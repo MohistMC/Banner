@@ -88,6 +88,10 @@ dependencies {
 	modImplementation "io.netty:netty-transport-classes-epoll:4.1.82.Final"
 	modImplementation "io.netty:netty-transport-native-unix-common:4.1.82.Final"
 
+	//class modify
+	modImplementation "com.github.LlamaLad7:MixinExtras:0.1.1"
+	annotationProcessor "com.github.LlamaLad7:MixinExtras:0.1.1"
+
 	//include - waiting for better way
 	include "org.yaml:snakeyaml:1.33"
 	include "org.apache.maven:maven-resolver-provider:3.8.5"
@@ -138,6 +142,8 @@ dependencies {
 	include "io.netty:netty-transport:4.1.82.Final"
 	include "io.netty:netty-transport-classes-epoll:4.1.82.Final"
 	include "io.netty:netty-transport-native-unix-common:4.1.82.Final"
+
+	include "com.github.LlamaLad7:MixinExtras:0.1.1"
 }
 
 base {

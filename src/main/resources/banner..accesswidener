@@ -1,6 +1,0 @@
-accessWidener	v1	named
-# Banner
-
-#clazz
-accessible class net/minecraft/server/MinecraftServer$ReloadableResources
-accessible class net/minecraft/server/dedicated/DedicatedServerProperties$WorldDimensionData
