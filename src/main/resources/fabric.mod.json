@@ -6,16 +6,17 @@
   "name": "Banner Mod",
   "description": "The Bukkit/Spigot/Paper API implementation for Fabric!",
   "authors": [
-    "Me!"
+    "Mohist Dev Team"
   ],
   "contact": {
     "homepage": "https://github.com/MohistMC/Banner",
     "sources": "https://github.com/MohistMC/Banner"
   },
 
-  "license": "CC0-1.0",
-  "icon": "assets/modid/icon.png",
+  "license": "LGPL-v3.0",
+  "icon": "assets/banner/icon.png",
 
+  "accessWidener": "banner.accesswidener",
   "environment": "*",
   "entrypoints": {
     "main": [
@@ -23,7 +24,7 @@
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "banner.mixins.json"
   ],
 
   "depends": {
