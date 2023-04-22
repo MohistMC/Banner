@@ -1,4 +1,4 @@
-package com.mohistmc.banner.injection;
+package com.mohistmc.banner.injection.world;
 
 import net.minecraft.world.item.ItemStack;
 
