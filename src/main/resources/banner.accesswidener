@@ -104,3 +104,4 @@ accessible field net/minecraft/util/datafix/fixes/ItemSpawnEggFix ID_TO_ENTITY [
 accessible field net/minecraft/world/BossEvent color Lnet/minecraft/world/BossEvent$BossBarColor;
 accessible field net/minecraft/world/BossEvent name Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/world/BossEvent overlay Lnet/minecraft/world/BossEvent$BossBarOverlay;
+accessible field net/minecraft/world/LockCode key Ljava/lang/String;
