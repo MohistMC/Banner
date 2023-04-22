@@ -13,4 +13,5 @@ public interface SimpleContainerInjection {
     default void setMaxStackSize(int i) {
 
     }
+
 }
