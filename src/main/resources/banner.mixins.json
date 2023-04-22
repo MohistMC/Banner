@@ -4,6 +4,7 @@
   "package": "com.mohistmc.banner.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "MixinBlock"
   ],
   "injectors": {
     "defaultRequire": 1
