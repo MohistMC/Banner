@@ -4,7 +4,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-public interface SimpleContainerInjection {
+public interface InjectionSimpleContainer {
 
     default List<ItemStack> getContents() {
         return null;

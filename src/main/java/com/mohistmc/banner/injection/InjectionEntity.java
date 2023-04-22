@@ -1,4 +1,4 @@
 package com.mohistmc.banner.injection;
 
-public interface EntityInjection {
+public interface InjectionEntity {
 }

@@ -1,6 +1,6 @@
 package com.mohistmc.banner.injection;
 
-public interface BlockInjection {
+public interface InjectionBlock {
 
     // Spigot start
     static float range(float min, float value, float max) {

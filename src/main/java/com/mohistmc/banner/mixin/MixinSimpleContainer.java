@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin;
 
-import com.mohistmc.banner.injection.SimpleContainerInjection;
+import com.mohistmc.banner.injection.InjectionSimpleContainer;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -13,11 +13,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.List;
 
 @Mixin(SimpleContainer.class)
-public abstract class MixinSimpleContainer implements Container, StackedContentsCompatible, SimpleContainerInjection {
+public abstract class MixinSimpleContainer implements Container, StackedContentsCompatible, InjectionSimpleContainer {
 
-    //formatted on
+    // @formatter:off  //formatted on
     @Shadow @Final public NonNullList<ItemStack> items;
-    //formatted off
+    // @formatter:on
 
     private int maxStack = LARGE_MAX_STACK_SIZE;
 

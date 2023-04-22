@@ -38,7 +38,8 @@
   },
   "custom": {
     "loom:injected_interfaces": {
-      "net/minecraft/class_1277": ["com/mohistmc/banner/injection/SimpleContainerInjection.java"]
+      "net/minecraft/class_1277": ["com/mohistmc/banner/injection/InjectionSimpleContainer"],
+      "net/minecraft/class_1282": ["com/mohistmc/banner/injection/InjectionDamageSource"]
     }
   }
 }
