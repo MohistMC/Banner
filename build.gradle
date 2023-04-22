@@ -1,0 +1,172 @@
+plugins {
+	id 'fabric-loom' version '1.1-SNAPSHOT'
+	id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+repositories {
+	maven {
+		name = 'spigot'
+		url = 'https://hub.spigotmc.org/nexus/content/groups/public/'
+	}
+	maven {
+		name = 'mohist'
+		url = 'https://maven.mohistmc.com/'
+	}
+	maven {
+		name = 'izzel'
+		url = 'https://maven.izzel.io/releases'
+	}
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings loom.officialMojangMappings()
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	// bukkit
+	modImplementation "org.yaml:snakeyaml:1.33"
+	modImplementation "org.apache.maven:maven-resolver-provider:3.8.5"
+	modImplementation "org.apache.maven.resolver:maven-resolver-connector-basic:1.7.3"
+	modImplementation "org.apache.maven.resolver:maven-resolver-transport-http:1.7.3"
+	compileOnly "org.jetbrains:annotations:21.0.1"
+
+	// craftbukkit
+	modImplementation "org.fusesource.jansi:jansi:1.18"
+	modImplementation "jline:jline:2.14.6"
+	modImplementation "com.googlecode.json-simple:json-simple:1.1.1"
+	modImplementation "org.xerial:sqlite-jdbc:3.41.0.0"
+	modImplementation "com.mysql:mysql-connector-j:8.0.32"
+
+	modImplementation "net.md-5:SpecialSource:1.11.0"
+
+	// spigot
+	modImplementation "net.md-5:bungeecord-chat:1.16-R0.4"
+	modImplementation "io.izzel:tools:1.3.0"
+	modImplementation "com.mohistmc.remapper:mohistremapper:0.3"
+	modImplementation "com.mohistmc:dynamicenum:0.1"
+	modImplementation "com.mohistmc:i18n:0.1"
+
+	modImplementation "com.google.guava:failureaccess:1.0.1"
+	modImplementation "com.google.guava:guava:31.0.1-jre"
+	modImplementation "com.google.code.gson:gson:2.10"
+	modImplementation "com.mojang:authlib:3.17.30"
+	modImplementation "com.mojang:logging:1.1.1"
+	compileOnly "commons-lang:commons-lang:2.6"
+	modImplementation "org.slf4j:slf4j-api:2.0.6"
+
+	modImplementation "org.apache.logging.log4j:log4j-core:2.20.0"
+	modImplementation "org.apache.logging.log4j:log4j-iostreams:2.20.0"
+	modImplementation "org.apache.logging.log4j:log4j-api:2.20.0"
+	modImplementation "org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0"
+	modImplementation "org.apache.commons:commons-lang3:3.12.0"
+	modImplementation "net.sf.jopt-simple:jopt-simple:5.0.4"
+	modImplementation "net.java.dev.jna:jna-platform:5.13.0"
+	modImplementation "net.java.dev.jna:jna:5.13.0"
+	modImplementation "it.unimi.dsi:fastutil:8.5.12"
+	modImplementation "commons-io:commons-io:2.11.0"
+	modImplementation "com.mojang:javabridge:2.0.25"
+	modImplementation "com.mojang:datafixerupper:6.0.6"
+	modImplementation "com.mojang:brigadier:1.0.18"
+	modImplementation "com.github.oshi:oshi-core:6.4.0"
+
+	modImplementation "io.netty:netty-buffer:4.1.82.Final"
+	modImplementation "io.netty:netty-codec:4.1.82.Final"
+	modImplementation "io.netty:netty-common:4.1.82.Final"
+	modImplementation "io.netty:netty-handler:4.1.82.Final"
+	modImplementation "io.netty:netty-resolver:4.1.82.Final"
+	modImplementation "io.netty:netty-transport:4.1.82.Final"
+	modImplementation "io.netty:netty-transport-classes-epoll:4.1.82.Final"
+	modImplementation "io.netty:netty-transport-native-unix-common:4.1.82.Final"
+
+	//include - waiting for better way
+	include "org.yaml:snakeyaml:1.33"
+	include "org.apache.maven:maven-resolver-provider:3.8.5"
+	include "org.apache.maven.resolver:maven-resolver-connector-basic:1.7.3"
+	include "org.apache.maven.resolver:maven-resolver-transport-http:1.7.3"
+
+	include "org.fusesource.jansi:jansi:1.18"
+	include "jline:jline:2.14.6"
+	include "com.googlecode.json-simple:json-simple:1.1.1"
+	include "org.xerial:sqlite-jdbc:3.41.0.0"
+	include "com.mysql:mysql-connector-j:8.0.32"
+
+	include "net.md-5:SpecialSource:1.11.0"
+
+	include "net.md-5:bungeecord-chat:1.16-R0.4"
+	include "io.izzel:tools:1.3.0"
+	include "com.mohistmc.remapper:mohistremapper:0.3"
+	include "com.mohistmc:dynamicenum:0.1"
+	include "com.mohistmc:i18n:0.1"
+
+	include "com.google.guava:failureaccess:1.0.1"
+	include "com.google.guava:guava:31.0.1-jre"
+	include "com.google.code.gson:gson:2.10"
+	include "com.mojang:authlib:3.17.30"
+	include "com.mojang:logging:1.1.1"
+	include "org.slf4j:slf4j-api:2.0.6"
+
+	include "org.apache.logging.log4j:log4j-core:2.20.0"
+	include "org.apache.logging.log4j:log4j-iostreams:2.20.0"
+	include "org.apache.logging.log4j:log4j-api:2.20.0"
+	include "org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0"
+	include "org.apache.commons:commons-lang3:3.12.0"
+	include "net.sf.jopt-simple:jopt-simple:5.0.4"
+	include "net.java.dev.jna:jna-platform:5.13.0"
+	include "net.java.dev.jna:jna:5.13.0"
+	include "it.unimi.dsi:fastutil:8.5.12"
+	include "commons-io:commons-io:2.11.0"
+	include "com.mojang:javabridge:2.0.25"
+	include "com.mojang:datafixerupper:6.0.6"
+	include "com.mojang:brigadier:1.0.18"
+	include "com.github.oshi:oshi-core:6.4.0"
+
+	include "io.netty:netty-buffer:4.1.82.Final"
+	include "io.netty:netty-codec:4.1.82.Final"
+	include "io.netty:netty-common:4.1.82.Final"
+	include "io.netty:netty-handler:4.1.82.Final"
+	include "io.netty:netty-resolver:4.1.82.Final"
+	include "io.netty:netty-transport:4.1.82.Final"
+	include "io.netty:netty-transport-classes-epoll:4.1.82.Final"
+	include "io.netty:netty-transport-native-unix-common:4.1.82.Final"
+}
+
+base {
+	archivesName = project.archives_base_name
+}
+
+processResources {
+	inputs.property "version", project.version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": project.version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 17
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+}
+
+jar {
+	from("LICENSE") 
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+		}
+	}
+
+	repositories {
+
+	}
+}

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "banner",
+  "version": "${version}",
+
+  "name": "Banner Mod",
+  "description": "The Bukkit/Spigot/Paper API implementation for Fabric!",
+  "authors": [
+    "Me!"
+  ],
+  "contact": {
+    "homepage": "https://github.com/MohistMC/Banner",
+    "sources": "https://github.com/MohistMC/Banner"
+  },
+
+  "license": "CC0-1.0",
+  "icon": "assets/modid/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.mohistmc.banner.BannerMod"
+    ]
+  },
+  "mixins": [
+    "modid.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.14.17",
+    "fabric-api": "*",
+    "minecraft": "~1.19.4",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
