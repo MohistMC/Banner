@@ -4,6 +4,10 @@
   "package": "com.mohistmc.banner.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "MixinBlock",
+    "MixinSimpleContainer",
+    "world.damagesource.MixinDamageSource",
+    "world.damagesource.MixinDamageSourcesDamageSources"
   ],
   "injectors": {
     "defaultRequire": 1
