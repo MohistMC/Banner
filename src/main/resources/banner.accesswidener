@@ -1,0 +1,107 @@
+accessWidener	v1	named
+# Banner
+
+#public clazz
+accessible class net/minecraft/server/MinecraftServer$ReloadableResources
+accessible class net/minecraft/server/dedicated/DedicatedServerProperties$WorldDimensionData
+accessible class net/minecraft/world/level/block/ComposterBlock$EmptyContainer
+accessible class net/minecraft/world/level/block/ComposterBlock$InputContainer
+accessible class net/minecraft/world/level/block/ComposterBlock$OutputContainer
+accessible class net/minecraft/server/level/ChunkMap$TrackedEntity
+accessible class net/minecraft/world/entity/Interaction$PlayerAction
+accessible class net/minecraft/world/entity/monster/Guardian$GuardianAttackGoal
+accessible class net/minecraft/world/entity/monster/SpellcasterIllager$IllagerSpell
+accessible class net/minecraft/world/entity/projectile/FishingHook$FishHookState
+accessible class net/minecraft/world/item/crafting/Ingredient$ItemValue
+accessible class net/minecraft/world/item/crafting/Ingredient$Value
+accessible class net/minecraft/world/level/biome/Biome$ClimateSettings
+
+#public methods
+accessible method net/minecraft/world/level/block/DispenserBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)V
+accessible method net/minecraft/world/level/block/DropperBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)V
+accessible method net/minecraft/world/entity/decoration/HangingEntity setDirection (Lnet/minecraft/core/Direction;)V
+accessible method net/minecraft/world/entity/decoration/ItemFrame setDirection (Lnet/minecraft/core/Direction;)V
+accessible method net/minecraft/server/level/ServerLevel getEntities ()Lnet/minecraft/world/level/entity/LevelEntityGetter;
+accessible method net/minecraft/world/level/Level getEntities ()Lnet/minecraft/world/level/entity/LevelEntityGetter;
+accessible method net/minecraft/world/entity/Mob getDefaultLootTable ()Lnet/minecraft/resources/ResourceLocation;
+accessible method net/minecraft/nbt/TagParser readArrayTag ()Lnet/minecraft/nbt/Tag;
+accessible method net/minecraft/nbt/TagParser type (Ljava/lang/String;)Lnet/minecraft/nbt/Tag;
+accessible method net/minecraft/server/Main forceUpgrade (Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;Lcom/mojang/datafixers/DataFixer;ZLjava/util/function/BooleanSupplier;Lnet/minecraft/core/Registry;)V
+accessible method net/minecraft/server/MinecraftServer prepareLevels (Lnet/minecraft/server/level/progress/ChunkProgressListener;)V
+accessible method net/minecraft/server/MinecraftServer wrapRunnable (Ljava/lang/Runnable;)Lnet/minecraft/server/TickTask;
+accessible method net/minecraft/server/WorldLoader loadAndReplaceLayer (Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/core/LayeredRegistryAccess;Lnet/minecraft/server/RegistryLayer;Ljava/util/List;)Lnet/minecraft/core/LayeredRegistryAccess;
+accessible method net/minecraft/server/level/ServerBossEvent broadcast (Ljava/util/function/Function;)V
+accessible method net/minecraft/server/level/ServerPlayer initMenu (Lnet/minecraft/world/inventory/AbstractContainerMenu;)V
+accessible method net/minecraft/server/level/ServerPlayer nextContainerCounter ()V
+accessible method net/minecraft/server/level/ServerPlayer triggerDimensionChangeTriggers (Lnet/minecraft/server/level/ServerLevel;)V
+accessible method net/minecraft/server/level/ChunkMap save (Lnet/minecraft/world/level/chunk/ChunkAccess;)Z
+accessible method net/minecraft/server/players/PlayerList updateEntireScoreboard (Lnet/minecraft/server/ServerScoreboard;Lnet/minecraft/server/level/ServerPlayer;)V
+accessible method net/minecraft/util/datafix/fixes/BlockStateData register (ILjava/lang/String;[Ljava/lang/String;)V
+
+#public fields
+accessible field net/minecraft/ChatFormatting code C
+accessible field net/minecraft/advancements/AdvancementList advancements Ljava/util/Map;
+accessible field net/minecraft/commands/CommandSourceStack source Lnet/minecraft/commands/CommandSource;
+accessible field net/minecraft/network/Connection address Ljava/net/SocketAddress;
+accessible field net/minecraft/network/Connection channel Lio/netty/channel/Channel;
+accessible field net/minecraft/network/chat/TextColor name Ljava/lang/String;
+accessible field net/minecraft/network/protocol/game/ServerboundCustomPayloadPacket data Lnet/minecraft/network/FriendlyByteBuf;
+accessible field net/minecraft/network/protocol/game/ServerboundCustomPayloadPacket identifier Lnet/minecraft/resources/ResourceLocation;
+accessible field net/minecraft/network/protocol/game/ServerboundMovePlayerPacket hasPos Z
+accessible field net/minecraft/network/protocol/game/ServerboundMovePlayerPacket hasRot Z
+accessible field net/minecraft/network/protocol/game/ServerboundMovePlayerPacket x D
+accessible field net/minecraft/network/protocol/game/ServerboundMovePlayerPacket xRot F
+accessible field net/minecraft/network/protocol/game/ServerboundMovePlayerPacket y D
+accessible field net/minecraft/network/protocol/game/ServerboundMovePlayerPacket yRot F
+accessible field net/minecraft/network/protocol/game/ServerboundMovePlayerPacket z D
+accessible field net/minecraft/network/protocol/game/ServerboundResourcePackPacket action Lnet/minecraft/network/protocol/game/ServerboundResourcePackPacket$Action;
+accessible field net/minecraft/network/protocol/game/ServerboundClientInformationPacket language Ljava/lang/String;
+accessible field net/minecraft/network/protocol/game/ServerboundClientInformationPacket viewDistance I
+accessible field net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket blockState Lnet/minecraft/world/level/block/state/BlockState;
+accessible field net/minecraft/network/protocol/game/ClientboundTabListPacket header Lnet/minecraft/network/chat/Component;
+accessible field net/minecraft/network/protocol/game/ClientboundTabListPacket footer Lnet/minecraft/network/chat/Component;
+accessible field net/minecraft/network/protocol/game/ClientboundSetDefaultSpawnPositionPacket pos Lnet/minecraft/core/BlockPos;
+accessible field net/minecraft/network/protocol/handshake/ClientIntentionPacket port I
+accessible field net/minecraft/server/ServerAdvancementManager GSON Lcom/google/gson/Gson;
+accessible field net/minecraft/server/ServerAdvancementManager advancements Lnet/minecraft/advancements/AdvancementList;
+accessible field net/minecraft/server/MinecraftServer LOGGER Lorg/slf4j/Logger;
+accessible field net/minecraft/server/MinecraftServer executor Ljava/util/concurrent/Executor;
+accessible field net/minecraft/server/MinecraftServer fixerUpper Lcom/mojang/datafixers/DataFixer;
+accessible field net/minecraft/server/MinecraftServer playerDataStorage Lnet/minecraft/world/level/storage/PlayerDataStorage;
+accessible field net/minecraft/server/MinecraftServer progressListenerFactory Lnet/minecraft/server/level/progress/ChunkProgressListenerFactory;
+accessible field net/minecraft/server/MinecraftServer resources Lnet/minecraft/server/MinecraftServer$ReloadableResources;
+accessible field net/minecraft/server/MinecraftServer serverThread Ljava/lang/Thread;
+accessible field net/minecraft/server/dedicated/DedicatedServer rconConsoleSource Lnet/minecraft/server/rcon/RconConsoleSource;
+accessible field net/minecraft/server/dedicated/Settings properties Ljava/util/Properties;
+accessible field net/minecraft/server/level/ServerBossEvent visible Z
+accessible field net/minecraft/server/level/DistanceManager tickets Lit/unimi/dsi/fastutil/longs/Long2ObjectOpenHashMap;
+accessible field net/minecraft/server/level/ServerChunkCache spawnEnemies Z
+accessible field net/minecraft/server/level/ServerChunkCache spawnFriendlies Z
+accessible field net/minecraft/server/level/ServerPlayer isChangingDimension Z
+accessible field net/minecraft/server/level/ServerPlayer lastSentExp I
+accessible field net/minecraft/server/level/ServerPlayer spawnInvulnerableTime I
+accessible field net/minecraft/server/level/ChunkHolder oldTicketLevel I
+accessible field net/minecraft/server/level/ChunkHolder playerProvider Lnet/minecraft/server/level/ChunkHolder$PlayerProvider;
+accessible field net/minecraft/server/level/ChunkMap$TrackedEntity seenBy Ljava/util/Set;
+accessible field net/minecraft/server/level/ChunkMap distanceManager Lnet/minecraft/server/level/ChunkMap$DistanceManager;
+accessible field net/minecraft/server/level/ChunkMap entityMap Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;
+accessible field net/minecraft/server/level/ChunkMap generator Lnet/minecraft/world/level/chunk/ChunkGenerator;
+accessible field net/minecraft/server/level/ChunkMap level Lnet/minecraft/server/level/ServerLevel;
+accessible field net/minecraft/server/level/ChunkMap progressListener Lnet/minecraft/server/level/progress/ChunkProgressListener;
+accessible field net/minecraft/server/level/ChunkMap toDrop Lit/unimi/dsi/fastutil/longs/LongSet;
+accessible field net/minecraft/server/level/ChunkMap updatingChunkMap Lit/unimi/dsi/fastutil/longs/Long2ObjectLinkedOpenHashMap;
+accessible field net/minecraft/server/level/ChunkMap visibleChunkMap Lit/unimi/dsi/fastutil/longs/Long2ObjectLinkedOpenHashMap;
+accessible field net/minecraft/server/level/Ticket key Ljava/lang/Object;
+accessible field net/minecraft/server/level/ServerLevel entityManager Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;
+accessible field net/minecraft/server/level/ServerLevel serverLevelData Lnet/minecraft/world/level/storage/ServerLevelData;
+accessible field net/minecraft/server/network/ServerLoginPacketListenerImpl connection Lnet/minecraft/network/Connection;
+accessible method net/minecraft/server/players/StoredUserEntry getUser ()Ljava/lang/Object;
+accessible field net/minecraft/server/players/PlayerList playerIo Lnet/minecraft/world/level/storage/PlayerDataStorage;
+accessible field net/minecraft/server/players/PlayerList players Ljava/util/List;
+accessible field net/minecraft/stats/RecipeBook known Ljava/util/Set;
+accessible field net/minecraft/util/datafix/fixes/ItemIdFix ITEM_NAMES Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;
+accessible field net/minecraft/util/datafix/fixes/ItemSpawnEggFix ID_TO_ENTITY [Ljava/lang/String;
+accessible field net/minecraft/world/BossEvent color Lnet/minecraft/world/BossEvent$BossBarColor;
+accessible field net/minecraft/world/BossEvent name Lnet/minecraft/network/chat/Component;
+accessible field net/minecraft/world/BossEvent overlay Lnet/minecraft/world/BossEvent$BossBarOverlay;
+accessible field net/minecraft/world/LockCode key Ljava/lang/String;
