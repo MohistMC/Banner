@@ -7,7 +7,7 @@
     "MixinBlock",
     "MixinSimpleContainer",
     "world.damagesource.MixinDamageSource",
-    "world.damagesource.MixinDamageSourcesDamageSources"
+    "world.damagesource.MixinDamageSources"
   ],
   "injectors": {
     "defaultRequire": 1

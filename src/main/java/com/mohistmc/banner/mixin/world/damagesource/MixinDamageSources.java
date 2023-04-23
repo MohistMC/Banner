@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(DamageSources.class)
-public abstract class MixinDamageSourcesDamageSources implements BridgeDamageSources {
+public abstract class MixinDamageSources implements BridgeDamageSources {
 
     // @formatter:off
     @Shadow protected abstract DamageSource source(ResourceKey<DamageType> resourceKey);
@@ -27,7 +27,7 @@ public abstract class MixinDamageSourcesDamageSources implements BridgeDamageSou
     @Inject(method = "<init>", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/damagesource/DamageSources;" +
                     "source(Lnet/minecraft/resources/ResourceKey;)" +
-                    "Lnet/minecraft/world/damagesource/DamageSource;", shift = At.Shift.AFTER, ordinal = 0))
+                    "Lnet/minecraft/world/damagesource/DamageSource;", shift = At.Shift.BEFORE, ordinal = 0))
     private void banner$init(RegistryAccess registryAccess, CallbackInfo ci) {
         this.melting = this.source(DamageTypes.ON_FIRE).melting();
         this.poison = this.source(DamageTypes.MAGIC).poison();
