@@ -6,8 +6,14 @@
   "mixins": [
     "MixinBlock",
     "MixinSimpleContainer",
+    "server.MixinMinecraftServer",
+    "server.dedicated.MixinDedicatedServer",
     "world.damagesource.MixinDamageSource",
-    "world.damagesource.MixinDamageSourcesDamageSources"
+    "world.damagesource.MixinDamageSources",
+    "world.entity.MixinEntity",
+    "world.entity.raid.MixinRaid",
+    "world.level.MixinLevel",
+    "world.level.MixinLevelAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

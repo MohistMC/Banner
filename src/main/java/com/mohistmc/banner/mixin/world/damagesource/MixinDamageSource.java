@@ -1,12 +1,11 @@
 package com.mohistmc.banner.mixin.world.damagesource;
 
-import com.mohistmc.banner.bridge.world.damagesource.BridgeDamageSource;
 import com.mohistmc.banner.injection.world.damagesource.InjectionDamageSource;
 import net.minecraft.world.damagesource.DamageSource;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(DamageSource.class)
-public class MixinDamageSource implements InjectionDamageSource, BridgeDamageSource {
+public class MixinDamageSource implements InjectionDamageSource {
 
     // CraftBukkit start
     private boolean sweep;

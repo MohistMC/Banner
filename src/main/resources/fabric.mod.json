@@ -39,7 +39,13 @@
   "custom": {
     "loom:injected_interfaces": {
       "net/minecraft/class_1277": ["com/mohistmc/banner/injection/world/InjectionSimpleContainer"],
-      "net/minecraft/class_1282": ["com/mohistmc/banner/injection/world/damagesource/InjectionDamageSource"]
+      "net/minecraft/class_1282": ["com/mohistmc/banner/injection/world/damagesource/InjectionDamageSource"],
+      "net/minecraft/class_8109": ["com/mohistmc/banner/injection/world/damagesource/InjectionDamageSources"],
+      "net/minecraft/server/MinecraftServer": ["com/mohistmc/banner/injection/server/InjectionMinecraftServer"],
+      "net/minecraft/class_1297": ["com/mohistmc/banner/injection/world/entity/InjectionEntity"],
+      "net/minecraft/class_1937": ["com/mohistmc/banner/injection/world/level/InjectionLevel"],
+      "net/minecraft/class_1936": ["com/mohistmc/banner/injection/world/level/InjectionLevelAccessor"],
+      "net/minecraft/class_3765": ["com/mohistmc/banner/injection/world/entity/raid/InjectionRaid"]
     }
   }
 }
