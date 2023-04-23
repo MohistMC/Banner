@@ -633,7 +633,7 @@ public class CraftEventFactory {
             event = CraftEventFactory.callLightningStrikeEvent((LightningStrike) entity.getBukkitEntity(), cause);
             // Spigot start
         } else if (entity instanceof net.minecraft.world.entity.ExperienceOrb xp) {
-            double radius = world.spigotConfig.expMerge;
+            double radius = world.bridge$spigotConfig().expMerge;
             if (radius > 0) {
                 List<Entity> entities = world.getEntities(entity, entity.getBoundingBox().inflate(radius, radius, radius));
                 for (Entity e : entities) {

@@ -34,7 +34,7 @@ public class SpigotCommand extends Command {
             MinecraftServer console = ServerUtils.getServer();
             SpigotConfig.init((File) console.bridge$options().valueOf("spigot-settings"));
             for (ServerLevel world : console.getAllLevels()) {
-                world.spigotConfig.init();
+                world.bridge$spigotConfig().init();
             }
             console.bridge$server().reloadCount++;
 

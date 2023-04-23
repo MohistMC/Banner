@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+
+import com.mohistmc.banner.util.ServerUtils;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -61,7 +63,7 @@ public final class CraftMapView implements MapView {
     @Override
     public World getWorld() {
         ResourceKey<net.minecraft.world.level.Level> dimension = worldMap.dimension;
-        ServerLevel world = MinecraftServer.getServer().getLevel(dimension);
+        ServerLevel world = ServerUtils.getServer().getLevel(dimension);
 
         if (world != null) {
             return world.getWorld();

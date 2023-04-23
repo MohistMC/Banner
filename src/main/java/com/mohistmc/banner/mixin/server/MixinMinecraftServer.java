@@ -87,5 +87,10 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         return forceTicks;
     }
 
+    @Override
+    public boolean isDebugging() {
+        return false;
+    }
+
     // Banner end
 }

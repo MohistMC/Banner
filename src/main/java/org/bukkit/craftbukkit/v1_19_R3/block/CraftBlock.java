@@ -67,9 +67,6 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
-
-import static com.mohistmc.forge.ForgeInjectBukkit.normalizeName;
-
 public class CraftBlock implements Block {
     private final net.minecraft.world.level.LevelAccessor world;
     private final BlockPos position;

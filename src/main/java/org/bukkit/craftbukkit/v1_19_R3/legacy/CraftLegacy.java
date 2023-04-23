@@ -1,6 +1,7 @@
 package org.bukkit.craftbukkit.v1_19_R3.legacy;
 
 import com.google.common.base.Preconditions;
+import com.mohistmc.banner.util.ServerUtils;
 import com.mojang.serialization.Dynamic;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -255,7 +256,7 @@ public final class CraftLegacy {
 
     static {
         System.err.println("Initializing Legacy Material Support. Unless you have legacy plugins and/or data this is a bug!");
-        if (MinecraftServer.getServer() != null && MinecraftServer.getServer().isDebugging()) {
+        if (ServerUtils.getServer() != null && ServerUtils.getServer().isDebugging()) {
             new Exception().printStackTrace();
         }
 

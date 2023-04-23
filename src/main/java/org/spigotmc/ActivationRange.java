@@ -1,7 +1,6 @@
 package org.spigotmc;
 
 import com.mohistmc.banner.util.ServerUtils;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LightningBolt;
@@ -107,20 +106,20 @@ public class ActivationRange
      */
     public static void activateEntities(Level world)
     {
-        final int miscActivationRange = world.spigotConfig.miscActivationRange;
-        final int raiderActivationRange = world.spigotConfig.raiderActivationRange;
-        final int animalActivationRange = world.spigotConfig.animalActivationRange;
-        final int monsterActivationRange = world.spigotConfig.monsterActivationRange;
+        final int miscActivationRange = world.bridge$spigotConfig().miscActivationRange;
+        final int raiderActivationRange = world.bridge$spigotConfig().raiderActivationRange;
+        final int animalActivationRange = world.bridge$spigotConfig().animalActivationRange;
+        final int monsterActivationRange = world.bridge$spigotConfig().monsterActivationRange;
 
         int maxRange = Math.max( monsterActivationRange, animalActivationRange );
         maxRange = Math.max( maxRange, raiderActivationRange );
         maxRange = Math.max( maxRange, miscActivationRange );
-        maxRange = Math.min( ( world.spigotConfig.simulationDistance << 4 ) - 8, maxRange );
+        maxRange = Math.min( ( world.bridge$spigotConfig().simulationDistance << 4 ) - 8, maxRange );
 
         for ( Player player : world.players() )
         {
             player.activatedTick = ServerUtils.getCurrentTick();
-            if ( world.spigotConfig.ignoreSpectatorActivation && player.isSpectator() )
+            if ( world.bridge$spigotConfig().ignoreSpectatorActivation && player.isSpectator() )
             {
                 continue;
             }

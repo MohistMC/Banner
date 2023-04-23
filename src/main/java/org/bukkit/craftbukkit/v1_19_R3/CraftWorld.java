@@ -1877,12 +1877,12 @@ public class CraftWorld extends CraftRegionAccessor implements World {
     // Spigot start
     @Override
     public int getViewDistance() {
-        return world.spigotConfig.viewDistance;
+        return world.bridge$spigotConfig().viewDistance;
     }
 
     @Override
     public int getSimulationDistance() {
-        return world.spigotConfig.simulationDistance;
+        return world.bridge$spigotConfig().simulationDistance;
     }
     // Spigot end
 

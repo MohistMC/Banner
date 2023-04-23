@@ -6,6 +6,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
+import org.spigotmc.SpigotWorldConfig;
 
 public interface InjectionLevel {
 
@@ -21,6 +22,10 @@ public interface InjectionLevel {
     }
 
     default BlockEntity getBlockEntity(BlockPos blockposition, boolean validate) {
+        return null;
+    }
+
+    default SpigotWorldConfig bridge$spigotConfig() {
         return null;
     }
 }

@@ -1,5 +1,6 @@
 package org.bukkit.craftbukkit.v1_19_R3.block;
 
+import com.mohistmc.banner.util.DoubleChestInventory;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.level.block.ChestBlock;
@@ -47,8 +48,8 @@ public class CraftChest extends CraftLootable<ChestBlockEntity> implements Chest
         ChestBlock blockChest= (ChestBlock) (this.getType() == Material.CHEST ? Blocks.CHEST : Blocks.TRAPPED_CHEST);
         MenuProvider nms = blockChest.getMenuProvider(data, world.getHandle(), this.getPosition(), true);
 
-        if (nms instanceof ChestBlock.DoubleInventory) {
-            inventory = new CraftInventoryDoubleChest((ChestBlock.DoubleInventory) nms);
+        if (nms instanceof DoubleChestInventory) {
+            inventory = new CraftInventoryDoubleChest((DoubleChestInventory) nms);
         }
         return inventory;
     }

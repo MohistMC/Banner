@@ -1484,6 +1484,15 @@ public interface Server extends PluginMessageRecipient {
     @Nullable
     Entity getEntity(@NotNull UUID uuid);
 
+    // Paper start
+    /**
+     * Gets the current server TPS
+     *
+     * @return current server TPS (1m, 5m, 15m in Paper-Server)
+     */
+    @NotNull
+    public double[] getTPS();
+
     /**
      * Get the advancement specified by this key.
      *
@@ -1650,4 +1659,14 @@ public interface Server extends PluginMessageRecipient {
     @Deprecated
     @NotNull
     UnsafeValues getUnsafe();
+
+    // Spigot start
+    public class Spigot {
+
+    }
+
+    @NotNull
+    Spigot spigot();
+    // Spigot end
+
 }

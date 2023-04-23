@@ -36,4 +36,8 @@ public interface InjectionMinecraftServer {
     default boolean bridge$forceTicks() {
         return false;
     }
+
+    default boolean isDebugging() {
+        return false;
+    }
 }
