@@ -132,6 +132,13 @@ accessible method net/minecraft/world/level/block/entity/LecternBlockEntity setP
 accessible method net/minecraft/world/level/dimension/end/EndDragonFight findExitPortal ()Lnet/minecraft/world/level/block/state/pattern/BlockPattern$BlockPatternMatch;
 accessible method net/minecraft/world/level/dimension/end/EndDragonFight setRespawnStage (Lnet/minecraft/world/level/dimension/end/DragonRespawnAnimation;)V
 accessible method net/minecraft/world/level/dimension/end/EndDragonFight spawnExitPortal (Z)V
+accessible method net/minecraft/world/level/entity/PersistentEntitySectionManager ensureChunkQueuedForLoad (J)V
+accessible method net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplateManager createAndValidatePathToStructure (Ljava/nio/file/Path;Lnet/minecraft/resources/ResourceLocation;Ljava/lang/String;)Ljava/nio/file/Path;
+accessible method net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplateManager loadFromGenerated (Lnet/minecraft/resources/ResourceLocation;)Ljava/util/Optional;
+accessible method net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplateManager loadFromResource (Lnet/minecraft/resources/ResourceLocation;)Ljava/util/Optional;
+accessible method net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplateManager readStructure (Ljava/io/InputStream;)Lnet/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplate;
+accessible method net/minecraft/world/level/saveddata/maps/MapItemSavedData setColorsDirty (II)V
+accessible method net/minecraft/world/level/saveddata/maps/MapItemSavedData setDecorationsDirty ()V
 
 #public fields
 accessible field net/minecraft/ChatFormatting code C
@@ -441,3 +448,23 @@ accessible field net/minecraft/world/level/dimension/end/EndDragonFight dragonUU
 accessible field net/minecraft/world/level/dimension/end/EndDragonFight level Lnet/minecraft/server/level/ServerLevel;
 accessible field net/minecraft/world/level/dimension/end/EndDragonFight portalLocation Lnet/minecraft/core/BlockPos;
 accessible field net/minecraft/world/level/dimension/end/EndDragonFight respawnStage Lnet/minecraft/world/level/dimension/end/DragonRespawnAnimation;
+accessible field net/minecraft/world/level/entity/PersistentEntitySectionManager permanentStorage Lnet/minecraft/world/level/entity/EntityPersistentStorage;
+accessible field net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator settings Lnet/minecraft/core/Holder;
+accessible field net/minecraft/world/level/levelgen/structure/placement/StructurePlacement exclusionZone Ljava/util/Optional;
+accessible field net/minecraft/world/level/levelgen/structure/placement/StructurePlacement frequency F
+accessible field net/minecraft/world/level/levelgen/structure/placement/StructurePlacement frequencyReductionMethod Lnet/minecraft/world/level/levelgen/structure/placement/StructurePlacement$FrequencyReductionMethod;
+accessible field net/minecraft/world/level/levelgen/structure/placement/StructurePlacement locateOffset Lnet/minecraft/core/Vec3i;
+accessible field net/minecraft/world/level/levelgen/structure/placement/StructurePlacement salt I
+accessible field net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplate entityInfoList Ljava/util/List;
+accessible field net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplate palettes Ljava/util/List;
+accessible field net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplateManager structureRepository Ljava/util/Map;
+accessible field net/minecraft/world/level/material/MaterialColor MATERIAL_COLORS [Lnet/minecraft/world/level/material/MaterialColor;
+accessible field net/minecraft/world/level/saveddata/maps/MapItemSavedData carriedBy Ljava/util/List;
+accessible field net/minecraft/world/level/saveddata/maps/MapItemSavedData carriedByPlayers Ljava/util/Map;
+accessible field net/minecraft/world/level/saveddata/maps/MapItemSavedData decorations Ljava/util/Map;
+accessible field net/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess levelDirectory Lnet/minecraft/world/level/storage/LevelStorageSource$LevelDirectory;
+accessible field net/minecraft/world/level/storage/LevelStorageSource baseDir Ljava/nio/file/Path;
+accessible field net/minecraft/world/level/storage/PrimaryLevelData settings Lnet/minecraft/world/level/LevelSettings;
+accessible field net/minecraft/world/level/storage/DimensionDataStorage cache Ljava/util/Map;
+accessible field net/minecraft/world/scores/Objective displayName Lnet/minecraft/network/chat/Component;
+accessible field net/minecraft/world/scores/criteria/ObjectiveCriteria CRITERIA_CACHE Ljava/util/Map;
