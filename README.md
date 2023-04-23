@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>Banner 1.19.4</h1>
+  <h1>Mohist Banner 1.19.4</h1>
 
 ### The Bukkit/Spigot/Paper API implementation for Fabric
 
