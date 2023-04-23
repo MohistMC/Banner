@@ -60,7 +60,7 @@ public final class CraftChunkData implements ChunkGenerator.ChunkData {
 
     @Override
     public Biome getBiome(int x, int y, int z) {
-        return CraftBlock.biomeBaseToBiome(getHandle().biomeRegistry, getHandle().getNoiseBiome(x >> 2, y >> 2, z >> 2));
+        return CraftBlock.biomeBaseToBiome(getHandle().bridge$biomeRegistry(), getHandle().getNoiseBiome(x >> 2, y >> 2, z >> 2));
     }
 
     @Override

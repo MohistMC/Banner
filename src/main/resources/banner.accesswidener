@@ -475,6 +475,7 @@ accessible field net/minecraft/world/level/block/entity/BellBlockEntity resonati
 accessible field net/minecraft/world/level/block/entity/JukeboxBlockEntity recordStartedTick J
 accessible field net/minecraft/world/level/block/entity/JukeboxBlockEntity tickCount J
 accessible field net/minecraft/world/level/block/entity/JukeboxBlockEntity isPlaying Z
+accessible field net/minecraft/world/level/levelgen/structure/templatesystem/StructurePlaceSettings palette I
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;

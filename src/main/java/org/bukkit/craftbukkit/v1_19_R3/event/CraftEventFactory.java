@@ -5,11 +5,7 @@ import com.google.common.base.Functions;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Either;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -399,7 +395,7 @@ public class CraftEventFactory {
     }
 
     public static void handleBlockDropItemEvent(Block block, BlockState state, ServerPlayer player, List<ItemEntity> items) {
-        BlockDropItemEvent event = new BlockDropItemEvent(block, state, player.getBukkitEntity(), Lists.transform(items, (item) -> (org.bukkit.entity.Item) item.getBukkitEntity()));
+        BlockDropItemEvent event = new BlockDropItemEvent(block, state, (CraftPlayer) player.getBukkitEntity(), Lists.transform(items, (item) -> (org.bukkit.entity.Item) item.getBukkitEntity()));
         Bukkit.getPluginManager().callEvent(event);
 
         if (!event.isCancelled()) {
@@ -1543,7 +1539,7 @@ public class CraftEventFactory {
         BlockPhysicsEvent event = new BlockPhysicsEvent(block, block.getBlockData());
         // Suppress during worldgen
         if (world instanceof Level) {
-            ((Level) world).getServer().server.getPluginManager().callEvent(event);
+            Objects.requireNonNull(((Level) world).getServer()).bridge$server().getPluginManager().callEvent(event);
         }
         return event;
     }

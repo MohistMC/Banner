@@ -16,6 +16,7 @@
     "server.MixinMinecraftServer",
     "server.bossevents.MixinCustomBossEvent",
     "server.dedicated.MixinDedicatedServer",
+    "server.level.MixinServerPlayer",
     "world.damagesource.MixinDamageSource",
     "world.damagesource.MixinDamageSources",
     "world.entity.MixinEntity",
@@ -24,8 +25,12 @@
     "world.entity.raid.MixinRaid",
     "world.level.MixinLevel",
     "world.level.MixinLevelAccessor",
+    "world.level.block.MixinAbstractCandleBlock",
     "world.level.block.entity.MixinContainerOpenersCounter",
-    "world.level.entity.MixinPersistentEntitySectionManager"
+    "world.level.chunk.MixinChunkAccess",
+    "world.level.entity.MixinPersistentEntitySectionManager",
+    "world.level.levelgen.structure.templatesystem.MixinStructureTemplate",
+    "world.level.saveddata.maps.MixinMapItemSavedData"
   ],
   "injectors": {
     "defaultRequire": 1

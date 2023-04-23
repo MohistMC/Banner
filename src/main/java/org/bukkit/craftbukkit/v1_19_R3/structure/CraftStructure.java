@@ -129,7 +129,7 @@ public class CraftStructure implements Structure {
 
     @Override
     public PersistentDataContainer getPersistentDataContainer() {
-        return getHandle().persistentDataContainer;
+        return getHandle().bridge$persistentDataContainer();
     }
 
     public StructureTemplate getHandle() {
