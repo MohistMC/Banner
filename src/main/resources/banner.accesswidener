@@ -17,6 +17,7 @@ accessible class net/minecraft/world/item/crafting/Ingredient$Value
 accessible class net/minecraft/world/level/biome/Biome$ClimateSettings
 accessible class net/minecraft/world/item/ItemCooldowns$CooldownInstance
 accessible class net/minecraft/world/entity/raid/Raid$RaidStatus
+accessible class net/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus
 
 # public methods
 accessible method net/minecraft/world/level/block/DispenserBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)V

@@ -43,4 +43,28 @@ public interface InjectionEntity {
     default boolean canCollideWithBukkit(Entity entity) {
         return false;
     }
+
+    default org.spigotmc.ActivationRange.ActivationType bridge$activationType() {
+        return null;
+    }
+
+    default void inactiveTick() {
+
+    }
+
+    default long bridge$activatedTick() {
+        return 0;
+    }
+
+    default void banner$setActivatedTick(long activatedTick) {
+
+    }
+
+    default boolean bridge$defaultActivationState() {
+        return false;
+    }
+
+    default void banner$setDefaultActivationState(boolean state) {
+
+    }
 }

@@ -52,7 +52,11 @@
       "net/minecraft/class_2170": ["com/mohistmc/banner/injection/commands/InjectionCommands"],
       "net/minecraft/class_2168": ["com/mohistmc/banner/injection/commands/InjectionCommandSourceStack"],
       "net/minecraft/class_2165": ["com/mohistmc/banner/injection/commands/InjectionCommandSource"],
-      "net/minecraft/class_5561": ["com/mohistmc/banner/injection/world/level/block/entity/InjectionContainerOpenersCounter"]
+      "net/minecraft/class_5561": ["com/mohistmc/banner/injection/world/level/block/entity/InjectionContainerOpenersCounter"],
+      "net/minecraft/class_2535": ["com/mohistmc/banner/injection/network/connection/InjectionConnection"],
+      "net/minecraft/class_2945": ["com/mohistmc/banner/injection/network/syncher/InjectionSynchedEntityData"],
+      "net/minecraft/class_3002": ["com/mohistmc/banner/injection/server/bossevents/InjectionCustomBossEvent"],
+      "net/minecraft/class_5579": ["com/mohistmc/banner/injection/world/level/entity/InjectionPersistentEntitySectionManager"]
     }
   }
 }

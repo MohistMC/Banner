@@ -11,7 +11,10 @@
     "commands.MixinCommands",
     "commands.MixinCommandSource",
     "commands.MixinCommandSourceStack",
+    "network.connection.MixinConnection",
+    "network.syncher.MixinSynchedEntityData",
     "server.MixinMinecraftServer",
+    "server.bossevents.MixinCustomBossEvent",
     "server.dedicated.MixinDedicatedServer",
     "world.damagesource.MixinDamageSource",
     "world.damagesource.MixinDamageSources",
@@ -21,7 +24,8 @@
     "world.entity.raid.MixinRaid",
     "world.level.MixinLevel",
     "world.level.MixinLevelAccessor",
-    "world.level.block.entity.MixinContainerOpenersCounter"
+    "world.level.block.entity.MixinContainerOpenersCounter",
+    "world.level.entity.MixinPersistentEntitySectionManager"
   ],
   "injectors": {
     "defaultRequire": 1

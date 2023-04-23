@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityAccess;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
 import org.bukkit.event.entity.EntityCombustEvent;
+import org.spigotmc.ActivationRange;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -43,6 +44,15 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Shadow public abstract boolean isPushable();
 
     private CraftEntity bukkitEntity;
+    public final org.spigotmc.ActivationRange.ActivationType activationType =
+            org.spigotmc.ActivationRange.initializeEntityActivationType((Entity) (Object) this);
+    public boolean defaultActivationState;
+    public long activatedTick = Integer.MIN_VALUE;
+
+    @Override
+    public void inactiveTick() {
+
+    }
 
     @Override
     public CraftEntity getBukkitEntity() {
@@ -112,5 +122,30 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Override
     public boolean canCollideWithBukkit(Entity entity) {
         return isPushable();
+    }
+
+    @Override
+    public ActivationRange.ActivationType bridge$activationType() {
+        return activationType;
+    }
+
+    @Override
+    public long bridge$activatedTick() {
+        return activatedTick;
+    }
+
+    @Override
+    public void banner$setActivatedTick(long activatedTick) {
+        this.activatedTick = activatedTick;
+    }
+
+    @Override
+    public boolean bridge$defaultActivationState() {
+        return defaultActivationState;
+    }
+
+    @Override
+    public void banner$setDefaultActivationState(boolean state) {
+        defaultActivationState = state;
     }
 }
