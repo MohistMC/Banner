@@ -139,6 +139,8 @@ accessible method net/minecraft/world/level/levelgen/structure/templatesystem/St
 accessible method net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplateManager readStructure (Ljava/io/InputStream;)Lnet/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplate;
 accessible method net/minecraft/world/level/saveddata/maps/MapItemSavedData setColorsDirty (II)V
 accessible method net/minecraft/world/level/saveddata/maps/MapItemSavedData setDecorationsDirty ()V
+accessible method net/minecraft/server/dedicated/DedicatedServerProperties$WorldDimensionData <init> (Lcom/google/gson/JsonObject;Ljava/lang/String;)V
+accessible method net/minecraft/server/players/StoredUserEntry getUser ()Ljava/lang/Object;
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C
@@ -197,7 +199,6 @@ accessible field net/minecraft/server/level/Ticket key Ljava/lang/Object;
 accessible field net/minecraft/server/level/ServerLevel entityManager Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;
 accessible field net/minecraft/server/level/ServerLevel serverLevelData Lnet/minecraft/world/level/storage/ServerLevelData;
 accessible field net/minecraft/server/network/ServerLoginPacketListenerImpl connection Lnet/minecraft/network/Connection;
-accessible method net/minecraft/server/players/StoredUserEntry getUser ()Ljava/lang/Object;
 accessible field net/minecraft/server/players/PlayerList playerIo Lnet/minecraft/world/level/storage/PlayerDataStorage;
 accessible field net/minecraft/server/players/PlayerList players Ljava/util/List;
 accessible field net/minecraft/stats/RecipeBook known Ljava/util/Set;

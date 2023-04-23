@@ -27,4 +27,16 @@ public interface InjectionDamageSource {
     default DamageSource poison() {
         return null;
     }
+
+    default boolean bridge$sweep() {
+        return false;
+    }
+
+    default boolean bridge$melting() {
+        return false;
+    }
+
+    default boolean bridge$poison() {
+        return false;
+    }
 }

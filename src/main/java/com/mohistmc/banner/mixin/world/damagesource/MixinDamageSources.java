@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.damagesource;
 
-import com.mohistmc.banner.bridge.world.damagesource.BridgeDamageSources;
+import com.mohistmc.banner.injection.world.damagesource.InjectionDamageSources;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageSource;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(DamageSources.class)
-public abstract class MixinDamageSources implements BridgeDamageSources {
+public abstract class MixinDamageSources implements InjectionDamageSources {
 
     // @formatter:off
     @Shadow protected abstract DamageSource source(ResourceKey<DamageType> resourceKey);
