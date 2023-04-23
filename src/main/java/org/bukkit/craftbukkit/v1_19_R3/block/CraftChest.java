@@ -57,22 +57,22 @@ public class CraftChest extends CraftLootable<ChestBlockEntity> implements Chest
     @Override
     public void open() {
         requirePlaced();
-        if (!getTileEntity().openersCounter.opened && getWorldHandle() instanceof net.minecraft.world.level.Level) {
+        if (!getTileEntity().openersCounter.bridge$opened() && getWorldHandle() instanceof net.minecraft.world.level.Level) {
             BlockState block = getTileEntity().getBlockState();
             getTileEntity().getLevel().blockEvent(getPosition(), block.getBlock(), 1, getTileEntity().openersCounter.getOpenerCount() + 1);
             ChestBlockEntity.playSound(getTileEntity().getLevel(), getPosition(), block, SoundEvents.CHEST_OPEN);
         }
-        getTileEntity().openersCounter.opened = true;
+        getTileEntity().openersCounter.banner$setOpened(true);
     }
 
     @Override
     public void close() {
         requirePlaced();
-        if (getTileEntity().openersCounter.opened && getWorldHandle() instanceof net.minecraft.world.level.Level) {
+        if (getTileEntity().openersCounter.bridge$opened() && getWorldHandle() instanceof net.minecraft.world.level.Level) {
             BlockState block = getTileEntity().getBlockState();
             getTileEntity().getLevel().blockEvent(getPosition(), block.getBlock(), 1, 0);
             ChestBlockEntity.playSound(getTileEntity().getLevel(), getPosition(), block, SoundEvents.CHEST_CLOSE);
         }
-        getTileEntity().openersCounter.opened = false;
+        getTileEntity().openersCounter.banner$setOpened(false);
     }
 }

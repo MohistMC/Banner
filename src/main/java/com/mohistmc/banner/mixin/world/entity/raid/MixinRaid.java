@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+//TODO fix inject methods
 @Mixin(Raid.class)
 public class MixinRaid implements InjectionRaid {
 

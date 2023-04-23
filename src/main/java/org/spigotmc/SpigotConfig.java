@@ -6,13 +6,10 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
+
+import com.mohistmc.banner.util.ServerUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -78,7 +75,7 @@ public class SpigotConfig
     public static void registerCommands()
     {
         for ( Map.Entry<String, Command> entry : commands.entrySet() ) {
-            MinecraftServer.getServer().server.getCommandMap().register(entry.getKey(), "Spigot", entry.getValue());
+            Objects.requireNonNull(ServerUtils.getServer()).bridge$server().getCommandMap().register(entry.getKey(), "Spigot", entry.getValue());
         }
     }
 

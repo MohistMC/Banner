@@ -14,26 +14,26 @@ public class CraftEnderChest extends CraftBlockEntityState<EnderChestBlockEntity
     @Override
     public void open() {
         requirePlaced();
-        if (!getTileEntity().openersCounter.opened && getWorldHandle() instanceof net.minecraft.world.level.Level) {
+        if (!getTileEntity().openersCounter.bridge$opened() && getWorldHandle() instanceof net.minecraft.world.level.Level) {
             BlockState block = getTileEntity().getBlockState();
             int openCount = getTileEntity().openersCounter.getOpenerCount();
 
             getTileEntity().openersCounter.onAPIOpen((net.minecraft.world.level.Level) getWorldHandle(), getPosition(), block);
             getTileEntity().openersCounter.openerAPICountChanged((net.minecraft.world.level.Level) getWorldHandle(), getPosition(), block, openCount, openCount + 1);
         }
-        getTileEntity().openersCounter.opened = true;
+        getTileEntity().openersCounter.banner$setOpened(true);
     }
 
     @Override
     public void close() {
         requirePlaced();
-        if (getTileEntity().openersCounter.opened && getWorldHandle() instanceof net.minecraft.world.level.Level) {
+        if (getTileEntity().openersCounter.bridge$opened() && getWorldHandle() instanceof net.minecraft.world.level.Level) {
             BlockState block = getTileEntity().getBlockState();
             int openCount = getTileEntity().openersCounter.getOpenerCount();
 
             getTileEntity().openersCounter.onAPIClose((net.minecraft.world.level.Level) getWorldHandle(), getPosition(), block);
             getTileEntity().openersCounter.openerAPICountChanged((net.minecraft.world.level.Level) getWorldHandle(), getPosition(), block, openCount, 0);
         }
-        getTileEntity().openersCounter.opened = false;
+        getTileEntity().openersCounter.banner$setOpened(false);
     }
 }
