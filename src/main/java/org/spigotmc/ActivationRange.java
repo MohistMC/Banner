@@ -76,10 +76,10 @@ public class ActivationRange
      */
     public static boolean initializeEntityActivationState(Entity entity, SpigotWorldConfig config)
     {
-        if ( ( entity.activationType == ActivationType.MISC && config.miscActivationRange == 0 )
-                || ( entity.activationType == ActivationType.RAIDER && config.raiderActivationRange == 0 )
-                || ( entity.activationType == ActivationType.ANIMAL && config.animalActivationRange == 0 )
-                || ( entity.activationType == ActivationType.MONSTER && config.monsterActivationRange == 0 )
+        if ( ( entity.bridge$activationType() == ActivationType.MISC && config.miscActivationRange == 0 )
+                || ( entity.bridge$activationType() == ActivationType.RAIDER && config.raiderActivationRange == 0 )
+                || ( entity.bridge$activationType() == ActivationType.ANIMAL && config.animalActivationRange == 0 )
+                || ( entity.bridge$activationType() == ActivationType.MONSTER && config.monsterActivationRange == 0 )
                 || entity instanceof Player
                 || entity instanceof ThrowableProjectile
                 || entity instanceof EnderDragon
@@ -118,7 +118,7 @@ public class ActivationRange
 
         for ( Player player : world.players() )
         {
-            player.activatedTick = ServerUtils.getCurrentTick();
+            player.banner$setActivatedTick(ServerUtils.getCurrentTick());
             if ( world.bridge$spigotConfig().ignoreSpectatorActivation && player.isSpectator() )
             {
                 continue;
@@ -136,20 +136,20 @@ public class ActivationRange
     /**
      * Checks for the activation state of all entities in this chunk.
      *
-     * @param chunk
+     * @param
      */
     private static void activateEntity(Entity entity)
     {
-        if ( ServerUtils.getCurrentTick() > entity.activatedTick )
+        if ( ServerUtils.getCurrentTick() > entity.bridge$activatedTick() )
         {
-            if ( entity.defaultActivationState )
+            if ( entity.bridge$defaultActivationState() )
             {
-                entity.activatedTick = ServerUtils.getCurrentTick();
+                entity.banner$setActivatedTick(ServerUtils.getCurrentTick());
                 return;
             }
-            if ( entity.activationType.boundingBox.intersects( entity.getBoundingBox() ) )
+            if ( entity.bridge$activationType().boundingBox.intersects( entity.getBoundingBox() ) )
             {
-                entity.activatedTick = ServerUtils.getCurrentTick();
+                entity.banner$setActivatedTick(ServerUtils.getCurrentTick());
             }
         }
     }
@@ -230,22 +230,22 @@ public class ActivationRange
             return true;
         }
 
-        boolean isActive = entity.activatedTick >= ServerUtils.getCurrentTick() || entity.defaultActivationState;
+        boolean isActive = entity.bridge$activatedTick() >= ServerUtils.getCurrentTick() || entity.bridge$defaultActivationState();
         // Should this entity tick?
         if ( !isActive )
         {
-            if ( ( ServerUtils.getCurrentTick() - entity.activatedTick - 1 ) % 20 == 0 )
+            if ( ( ServerUtils.getCurrentTick() - entity.bridge$activatedTick() - 1 ) % 20 == 0 )
             {
                 // Check immunities every 20 ticks.
                 if ( checkEntityImmunities( entity ) )
                 {
                     // Triggered some sort of immunity, give 20 full ticks before we check again.
-                    entity.activatedTick = ServerUtils.getCurrentTick() + 20;
+                    entity.banner$setActivatedTick(ServerUtils.getCurrentTick() + 20);
                 }
                 isActive = true;
             }
             // Add a little performance juice to active entities. Skip 1/4 if not immune.
-        } else if ( !entity.defaultActivationState && entity.tickCount % 4 == 0 && !checkEntityImmunities( entity ) )
+        } else if ( !entity.bridge$defaultActivationState() && entity.tickCount % 4 == 0 && !checkEntityImmunities( entity ) )
         {
             isActive = false;
         }

@@ -17,6 +17,7 @@ accessible class net/minecraft/world/item/crafting/Ingredient$Value
 accessible class net/minecraft/world/level/biome/Biome$ClimateSettings
 accessible class net/minecraft/world/item/ItemCooldowns$CooldownInstance
 accessible class net/minecraft/world/entity/raid/Raid$RaidStatus
+accessible class net/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus
 
 # public methods
 accessible method net/minecraft/world/level/block/DispenserBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)V
@@ -474,6 +475,7 @@ accessible field net/minecraft/world/level/block/entity/BellBlockEntity resonati
 accessible field net/minecraft/world/level/block/entity/JukeboxBlockEntity recordStartedTick J
 accessible field net/minecraft/world/level/block/entity/JukeboxBlockEntity tickCount J
 accessible field net/minecraft/world/level/block/entity/JukeboxBlockEntity isPlaying Z
+accessible field net/minecraft/world/level/levelgen/structure/templatesystem/StructurePlaceSettings palette I
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;

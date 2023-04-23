@@ -277,7 +277,7 @@ public class CraftChunk implements Chunk {
         Preconditions.checkArgument(biome != null, "Biome cannot be null");
 
         ChunkAccess chunk = getHandle(ChunkStatus.BIOMES);
-        Predicate<Holder<Biome>> nms = Predicates.equalTo(CraftBlock.biomeToBiomeBase(chunk.biomeRegistry, biome));
+        Predicate<Holder<Biome>> nms = Predicates.equalTo(CraftBlock.biomeToBiomeBase(chunk.bridge$biomeRegistry(), biome));
         for ( LevelChunkSection section : chunk.getSections()) {
             if (section != null && section.getBiomes().maybeHas(nms)) {
                 return true;
@@ -347,7 +347,7 @@ public class CraftChunk implements Chunk {
 
     @Override
     public PersistentDataContainer getPersistentDataContainer() {
-        return getHandle(ChunkStatus.STRUCTURE_STARTS).persistentDataContainer;
+        return getHandle(ChunkStatus.STRUCTURE_STARTS).bridge$persistentDataContainer();
     }
 
     @Override

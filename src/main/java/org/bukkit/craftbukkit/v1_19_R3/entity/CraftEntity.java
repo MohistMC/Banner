@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import com.mohistmc.entity.*;
 import net.minecraft.core.PositionImpl;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.CompoundTag;

@@ -102,8 +102,6 @@ import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.WorldData;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.CommandEvent;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
@@ -1483,7 +1481,7 @@ public final class CraftServer implements Server {
         if (worldmap == null) {
             return null;
         }
-        return worldmap.mapView;
+        return worldmap.bridge$mapView();
     }
 
     @Override
@@ -1493,7 +1491,7 @@ public final class CraftServer implements Server {
         net.minecraft.world.level.Level minecraftWorld = ((CraftWorld) world).getHandle();
         // creates a new map at world spawn with the scale of 3, with out tracking position and unlimited tracking
         int newId = MapItem.createNewSavedData(minecraftWorld, minecraftWorld.getLevelData().getXSpawn(), minecraftWorld.getLevelData().getZSpawn(), 3, false, false, minecraftWorld.dimension());
-        return minecraftWorld.getMapData(MapItem.makeKey(newId)).mapView;
+        return minecraftWorld.getMapData(MapItem.makeKey(newId)).bridge$mapView();
     }
 
     @Override

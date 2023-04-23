@@ -33,7 +33,7 @@ public final class CraftMapView implements MapView {
 
     @Override
     public int getId() {
-        String text = worldMap.id;
+        String text = worldMap.bridge$id();
         if (text.startsWith("map_")) {
             try {
                 return Integer.parseInt(text.substring("map_".length()));
@@ -69,8 +69,8 @@ public final class CraftMapView implements MapView {
             return world.getWorld();
         }
 
-        if (worldMap.uniqueId != null) {
-            return Bukkit.getServer().getWorld(worldMap.uniqueId);
+        if (worldMap.bridge$uniqueId() != null) {
+            return Bukkit.getServer().getWorld(worldMap.bridge$uniqueId());
         }
         return null;
     }
@@ -78,7 +78,7 @@ public final class CraftMapView implements MapView {
     @Override
     public void setWorld(World world) {
         worldMap.dimension = ((CraftWorld) world).getHandle().dimension();
-        worldMap.uniqueId = world.getUID();
+        worldMap.banner$setUniqueId(world.getUID());
     }
 
     @Override
