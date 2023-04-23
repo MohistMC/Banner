@@ -1,7 +1,7 @@
 accessWidener	v1	named
 # Banner
 
-#public clazz
+# public clazz
 accessible class net/minecraft/server/MinecraftServer$ReloadableResources
 accessible class net/minecraft/server/dedicated/DedicatedServerProperties$WorldDimensionData
 accessible class net/minecraft/world/level/block/ComposterBlock$EmptyContainer
@@ -17,7 +17,7 @@ accessible class net/minecraft/world/item/crafting/Ingredient$Value
 accessible class net/minecraft/world/level/biome/Biome$ClimateSettings
 accessible class net/minecraft/world/item/ItemCooldowns$CooldownInstance
 
-#public methods
+# public methods
 accessible method net/minecraft/world/level/block/DispenserBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)V
 accessible method net/minecraft/world/level/block/DropperBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)V
 accessible method net/minecraft/world/entity/decoration/HangingEntity setDirection (Lnet/minecraft/core/Direction;)V
@@ -140,7 +140,7 @@ accessible method net/minecraft/world/level/levelgen/structure/templatesystem/St
 accessible method net/minecraft/world/level/saveddata/maps/MapItemSavedData setColorsDirty (II)V
 accessible method net/minecraft/world/level/saveddata/maps/MapItemSavedData setDecorationsDirty ()V
 
-#public fields
+# public fields
 accessible field net/minecraft/ChatFormatting code C
 accessible field net/minecraft/advancements/AdvancementList advancements Ljava/util/Map;
 accessible field net/minecraft/commands/CommandSourceStack source Lnet/minecraft/commands/CommandSource;
@@ -468,3 +468,67 @@ accessible field net/minecraft/world/level/storage/PrimaryLevelData settings Lne
 accessible field net/minecraft/world/level/storage/DimensionDataStorage cache Ljava/util/Map;
 accessible field net/minecraft/world/scores/Objective displayName Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/world/scores/criteria/ObjectiveCriteria CRITERIA_CACHE Ljava/util/Map;
+
+# public -f fields
+mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;
+accessible field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;
+mutable field net/minecraft/server/ReloadableServerResources commands Lnet/minecraft/commands/Commands;
+accessible field net/minecraft/server/ReloadableServerResources commands Lnet/minecraft/commands/Commands;
+mutable field net/minecraft/server/MinecraftServer connection Lnet/minecraft/server/network/ServerConnectionListener;
+accessible field net/minecraft/server/MinecraftServer connection Lnet/minecraft/server/network/ServerConnectionListener;
+mutable field net/minecraft/server/MinecraftServer levels Ljava/util/Map;
+accessible field net/minecraft/server/MinecraftServer levels Ljava/util/Map;
+mutable field net/minecraft/server/MinecraftServer storageSource Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;
+accessible field net/minecraft/server/MinecraftServer storageSource Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;
+mutable field net/minecraft/server/MinecraftServer worldData Lnet/minecraft/world/level/storage/WorldData;
+accessible field net/minecraft/server/MinecraftServer worldData Lnet/minecraft/world/level/storage/WorldData;
+mutable field net/minecraft/server/dedicated/DedicatedServer settings Lnet/minecraft/server/dedicated/DedicatedServerSettings;
+accessible field net/minecraft/server/dedicated/DedicatedServer settings Lnet/minecraft/server/dedicated/DedicatedServerSettings;
+mutable field net/minecraft/server/level/TicketType timeout J
+accessible field net/minecraft/server/level/TicketType timeout J
+mutable field net/minecraft/world/entity/ai/attributes/RangedAttribute maxValue D
+accessible field net/minecraft/world/entity/ai/attributes/RangedAttribute maxValue D
+mutable field net/minecraft/world/entity/AreaEffectCloud effects Ljava/util/List;
+accessible field net/minecraft/world/entity/AreaEffectCloud effects Ljava/util/List;
+mutable field net/minecraft/world/entity/Mob goalSelector Lnet/minecraft/world/entity/ai/goal/GoalSelector;
+accessible field net/minecraft/world/entity/Mob goalSelector Lnet/minecraft/world/entity/ai/goal/GoalSelector;
+mutable field net/minecraft/world/entity/Mob targetSelector Lnet/minecraft/world/entity/ai/goal/GoalSelector;
+accessible field net/minecraft/world/entity/Mob targetSelector Lnet/minecraft/world/entity/ai/goal/GoalSelector;
+mutable field net/minecraft/world/entity/LivingEntity combatTracker Lnet/minecraft/world/damagesource/CombatTracker;
+accessible field net/minecraft/world/entity/LivingEntity combatTracker Lnet/minecraft/world/damagesource/CombatTracker;
+mutable field net/minecraft/world/entity/LivingEntity invulnerableDuration I
+accessible field net/minecraft/world/entity/LivingEntity invulnerableDuration I
+mutable field net/minecraft/world/inventory/AbstractContainerMenu lastSlots Lnet/minecraft/core/NonNullList;
+accessible field net/minecraft/world/inventory/AbstractContainerMenu lastSlots Lnet/minecraft/core/NonNullList;
+mutable field net/minecraft/world/inventory/AbstractContainerMenu remoteSlots Lnet/minecraft/core/NonNullList;
+accessible field net/minecraft/world/inventory/AbstractContainerMenu remoteSlots Lnet/minecraft/core/NonNullList;
+mutable field net/minecraft/world/inventory/AbstractContainerMenu slots Lnet/minecraft/core/NonNullList;
+accessible field net/minecraft/world/inventory/AbstractContainerMenu slots Lnet/minecraft/core/NonNullList;
+mutable field net/minecraft/world/item/ItemStack item Lnet/minecraft/world/item/Item;
+accessible field net/minecraft/world/item/ItemStack item Lnet/minecraft/world/item/Item;
+mutable field net/minecraft/world/item/crafting/RecipeManager recipes Ljava/util/Map;
+accessible field net/minecraft/world/item/crafting/RecipeManager recipes Ljava/util/Map;
+mutable field net/minecraft/world/item/trading/MerchantOffer baseCostA Lnet/minecraft/world/item/ItemStack;
+accessible field net/minecraft/world/item/trading/MerchantOffer baseCostA Lnet/minecraft/world/item/ItemStack;
+mutable field net/minecraft/world/item/trading/MerchantOffer costB Lnet/minecraft/world/item/ItemStack;
+accessible field net/minecraft/world/item/trading/MerchantOffer costB Lnet/minecraft/world/item/ItemStack;
+mutable field net/minecraft/world/item/trading/MerchantOffer maxUses I
+accessible field net/minecraft/world/item/trading/MerchantOffer maxUses I
+mutable field net/minecraft/world/level/LevelSettings hardcore Z
+accessible field net/minecraft/world/level/LevelSettings hardcore Z
+mutable field net/minecraft/world/level/LevelSettings levelName Ljava/lang/String;
+accessible field net/minecraft/world/level/LevelSettings levelName Ljava/lang/String;
+mutable field net/minecraft/world/level/saveddata/maps/MapItemSavedData dimension Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/world/level/saveddata/maps/MapItemSavedData dimension Lnet/minecraft/resources/ResourceKey;
+mutable field net/minecraft/world/level/saveddata/maps/MapItemSavedData locked Z
+accessible field net/minecraft/world/level/saveddata/maps/MapItemSavedData locked Z
+mutable field net/minecraft/world/level/saveddata/maps/MapItemSavedData scale B
+accessible field net/minecraft/world/level/saveddata/maps/MapItemSavedData scale B
+mutable field net/minecraft/world/level/saveddata/maps/MapItemSavedData trackingPosition Z
+accessible field net/minecraft/world/level/saveddata/maps/MapItemSavedData trackingPosition Z
+mutable field net/minecraft/world/level/saveddata/maps/MapItemSavedData unlimitedTracking Z
+accessible field net/minecraft/world/level/saveddata/maps/MapItemSavedData unlimitedTracking Z
+mutable field net/minecraft/world/level/saveddata/maps/MapItemSavedData centerX I
+accessible field net/minecraft/world/level/saveddata/maps/MapItemSavedData centerX I
+mutable field net/minecraft/world/level/saveddata/maps/MapItemSavedData centerZ I
+accessible field net/minecraft/world/level/saveddata/maps/MapItemSavedData centerZ I
