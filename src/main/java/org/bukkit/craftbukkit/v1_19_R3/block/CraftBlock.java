@@ -495,15 +495,15 @@ public class CraftBlock implements Block {
         UseOnContext context = new UseOnContext(world, null, InteractionHand.MAIN_HAND, Items.BONE_MEAL.getDefaultInstance(), new BlockHitResult(Vec3.ZERO, direction, getPosition(), false));
 
         // SPIGOT-6895: Call StructureGrowEvent and BlockFertilizeEvent
-        world.captureTreeGeneration = true;
+        world.banner$setCaptureTreeGeneration(true);
         InteractionResult result = BoneMealItem.applyBonemeal(context);
-        world.captureTreeGeneration = false;
+        world.banner$setCaptureTreeGeneration(false);
 
-        if (world.capturedBlockStates.size() > 0) {
+        if (world.bridge$capturedBlockStates().size() > 0) {
             TreeType treeType = SaplingBlock.treeType;
             SaplingBlock.treeType = null;
-            List<BlockState> blocks = new ArrayList<>(world.capturedBlockStates.values());
-            world.capturedBlockStates.clear();
+            List<BlockState> blocks = new ArrayList<>(world.bridge$capturedBlockStates().values());
+            world.bridge$capturedBlockStates().clear();
             StructureGrowEvent structureEvent = null;
 
             if (treeType != null) {
