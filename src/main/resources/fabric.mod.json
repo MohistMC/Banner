@@ -71,7 +71,10 @@
       "net/minecraft/class_1668": ["com/mohistmc/banner/injection/world/entity/projectile/InjectionAbstractHurtingProjectile"],
       "net/minecraft/class_1676": ["com/mohistmc/banner/injection/world/entity/projectile/InjectionProjectile"],
       "net/minecraft/class_1678": ["com/mohistmc/banner/injection/world/entity/projectile/InjectionShulkerBullet"],
-      "net/minecraft/class_3857": ["com/mohistmc/banner/injection/world/entity/projectile/InjectionThrowableItemProjectile"]
+      "net/minecraft/class_3857": ["com/mohistmc/banner/injection/world/entity/projectile/InjectionThrowableItemProjectile"],
+      "net/minecraft/class_4980": ["com/mohistmc/banner/injection/world/entity/InjectionItemBasedSteering"],
+      "net/minecraft/class_5354": ["com/mohistmc/banner/injection/world/entity/InjectionNeutralMob"],
+      "net/minecraft/class_1299": ["com/mohistmc/banner/injection/world/entity/InjectionEntityType"]
     }
   }
 }
