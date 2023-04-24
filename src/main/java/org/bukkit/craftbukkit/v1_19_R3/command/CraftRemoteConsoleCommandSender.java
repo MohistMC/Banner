@@ -3,6 +3,7 @@ package org.bukkit.craftbukkit.v1_19_R3.command;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.rcon.RconConsoleSource;
 import org.bukkit.command.RemoteConsoleCommandSender;
+import org.jetbrains.annotations.NotNull;
 
 public class CraftRemoteConsoleCommandSender extends ServerCommandSender implements RemoteConsoleCommandSender {
 
@@ -27,6 +28,11 @@ public class CraftRemoteConsoleCommandSender extends ServerCommandSender impleme
     @Override
     public String getName() {
         return "Rcon";
+    }
+
+    @Override
+    public @NotNull Spigot spigot() {
+        return null;
     }
 
     @Override

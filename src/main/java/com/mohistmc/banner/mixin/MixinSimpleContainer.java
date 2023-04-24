@@ -15,7 +15,7 @@ import java.util.List;
 @Mixin(SimpleContainer.class)
 public abstract class MixinSimpleContainer implements Container, StackedContentsCompatible, InjectionSimpleContainer {
 
-    // @formatter:off  //formatted on
+    // @formatter:off
     @Shadow @Final public NonNullList<ItemStack> items;
     // @formatter:on
 

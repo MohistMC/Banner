@@ -1096,7 +1096,7 @@ public final class CraftServer implements Server {
 
             handle.getChunkSource().close(save);
             handle.entityManager.close(save); // SPIGOT-6722: close entityManager
-            handle.convertable.close();
+            handle.bridge$convertable().close();
         } catch (Exception ex) {
             getLogger().log(Level.SEVERE, null, ex);
         }
@@ -2287,14 +2287,14 @@ public final class CraftServer implements Server {
         @Override
         public void broadcast(BaseComponent component) {
             for (Player player : getOnlinePlayers()) {
-                player.spigot().sendMessage(component);
+                //player.spigot().sendMessage(component);
             }
         }
 
         @Override
         public void broadcast(BaseComponent... components) {
             for (Player player : getOnlinePlayers()) {
-                player.spigot().sendMessage(components);
+                //player.spigot().sendMessage(components);
             }
         }
     };

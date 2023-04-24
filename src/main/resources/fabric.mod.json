@@ -14,7 +14,7 @@
   },
 
   "license": "LGPL-v3.0",
-  "icon": "assets/banner/icon.png",
+  "icon": "assets/banner/logo.png",
 
   "accessWidener": "banner.accesswidener",
   "environment": "*",
@@ -64,6 +64,7 @@
       "net/minecraft/class_3193": ["com/mohistmc/banner/injection/server/level/InjectionChunkHolder"],
       "net/minecraft/class_3215": ["com/mohistmc/banner/injection/server/level/InjectionServerChunkCache"],
       "net/minecraft/class_3204": ["com/mohistmc/banner/injection/server/level/InjectionDistanceManager"],
+      "net/minecraft/class_3218": ["com/mohistmc/banner/injection/server/level/InjectionServerLevel"],
       "net/minecraft/class_52": ["com/mohistmc/banner/injection/world/level/storage/loot/InjectionLootTable"],
       "net/minecraft/class_29": ["com/mohistmc/banner/injection/world/level/storage/InjectionPlayerDataStorage"],
       "net/minecraft/class_3324": ["com/mohistmc/banner/injection/server/players/InjectionPlayerList"],
@@ -74,7 +75,12 @@
       "net/minecraft/class_3857": ["com/mohistmc/banner/injection/world/entity/projectile/InjectionThrowableItemProjectile"],
       "net/minecraft/class_4980": ["com/mohistmc/banner/injection/world/entity/InjectionItemBasedSteering"],
       "net/minecraft/class_5354": ["com/mohistmc/banner/injection/world/entity/InjectionNeutralMob"],
-      "net/minecraft/class_1299": ["com/mohistmc/banner/injection/world/entity/InjectionEntityType"]
+      "net/minecraft/class_1299": ["com/mohistmc/banner/injection/world/entity/InjectionEntityType"],
+      "net/minecraft/class_1538": ["com/mohistmc/banner/injection/world/entity/InjectionLightningBolt"],
+      "net/minecraft/class_1922": ["com/mohistmc/banner/injection/world/level/InjectionBlockGetter"],
+      "net/minecraft/class_1945": ["com/mohistmc/banner/injection/world/level/InjectionLevelWriter"],
+      "net/minecraft/class_5425": ["com/mohistmc/banner/injection/world/level/InjectionServerLevelAccessor"],
+      "net/minecraft/class_1927": ["com/mohistmc/banner/injection/world/level/InjectionExplosion"]
     }
   }
 }

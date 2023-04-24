@@ -1,4 +1,4 @@
-package com.mohistmc.banner.injection.world.level.block;
+package com.mohistmc.banner.injection.world.level;
 
 public interface InjectionBlock {
 

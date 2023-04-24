@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin;
 
-import com.mohistmc.banner.injection.world.level.block.InjectionBlock;
+import com.mohistmc.banner.injection.world.level.InjectionBlock;
 import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
 
