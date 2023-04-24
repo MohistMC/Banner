@@ -25,6 +25,7 @@
     "world.damagesource.MixinDamageSources",
     "world.entity.MixinEntity",
     "world.entity.MixinEntityType",
+    "world.entity.MixinInteraction",
     "world.entity.MixinItemBasedSteering",
     "world.entity.MixinNeutralMob",
     "world.entity.decoration.MixinArmorStand",
