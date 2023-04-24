@@ -25,6 +25,9 @@ Progress
         * [ ] Bukkit-Patches
         * [ ] CraftBukkit-Patches (3%) - (029/030/091)
 
+- [ ] Start Injection
+    * [ ] NMS-Base-Methods (56%) - (029/030/091)
+  
 Upstream Projects
 ------
 *[**FabricLoader**](https://github.com/FabricMC/fabric-loader.git) - mod load support.
