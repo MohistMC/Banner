@@ -7,6 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents input from a command block
@@ -43,6 +44,11 @@ public class CraftBlockCommandSender extends ServerCommandSender implements Bloc
     @Override
     public String getName() {
         return block.getTextName();
+    }
+
+    @Override
+    public @NotNull Spigot spigot() {
+        return null;
     }
 
     @Override

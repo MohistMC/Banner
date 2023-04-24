@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.mohistmc.banner.util.ItemEntityUtils;
 import com.mohistmc.banner.util.ServerUtils;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
@@ -585,7 +586,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public UUID getUID() {
-        return world.uuid;
+        return world.bridge$uuid();
     }
 
     @Override
@@ -659,7 +660,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public boolean createExplosion(double x, double y, double z, float power, boolean setFire, boolean breakBlocks, Entity source) {
-        return !world.explode(source == null ? null : ((CraftEntity) source).getHandle(), x, y, z, power, setFire, breakBlocks ? Level.ExplosionInteraction.MOB : net.minecraft.world.level.Level.ExplosionInteraction.NONE).wasCanceled;
+        return !world.explode(source == null ? null : ((CraftEntity) source).getHandle(), x, y, z, power, setFire, breakBlocks ? Level.ExplosionInteraction.MOB : net.minecraft.world.level.Level.ExplosionInteraction.NONE).bridge$wasCanceled();
     }
 
     @Override
@@ -795,7 +796,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public double getHumidity(int x, int y, int z) {
-        return this.world.getNoiseBiome(x >> 2, y >> 2, z >> 2).value().getModifiedClimateSettings().downfall(); // Mohsit Fix Forge coremod  #line-11
+        return this.world.getNoiseBiome(x >> 2, y >> 2, z >> 2).value().climateSettings.downfall(); // Mohsit Fix Forge coremod  #line-11
     }
 
     @Override
@@ -1011,7 +1012,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public void setDifficulty(Difficulty difficulty) {
-        this.getHandle().serverLevelDataCB.setDifficulty(net.minecraft.world.Difficulty.byId(difficulty.getValue()));
+        this.getHandle().bridge$serverLevelDataCB().setDifficulty(net.minecraft.world.Difficulty.byId(difficulty.getValue()));
     }
 
     @Override
@@ -1157,7 +1158,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         Validate.notNull(material, "Material cannot be null");
         Validate.isTrue(material.isBlock(), "Material must be a block");
 
-        FallingBlockEntity entity = FallingBlockEntity.fall(world, BlockPos.containing(location.getX(), location.getY(), location.getZ()), CraftMagicNumbers.getBlock(material).defaultBlockState(), SpawnReason.CUSTOM);
+        FallingBlockEntity entity = ItemEntityUtils.fall(world, BlockPos.containing(location.getX(), location.getY(), location.getZ()), CraftMagicNumbers.getBlock(material).defaultBlockState(), SpawnReason.CUSTOM);
         return (FallingBlock) entity.getBukkitEntity();
     }
 
@@ -1166,7 +1167,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         Validate.notNull(location, "Location cannot be null");
         Validate.notNull(data, "BlockData cannot be null");
 
-        FallingBlockEntity entity = FallingBlockEntity.fall(world, BlockPos.containing(location.getX(), location.getY(), location.getZ()), ((CraftBlockData) data).getState(), SpawnReason.CUSTOM);
+        FallingBlockEntity entity = ItemEntityUtils.fall(world, BlockPos.containing(location.getX(), location.getY(), location.getZ()), ((CraftBlockData) data).getState(), SpawnReason.CUSTOM);
         return (FallingBlock) entity.getBukkitEntity();
     }
 
@@ -1289,7 +1290,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public File getWorldFolder() {
-        return world.convertable.getDimensionPath(this.world.dimension()).toFile();
+        return world.bridge$convertable().getDimensionPath(this.world.dimension()).toFile();
     }
 
     @Override
@@ -1319,7 +1320,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public boolean canGenerateStructures() {
-        return world.serverLevelDataCB.worldGenOptions().generateStructures();
+        return world.bridge$serverLevelDataCB().worldGenOptions().generateStructures();
     }
 
     @Override
@@ -1329,7 +1330,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public void setHardcore(boolean hardcore) {
-        world.serverLevelDataCB.settings.hardcore = hardcore;
+        world.bridge$serverLevelDataCB().settings.hardcore = hardcore;
     }
 
     @Override
@@ -1875,6 +1876,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         return new CraftStructureSearchResult(CraftStructure.minecraftToBukkit(found.getSecond().value(), getHandle().registryAccess()), CraftLocation.toBukkit(found.getFirst(), this));
     }
 
+    /**
     // Spigot start
     @Override
     public int getViewDistance() {
@@ -1886,6 +1888,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         return world.bridge$spigotConfig().simulationDistance;
     }
     // Spigot end
+    */
 
     // Spigot start
     private final Spigot spigot = new Spigot() {
@@ -1894,7 +1897,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         public LightningStrike strikeLightning(Location loc, boolean isSilent) {
             LightningBolt lightning = net.minecraft.world.entity.EntityType.LIGHTNING_BOLT.create(world);
             lightning.moveTo(loc.getX(), loc.getY(), loc.getZ());
-            lightning.isSilent = isSilent;
+            lightning.banner$setIsSilent(isSilent);
             world.strikeLightning(lightning, LightningStrikeEvent.Cause.CUSTOM );
             return (LightningStrike) lightning.getBukkitEntity();
         }
@@ -1904,7 +1907,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
             LightningBolt lightning = net.minecraft.world.entity.EntityType.LIGHTNING_BOLT.create(world);
             lightning.moveTo(loc.getX(), loc.getY(), loc.getZ());
             lightning.visualOnly = true;
-            lightning.isSilent = isSilent;
+            lightning.banner$setIsSilent(isSilent);
             world.strikeLightning( lightning, LightningStrikeEvent.Cause.CUSTOM );
             return (LightningStrike) lightning.getBukkitEntity();
         }

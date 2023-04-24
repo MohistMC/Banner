@@ -7,6 +7,7 @@ import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
 import org.bukkit.conversations.ManuallyAbandonedConversationCanceller;
 import org.bukkit.craftbukkit.v1_19_R3.conversations.ConversationTracker;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents CLI input from a console
@@ -44,6 +45,11 @@ public class CraftConsoleCommandSender extends ServerCommandSender implements Co
     @Override
     public String getName() {
         return "CONSOLE";
+    }
+
+    @Override
+    public @NotNull Spigot spigot() {
+        return null;
     }
 
     @Override

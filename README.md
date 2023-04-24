@@ -23,7 +23,7 @@ Progress
     * [ ] CraftBukkit([**f92a41c39**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/commits/f92a41c39))
     * [ ] Spigot ([**d1bd3bd2**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/spigot/commits/d1bd3bd2))
         * [ ] Bukkit-Patches
-        * [ ] CraftBukkit-Patches (0%) - (029/030/091)
+        * [ ] CraftBukkit-Patches (3%) - (029/030/091)
 
 Upstream Projects
 ------

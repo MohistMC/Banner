@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.mohistmc.banner.util.BlockUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -14,7 +16,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ClipContext;
@@ -351,8 +352,7 @@ public class CraftBlock implements Block {
         }
 
         Biome biome = Registry.BIOME.get(CraftNamespacedKey.fromMinecraft(registry.getKey(base)));
-        Biome biome1 = Biome.valueOf(normalizeName(registry.getKey(base).toString()));
-        return (biome == null) ? biome1 : biome;
+        return (biome == null) ? Biome.CUSTOM : biome;
     }
 
     public static Holder<net.minecraft.world.level.biome.Biome> biomeToBiomeBase(net.minecraft.core.Registry<net.minecraft.world.level.biome.Biome> registry, Biome bio) {
@@ -496,12 +496,12 @@ public class CraftBlock implements Block {
 
         // SPIGOT-6895: Call StructureGrowEvent and BlockFertilizeEvent
         world.banner$setCaptureTreeGeneration(true);
-        InteractionResult result = BoneMealItem.applyBonemeal(context);
+        InteractionResult result = BlockUtils.applyBonemeal(context);
         world.banner$setCaptureTreeGeneration(false);
 
         if (world.bridge$capturedBlockStates().size() > 0) {
-            TreeType treeType = SaplingBlock.treeType;
-            SaplingBlock.treeType = null;
+            TreeType treeType = BlockUtils.treeType;
+            BlockUtils.treeType = null;
             List<BlockState> blocks = new ArrayList<>(world.bridge$capturedBlockStates().values());
             world.bridge$capturedBlockStates().clear();
             StructureGrowEvent structureEvent = null;

@@ -146,6 +146,9 @@ accessible method net/minecraft/server/players/StoredUserEntry getUser ()Ljava/l
 accessible method net/minecraft/server/level/ServerChunkCache$MainThreadExecutor pollTask ()Z
 accessible method net/minecraft/world/entity/decoration/HangingEntity recalculateBoundingBox ()V
 accessible method net/minecraft/world/entity/decoration/ItemFrame recalculateBoundingBox ()V
+accessible method net/minecraft/world/level/GameRules$Value deserialize (Ljava/lang/String;)V
+accessible method net/minecraft/world/level/GameRules$BooleanValue deserialize (Ljava/lang/String;)V
+accessible method net/minecraft/world/level/GameRules$IntegerValue deserialize (Ljava/lang/String;)V
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C
@@ -479,6 +482,8 @@ accessible field net/minecraft/world/level/block/entity/JukeboxBlockEntity recor
 accessible field net/minecraft/world/level/block/entity/JukeboxBlockEntity tickCount J
 accessible field net/minecraft/world/level/block/entity/JukeboxBlockEntity isPlaying Z
 accessible field net/minecraft/world/level/levelgen/structure/templatesystem/StructurePlaceSettings palette I
+accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamageMax I
+accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamagePerDistance F
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;
