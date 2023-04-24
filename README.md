@@ -27,6 +27,8 @@ Progress
 
 Upstream Projects
 ------
+*[**FabricLoader**](https://github.com/FabricMC/fabric-loader.git) - mod load support.
+*[**FabricApi**](https://github.com/FabricMC/fabric-loader.git) - mod api support.
 * [**Bukkit**](https://hub.spigotmc.org/stash/scm/spigot/bukkit.git) - plugin support.
 * [**CraftBukkit**](https://hub.spigotmc.org/stash/scm/spigot/craftbukkit.git) - plugin support.
 * [**Spigot**](https://hub.spigotmc.org/stash/scm/spigot/spigot.git) - plugin support.
