@@ -204,7 +204,7 @@ public class CraftOfflinePlayer implements OfflinePlayer, ConfigurationSerializa
     }
 
     private File getDataFile() {
-        return new File(storage.getPlayerDataFolder(), getUniqueId() + ".dat");
+        return new File(storage.getPlayerDir(), getUniqueId() + ".dat");
     }
 
     @Override

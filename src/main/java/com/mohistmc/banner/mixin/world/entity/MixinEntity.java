@@ -2,8 +2,6 @@ package com.mohistmc.banner.mixin.world.entity;
 
 import com.mohistmc.banner.injection.world.entity.InjectionEntity;
 import net.minecraft.commands.CommandSource;
-import net.minecraft.core.PositionImpl;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.Nameable;
@@ -48,6 +46,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
             org.spigotmc.ActivationRange.initializeEntityActivationType((Entity) (Object) this);
     public boolean defaultActivationState;
     public long activatedTick = Integer.MIN_VALUE;
+    public boolean generation;
 
     @Override
     public void inactiveTick() {
@@ -147,5 +146,15 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Override
     public void banner$setDefaultActivationState(boolean state) {
         defaultActivationState = state;
+    }
+
+    @Override
+    public boolean bridge$generation() {
+        return generation;
+    }
+
+    @Override
+    public void banner$setGeneration(boolean gen) {
+        this.generation = gen;
     }
 }

@@ -60,7 +60,18 @@
       "net/minecraft/class_2791": ["com/mohistmc/banner/injection/world/level/chunk/InjectionChunkAccess"],
       "net/minecraft/class_3499": ["com/mohistmc/banner/injection/world/level/levelgen/structure/templatesystem/InjectionStructureTemplate"],
       "net/minecraft/class_22": ["com/mohistmc/banner/injection/world/level/saveddata/maps/InjectionMapItemSavedData"],
-      "net/minecraft/class_3222": ["com/mohistmc/banner/injection/server/level/InjectionServerPlayer"]
+      "net/minecraft/class_3222": ["com/mohistmc/banner/injection/server/level/InjectionServerPlayer"],
+      "net/minecraft/class_3193": ["com/mohistmc/banner/injection/server/level/InjectionChunkHolder"],
+      "net/minecraft/class_3215": ["com/mohistmc/banner/injection/server/level/InjectionServerChunkCache"],
+      "net/minecraft/class_3204": ["com/mohistmc/banner/injection/server/level/InjectionDistanceManager"],
+      "net/minecraft/class_52": ["com/mohistmc/banner/injection/world/level/storage/loot/InjectionLootTable"],
+      "net/minecraft/class_29": ["com/mohistmc/banner/injection/world/level/storage/InjectionPlayerDataStorage"],
+      "net/minecraft/class_3324": ["com/mohistmc/banner/injection/server/players/InjectionPlayerList"],
+      "net/minecraft/class_1667": ["com/mohistmc/banner/injection/world/entity/projectile/InjectionArrow"],
+      "net/minecraft/class_1668": ["com/mohistmc/banner/injection/world/entity/projectile/InjectionAbstractHurtingProjectile"],
+      "net/minecraft/class_1676": ["com/mohistmc/banner/injection/world/entity/projectile/InjectionProjectile"],
+      "net/minecraft/class_1678": ["com/mohistmc/banner/injection/world/entity/projectile/InjectionShulkerBullet"],
+      "net/minecraft/class_3857": ["com/mohistmc/banner/injection/world/entity/projectile/InjectionThrowableItemProjectile"]
     }
   }
 }
