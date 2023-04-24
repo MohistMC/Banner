@@ -556,13 +556,13 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public boolean generateTree(Location loc, TreeType type, BlockChangeDelegate delegate) {
-        world.captureTreeGeneration = true;
-        world.captureBlockStates = true;
+        world.banner$setCaptureTreeGeneration(true);
+        world.banner$setCaptureBlockStates(true);
         boolean grownTree = generateTree(loc, type);
-        world.captureTreeGeneration = false;
-        world.captureBlockStates = false;
+        world.banner$setCaptureTreeGeneration(false);
+        world.banner$setCaptureBlockStates(false);
         if (grownTree) { // Copy block data to delegate
-            for (BlockState blockstate : world.capturedBlockStates.values()) {
+            for (BlockState blockstate : world.bridge$capturedBlockStates().values()) {
                 BlockPos position = ((CraftBlockState) blockstate).getPosition();
                 net.minecraft.world.level.block.state.BlockState oldBlock = world.getBlockState(position);
                 int flag = ((CraftBlockState) blockstate).getFlag();
@@ -570,10 +570,10 @@ public class CraftWorld extends CraftRegionAccessor implements World {
                 net.minecraft.world.level.block.state.BlockState newBlock = world.getBlockState(position);
                 world.notifyAndUpdatePhysics(position, null, oldBlock, newBlock, newBlock, flag, 512);
             }
-            world.capturedBlockStates.clear();
+            world.bridge$capturedBlockStates().clear();
             return true;
         } else {
-            world.capturedBlockStates.clear();
+            world.bridge$capturedBlockStates().clear();
             return false;
         }
     }
@@ -1089,12 +1089,12 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public boolean getPVP() {
-        return world.pvpMode;
+        return world.bridge$pvpMode();
     }
 
     @Override
     public void setPVP(boolean pvp) {
-        world.pvpMode = pvp;
+        world.banner$setPvpMode(pvp);
     }
 
     public void playEffect(Player player, Effect effect, int data) {
@@ -1252,12 +1252,12 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public boolean getKeepSpawnInMemory() {
-        return world.keepSpawnInMemory;
+        return world.bridge$KeepSpawnInMemory();
     }
 
     @Override
     public void setKeepSpawnInMemory(boolean keepLoaded) {
-        world.keepSpawnInMemory = keepLoaded;
+        world.banner$setKeepSpawnInMemory(keepLoaded);
         // Grab the worlds spawn chunk
         BlockPos chunkcoordinates = this.world.getSharedSpawnPos();
         if (keepLoaded) {
@@ -1409,7 +1409,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         Validate.notNull(spawnCategory, "SpawnCategory cannot be null");
         Validate.isTrue(CraftSpawnCategory.isValidForLimits(spawnCategory), "SpawnCategory." + spawnCategory + " are not supported.");
 
-        world.ticksPerSpawnCategory.put(spawnCategory, (long) ticksPerCategorySpawn);
+        world.bridge$ticksPerSpawnCategory().put(spawnCategory, (long) ticksPerCategorySpawn);
     }
 
     @Override
@@ -1417,7 +1417,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         Validate.notNull(spawnCategory, "SpawnCategory cannot be null");
         Validate.isTrue(CraftSpawnCategory.isValidForLimits(spawnCategory), "SpawnCategory." + spawnCategory + " are not supported.");
 
-        return world.ticksPerSpawnCategory.getLong(spawnCategory);
+        return world.bridge$ticksPerSpawnCategory().getLong(spawnCategory);
     }
 
     @Override
