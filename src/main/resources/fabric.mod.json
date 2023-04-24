@@ -14,7 +14,7 @@
   },
 
   "license": "LGPL-v3.0",
-  "icon": "assets/banner/icon.png",
+  "icon": "assets/banner/logo.png",
 
   "accessWidener": "banner.accesswidener",
   "environment": "*",

@@ -1,5 +1,5 @@
 <div align="center">
-<img src="logo.png">
+<img src="src/main/resources/assets/banner/logo.png">
   <h1>Mohist Banner 1.19.4</h1>
 
 ### The Bukkit/Spigot/Paper API implementation for Fabric
