@@ -24,6 +24,7 @@
     "world.damagesource.MixinDamageSource",
     "world.damagesource.MixinDamageSources",
     "world.entity.MixinEntity",
+    "world.entity.decoration.MixinArmorStand",
     "world.entity.player.MixinInventory",
     "world.entity.player.MixinPlayer",
     "world.entity.projectile.MixinAbstractHurtingProjectile",

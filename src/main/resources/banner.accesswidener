@@ -144,6 +144,8 @@ accessible method net/minecraft/world/level/saveddata/maps/MapItemSavedData setD
 accessible method net/minecraft/server/dedicated/DedicatedServerProperties$WorldDimensionData <init> (Lcom/google/gson/JsonObject;Ljava/lang/String;)V
 accessible method net/minecraft/server/players/StoredUserEntry getUser ()Ljava/lang/Object;
 accessible method net/minecraft/server/level/ServerChunkCache$MainThreadExecutor pollTask ()Z
+accessible method net/minecraft/world/entity/decoration/HangingEntity recalculateBoundingBox ()V
+accessible method net/minecraft/world/entity/decoration/ItemFrame recalculateBoundingBox ()V
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C
