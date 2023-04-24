@@ -514,7 +514,7 @@ public abstract class CraftRegionAccessor implements RegionAccessor {
         }
 
         if (!isNormalWorld()) {
-            entity.generation = true;
+            entity.banner$setGeneration(true);
         }
 
         if (function != null) {

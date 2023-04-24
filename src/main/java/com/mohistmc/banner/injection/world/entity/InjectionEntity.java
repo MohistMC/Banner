@@ -67,4 +67,12 @@ public interface InjectionEntity {
     default void banner$setDefaultActivationState(boolean state) {
 
     }
+
+    default boolean bridge$generation() {
+        return false;
+    }
+
+    default void banner$setGeneration(boolean gen) {
+
+    }
 }
