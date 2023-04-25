@@ -3,6 +3,8 @@ package org.bukkit.craftbukkit.v1_19_R3.inventory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+
+import com.mohistmc.banner.util.BannerLecternInventory;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.MerchantContainer;
@@ -487,7 +489,7 @@ public class CraftInventory implements Inventory {
             return InventoryType.SHULKER_BOX;
         } else if (inventory instanceof BarrelBlockEntity) {
             return InventoryType.BARREL;
-        } else if (inventory instanceof LecternBlockEntity.LecternInventory) {
+        } else if (inventory instanceof BannerLecternInventory) {
             return InventoryType.LECTERN;
         } else if (inventory instanceof ChiseledBookShelfBlockEntity) {
             return InventoryType.CHISELED_BOOKSHELF;

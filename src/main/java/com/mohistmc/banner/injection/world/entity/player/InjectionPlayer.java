@@ -3,6 +3,7 @@ package com.mohistmc.banner.injection.world.entity.player;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Unit;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -30,5 +31,23 @@ public interface InjectionPlayer {
 
     default void causeFoodExhaustion(float f, EntityExhaustionEvent.ExhaustionReason reason) {
 
+    }
+
+    default boolean spawnEntityFromShoulder(CompoundTag nbttagcompound) { // CraftBukkit void->boolean
+        return false;
+    }
+
+    default boolean bridge$fauxSleeping() {
+        return false;
+    }
+
+    default void banner$setFauxSleeping(boolean fauxSleeping) {
+    }
+
+    default int bridge$oldLevel() {
+        return 0;
+    }
+
+    default void banner$setOldLevel(int oldLevel) {
     }
 }

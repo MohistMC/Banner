@@ -813,15 +813,15 @@ public class CraftEventFactory {
         CraftPlayer entity = victim.getBukkitEntity();
         PlayerDeathEvent event = new PlayerDeathEvent(entity, drops, victim.getExpReward(), 0, deathMessage);
         event.setKeepInventory(keepInventory);
-        event.setKeepLevel(victim.keepLevel); // SPIGOT-2222: pre-set keepLevel
+        event.setKeepLevel(victim.bridge$keepLevel()); // SPIGOT-2222: pre-set keepLevel
         org.bukkit.World world = entity.getWorld();
         Bukkit.getServer().getPluginManager().callEvent(event);
 
-        victim.keepLevel = event.getKeepLevel();
-        victim.newLevel = event.getNewLevel();
-        victim.newTotalExp = event.getNewTotalExp();
+        victim.banner$setKeepLevel(event.getKeepLevel());
+        victim.banner$setNewLevel(event.getNewLevel());
+        victim.banner$setNewTotalExp(event.getNewTotalExp());
         victim.expToDrop = event.getDroppedExp();
-        victim.newExp = event.getNewExp();
+        victim.banner$setNewExp(event.getNewExp());
 
         for (org.bukkit.inventory.ItemStack stack : event.getDrops()) {
             if (stack == null || stack.getType() == Material.AIR) continue;

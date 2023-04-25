@@ -1,4 +1,4 @@
-package com.mohistmc.banner.mixin;
+package com.mohistmc.banner.mixin.world;
 
 import com.mohistmc.banner.injection.world.InjectionSimpleContainer;
 import net.minecraft.core.NonNullList;

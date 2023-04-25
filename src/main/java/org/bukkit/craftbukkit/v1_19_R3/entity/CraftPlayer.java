@@ -327,7 +327,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public Location getCompassTarget() {
-        return getHandle().compassTarget;
+        return getHandle().bridge$compassTarget();
     }
 
     @Override
@@ -940,13 +940,13 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public void setSleepingIgnored(boolean isSleeping) {
-        getHandle().fauxSleeping = isSleeping;
+        getHandle().banner$setFauxSleeping(isSleeping);
         ((CraftWorld) getWorld()).getHandle().updateSleepingPlayerList();
     }
 
     @Override
     public boolean isSleepingIgnored() {
-        return getHandle().fauxSleeping;
+        return getHandle().bridge$fauxSleeping();
     }
 
     @Override
@@ -1315,7 +1315,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         // Remove the hidden entity from this player user list, if they're on it
         if (other instanceof ServerPlayer) {
             ServerPlayer otherPlayer = (ServerPlayer) other;
-            if (otherPlayer.sentListPacket) {
+            if (otherPlayer.bridge$sentListPacket()) {
                 getHandle().connection.send(new ClientboundPlayerInfoRemovePacket(List.of(otherPlayer.getUUID())));
             }
         }
@@ -1500,11 +1500,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
             if (data.contains("newExp")) {
                 ServerPlayer handle = getHandle();
-                handle.newExp = data.getInt("newExp");
-                handle.newTotalExp = data.getInt("newTotalExp");
-                handle.newLevel = data.getInt("newLevel");
+                handle.banner$setNewExp(data.getInt("newExp"));
+                handle.banner$setNewTotalExp(data.getInt("newTotalExp"));
+                handle.banner$setNewLevel(data.getInt("newLevel"));
                 handle.expToDrop = data.getInt("expToDrop");
-                handle.keepLevel = data.getBoolean("keepLevel");
+                handle.banner$setKeepLevel(data.getBoolean("keepLevel"));
             }
         }
     }
@@ -1516,11 +1516,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
         CompoundTag data = nbttagcompound.getCompound("bukkit");
         ServerPlayer handle = getHandle();
-        data.putInt("newExp", handle.newExp);
-        data.putInt("newTotalExp", handle.newTotalExp);
-        data.putInt("newLevel", handle.newLevel);
+        data.putInt("newExp", handle.bridge$newExp());
+        data.putInt("newTotalExp", handle.bridge$newTotalExp());
+        data.putInt("newLevel", handle.bridge$newLevel());
         data.putInt("expToDrop", handle.expToDrop);
-        data.putBoolean("keepLevel", handle.keepLevel);
+        data.putBoolean("keepLevel", handle.bridge$keepLevel());
         data.putLong("firstPlayed", getFirstPlayed());
         data.putLong("lastPlayed", System.currentTimeMillis());
         data.putString("lastKnownName", handle.getScoreboardName());
@@ -1857,7 +1857,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         }
         getHandle().getEntityData().set(LivingEntity.DATA_HEALTH_ID, (float) getScaledHealth());
 
-        getHandle().maxHealthCache = getMaxHealth();
+        getHandle().banner$setMaxHealthCache(getMaxHealth());
     }
 
     public void sendHealthUpdate() {
@@ -2004,7 +2004,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public int getClientViewDistance() {
-        return (getHandle().clientViewDistance == null) ? Bukkit.getViewDistance() : getHandle().clientViewDistance;
+        return (getHandle().bridge$clientViewDistance() == null) ? Bukkit.getViewDistance() : getHandle().bridge$clientViewDistance();
     }
 
     @Override

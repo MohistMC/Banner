@@ -5,6 +5,7 @@ import com.mojang.datafixers.util.Unit;
 import net.minecraft.BlockUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -23,12 +24,92 @@ import java.util.Set;
 
 public interface InjectionServerPlayer {
 
+    default Component bridge$listName() {
+        return null;
+    }
+
+    default void banner$setListName(Component listName) {
+    }
+
+    default org.bukkit.Location bridge$compassTarget() {
+        return null;
+    }
+
+    default void banner$setCompassTarget(org.bukkit.Location compassTarget) {
+    }
+
+    default int bridge$newExp(){
+        return 0;
+    }
+
+    default void banner$setNewExp(int newExp) {
+    }
+
+    default int bridge$newLevel() {
+        return 0;
+    }
+
+    default void banner$setNewLevel(int newLevel) {
+    }
+
+    default int bridge$newTotalExp() {
+        return 0;
+    }
+
+    default void banner$setNewTotalExp(int newTotalExp) {
+    }
+
+    default boolean bridge$keepLevel() {
+        return false;
+    }
+
+    default void banner$setKeepLevel(boolean keepLevel) {
+    }
+
+    default double bridge$maxHealthCache() {
+        return 0;
+    }
+
+    default void banner$setMaxHealthCache(double maxHealthCache) {
+    }
+
+    default boolean bridge$joining() {
+        return false;
+    }
+
+    default void banner$setJoining(boolean joining) {
+    }
+
+    default boolean bridge$sentListPacket() {
+        return false;
+    }
+
+    default void banner$setSentListPacket(boolean sentListPacket) {
+    }
+
+    default Integer bridge$clientViewDistance() {
+        return null;
+    }
+
+    default void banner$setClientViewDistance(Integer clientViewDistance) {
+    }
+
+    default String bridge$kickLeaveMessage() {
+        return null;
+    }
+
+    default void banner$setKickLeaveMessage(String kickLeaveMessage) {
+    }
+
     default BlockPos getSpawnPoint(ServerLevel worldserver) {
         return null;
     }
 
     default String bridge$displayName() {
         return null;
+    }
+
+    default void banner$setDisplayName(String displayName) {
     }
 
     default void spawnIn(Level world) {

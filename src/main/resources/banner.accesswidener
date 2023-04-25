@@ -484,6 +484,9 @@ accessible field net/minecraft/world/level/block/entity/JukeboxBlockEntity isPla
 accessible field net/minecraft/world/level/levelgen/structure/templatesystem/StructurePlaceSettings palette I
 accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamageMax I
 accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamagePerDistance F
+accessible field net/minecraft/world/level/block/entity/LecternBlockEntity book Lnet/minecraft/world/item/ItemStack;
+accessible field net/minecraft/world/level/block/entity/BlockEntity level Lnet/minecraft/world/level/Level;
+accessible field net/minecraft/world/level/block/entity/BlockEntity worldPosition Lnet/minecraft/core/BlockPos;
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;
