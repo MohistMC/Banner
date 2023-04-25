@@ -534,7 +534,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
 
     @Override
     public boolean isValid() {
-        return entity.isAlive() && entity.valid && entity.isChunkLoaded();
+        return entity.isAlive() && entity.bridge$valid() && entity.isChunkLoaded();
     }
 
     @Override
@@ -544,12 +544,12 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
 
     @Override
     public boolean isPersistent() {
-        return entity.persist;
+        return entity.bridge$persist();
     }
 
     @Override
     public void setPersistent(boolean persistent) {
-        entity.persist = persistent;
+        entity.banner$setPersist(persistent);
     }
 
     public Vector getMomentum() {
@@ -789,7 +789,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
 
     @Override
     public void setVisibleByDefault(boolean visible) {
-        if (getHandle().visibleByDefault != visible) {
+        if (getHandle().bridge$visibleByDefault() != visible) {
             if (visible) {
                 // Making visible by default, reset and show to all players
                 for (Player player : server.getOnlinePlayers()) {
@@ -802,13 +802,13 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
                 }
             }
 
-            getHandle().visibleByDefault = visible;
+            getHandle().banner$setVisibleByDefault(visible);
         }
     }
 
     @Override
     public boolean isVisibleByDefault() {
-        return getHandle().visibleByDefault;
+        return getHandle().bridge$visibleByDefault();
     }
 
     @Override

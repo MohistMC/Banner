@@ -870,7 +870,7 @@ public class CraftEventFactory {
             if (!event.isCancelled()) {
                 event.getEntity().setLastDamageCause(event);
             } else {
-                entity.lastDamageCancelled = true; // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
+                entity.banner$setLastDamageCancelled(true); // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
             }
             return event;
         } else if (source.getEntity() != null || source.getDirectEntity() != null) {
@@ -901,7 +901,7 @@ public class CraftEventFactory {
             if (!event.isCancelled()) {
                 event.getEntity().setLastDamageCause(event);
             } else {
-                entity.lastDamageCancelled = true; // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
+                entity.banner$setLastDamageCancelled(true); // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
             }
             return event;
         } else if (source.is(DamageTypes.LAVA)) {
@@ -938,7 +938,7 @@ public class CraftEventFactory {
             if (!event.isCancelled()) {
                 event.getEntity().setLastDamageCause(event);
             } else {
-                entity.lastDamageCancelled = true; // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
+                entity.banner$setLastDamageCancelled(true); // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
             }
             return event;
         } else if (entityDamage != null) {
@@ -964,7 +964,7 @@ public class CraftEventFactory {
             if (!event.isCancelled()) {
                 event.getEntity().setLastDamageCause(event);
             } else {
-                entity.lastDamageCancelled = true; // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
+                entity.banner$setLastDamageCancelled(true); // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
             }
             return event;
         }
@@ -1026,7 +1026,7 @@ public class CraftEventFactory {
         if (!event.isCancelled()) {
             event.getEntity().setLastDamageCause(event);
         } else {
-            damagee.lastDamageCancelled = true; // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
+            damagee.banner$setLastDamageCancelled(true); // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
         }
 
         return event;

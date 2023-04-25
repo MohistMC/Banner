@@ -226,12 +226,12 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
 
     @Override
     public int getMaximumAir() {
-        return getHandle().maxAirTicks;
+        return getHandle().bridge$maxAirTicks();
     }
 
     @Override
     public void setMaximumAir(int ticks) {
-        getHandle().maxAirTicks = ticks;
+        getHandle().banner$setMaxAirTicks(ticks);
     }
 
     @Override
@@ -436,7 +436,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
                 launch = new net.minecraft.world.entity.projectile.LargeFireball(world, getHandle(), direction.getX(), direction.getY(), direction.getZ(), 1);
             }
 
-            ((AbstractHurtingProjectile) launch).projectileSource = this;
+            ((AbstractHurtingProjectile) launch).banner$setProjectileSource(this);
             launch.moveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
         } else if (LlamaSpit.class.isAssignableFrom(projectile)) {
             Location location = getEyeLocation();
@@ -739,7 +739,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
 
     @Override
     public void setInvisible(boolean invisible) {
-        getHandle().persistentInvisibility = invisible;
+        getHandle().banner$setPersistentInvisibility(invisible);
         getHandle().setSharedFlag(5, invisible);
     }
 }

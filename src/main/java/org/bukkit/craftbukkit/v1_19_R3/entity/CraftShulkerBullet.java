@@ -15,7 +15,7 @@ public class CraftShulkerBullet extends AbstractProjectile implements ShulkerBul
 
     @Override
     public ProjectileSource getShooter() {
-        return getHandle().projectileSource;
+        return getHandle().bridge$projectileSource();
     }
 
     @Override
@@ -25,7 +25,7 @@ public class CraftShulkerBullet extends AbstractProjectile implements ShulkerBul
         } else {
             getHandle().setOwner(null);
         }
-        getHandle().projectileSource = shooter;
+        getHandle().banner$setProjectileSource(shooter);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class CraftShulkerBullet extends AbstractProjectile implements ShulkerBul
 
     @Override
     public void setTarget(org.bukkit.entity.Entity target) {
-        Preconditions.checkState(!getHandle().generation, "Cannot set target during world generation");
+        Preconditions.checkState(!getHandle().bridge$generation(), "Cannot set target during world generation");
         getHandle().setTarget(target == null ? null : ((CraftEntity) target).getHandle());
     }
 
