@@ -91,7 +91,8 @@
       "net/minecraft/class_1867": ["com/mohistmc/banner/injection/world/item/crafting/InjectionShapelessRecipe"],
       "net/minecraft/class_1869": ["com/mohistmc/banner/injection/world/item/crafting/InjectionShapedRecipe"],
       "net/minecraft/class_1915": ["com/mohistmc/banner/injection/world/item/trading/InjectionMerchant"],
-      "net/minecraft/class_1914": ["com/mohistmc/banner/injection/world/item/trading/InjectionMerchantOffer"]
+      "net/minecraft/class_1914": ["com/mohistmc/banner/injection/world/item/trading/InjectionMerchantOffer"],
+      "net/minecraft/class_1799": ["com/mohistmc/banner/injection/world/item/InjectionItemStack"]
     }
   }
 }

@@ -43,6 +43,7 @@
     "world.entity.raid.MixinRaid",
     "world.food.MixinFoodData",
     "world.inventory.MixinAbstractContainerMenu",
+    "world.item.MixinItemStack",
     "world.item.crafting.MixinBlastingRecipe",
     "world.item.crafting.MixinCampfireCookingRecipe",
     "world.item.crafting.MixinCustomRecipe",
