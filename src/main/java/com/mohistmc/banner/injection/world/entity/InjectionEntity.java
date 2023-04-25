@@ -1,6 +1,8 @@
 package com.mohistmc.banner.injection.world.entity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Position;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
@@ -109,6 +111,10 @@ public interface InjectionEntity {
 
     }
 
+    default Entity teleportTo(ServerLevel worldserver, Position location) {
+        return null;
+    }
+
     default long bridge$activatedTick() {
         return 0;
     }
@@ -130,6 +136,5 @@ public interface InjectionEntity {
     }
 
     default void banner$setGeneration(boolean gen) {
-
     }
 }

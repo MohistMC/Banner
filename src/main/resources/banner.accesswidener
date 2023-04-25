@@ -487,6 +487,7 @@ accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamagePe
 accessible field net/minecraft/world/level/block/entity/LecternBlockEntity book Lnet/minecraft/world/item/ItemStack;
 accessible field net/minecraft/world/level/block/entity/BlockEntity level Lnet/minecraft/world/level/Level;
 accessible field net/minecraft/world/level/block/entity/BlockEntity worldPosition Lnet/minecraft/core/BlockPos;
+accessible field net/minecraft/server/network/ServerGamePacketListenerImpl connection Lnet/minecraft/network/Connection;
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;

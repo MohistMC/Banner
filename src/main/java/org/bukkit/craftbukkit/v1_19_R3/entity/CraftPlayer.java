@@ -225,12 +225,12 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public String getDisplayName() {
-        return getHandle().displayName;
+        return getHandle().bridge$displayName();
     }
 
     @Override
     public void setDisplayName(final String name) {
-        getHandle().displayName = name == null ? getName() : name;
+        getHandle().banner$setDisplayName(name == null ? getName() : name);
     }
 
     @Override
@@ -243,7 +243,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         if (name == null) {
             name = getName();
         }
-        getHandle().setTabListDisplayName(name.equals(getName()) ? null : CraftChatMessage.fromStringOrNull(name));
+        getHandle().banner$setListName(name.equals(getName()) ? null : CraftChatMessage.fromStringOrNull(name));
         for (ServerPlayer player : (List<ServerPlayer>) server.getHandle().players) {
             if (player.getBukkitEntity().canSee(this)) {
                 player.connection.send(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_DISPLAY_NAME, getHandle()));
@@ -1091,13 +1091,13 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public void setPlayerTime(long time, boolean relative) {
-        getHandle().timeOffset = time;
-        getHandle().relativeTime = relative;
+        getHandle().banner$setTimeOffset(time);
+        getHandle().banner$setRelativeTime(relative);
     }
 
     @Override
     public long getPlayerTimeOffset() {
-        return getHandle().timeOffset;
+        return getHandle().bridge$timeOffset();
     }
 
     @Override
@@ -1107,7 +1107,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public boolean isPlayerTimeRelative() {
-        return getHandle().relativeTime;
+        return getHandle().bridge$relativeTime();
     }
 
     @Override
@@ -2055,6 +2055,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     // Spigot start
     private final Player.Spigot spigot = new Player.Spigot()
     {
+        /**
         @Override
         public boolean getCollidesWithEntities() {
             return CraftPlayer.this.isCollidable();
@@ -2089,7 +2090,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
                 }
             }
             return java.util.Collections.unmodifiableSet(ret);
-        }
+        }*/
 
     };
 

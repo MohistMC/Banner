@@ -24,6 +24,20 @@ import java.util.Set;
 
 public interface InjectionServerPlayer {
 
+    default long bridge$timeOffset() {
+        return 0;
+    }
+
+    default void banner$setTimeOffset(long timeOffset) {
+    }
+
+    default boolean bridge$relativeTime() {
+        return false;
+    }
+
+    default void banner$setRelativeTime(boolean relativeTime) {
+    }
+
     default Component bridge$listName() {
         return null;
     }
