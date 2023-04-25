@@ -10,6 +10,7 @@
     "commands.MixinCommands",
     "commands.MixinCommandSource",
     "commands.MixinCommandSourceStack",
+    "commands.arguments.MixinEntityArgument",
     "network.connection.MixinConnection",
     "network.syncher.MixinSynchedEntityData",
     "server.MixinMinecraftServer",
@@ -20,6 +21,7 @@
     "server.level.MixinServerChunkCache",
     "server.level.MixinServerLevel",
     "server.level.MixinServerPlayer",
+    "server.network.MixinServerGamePacketListenerImpl",
     "server.players.MixinPlayerList",
     "world.MixinContainer",
     "world.MixinSimpleContainer",
@@ -31,6 +33,7 @@
     "world.entity.MixinItemBasedSteering",
     "world.entity.MixinLightningBolt",
     "world.entity.MixinLivingEntity",
+    "world.entity.MixinMob",
     "world.entity.MixinNeutralMob",
     "world.entity.decoration.MixinArmorStand",
     "world.entity.player.MixinInventory",
@@ -73,8 +76,10 @@
     "world.level.entity.MixinPersistentEntitySectionManager",
     "world.level.levelgen.structure.templatesystem.MixinStructureTemplate",
     "world.level.saveddata.maps.MixinMapItemSavedData",
+    "world.level.storage.MixinLevelStorageSource",
     "world.level.storage.MixinPlayerDataStorage",
-    "world.level.storage.loot.MixinLootTable"
+    "world.level.storage.loot.MixinLootTable",
+    "world.level.storage.loot.MixinLootTables"
   ],
   "injectors": {
     "defaultRequire": 1

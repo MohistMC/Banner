@@ -30,6 +30,10 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     public String kickLeaveMessage = null; // SPIGOT-3034: Forward leave message to PlayerQuitEvent
     // CraftBukkit end
 
+    public long timeOffset = 0;
+    public boolean relativeTime = true;
+    public String locale = "en_us"; // CraftBukkit - add, lowercase
+
     public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
         super(level, blockPos, f, gameProfile);
     }
@@ -174,4 +178,33 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         this.displayName = displayName;
     }
 
+    @Override
+    public long bridge$timeOffset() {
+        return timeOffset;
+    }
+
+    @Override
+    public void banner$setTimeOffset(long timeOffset) {
+        this.timeOffset = timeOffset;
+    }
+
+    @Override
+    public boolean bridge$relativeTime() {
+        return relativeTime;
+    }
+
+    @Override
+    public void banner$setRelativeTime(boolean relativeTime) {
+        this.relativeTime = relativeTime;
+    }
+
+    @Override
+    public String bridge$locale() {
+        return locale;
+    }
+
+    @Override
+    public void banner$setLocale(String locale) {
+        this.locale = locale;
+    }
 }

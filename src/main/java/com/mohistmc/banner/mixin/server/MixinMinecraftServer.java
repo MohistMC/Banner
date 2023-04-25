@@ -41,8 +41,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
      * @author 1798643961
      * @reason our branding
      */
-    @DontObfuscate
-    @Overwrite
+    @Overwrite(remap = false)
     public String getServerModName() {
         return "banner";
     }

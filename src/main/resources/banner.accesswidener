@@ -149,6 +149,7 @@ accessible method net/minecraft/world/entity/decoration/ItemFrame recalculateBou
 accessible method net/minecraft/world/level/GameRules$Value deserialize (Ljava/lang/String;)V
 accessible method net/minecraft/world/level/GameRules$BooleanValue deserialize (Ljava/lang/String;)V
 accessible method net/minecraft/world/level/GameRules$IntegerValue deserialize (Ljava/lang/String;)V
+accessible method net/minecraft/server/commands/ReloadCommand discoverNewPacks (Lnet/minecraft/server/packs/repository/PackRepository;Lnet/minecraft/world/level/storage/WorldData;Ljava/util/Collection;)Ljava/util/Collection;
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C
@@ -487,6 +488,7 @@ accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamagePe
 accessible field net/minecraft/world/level/block/entity/LecternBlockEntity book Lnet/minecraft/world/item/ItemStack;
 accessible field net/minecraft/world/level/block/entity/BlockEntity level Lnet/minecraft/world/level/Level;
 accessible field net/minecraft/world/level/block/entity/BlockEntity worldPosition Lnet/minecraft/core/BlockPos;
+accessible field net/minecraft/server/network/ServerGamePacketListenerImpl connection Lnet/minecraft/network/Connection;
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;
