@@ -1,6 +1,8 @@
 package org.bukkit.craftbukkit.v1_19_R3.inventory;
 
 import java.util.Map;
+
+import com.mohistmc.banner.util.ServerUtils;
 import net.minecraft.core.NonNullList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -56,6 +58,6 @@ public class CraftShapedRecipe extends ShapedRecipe implements CraftRecipe {
             }
         }
 
-        MinecraftServer.getServer().getRecipeManager().addRecipe(new net.minecraft.world.item.crafting.ShapedRecipe(CraftNamespacedKey.toMinecraft(this.getKey()), this.getGroup(), CraftRecipe.getCategory(this.getCategory()), width, shape.length, data, CraftItemStack.asNMSCopy(this.getResult())));
+        ServerUtils.getServer().getRecipeManager().addRecipe(new net.minecraft.world.item.crafting.ShapedRecipe(CraftNamespacedKey.toMinecraft(this.getKey()), this.getGroup(), CraftRecipe.getCategory(this.getCategory()), width, shape.length, data, CraftItemStack.asNMSCopy(this.getResult())));
     }
 }

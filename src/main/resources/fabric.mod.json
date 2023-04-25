@@ -77,13 +77,22 @@
       "net/minecraft/class_5354": ["com/mohistmc/banner/injection/world/entity/InjectionNeutralMob"],
       "net/minecraft/class_1299": ["com/mohistmc/banner/injection/world/entity/InjectionEntityType"],
       "net/minecraft/class_1538": ["com/mohistmc/banner/injection/world/entity/InjectionLightningBolt"],
+      "net/minecraft/class_1309": ["com/mohistmc/banner/injection/world/entity/InjectionLivingEntity"],
       "net/minecraft/class_1922": ["com/mohistmc/banner/injection/world/level/InjectionBlockGetter"],
       "net/minecraft/class_1945": ["com/mohistmc/banner/injection/world/level/InjectionLevelWriter"],
       "net/minecraft/class_5425": ["com/mohistmc/banner/injection/world/level/InjectionServerLevelAccessor"],
       "net/minecraft/class_1927": ["com/mohistmc/banner/injection/world/level/InjectionExplosion"],
       "net/minecraft/class_1263": ["com/mohistmc/banner/injection/world/InjectionContainer"],
       "net/minecraft/class_1702": ["com/mohistmc/banner/injection/world/food/InjectionFoodData"],
-      "net/minecraft/class_1703": ["com/mohistmc/banner/injection/world/inventory/InjectionAbstractContainerMenu"]
+      "net/minecraft/class_1703": ["com/mohistmc/banner/injection/world/inventory/InjectionAbstractContainerMenu"],
+      "net/minecraft/class_1860": ["com/mohistmc/banner/injection/world/item/crafting/InjectionRecipe"],
+      "net/minecraft/class_1863": ["com/mohistmc/banner/injection/world/item/crafting/InjectionRecipeManager"],
+      "net/minecraft/class_1856": ["com/mohistmc/banner/injection/world/item/crafting/InjectionIngredient"],
+      "net/minecraft/class_1867": ["com/mohistmc/banner/injection/world/item/crafting/InjectionShapelessRecipe"],
+      "net/minecraft/class_1869": ["com/mohistmc/banner/injection/world/item/crafting/InjectionShapedRecipe"],
+      "net/minecraft/class_1915": ["com/mohistmc/banner/injection/world/item/trading/InjectionMerchant"],
+      "net/minecraft/class_1914": ["com/mohistmc/banner/injection/world/item/trading/InjectionMerchantOffer"],
+      "net/minecraft/class_1799": ["com/mohistmc/banner/injection/world/item/InjectionItemStack"]
     }
   }
 }

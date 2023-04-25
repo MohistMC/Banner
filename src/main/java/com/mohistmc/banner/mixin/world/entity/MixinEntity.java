@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.entity;
 
 import com.mohistmc.banner.injection.world.entity.InjectionEntity;
 import net.minecraft.commands.CommandSource;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.Nameable;
@@ -10,6 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityAccess;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
 import org.bukkit.event.entity.EntityCombustEvent;
+import org.bukkit.projectiles.ProjectileSource;
 import org.spigotmc.ActivationRange;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -47,6 +49,14 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     public boolean defaultActivationState;
     public long activatedTick = Integer.MIN_VALUE;
     public boolean generation;
+    public boolean persist = true;
+    public boolean visibleByDefault = true;
+    public boolean valid;
+    public int maxAirTicks = getDefaultMaxAirSupply(); // CraftBukkit - SPIGOT-6907: re-implement LivingEntity#setMaximumAir()
+    public org.bukkit.projectiles.ProjectileSource projectileSource; // For projectiles only
+    public boolean lastDamageCancelled; // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
+    public boolean persistentInvisibility = false;
+    public BlockPos lastLavaContact;
 
     @Override
     public void inactiveTick() {
@@ -156,5 +166,85 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Override
     public void banner$setGeneration(boolean gen) {
         this.generation = gen;
+    }
+
+    @Override
+    public boolean bridge$persist() {
+        return persist;
+    }
+
+    @Override
+    public void banner$setPersist(boolean persist) {
+        this.persist = persist;
+    }
+
+    @Override
+    public boolean bridge$visibleByDefault() {
+        return visibleByDefault;
+    }
+
+    @Override
+    public void banner$setVisibleByDefault(boolean visibleByDefault) {
+        this.visibleByDefault = visibleByDefault;
+    }
+
+    @Override
+    public boolean bridge$valid() {
+        return valid;
+    }
+
+    @Override
+    public void banner$setValid(boolean valid) {
+        this.valid = valid;
+    }
+
+    @Override
+    public int bridge$maxAirTicks() {
+        return maxAirTicks;
+    }
+
+    @Override
+    public void banner$setMaxAirTicks(int maxAirTicks) {
+        this.maxAirTicks = maxAirTicks;
+    }
+
+    @Override
+    public ProjectileSource bridge$projectileSource() {
+        return projectileSource;
+    }
+
+    @Override
+    public void banner$setProjectileSource(ProjectileSource projectileSource) {
+        this.projectileSource = projectileSource;
+    }
+
+    @Override
+    public boolean bridge$lastDamageCancelled() {
+        return lastDamageCancelled;
+    }
+
+    @Override
+    public void banner$setLastDamageCancelled(boolean lastDamageCancelled) {
+        this.lastDamageCancelled = lastDamageCancelled;
+    }
+
+    @Override
+    public boolean bridge$persistentInvisibility() {
+        return persistentInvisibility;
+    }
+
+    @Override
+    public void banner$setPersistentInvisibility(boolean persistentInvisibility) {
+        this.persistentInvisibility = persistentInvisibility;
+    }
+
+    @Override
+    public BlockPos bridge$lastLavaContact() {
+        return lastLavaContact;
+    }
+
+    @Override
+    public void banner$setLastLavaContact(BlockPos lastLavaContact) {
+        this.lastLavaContact = lastLavaContact;
     }
 }

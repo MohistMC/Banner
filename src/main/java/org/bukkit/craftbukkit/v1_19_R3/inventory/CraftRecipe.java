@@ -23,7 +23,7 @@ public interface CraftRecipe extends Recipe {
             stack = new Ingredient(((RecipeChoice.MaterialChoice) bukkit).getChoices().stream().map((mat) -> new net.minecraft.world.item.crafting.Ingredient.ItemValue(CraftItemStack.asNMSCopy(new ItemStack(mat)))));
         } else if (bukkit instanceof RecipeChoice.ExactChoice) {
             stack = new Ingredient(((RecipeChoice.ExactChoice) bukkit).getChoices().stream().map((mat) -> new net.minecraft.world.item.crafting.Ingredient.ItemValue(CraftItemStack.asNMSCopy(mat))));
-            stack.exact = true;
+            stack.banner$setExact(true);
         } else {
             throw new IllegalArgumentException("Unknown recipe stack instance " + bukkit);
         }
@@ -43,7 +43,7 @@ public interface CraftRecipe extends Recipe {
             return null;
         }
 
-        if (list.exact) {
+        if (list.bridge$exact()) {
             List<org.bukkit.inventory.ItemStack> choices = new ArrayList<>(list.itemStacks.length);
             for (net.minecraft.world.item.ItemStack i : list.itemStacks) {
                 choices.add(CraftItemStack.asBukkitCopy(i));

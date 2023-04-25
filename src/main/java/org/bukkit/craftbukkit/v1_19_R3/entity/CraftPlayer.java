@@ -1503,7 +1503,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
                 handle.banner$setNewExp(data.getInt("newExp"));
                 handle.banner$setNewTotalExp(data.getInt("newTotalExp"));
                 handle.banner$setNewLevel(data.getInt("newLevel"));
-                handle.expToDrop = data.getInt("expToDrop");
+                handle.banner$setExpToDrop(data.getInt("expToDrop"));
                 handle.banner$setKeepLevel(data.getBoolean("keepLevel"));
             }
         }
@@ -1519,7 +1519,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         data.putInt("newExp", handle.bridge$newExp());
         data.putInt("newTotalExp", handle.bridge$newTotalExp());
         data.putInt("newLevel", handle.bridge$newLevel());
-        data.putInt("expToDrop", handle.expToDrop);
+        data.putInt("expToDrop", handle.bridge$expToDrop());
         data.putBoolean("keepLevel", handle.bridge$keepLevel());
         data.putLong("firstPlayed", getFirstPlayed());
         data.putLong("lastPlayed", System.currentTimeMillis());

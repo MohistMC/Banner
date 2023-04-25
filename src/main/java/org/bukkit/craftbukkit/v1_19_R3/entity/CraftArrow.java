@@ -62,7 +62,7 @@ public class CraftArrow extends AbstractProjectile implements AbstractArrow {
 
     @Override
     public ProjectileSource getShooter() {
-        return getHandle().projectileSource;
+        return getHandle().bridge$projectileSource();
     }
 
     @Override
@@ -72,7 +72,7 @@ public class CraftArrow extends AbstractProjectile implements AbstractArrow {
         } else {
             getHandle().setOwner(null);
         }
-        getHandle().projectileSource = shooter;
+        getHandle().banner$setProjectileSource(shooter);
     }
 
     @Override
