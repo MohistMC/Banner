@@ -16,9 +16,32 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
         super(entityType, level);
     }
 
+    public boolean fauxSleeping;
+    public int oldLevel = -1;
+
     @Override
     public CraftHumanEntity getBukkitEntity() {
         return (CraftHumanEntity) super.getBukkitEntity();
     }
 
+
+    @Override
+    public boolean bridge$fauxSleeping() {
+        return fauxSleeping;
+    }
+
+    @Override
+    public void banner$setFauxSleeping(boolean fauxSleeping) {
+        this.fauxSleeping = fauxSleeping;
+    }
+
+    @Override
+    public int bridge$oldLevel() {
+        return oldLevel;
+    }
+
+    @Override
+    public void banner$setOldLevel(int oldLevel) {
+        this.oldLevel = oldLevel;
+    }
 }

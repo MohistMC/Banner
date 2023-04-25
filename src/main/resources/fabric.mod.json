@@ -80,7 +80,10 @@
       "net/minecraft/class_1922": ["com/mohistmc/banner/injection/world/level/InjectionBlockGetter"],
       "net/minecraft/class_1945": ["com/mohistmc/banner/injection/world/level/InjectionLevelWriter"],
       "net/minecraft/class_5425": ["com/mohistmc/banner/injection/world/level/InjectionServerLevelAccessor"],
-      "net/minecraft/class_1927": ["com/mohistmc/banner/injection/world/level/InjectionExplosion"]
+      "net/minecraft/class_1927": ["com/mohistmc/banner/injection/world/level/InjectionExplosion"],
+      "net/minecraft/class_1263": ["com/mohistmc/banner/injection/world/InjectionContainer"],
+      "net/minecraft/class_1702": ["com/mohistmc/banner/injection/world/food/InjectionFoodData"],
+      "net/minecraft/class_1703": ["com/mohistmc/banner/injection/world/inventory/InjectionAbstractContainerMenu"]
     }
   }
 }

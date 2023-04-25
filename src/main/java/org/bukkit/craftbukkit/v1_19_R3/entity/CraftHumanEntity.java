@@ -307,7 +307,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         if (getHandle().containerMenu == formerContainer) {
             return null;
         }
-        getHandle().containerMenu.checkReachable = false;
+        getHandle().containerMenu.banner$setCheckReachable(false);
         return getHandle().containerMenu.getBukkitView();
     }
 
@@ -339,7 +339,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         }
         getHandle().openMenu(((CraftingTableBlock) Blocks.CRAFTING_TABLE).getMenuProvider(null, getHandle().level, CraftLocation.toBlockPosition(location)));
         if (force) {
-            getHandle().containerMenu.checkReachable = false;
+            getHandle().containerMenu.banner$setCheckReachable(false);
         }
         return getHandle().containerMenu.getBukkitView();
     }
@@ -361,7 +361,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         getHandle().openMenu(((EnchantmentTableBlock) Blocks.ENCHANTING_TABLE).getMenuProvider(null, getHandle().level, pos));
 
         if (force) {
-            getHandle().containerMenu.checkReachable = false;
+            getHandle().containerMenu.banner$setCheckReachable(false);
         }
         return getHandle().containerMenu.getBukkitView();
     }
@@ -629,32 +629,32 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
 
     @Override
     public int getSaturatedRegenRate() {
-        return getHandle().getFoodData().saturatedRegenRate;
+        return getHandle().getFoodData().bridge$saturatedRegenRate();
     }
 
     @Override
     public void setSaturatedRegenRate(int i) {
-        getHandle().getFoodData().saturatedRegenRate = i;
+        getHandle().getFoodData().banner$setSaturatedRegenRate(i);
     }
 
     @Override
     public int getUnsaturatedRegenRate() {
-        return getHandle().getFoodData().unsaturatedRegenRate;
+        return getHandle().getFoodData().bridge$unsaturatedRegenRate();
     }
 
     @Override
     public void setUnsaturatedRegenRate(int i) {
-        getHandle().getFoodData().unsaturatedRegenRate = i;
+        getHandle().getFoodData().banner$setUnsaturatedRegenRate(i);
     }
 
     @Override
     public int getStarvationRate() {
-        return getHandle().getFoodData().starvationRate;
+        return getHandle().getFoodData().bridge$starvationRate();
     }
 
     @Override
     public void setStarvationRate(int i) {
-        getHandle().getFoodData().starvationRate = i;
+        getHandle().getFoodData().banner$setStarvationRate(i);
     }
 
     @Override
