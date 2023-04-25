@@ -1,6 +1,8 @@
 package org.bukkit.craftbukkit.v1_19_R3.inventory;
 
 import java.util.List;
+
+import com.mohistmc.banner.util.ServerUtils;
 import net.minecraft.core.NonNullList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -44,6 +46,6 @@ public class CraftShapelessRecipe extends ShapelessRecipe implements CraftRecipe
             data.set(i, toNMS(ingred.get(i), true));
         }
 
-        MinecraftServer.getServer().getRecipeManager().addRecipe(new net.minecraft.world.item.crafting.ShapelessRecipe(CraftNamespacedKey.toMinecraft(this.getKey()), this.getGroup(), CraftRecipe.getCategory(this.getCategory()), CraftItemStack.asNMSCopy(this.getResult()), data));
+        ServerUtils.getServer().getRecipeManager().addRecipe(new net.minecraft.world.item.crafting.ShapelessRecipe(CraftNamespacedKey.toMinecraft(this.getKey()), this.getGroup(), CraftRecipe.getCategory(this.getCategory()), CraftItemStack.asNMSCopy(this.getResult()), data));
     }
 }

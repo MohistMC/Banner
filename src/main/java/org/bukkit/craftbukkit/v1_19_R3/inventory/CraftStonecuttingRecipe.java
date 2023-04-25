@@ -1,5 +1,6 @@
 package org.bukkit.craftbukkit.v1_19_R3.inventory;
 
+import com.mohistmc.banner.util.ServerUtils;
 import net.minecraft.server.MinecraftServer;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
@@ -25,6 +26,6 @@ public class CraftStonecuttingRecipe extends StonecuttingRecipe implements Craft
     public void addToCraftingManager() {
         ItemStack result = this.getResult();
 
-        MinecraftServer.getServer().getRecipeManager().addRecipe(new net.minecraft.world.item.crafting.StonecutterRecipe(CraftNamespacedKey.toMinecraft(this.getKey()), this.getGroup(), toNMS(this.getInputChoice(), true), CraftItemStack.asNMSCopy(result)));
+        ServerUtils.getServer().getRecipeManager().addRecipe(new net.minecraft.world.item.crafting.StonecutterRecipe(CraftNamespacedKey.toMinecraft(this.getKey()), this.getGroup(), toNMS(this.getInputChoice(), true), CraftItemStack.asNMSCopy(result)));
     }
 }
