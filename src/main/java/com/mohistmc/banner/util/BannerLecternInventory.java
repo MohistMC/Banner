@@ -40,12 +40,6 @@ public class BannerLecternInventory extends CraftInventory {
     }
 
     @Override
-    public Location getLocation() {
-        if (LecternBlockEntity.level == null) return null;
-        return CraftLocation.toBukkit(LecternBlockEntity.worldPosition, LecternBlockEntity.level.getWorld());
-    }
-
-    @Override
     public void forEach(Consumer<? super ItemStack> action) {
         super.forEach(action);
     }
