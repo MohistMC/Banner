@@ -21,9 +21,10 @@ public interface InjectionPlayer {
         return null;
     }
 
+    /**
     default boolean damageEntity0(DamageSource damagesource, float f) {
         return false;
-    }
+    }*/
 
     default Either<Player.BedSleepingProblem, Unit> startSleepInBed(BlockPos blockposition, boolean force) {
         return null;

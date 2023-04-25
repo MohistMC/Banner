@@ -24,6 +24,13 @@ import java.util.Set;
 
 public interface InjectionServerPlayer {
 
+    default String bridge$locale() {
+        return null;
+    }
+
+    default void banner$setLocale(String locale) {
+    }
+
     default long bridge$timeOffset() {
         return 0;
     }

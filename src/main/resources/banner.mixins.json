@@ -10,6 +10,7 @@
     "commands.MixinCommands",
     "commands.MixinCommandSource",
     "commands.MixinCommandSourceStack",
+    "commands.arguments.MixinEntityArgument",
     "network.connection.MixinConnection",
     "network.syncher.MixinSynchedEntityData",
     "server.MixinMinecraftServer",
@@ -75,6 +76,7 @@
     "world.level.entity.MixinPersistentEntitySectionManager",
     "world.level.levelgen.structure.templatesystem.MixinStructureTemplate",
     "world.level.saveddata.maps.MixinMapItemSavedData",
+    "world.level.storage.MixinLevelStorageSource",
     "world.level.storage.MixinPlayerDataStorage",
     "world.level.storage.loot.MixinLootTable",
     "world.level.storage.loot.MixinLootTables"

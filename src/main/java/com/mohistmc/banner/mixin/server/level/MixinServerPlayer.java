@@ -32,6 +32,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     public long timeOffset = 0;
     public boolean relativeTime = true;
+    public String locale = "en_us"; // CraftBukkit - add, lowercase
 
     public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
         super(level, blockPos, f, gameProfile);
@@ -195,5 +196,15 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Override
     public void banner$setRelativeTime(boolean relativeTime) {
         this.relativeTime = relativeTime;
+    }
+
+    @Override
+    public String bridge$locale() {
+        return locale;
+    }
+
+    @Override
+    public void banner$setLocale(String locale) {
+        this.locale = locale;
     }
 }

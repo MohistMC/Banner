@@ -24,7 +24,7 @@ public class MohistModsRaider extends CraftRaider {
 
     @Override
     public EntityType getType() {
-        return EntityAPI.entityType(entityName, EntityType.FORGE_MOD_PROJECTILE);
+        return EntityAPI.entityType(entityName);
     }
 
     @Override

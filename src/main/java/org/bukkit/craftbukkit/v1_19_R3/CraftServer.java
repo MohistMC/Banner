@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.mohistmc.banner.BannerMod;
 import com.mohistmc.api.ServerAPI;
+import com.mohistmc.banner.util.ReloadUtils;
 import com.mohistmc.banner.util.ServerUtils;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
@@ -433,8 +434,9 @@ public final class CraftServer implements Server {
     private void setVanillaCommands(boolean first) { // Spigot
         CommandDispatcher dispatcher = (ServerUtils.bridge$vanillaCommandDispatcher = console.getCommands().getDispatcher());
 
+        /**
         // Build a list of all Vanilla commands and create wrappers
-        for (CommandNode<CommandSourceStack> cmd : dispatcher.getRoot().getChildren()) {
+        for (Object cmd : dispatcher.getRoot().getChildren()) {
             // Spigot start
             VanillaCommandWrapper wrapper = new VanillaCommandWrapper(dispatcher, cmd);
             if (org.spigotmc.SpigotConfig.replaceCommands.contains( wrapper.getName() ) ) {
@@ -444,11 +446,11 @@ public final class CraftServer implements Server {
             } else if (!first) {
                 commandMap.register("minecraft", wrapper);
             }
-            // Spigot end
-        }
+            // Spigot end*/
     }
 
     public void syncCommands() {
+        /**
         // Clear existing commands
         Commands dispatcher = console.resources.managers().commands = new Commands();
 
@@ -477,7 +479,7 @@ public final class CraftServer implements Server {
         // Refresh commands
         for (ServerPlayer player : getHandle().players) {
             dispatcher.sendCommands(player);
-        }
+        }*/
     }
 
     private void enablePlugin(Plugin plugin) {
@@ -830,16 +832,7 @@ public final class CraftServer implements Server {
         if (stringreader.canRead() && stringreader.peek() == '/') {
             stringreader.skip();
         }
-        ParseResults<CommandSourceStack> parse = ServerAPI.getNMSServer().getCommands().getDispatcher().parse(stringreader, commandSource);
-        CommandEvent event = new CommandEvent(parse);
-        if (MinecraftForge.EVENT_BUS.post(event)) {
-            return null;
-        } else if (event.getException() != null) {
-            return null;
-        } else {
-            String s = event.getParseResults().getReader().getString();
-            return s.startsWith("/") ? s.substring(1) : s;
-        }
+        return commandLine;
     }
 
     @Override
@@ -849,7 +842,7 @@ public final class CraftServer implements Server {
 
     @Override
     public void reloadData() {
-        ReloadCommand.reload(console);
+        ReloadUtils.reload(console);
     }
 
     private void loadIcon() {
@@ -1004,8 +997,9 @@ public final class CraftServer implements Server {
             worlddata = new PrimaryLevelData(worldsettings, worldoptions, worlddimensions_b.specialWorldProperty(), lifecycle);
             iregistry = worlddimensions_b.dimensions();
         }
+        /**
         worlddata.customDimensions = iregistry;
-        worlddata.checkName(name);
+        worlddata.checkName(name);*/
         worlddata.setModdedInfo(console.getServerModName(), console.getModdedStatus().shouldReportAsModified());
 
         if (console.bridge$options().has("forceUpgrade")) {
@@ -1040,12 +1034,12 @@ public final class CraftServer implements Server {
             return null;
         }
 
-        console.initWorld(internal, worlddata, worlddata, worlddata.worldGenOptions());
+        //console.initWorld(internal, worlddata, worlddata, worlddata.worldGenOptions());
 
         internal.setSpawnSettings(true, true);
-        console.addLevel(internal);
+        //console.addLevel(internal);
 
-        getServer().prepareLevels(internal.getChunkSource().chunkMap.progressListener, internal);
+        //getServer().prepareLevels(internal.getChunkSource().chunkMap.progressListener, internal);
         internal.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API
 
         pluginManager.callEvent(new WorldLoadEvent(internal.getWorld()));
@@ -1097,7 +1091,7 @@ public final class CraftServer implements Server {
         }
 
         worlds.remove(world.getName().toLowerCase(java.util.Locale.ENGLISH));
-        console.removeLevel(handle);
+        //console.removeLevel(handle);
         return true;
     }
 
@@ -1740,7 +1734,7 @@ public final class CraftServer implements Server {
     @Override
     public OfflinePlayer[] getOfflinePlayers() {
         PlayerDataStorage storage = console.playerDataStorage;
-        String[] files = storage.getPlayerDataFolder().list(new DatFileFilter());
+        String[] files = storage.getPlayerDir().list(new DatFileFilter());
         Set<OfflinePlayer> players = new HashSet<OfflinePlayer>();
 
         for (String file : files) {
@@ -1964,7 +1958,7 @@ public final class CraftServer implements Server {
     }
 
     public void checkSaveState() {
-        if (this.playerCommandState || this.printSaveWarning || ServerUtils.bridge$processQueue <= 0) {
+        if (this.playerCommandState || this.printSaveWarning /**|| ServerUtils.bridge$processQueue <= 0*/) {
             return;
         }
         this.printSaveWarning = true;
@@ -2108,7 +2102,7 @@ public final class CraftServer implements Server {
         return Iterators.unmodifiableIterator(Iterators.transform(console.getAdvancements().getAllAdvancements().iterator(), new Function<Advancement, org.bukkit.advancement.Advancement>() {
             @Override
             public org.bukkit.advancement.Advancement apply(Advancement advancement) {
-                return advancement.bukkit;
+                return advancement.bridge$bukkit();
             }
         }));
     }
