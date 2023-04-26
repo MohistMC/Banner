@@ -1,4 +1,4 @@
-package com.mohistmc.api;
+package com.mohistmc.banner.api;
 
 import java.util.HashMap;
 import java.util.Map;

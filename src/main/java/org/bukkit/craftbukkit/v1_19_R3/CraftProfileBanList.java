@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
-import net.minecraft.server.MinecraftServer;
+
 import net.minecraft.server.players.UserBanListEntry;
 import net.minecraft.server.players.UserBanList;
 import net.minecraft.server.players.StoredUserEntry;

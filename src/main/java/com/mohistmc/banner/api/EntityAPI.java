@@ -1,4 +1,4 @@
-package com.mohistmc.api;
+package com.mohistmc.banner.api;
 
 import net.minecraft.world.entity.Entity;
 import org.bukkit.entity.EntityType;

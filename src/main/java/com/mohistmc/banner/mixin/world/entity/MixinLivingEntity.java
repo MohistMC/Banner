@@ -10,7 +10,6 @@ import net.minecraft.world.level.Level;
 import org.bukkit.craftbukkit.v1_19_R3.attribute.CraftAttributeMap;
 import org.bukkit.inventory.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 
 import java.util.*;
 

@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.mohistmc.banner.util.ServerUtils;
 import net.minecraft.core.NonNullList;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;

@@ -1,4 +1,4 @@
-package com.mohistmc.api.filestream;
+package com.mohistmc.banner.api.filestream;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

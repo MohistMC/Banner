@@ -1,6 +1,6 @@
-package com.mohistmc.entity;
+package com.mohistmc.banner.entity;
 
-import com.mohistmc.api.EntityAPI;
+import com.mohistmc.banner.api.EntityAPI;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftThrowableProjectile;

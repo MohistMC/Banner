@@ -1,4 +1,4 @@
-package com.mohistmc.api;
+package com.mohistmc.banner.api;
 
 import com.mohistmc.banner.util.ServerUtils;
 import net.minecraft.server.level.ServerPlayer;

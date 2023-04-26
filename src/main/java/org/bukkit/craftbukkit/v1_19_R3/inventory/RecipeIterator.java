@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.mohistmc.banner.util.ServerUtils;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.bukkit.inventory.Recipe;
 

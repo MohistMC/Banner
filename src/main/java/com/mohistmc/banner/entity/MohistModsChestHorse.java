@@ -1,30 +1,30 @@
-package com.mohistmc.entity;
+package com.mohistmc.banner.entity;
 
-import com.mohistmc.api.EntityAPI;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import com.mohistmc.banner.api.EntityAPI;
+import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftAbstractHorse;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftChestedHorse;
 import org.bukkit.entity.EntityCategory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
 
-public class MohistModsAbstractHorse extends CraftAbstractHorse {
+public class MohistModsChestHorse extends CraftChestedHorse {
 
     public String entityName;
 
-    public MohistModsAbstractHorse(CraftServer server, AbstractHorse entity) {
+    public MohistModsChestHorse(CraftServer server, AbstractChestedHorse entity) {
         super(server, entity);
         this.entityName = EntityAPI.entityName(entity);
     }
 
     @Override
     public String toString() {
-        return "MohistModsAbstractHorse{" + entityName + '}';
+        return "MohistModsChestHorse{" + entityName + '}';
     }
 
     @Override
-    public AbstractHorse getHandle() {
-        return (AbstractHorse) entity;
+    public AbstractChestedHorse getHandle() {
+        return (AbstractChestedHorse) entity;
     }
 
     @Override

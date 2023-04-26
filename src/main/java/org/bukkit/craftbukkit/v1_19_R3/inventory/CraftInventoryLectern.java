@@ -1,8 +1,6 @@
 package org.bukkit.craftbukkit.v1_19_R3.inventory;
 
-import com.mohistmc.banner.util.BannerLecternInventory;
 import net.minecraft.world.Container;
-import net.minecraft.world.level.block.entity.LecternBlockEntity;
 import org.bukkit.block.Lectern;
 import org.bukkit.inventory.LecternInventory;
 

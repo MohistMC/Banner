@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import com.mohistmc.banner.util.ServerUtils;
-import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
