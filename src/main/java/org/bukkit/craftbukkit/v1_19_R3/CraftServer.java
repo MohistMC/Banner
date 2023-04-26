@@ -223,7 +223,7 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 
 public final class CraftServer implements Server {
-    private final String serverName = "Mohist";
+    private final String serverName = "Mohist Banner";
     public static String serverVersion;
     private final String bukkitVersion = Versioning.getBukkitVersion();
     private final Logger logger = Logger.getLogger("Minecraft");
@@ -2270,7 +2270,7 @@ public final class CraftServer implements Server {
 
         @Override
         public void restart() {
-            throw new UnsupportedOperationException("Mohist Not supported yet, This causes unknown issues with the mod.");
+            throw new UnsupportedOperationException("Mohist Banner Not supported yet, This causes unknown issues with the mod.");
         }
 
         @Override

@@ -13,7 +13,7 @@
 
 | Version | Support     | Stability | Mod compatibility   | Plugin compatibility |
 |---------|-------------|-----------|---------------------|----------------------|
-| 1.19.4  | WIP         | Zero      | Better than Plugins | Zero                 |   
+| 1.19.4  | WIP         | Poor      | Better than Plugins | Zero                 |   
 
 Progress
 ------
@@ -29,7 +29,8 @@ Progress
     * [ ] NMS-Base-Methods (96%) - (029/030/091)
 
 - [ ] Running ?
-    * [ ] It can be compilable, and running without plugins,but still can not running in CraftBukkit at now
+    * [ ] It can be compilable, and running
+    * [ ] But the compatibility with plugins is zero
   
 Upstream Projects
 ------
@@ -42,7 +43,7 @@ Upstream Projects
 * [**Purpur**](https://github.com/PurpurMC/Purpur.git) - plugin support.
 * [**Pufferfish**](https://github.com/pufferfish-gg/Pufferfish.git) - plugin support.
 * [**Mirai**](https://github.com/etil2jz/Mirai.git) - plugin support.
-* [**Arclight**](https://github.com/IzzelAliz/Arclight.git) - Remapper support.
+* [**Arclight**](https://github.com/IzzelAliz/Arclight.git) - Some code.
 * [**Mohist**](https://github.com/MohistMC/Mohist.git) - Some code.
 
 A Special Thanks To:
