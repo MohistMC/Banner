@@ -44,17 +44,18 @@ public class CraftAllay extends CraftCreature implements org.bukkit.entity.Allay
 
     @Override
     public void setCanDuplicate(boolean canDuplicate) {
-        getHandle().setCanDuplicate(canDuplicate);
+        // TODO getHandle().setCanDuplicate(canDuplicate);
     }
 
     @Override
     public long getDuplicationCooldown() {
-        return getHandle().duplicationCooldown;
+        // TODO return getHandle().duplicationCooldown;
+        return 0;
     }
 
     @Override
     public void setDuplicationCooldown(long l) {
-        getHandle().duplicationCooldown = l;
+        // TODO getHandle().duplicationCooldown = l;
     }
 
     @Override
@@ -76,25 +77,30 @@ public class CraftAllay extends CraftCreature implements org.bukkit.entity.Allay
 
     @Override
     public void startDancing() {
-        getHandle().forceDancing = true;
+        //TODO getHandle().forceDancing = true;
         getHandle().setDancing(true);
     }
 
     @Override
     public void stopDancing() {
-        getHandle().forceDancing = false;
-        getHandle().jukeboxPos = null;
+        //TODO getHandle().forceDancing = false;
+        //TODO getHandle().jukeboxPos = null;
         getHandle().setJukeboxPlaying(null, false);
     }
 
     @Override
     public org.bukkit.entity.Allay duplicateAllay() {
-        Allay nmsAllay = getHandle().duplicateAllay0();
+        /**TODO Allay nmsAllay = getHandle().duplicateAllay0();
         return (nmsAllay != null) ? (org.bukkit.entity.Allay) nmsAllay.getBukkitEntity() : null;
+         */
+        return null;
     }
 
     public Location getJukebox() {
+        /**TODO
         BlockPos nmsJukeboxPos = getHandle().jukeboxPos;
         return (nmsJukeboxPos != null) ? CraftLocation.toBukkit(nmsJukeboxPos, getWorld()) : null;
+         */
+        return null;
     }
 }

@@ -314,6 +314,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
     private static void openCustomInventory(Inventory inventory, ServerPlayer player, MenuType<?> windowType) {
         if (player.connection == null) return;
         Preconditions.checkArgument(windowType != null, "Unknown windowType");
+        /**
         AbstractContainerMenu container = new CraftContainer(inventory, player, player.nextContainerCounterInt());
 
         container = CraftEventFactory.callInventoryOpenEvent(player, container);
@@ -323,7 +324,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
 
         player.connection.send(new ClientboundOpenScreenPacket(container.containerId, windowType, CraftChatMessage.fromString(title)[0]));
         player.containerMenu = container;
-        player.initMenu(container);
+        player.initMenu(container);*/
     }
 
     @Override
@@ -368,6 +369,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
 
     @Override
     public void openInventory(InventoryView inventory) {
+        /**
         if (!(getHandle() instanceof ServerPlayer)) return; // TODO: NPC support?
         if (((ServerPlayer) getHandle()).connection == null) return;
         if (getHandle().containerMenu != getHandle().inventoryMenu) {
@@ -393,7 +395,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         String title = inventory.getTitle();
         player.connection.send(new ClientboundOpenScreenPacket(container.containerId, windowType, CraftChatMessage.fromString(title)[0]));
         player.containerMenu = container;
-        player.initMenu(container);
+        player.initMenu(container);*/
     }
 
     @Override

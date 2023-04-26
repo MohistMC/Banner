@@ -103,6 +103,6 @@ public class CraftBlockEntityState<T extends BlockEntity> extends CraftBlockStat
 
     @Override
     public PersistentDataContainer getPersistentDataContainer() {
-        return this.getSnapshot().persistentDataContainer;
+        return this.getSnapshot().bridge$persistentDataContainer();
     }
 }

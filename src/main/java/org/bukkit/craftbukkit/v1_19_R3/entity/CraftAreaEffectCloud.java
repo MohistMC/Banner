@@ -150,14 +150,14 @@ public class CraftAreaEffectCloud extends CraftEntity implements AreaEffectCloud
             getHandle().effects.remove(existing);
         }
         getHandle().addEffect(CraftPotionUtil.fromBukkit(effect));
-        getHandle().refreshEffects();
+        //TODO getHandle().refreshEffects();
         return true;
     }
 
     @Override
     public void clearCustomEffects() {
         getHandle().effects.clear();
-        getHandle().refreshEffects();
+        //TODO getHandle().refreshEffects();
     }
 
     @Override
@@ -197,19 +197,20 @@ public class CraftAreaEffectCloud extends CraftEntity implements AreaEffectCloud
             return false;
         }
         getHandle().effects.remove(existing);
-        getHandle().refreshEffects();
+        //TODO getHandle().refreshEffects();
         return true;
     }
 
     @Override
     public void setBasePotionData(PotionData data) {
         Validate.notNull(data, "PotionData cannot be null");
-        getHandle().setPotionType(CraftPotionUtil.fromBukkit(data));
+        //TODO  getHandle().setPotionType(CraftPotionUtil.fromBukkit(data));
     }
 
     @Override
     public PotionData getBasePotionData() {
-        return CraftPotionUtil.toBukkit(getHandle().getPotionType());
+        //TODO return CraftPotionUtil.toBukkit(getHandle().getPotionType());
+        return null;
     }
 
     @Override

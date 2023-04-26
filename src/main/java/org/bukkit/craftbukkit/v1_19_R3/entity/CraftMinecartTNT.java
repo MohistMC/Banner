@@ -13,7 +13,7 @@ public final class CraftMinecartTNT extends CraftMinecart implements ExplosiveMi
 
     @Override
     public void setFuseTicks(int ticks) {
-        getHandle().fuse = ticks;
+        //TODO getHandle().fuse = ticks;
     }
 
     @Override

@@ -21,6 +21,7 @@ public class CraftSmithingRecipe extends SmithingRecipe implements CraftRecipe {
         return ret;
     }
 
+    @SuppressWarnings("removal")
     @Override
     public void addToCraftingManager() {
         ItemStack result = this.getResult();

@@ -71,7 +71,8 @@ public class CraftSniffer extends CraftAnimals implements Sniffer {
 
     @Override
     public Location findPossibleDigLocation() {
-        return this.getHandle().calculateDigPosition().map(blockPosition -> CraftLocation.toBukkit(blockPosition, this.getLocation().getWorld())).orElse(null);
+        //TODO return this.getHandle().calculateDigPosition().map(blockPosition -> CraftLocation.toBukkit(blockPosition, this.getLocation().getWorld())).orElse(null);
+        return null;
     }
 
     @Override

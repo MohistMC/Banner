@@ -150,6 +150,14 @@ accessible method net/minecraft/world/level/GameRules$Value deserialize (Ljava/l
 accessible method net/minecraft/world/level/GameRules$BooleanValue deserialize (Ljava/lang/String;)V
 accessible method net/minecraft/world/level/GameRules$IntegerValue deserialize (Ljava/lang/String;)V
 accessible method net/minecraft/server/commands/ReloadCommand discoverNewPacks (Lnet/minecraft/server/packs/repository/PackRepository;Lnet/minecraft/world/level/storage/WorldData;Ljava/util/Collection;)Ljava/util/Collection;
+accessible method net/minecraft/world/entity/animal/allay/Allay resetDuplicationCooldown ()V
+accessible method net/minecraft/world/entity/animal/allay/Allay canDuplicate ()Z
+accessible method net/minecraft/world/entity/animal/horse/Llama setStrength (I)V
+accessible method net/minecraft/world/entity/vehicle/MinecartTNT explode (D)V
+accessible method net/minecraft/world/entity/animal/sniffer/Sniffer canDig ()Z
+accessible method net/minecraft/world/entity/animal/sniffer/Sniffer getExploredPositions ()Ljava/util/stream/Stream;
+accessible method net/minecraft/world/entity/animal/sniffer/Sniffer storeExploredPosition (Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/entity/animal/sniffer/Sniffer;
+accessible method net/minecraft/world/entity/animal/sniffer/Sniffer getState ()Lnet/minecraft/world/entity/animal/sniffer/Sniffer$State;
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C

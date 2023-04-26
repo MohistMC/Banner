@@ -11,6 +11,7 @@
     "commands.MixinCommandSource",
     "commands.MixinCommandSourceStack",
     "commands.arguments.MixinEntityArgument",
+    "network.chat.MixinTextColor",
     "network.connection.MixinConnection",
     "network.syncher.MixinSynchedEntityData",
     "server.MixinMinecraftServer",

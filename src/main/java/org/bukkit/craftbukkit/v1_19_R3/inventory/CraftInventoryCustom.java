@@ -32,7 +32,7 @@ public class CraftInventoryCustom extends CraftInventory {
 
     static class MinecraftInventory implements Container {
         private final NonNullList<ItemStack> items;
-        private int maxStack = MAX_STACK;
+        private int maxStack = 64;
         private final List<HumanEntity> viewers;
         private final String title;
         private InventoryType type;

@@ -7,7 +7,7 @@ import org.bukkit.inventory.MerchantRecipe;
 
 public class CraftMerchantRecipe extends MerchantRecipe {
 
-    private final net.minecraft.world.item.trading.MerchantOffer handle;
+    private net.minecraft.world.item.trading.MerchantOffer handle;
 
     public CraftMerchantRecipe(net.minecraft.world.item.trading.MerchantOffer merchantRecipe) {
         super(CraftItemStack.asBukkitCopy(merchantRecipe.result), 0);
@@ -23,6 +23,7 @@ public class CraftMerchantRecipe extends MerchantRecipe {
 
     public CraftMerchantRecipe(ItemStack result, int uses, int maxUses, boolean experienceReward, int experience, float priceMultiplier, int demand, int specialPrice) {
         super(result, uses, maxUses, experienceReward, experience, priceMultiplier, demand, specialPrice);
+        /**
         this.handle = new net.minecraft.world.item.trading.MerchantOffer(
                 net.minecraft.world.item.ItemStack.EMPTY,
                 net.minecraft.world.item.ItemStack.EMPTY,
@@ -33,7 +34,7 @@ public class CraftMerchantRecipe extends MerchantRecipe {
                 priceMultiplier,
                 demand,
                 this
-        );
+        );*/
         this.setSpecialPrice(specialPrice);
         this.setExperienceReward(experienceReward);
     }

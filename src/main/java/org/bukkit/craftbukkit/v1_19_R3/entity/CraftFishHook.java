@@ -31,121 +31,130 @@ public class CraftFishHook extends CraftProjectile implements FishHook {
 
     @Override
     public int getMinWaitTime() {
-        return getHandle().minWaitTime;
+        //TODO return getHandle().minWaitTime;
+        return 0;
     }
 
     @Override
     public void setMinWaitTime(int minWaitTime) {
         net.minecraft.world.entity.projectile.FishingHook hook = getHandle();
         Validate.isTrue(minWaitTime >= 0 && minWaitTime <= this.getMaxWaitTime(), "The minimum wait time should be between 0 and the maximum wait time.");
-        hook.minWaitTime = minWaitTime;
+        //TODO hook.minWaitTime = minWaitTime;
     }
 
     @Override
     public int getMaxWaitTime() {
-        return getHandle().maxWaitTime;
+        //TODO return getHandle().maxWaitTime;
+        return 0;
     }
 
     @Override
     public void setMaxWaitTime(int maxWaitTime) {
         net.minecraft.world.entity.projectile.FishingHook hook = getHandle();
         Validate.isTrue(maxWaitTime >= 0 && maxWaitTime >= this.getMinWaitTime(), "The maximum wait time should be higher than or equal to 0 and the minimum wait time.");
-        hook.maxWaitTime = maxWaitTime;
+        //TODO hook.maxWaitTime = maxWaitTime;
     }
 
     @Override
     public void setWaitTime(int min, int max) {
         Validate.isTrue(min >= 0 && max >= 0 && min <= max, "The minimum/maximum wait time should be higher than or equal to 0 and the minimum wait time.");
-        getHandle().minWaitTime = min;
-        getHandle().maxWaitTime = max;
+        //TODO getHandle().minWaitTime = min;
+        //TODO getHandle().maxWaitTime = max;
     }
 
     @Override
     public int getMinLureTime() {
-        return getHandle().minLureTime;
+        //TODO return getHandle().minLureTime;
+        return 0;
     }
 
     @Override
     public void setMinLureTime(int minLureTime) {
         Validate.isTrue(minLureTime >= 0 && minLureTime <= this.getMaxLureTime(), "The minimum lure time should be between 0 and the maximum wait time.");
-        getHandle().minLureTime = minLureTime;
+        //TODO getHandle().minLureTime = minLureTime;
     }
 
     @Override
     public int getMaxLureTime() {
-        return getHandle().maxLureTime;
+        //TODO  return getHandle().maxLureTime;
+        return 0;
     }
 
     @Override
     public void setMaxLureTime(int maxLureTime) {
         Validate.isTrue(maxLureTime >= 0 && maxLureTime >= this.getMinLureTime(), "The maximum lure time should be higher than or equal to 0 and the minimum wait time.");
-        getHandle().maxLureTime = maxLureTime;
+        //TODO getHandle().maxLureTime = maxLureTime;
     }
 
     @Override
     public void setLureTime(int min, int max) {
         Validate.isTrue(min >= 0 && max >= 0 && min <= max, "The minimum/maximum lure time should be higher than or equal to 0 and the minimum wait time.");
-        getHandle().minLureTime = min;
-        getHandle().maxLureTime = max;
+        //TODO  getHandle().minLureTime = min;
+        //TODO getHandle().maxLureTime = max;
     }
 
     @Override
     public float getMinLureAngle() {
-        return getHandle().minLureAngle;
+        //TODO return getHandle().minLureAngle;
+        return 0;
     }
 
     @Override
     public void setMinLureAngle(float minLureAngle) {
         Validate.isTrue(minLureAngle <= this.getMaxLureAngle(), "The minimum lure angle should be less than the maximum lure angle.");
-        getHandle().minLureAngle = minLureAngle;
+        //TODO getHandle().minLureAngle = minLureAngle;
     }
 
     @Override
     public float getMaxLureAngle() {
-        return getHandle().maxLureAngle;
+        //TODO return getHandle().maxLureAngle;
+        return 0;
     }
 
     @Override
     public void setMaxLureAngle(float maxLureAngle) {
         Validate.isTrue(maxLureAngle >= this.getMinLureAngle(), "The minimum lure angle should be less than the maximum lure angle.");
-        getHandle().maxLureAngle = maxLureAngle;
+        //TODO getHandle().maxLureAngle = maxLureAngle;
     }
 
     @Override
     public void setLureAngle(float min, float max) {
         Validate.isTrue(min <= max, "The minimum lure angle should be less than the maximum lure angle.");
-        getHandle().minLureAngle = min;
-        getHandle().maxLureAngle = max;
+        //TODO getHandle().minLureAngle = min;
+        //TODO getHandle().maxLureAngle = max;
     }
 
     @Override
     public boolean isSkyInfluenced() {
-        return getHandle().skyInfluenced;
+        //TODO return getHandle().skyInfluenced;
+        return false;
     }
 
     @Override
     public void setSkyInfluenced(boolean skyInfluenced) {
-        getHandle().skyInfluenced = skyInfluenced;
+        //TODO getHandle().skyInfluenced = skyInfluenced;
     }
 
     @Override
     public boolean isRainInfluenced() {
-        return getHandle().rainInfluenced;
+        //TODO return getHandle().rainInfluenced;
+        return false;
     }
 
     @Override
     public void setRainInfluenced(boolean rainInfluenced) {
-        getHandle().rainInfluenced = rainInfluenced;
+        //TODO getHandle().rainInfluenced = rainInfluenced;
     }
 
     @Override
     public boolean getApplyLure() {
-        return getHandle().applyLure;
+        //TODO return getHandle().applyLure;
+        return false;
     }
 
     @Override
     public void setApplyLure(boolean applyLure) {
-        getHandle().applyLure = applyLure;
+        //TODO getHandle().applyLure = applyLure;
     }
 
     @Override

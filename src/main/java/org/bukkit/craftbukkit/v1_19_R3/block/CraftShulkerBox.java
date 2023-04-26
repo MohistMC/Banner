@@ -42,22 +42,22 @@ public class CraftShulkerBox extends CraftLootable<ShulkerBoxBlockEntity> implem
     @Override
     public void open() {
         requirePlaced();
-        if (!getTileEntity().opened && getWorldHandle() instanceof net.minecraft.world.level.Level) {
+        if (!getTileEntity().bridge$opened() && getWorldHandle() instanceof net.minecraft.world.level.Level) {
             Level world = getTileEntity().getLevel();
             world.blockEvent(getPosition(), getTileEntity().getBlockState().getBlock(), 1, 1);
             world.playSound(null, getPosition(), SoundEvents.SHULKER_BOX_OPEN, SoundSource.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
         }
-        getTileEntity().opened = true;
+        getTileEntity().banner$setOpened(true);
     }
 
     @Override
     public void close() {
         requirePlaced();
-        if (getTileEntity().opened && getWorldHandle() instanceof net.minecraft.world.level.Level) {
+        if (getTileEntity().bridge$opened() && getWorldHandle() instanceof net.minecraft.world.level.Level) {
             Level world = getTileEntity().getLevel();
             world.blockEvent(getPosition(), getTileEntity().getBlockState().getBlock(), 1, 0);
             world.playSound(null, getPosition(), SoundEvents.SHULKER_BOX_OPEN, SoundSource.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
         }
-        getTileEntity().opened = false;
+        getTileEntity().banner$setOpened(false);
     }
 }

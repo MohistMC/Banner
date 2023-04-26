@@ -28,6 +28,7 @@ public class CraftBeacon extends CraftBlockEntityState<BeaconBlockEntity> implem
         if (tileEntity instanceof BeaconBlockEntity) {
             BeaconBlockEntity beacon = (BeaconBlockEntity) tileEntity;
 
+            /**
             Collection<net.minecraft.world.entity.player.Player> nms = BeaconBlockEntity.getHumansInRange(beacon.getLevel(), beacon.getBlockPos(), beacon.levels);
             Collection<LivingEntity> bukkit = new ArrayList<LivingEntity>(nms.size());
 
@@ -35,7 +36,7 @@ public class CraftBeacon extends CraftBlockEntityState<BeaconBlockEntity> implem
                 bukkit.add(human.getBukkitEntity());
             }
 
-            return bukkit;
+            return bukkit;*/
         }
 
         // block is no longer a beacon
