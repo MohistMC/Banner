@@ -1,20 +1,29 @@
 package com.mohistmc.banner.mixin.server;
 
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
+import com.mohistmc.banner.util.BukkitOptionParser;
 import com.mohistmc.banner.util.ServerUtils;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.datafixers.DataFixer;
 import jline.console.ConsoleReader;
+import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import net.minecraft.obfuscate.DontObfuscate;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.TickTask;
-import net.minecraft.server.WorldLoader;
+import net.minecraft.server.*;
+import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
+import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.util.thread.ReentrantBlockableEventLoop;
+import net.minecraft.world.level.storage.LevelStorageSource;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.lang.management.ManagementFactory;
+import java.net.Proxy;
 
 @Mixin(MinecraftServer.class)
 public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<TickTask> implements InjectionMinecraftServer {
@@ -37,13 +46,25 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         super(string);
     }
 
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void banner$initServer(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Proxy proxy, DataFixer dataFixer, Services services, ChunkProgressListenerFactory chunkProgressListenerFactory, CallbackInfo ci) {
+        String[] arguments = ManagementFactory.getRuntimeMXBean().getInputArguments().toArray(new String[0]);
+        OptionParser parser = new BukkitOptionParser();
+        try {
+            options = parser.parse(arguments);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands().getDispatcher();
+    }
+
     /**
      * @author 1798643961
      * @reason our branding
      */
     @Overwrite(remap = false)
     public String getServerModName() {
-        return "banner";
+        return "Mohist Banner";
     }
 
     private static MinecraftServer getServer() {
