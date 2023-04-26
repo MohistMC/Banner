@@ -3,6 +3,11 @@ package com.mohistmc.banner.injection.server;
 import jline.console.ConsoleReader;
 import joptsimple.OptionSet;
 import net.minecraft.server.WorldLoader;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.progress.ChunkProgressListener;
+import net.minecraft.world.level.levelgen.WorldOptions;
+import net.minecraft.world.level.storage.ServerLevelData;
+import net.minecraft.world.level.storage.WorldData;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
@@ -39,5 +44,21 @@ public interface InjectionMinecraftServer {
 
     default boolean isDebugging() {
         return false;
+    }
+
+    default boolean hasStopped() {
+        return false;
+    }
+
+    default void initWorld(ServerLevel serverWorld, ServerLevelData worldInfo, WorldData saveData, WorldOptions worldOptions) {
+    }
+
+    default void prepareLevels(ChunkProgressListener listener, ServerLevel serverWorld) {
+    }
+
+    default void addLevel(ServerLevel level) {
+    }
+
+    default void removeLevel(ServerLevel level) {
     }
 }

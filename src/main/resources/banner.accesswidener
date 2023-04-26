@@ -18,6 +18,7 @@ accessible class net/minecraft/world/level/biome/Biome$ClimateSettings
 accessible class net/minecraft/world/item/ItemCooldowns$CooldownInstance
 accessible class net/minecraft/world/entity/raid/Raid$RaidStatus
 accessible class net/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus
+accessible class net/minecraft/server/MinecraftServer$TimeProfiler
 
 # public methods
 accessible method net/minecraft/world/level/block/DispenserBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)V
@@ -158,6 +159,7 @@ accessible method net/minecraft/world/entity/animal/sniffer/Sniffer canDig ()Z
 accessible method net/minecraft/world/entity/animal/sniffer/Sniffer getExploredPositions ()Ljava/util/stream/Stream;
 accessible method net/minecraft/world/entity/animal/sniffer/Sniffer storeExploredPosition (Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/entity/animal/sniffer/Sniffer;
 accessible method net/minecraft/world/entity/animal/sniffer/Sniffer getState ()Lnet/minecraft/world/entity/animal/sniffer/Sniffer$State;
+accessible method net/minecraft/server/MinecraftServer$TimeProfiler <init> (JI)V
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C

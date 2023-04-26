@@ -19,6 +19,7 @@ import org.bukkit.craftbukkit.v1_19_R3.block.CapturedBlockState;
 import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
 import org.bukkit.entity.SpawnCategory;
 import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.generator.ChunkGenerator;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotWorldConfig;
 import org.spongepowered.asm.mixin.Final;
@@ -220,6 +221,16 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     @Override
     public void banner$setKeepSpawnInMemory(boolean keepSpawnInMemory) {
         this.keepSpawnInMemory = keepSpawnInMemory;
+    }
+
+    @Override
+    public ChunkGenerator bridge$generator() {
+        return generator;
+    }
+
+    @Override
+    public void banner$setGenerator(ChunkGenerator generator) {
+        this.generator = generator;
     }
 }
 
