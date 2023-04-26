@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.mohistmc.banner.util.ServerUtils;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;

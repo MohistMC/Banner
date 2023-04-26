@@ -1,7 +1,6 @@
 package org.bukkit.craftbukkit.v1_19_R3.inventory;
 
 import com.mohistmc.banner.util.ServerUtils;
-import net.minecraft.server.MinecraftServer;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
 import org.bukkit.inventory.RecipeChoice;

@@ -7,7 +7,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.mohistmc.banner.util.ServerUtils;
-import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
 
 public class WatchdogThread extends Thread

@@ -16,4 +16,9 @@ public class BannerMod implements ModInitializer {
         MixinExtrasBootstrap.init();
         LOGGER.info("Welcome to use Mohist Banner!");
     }
+
+    public static void loadLibs() {
+        String repository = "https://repo.glowstone.net/repository/maven-public/";
+        String libraryFolder = "banner-lib";
+    }
 }

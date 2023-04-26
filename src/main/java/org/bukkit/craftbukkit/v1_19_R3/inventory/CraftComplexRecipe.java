@@ -2,7 +2,6 @@ package org.bukkit.craftbukkit.v1_19_R3.inventory;
 
 import com.mohistmc.banner.util.ServerUtils;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;

@@ -110,7 +110,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
 
     @Inject(method = "setSecondsOnFire", at = @At("HEAD"))
     private void banner$setSecondsOnFire(int seconds, CallbackInfo ci) {
-        setSecondsOnFire(seconds);
+        setSecondsOnFire(seconds, true);
     }
 
     @Override

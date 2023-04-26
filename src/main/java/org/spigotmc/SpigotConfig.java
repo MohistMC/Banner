@@ -12,7 +12,6 @@ import java.util.logging.Level;
 import com.mohistmc.banner.util.ServerUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import org.apache.logging.log4j.LogManager;

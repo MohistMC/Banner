@@ -8,15 +8,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import com.mohistmc.entity.*;
-import net.minecraft.core.PositionImpl;
+import com.mohistmc.banner.entity.*;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.AbstractFish;
