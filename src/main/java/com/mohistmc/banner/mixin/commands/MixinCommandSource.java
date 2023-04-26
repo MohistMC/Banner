@@ -6,5 +6,5 @@ import org.spongepowered.asm.mixin.Mixin;
 
 // TODO fix inject methods
 @Mixin(CommandSource.class)
-public class MixinCommandSource implements InjectionCommandSource {
+public interface MixinCommandSource extends InjectionCommandSource {
 }

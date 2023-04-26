@@ -450,6 +450,8 @@ public class CraftMetaBook extends CraftMetaItem implements BookMeta {
                 return CraftChatMessage.fromJSONComponent(ComponentSerializer.toString(components));
             }
         }
+
+        /**
         @Override
         public BaseComponent[] getPage(final int page) {
             Validate.isTrue(isValidPage(page), "Invalid page number");
@@ -504,7 +506,7 @@ public class CraftMetaBook extends CraftMetaItem implements BookMeta {
             for (BaseComponent[] page : pages) {
                 addPage(page);
             }
-        }
+        }*/
     };
 
     @Override

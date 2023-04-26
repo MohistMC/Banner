@@ -15,11 +15,12 @@ public class MixinConnection implements InjectionConnection {
     @Shadow public Channel channel;
     public String hostname = ""; // CraftBukkit - add field
 
+    /**
     @Redirect(method = "disconnect", at = @At(value = "INVOKE",
             target = "Lio/netty/channel/Channel;close()Lio/netty/channel/ChannelFuture;"), remap = false)
     private ChannelFuture banner$disconnect(Channel instance) {
         return this.channel.close();// We can't wait as this may be called from an event loop.
-    }
+    }*/
 
     @Override
     public String bridge$hostname() {

@@ -49,12 +49,13 @@ public class CraftInventoryAnvil extends CraftResultInventory implements AnvilIn
 
     @Override
     public int getMaximumRepairCost() {
-        return container.maximumRepairCost;
+        //TODO return container.maximumRepairCost;
+        return 0;
     }
 
     @Override
     public void setMaximumRepairCost(int levels) {
         Preconditions.checkArgument(levels >= 0, "Maximum repair cost must be positive (or 0)");
-        container.maximumRepairCost = levels;
+        //TODO container.maximumRepairCost = levels;
     }
 }

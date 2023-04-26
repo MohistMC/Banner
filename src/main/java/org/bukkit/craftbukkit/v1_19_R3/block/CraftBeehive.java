@@ -48,14 +48,14 @@ public class CraftBeehive extends CraftBlockEntityState<BeehiveBlockEntity> impl
 
     @Override
     public int getMaxEntities() {
-        return getSnapshot().maxBees;
+        return getSnapshot().bridge$maxBees();
     }
 
     @Override
     public void setMaxEntities(int max) {
         Preconditions.checkArgument(max > 0, "Max bees must be more than 0");
 
-        getSnapshot().maxBees = max;
+        getSnapshot().banner$setMaxBees(max);
     }
 
     @Override

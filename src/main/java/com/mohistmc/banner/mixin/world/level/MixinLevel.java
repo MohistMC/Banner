@@ -3,9 +3,6 @@ package com.mohistmc.banner.mixin.world.level;
 import com.mohistmc.banner.injection.world.level.InjectionLevel;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -15,7 +12,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.storage.WritableLevelData;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
@@ -28,16 +24,10 @@ import org.spigotmc.SpigotWorldConfig;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 @Mixin(Level.class)
 public abstract class MixinLevel implements LevelAccessor, AutoCloseable, InjectionLevel {
@@ -71,12 +61,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     public List<ItemEntity> captureDrops;
     public final it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap<SpawnCategory> ticksPerSpawnCategory = new it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap<>();
     public boolean populating;
-    private static org.spigotmc.SpigotWorldConfig spigotConfig; // Spigot
-
-    @Inject(method = "<init>", at = @At("HEAD"))
-    private static void banner$init(WritableLevelData writableLevelData, ResourceKey resourceKey, RegistryAccess registryAccess, Holder holder, Supplier supplier, boolean bl, boolean bl2, long l, int i, CallbackInfo ci) {
-        spigotConfig = new org.spigotmc.SpigotWorldConfig(((net.minecraft.world.level.storage.PrimaryLevelData) writableLevelData).getLevelName()); // Spigot
-    }
+    private org.spigotmc.SpigotWorldConfig spigotConfig; // Spigot
 
     @Override
     public CraftWorld getWorld() {
@@ -138,11 +123,6 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                 }
             }
         }
-    }
-
-    @Redirect(method = "getBlockEntity", at = @At("HEAD"))
-    private void banner$getBlockEntity(BlockPos pos, CallbackInfoReturnable<BlockEntity> cir) {
-        getBlockEntity(pos, true);
     }
 
     @Override

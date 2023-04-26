@@ -14,6 +14,15 @@ public class BannerMod implements ModInitializer {
     @Override
     public void onInitialize() {
         MixinExtrasBootstrap.init();
-        LOGGER.info("Hello Fabric world!");
+        String showLogo = """
+                 _____       ___   __   _   __   _   _____   _____  \s
+                |  _  \\     /   | |  \\ | | |  \\ | | | ____| |  _  \\ \s
+                | |_| |    / /| | |   \\| | |   \\| | | |__   | |_| | \s
+                |  _  {   / / | | | |\\   | | |\\   | |  __|  |  _  / \s
+                | |_| |  / /  | | | | \\  | | | \\  | | |___  | | \\ \\ \s
+                |_____/ /_/   |_| |_|  \\_| |_|  \\_| |_____| |_|  \\_\\\s
+                """;
+        LOGGER.info(showLogo);
+        LOGGER.info("Welcome to use Mohist Banner!");
     }
 }

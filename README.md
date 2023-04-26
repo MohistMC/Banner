@@ -13,7 +13,7 @@
 
 | Version | Support     | Stability | Mod compatibility   | Plugin compatibility |
 |---------|-------------|-----------|---------------------|----------------------|
-| 1.19.4  | WIP         | Zero      | Zero                | Zero                 |   
+| 1.19.4  | WIP         | Zero      | Better than Plugins | Zero                 |   
 
 Progress
 ------
@@ -26,10 +26,10 @@ Progress
         * [ ] CraftBukkit-Patches (3%) - (029/030/091)
 
 - [ ] Start Injection
-    * [ ] NMS-Base-Methods (76%) - (029/030/091)
+    * [ ] NMS-Base-Methods (96%) - (029/030/091)
 
 - [ ] Running ?
-    * [ ] It still can not run at now
+    * [ ] It can be compilable, and running without plugins,but still can not running in CraftBukkit at now
   
 Upstream Projects
 ------

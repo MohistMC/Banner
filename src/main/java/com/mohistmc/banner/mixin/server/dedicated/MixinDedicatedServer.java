@@ -22,6 +22,7 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         super(thread, levelStorageAccess, packRepository, worldStem, proxy, dataFixer, services, chunkProgressListenerFactory);
     }
 
+    /**
     @Inject(method = "initServer", at = @At(value = "INVOKE",
     target = "Lnet/minecraft/server/dedicated/DedicatedServer;setPvpAllowed(Z)V",
     shift = At.Shift.BEFORE))
@@ -30,5 +31,5 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         org.spigotmc.SpigotConfig.init((java.io.File) bridge$options().valueOf("spigot-settings"));
         org.spigotmc.SpigotConfig.registerCommands();
         // Spigot end
-    }
+    }*/
 }
