@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.dedicated;
 
+import com.mohistmc.i18n.i18n;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.Services;
@@ -39,16 +40,13 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
 
     @Inject(method = "initServer", at = @At(value = "JUMP", ordinal = 8))
     private void banner$setupServer(CallbackInfoReturnable<Boolean> cir) {
-        String showLogo = """
-                 _____       ___   __   _   __   _   _____   _____  \s
-                |  _  \\     /   | |  \\ | | |  \\ | | | ____| |  _  \\ \s
-                | |_| |    / /| | |   \\| | |   \\| | | |__   | |_| | \s
-                |  _  {   / / | | | |\\   | | |\\   | |  __|  |  _  / \s
-                | |_| |  / /  | | | | \\  | | | \\  | | |___  | | \\ \\ \s
-                |_____/ /_/   |_| |_|  \\_| |_|  \\_| |_____| |_|  \\_\\\s
-                """;
-        LOGGER.info(showLogo);
-        Bukkit.getLogger().info("Loading Bukkit plugins...");
+        LOGGER.info(" _____       ___   __   _   __   _   _____   _____   ");
+        LOGGER.info("|  _  \\     /   | |  \\ | | |  \\ | | | ____| |  _  \\  ");
+        LOGGER.info("| |_| |    / /| | |   \\| | |   \\| | | |__   | |_| |  ");
+        LOGGER.info("|  _  {   / / | | | |\\   | | |\\   | |  __|  |  _  /  ");
+        LOGGER.info("| |_| |  / /  | | | | \\  | | | \\  | | |___  | | \\ \\  ");
+        LOGGER.info("|_____/ /_/   |_| |_|  \\_| |_|  \\_| |_____| |_|  \\_\\ ");
+        Bukkit.getLogger().info(i18n.get("bukkit.plugins.loading"));
         ((CraftServer) Bukkit.getServer()).loadPlugins();
         ((CraftServer) Bukkit.getServer()).enablePlugins(PluginLoadOrder.STARTUP);
     }

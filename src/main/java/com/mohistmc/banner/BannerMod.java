@@ -19,9 +19,9 @@ public class BannerMod implements ModInitializer {
     @Override
     public void onInitialize() {
         MixinExtrasBootstrap.init();
-        LOGGER.info("Welcome to use Mohist Banner!");
         String l = BannerConfig.banner_lang.split("_")[0];
         String c = BannerConfig.banner_lang.split("_")[1];
         new i18n().build(BannerMod.class.getClassLoader(), new Locale(l, c));
+        LOGGER.info(i18n.get("banner.welcome"));
     }
 }
