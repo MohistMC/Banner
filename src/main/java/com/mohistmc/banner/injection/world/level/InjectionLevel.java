@@ -18,6 +18,13 @@ import java.util.Map;
 
 public interface InjectionLevel {
 
+    default org.bukkit.generator.ChunkGenerator bridge$generator() {
+        return null;
+    }
+
+    default void banner$setGenerator(org.bukkit.generator.ChunkGenerator generator) {
+    }
+
     default boolean bridge$pvpMode() {
         return false;
     }
