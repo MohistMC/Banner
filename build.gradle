@@ -112,11 +112,6 @@ dependencies {
 	include "com.mohistmc:dynamicenum:0.1"
 	include "com.mohistmc:i18n:0.1"
 
-	include "com.google.guava:failureaccess:1.0.1"
-	include "com.google.guava:guava:31.0.1-jre"
-	include "com.google.code.gson:gson:2.10"
-	include "com.mojang:authlib:3.17.30"
-	include "com.mojang:logging:1.1.1"
 	include "org.slf4j:slf4j-api:2.0.6"
 
 	include "org.apache.logging.log4j:log4j-core:2.20.0"
@@ -124,17 +119,11 @@ dependencies {
 	include "org.apache.logging.log4j:log4j-api:2.20.0"
 	include "org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0"
 	include "org.apache.commons:commons-lang3:3.12.0"
-	include "net.sf.jopt-simple:jopt-simple:5.0.4"
-	include "net.java.dev.jna:jna-platform:5.13.0"
-	include "net.java.dev.jna:jna:5.13.0"
 	include "it.unimi.dsi:fastutil:8.5.12"
 	include "commons-io:commons-io:2.11.0"
-	include "com.mojang:javabridge:2.0.25"
-	include "com.mojang:datafixerupper:6.0.6"
-	include "com.mojang:brigadier:1.0.18"
-	include "com.github.oshi:oshi-core:6.4.0"
 
 	include "com.github.LlamaLad7:MixinExtras:0.1.1"
+	include "commons-lang:commons-lang:2.6"
 }
 
 base {

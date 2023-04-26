@@ -45,6 +45,8 @@ Upstream Projects
 * [**Mirai**](https://github.com/etil2jz/Mirai.git) - plugin support.
 * [**Arclight**](https://github.com/IzzelAliz/Arclight.git) - Some code.
 * [**Mohist**](https://github.com/MohistMC/Mohist.git) - Some code.
+* [**CardBoard**](https://github.com/CardboardPowered/cardboard.git) - Some code.
+* [**GlowStone**](https://glowstone.net/) - library loader.
 
 A Special Thanks To:
 -------------
