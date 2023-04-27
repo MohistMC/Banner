@@ -20,6 +20,7 @@
     "network.syncher.MixinSynchedEntityData",
     "server.MixinMain",
     "server.MixinMinecraftServer",
+    "server.MixinPlayerAdvancements",
     "server.bossevents.MixinCustomBossEvent",
     "server.dedicated.MixinDedicatedServer",
     "server.level.MixinChunkHolder",
