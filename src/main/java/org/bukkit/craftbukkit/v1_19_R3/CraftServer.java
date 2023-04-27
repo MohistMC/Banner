@@ -7,13 +7,18 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
-import com.mohistmc.banner.BannerMod;
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.api.ServerAPI;
+import com.mohistmc.banner.fabric.FabricInjectBukkit;
+import com.mojang.brigadier.tree.CommandNode;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.Commands;
+import net.minecraft.world.flag.FeatureFlagSet;
 import org.bukkit.craftbukkit.Main;
 import com.mohistmc.banner.util.ReloadUtils;
 import com.mohistmc.banner.util.ServerUtils;
 import com.mojang.authlib.GameProfile;
-import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
@@ -130,6 +135,7 @@ import org.bukkit.conversations.Conversable;
 import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_19_R3.boss.CraftBossBar;
 import org.bukkit.craftbukkit.v1_19_R3.boss.CraftKeyedBossbar;
+import org.bukkit.craftbukkit.v1_19_R3.command.BukkitCommandWrapper;
 import org.bukkit.craftbukkit.v1_19_R3.command.CraftBlockCommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.command.CraftCommandMap;
 import org.bukkit.craftbukkit.v1_19_R3.command.VanillaCommandWrapper;
@@ -267,11 +273,13 @@ public final class CraftServer implements Server {
                 return player.getBukkitEntity();
             }
         }));
+        vanillaCommandManager = console.getCommands();
         this.serverVersion = "unknown";
         this.structureManager = new CraftStructureManager(console.getStructureManager());
         this.scoreboardManager = new CraftScoreboardManager(console, new ServerScoreboard(console));
         Bukkit.setServer(this);
 
+        FabricInjectBukkit.init();
         // Register all the Enchantments and PotionTypes now so we can stop new registration immediately after
         Enchantments.SHARPNESS.getClass();
 
@@ -425,28 +433,29 @@ public final class CraftServer implements Server {
         pluginManager.disablePlugins();
     }
 
-    private void setVanillaCommands(boolean first) { // Spigot
-        CommandDispatcher dispatcher = (ServerUtils.bridge$vanillaCommandDispatcher = console.getCommands().getDispatcher());
+    public static Commands vanillaCommandManager;
 
-        /**
+    private void setVanillaCommands(boolean first) { // Spigot
+        Commands dispatcher = (vanillaCommandManager = console.getCommands());
         // Build a list of all Vanilla commands and create wrappers
-        for (Object cmd : dispatcher.getRoot().getChildren()) {
+        for (CommandNode<CommandSourceStack> cmd : dispatcher.getDispatcher().getRoot().getChildren()) {
             // Spigot start
             VanillaCommandWrapper wrapper = new VanillaCommandWrapper(dispatcher, cmd);
-            if (org.spigotmc.SpigotConfig.replaceCommands.contains( wrapper.getName() ) ) {
+            /**
+            if (org.spigotmc.SpigotConfig.replaceCommands.contains(wrapper.getName())) {
                 if (first) {
                     commandMap.register("minecraft", wrapper);
                 }
-            } else if (!first) {
+            } else if (!first) {*/
                 commandMap.register("minecraft", wrapper);
-            }
+            //}
             // Spigot end*/
+        }
     }
 
     public void syncCommands() {
-        /**
         // Clear existing commands
-        Commands dispatcher = console.resources.managers().commands = new Commands();
+        Commands dispatcher = console.resources.managers().commands = new Commands(Commands.CommandSelection.ALL, CommandBuildContext.simple(console.registryAccess(), FeatureFlagSet.of()));
 
         // Register all commands, vanilla ones will be using the old dispatcher references
         for (Map.Entry<String, Command> entry : commandMap.getKnownCommands().entrySet()) {
@@ -473,7 +482,7 @@ public final class CraftServer implements Server {
         // Refresh commands
         for (ServerPlayer player : getHandle().players) {
             dispatcher.sendCommands(player);
-        }*/
+        }
     }
 
     private void enablePlugin(Plugin plugin) {
@@ -831,7 +840,7 @@ public final class CraftServer implements Server {
 
     @Override
     public void reload() {
-        BannerMod.LOGGER.warn("For your server security, Bukkit reloading is not supported by Mohist.");
+        BannerServer.LOGGER.warn("For your server security, Bukkit reloading is not supported by Mohist.");
     }
 
     @Override

@@ -22,7 +22,7 @@ public class BukkitDispatcher extends CommandDispatcher<CommandSourceStack> {
     public LiteralCommandNode<CommandSourceStack> register(LiteralArgumentBuilder<CommandSourceStack> command) {
         LiteralCommandNode<CommandSourceStack> node = command.build();
         if (!(node.getCommand() instanceof BukkitCommandWrapper)) {
-            VanillaCommandWrapper wrapper = new VanillaCommandWrapper(this.commands.getDispatcher(), node);
+            VanillaCommandWrapper wrapper = new VanillaCommandWrapper(this.commands, node);
             ((CraftServer) Bukkit.getServer()).getCommandMap().register("forge", wrapper);
         }
         getRoot().addChild(node);

@@ -1,10 +1,12 @@
 package com.mohistmc.banner.mixin.world.level;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mohistmc.banner.injection.world.level.InjectionLevel;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.protocol.game.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ServerLevel;
@@ -15,6 +17,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -36,6 +39,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -62,6 +66,11 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     @Shadow @Nullable public abstract BlockEntity getBlockEntity(BlockPos pos);
 
     @Shadow @Final private WorldBorder worldBorder;
+
+    @Shadow public abstract WorldBorder getWorldBorder();
+
+    @Shadow public abstract LevelChunk getChunk(int chunkX, int chunkZ);
+
     private CraftWorld world;
     public boolean pvpMode;
     public boolean keepSpawnInMemory = true;
@@ -93,10 +102,95 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(WritableLevelData info, ResourceKey<Level> dimension, RegistryAccess registryAccess, Holder<DimensionType> dimType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdates, CallbackInfo ci) {
-        this.worldBorder.banner$setWorld((ServerLevel) (Object) this);
         for (SpawnCategory spawnCategory : SpawnCategory.values()) {
             if (CraftSpawnCategory.isValidForLimits(spawnCategory)) {
                 this.ticksPerSpawnCategory.put(spawnCategory, this.getCraftServer().getTicksPerSpawns(spawnCategory));
+            }
+        }
+    }
+
+    @Inject(method = "<init>", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/damagesource/DamageSources;<init>(Lnet/minecraft/core/RegistryAccess;)V",
+            shift = At.Shift.AFTER))
+    private void banner$addWorldBorder(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder holder, Supplier supplier, boolean bl, boolean bl2, long l, int i, CallbackInfo ci) {
+        // CraftBukkit start
+        getWorldBorder().banner$setWorld(((ServerLevel) (Object) this));
+        getWorldBorder().addListener(new BorderChangeListener() {
+            @Override
+            public void onBorderSizeSet(WorldBorder border, double size) {
+                getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderSizePacket(worldBorder), worldBorder.bridge$world());
+            }
+
+            @Override
+            public void onBorderSizeLerping(WorldBorder border, double oldSize, double newSize, long time) {
+                getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderLerpSizePacket(worldBorder), worldBorder.bridge$world());
+            }
+
+            @Override
+            public void onBorderCenterSet(WorldBorder border, double x, double z) {
+                getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderCenterPacket(worldBorder), worldBorder.bridge$world());
+            }
+
+            @Override
+            public void onBorderSetWarningTime(WorldBorder border, int warningTime) {
+                getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderWarningDelayPacket(worldBorder), worldBorder.bridge$world());
+            }
+
+            @Override
+            public void onBorderSetWarningBlocks(WorldBorder border, int warningBlocks) {
+                getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderWarningDistancePacket(worldBorder), worldBorder.bridge$world());
+            }
+
+            @Override
+            public void onBorderSetDamagePerBlock(WorldBorder border, double damagePerBlock) {
+            }
+
+            @Override
+            public void onBorderSetDamageSafeZOne(WorldBorder border, double damageSafeZone) {}
+        });
+    }
+
+    @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At("HEAD"), cancellable = true)
+    private void banner$captureTreeGeneration(BlockPos pos, BlockState state, int flags, int recursionLeft, CallbackInfoReturnable<Boolean> cir) {
+        if (this.captureTreeGeneration) {
+            CapturedBlockState blockstate = capturedBlockStates.get(pos);
+            if (blockstate == null) {
+                blockstate = CapturedBlockState.getTreeBlockState(((Level) (Object) this), pos, flags);
+                this.capturedBlockStates.put(pos.immutable(), blockstate);
+            }
+            blockstate.setData(state);
+        }
+        cir.setReturnValue(true);
+    }
+
+    @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getBlock()Lnet/minecraft/world/level/block/Block;",
+                    ordinal = 0, shift = At.Shift.AFTER))
+    private void banner$captured(BlockPos pos, BlockState state, int flags, int recursionLeft, CallbackInfoReturnable<Boolean> cir) {
+        boolean banner$captured = false;
+        if (this.captureBlockStates && !this.capturedBlockStates.containsKey(pos)) {
+            CapturedBlockState blockstate = CapturedBlockState.getBlockState(((Level) (Object) this), pos, flags);
+            this.capturedBlockStates.put(pos.immutable(), blockstate);
+            banner$captured = true;
+        }
+        BlockState banner$blockState = this.getChunkAt(pos).setBlockState(pos, state, (flags & 64) != 0);
+        if (banner$blockState == null) {
+            if (this.captureBlockStates && banner$captured) {
+                this.capturedBlockStates.remove(pos);
+            }
+        }
+
+        if (!this.captureBlockStates) { // Don't notify clients or update physics while capturing blockstates
+            notifyAndUpdatePhysics(pos, this.getChunkAt(pos), banner$blockState, this.getBlockState(pos), this.getBlockState(pos), flags, recursionLeft);
+        }
+    }
+
+    @Inject(method = "getBlockState", at = @At("HEAD"), cancellable = true)
+    private void banner$injectBlockState(BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
+        if (captureTreeGeneration) {
+            CapturedBlockState previous = capturedBlockStates.get(pos);
+            if (previous != null) {
+                cir.setReturnValue(previous.getHandle());
             }
         }
     }
@@ -163,6 +257,11 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         }
     }
 
+    @ModifyReturnValue(method = "getBlockEntity", at = @At("RETURN"))
+    private BlockEntity banner$changeBlockEntity(BlockPos pos) {
+        return getBlockEntity(pos, true);
+    }
+
     @Override
     public BlockEntity getBlockEntity(BlockPos blockposition, boolean validate) {
         if (capturedTileEntities.containsKey(blockposition)) {
@@ -172,6 +271,15 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             return null;
         } else {
             return !this.isClientSide && Thread.currentThread() != this.thread ? null : this.getChunkAt(blockposition).getBlockEntity(blockposition, LevelChunk.EntityCreationType.IMMEDIATE);
+        }
+    }
+
+    @Inject(method = "setBlockEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getChunkAt(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/chunk/LevelChunk;",
+            shift =  At.Shift.BEFORE), cancellable = true)
+    private void banner$addTreeCapture(BlockEntity blockEntity, CallbackInfo ci) {
+        if (captureBlockStates) {
+            capturedTileEntities.put(blockEntity.getBlockPos().immutable(), blockEntity);
+            ci.cancel();
         }
     }
 

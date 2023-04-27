@@ -2,12 +2,14 @@ package org.bukkit.craftbukkit.v1_19_R3.command;
 
 import com.google.common.base.Joiner;
 import com.mohistmc.banner.util.ServerUtils;
-import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.tree.CommandNode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.world.entity.vehicle.MinecartCommandBlock;
 import org.apache.commons.lang3.Validate;
@@ -19,7 +21,6 @@ import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftMinecartCommand;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -27,10 +28,10 @@ import org.bukkit.entity.minecart.CommandMinecart;
 
 public final class VanillaCommandWrapper extends BukkitCommand {
 
-    private final CommandDispatcher dispatcher;
+    private final Commands dispatcher;
     public final CommandNode<CommandSourceStack> vanillaCommand;
 
-    public VanillaCommandWrapper(CommandDispatcher dispatcher, CommandNode<CommandSourceStack> vanillaCommand) {
+    public VanillaCommandWrapper(Commands dispatcher, CommandNode<CommandSourceStack> vanillaCommand) {
         super(vanillaCommand.getName(), "A Mojang provided command.", vanillaCommand.getUsageText(), Collections.EMPTY_LIST);
         this.dispatcher = dispatcher;
         this.vanillaCommand = vanillaCommand;
@@ -42,20 +43,8 @@ public final class VanillaCommandWrapper extends BukkitCommand {
         if (!testPermission(sender)) return true;
 
         CommandSourceStack icommandlistener = getListener(sender);
-        //.execute(getCommandSource(sender), toDispatcher(args, commandLabel));
+        dispatcher.dispatchServerCommand(icommandlistener, toDispatcher(args, commandLabel));
         return true;
-    }
-
-    // TODO
-    public static CommandSourceStack getCommandSource(CommandSender s) {
-        if (s instanceof CraftPlayer)
-            return ((CraftPlayer)s).getHandle().getServer().createCommandSourceStack();
-        if (s instanceof CraftEntity)
-            return ((CraftEntity)s).getHandle().getServer().createCommandSourceStack();
-        if (s instanceof ConsoleCommandSender)
-            return ((CraftServer) s.getServer()).getServer().createCommandSourceStack();
-
-        return null;
     }
 
     @Override
@@ -65,13 +54,12 @@ public final class VanillaCommandWrapper extends BukkitCommand {
         Validate.notNull(alias, "Alias cannot be null");
 
         CommandSourceStack icommandlistener = getListener(sender);
-        ///ParseResults<CommandSourceStack> parsed = dispatcher.getDispatcher().parse(toDispatcher(args, getName()), icommandlistener);
+        ParseResults<CommandSourceStack> parsed = dispatcher.getDispatcher().parse(toDispatcher(args, getName()), icommandlistener);
 
         List<String> results = new ArrayList<>();
-        /**
         dispatcher.getDispatcher().getCompletionSuggestions(parsed).thenAccept((suggestions) -> {
             suggestions.getList().forEach((s) -> results.add(s.getText()));
-        });*/
+        });
 
         return results;
     }
