@@ -84,6 +84,7 @@
     "world.level.block.entity.MixinContainerOpenersCounter",
     "world.level.block.entity.MixinFurnaceBlockEntity",
     "world.level.block.entity.MixinShulkerBoxBlockEntity",
+    "world.level.border.MixinWorldBorder",
     "world.level.chunk.MixinChunkAccess",
     "world.level.entity.MixinPersistentEntitySectionManager",
     "world.level.levelgen.structure.templatesystem.MixinStructureTemplate",

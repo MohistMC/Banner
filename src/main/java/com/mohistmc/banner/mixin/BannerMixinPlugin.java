@@ -1,11 +1,13 @@
 package com.mohistmc.banner.mixin;
 
+import com.google.common.collect.ImmutableSet;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.library.Library;
 import com.mohistmc.banner.library.LibraryManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.*;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
@@ -27,7 +29,7 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
             throw new RuntimeException(e);
         }
 
-        LOGGER.info("Mohist Banner Libraries Loading...");
+        LOGGER.info("Loading libraries, please wait...");
         loadLibs();
     }
 
@@ -64,6 +66,10 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
         return "Asia/Shanghai".equals(timeZone.getID());
     }
 
+    private final Set<String> modifyConstructor = ImmutableSet.<String>builder()
+            .add("net.minecraft.world.level.Level")
+            .build();
+
     @Override
     public String getRefMapperConfig() {
         return null;
@@ -89,5 +95,81 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+        modifyConstructor(targetClassName, targetClass);
+    }
+
+    private void modifyConstructor(String targetClassName, ClassNode classNode) {
+        if (modifyConstructor.contains(targetClassName)) {
+            Set<String> presentCtor = new HashSet<>();
+            Set<String> overrideCtor = new HashSet<>();
+            for (MethodNode method : classNode.methods) {
+                if (method.name.equals("<init>")) {
+                    presentCtor.add(method.desc);
+                }
+                if (method.name.equals("banner$constructor$override")) {
+                    overrideCtor.add(method.desc);
+                }
+            }
+            ListIterator<MethodNode> iterator = classNode.methods.listIterator();
+            while (iterator.hasNext()) {
+                MethodNode methodNode = iterator.next();
+                if (methodNode.name.equals("banner$constructor")) {
+                    String desc = methodNode.desc;
+                    if (presentCtor.contains(desc)) {
+                        iterator.remove();
+                    } else {
+                        methodNode.name = "<init>";
+                        presentCtor.add(methodNode.desc);
+                        remapCtor(classNode, methodNode);
+                    }
+                }
+                if (methodNode.name.equals("banner$constructor$super")) {
+                    iterator.remove();
+                }
+                if (methodNode.name.equals("<init>") && overrideCtor.contains(methodNode.desc)) {
+                    iterator.remove();
+                } else if (methodNode.name.equals("banner$constructor$override")) {
+                    methodNode.name = "<init>";
+                    remapCtor(classNode, methodNode);
+                }
+            }
+        }
+    }
+
+    private void remapCtor(ClassNode classNode, MethodNode methodNode) {
+        boolean initialized = false;
+        for (AbstractInsnNode node : methodNode.instructions) {
+            if (node instanceof MethodInsnNode methodInsnNode) {
+                if (methodInsnNode.name.equals("banner$constructor")) {
+                    if (initialized) {
+                        throw new ClassFormatError("Duplicate constructor call");
+                    } else {
+                        methodInsnNode.setOpcode(Opcodes.INVOKESPECIAL);
+                        methodInsnNode.name = "<init>";
+                        initialized = true;
+                    }
+                }
+                if (methodInsnNode.name.equals("banner$constructor$super")) {
+                    if (initialized) {
+                        throw new ClassFormatError("Duplicate constructor call");
+                    } else {
+                        methodInsnNode.setOpcode(Opcodes.INVOKESPECIAL);
+                        methodInsnNode.owner = classNode.superName;
+                        methodInsnNode.name = "<init>";
+                        initialized = true;
+                    }
+                }
+            }
+        }
+        if (!initialized) {
+            if (classNode.superName.equals("java/lang/Object")) {
+                InsnList insnList = new InsnList();
+                insnList.add(new VarInsnNode(Opcodes.ALOAD, 0));
+                insnList.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false));
+                methodNode.instructions.insert(insnList);
+            } else {
+                throw new ClassFormatError("No super constructor call present: " + classNode.name);
+            }
+        }
     }
 }

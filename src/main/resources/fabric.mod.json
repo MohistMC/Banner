@@ -79,6 +79,7 @@
       "net/minecraft/class_60": ["com/mohistmc/banner/injection/world/level/storage/loot/InjectionLootTables"],
       "net/minecraft/class_29": ["com/mohistmc/banner/injection/world/level/storage/InjectionPlayerDataStorage"],
       "net/minecraft/class_32": ["com/mohistmc/banner/injection/world/level/storage/InjectionLevelStorageSource"],
+      "net/minecraft/class_2784": ["com/mohistmc/banner/injection/world/level/border/InjectionWorldBorder"],
       "net/minecraft/class_3324": ["com/mohistmc/banner/injection/server/players/InjectionPlayerList"],
       "net/minecraft/class_1667": ["com/mohistmc/banner/injection/world/entity/projectile/InjectionArrow"],
       "net/minecraft/class_1668": ["com/mohistmc/banner/injection/world/entity/projectile/InjectionAbstractHurtingProjectile"],

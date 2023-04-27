@@ -40,9 +40,6 @@ Upstream Projects
 * [**CraftBukkit**](https://hub.spigotmc.org/stash/scm/spigot/craftbukkit.git) - plugin support.
 * [**Spigot**](https://hub.spigotmc.org/stash/scm/spigot/spigot.git) - plugin support.
 * [**Paper**](https://github.com/PaperMC/Paper.git) - plugin support.
-* [**Purpur**](https://github.com/PurpurMC/Purpur.git) - plugin support.
-* [**Pufferfish**](https://github.com/pufferfish-gg/Pufferfish.git) - plugin support.
-* [**Mirai**](https://github.com/etil2jz/Mirai.git) - plugin support.
 * [**Arclight**](https://github.com/IzzelAliz/Arclight.git) - Some code.
 * [**Mohist**](https://github.com/MohistMC/Mohist.git) - Some code.
 * [**CardBoard**](https://github.com/CardboardPowered/cardboard.git) - Some code.
