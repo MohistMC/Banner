@@ -121,9 +121,4 @@ public abstract class MixinCommands implements InjectionCommands {
         player.connection.send(new ClientboundCommandsPacket(rootCommandNode));
     }
 
-    /**
-    @Redirect(method = "fillUsableCommands", at = @At(value = "INVOKE", remap = false, target = "Lcom/mojang/brigadier/tree/CommandNode;canUse(Ljava/lang/Object;)Z"))
-    private <S> boolean banner$canUse(CommandNode<S> commandNode, S source) {
-        return CommandNodeHooks.canUse(commandNode, source);
-    }*/
 }
