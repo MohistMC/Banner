@@ -1037,12 +1037,12 @@ public final class CraftServer implements Server {
             return null;
         }
 
-        //console.initWorld(internal, worlddata, worlddata, worlddata.worldGenOptions());
+        console.initWorld(internal, worlddata, worlddata, worlddata.worldGenOptions());
 
         internal.setSpawnSettings(true, true);
-        //console.addLevel(internal);
+        console.addLevel(internal);
 
-        //getServer().prepareLevels(internal.getChunkSource().chunkMap.progressListener, internal);
+        getServer().prepareLevels(internal.getChunkSource().chunkMap.progressListener, internal);
         internal.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API
 
         pluginManager.callEvent(new WorldLoadEvent(internal.getWorld()));
@@ -1094,7 +1094,7 @@ public final class CraftServer implements Server {
         }
 
         worlds.remove(world.getName().toLowerCase(java.util.Locale.ENGLISH));
-        //console.removeLevel(handle);
+        console.removeLevel(handle);
         return true;
     }
 

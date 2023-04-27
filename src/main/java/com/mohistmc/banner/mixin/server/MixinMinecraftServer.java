@@ -1,7 +1,23 @@
 package com.mohistmc.banner.mixin.server;
 
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
-import net.minecraft.world.level.storage.CommandStorage;
+import it.unimi.dsi.fastutil.longs.LongIterator;
+import net.minecraft.CrashReport;
+import net.minecraft.ReportedException;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.TicketType;
+import net.minecraft.server.level.progress.ChunkProgressListener;
+import net.minecraft.util.Unit;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.ForcedChunksSavedData;
+import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.levelgen.WorldOptions;
+import net.minecraft.world.level.storage.ServerLevelData;
+import net.minecraft.world.level.storage.WorldData;
 import org.bukkit.craftbukkit.Main;
 import com.mohistmc.banner.util.ServerUtils;
 import com.mojang.datafixers.DataFixer;
@@ -17,7 +33,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.fusesource.jansi.AnsiConsole;
-import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,6 +47,8 @@ import java.lang.management.ManagementFactory;
 import java.net.Proxy;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,8 +56,25 @@ import java.util.logging.Logger;
 @Mixin(MinecraftServer.class)
 public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<TickTask> implements InjectionMinecraftServer {
 
-    @Shadow @Nullable private CommandStorage commandStorage;
     @Shadow public MinecraftServer.ReloadableResources resources;
+
+
+    @Shadow public Map<ResourceKey<net.minecraft.world.level.Level>, ServerLevel> levels;
+
+    @Shadow
+    private static void setInitialSpawn(ServerLevel level, ServerLevelData levelData, boolean generateBonusChest, boolean debug) {
+    }
+
+    @Shadow protected abstract void setupDebugLevel(WorldData worldData);
+
+    @Shadow public WorldData worldData;
+    @Shadow @Final public static org.slf4j.Logger LOGGER;
+    @Shadow private long nextTickTime;
+
+    @Shadow public abstract boolean isSpawningMonsters();
+
+    @Shadow public abstract boolean isSpawningAnimals();
+
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
     public org.bukkit.craftbukkit.v1_19_R3.CraftServer server;
@@ -146,6 +181,89 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     private static MinecraftServer getServer() {
         return ServerUtils.getServer();
+    }
+
+    @Override
+    public void addLevel(ServerLevel level) {
+        this.levels.put(level.dimension(), level);
+    }
+
+    @Override
+    public void removeLevel(ServerLevel level) {
+        this.levels.remove(level.dimension());
+    }
+
+    @Override
+    public void initWorld(ServerLevel serverWorld, ServerLevelData worldInfo, WorldData saveData, WorldOptions worldOptions) {
+        boolean flag = saveData.isDebugWorld();
+        if ((serverWorld.bridge$generator() != null)) {
+            serverWorld.getWorld().getPopulators().addAll(
+                    (serverWorld.bridge$generator().getDefaultPopulators(
+                            (serverWorld.getWorld()))));
+        }
+        WorldBorder worldborder = serverWorld.getWorldBorder();
+        worldborder.applySettings(worldInfo.getWorldBorder());
+        if (!worldInfo.isInitialized()) {
+            try {
+                setInitialSpawn(serverWorld, worldInfo, worldOptions.generateBonusChest(), flag);
+                worldInfo.setInitialized(true);
+                if (flag) {
+                    this.setupDebugLevel(this.worldData);
+                }
+            } catch (Throwable throwable) {
+                CrashReport crashreport = CrashReport.forThrowable(throwable, "Exception initializing level");
+                try {
+                    serverWorld.fillReportDetails(crashreport);
+                } catch (Throwable throwable2) {
+                    // empty catch block
+                }
+                throw new ReportedException(crashreport);
+            }
+            worldInfo.setInitialized(true);
+        }
+    }
+
+    @Override
+    public void prepareLevels(ChunkProgressListener listener, ServerLevel serverWorld) {
+        if (!serverWorld.getWorld().getKeepSpawnInMemory()) {
+            return;
+        }
+        this.forceTicks = true;
+        LOGGER.info("Preparing start region for dimension {}", serverWorld.dimension().location());
+        BlockPos blockpos = serverWorld.getSharedSpawnPos();
+        listener.updateSpawnPos(new ChunkPos(blockpos));
+        ServerChunkCache serverchunkprovider = serverWorld.getChunkSource();
+        serverchunkprovider.getLightEngine().setTaskPerBatch(500);
+        this.nextTickTime = Util.getMillis();
+        serverchunkprovider.addRegionTicket(TicketType.START, new ChunkPos(blockpos), 11, Unit.INSTANCE);
+
+        while (serverchunkprovider.getTickingGenerated() < 441) {
+            this.executeModerately();
+        }
+
+        this.executeModerately();
+
+        ForcedChunksSavedData forcedchunkssavedata = serverWorld.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
+        if (forcedchunkssavedata != null) {
+            LongIterator longiterator = forcedchunkssavedata.getChunks().iterator();
+
+            while (longiterator.hasNext()) {
+                long i = longiterator.nextLong();
+                ChunkPos chunkpos = new ChunkPos(i);
+                serverWorld.getChunkSource().updateChunkForced(chunkpos, true);
+            }
+        }
+        this.executeModerately();
+        listener.stop();
+        serverchunkprovider.getLightEngine().setTaskPerBatch(5);
+        serverWorld.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
+        this.forceTicks = false;
+    }
+
+    @Override
+    public void executeModerately() {
+        this.runAllTasks();
+        java.util.concurrent.locks.LockSupport.parkNanos("executing tasks", 1000L);
     }
 
     // Banner start

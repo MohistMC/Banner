@@ -64,4 +64,7 @@ public interface InjectionMinecraftServer {
 
     default void removeLevel(ServerLevel level) {
     }
+
+    default void executeModerately() {
+    }
 }

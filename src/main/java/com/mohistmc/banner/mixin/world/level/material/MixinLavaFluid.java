@@ -75,10 +75,9 @@ public abstract class MixinLavaFluid {
         }
     }
 
-    /**
     @Redirect(method = "spreadTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/LevelAccessor;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
     private boolean banner$spreadTo(LevelAccessor instance, BlockPos pos, BlockState state, int i) {
         return org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.handleBlockFormEvent(instance.getMinecraftWorld(), pos, Blocks.STONE.defaultBlockState(), 3);
-    }*/
+    }
 
 }

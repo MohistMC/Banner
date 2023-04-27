@@ -331,7 +331,6 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         banner$damageEventBlock = null;
     }
 
-    /**
     @Inject(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity$MovementEmission;emitsAnything()Z"))
     private void banner$move$blockCollide(MoverType typeIn, Vec3 pos, CallbackInfo ci) {
         if (horizontalCollision && this.getBukkitEntity() instanceof Vehicle vehicle) {
@@ -352,7 +351,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
                 Bukkit.getPluginManager().callEvent(event);
             }
         }
-    }*/
+    }
 
     @Inject(method = "absMoveTo(DDDFF)V", at = @At("RETURN"))
     private void banner$loadChunk(double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {
@@ -378,7 +377,6 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         }
     }
 
-    /**
     @Inject(method = "saveWithoutId", at = @At(value = "INVOKE", shift = At.Shift.AFTER, ordinal = 0, target = "Lnet/minecraft/nbt/CompoundTag;putUUID(Ljava/lang/String;Ljava/util/UUID;)V"))
     public void banner$writeWithoutTypeId$CraftBukkitNBT(CompoundTag compound, CallbackInfoReturnable<CompoundTag> cir) {
         compound.putLong("WorldUUIDLeast", this.level.getWorld().getUID().getLeastSignificantBits());
@@ -397,7 +395,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         if (maxAirTicks != getDefaultMaxAirSupply()) {
             compound.putInt("Bukkit.MaxAirSupply", getMaxAirSupply());
         }
-    }*/
+    }
 
     @Inject(method = "saveWithoutId", at = @At(value = "RETURN"))
     public void banner$writeWithoutTypeId$StoreBukkitValues(CompoundTag compound, CallbackInfoReturnable<CompoundTag> cir) {
@@ -410,7 +408,6 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         return tag.contains("Bukkit.updateLevel") && tag.getInt("Bukkit.updateLevel") >= level;
     }
 
-    /**
     @Inject(method = "load", at = @At(value = "RETURN"))
     public void banner$read$ReadBukkitValues(CompoundTag compound, CallbackInfo ci) {
         // CraftBukkit start
@@ -451,7 +448,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
             maxAirTicks = compound.getInt("Bukkit.MaxAirSupply");
         }
         // CraftBukkit end
-    }*/
+    }
 
     @Inject(method = "setInvisible", cancellable = true, at = @At("HEAD"))
     private void banner$preventVisible(boolean invisible, CallbackInfo ci) {
