@@ -7,6 +7,8 @@ import java.lang.reflect.Constructor;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
+
+import com.mohistmc.dynamicenum.MohistDynamEnum;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
@@ -4506,6 +4508,26 @@ public enum Material implements Keyed, Translatable {
     public final Class<?> data;
     private final boolean legacy;
     private final NamespacedKey key;
+    private int blockID;
+    public boolean isFabricBlock = false;
+    private NamespacedKey keyFabric;
+    private String modName;
+
+    // Banner start - constructor used to set if the Material is a block or not
+    private Material(final int id, boolean flag) {
+        this(id, 64);
+        this.isFabricBlock = flag;
+    }
+    // Banner end
+
+    // Banner start - constructor used to set if block is modded
+    private Material(final int id, boolean flag, String modName) {
+        this(id, 64);
+        this.isFabricBlock = flag;
+        this.modName = modName;
+        this.keyFabric = new NamespacedKey(modName, this.name().toLowerCase(Locale.ROOT).substring(modName.length() + 1));
+    }
+    // Banner end
 
     private Material(final int id) {
         this(id, 64);
@@ -11060,5 +11082,44 @@ public enum Material implements Keyed, Translatable {
     @Nullable
     public String getItemTranslationKey() {
         return Bukkit.getUnsafe().getItemTranslationKey(this);
+    }
+
+
+    public static Material addMaterial(String materialName, int id, boolean isBlock) {
+        // Fabric Blocks
+        if (isBlock) {
+            Material material = BY_NAME.get(materialName);
+            if (material != null){
+                material.blockID = id;
+                material.isFabricBlock = true;
+            }else {
+                material = (Material) MohistDynamEnum.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE}, new Object[]{id, true});
+            }
+            BY_NAME.put(materialName, material);
+            return material;
+        } else { // Fabric Items
+            Material material = (Material) MohistDynamEnum.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE}, new Object[]{id, false});
+            BY_NAME.put(materialName, material);
+            return material;
+        }
+    }
+
+    public static Material addMaterial(String materialName, int id, boolean isBlock, String modName) {
+        // Fabric Blocks
+        if (isBlock) {
+            Material material = BY_NAME.get(materialName);
+            if (material != null){
+                material.blockID = id;
+                material.isFabricBlock = true;
+            }else {
+                material = (Material) MohistDynamEnum.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE, String.class}, new Object[]{id, true, modName});
+            }
+            BY_NAME.put(materialName, material);
+            return material;
+        } else { // Fabric Items
+            Material material = (Material) MohistDynamEnum.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE, String.class}, new Object[]{id, false, modName});
+            BY_NAME.put(materialName, material);
+            return material;
+        }
     }
 }

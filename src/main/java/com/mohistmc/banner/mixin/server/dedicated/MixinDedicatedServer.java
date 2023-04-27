@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.dedicated;
 
+import com.mohistmc.banner.BannerMod;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.Services;
@@ -45,7 +46,7 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         LOGGER.info("|  _  {   / / | | | |\\   | | |\\   | |  __|  |  _  /  ");
         LOGGER.info("| |_| |  / /  | | | | \\  | | | \\  | | |___  | | \\ \\  ");
         LOGGER.info("|_____/ /_/   |_| |_|  \\_| |_|  \\_| |_____| |_|  \\_\\ ");
-        Bukkit.getLogger().info("Loading Bukkit plugins...");
+        BannerMod.LOGGER.info("Loading Bukkit plugins...");
         ((CraftServer) Bukkit.getServer()).loadPlugins();
         ((CraftServer) Bukkit.getServer()).enablePlugins(PluginLoadOrder.STARTUP);
     }

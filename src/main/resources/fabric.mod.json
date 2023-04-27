@@ -90,6 +90,8 @@
       "net/minecraft/class_1299": ["com/mohistmc/banner/injection/world/entity/InjectionEntityType"],
       "net/minecraft/class_1538": ["com/mohistmc/banner/injection/world/entity/InjectionLightningBolt"],
       "net/minecraft/class_1309": ["com/mohistmc/banner/injection/world/entity/InjectionLivingEntity"],
+      "net/minecraft/class_1296": ["com/mohistmc/banner/injection/world/entity/InjectionAgeableMob"],
+      "net/minecraft/class_1295": ["com/mohistmc/banner/injection/world/entity/InjectionAreaEffectCloud"],
       "net/minecraft/class_1922": ["com/mohistmc/banner/injection/world/level/InjectionBlockGetter"],
       "net/minecraft/class_1945": ["com/mohistmc/banner/injection/world/level/InjectionLevelWriter"],
       "net/minecraft/class_5425": ["com/mohistmc/banner/injection/world/level/InjectionServerLevelAccessor"],

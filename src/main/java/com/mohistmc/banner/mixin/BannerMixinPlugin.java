@@ -48,11 +48,11 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
         libraries.add(new Library("io.izzel", "tools", "1.3.0", MD5, "440242a418ab84713632b0026144eea4"));
         libraries.add(new Library("com.mohistmc.remapper", "mohistremapper", "0.3", MD5, "327e55217d11b8c93c1f4bec14ddb3a3"));
         libraries.add(new Library("com.mohistmc", "dynamicenum", "0.1", MD5, "ae876076bdcc7ee5673b445c313d3be5"));
-        libraries.add(new Library("com.mohistmc", "i18n", "0.1", MD5, "012e81b705b91aeb7d94bb2790ae0c7a"));
+        libraries.add(new Library("com.mohistmc", "i18n", "0.2", MD5, "956a8d30a6e464eef86027fb74fd7177"));
         libraries.add(new Library("org.apache.logging.log4j", "log4j-iostreams", "2.20.0", MD5, "d612855f572573a409bb59957c7c24c8"));
         libraries.add(new Library("commons-io", "commons-io", "2.11.0", MD5, "3b4b7ccfaeceeac240b804839ee1a1ca"));
         libraries.add(new Library("commons-lang", "commons-lang", "2.6-mohist", MD5, "755f5cdb5de00d072215340e8370daff"));
-        new LibraryManager(getRepository(), "banner-libs", true, 2, libraries).run();
+        new LibraryManager(getRepository(), "banner-libs", true, 6, libraries).run();
     }
 
     private static String getRepository() {
