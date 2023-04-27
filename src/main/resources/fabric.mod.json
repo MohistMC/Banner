@@ -19,8 +19,8 @@
   "accessWidener": "banner.accesswidener",
   "environment": "*",
   "entrypoints": {
-    "main": [
-      "com.mohistmc.banner.BannerMod"
+    "server": [
+      "com.mohistmc.banner.BannerServer"
     ]
   },
   "mixins": [
@@ -54,6 +54,7 @@
       "net/minecraft/class_2168": ["com/mohistmc/banner/injection/commands/InjectionCommandSourceStack"],
       "net/minecraft/class_2165": ["com/mohistmc/banner/injection/commands/InjectionCommandSource"],
       "net/minecraft/class_2186": ["com/mohistmc/banner/injection/commands/arguments/InjectionEntityArgument"],
+      "net/minecraft/class_2303": ["com/mohistmc/banner/injection/commands/arguments/selector/InjectionEntitySelectorParser"],
       "net/minecraft/class_5561": ["com/mohistmc/banner/injection/world/level/block/entity/InjectionContainerOpenersCounter"],
       "net/minecraft/class_2580": ["com/mohistmc/banner/injection/world/level/block/entity/InjectionBeaconBlockEntity"],
       "net/minecraft/class_4482": ["com/mohistmc/banner/injection/world/level/block/entity/InjectionBeehiveBlockEntity"],

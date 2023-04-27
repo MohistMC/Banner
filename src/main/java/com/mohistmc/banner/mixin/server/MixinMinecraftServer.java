@@ -1,9 +1,9 @@
 package com.mohistmc.banner.mixin.server;
 
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
+import net.minecraft.world.level.storage.CommandStorage;
 import org.bukkit.craftbukkit.Main;
 import com.mohistmc.banner.util.ServerUtils;
-import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.datafixers.DataFixer;
 import jline.console.ConsoleReader;
 import joptsimple.OptionParser;
@@ -17,7 +17,9 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.fusesource.jansi.AnsiConsole;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -36,6 +38,8 @@ import java.util.logging.Logger;
 @Mixin(MinecraftServer.class)
 public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<TickTask> implements InjectionMinecraftServer {
 
+    @Shadow @Nullable private CommandStorage commandStorage;
+    @Shadow public MinecraftServer.ReloadableResources resources;
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
     public org.bukkit.craftbukkit.v1_19_R3.CraftServer server;
@@ -47,7 +51,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     public java.util.Queue<Runnable> processQueue = ServerUtils.bridge$processQueue;
     public int autosavePeriod = ServerUtils.bridge$autosavePeriod;
     private boolean forceTicks;
-    public CommandDispatcher vanillaCommandDispatcher = ServerUtils.bridge$vanillaCommandDispatcher;
     // CraftBukkit end
 
     public MixinMinecraftServer(String string) {
@@ -129,7 +132,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                 t.printStackTrace();
             }
         }
-        this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands().getDispatcher();
     }
 
     @Inject(method = "getServerModName", at = @At(value = "HEAD"), remap = false, cancellable = true)

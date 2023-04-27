@@ -1,6 +1,6 @@
 package com.mohistmc.banner.fabric;
 
-import com.mohistmc.banner.BannerMod;
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.dynamicenum.MohistDynamEnum;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -42,7 +42,7 @@ public class FabricInjectBukkit {
                 if (material != null) {
                     CraftMagicNumbers.ITEM_MATERIAL.put(item, material);
                     CraftMagicNumbers.MATERIAL_ITEM.put(material, item);
-                    BannerMod.LOGGER.debug("Save-ITEM: " + material.name() + " - " + materialName);
+                    BannerServer.LOGGER.debug("Save-ITEM: " + material.name() + " - " + materialName);
                 }
             }
         }
@@ -61,7 +61,7 @@ public class FabricInjectBukkit {
                 if (material != null) {
                     CraftMagicNumbers.BLOCK_MATERIAL.put(block, material);
                     CraftMagicNumbers.MATERIAL_BLOCK.put(material, block);
-                    BannerMod.LOGGER.debug("Save-BLOCK:" + material.name() + " - " + materialName);
+                    BannerServer.LOGGER.debug("Save-BLOCK:" + material.name() + " - " + materialName);
                 }
             }
         }
@@ -90,7 +90,7 @@ public class FabricInjectBukkit {
                 MobEffectInstance effectInstance = potion.getEffects().isEmpty() ? null : potion.getEffects().get(0);
                 PotionType potionType = MohistDynamEnum.addEnum0(PotionType.class, name, new Class[]{PotionEffectType.class, Boolean.TYPE, Boolean.TYPE}, effectInstance == null ? null : PotionEffectType.getById(MobEffect.getId(effectInstance.getEffect())), false, false);
                 if (potionType != null) {
-                    BannerMod.LOGGER.debug("Save-PotionType:" + name + " - " + potionType.name());
+                    BannerServer.LOGGER.debug("Save-PotionType:" + name + " - " + potionType.name());
                 }
             }
         }

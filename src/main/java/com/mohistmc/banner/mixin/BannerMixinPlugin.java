@@ -68,6 +68,22 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
 
     private final Set<String> modifyConstructor = ImmutableSet.<String>builder()
             .add("net.minecraft.world.level.Level")
+            .add("net.minecraft.server.level.ServerLevel")
+            .add("net.minecraft.world.SimpleContainer")
+            .add("net.minecraft.world.level.block.ComposterBlock")
+            .add("net.minecraft.world.level.block.ComposterBlock$EmptyContainer")
+            .add("net.minecraft.world.food.FoodData")
+            .add("net.minecraft.world.inventory.CraftingContainer")
+            .add("net.minecraft.world.inventory.PlayerEnderChestContainer")
+            .add("net.minecraft.world.item.trading.MerchantOffer")
+            .add("net.minecraft.world.inventory.LecternMenu")
+            .add("net.minecraft.server.level.ServerEntity")
+            .add("net.minecraft.network.protocol.game.ServerboundContainerClosePacket")
+            .add("net.minecraft.network.chat.TextColor")
+            .add("net.minecraft.commands.Commands")
+            .add("net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess")
+            .add("net.minecraft.network.protocol.game.ClientboundSystemChatPacket")
+            .add("net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket")
             .build();
 
     @Override

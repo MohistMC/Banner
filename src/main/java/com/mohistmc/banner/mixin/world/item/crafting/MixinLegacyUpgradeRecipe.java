@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
+@SuppressWarnings("removal")
 @Mixin(LegacyUpgradeRecipe.class)
 public abstract class MixinLegacyUpgradeRecipe implements SmithingRecipe {
 
