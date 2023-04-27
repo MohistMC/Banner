@@ -35,7 +35,7 @@ public class KnotHelper {
         try {
             Class<?> l = Class.forName("net.fabricmc.loader.launch.knot.Knot");
             Method m = l.getMethod("getLauncher");
-            Object lb = m.invoke(null, null);
+            Object lb = m.invoke(null, (Object) null);
             Method m2 = lb.getClass().getMethod("propose", URL.class);
             m2.invoke(lb, file.toURI().toURL());
         } catch (Exception e) {

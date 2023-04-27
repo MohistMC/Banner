@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.projectlombok:lombok:1.18.22'
+	implementation 'org.projectlombok:lombok:1.18.26'
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings loom.layered() {
 		officialMojangMappings()
@@ -120,6 +120,7 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
 	it.options.release = 17
+	options.compilerArgs << '-Xlint:-dep-ann' << '-Xlint:-removal'
 }
 
 java {
