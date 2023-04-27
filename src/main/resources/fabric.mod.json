@@ -75,6 +75,7 @@
       "net/minecraft/class_3215": ["com/mohistmc/banner/injection/server/level/InjectionServerChunkCache"],
       "net/minecraft/class_3204": ["com/mohistmc/banner/injection/server/level/InjectionDistanceManager"],
       "net/minecraft/class_3218": ["com/mohistmc/banner/injection/server/level/InjectionServerLevel"],
+      "net/minecraft/class_3350": ["com/mohistmc/banner/injection/server/rcon/InjectionRconConsoleSource"],
       "net/minecraft/class_3244": ["com/mohistmc/banner/injection/server/network/InjectionServerGamePacketListenerImpl"],
       "net/minecraft/class_52": ["com/mohistmc/banner/injection/world/level/storage/loot/InjectionLootTable"],
       "net/minecraft/class_60": ["com/mohistmc/banner/injection/world/level/storage/loot/InjectionLootTables"],
