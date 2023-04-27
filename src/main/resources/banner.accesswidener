@@ -499,6 +499,8 @@ accessible field net/minecraft/world/level/block/entity/LecternBlockEntity book 
 accessible field net/minecraft/world/level/block/entity/BlockEntity level Lnet/minecraft/world/level/Level;
 accessible field net/minecraft/world/level/block/entity/BlockEntity worldPosition Lnet/minecraft/core/BlockPos;
 accessible field net/minecraft/server/network/ServerGamePacketListenerImpl connection Lnet/minecraft/network/Connection;
+accessible field net/minecraft/world/entity/AreaEffectCloud DATA_COLOR Lnet/minecraft/network/syncher/EntityDataAccessor;
+accessible field net/minecraft/world/entity/Entity boardingCooldown I
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;

@@ -137,4 +137,12 @@ public interface InjectionEntity {
 
     default void banner$setGeneration(boolean gen) {
     }
+
+    default boolean banner$addPassenger(Entity entity) {
+        return false;
+    }
+
+    default boolean banner$removePassenger(Entity entity) {
+        return false;
+    }
 }

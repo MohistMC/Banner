@@ -24,7 +24,7 @@ repositories {
 		url = 'https://maven.parchmentmc.org'
 	}
 	maven {
-		name = "JirPack"
+		name = 'JirPack'
 		url = 'https://jitpack.io'
 	}
 }
@@ -45,7 +45,7 @@ dependencies {
 	modImplementation "org.apache.maven.resolver:maven-resolver-connector-basic:1.7.3"
 	modImplementation "org.apache.maven.resolver:maven-resolver-transport-http:1.7.3"
 	compileOnly "org.jetbrains:annotations:21.0.1"
-	modImplementation "com.mohistmc:i18n:0.1"
+	modImplementation "com.mohistmc:i18n:0.2"
 
 	// craftbukkit
 	modImplementation "org.fusesource.jansi:jansi:1.18"
@@ -97,6 +97,8 @@ dependencies {
 	modImplementation "com.github.LlamaLad7:MixinExtras:0.1.1"
 	annotationProcessor "com.github.LlamaLad7:MixinExtras:0.1.1"
 
+	modImplementation "com.github.Chocohead:Fabric-ASM:v2.1"
+	include "com.github.Chocohead:Fabric-ASM:v2.1"
 	include "com.github.LlamaLad7:MixinExtras:0.1.1"
 }
 
