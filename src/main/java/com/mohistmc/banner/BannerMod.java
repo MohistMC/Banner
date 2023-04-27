@@ -1,6 +1,7 @@
 package com.mohistmc.banner;
 
 import com.mohistmc.banner.config.BannerConfig;
+import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import com.mohistmc.i18n.i18n;
 import com.llamalad7.mixinextras.MixinExtrasBootstrap;
 import net.fabricmc.api.ModInitializer;
@@ -24,5 +25,6 @@ public class BannerMod implements ModInitializer {
         String c = BannerConfig.banner_lang.split("_")[1];
         I18N = new i18n(BannerMod.class.getClassLoader(), new Locale(l, c));
         LOGGER.info(I18N.get("banner.welcome"));
+        FabricInjectBukkit.init();
     }
 }
