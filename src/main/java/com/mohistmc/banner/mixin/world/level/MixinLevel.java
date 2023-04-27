@@ -3,20 +3,28 @@ package com.mohistmc.banner.mixin.world.level;
 import com.mohistmc.banner.injection.world.level.InjectionLevel;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.storage.WritableLevelData;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.block.CapturedBlockState;
 import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftSpawnCategory;
 import org.bukkit.entity.SpawnCategory;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.generator.ChunkGenerator;
@@ -25,10 +33,14 @@ import org.spigotmc.SpigotWorldConfig;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 @Mixin(Level.class)
 public abstract class MixinLevel implements LevelAccessor, AutoCloseable, InjectionLevel {
@@ -49,6 +61,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
 
     @Shadow @Nullable public abstract BlockEntity getBlockEntity(BlockPos pos);
 
+    @Shadow @Final private WorldBorder worldBorder;
     private CraftWorld world;
     public boolean pvpMode;
     public boolean keepSpawnInMemory = true;
@@ -63,6 +76,30 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     public final it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap<SpawnCategory> ticksPerSpawnCategory = new it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap<>();
     public boolean populating;
     private org.spigotmc.SpigotWorldConfig spigotConfig; // Spigot
+    protected org.bukkit.World.Environment environment;
+    protected org.bukkit.generator.BiomeProvider biomeProvider;
+
+    public void banner$constructor(WritableLevelData worldInfo, ResourceKey<Level> dimension, RegistryAccess registryAccess, final Holder<DimensionType> dimensionType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdate) {
+        throw new RuntimeException();
+    }
+
+    public void banner$constructor(WritableLevelData worldInfo, ResourceKey<Level> dimension, RegistryAccess registryAccess, final Holder<DimensionType> dimensionType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdate, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider, org.bukkit.World.Environment env) {
+        banner$constructor(worldInfo, dimension, registryAccess, dimensionType, profiler, isRemote, isDebug, seed, maxNeighborUpdate);
+        this.generator = gen;
+        this.environment = env;
+        this.biomeProvider = biomeProvider;
+        this.world = new CraftWorld((ServerLevel) (Object) this, gen, biomeProvider, env);
+    }
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void banner$init(WritableLevelData info, ResourceKey<Level> dimension, RegistryAccess registryAccess, Holder<DimensionType> dimType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdates, CallbackInfo ci) {
+        this.worldBorder.banner$setWorld((ServerLevel) (Object) this);
+        for (SpawnCategory spawnCategory : SpawnCategory.values()) {
+            if (CraftSpawnCategory.isValidForLimits(spawnCategory)) {
+                this.ticksPerSpawnCategory.put(spawnCategory, this.getCraftServer().getTicksPerSpawns(spawnCategory));
+            }
+        }
+    }
 
     @Override
     public CraftWorld getWorld() {

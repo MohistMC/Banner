@@ -58,7 +58,7 @@ public class KnotHelper {
 
             if (!FabricLoader.getInstance().isDevelopmentEnvironment())
                 m.invoke(lb, file.toPath(), getPackages());
-            logger.info("Debug: Loading library " + file.getName());
+            logger.info("Loading library " + file.getName());
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ERROR: Got " + e.getClass().getSimpleName() + " while accessing Fabric Loader.");
