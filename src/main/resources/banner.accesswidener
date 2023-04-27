@@ -160,6 +160,7 @@ accessible method net/minecraft/world/entity/animal/sniffer/Sniffer getExploredP
 accessible method net/minecraft/world/entity/animal/sniffer/Sniffer storeExploredPosition (Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/entity/animal/sniffer/Sniffer;
 accessible method net/minecraft/world/entity/animal/sniffer/Sniffer getState ()Lnet/minecraft/world/entity/animal/sniffer/Sniffer$State;
 accessible method net/minecraft/server/MinecraftServer$TimeProfiler <init> (JI)V
+accessible method net/minecraft/server/MinecraftServer setId (Ljava/lang/String;)V
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C

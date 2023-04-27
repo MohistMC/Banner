@@ -11,9 +11,9 @@
 [![]()](https://bstats.org/plugin/server-implementation/Mohist/6762)
 </div>
 
-| Version | Support     | Stability | Mod compatibility   | Plugin compatibility |
-|---------|-------------|-----------|---------------------|----------------------|
-| 1.19.4  | WIP         | Poor      | Better than Plugins | Zero                 |   
+| Version | Support     | Stability | Mod compatibility | Plugin compatibility |
+|---------|-------------|-----------|-------------------|----------------------|
+| 1.19.4  | WIP         | Poor      | Zero              | Zero                 |   
 
 Progress
 ------

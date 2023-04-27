@@ -57,14 +57,14 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         console.enablePlugins(PluginLoadOrder.POSTWORLD);
     }
 
-    /**
+
     @Inject(method = "initServer", at = @At(value = "INVOKE",
     target = "Lnet/minecraft/server/dedicated/DedicatedServer;setPvpAllowed(Z)V",
     shift = At.Shift.BEFORE))
     private void banner$addConfig(CallbackInfoReturnable<Boolean> cir) {
         // Spigot start
         org.spigotmc.SpigotConfig.init((java.io.File) bridge$options().valueOf("spigot-settings"));
-        org.spigotmc.SpigotConfig.registerCommands();
+        //org.spigotmc.SpigotConfig.registerCommands();
         // Spigot end
-    }*/
+    }
 }
