@@ -32,9 +32,3 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build
-      - name: Upload binaries to release
-        uses: actions/upload-artifact@v2
-        with:
-          name: banner-1.19.4-1.0.0.jar
-          path: build/libs/banner-1.19.4-1.0.0.jar
-          repo-token:  ${{ secrets.ACTION_TOKEN }}
