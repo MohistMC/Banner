@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.commands;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
+import com.mohistmc.banner.injection.commands.InjectionCommandNode;
 import com.mohistmc.banner.injection.commands.InjectionCommands;
 import com.mohistmc.banner.util.BukkitDispatcher;
 import com.mojang.brigadier.CommandDispatcher;
@@ -114,7 +115,7 @@ public abstract class MixinCommands implements InjectionCommands {
         // Remove labels that were removed during the event
         for (String orig : bukkit) {
             if (!event.getCommands().contains(orig)) {
-                //CommandNodeHooks.removeCommand(rootCommandNode, orig);
+                ((InjectionCommandNode) rootCommandNode).removeCommand(orig);
             }
         }
         player.connection.send(new ClientboundCommandsPacket(rootCommandNode));

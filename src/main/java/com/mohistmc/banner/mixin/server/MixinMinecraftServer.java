@@ -139,6 +139,11 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         cir.setReturnValue("Mohist Banner (Spigot+Fabric)");
     }
 
+    @Override
+    public void banner$setServer(CraftServer server) {
+        this.server = server;
+    }
+
     private static MinecraftServer getServer() {
         return ServerUtils.getServer();
     }

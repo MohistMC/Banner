@@ -54,4 +54,14 @@ public abstract class MixinCommandSourceStack implements InjectionCommandSourceS
     public CommandSender getBukkitSender() {
         return this.source.getBukkitSender((CommandSourceStack) (Object) this);
     }
+
+    @Override
+    public CommandNode<?> bridge$getCurrentCommand() {
+        return currentCommand;
+    }
+
+    @Override
+    public void banner$setCurrentCommand(CommandNode<?> node) {
+        this.currentCommand = node;
+    }
 }

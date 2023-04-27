@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.server.dedicated;
 
 import com.mohistmc.banner.BannerServer;
 import com.mojang.datafixers.DataFixer;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.Services;
 import net.minecraft.server.WorldStem;
@@ -11,6 +12,7 @@ import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.plugin.PluginLoadOrder;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,7 +37,7 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         ((DedicatedServer) (Object) this).setPlayerList(
                 new DedicatedPlayerList((DedicatedServer) (Object) this,
                         this.registries(), this.playerDataStorage));
-        CraftServer server = new CraftServer(((DedicatedServer) (Object) this), this.getPlayerList());
+        this.banner$setServer(new CraftServer(((DedicatedServer) (Object) this), this.getPlayerList()));
     }
 
     @Inject(method = "initServer", at = @At(value = "JUMP", ordinal = 8))
@@ -66,5 +68,36 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         org.spigotmc.SpigotConfig.init((java.io.File) bridge$options().valueOf("spigot-settings"));
         //org.spigotmc.SpigotConfig.registerCommands();
         // Spigot end
+    }
+
+    @Inject(method = "getPluginNames", at = @At("RETURN"), cancellable = true)
+    private void banner$setPluginNames(CallbackInfoReturnable<String> cir) {
+        StringBuilder result = new StringBuilder();
+        org.bukkit.plugin.Plugin[] plugins = bridge$server().getPluginManager().getPlugins();
+
+        result.append(bridge$server().getName());
+        result.append(" on Bukkit ");
+        result.append(bridge$server().getBukkitVersion());
+
+        if (plugins.length > 0 && bridge$server().getQueryPlugins()) {
+            result.append(": ");
+
+            for (int i = 0; i < plugins.length; i++) {
+                if (i > 0) {
+                    result.append("; ");
+                }
+
+                result.append(plugins[i].getDescription().getName());
+                result.append(" ");
+                result.append(plugins[i].getDescription().getVersion().replaceAll(";", ","));
+            }
+        }
+
+        cir.setReturnValue(result.toString());
+    }
+
+    @Override
+    public CommandSender getBukkitSender(CommandSourceStack wrapper) {
+        return bridge$console();
     }
 }

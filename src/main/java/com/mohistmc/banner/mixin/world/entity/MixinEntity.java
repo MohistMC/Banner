@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.mohistmc.banner.injection.world.entity.InjectionEntity;
 import net.minecraft.commands.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -31,6 +32,7 @@ import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.block.BlockFace;
+import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
@@ -765,5 +767,10 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Override
     public void banner$setLastLavaContact(BlockPos lastLavaContact) {
         this.lastLavaContact = lastLavaContact;
+    }
+
+    @Override
+    public CommandSender getBukkitSender(CommandSourceStack wrapper) {
+        return getBukkitEntity();
     }
 }

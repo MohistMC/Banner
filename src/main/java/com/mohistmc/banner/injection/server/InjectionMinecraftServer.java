@@ -22,6 +22,9 @@ public interface InjectionMinecraftServer {
         return null;
     }
 
+    default void banner$setServer(CraftServer server) {
+    }
+
     default OptionSet bridge$options() {
         return null;
     }

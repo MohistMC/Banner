@@ -8,6 +8,7 @@
     "MixinBlock",
     "MixinCrashReport",
     "advancement.MixinAdvancement",
+    "commands.MixinCommandNode",
     "commands.MixinCommands",
     "commands.MixinCommandSource",
     "commands.MixinCommandSource1",
