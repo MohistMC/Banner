@@ -52,11 +52,10 @@ public abstract class MixinPrimaryLevelData implements InjectionPrimaryLevelData
 
     @Inject(method = "setTagData", at = @At("RETURN"))
     private void banner$addTagData(RegistryAccess registry, CompoundTag nbt, CompoundTag playerNBT, CallbackInfo ci) {
-        nbt.putString("Bukkit.Version", "Mohist Banner" + "/" + "alpha-1.0.0" + "/" + "v_1_19_R3"); // CraftBukkit
-        if (this.world.getServer().bridge$server() != null) {
-            nbt.putString("Bukkit.Version", Bukkit.getName() + "/" + Bukkit.getVersion() + "/" + Bukkit.getBukkitVersion()); // CraftBukkit
-        }
         if (this.world != null) {
+            if (this.world.getServer().bridge$server() != null) {
+                nbt.putString("Bukkit.Version", Bukkit.getName() + "/" + Bukkit.getVersion() + "/" + Bukkit.getBukkitVersion()); // CraftBukkit
+            }
             world.getWorld().storeBukkitValues(nbt); // CraftBukkit - add pdc
         }
     }

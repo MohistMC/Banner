@@ -113,12 +113,6 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
         banner$item = itemEntity;
     }
 
-    @Redirect(method = "setTarget", at = @At(value = "RETURN"))
-    private boolean banner$setTarget(Mob instance, LivingEntity value) {
-        return setTarget(target, EntityTargetEvent.TargetReason.UNKNOWN, true);
-    }
-
-
     /**
      * @author wdog5
      * @reason
