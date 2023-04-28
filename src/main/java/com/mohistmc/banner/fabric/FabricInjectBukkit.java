@@ -4,27 +4,38 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.api.ServerAPI;
+import com.mohistmc.banner.entity.MohistModsEntity;
 import com.mohistmc.dynamicenum.MohistDynamEnum;
+import com.mojang.serialization.Codec;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.dimension.LevelStem;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_19_R3.enchantments.CraftEnchantment;
 import org.bukkit.craftbukkit.v1_19_R3.potion.CraftPotionEffectType;
 import org.bukkit.craftbukkit.v1_19_R3.potion.CraftPotionUtil;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Villager;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FabricInjectBukkit {
 
@@ -34,12 +45,19 @@ public class FabricInjectBukkit {
                     .put(LevelStem.NETHER, World.Environment.NETHER)
                     .put(LevelStem.END, World.Environment.THE_END)
                     .build());
+    public static Map<Villager.Profession, ResourceLocation> profession = new HashMap<>();
+    public static Map<org.bukkit.attribute.Attribute, ResourceLocation> attributemap = new HashMap<>();
 
     public static void init() {
         addEnumMaterialInItems();
         addEnumMaterialsInBlocks();
+        addEnumBiome();
         addEnumEnchantment();
         addEnumEffectAndPotion();
+        addFluid();
+        addEnumEntity();
+        addEnumVillagerProfession();
+        addEnumParticle();
     }
 
     public static void addEnumMaterialInItems() {
@@ -105,6 +123,77 @@ public class FabricInjectBukkit {
                 if (potionType != null) {
                     BannerServer.LOGGER.debug("Save-PotionType:" + name + " - " + potionType.name());
                 }
+            }
+        }
+    }
+
+    public static void addEnumParticle() {
+        var registry = BuiltInRegistries.PARTICLE_TYPE;
+        for (ParticleType particleType : BuiltInRegistries.PARTICLE_TYPE) {
+            ResourceLocation resourceLocation = registry.getKey(particleType);
+            String name = normalizeName(resourceLocation.toString());
+            if (!resourceLocation.getNamespace().equals(NamespacedKey.MINECRAFT)) {
+                Particle particle = MohistDynamEnum.addEnum0(Particle.class, name, new Class[0]);
+                if (particle != null) {
+                    org.bukkit.craftbukkit.v1_19_R3.CraftParticle.putParticles(particle, resourceLocation);
+                    BannerServer.LOGGER.debug("Save-ParticleType:" + name + " - " + particle.name());
+                }
+            }
+        }
+    }
+
+    public static void addEnumBiome() {
+        List<String> map = new ArrayList<>();
+        var registry = BuiltInRegistries.BIOME_SOURCE;
+        for (Codec<? extends BiomeSource> biome : registry) {
+            ResourceLocation resourceLocation = registry.getKey(biome);
+            String biomeName = normalizeName(resourceLocation.toString());
+            if (!isMINECRAFT(resourceLocation) && !map.contains(biomeName)) {
+                map.add(biomeName);
+                org.bukkit.block.Biome biomeCB = MohistDynamEnum.addEnum0(org.bukkit.block.Biome.class, biomeName, new Class[0]);
+                BannerServer.LOGGER.debug("Save-BIOME:" + biomeCB.name() + " - " + biomeName);
+            }
+        }
+        map.clear();
+    }
+
+    public static void addEnumEntity() {
+        var registry = BuiltInRegistries.ENTITY_TYPE;
+        for (net.minecraft.world.entity.EntityType<?> entity : registry) {
+            ResourceLocation resourceLocation = registry.getKey(entity);
+            if (!isMINECRAFT(resourceLocation)) {
+                String entityType = normalizeName(resourceLocation.toString());
+                int typeId = entityType.hashCode();
+                EntityType bukkitType = MohistDynamEnum.addEnum0(EntityType.class, entityType, new Class[]{String.class, Class.class, Integer.TYPE, Boolean.TYPE}, entityType.toLowerCase(), MohistModsEntity.class, typeId, false);
+                EntityType.NAME_MAP.put(entityType.toLowerCase(), bukkitType);
+                EntityType.ID_MAP.put((short) typeId, bukkitType);
+                ServerAPI.entityTypeMap.put(entity, entityType);
+            }
+        }
+    }
+
+    public static void addEnumVillagerProfession() {
+        var registry = BuiltInRegistries.VILLAGER_PROFESSION;
+        for (VillagerProfession villagerProfession : registry) {
+            ResourceLocation resourceLocation = registry.getKey(villagerProfession);
+            if (!isMINECRAFT(resourceLocation)) {
+                String name = normalizeName(resourceLocation.toString());
+                Villager.Profession vp = MohistDynamEnum.addEnum0(Villager.Profession.class, name, new Class[0]);
+                profession.put(vp, resourceLocation);
+                BannerServer.LOGGER.debug("Registered forge VillagerProfession as Profession {}", vp.name());
+            }
+        }
+    }
+
+    public static void addFluid() {
+        var registry = BuiltInRegistries.FLUID;
+        for (net.minecraft.world.level.material.Fluid fluidType : registry) {
+            ResourceLocation resourceLocation = registry.getKey(fluidType);
+            String name = normalizeName(resourceLocation.getPath());
+            if (!isMINECRAFT(resourceLocation)) {
+                Fluid fluid = MohistDynamEnum.addEnum0(Fluid.class, name, new Class[0]);
+                CraftMagicNumbers.FLUIDTYPE_FLUID.put(fluidType, fluid);
+                BannerServer.LOGGER.debug("Registered forge Fluid as Fluid(Bukkit) {}", fluid.name());
             }
         }
     }

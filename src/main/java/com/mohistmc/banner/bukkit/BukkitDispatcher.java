@@ -1,4 +1,4 @@
-package com.mohistmc.banner.util;
+package com.mohistmc.banner.bukkit;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;

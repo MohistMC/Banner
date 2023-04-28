@@ -4,7 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import com.mohistmc.banner.injection.commands.InjectionCommandNode;
 import com.mohistmc.banner.injection.commands.InjectionCommands;
-import com.mohistmc.banner.util.BukkitDispatcher;
+import com.mohistmc.banner.bukkit.BukkitDispatcher;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.tree.CommandNode;
