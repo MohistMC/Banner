@@ -30,6 +30,7 @@ import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WritableLevelData;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.block.CapturedBlockState;
@@ -41,6 +42,7 @@ import org.bukkit.craftbukkit.v1_19_R3.generator.CustomWorldChunkManager;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftSpawnCategory;
 import org.bukkit.entity.SpawnCategory;
 import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotWorldConfig;
@@ -328,6 +330,26 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             capturedTileEntities.put(blockEntity.getBlockPos().immutable(), blockEntity);
             ci.cancel();
         }
+    }
+
+    @Override
+    public BiomeProvider bridge$biomeProvider() {
+        return biomeProvider;
+    }
+
+    @Override
+    public void banner$setBiomeProvider(BiomeProvider biomeProvider) {
+        this.biomeProvider = biomeProvider;
+    }
+
+    @Override
+    public World.Environment bridge$environment() {
+        return environment;
+    }
+
+    @Override
+    public void banner$setEnvironment(World.Environment environment) {
+        this.environment = environment;
     }
 
     @Override

@@ -35,7 +35,7 @@ Progress
 
 Using
 ------
-- Please putting it in mods folder because it is WIP
+- Please putting it in mods folder
 - Remember that Banner is still in WIP,Do not use it in production environment
   
 Upstream Projects

@@ -18,6 +18,20 @@ import java.util.Map;
 
 public interface InjectionLevel {
 
+    default org.bukkit.generator.BiomeProvider bridge$biomeProvider() {
+        return null;
+    }
+
+    default void banner$setBiomeProvider(org.bukkit.generator.BiomeProvider biomeProvider) {
+    }
+
+    default org.bukkit.World.Environment bridge$environment() {
+        return null;
+    }
+
+    default void banner$setEnvironment(org.bukkit.World.Environment environment) {
+    }
+
     default org.bukkit.generator.ChunkGenerator bridge$generator() {
         return null;
     }
