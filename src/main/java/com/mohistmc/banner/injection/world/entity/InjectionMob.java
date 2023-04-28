@@ -37,4 +37,10 @@ public interface InjectionMob {
     default <T extends Mob> T convertTo(EntityType<T> entitytypes, boolean flag, EntityTransformEvent.TransformReason transformReason, CreatureSpawnEvent.SpawnReason spawnReason) {
         return null;
     }
+
+    default void bridge$pushGoalTargetReason(EntityTargetEvent.TargetReason reason, boolean fireEvent) {
+    }
+
+    default void bridge$pushTransformReason(EntityTransformEvent.TransformReason transformReason) {
+    }
 }

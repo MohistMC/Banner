@@ -226,7 +226,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     public CraftWorld getWorld() {
         if (this.world == null) {
             if (environment == null) {
-                environment = org.bukkit.World.Environment.getEnvironment(FabricInjectBukkit.DIM_MAP.size());
+                environment = FabricInjectBukkit.DIM_MAP.getOrDefault(this.getTypeKey(), World.Environment.CUSTOM);
             }
             if (generator == null) {
                 generator = getCraftServer().getGenerator(((ServerLevelData) this.getLevelData()).getLevelName());
