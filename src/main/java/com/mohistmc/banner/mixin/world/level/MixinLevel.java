@@ -41,6 +41,7 @@ import org.bukkit.craftbukkit.v1_19_R3.generator.CustomWorldChunkManager;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftSpawnCategory;
 import org.bukkit.entity.SpawnCategory;
 import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
 import org.jetbrains.annotations.Nullable;
@@ -329,6 +330,31 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             capturedTileEntities.put(blockEntity.getBlockPos().immutable(), blockEntity);
             ci.cancel();
         }
+    }
+
+    @Override
+    public boolean addEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
+        if (getWorld().getHandle() != (Object) this) {
+            return getWorld().getHandle().addEntity(entity, reason);
+        } else {
+            this.pushAddEntityReason(reason);
+            return this.addFreshEntity(entity);
+        }
+    }
+
+    @Override
+    public void pushAddEntityReason(CreatureSpawnEvent.SpawnReason reason) {
+        if (getWorld().getHandle() != (Object) this) {
+           getWorld().getHandle().pushAddEntityReason(reason);
+        }
+    }
+
+    @Override
+    public CreatureSpawnEvent.SpawnReason getAddEntityReason() {
+        if (getWorld().getHandle() != (Object) this) {
+            return getWorld().getHandle().getAddEntityReason();
+        }
+        return null;
     }
 
     @Override

@@ -9,8 +9,4 @@ public interface InjectionBlockGetter {
     default BlockHitResult clip(ClipContext raytrace1, BlockPos blockposition) {
         return null;
     }
-
-    default BlockHitResult clip(ClipContext raytrace) {
-        return null;
-    }
 }

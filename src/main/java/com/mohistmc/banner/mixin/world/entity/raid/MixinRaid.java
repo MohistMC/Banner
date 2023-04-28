@@ -71,7 +71,7 @@ public class MixinRaid implements InjectionRaid {
         CraftEventFactory.callRaidStopEvent((Raid) (Object) this, RaidStopEvent.Reason.FINISHED);
     }
 
-    @Inject(method = "tick", at = @At(value = "FIELD", shift = At.Shift.BY, by = 2, target = "Lnet/minecraft/world/entity/raid/Raid$RaidStatus;LOSS:Lnet/minecraft/world/entity/raid/Raid$RaidStatus;"))
+    @Inject(method = "tick", at = @At(value = "FIELD", shift = At.Shift.BY, target = "Lnet/minecraft/world/entity/raid/Raid$RaidStatus;LOSS:Lnet/minecraft/world/entity/raid/Raid$RaidStatus;"))
     public void banner$finishNone(CallbackInfo ci) {
         CraftEventFactory.callRaidFinishEvent((Raid) (Object) this, new ArrayList<>());
     }

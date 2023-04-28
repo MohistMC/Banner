@@ -2,6 +2,7 @@ package com.mohistmc.banner.injection.world.level;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -11,6 +12,7 @@ import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.block.CapturedBlockState;
 import org.bukkit.entity.SpawnCategory;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.spigotmc.SpigotWorldConfig;
 
 import java.util.List;
@@ -122,5 +124,16 @@ public interface InjectionLevel {
 
     default SpigotWorldConfig bridge$spigotConfig() {
         return null;
+    }
+
+    default void pushAddEntityReason(CreatureSpawnEvent.SpawnReason reason) {
+    }
+
+    default CreatureSpawnEvent.SpawnReason getAddEntityReason() {
+        return null;
+    }
+
+    default boolean addEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
+        return false;
     }
 }

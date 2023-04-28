@@ -32,10 +32,6 @@ public interface InjectionServerLevel {
     default void addDuringTeleport(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
     }
 
-    default boolean addEntity(Entity entity, CreatureSpawnEvent.SpawnReason spawnReason) {
-        return false;
-    }
-
     default boolean tryAddFreshEntityWithPassengers(Entity entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason reason) {
         return false;
     }
