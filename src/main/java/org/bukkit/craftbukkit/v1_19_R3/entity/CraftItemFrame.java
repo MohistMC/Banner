@@ -57,7 +57,7 @@ public class CraftItemFrame extends CraftHanging implements ItemFrame {
 
     @Override
     public void setItem(org.bukkit.inventory.ItemStack item, boolean playSound) {
-        //TODO getHandle().setItem(CraftItemStack.asNMSCopy(item), !getHandle().bridge$generation(), !getHandle().bridge$generation() && playSound);
+        getHandle().setItem(CraftItemStack.asNMSCopy(item), !getHandle().bridge$generation(), !getHandle().bridge$generation() && playSound);
     }
 
     @Override

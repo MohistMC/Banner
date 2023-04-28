@@ -27,6 +27,10 @@ repositories {
 		name = 'JirPack'
 		url = 'https://jitpack.io'
 	}
+	maven {
+		name = "Sponge"
+		url = 'https://repo.spongepowered.org/maven'
+	}
 }
 
 dependencies {
@@ -96,9 +100,10 @@ dependencies {
 	//class modify
 	modImplementation "com.github.LlamaLad7:MixinExtras:0.1.1"
 	annotationProcessor "com.github.LlamaLad7:MixinExtras:0.1.1"
+	modImplementation 'com.github.ArclightTeam:mixin-tools:1.0.0'
+	annotationProcessor 'com.github.ArclightTeam:mixin-tools:1.0.0'
 
-	modImplementation "com.github.Chocohead:Fabric-ASM:v2.1"
-	include "com.github.Chocohead:Fabric-ASM:v2.1"
+	include "com.github.ArclightTeam:mixin-tools:1.0.0"
 	include "com.github.LlamaLad7:MixinExtras:0.1.1"
 }
 

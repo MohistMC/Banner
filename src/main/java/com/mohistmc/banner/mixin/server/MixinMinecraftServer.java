@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server;
 
+import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import net.minecraft.CrashReport;
@@ -168,6 +169,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             }
         }
         this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
+        this.worldLoader = BukkitCaptures.getDataLoadContext();
     }
 
     @Inject(method = "stopServer", at = @At(value = "INVOKE", remap = false, ordinal = 0, shift = At.Shift.AFTER, target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V"))

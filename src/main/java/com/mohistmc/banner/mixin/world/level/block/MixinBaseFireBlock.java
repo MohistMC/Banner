@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -38,7 +38,7 @@ public class MixinBaseFireBlock {
         return false;
     }
 
-    @ModifyReturnValue(method = "inPortalDimension", at = @At("RETURN"))
+    @ModifyExpressionValue(method = "inPortalDimension", at = @At("RETURN"))
     private static boolean banner$inPortalDimension(Level level, CallbackInfoReturnable<Boolean> cir) {
         var typeKey = level.getTypeKey();
         return typeKey == LevelStem.NETHER || typeKey == LevelStem.OVERWORLD;
