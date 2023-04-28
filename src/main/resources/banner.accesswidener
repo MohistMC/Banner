@@ -566,3 +566,5 @@ mutable field net/minecraft/world/level/saveddata/maps/MapItemSavedData centerX 
 accessible field net/minecraft/world/level/saveddata/maps/MapItemSavedData centerX I
 mutable field net/minecraft/world/level/saveddata/maps/MapItemSavedData centerZ I
 accessible field net/minecraft/world/level/saveddata/maps/MapItemSavedData centerZ I
+mutable field net/minecraft/world/level/chunk/ChunkGenerator biomeSource Lnet/minecraft/world/level/biome/BiomeSource;
+accessible field net/minecraft/world/level/chunk/ChunkGenerator biomeSource Lnet/minecraft/world/level/biome/BiomeSource;

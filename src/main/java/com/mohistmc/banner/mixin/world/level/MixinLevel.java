@@ -1,19 +1,24 @@
 package com.mohistmc.banner.mixin.world.level;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.mohistmc.banner.bukkit.BukkitCaptures;
+import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import com.mohistmc.banner.injection.world.level.InjectionLevel;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -21,12 +26,18 @@ import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.storage.LevelData;
+import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WritableLevelData;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.block.CapturedBlockState;
 import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_19_R3.generator.CraftWorldInfo;
+import org.bukkit.craftbukkit.v1_19_R3.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_19_R3.generator.CustomWorldChunkManager;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftSpawnCategory;
 import org.bukkit.entity.SpawnCategory;
 import org.bukkit.event.block.BlockPhysicsEvent;
@@ -49,27 +60,22 @@ import java.util.function.Supplier;
 @Mixin(Level.class)
 public abstract class MixinLevel implements LevelAccessor, AutoCloseable, InjectionLevel {
 
+    // @formatter:off
     @Shadow public abstract void setBlocksDirty(BlockPos blockPos, net.minecraft.world.level.block.state.BlockState oldState, net.minecraft.world.level.block.state.BlockState newState);
-
     @Shadow @Final public boolean isClientSide;
-
     @Shadow public abstract void sendBlockUpdated(BlockPos pos, BlockState oldState, BlockState newState, int flags);
-
     @Shadow public abstract void updateNeighbourForOutputSignal(BlockPos pos, Block block);
-
     @Shadow public abstract void onBlockStateChange(BlockPos pos, BlockState blockState, BlockState newState);
-
     @Shadow @Final public Thread thread;
-
     @Shadow public abstract LevelChunk getChunkAt(BlockPos pos);
-
     @Shadow @Nullable public abstract BlockEntity getBlockEntity(BlockPos pos);
-
     @Shadow @Final private WorldBorder worldBorder;
-
     @Shadow public abstract WorldBorder getWorldBorder();
-
     @Shadow public abstract LevelChunk getChunk(int chunkX, int chunkZ);
+    @Shadow public abstract LevelData getLevelData();
+    @Shadow public abstract ResourceKey<Level> dimension();
+    @Shadow public abstract DimensionType dimensionType();
+    // @formatter:on
 
     private CraftWorld world;
     public boolean pvpMode;
@@ -97,12 +103,12 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         this.generator = gen;
         this.environment = env;
         this.biomeProvider = biomeProvider;
-        this.world = new CraftWorld((ServerLevel) (Object) this, gen, biomeProvider, env);
+        getWorld();
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(WritableLevelData info, ResourceKey<Level> dimension, RegistryAccess registryAccess, Holder<DimensionType> dimType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdates, CallbackInfo ci) {
-        this.getServer().addLevel((ServerLevel) (Object) this);
+        this.getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
         for (SpawnCategory spawnCategory : SpawnCategory.values()) {
             if (CraftSpawnCategory.isValidForLimits(spawnCategory)) {
                 this.ticksPerSpawnCategory.put(spawnCategory, this.getCraftServer().getTicksPerSpawns(spawnCategory));
@@ -114,8 +120,8 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             target = "Lnet/minecraft/world/damagesource/DamageSources;<init>(Lnet/minecraft/core/RegistryAccess;)V",
             shift = At.Shift.AFTER))
     private void banner$addWorldBorder(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder holder, Supplier supplier, boolean bl, boolean bl2, long l, int i, CallbackInfo ci) {
+        this.getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
         // CraftBukkit start
-        getWorldBorder().banner$setWorld(((ServerLevel) (Object) this));
         getWorldBorder().addListener(new BorderChangeListener() {
             @Override
             public void onBorderSizeSet(WorldBorder border, double size) {
@@ -149,6 +155,24 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             @Override
             public void onBorderSetDamageSafeZOne(WorldBorder border, double damageSafeZone) {}
         });
+    }
+
+    @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z",
+            at = @At("HEAD"), cancellable = true)
+    private void banner$hooks(BlockPos pos, BlockState newState, int flags, CallbackInfoReturnable<Boolean> cir) {
+        if (!processCaptures(pos, newState, flags)) {
+            cir.setReturnValue(false);
+        }
+    }
+
+    private boolean processCaptures(BlockPos pos, BlockState newState, int flags) {
+        Entity entityChangeBlock = BukkitCaptures.getEntityChangeBlock();
+        if (entityChangeBlock != null) {
+            if (CraftEventFactory.callEntityChangeBlockEvent(entityChangeBlock, pos, newState).isCancelled()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At("HEAD"), cancellable = true)
@@ -198,6 +222,28 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
 
     @Override
     public CraftWorld getWorld() {
+        if (this.world == null) {
+            if (environment == null) {
+                environment = org.bukkit.World.Environment.getEnvironment(FabricInjectBukkit.DIM_MAP.size());
+            }
+            if (generator == null) {
+                generator = getCraftServer().getGenerator(((ServerLevelData) this.getLevelData()).getLevelName());
+                if (generator != null && (Object) this instanceof ServerLevel serverWorld) {
+                    org.bukkit.generator.WorldInfo worldInfo = new CraftWorldInfo((ServerLevelData) getLevelData(),
+                            ((ServerLevel) (Object) this).bridge$convertable(), environment, this.dimensionType());
+                    if (biomeProvider == null && generator != null) {
+                        biomeProvider = generator.getDefaultBiomeProvider(worldInfo);
+                    }
+                    var generator = serverWorld.getChunkSource().getGenerator();
+                    if (biomeProvider != null) {
+                        generator.biomeSource = new CustomWorldChunkManager(worldInfo, biomeProvider, serverWorld.registryAccess().registryOrThrow(Registries.BIOME));
+                    }
+                    serverWorld.getChunkSource().chunkMap.generator = new CustomChunkGenerator(serverWorld, generator, this.generator);
+                }
+            }
+            this.world = new CraftWorld((ServerLevel) (Object) this, generator, biomeProvider, environment);
+            getCraftServer().addWorld(this.world);
+        }
         return this.world;
     }
 

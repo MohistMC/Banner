@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.longs.LongIterator;
 import net.minecraft.CrashReport;
 import net.minecraft.ReportedException;
 import net.minecraft.Util;
+import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerChunkCache;
@@ -32,6 +33,7 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
+import org.bukkit.plugin.PluginLoadOrder;
 import org.fusesource.jansi.AnsiConsole;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -46,9 +48,10 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.Proxy;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,24 +59,18 @@ import java.util.logging.Logger;
 @Mixin(MinecraftServer.class)
 public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<TickTask> implements InjectionMinecraftServer {
 
+    // @formatter:off
     @Shadow public MinecraftServer.ReloadableResources resources;
 
-
     @Shadow public Map<ResourceKey<net.minecraft.world.level.Level>, ServerLevel> levels;
-
-    @Shadow
-    private static void setInitialSpawn(ServerLevel level, ServerLevelData levelData, boolean generateBonusChest, boolean debug) {
-    }
-
+    @Shadow private static void setInitialSpawn(ServerLevel level, ServerLevelData levelData, boolean generateBonusChest, boolean debug) {}
     @Shadow protected abstract void setupDebugLevel(WorldData worldData);
-
     @Shadow public WorldData worldData;
     @Shadow @Final public static org.slf4j.Logger LOGGER;
     @Shadow private long nextTickTime;
-
     @Shadow public abstract boolean isSpawningMonsters();
-
     @Shadow public abstract boolean isSpawningAnimals();
+    // @formatter:on
 
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
@@ -86,6 +83,9 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     public java.util.Queue<Runnable> processQueue = ServerUtils.bridge$processQueue;
     public int autosavePeriod = ServerUtils.bridge$autosavePeriod;
     private boolean forceTicks;
+    public Commands vanillaCommandDispatcher;
+    private boolean hasStopped = false;
+    private final Object stopLock = new Object();
     // CraftBukkit end
 
     public MixinMinecraftServer(String string) {
@@ -167,11 +167,54 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                 t.printStackTrace();
             }
         }
+        this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
+    }
+
+    @Inject(method = "stopServer", at = @At(value = "INVOKE", remap = false, ordinal = 0, shift = At.Shift.AFTER, target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V"))
+    public void banner$unloadPlugins(CallbackInfo ci) {
+        if (this.server != null) {
+            this.server.disablePlugins();
+        }
+    }
+
+    @Inject(method = "createLevels", at = @At("RETURN"))
+    public void banner$enablePlugins(ChunkProgressListener p_240787_1_, CallbackInfo ci) {
+        this.server.enablePlugins(PluginLoadOrder.POSTWORLD);
     }
 
     @Inject(method = "getServerModName", at = @At(value = "HEAD"), remap = false, cancellable = true)
     private void banner$setServerModName(CallbackInfoReturnable<String> cir) {
-        cir.setReturnValue("Mohist Banner (Spigot+Fabric)");
+        if (this.server != null) {
+            cir.setReturnValue("Mohist Banner (Spigot+Fabric)");
+        }
+    }
+
+    @Inject(method = "haveTime", cancellable = true, at = @At("HEAD"))
+    private void banner$forceAheadOfTime(CallbackInfoReturnable<Boolean> cir) {
+        if (this.forceTicks) cir.setReturnValue(true);
+    }
+
+    @Inject(method = "reloadResources", at = @At(value = "RETURN", target = "Ljava/util/concurrent/CompletableFuture;thenAcceptAsync(Ljava/util/function/Consumer;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
+    private void banner$syncCommand(Collection<String> selectedIds, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
+        this.server.syncCommands();
+    }
+
+    @Inject(method = "stopServer", cancellable = true, at = @At("HEAD"))
+    public void banner$setStopped(CallbackInfo ci) {
+        synchronized (stopLock) {
+            if (hasStopped) {
+                ci.cancel();
+                return;
+            }
+            hasStopped = true;
+        }
+    }
+
+    @Override
+    public boolean hasStopped() {
+        synchronized (stopLock) {
+            return hasStopped;
+        }
     }
 
     @Override
