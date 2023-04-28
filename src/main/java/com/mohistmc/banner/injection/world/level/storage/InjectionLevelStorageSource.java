@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public interface InjectionLevelStorageSource {
 
-    default LevelStorageSource.LevelStorageAccess createAccess(String s, ResourceKey<LevelStem> dimensionType) {
+    default LevelStorageSource.LevelStorageAccess createAccess(String s, ResourceKey<LevelStem> dimensionType) throws IOException {
         return null;
     }
 }

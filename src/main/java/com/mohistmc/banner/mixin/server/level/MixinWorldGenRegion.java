@@ -10,7 +10,13 @@ import org.spongepowered.asm.mixin.Mixin;
 public abstract class MixinWorldGenRegion implements WorldGenLevel {
 
     @Override
-    public void addFreshEntityWithPassengers(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
+    public boolean addFreshEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
+        return this.addFreshEntity(entity);
+    }
+
+    @Override
+    public CreatureSpawnEvent.SpawnReason bridge$getAddEntityReason() {
+        return CreatureSpawnEvent.SpawnReason.DEFAULT;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.level;
 
+import com.mohistmc.banner.fabric.BannerDerivedWorldInfo;
 import com.mohistmc.banner.injection.server.level.InjectionServerLevel;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
@@ -9,6 +10,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,10 +23,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.storage.LevelStorageSource;
-import net.minecraft.world.level.storage.PrimaryLevelData;
-import net.minecraft.world.level.storage.ServerLevelData;
-import net.minecraft.world.level.storage.WritableLevelData;
+import net.minecraft.world.level.storage.*;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.ticks.LevelTicks;
 import org.bukkit.Bukkit;
@@ -33,6 +32,7 @@ import org.bukkit.craftbukkit.v1_19_R3.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
 import org.bukkit.craftbukkit.v1_19_R3.util.WorldUUID;
 import org.bukkit.event.world.GenericGameEvent;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -56,6 +56,10 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
 
     @Shadow public abstract boolean sendParticles(ServerPlayer player, boolean longDistance, double posX, double posY, double posZ, Packet<?> packet);
 
+    @Shadow @Final public ServerLevelData serverLevelData;
+
+    @Shadow @NotNull public abstract MinecraftServer getServer();
+
     public LevelStorageSource.LevelStorageAccess convertable;
     public UUID uuid;
     public PrimaryLevelData serverLevelDataCB;
@@ -78,6 +82,19 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
             this.chunkSource.chunkMap.generator = new CustomChunkGenerator((ServerLevel) (Object) this, this.chunkSource.getGenerator(), gen);
         }
         getWorld();
+    }
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void banner$initWorldServer(MinecraftServer minecraftServer, Executor executor, LevelStorageSource.LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey resourceKey, LevelStem levelStem, ChunkProgressListener chunkProgressListener, boolean bl, long l, List list, boolean bl2, CallbackInfo ci) {
+        getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
+        this.convertable = levelStorageAccess;
+        this.uuid = WorldUUID.getUUID(levelStorageAccess.getDimensionPath(this.dimension()).toFile());
+        if (serverLevelData instanceof PrimaryLevelData) {
+            this.serverLevelDataCB = (PrimaryLevelData) serverLevelData;
+        } else if (serverLevelData instanceof DerivedLevelData) {
+            this.serverLevelDataCB = BannerDerivedWorldInfo.create((DerivedLevelData)serverLevelData);
+            serverLevelDataCB.setWorld((ServerLevel) (Object) this);
+        }
     }
 
     @Inject(method = "gameEvent", cancellable = true, at = @At("HEAD"))
@@ -108,11 +125,6 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
             }
         }
         return j;
-    }
-
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void banner$init(MinecraftServer minecraftServer, Executor backgroundExecutor, LevelStorageSource.LevelStorageAccess levelSave, ServerLevelData worldInfo, ResourceKey<Level> dimension, LevelStem levelStem, ChunkProgressListener statusListener, boolean isDebug, long seed, List<CustomSpawner> specialSpawners, boolean shouldBeTicking, CallbackInfo ci) {
-        this.uuid = WorldUUID.getUUID(levelSave.getDimensionPath(this.dimension()).toFile());
     }
 
     @Override

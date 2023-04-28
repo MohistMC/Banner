@@ -24,6 +24,9 @@ public interface InjectionContainer {
         return null;
     }
 
+    default void setOwner(org.bukkit.inventory.InventoryHolder owner) {
+    }
+
     default void setMaxStackSize(int size) {
     }
 
