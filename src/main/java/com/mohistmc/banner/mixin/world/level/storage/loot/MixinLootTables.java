@@ -24,7 +24,7 @@ public class MixinLootTables implements InjectionLootTables {
     public Map<LootTable, ResourceLocation> lootTableToKey = ImmutableMap.of(); // CraftBukkit
 
     @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("RETURN"))
-    private void arclight$buildRev(Map<ResourceLocation, JsonElement> object, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci) {
+    private void banner$buildRev(Map<ResourceLocation, JsonElement> object, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci) {
         Map<LootTable, ResourceLocation> lootTableToKeyBuilder = new HashMap<>();
         this.tables.forEach((lootTable, key) -> lootTableToKeyBuilder.put(key, lootTable));
         this.lootTableToKey = ImmutableMap.copyOf(lootTableToKeyBuilder);
