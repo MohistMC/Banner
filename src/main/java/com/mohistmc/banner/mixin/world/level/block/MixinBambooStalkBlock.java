@@ -11,13 +11,13 @@ import net.minecraft.world.level.block.state.properties.BambooLeaves;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
-import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BambooStalkBlock.class)
 public abstract class MixinBambooStalkBlock extends Block {
@@ -26,7 +26,7 @@ public abstract class MixinBambooStalkBlock extends Block {
 
     @Shadow @Final public static EnumProperty<BambooLeaves> LEAVES;
 
-    @Shadow @Final public static IntegerProperty STAGE;
+    boolean shouldUpdateOthers = false; // CraftBukkit
 
     public MixinBambooStalkBlock(Properties properties) {
         super(properties);
@@ -41,40 +41,52 @@ public abstract class MixinBambooStalkBlock extends Block {
         }
     }
 
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    protected void growBamboo(BlockState blockStateIn, Level worldIn, BlockPos posIn, RandomSource rand, int height) {
-        BlockState blockstate = worldIn.getBlockState(posIn.below());
-        BlockPos blockpos = posIn.below(2);
-        BlockState blockstate1 = worldIn.getBlockState(blockpos);
-        BambooLeaves bambooleaves = BambooLeaves.NONE;
+    @Redirect(method = "growBamboo",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z",
+                    ordinal = 0))
+    private boolean banner$cancelSetBlock(Level instance, BlockPos pos, BlockState newState, int flags) {
+        return false;
+    }
 
-        boolean update = false;
+    @Redirect(method = "growBamboo",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z",
+                    ordinal = 1))
+    private boolean banner$cancelSetBlock0(Level instance, BlockPos pos, BlockState newState, int flags) {
+        shouldUpdateOthers = true;
+        return false;
+    }
 
-        if (height >= 1) {
-            if (blockstate.is(Blocks.BAMBOO) && blockstate.getValue(LEAVES) != BambooLeaves.NONE) {
-                if (blockstate.is(Blocks.BAMBOO) && blockstate.getValue(LEAVES) != BambooLeaves.NONE) {
-                    bambooleaves = BambooLeaves.LARGE;
-                    if (blockstate1.is(Blocks.BAMBOO)) {
-                        update = true;
+    @Inject(method = "growBamboo",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z",
+                    ordinal = 2))
+    private void banner$callBambooEvent(BlockState state, Level level, BlockPos pos, RandomSource random, int age, CallbackInfo ci) {
+        BlockPos banner$blockPos = pos.below(2);
+        BlockState banner$blockState2 = level.getBlockState(banner$blockPos);
+        BlockState banner$blockState = level.getBlockState(pos.below());
+        int banner$j = (Integer)state.getValue(AGE) != 1 && !banner$blockState2.is(Blocks.BAMBOO) ? 0 : 1;
+        int banner$k = (age < 11 || !(random.nextFloat() < 0.25F)) && age != 15 ? 0 : 1;
+        BambooLeaves banner$blockpropertybamboosize = BambooLeaves.NONE;
+        if (age >= 1) {
+            if (banner$blockState.is(Blocks.BAMBOO) && banner$blockState.getValue(LEAVES) != BambooLeaves.NONE) {
+                if (banner$blockState.is(Blocks.BAMBOO) && banner$blockState.getValue(LEAVES) != BambooLeaves.NONE) {
+                    banner$blockpropertybamboosize = BambooLeaves.LARGE;
+                    if (banner$blockState2.is(Blocks.BAMBOO)) {
+                        level.setBlock(pos.below(), (BlockState) banner$blockState.setValue(LEAVES, BambooLeaves.SMALL), 3);
+                        level.setBlock(banner$blockPos, (BlockState) banner$blockState2.setValue(LEAVES, BambooLeaves.NONE), 3);
                     }
                 }
             } else {
-                bambooleaves = BambooLeaves.SMALL;
+                banner$blockpropertybamboosize = BambooLeaves.SMALL;
             }
-        }
-
-        int newAge = blockStateIn.getValue(AGE) != 1 && !blockstate1.is(Blocks.BAMBOO) ? 0 : 1;
-        int newState = (height < 11 || !(rand.nextFloat() < 0.25F)) && height != 15 ? 0 : 1;
-
-        if (CraftEventFactory.handleBlockSpreadEvent(worldIn, posIn, posIn.above(),
-                this.defaultBlockState().setValue(AGE, newAge).setValue(LEAVES, bambooleaves).setValue(STAGE, newState), 3)) {
-            if (update) {
-                worldIn.setBlock(posIn.below(), blockstate.setValue(LEAVES, BambooLeaves.SMALL), 3);
-                worldIn.setBlock(blockpos, blockstate1.setValue(LEAVES, BambooLeaves.NONE), 3);
+            // CraftBukkit start
+            if (org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.handleBlockSpreadEvent(level, pos, pos.above(), this.defaultBlockState().setValue(BambooStalkBlock.AGE, banner$j).setValue(BambooStalkBlock.LEAVES, banner$blockpropertybamboosize).setValue(BambooStalkBlock.STAGE, banner$k), 3)) {
+                if (shouldUpdateOthers) {
+                    level.setBlock(pos.below(), (BlockState) banner$blockState.setValue(BambooStalkBlock.LEAVES, BambooLeaves.SMALL), 3);
+                    level.setBlock(banner$blockPos, (BlockState) banner$blockState2.setValue(BambooStalkBlock.LEAVES, BambooLeaves.NONE), 3);
+                }
             }
         }
     }
