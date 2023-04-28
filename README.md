@@ -32,6 +32,11 @@ Progress
 - [ ] Running ?
     * [ ] It can be compilable, and running
     * [ ] But the compatibility with plugins is zero
+
+Using
+------
+- Please putting it in mods folder because it is WIP
+- Remember that Banner is still in WIP,Do not use it in production environment
   
 Upstream Projects
 ------
