@@ -15,6 +15,7 @@ public class ServerUtils {
     public static int bridge$autosavePeriod;
 
     public static final TicketType<Unit> PLUGIN = TicketType.create("plugin", (a, b) -> 0); // CraftBukkit
+    public static int currentTick = (int) (System.currentTimeMillis() / 50);
     public static final TicketType<org.bukkit.plugin.Plugin> PLUGIN_TICKET =
             TicketType.create("plugin_ticket", (plugin1, plugin2) -> plugin1.getClass().getName().compareTo(plugin2.getClass().getName())); // CraftBukkit
     public static final LootContextParam<Integer> LOOTING_MOD =
@@ -24,6 +25,7 @@ public class ServerUtils {
     }
 
     public static int getCurrentTick() {
-        return (int) (System.currentTimeMillis() / 50);
+        return currentTick;
     }
+
 }

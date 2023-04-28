@@ -39,8 +39,7 @@ public class BukkitCommandWrapper implements com.mojang.brigadier.Command<Comman
 
     @Override
     public boolean test(CommandSourceStack wrapper) {
-        return false;
-        //return command.testPermissionSilent(wrapper.getBukkitSender());
+        return command.testPermissionSilent(wrapper.getBukkitSender());
     }
 
     @Override

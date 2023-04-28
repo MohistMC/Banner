@@ -37,6 +37,14 @@ public interface InjectionMinecraftServer {
         return null;
     }
 
+    default void banner$setConsole(ConsoleCommandSender console) {
+
+    }
+
+    default void banner$setRemoteConsole(RemoteConsoleCommandSender remoteConsole) {
+
+    }
+
     default ConsoleReader bridge$reader() {
         return null;
     }

@@ -10,17 +10,23 @@ import net.minecraft.stats.ServerStatsCounter;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
+import java.net.SocketAddress;
 import java.util.UUID;
 
 public interface InjectionPlayerList {
+
+    default CraftServer getCraftServer() {
+        return null;
+    }
 
     default String remove(ServerPlayer entityplayer) { // CraftBukkit - return string
         return null;
     }
 
-    default ServerPlayer canPlayerLogin(ServerLoginPacketListenerImpl loginlistener, GameProfile gameprofile) {
+    default ServerPlayer canPlayerLogin(SocketAddress socketAddress, GameProfile gameProfile, ServerLoginPacketListenerImpl handler) {
         return null;
     }
 
@@ -36,10 +42,10 @@ public interface InjectionPlayerList {
         return null;
     }
 
-    default void broadcastAll(Packet packet, Player entityhuman) {
+    default void broadcastAll(Packet<?> packet, Player entityhuman) {
     }
 
-    default void broadcastAll(Packet packet, Level world) {
+    default void broadcastAll(Packet<?> packet, Level world) {
     }
 
     default void broadcastMessage(Component[] iChatBaseComponents) {

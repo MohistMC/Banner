@@ -15,7 +15,6 @@ import net.fabricmc.loader.api.Version;
 
 public class KnotHelper {
 
-    public static boolean PAPER_API_LOADED = false;
     private static final Logger logger = LogManager.getLogger("KnotHelper");
 
 
@@ -72,10 +71,6 @@ public class KnotHelper {
         double ver = Double.valueOf( verString );
 
         propose_file(file, ver);
-
-        if (file.getName().contains("paper")) {
-            PAPER_API_LOADED = true;
-        }
     }
 
     public static void propose_file(File file, double ver) {
@@ -206,7 +201,8 @@ public class KnotHelper {
                         "com.",
                         "net.",
                         "org.",
-                        "me."
+                        "me.",
+                        "jline."
                 };
         return args;
     }

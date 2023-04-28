@@ -167,9 +167,19 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             } catch (Throwable t) {
                 t.printStackTrace();
             }
+
+            this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
+            this.worldLoader = BukkitCaptures.getDataLoadContext();
         }
-        this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
-        this.worldLoader = BukkitCaptures.getDataLoadContext();
+    }
+
+    @Inject(method = "runServer",
+            at = @At(value = "FIELD",
+                    target = "Lnet/minecraft/server/MinecraftServer;nextTickTime:J",
+                    ordinal = 5,
+                    shift =  At.Shift.BEFORE))
+    private void banner$setTickOnServer(CallbackInfo ci) {
+        ServerUtils.currentTick = ((int) (System.currentTimeMillis() / 50));// CraftBukkit
     }
 
     @Inject(method = "stopServer", at = @At(value = "INVOKE", remap = false, ordinal = 0, shift = At.Shift.AFTER, target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V"))
@@ -350,6 +360,16 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Override
     public boolean isDebugging() {
         return false;
+    }
+
+    @Override
+    public void banner$setRemoteConsole(RemoteConsoleCommandSender remoteConsole) {
+        this.remoteConsole = remoteConsole;
+    }
+
+    @Override
+    public void banner$setConsole(ConsoleCommandSender console) {
+        this.console = console;
     }
 
     // Banner end
