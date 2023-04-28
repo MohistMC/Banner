@@ -15,11 +15,14 @@ import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.rcon.RconConsoleSource;
 import net.minecraft.world.level.storage.LevelStorageSource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.io.IoBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.command.ColouredConsoleSender;
 import org.bukkit.craftbukkit.v1_19_R3.command.CraftRemoteConsoleCommandSender;
+import org.bukkit.craftbukkit.v1_19_R3.util.ForwardLogHandler;
 import org.bukkit.event.server.RemoteServerCommandEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.PluginLoadOrder;
@@ -67,6 +70,26 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         BannerServer.LOGGER.info("Loading Bukkit plugins...");
         ((CraftServer) Bukkit.getServer()).loadPlugins();
         ((CraftServer) Bukkit.getServer()).enablePlugins(PluginLoadOrder.STARTUP);
+    }
+
+    @Inject(method = "initServer",
+            at = @At(value = "INVOKE",
+            target = "Ljava/lang/Thread;setDaemon(Z)V",
+            ordinal = 0,
+            shift = At.Shift.BEFORE))
+    private void banner$addLog4j(CallbackInfoReturnable<Boolean> cir) {
+        // CraftBukkit start - TODO: handle command-line logging arguments
+        java.util.logging.Logger global = java.util.logging.Logger.getLogger("");
+        global.setUseParentHandlers(false);
+        for (java.util.logging.Handler handler : global.getHandlers()) {
+            global.removeHandler(handler);
+        }
+        global.addHandler(new ForwardLogHandler());
+        final org.apache.logging.log4j.Logger logger = LogManager.getRootLogger();
+
+        System.setOut(IoBuilder.forLogger(logger).setLevel(org.apache.logging.log4j.Level.INFO).buildPrintStream());
+        System.setErr(IoBuilder.forLogger(logger).setLevel(org.apache.logging.log4j.Level.WARN).buildPrintStream());
+        // CraftBukkit end
     }
 
     @Inject(method = "initServer", at = @At("RETURN"))
