@@ -1,6 +1,9 @@
 package com.mohistmc.banner.mixin;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.library.Library;
 import com.mohistmc.banner.library.LibraryManager;
@@ -20,6 +23,17 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
     private final Logger LOGGER = LogManager.getLogger("Mohist Banner");
     private static final String MOHIST = "https://maven.mohistmc.com/libraries";
     private static final String CHINA = "http://s1.devicloud.cn:25119/libraries";
+
+    private final Map<String, Map.Entry<List<FieldNode>, List<MethodNode>>> accessTransformer =
+            ImmutableMap.<String, Map.Entry<List<FieldNode>, List<MethodNode>>>builder()
+                    .put("net.minecraft.world.item.BoneMealItem",
+                            Maps.immutableEntry(
+                                    ImmutableList.of(),
+                                    ImmutableList.of(
+                                            new MethodNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "applyBonemeal", "(Lnet/minecraft/world/item/context/UseOnContext;)Lnet/minecraft/world/InteractionResult;", null, null)
+                                    )
+                            )
+                    ).build();
 
     @Override
     public void onLoad(String mixinPackage) {
@@ -112,6 +126,17 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+        Map.Entry<List<FieldNode>, List<MethodNode>> entry = accessTransformer.get(targetClassName);
+        if (entry != null) {
+            List<FieldNode> fields = entry.getKey();
+            for (FieldNode fieldNode : targetClass.fields) {
+                tryTransform(fields, fieldNode);
+            }
+            List<MethodNode> methods = entry.getValue();
+            for (MethodNode methodNode : targetClass.methods) {
+                tryTransform(methods, methodNode);
+            }
+        }
         modifyConstructor(targetClassName, targetClass);
     }
 
@@ -186,6 +211,24 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
                 methodNode.instructions.insert(insnList);
             } else {
                 throw new ClassFormatError("No super constructor call present: " + classNode.name);
+            }
+        }
+    }
+
+    private void tryTransform(List<FieldNode> fields, FieldNode fieldNode) {
+        for (FieldNode field : fields) {
+            if (Objects.equals(fieldNode.name, field.name)
+                    && Objects.equals(fieldNode.desc, field.desc)) {
+                fieldNode.access = field.access;
+            }
+        }
+    }
+
+    private void tryTransform(List<MethodNode> methods, MethodNode methodNode) {
+        for (MethodNode method : methods) {
+            if (Objects.equals(methodNode.name, method.name)
+                    && Objects.equals(methodNode.desc, method.desc)) {
+                methodNode.access = method.access;
             }
         }
     }

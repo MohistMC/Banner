@@ -28,7 +28,6 @@ public class BannerServer implements DedicatedServerModInitializer {
     @Override
     public void onInitializeServer() {
         if (System.getProperty("log4j.configurationFile") == null) {
-            LOGGER.info("Banner loading log4j.xml...");
             System.setProperty("log4j.configurationFile", "log4j2_banner.xml");
         }
         MixinExtrasBootstrap.init();

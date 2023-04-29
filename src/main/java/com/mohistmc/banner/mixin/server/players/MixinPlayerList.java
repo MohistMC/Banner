@@ -84,11 +84,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         this.cserver.enablePlugins(PluginLoadOrder.STARTUP);
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void banner$finishInit(MinecraftServer minecraftServer, LayeredRegistryAccess layeredRegistryAccess, PlayerDataStorage playerDataStorage, int i, CallbackInfo ci) {
-        this.cserver.enablePlugins(PluginLoadOrder.POSTWORLD);
-    }
-
     @Inject (method = "placeNewPlayer", at = @At (value = "INVOKE",
             target = "Lnet/minecraft/server/level/ServerPlayer;setLevel(Lnet/minecraft/server/level/ServerLevel;)V"),
             locals = LocalCapture.CAPTURE_FAILHARD)

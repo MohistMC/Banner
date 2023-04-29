@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.server.level.progress.ChunkProgressListener;
+import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.Unit;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ForcedChunksSavedData;
@@ -70,6 +71,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow public abstract boolean isSpawningAnimals();
     // @formatter:on
 
+    @Shadow private PlayerList playerList;
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
     public org.bukkit.craftbukkit.v1_19_R3.CraftServer server;
@@ -168,6 +170,12 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
             this.worldLoader = BukkitCaptures.getDataLoadContext();
         }
+        Runtime.getRuntime().addShutdownHook(new org.bukkit.craftbukkit.v1_19_R3.util.ServerShutdownThread((MinecraftServer)(Object)this));
+    }
+
+    @Inject(method = "loadLevel", at = @At("RETURN"))
+    public void banner$onLevelLoad(CallbackInfo ci) { // Calls from server's init method
+        this.server.enablePlugins(PluginLoadOrder.POSTWORLD);
     }
 
     @Inject(method = "runServer",
