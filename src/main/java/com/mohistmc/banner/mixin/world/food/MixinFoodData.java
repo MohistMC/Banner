@@ -13,6 +13,10 @@ public class MixinFoodData implements InjectionFoodData {
     public int unsaturatedRegenRate = 80;
     public int starvationRate = 80;
 
+    public void banner$constructor() {
+        throw new RuntimeException();
+    }
+
     public void banner$constructor(Player entityhuman) {
         org.apache.commons.lang.Validate.notNull(entityhuman);
         this.entityhuman = entityhuman;

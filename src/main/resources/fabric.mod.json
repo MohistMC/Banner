@@ -66,6 +66,7 @@
       "net/minecraft/class_2248": ["com/mohistmc/banner/injection/world/level/block/InjectionBlock"],
       "net/minecraft/class_2358": ["com/mohistmc/banner/injection/world/level/block/InjectionFireBlock"],
       "net/minecraft/class_5454": ["com/mohistmc/banner/injection/world/level/block/InjectionPortalInfo"],
+      "net/minecraft/class_2473": ["com/mohistmc/banner/injection/world/level/block/InjectionSaplingBlock"],
       "net/minecraft/class_2535": ["com/mohistmc/banner/injection/network/connection/InjectionConnection"],
       "net/minecraft/class_2945": ["com/mohistmc/banner/injection/network/syncher/InjectionSynchedEntityData"],
       "net/minecraft/class_5251": ["com/mohistmc/banner/injection/network/chat/InjectionTextColor"],

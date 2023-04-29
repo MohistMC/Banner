@@ -14,6 +14,17 @@ import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 
 public interface InjectionMinecraftServer {
 
+    default void bridge$queuedProcess(Runnable runnable) {
+
+    }
+
+    default java.util.Queue<Runnable> bridge$processQueue() {
+        return null;
+    }
+
+    default void banner$setProcessQueue(java.util.Queue<Runnable> processQueue) {
+    }
+
     default WorldLoader.DataLoadContext bridge$worldLoader() {
         return null;
     }

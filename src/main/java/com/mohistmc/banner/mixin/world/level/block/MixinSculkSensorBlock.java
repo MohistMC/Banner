@@ -1,9 +1,13 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SculkSensorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
@@ -18,8 +22,11 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(SculkSensorBlock.class)
-public class MixinSculkSensorBlock {
+public abstract class MixinSculkSensorBlock extends Block {
 
+    public MixinSculkSensorBlock(Properties properties) {
+        super(properties);
+    }
 
     @Inject(method = "stepOn", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;"))
     private void banner$stepOn(Level level, BlockPos pos, BlockState p_222134_, Entity entity, CallbackInfo ci) {
@@ -61,5 +68,13 @@ public class MixinSculkSensorBlock {
     @ModifyVariable(method = "activate", ordinal = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"), argsOnly = true)
     private static int banner$updateCurrent(int old) {
         return newCurrent;
+    }
+
+    @Override
+    public int getExpDrop(BlockState blockState, ServerLevel world, BlockPos blockPos, ItemStack itemStack, boolean flag) {
+        if (flag) {
+            return this.banner$tryDropExperience(world, blockPos, itemStack, ConstantInt.of(5));
+        }
+        return 0;
     }
 }

@@ -48,10 +48,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.Proxy;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -373,4 +370,20 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     }
 
     // Banner end
+
+
+    @Override
+    public void bridge$queuedProcess(Runnable runnable) {
+        processQueue.add(runnable);
+    }
+
+    @Override
+    public Queue<Runnable> bridge$processQueue() {
+        return processQueue;
+    }
+
+    @Override
+    public void banner$setProcessQueue(Queue<Runnable> processQueue) {
+        this.processQueue = processQueue;
+    }
 }

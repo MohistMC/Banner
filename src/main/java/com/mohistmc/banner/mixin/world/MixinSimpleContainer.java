@@ -74,12 +74,12 @@ public abstract class MixinSimpleContainer implements Container, StackedContents
     }
 
     @Override
-    public Recipe getCurrentRecipe() {
+    public Recipe<?> getCurrentRecipe() {
         return null;
     }
 
     @Override
-    public void setCurrentRecipe(Recipe recipe) {
+    public void setCurrentRecipe(Recipe<?> recipe) {
     }
 
     @Override

@@ -34,10 +34,10 @@ public interface InjectionContainer {
         return null;
     }
 
-    default Recipe getCurrentRecipe() {
+    default Recipe<?> getCurrentRecipe() {
         return null;
     }
 
-    default void setCurrentRecipe(Recipe recipe) {
+    default void setCurrentRecipe(Recipe<?> recipe) {
     }
 }

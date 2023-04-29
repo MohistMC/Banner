@@ -3,7 +3,6 @@ package com.mohistmc.banner.mixin.world;
 import net.minecraft.world.CompoundContainer;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftHumanEntity;
 import org.bukkit.entity.HumanEntity;
@@ -20,7 +19,7 @@ public abstract class MixinCompoundContainer implements Container {
 
     @Shadow @Final public Container container1;
     @Shadow @Final public Container container2;
-    private List<HumanEntity> transactions = new ArrayList<>();
+    public List<HumanEntity> transaction = new java.util.ArrayList<HumanEntity>();
 
     @Override
     public List<ItemStack> getContents() {
@@ -36,19 +35,19 @@ public abstract class MixinCompoundContainer implements Container {
     public void onOpen(CraftHumanEntity who) {
         this.container1.onOpen(who);
         this.container2.onOpen(who);
-        this.transactions.add(who);
+        this.transaction.add(who);
     }
 
     @Override
     public void onClose(CraftHumanEntity who) {
         this.container1.onClose(who);
         this.container2.onClose(who);
-        this.transactions.remove(who);
+        this.transaction.remove(who);
     }
 
     @Override
     public List<HumanEntity> getViewers() {
-        return transactions;
+        return transaction;
     }
 
     @Override
@@ -69,10 +68,4 @@ public abstract class MixinCompoundContainer implements Container {
     public Location getLocation() {
         return this.container1.getLocation();
     }
-
-    @Override
-    public Recipe<?> getCurrentRecipe() { return null; }
-
-    @Override
-    public void setCurrentRecipe(Recipe recipe) {}
 }

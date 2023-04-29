@@ -161,6 +161,7 @@ accessible method net/minecraft/world/entity/animal/sniffer/Sniffer storeExplore
 accessible method net/minecraft/world/entity/animal/sniffer/Sniffer getState ()Lnet/minecraft/world/entity/animal/sniffer/Sniffer$State;
 accessible method net/minecraft/server/MinecraftServer$TimeProfiler <init> (JI)V
 accessible method net/minecraft/server/MinecraftServer setId (Ljava/lang/String;)V
+accessible method net/minecraft/server/level/PlayerRespawnLogic getOverworldRespawnPos (Lnet/minecraft/server/level/ServerLevel;II)Lnet/minecraft/core/BlockPos;
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C
