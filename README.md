@@ -3,7 +3,7 @@
   <h1>Mohist Banner 1.19.4</h1>
 
 ### The Bukkit/Spigot/Paper API implementation for Fabric
-[![](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.codemc.io%2Fjob%2FMohistMC%2Fjob%2FBanner)](https://ci.codemc.io/job/MohistMC/job/Banner/)
+[![](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.codemc.io%2Fjob%2FMohistMC%2Fjob%2FBanner&label=Jenkins&logo=jenkins&logoColor=%23ffffff)](https://ci.codemc.io/job/MohistMC/job/Banner/)
 [![](https://img.shields.io/github/stars/MohistMC/Banner.svg?label=Stars&logo=github)](https://github.com/MohistMC/Banner/stargazers)
 [![](https://img.shields.io/badge/jdk-17.0.5+8-brightgreen.svg?colorB=469C00&logo=java)](https://adoptium.net/temurin/releases/?version=17)
 [![](https://img.shields.io/badge/Gradle-7.5.1-brightgreen.svg?colorB=469C00&logo=gradle)](https://docs.gradle.org/7.5.1/release-notes.html)
