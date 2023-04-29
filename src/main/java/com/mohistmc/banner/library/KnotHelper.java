@@ -202,6 +202,7 @@ public class KnotHelper {
                         "net.",
                         "org.",
                         "me.",
+                        "io.izzel",
                         "jline."
                 };
         return args;
