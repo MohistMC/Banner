@@ -113,6 +113,7 @@
       "net/minecraft/class_1702": ["com/mohistmc/banner/injection/world/food/InjectionFoodData"],
       "net/minecraft/class_1703": ["com/mohistmc/banner/injection/world/inventory/InjectionAbstractContainerMenu"],
       "net/minecraft/class_3914": ["com/mohistmc/banner/injection/world/inventory/InjectionContainerLevelAccess"],
+      "net/minecraft/class_1706": ["com/mohistmc/banner/injection/world/inventory/InjectionAnvilMenu"],
       "net/minecraft/class_1860": ["com/mohistmc/banner/injection/world/item/crafting/InjectionRecipe"],
       "net/minecraft/class_1863": ["com/mohistmc/banner/injection/world/item/crafting/InjectionRecipeManager"],
       "net/minecraft/class_1856": ["com/mohistmc/banner/injection/world/item/crafting/InjectionIngredient"],

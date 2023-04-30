@@ -511,6 +511,8 @@ accessible field net/minecraft/server/network/ServerGamePacketListenerImpl conne
 accessible field net/minecraft/world/entity/AreaEffectCloud DATA_COLOR Lnet/minecraft/network/syncher/EntityDataAccessor;
 accessible field net/minecraft/world/entity/Entity boardingCooldown I
 accessible field net/minecraft/world/level/storage/DerivedLevelData wrapped Lnet/minecraft/world/level/storage/ServerLevelData;
+accessible field net/minecraft/world/inventory/CartographyTableMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
+accessible field net/minecraft/world/inventory/EnchantmentMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;
