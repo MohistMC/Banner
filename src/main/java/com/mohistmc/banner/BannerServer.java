@@ -24,6 +24,7 @@ public class BannerServer implements DedicatedServerModInitializer {
     private static final ExecutorService chatExecutor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder().setDaemon(true).setNameFormat("Async Chat Thread - #%d")
                     .setThreadFactory(chatFactory()).build());
+    public static final float javaVersion = Float.parseFloat(System.getProperty("java.class.version"));
 
     @Override
     public void onInitializeServer() {
@@ -34,7 +35,6 @@ public class BannerServer implements DedicatedServerModInitializer {
         String l = BannerConfig.banner_lang.split("_")[0];
         String c = BannerConfig.banner_lang.split("_")[1];
         I18N = new i18n(BannerServer.class.getClassLoader(), new Locale(l, c));
-        LOGGER.info(I18N.get("banner.welcome"));
         BannerEventDispatcherRegistry.registerEventDispatchers();
     }
 
@@ -50,5 +50,9 @@ public class BannerServer implements DedicatedServerModInitializer {
 
     public static ExecutorService getChatExecutor() {
         return chatExecutor;
+    }
+
+    public static String getVersion() {
+        return (BannerServer.class.getPackage().getImplementationVersion() != null) ? BannerServer.class.getPackage().getImplementationVersion() : "unknown";
     }
 }

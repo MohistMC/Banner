@@ -125,12 +125,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         banner$server.banner$setConsole(ColouredConsoleSender.getInstance());
         org.spigotmc.SpigotConfig.init((java.io.File) banner$server.bridge$options().valueOf("spigot-settings"));
         org.spigotmc.SpigotConfig.registerCommands();
-        LOGGER.info(" _____       ___   __   _   __   _   _____   _____   ");
-        LOGGER.info("|  _  \\     /   | |  \\ | | |  \\ | | | ____| |  _  \\  ");
-        LOGGER.info("| |_| |    / /| | |   \\| | |   \\| | | |__   | |_| |  ");
-        LOGGER.info("|  _  {   / / | | | |\\   | | |\\   | |  __|  |  _  /  ");
-        LOGGER.info("| |_| |  / /  | | | | \\  | | | \\  | | |___  | | \\ \\  ");
-        LOGGER.info("|_____/ /_/   |_| |_|  \\_| |_|  \\_| |_____| |_|  \\_\\ ");
         BannerServer.LOGGER.info("Loading Bukkit plugins...");
         this.cserver.loadPlugins();
         this.cserver.enablePlugins(PluginLoadOrder.STARTUP);
