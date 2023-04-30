@@ -11,6 +11,10 @@ public interface InjectionChunkAccess {
         return null;
     }
 
+    default void banner$setPersistentDataContainer(DirtyCraftPersistentDataContainer persistentDataContainer) {
+
+    }
+
     default void setBiome(int i, int j, int k, Holder<Biome> biome) {
 
     }

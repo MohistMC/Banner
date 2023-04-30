@@ -10,7 +10,6 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.levelgen.blending.BlendingData;
 import org.bukkit.craftbukkit.v1_19_R3.persistence.DirtyCraftPersistentDataContainer;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,18 +17,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Map;
-
 @Mixin(ChunkAccess.class)
 public abstract class MixinChunkAccess implements InjectionChunkAccess {
 
-    @Shadow public abstract int getMinBuildHeight();
-
     @Shadow public abstract int getHeight();
-
-    @Shadow public abstract LevelChunkSection getSection(int index);
-
-    @Shadow @Final protected LevelChunkSection[] sections;
     // CraftBukkit start - SPIGOT-6814: move to IChunkAccess to account for 1.17 to 1.18 chunk upgrading.
     private static final org.bukkit.craftbukkit.v1_19_R3.persistence.CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY
             = new org.bukkit.craftbukkit.v1_19_R3.persistence.CraftPersistentDataTypeRegistry();
@@ -53,6 +44,11 @@ public abstract class MixinChunkAccess implements InjectionChunkAccess {
     @Inject(method = "isUnsaved", cancellable = true, at = @At("RETURN"))
     private void banner$isDirty(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(cir.getReturnValueZ() || this.persistentDataContainer.dirty());
+    }
+
+    @Override
+    public void banner$setPersistentDataContainer(DirtyCraftPersistentDataContainer persistentDataContainer) {
+        this.persistentDataContainer = persistentDataContainer;
     }
 
     @Override
