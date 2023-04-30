@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world;
 
-import com.mohistmc.banner.injection.world.InjectionSimpleContainer;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -19,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(SimpleContainer.class)
-public abstract class MixinSimpleContainer implements Container, StackedContentsCompatible, InjectionSimpleContainer {
+public abstract class MixinSimpleContainer implements Container, StackedContentsCompatible {
 
     // @formatter:off
     @Shadow @Final public NonNullList<ItemStack> items;

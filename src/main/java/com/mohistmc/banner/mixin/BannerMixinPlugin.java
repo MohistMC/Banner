@@ -33,6 +33,21 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
                                             new MethodNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "applyBonemeal", "(Lnet/minecraft/world/item/context/UseOnContext;)Lnet/minecraft/world/InteractionResult;", null, null)
                                     )
                             )
+                    ).put("net.minecraft.world.level.block.DispenserBlock",
+                            Maps.immutableEntry(
+                                    ImmutableList.of(
+                                            new FieldNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.T_BOOLEAN, "eventFired", "Z", null, null)
+                                    ),
+                                    ImmutableList.of()
+                            )
+                    )
+                    .put("net.minecraft.world.level.block.ComposterBlock",
+                            Maps.immutableEntry(
+                                    ImmutableList.of(),
+                                    ImmutableList.of(
+                                            new MethodNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "addItem", "(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;D)Lnet/minecraft/world/level/block/state/BlockState;", null, null)
+                                    )
+                            )
                     ).build();
 
     @Override

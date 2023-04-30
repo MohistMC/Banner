@@ -162,6 +162,7 @@ accessible method net/minecraft/world/entity/animal/sniffer/Sniffer getState ()L
 accessible method net/minecraft/server/MinecraftServer$TimeProfiler <init> (JI)V
 accessible method net/minecraft/server/MinecraftServer setId (Ljava/lang/String;)V
 accessible method net/minecraft/server/level/PlayerRespawnLogic getOverworldRespawnPos (Lnet/minecraft/server/level/ServerLevel;II)Lnet/minecraft/core/BlockPos;
+accessible method net/minecraft/world/level/block/ComposterBlock empty (Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C

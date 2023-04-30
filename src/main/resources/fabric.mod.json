@@ -38,7 +38,6 @@
   },
   "custom": {
     "loom:injected_interfaces": {
-      "net/minecraft/class_1277": ["com/mohistmc/banner/injection/world/InjectionSimpleContainer"],
       "net/minecraft/class_1282": ["com/mohistmc/banner/injection/world/damagesource/InjectionDamageSource"],
       "net/minecraft/class_8109": ["com/mohistmc/banner/injection/world/damagesource/InjectionDamageSources"],
       "net/minecraft/server/MinecraftServer": ["com/mohistmc/banner/injection/server/InjectionMinecraftServer"],
@@ -67,6 +66,7 @@
       "net/minecraft/class_2358": ["com/mohistmc/banner/injection/world/level/block/InjectionFireBlock"],
       "net/minecraft/class_5454": ["com/mohistmc/banner/injection/world/level/block/InjectionPortalInfo"],
       "net/minecraft/class_2473": ["com/mohistmc/banner/injection/world/level/block/InjectionSaplingBlock"],
+      "net/minecraft/class_2647": ["com/mohistmc/banner/injection/world/level/block/InjectionAbstractTreeGrower"],
       "net/minecraft/class_2535": ["com/mohistmc/banner/injection/network/connection/InjectionConnection"],
       "net/minecraft/class_2945": ["com/mohistmc/banner/injection/network/syncher/InjectionSynchedEntityData"],
       "net/minecraft/class_5251": ["com/mohistmc/banner/injection/network/chat/InjectionTextColor"],
