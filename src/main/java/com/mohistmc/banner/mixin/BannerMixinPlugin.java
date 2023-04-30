@@ -48,7 +48,16 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
                                             new MethodNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "addItem", "(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;D)Lnet/minecraft/world/level/block/state/BlockState;", null, null)
                                     )
                             )
-                    ).build();
+                    )
+                    .put("net.minecraft.server.commands.ReloadCommand",
+                            Maps.immutableEntry(
+                                    ImmutableList.of(),
+                                    ImmutableList.of(
+                                            new MethodNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "reload", "(Lnet/minecraft/server/MinecraftServer;)V", null, null)
+                                    )
+                            )
+                    )
+                    .build();
 
     @Override
     public void onLoad(String mixinPackage) {

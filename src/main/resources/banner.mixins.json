@@ -36,6 +36,7 @@
     "server.bossevents.MixinCustomBossEvent",
     "server.commands.MixinGameRuleCommand",
     "server.commands.MixinReloadCommand",
+    "server.commands.MixinTimeCommand",
     "server.dedicated.MixinDedicatedServer",
     "server.level.MixinChunkHolder",
     "server.level.MixinDistanceManager",
