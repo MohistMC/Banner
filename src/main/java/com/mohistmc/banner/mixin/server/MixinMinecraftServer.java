@@ -21,6 +21,7 @@ import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WorldData;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.Main;
 import com.mohistmc.banner.util.ServerUtils;
 import com.mojang.datafixers.DataFixer;
@@ -71,7 +72,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow public abstract boolean isSpawningAnimals();
     // @formatter:on
 
-    @Shadow private PlayerList playerList;
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
     public org.bukkit.craftbukkit.v1_19_R3.CraftServer server;
@@ -240,7 +240,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     }
 
     private static MinecraftServer getServer() {
-        return ServerUtils.getServer();
+        return Bukkit.getServer() instanceof CraftServer ? ((CraftServer) Bukkit.getServer()).getServer() : null;
     }
 
     @Override

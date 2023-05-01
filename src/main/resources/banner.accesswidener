@@ -513,6 +513,8 @@ accessible field net/minecraft/world/entity/Entity boardingCooldown I
 accessible field net/minecraft/world/level/storage/DerivedLevelData wrapped Lnet/minecraft/world/level/storage/ServerLevelData;
 accessible field net/minecraft/world/inventory/CartographyTableMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
 accessible field net/minecraft/world/inventory/EnchantmentMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
+accessible field net/minecraft/world/inventory/GrindstoneMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
+accessible field net/minecraft/world/inventory/LoomMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;

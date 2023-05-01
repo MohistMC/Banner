@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mohistmc.banner.BannerServer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.md_5.specialsource.SpecialSource;
 
@@ -77,7 +78,7 @@ public class Remapper {
         if (hashes.contains(md5) && hashes.get(0).equals("mappings=" + MAPPINGS_VERSION)) return;
 
         String jarName = jarFile.getName().substring(0, jarFile.getName().indexOf(".jar"));
-        //BannerServer.LOGGER.info("Remapping \"" + jarFile + "\"...");
+        BannerServer.LOGGER.info("Remapping \"" + jarFile + "\"...");
 
         // Spigot -> Intermediary
         File finalJar = new File(remappedDir, jarName + "-intermediary.jar");

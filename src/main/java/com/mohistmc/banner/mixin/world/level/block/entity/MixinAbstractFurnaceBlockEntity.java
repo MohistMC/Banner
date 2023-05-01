@@ -180,6 +180,10 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
     }
 
     @Override
+    public List<Recipe<?>> bridge$dropExp(ServerPlayer entity, ItemStack itemStack, int amount) {
+        return getRecipesToAwardAndPopExperience(entity.getLevel(), entity.position(), this.worldPosition, entity, itemStack, amount);    }
+
+    @Override
     public Object2IntOpenHashMap<ResourceLocation> getRecipesUsed() {
         return this.recipesUsed;
     }

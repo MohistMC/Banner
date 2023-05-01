@@ -60,6 +60,25 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
                                     )
                             )
                     )
+                    .put("net.minecraft.server.MinecraftServer",
+                            Maps.immutableEntry(
+                                    ImmutableList.of(
+                                            new FieldNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "currentTick", "I", null, null)
+                                    ),
+                                    ImmutableList.of(
+                                            new MethodNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "getServer", "()Lnet/minecraft/server/MinecraftServer;", null, null)
+                                    )
+                            ))
+                    .put("net.minecraft.server.level.TicketType",
+                            Maps.immutableEntry(
+                                    ImmutableList.of(
+                                            new FieldNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, "PLUGIN",
+                                                    "Lnet/minecraft/server/level/TicketType;", null, null),
+                                            new FieldNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, "PLUGIN_TICKET",
+                                                    "Lnet/minecraft/server/level/TicketType;", null, null)
+                                    ),
+                                    ImmutableList.of()
+                            ))
                     .build();
 
     @Override
