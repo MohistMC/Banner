@@ -126,6 +126,9 @@ public interface InjectionLevel {
         return null;
     }
 
+    default void banner$setSpigotConfig(SpigotWorldConfig spigotWorldConfig) {
+    }
+
     default void pushAddEntityReason(CreatureSpawnEvent.SpawnReason reason) {
     }
 

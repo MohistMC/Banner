@@ -32,6 +32,7 @@ import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
 import org.bukkit.craftbukkit.v1_19_R3.util.WorldUUID;
 import org.bukkit.event.world.GenericGameEvent;
 import org.jetbrains.annotations.NotNull;
+import org.spigotmc.SpigotWorldConfig;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -83,8 +84,9 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
         getWorld();
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
+    @Inject(method = "<init>", at = @At("TAIL"))
     private void banner$initWorldServer(MinecraftServer minecraftServer, Executor executor, LevelStorageSource.LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey resourceKey, LevelStem levelStem, ChunkProgressListener chunkProgressListener, boolean bl, long l, List list, boolean bl2, CallbackInfo ci) {
+        this.banner$setPvpMode(minecraftServer.isPvpAllowed());
         getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
         this.convertable = levelStorageAccess;
         this.uuid = WorldUUID.getUUID(levelStorageAccess.getDimensionPath(this.dimension()).toFile());
@@ -94,6 +96,7 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
             this.serverLevelDataCB = BannerDerivedWorldInfo.create((DerivedLevelData)serverLevelData);
             serverLevelDataCB.setWorld((ServerLevel) (Object) this);
         }
+        this.banner$setSpigotConfig(new SpigotWorldConfig(serverLevelDataCB.getLevelName()));
     }
 
     @Inject(method = "gameEvent", cancellable = true, at = @At("HEAD"))

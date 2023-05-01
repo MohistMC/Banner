@@ -471,5 +471,10 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     public void banner$setGenerator(ChunkGenerator generator) {
         this.generator = generator;
     }
+
+    @Override
+    public void banner$setSpigotConfig(SpigotWorldConfig spigotWorldConfig) {
+        this.spigotConfig = spigotWorldConfig;
+    }
 }
 
