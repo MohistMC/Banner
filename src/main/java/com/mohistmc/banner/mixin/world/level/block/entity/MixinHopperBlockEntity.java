@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
-import com.mohistmc.banner.util.DistValidate;
+import com.mohistmc.banner.bukkit.DistValidate;
 import io.izzel.arclight.mixin.Eject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

@@ -1,6 +1,6 @@
 package com.mohistmc.banner.eventhandler.dispatcher;
 
-import com.mohistmc.banner.util.DistValidate;
+import com.mohistmc.banner.bukkit.DistValidate;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;

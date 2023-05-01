@@ -16,6 +16,10 @@ import java.util.*;
 
 public interface InjectionLivingEntity {
 
+    default void pushEffectCause(EntityPotionEffectEvent.Cause cause) {
+
+    }
+
     default int bridge$expToDrop() {
         return 0;
     }

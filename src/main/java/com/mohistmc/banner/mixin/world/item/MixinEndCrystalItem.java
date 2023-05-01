@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.item;
 
-import com.mohistmc.banner.util.DistValidate;
+import com.mohistmc.banner.bukkit.DistValidate;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.item.EndCrystalItem;

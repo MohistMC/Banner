@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
-import com.mohistmc.banner.util.DistValidate;
+import com.mohistmc.banner.bukkit.DistValidate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;

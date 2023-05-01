@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.item;
 
-import com.mohistmc.banner.util.DistValidate;
+import com.mohistmc.banner.bukkit.DistValidate;
 import io.izzel.arclight.mixin.Eject;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;

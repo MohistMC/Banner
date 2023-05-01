@@ -1,7 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.chunk;
 
 import com.mohistmc.banner.injection.world.level.chunk.InjectionLevelChunk;
-import com.mohistmc.banner.util.DistValidate;
+import com.mohistmc.banner.bukkit.DistValidate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerLevel;

@@ -2,7 +2,7 @@ package com.mohistmc.banner.mixin.world.level.block;
 
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.injection.world.level.block.InjectionBlock;
-import com.mohistmc.banner.util.DistValidate;
+import com.mohistmc.banner.bukkit.DistValidate;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;

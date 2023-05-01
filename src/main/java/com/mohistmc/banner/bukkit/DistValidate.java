@@ -1,4 +1,4 @@
-package com.mohistmc.banner.util;
+package com.mohistmc.banner.bukkit;
 
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
