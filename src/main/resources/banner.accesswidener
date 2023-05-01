@@ -20,6 +20,7 @@ accessible class net/minecraft/world/entity/raid/Raid$RaidStatus
 accessible class net/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus
 accessible class net/minecraft/server/MinecraftServer$TimeProfiler
 accessible class net/minecraft/world/level/block/entity/BeehiveBlockEntity$BeeData
+accessible class net/minecraft/server/commands/TeleportCommand$LookAt
 
 # public methods
 accessible method net/minecraft/world/level/block/DispenserBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)V
