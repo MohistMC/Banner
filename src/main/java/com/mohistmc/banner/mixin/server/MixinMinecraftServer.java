@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
 import it.unimi.dsi.fastutil.longs.LongIterator;
@@ -8,6 +9,7 @@ import net.minecraft.ReportedException;
 import net.minecraft.Util;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.ChatDecorator;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
@@ -36,6 +38,9 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
+import org.bukkit.craftbukkit.v1_19_R3.util.LazyPlayerSet;
+import org.bukkit.event.player.AsyncPlayerChatPreviewEvent;
 import org.bukkit.plugin.PluginLoadOrder;
 import org.fusesource.jansi.AnsiConsole;
 import org.spongepowered.asm.mixin.Final;
@@ -43,6 +48,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -170,21 +176,11 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
             this.worldLoader = BukkitCaptures.getDataLoadContext();
         }
-        Runtime.getRuntime().addShutdownHook(new org.bukkit.craftbukkit.v1_19_R3.util.ServerShutdownThread((MinecraftServer)(Object)this));
     }
 
     @Inject(method = "loadLevel", at = @At("RETURN"))
     public void banner$onLevelLoad(CallbackInfo ci) { // Calls from server's init method
         this.server.enablePlugins(PluginLoadOrder.POSTWORLD);
-    }
-
-    @Inject(method = "runServer",
-            at = @At(value = "FIELD",
-                    target = "Lnet/minecraft/server/MinecraftServer;nextTickTime:J",
-                    ordinal = 5,
-                    shift =  At.Shift.BEFORE))
-    private void banner$setTickOnServer(CallbackInfo ci) {
-        ServerUtils.currentTick = ((int) (System.currentTimeMillis() / 50));// CraftBukkit
     }
 
     @Inject(method = "stopServer", at = @At(value = "INVOKE", remap = false, ordinal = 0, shift = At.Shift.AFTER, target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V"))
@@ -194,11 +190,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         }
     }
 
-    @Inject(method = "createLevels", at = @At("RETURN"))
-    public void banner$enablePlugins(ChunkProgressListener p_240787_1_, CallbackInfo ci) {
-        this.server.enablePlugins(PluginLoadOrder.POSTWORLD);
-    }
-
     @Inject(method = "getServerModName", at = @At(value = "HEAD"), remap = false, cancellable = true)
     private void banner$setServerModName(CallbackInfoReturnable<String> cir) {
         if (this.server != null) {
@@ -206,25 +197,9 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         }
     }
 
-    @Inject(method = "haveTime", cancellable = true, at = @At("HEAD"))
-    private void banner$forceAheadOfTime(CallbackInfoReturnable<Boolean> cir) {
-        if (this.forceTicks) cir.setReturnValue(true);
-    }
-
     @Inject(method = "reloadResources", at = @At(value = "RETURN", target = "Ljava/util/concurrent/CompletableFuture;thenAcceptAsync(Ljava/util/function/Consumer;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
     private void banner$syncCommand(Collection<String> selectedIds, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
         this.server.syncCommands();
-    }
-
-    @Inject(method = "stopServer", cancellable = true, at = @At("HEAD"))
-    public void banner$setStopped(CallbackInfo ci) {
-        synchronized (stopLock) {
-            if (hasStopped) {
-                ci.cancel();
-                return;
-            }
-            hasStopped = true;
-        }
     }
 
     @Override
@@ -324,6 +299,31 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     public void executeModerately() {
         this.runAllTasks();
         java.util.concurrent.locks.LockSupport.parkNanos("executing tasks", 1000L);
+    }
+
+    // CraftBukkit start
+    public final java.util.concurrent.ExecutorService chatExecutor = java.util.concurrent.Executors.newCachedThreadPool(
+            new com.google.common.util.concurrent.ThreadFactoryBuilder().setDaemon(true).setNameFormat("Async Chat Thread - #%d").build());
+
+    @ModifyReturnValue(method = "getChatDecorator", at = @At("RETURN"))
+    private ChatDecorator banner$fireChatEvent() {
+        return (entityplayer, ichatbasecomponent) -> {
+            // SPIGOT-7127: Console /say and similar
+            if (entityplayer == null) {
+                return CompletableFuture.completedFuture(ichatbasecomponent);
+            }
+
+            return CompletableFuture.supplyAsync(() -> {
+                AsyncPlayerChatPreviewEvent event = new AsyncPlayerChatPreviewEvent(true, entityplayer.getBukkitEntity(), CraftChatMessage.fromComponent(ichatbasecomponent), new LazyPlayerSet(((MinecraftServer) (Object) this)));
+                String originalFormat = event.getFormat(), originalMessage = event.getMessage();
+                this.server.getPluginManager().callEvent(event);
+
+                if (originalFormat.equals(event.getFormat()) && originalMessage.equals(event.getMessage()) && event.getPlayer().getName().equalsIgnoreCase(event.getPlayer().getDisplayName())) {
+                    return ichatbasecomponent;
+                }
+                return CraftChatMessage.fromStringOrNull(String.format(event.getFormat(), event.getPlayer().getDisplayName(), event.getMessage()));
+            }, chatExecutor);
+        };
     }
 
     // Banner start

@@ -1,4 +1,4 @@
-package com.mohistmc.banner.mixin.world.entity.ai;
+package com.mohistmc.banner.mixin.world.entity.ai.behavior;
 
 import net.minecraft.world.entity.ai.behavior.AssignProfessionFromJobSite;
 import net.minecraft.world.entity.npc.Villager;

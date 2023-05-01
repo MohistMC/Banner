@@ -1,6 +1,5 @@
 package com.mohistmc.banner;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.eventhandler.BannerEventDispatcherRegistry;
 import com.mohistmc.i18n.i18n;
@@ -10,9 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 public class BannerServer implements DedicatedServerModInitializer {
 
@@ -21,9 +17,6 @@ public class BannerServer implements DedicatedServerModInitializer {
 
     public static final Logger LOGGER =
             LoggerFactory.getLogger(MOD_ID);
-    private static final ExecutorService chatExecutor = Executors.newCachedThreadPool(
-            new ThreadFactoryBuilder().setDaemon(true).setNameFormat("Async Chat Thread - #%d")
-                    .setThreadFactory(chatFactory()).build());
     public static final float javaVersion = Float.parseFloat(System.getProperty("java.class.version"));
 
     @Override
@@ -36,20 +29,6 @@ public class BannerServer implements DedicatedServerModInitializer {
         String c = BannerConfig.banner_lang.split("_")[1];
         I18N = new i18n(BannerServer.class.getClassLoader(), new Locale(l, c));
         BannerEventDispatcherRegistry.registerEventDispatchers();
-    }
-
-    private static ThreadFactory chatFactory() {
-        var group = Thread.currentThread().getThreadGroup();
-        var classLoader = Thread.currentThread().getContextClassLoader();
-        return r -> {
-            var thread = new Thread(group, r);
-            thread.setContextClassLoader(classLoader);
-            return thread;
-        };
-    }
-
-    public static ExecutorService getChatExecutor() {
-        return chatExecutor;
     }
 
     public static String getVersion() {
