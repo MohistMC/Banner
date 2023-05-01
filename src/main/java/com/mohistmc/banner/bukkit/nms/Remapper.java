@@ -9,7 +9,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mohistmc.banner.BannerServer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.md_5.specialsource.SpecialSource;
 
@@ -22,8 +21,8 @@ public class Remapper {
 
     public static int MAPPINGS_VERSION = 105;
 
-    public static File configDir = new File(FabricLoader.getInstance().getConfigDir().toFile(), "banner");
-    public static File remappedDir = new File(configDir, "remapped-plugins");
+    public static File libDir = new File(FabricLoader.getInstance().getGameDir().toFile(), ".fabric");
+    public static File remappedDir = new File(libDir, "remapped-plugins");
     public static File backup = new File(remappedDir, "backup-plugins");
     public static File spigot2inter;
     public static File md5info = new File(remappedDir, "md5-hashes.dat");
@@ -39,6 +38,9 @@ public class Remapper {
      * These steps will hopefully allow plugins to use NMS during snapshots
      */
     public static void remap(File jarFile) {
+        if (!libDir.exists()) {
+            libDir.mkdir();
+        }
         remappedDir.mkdirs();
         backup.mkdirs();
 
@@ -47,27 +49,14 @@ public class Remapper {
             if (b) return;
         }
 
-        // TODO: Don't remap worldedit in dev; Testing of new remapper
-        if (jarFile.getName().contains("worldedit") && FabricLoader.getInstance().isDevelopmentEnvironment()) {
-            // return;
-        }
-        /*if (jarFile.getName().contains("worldedit")) {
-            try {
-                wea(jarFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return;
-        }*/
-
         try {
             md5info.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        spigot2inter = new File(configDir, "spigot2intermediary.csrg");
-        exportResource("spigot2intermediary.csrg", configDir);
+        spigot2inter = new File(remappedDir, "spigot2intermediary.csrg");
+        exportResource("spigot2intermediary.csrg", remappedDir);
         String md5 = null;
         try (InputStream is = Files.newInputStream(jarFile.toPath())) {
             md5 = com.mohistmc.banner.bukkit.nms.DigestUtil.md5Hex(is);
@@ -92,7 +81,6 @@ public class Remapper {
 
         // Spigot -> Intermediary
         File finalJar = new File(remappedDir, jarName + "-intermediary.jar");
-        //System.out.println(IngotReader.finishedSetup);
         runSpecialSource(spigot2inter, toMap, finalJar);
 
         if (!usingBackup) {

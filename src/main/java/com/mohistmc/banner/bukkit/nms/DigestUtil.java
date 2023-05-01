@@ -1,6 +1,5 @@
 package com.mohistmc.banner.bukkit.nms;
 
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;

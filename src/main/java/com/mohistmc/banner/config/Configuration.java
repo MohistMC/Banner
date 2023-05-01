@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mohistmc.banner.BannerServer;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.commons.io.FileUtils;
 
@@ -29,7 +28,7 @@ public class Configuration {
     }
 
     private void setup() {
-        final File configDir = new File(FabricLoader.getInstance().getConfigDir().toFile(), BannerServer.MOD_ID);
+        final File configDir = new File(FabricLoader.getInstance().getConfigDir().toFile().toURI());
 
         if (!configDir.exists()) {
             configDir.mkdirs();
