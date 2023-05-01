@@ -78,6 +78,7 @@ public abstract class MixinBlock extends BlockBehaviour implements InjectionBloc
         return 0;
     }
 
+    /**
     @Inject(method = "playerDestroy", at = @At("RETURN"))
     private void banner$handleBlockDrops(Level worldIn, Player player, BlockPos pos, BlockState blockState, BlockEntity te, ItemStack stack, CallbackInfo ci) {
         BukkitCaptures.BlockBreakEventContext breakEventContext = BukkitCaptures.popPrimaryBlockBreakEvent();
@@ -93,5 +94,5 @@ public abstract class MixinBlock extends BlockBehaviour implements InjectionBloc
                 CraftEventFactory.handleBlockDropItemEvent(craftBlock, state, ((ServerPlayer) player), blockDrops);
             }
         }
-    }
+    }*/
 }
