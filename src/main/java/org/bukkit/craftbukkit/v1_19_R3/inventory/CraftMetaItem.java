@@ -37,6 +37,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.CompoundTag;
@@ -916,8 +918,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
 
     @Override
     public BlockData getBlockData(Material material) {
-        //TODO return CraftBlockData.fromData(BlockItem.getBlockState(CraftMagicNumbers.getBlock(material).defaultBlockState(), blockData));
-        return null;
+        return CraftBlockData.fromData(BukkitExtraConstants.getBlockState(CraftMagicNumbers.getBlock(material).defaultBlockState(), blockData));
     }
 
     @Override

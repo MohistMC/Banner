@@ -169,6 +169,7 @@ accessible method net/minecraft/world/inventory/Slot onSwapCraft (I)V
 accessible method net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity isLit ()Z
 accessible method net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity getBurnDuration (Lnet/minecraft/world/item/ItemStack;)I
 accessible method net/minecraft/world/level/block/entity/HopperBlockEntity setCooldown (I)V
+accessible method net/minecraft/world/item/BlockItem updateState (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/properties/Property;Ljava/lang/String;)Lnet/minecraft/world/level/block/state/BlockState;
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C
@@ -515,6 +516,7 @@ accessible field net/minecraft/world/inventory/CartographyTableMenu access Lnet/
 accessible field net/minecraft/world/inventory/EnchantmentMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
 accessible field net/minecraft/world/inventory/GrindstoneMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
 accessible field net/minecraft/world/inventory/LoomMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
+accessible field net/minecraft/world/inventory/StonecutterMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;

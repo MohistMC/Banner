@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.inventory;
 
+import com.mohistmc.banner.injection.world.inventory.InjectionLecternMenu;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LecternMenu.class)
-public abstract class MixinLecternMenu extends AbstractContainerMenu {
+public abstract class MixinLecternMenu extends AbstractContainerMenu implements InjectionLecternMenu {
 
     @Shadow @Final private Container lectern;
     private CraftInventoryView bukkitEntity;
@@ -70,5 +71,10 @@ public abstract class MixinLecternMenu extends AbstractContainerMenu {
         CraftInventoryLectern inventory = new CraftInventoryLectern(this.lectern);
         bukkitEntity = new CraftInventoryView(this.playerInventory.player.getBukkitEntity(), inventory, (AbstractContainerMenu) (Object) this);
         return bukkitEntity;
+    }
+
+    @Override
+    public void bridge$setPlayerInventory(Inventory playerInventory) {
+        this.playerInventory = playerInventory;
     }
 }

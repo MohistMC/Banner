@@ -19,7 +19,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-//TODO fix inject methods
 @Mixin(CommandSourceStack.class)
 public abstract class MixinCommandSourceStack implements InjectionCommandSourceStack {
 

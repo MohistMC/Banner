@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
-// TODO fix inject methods
 @Mixin(Commands.class)
 public abstract class MixinCommands implements InjectionCommands {
 
