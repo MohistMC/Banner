@@ -1,16 +1,12 @@
 package com.mohistmc.banner.bukkit.nms;
 
-
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_19_R3.util.Commodore;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -166,17 +162,6 @@ public class ReflectionMethodVisitor extends MethodVisitor {
             super.visitMethodInsn( Opcodes.INVOKESTATIC, "com/mohistmc/banner/bukkit/nms/ReflectionRemapper", "getCanonicalName", "(Ljava/lang/Class;)Ljava/lang/String;", false);
             return;
         }
-        if (owner.startsWith("net/minecraft/class_")) {
-            if (!name.startsWith("method_"))
-                name = MappingsReader.METHODS2.getOrDefault(name + desc, MappingsReader.getIntermedMethod(owner.replace('/', '.'), name));
-
-            if (owner.equalsIgnoreCase("net/minecraft/class_3176") && name.equalsIgnoreCase("getVersion")) {
-                // Add MinecraftServer#getVersion
-                super.visitMethodInsn( Opcodes.INVOKESTATIC, "com/javazilla/bukkitfabric/nms/ReflectionRemapper", "getMinecraftServerVersion", "()Ljava/lang/String;", false);
-                return;
-            }
-        }
-
         super.visitMethodInsn( opcode, owner, name, desc, itf );
     }
 
