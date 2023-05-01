@@ -102,6 +102,8 @@ dependencies {
 	annotationProcessor "com.github.LlamaLad7:MixinExtras:0.1.1"
 	modImplementation 'com.github.ArclightTeam:mixin-tools:1.0.0'
 	annotationProcessor 'com.github.ArclightTeam:mixin-tools:1.0.0'
+	implementation "com.github.phase:SrgLib:master-SNAPSHOT"
+	include "com.github.phase:SrgLib:master-SNAPSHOT"
 
 	include "com.github.ArclightTeam:mixin-tools:1.0.0"
 	include "com.github.LlamaLad7:MixinExtras:0.1.1"

@@ -385,6 +385,17 @@ public final class CraftServer implements Server {
         File pluginFolder = (File) console.bridge$options().valueOf("plugins");
 
         if (pluginFolder.exists()) {
+            if (pluginFolder.exists()) {
+                for (File f : pluginFolder.listFiles()) {
+                    if (f.getName().endsWith(".jar")) {
+                        try {
+                            com.mohistmc.banner.bukkit.nms.Remapper.remap(f); // Banner: Remap Jar file
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
             Plugin[] plugins = pluginManager.loadPlugins(pluginFolder);
             for (Plugin plugin : plugins) {
                 try {
@@ -441,15 +452,14 @@ public final class CraftServer implements Server {
         for (CommandNode<CommandSourceStack> cmd : dispatcher.getDispatcher().getRoot().getChildren()) {
             // Spigot start
             VanillaCommandWrapper wrapper = new VanillaCommandWrapper(dispatcher, cmd);
-            /**
             if (org.spigotmc.SpigotConfig.replaceCommands.contains(wrapper.getName())) {
                 if (first) {
                     commandMap.register("minecraft", wrapper);
                 }
-            } else if (!first) {*/
+            } else if (!first) {
                 commandMap.register("minecraft", wrapper);
-            //}
-            // Spigot end*/
+            }
+            // Spigot end
         }
     }
 
