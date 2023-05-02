@@ -36,7 +36,7 @@ public abstract class MixinWolf extends TamableAnimal {
 
     @Inject(method = "mobInteract", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/Wolf;heal(F)V"))
     private void banner$healReason(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
-        pushHealReason(EntityRegainHealthEvent.RegainReason.EATING);
+        //pushHealReason(EntityRegainHealthEvent.RegainReason.EATING);
     }
 
     @Inject(method = "mobInteract", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/Wolf;setTarget(Lnet/minecraft/world/entity/LivingEntity;)V"))
