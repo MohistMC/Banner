@@ -22,7 +22,6 @@ public abstract class MixinPig extends Animal {
         super(entityType, level);
     }
 
-
     @Inject(method = "thunderHit", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD,
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
     private void banner$pigZap(ServerLevel world, LightningBolt lightningBolt, CallbackInfo ci, ZombifiedPiglin piglin) {
