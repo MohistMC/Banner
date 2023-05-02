@@ -323,6 +323,7 @@
     "world.level.levelgen.structure.templatesystem.MixinStructureTemplate",
     "world.level.material.MixinFlowingFluid",
     "world.level.material.MixinLavaFluid",
+    "world.level.redstone.MixinNeighborUpdater",
     "world.level.saveddata.maps.MixinMapItemSavedData",
     "world.level.spawner.MixinBaseSpawner",
     "world.level.storage.MixinLevelStorageAccess",

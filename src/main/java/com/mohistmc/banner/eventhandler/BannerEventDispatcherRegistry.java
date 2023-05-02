@@ -1,10 +1,7 @@
 package com.mohistmc.banner.eventhandler;
 
 import com.mohistmc.banner.BannerServer;
-import com.mohistmc.banner.eventhandler.dispatcher.CommandsEventDispatcher;
-import com.mohistmc.banner.eventhandler.dispatcher.LevelEventDispatcher;
-import com.mohistmc.banner.eventhandler.dispatcher.PlayerEventDispatcher;
-import com.mohistmc.banner.eventhandler.dispatcher.ServerEventDispatcher;
+import com.mohistmc.banner.eventhandler.dispatcher.*;
 
 public class BannerEventDispatcherRegistry {
 
@@ -14,5 +11,6 @@ public class BannerEventDispatcherRegistry {
         LevelEventDispatcher.dispatchLevel();
         PlayerEventDispatcher.dispatcherPlayer();
         CommandsEventDispatcher.onCommandDispatch();
+        EntityEventDispatcher.dispatchEntity();
     }
 }
