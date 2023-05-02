@@ -87,7 +87,6 @@ public abstract class MixinBlockItem {
      * @author wdog5
      * @reason
      */
-    /**
     @Overwrite
     protected boolean canPlace(BlockPlaceContext context, BlockState state) {
         net.minecraft.world.entity.player.Player playerentity = context.getPlayer();
@@ -98,5 +97,5 @@ public abstract class MixinBlockItem {
         BlockCanBuildEvent event = new BlockCanBuildEvent(CraftBlock.at(context.getLevel(), context.getClickedPos()), player, CraftBlockData.fromData(state), original);
         if (DistValidate.isValid(context)) Bukkit.getPluginManager().callEvent(event);
         return event.isBuildable();
-    }*/
+    }
 }
