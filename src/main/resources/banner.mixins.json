@@ -93,6 +93,8 @@
     "world.entity.animal.MixinPig",
     "world.entity.decoration.MixinArmorStand",
     "world.entity.decoration.MixinItemFrame",
+    "world.entity.item.MixinFallingBlockEntity",
+    "world.entity.item.MixinHangingEntity",
     "world.entity.player.MixinInventory",
     "world.entity.player.MixinPlayer",
     "world.entity.projectile.MixinAbstractHurtingProjectile",

@@ -1,6 +1,6 @@
 package org.bukkit.craftbukkit.v1_19_R3.block;
 
-import com.mohistmc.banner.util.DoubleChestInventory;
+import com.mohistmc.banner.bukkit.DoubleChestInventory;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.level.block.ChestBlock;

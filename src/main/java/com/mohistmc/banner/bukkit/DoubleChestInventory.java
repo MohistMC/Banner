@@ -1,4 +1,4 @@
-package com.mohistmc.banner.util;
+package com.mohistmc.banner.bukkit;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.CompoundContainer;
