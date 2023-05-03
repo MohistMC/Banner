@@ -1,4 +1,4 @@
-package com.mohistmc.banner.util;
+package com.mohistmc.banner.bukkit;
 
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -30,6 +30,10 @@ public class ProcessableEffect {
 
     public MobEffectInstance getEffect() {
         return effect;
+    }
+
+    public EntityPotionEffectEvent.Cause getCause() {
+        return cause;
     }
 
     public void setEffect(MobEffectInstance effect) {

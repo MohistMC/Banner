@@ -1,8 +1,8 @@
 package com.mohistmc.banner.mixin.world.entity;
 
 import com.google.common.collect.Lists;
+import com.mohistmc.banner.bukkit.ProcessableEffect;
 import com.mohistmc.banner.injection.world.entity.InjectionLivingEntity;
-import com.mohistmc.banner.util.ProcessableEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;

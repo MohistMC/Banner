@@ -1,6 +1,6 @@
 package com.mohistmc.banner.injection.world.entity;
 
-import com.mohistmc.banner.util.ProcessableEffect;
+import com.mohistmc.banner.bukkit.ProcessableEffect;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
