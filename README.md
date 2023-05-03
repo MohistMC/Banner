@@ -16,6 +16,12 @@
 |---------|-------------|-----------|-------------------|----------------------|
 | 1.19.4  | WIP         | Poor      | Zero              | Zero                 |   
 
+Notice
+------
+Fabric + Bukkit is more vanilla like than Forge + Bukkit
+Fabric api use mixins to change minecraft indirectly
+they are no a lot of breaking changes
+
 Progress
 ------
 
@@ -24,7 +30,7 @@ Progress
     * [ ] CraftBukkit([**f92a41c39**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/commits/f92a41c39))
     * [ ] Spigot ([**d1bd3bd2**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/spigot/commits/d1bd3bd2))
         * [ ] Bukkit-Patches
-        * [ ] CraftBukkit-Patches (50%) - (029/030/091)
+        * [ ] CraftBukkit-Patches (65%) - (029/030/091)
 
 - [ ] Start Injection
     * [ ] NMS-Base-Empty-Methods (96%) - (029/030/091)
