@@ -324,4 +324,9 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
     public void banner$setAware(boolean aware) {
         this.aware = aware;
     }
+
+    @Override
+    public boolean getBanner$targetSuccess() {
+        return banner$targetSuccess;
+    }
 }

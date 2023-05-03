@@ -12,6 +12,10 @@ import org.bukkit.event.entity.EntityTransformEvent;
 
 public interface InjectionMob {
 
+    default boolean getBanner$targetSuccess() {
+        return false;
+    }
+
     default boolean bridge$aware() {
         return false;
     }
