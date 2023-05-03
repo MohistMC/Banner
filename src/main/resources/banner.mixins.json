@@ -26,6 +26,7 @@
     "commands.arguments.selector.MixinEntitySelectorParser",
     "core.dispenser.MixinAbstractProjectileDispenseBehavior",
     "core.dispenser.MixinBoatDispenseItemBehavior",
+    "core.dispenser.MixinDefaultDispenseItemBehavior",
     "core.dispenser.MixinShearsDispenseItemBehavior",
     "core.dispenser.MixinShulkerBoxDispenseBehavior",
     "network.MixinFriendlyByteBuf",
