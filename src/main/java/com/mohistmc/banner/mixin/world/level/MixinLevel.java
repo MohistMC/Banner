@@ -333,9 +333,15 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     }
 
     @Override
-    public boolean addEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
+    public boolean addFreshEntity(Entity entity) {
+        this.pushAddEntityReason(getAddEntityReason());
+        return LevelAccessor.super.addFreshEntity(entity);
+    }
+
+    @Override
+    public boolean addFreshEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
         if (getWorld().getHandle() != (Object) this) {
-            return getWorld().getHandle().addEntity(entity, reason);
+            return getWorld().getHandle().addFreshEntity(entity, reason);
         } else {
             this.pushAddEntityReason(reason);
             return this.addFreshEntity(entity);

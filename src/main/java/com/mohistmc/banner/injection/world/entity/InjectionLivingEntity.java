@@ -16,6 +16,10 @@ import java.util.*;
 
 public interface InjectionLivingEntity {
 
+    default void pushHealReason(EntityRegainHealthEvent.RegainReason reason) {
+
+    }
+
     default void pushEffectCause(EntityPotionEffectEvent.Cause cause) {
 
     }

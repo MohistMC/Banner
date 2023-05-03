@@ -171,6 +171,7 @@ accessible method net/minecraft/world/level/block/entity/AbstractFurnaceBlockEnt
 accessible method net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity getBurnDuration (Lnet/minecraft/world/item/ItemStack;)I
 accessible method net/minecraft/world/level/block/entity/HopperBlockEntity setCooldown (I)V
 accessible method net/minecraft/world/item/BlockItem updateState (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/properties/Property;Ljava/lang/String;)Lnet/minecraft/world/level/block/state/BlockState;
+accessible method net/minecraft/world/item/DebugStickItem handleInteraction (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;ZLnet/minecraft/world/item/ItemStack;)Z
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C

@@ -135,8 +135,4 @@ public interface InjectionLevel {
     default CreatureSpawnEvent.SpawnReason getAddEntityReason() {
         return null;
     }
-
-    default boolean addEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
-        return false;
-    }
 }
