@@ -695,4 +695,9 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
             }
         }
     }
+
+    @Override
+    public boolean isDisconnected() {
+        return !this.player.bridge$joining() && !this.connection.isConnected();
+    }
 }
