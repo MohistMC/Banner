@@ -555,11 +555,10 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         return name;
     }
 
-    /**
     @Inject(method = "sendPlayerPermissionLevel(Lnet/minecraft/server/level/ServerPlayer;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getCommands()Lnet/minecraft/commands/Commands;"))
     private void banner$calculatePerms(ServerPlayer player, int permLevel, CallbackInfo ci) {
         player.getBukkitEntity().recalculatePermissions();
-    }*/
+    }
 
     @Redirect(method = "sendAllPlayerInfo", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;resetSentInfo()V"))
     private void banner$useScaledHealth(ServerPlayer playerEntity) {
