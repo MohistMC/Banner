@@ -89,7 +89,9 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
         this.banner$setPvpMode(minecraftServer.isPvpAllowed());
         getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
         this.convertable = levelStorageAccess;
-        this.uuid = WorldUUID.getUUID(levelStorageAccess.getDimensionPath(this.dimension()).toFile());
+        if (this.uuid == null) {
+            this.uuid = WorldUUID.getUUID(levelStorageAccess.getDimensionPath(this.dimension()).toFile());
+        }
         if (serverLevelData instanceof PrimaryLevelData) {
             this.serverLevelDataCB = (PrimaryLevelData) serverLevelData;
         } else if (serverLevelData instanceof DerivedLevelData) {

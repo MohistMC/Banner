@@ -236,7 +236,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     }
 
     @Override
-    protected boolean isImmobile() {
+    public boolean isImmobile() {
         return super.isImmobile() || !getBukkitEntity().isOnline();
     }
 

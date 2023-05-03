@@ -14,6 +14,10 @@ import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 
 public interface InjectionMinecraftServer {
 
+    default java.util.concurrent.ExecutorService bridge$chatExecutor() {
+        return null;
+    }
+
     default void bridge$queuedProcess(Runnable runnable) {
 
     }

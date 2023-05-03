@@ -21,6 +21,7 @@ accessible class net/minecraft/world/level/entity/PersistentEntitySectionManager
 accessible class net/minecraft/server/MinecraftServer$TimeProfiler
 accessible class net/minecraft/world/level/block/entity/BeehiveBlockEntity$BeeData
 accessible class net/minecraft/server/commands/TeleportCommand$LookAt
+accessible class net/minecraft/server/network/ServerLoginPacketListenerImpl$State
 
 # public methods
 accessible method net/minecraft/world/level/block/DispenserBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)V
@@ -172,6 +173,7 @@ accessible method net/minecraft/world/level/block/entity/AbstractFurnaceBlockEnt
 accessible method net/minecraft/world/level/block/entity/HopperBlockEntity setCooldown (I)V
 accessible method net/minecraft/world/item/BlockItem updateState (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/properties/Property;Ljava/lang/String;)Lnet/minecraft/world/level/block/state/BlockState;
 accessible method net/minecraft/world/item/DebugStickItem handleInteraction (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;ZLnet/minecraft/world/item/ItemStack;)Z
+accessible method net/minecraft/world/entity/player/Player isImmobile ()Z
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C

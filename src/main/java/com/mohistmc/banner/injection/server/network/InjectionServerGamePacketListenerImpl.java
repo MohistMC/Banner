@@ -39,4 +39,8 @@ public interface InjectionServerGamePacketListenerImpl {
     default boolean isDisconnected() {
         return false;
     }
+
+    default boolean checkLimit(long timestamp) {
+        return false;
+    }
 }

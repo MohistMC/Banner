@@ -394,4 +394,9 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     public void banner$setProcessQueue(Queue<Runnable> processQueue) {
         this.processQueue = processQueue;
     }
+
+    @Override
+    public java.util.concurrent.ExecutorService bridge$chatExecutor() {
+        return chatExecutor;
+    }
 }
