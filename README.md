@@ -18,9 +18,9 @@
 
 Notice
 ------
-Fabric + Bukkit is more vanilla like than Forge + Bukkit
-Fabric api use mixins to change minecraft indirectly
-they are no a lot of breaking changes
+* [ ] Fabric + Bukkit is more vanilla like than Forge + Bukkit
+* [ ] Fabric api use mixins to change minecraft indirectly
+* [ ] they are no a lot of breaking changes
 
 Progress
 ------
