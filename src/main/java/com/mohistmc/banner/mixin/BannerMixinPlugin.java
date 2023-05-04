@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.mohistmc.banner.BannerServer;
-import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.library.Library;
 import com.mohistmc.banner.library.LibraryManager;
 import net.fabricmc.loader.api.FabricLoader;
@@ -83,23 +82,15 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void onLoad(String mixinPackage) {
-        try {
-            BannerConfig.setup();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        if (BannerConfig.showLogo) {
-            LOGGER.info(" _____       ___   __   _   __   _   _____   _____   ");
-            LOGGER.info("|  _  \\     /   | |  \\ | | |  \\ | | | ____| |  _  \\  ");
-            LOGGER.info("| |_| |    / /| | |   \\| | |   \\| | | |__   | |_| |  ");
-            LOGGER.info("|  _  {   / / | | | |\\   | | |\\   | |  __|  |  _  /  ");
-            LOGGER.info("| |_| |  / /  | | | | \\  | | | \\  | | |___  | | \\ \\  ");
-            LOGGER.info("|_____/ /_/   |_| |_|  \\_| |_|  \\_| |_____| |_|  \\_\\ ");
-            LOGGER.info("Welcome to Mohist Banner ! - Mohist Developement Group" + " - " + BannerServer.getVersion() + ", Java " + BannerServer.javaVersion);
-            LOGGER.info("Loading libraries, please wait...");
-        }
-        loadLibs();
+       LOGGER.info(" _____       ___   __   _   __   _   _____   _____   ");
+       LOGGER.info("|  _  \\     /   | |  \\ | | |  \\ | | | ____| |  _  \\  ");
+       LOGGER.info("| |_| |    / /| | |   \\| | |   \\| | | |__   | |_| |  ");
+       LOGGER.info("|  _  {   / / | | | |\\   | | |\\   | |  __|  |  _  /  ");
+       LOGGER.info("| |_| |  / /  | | | | \\  | | | \\  | | |___  | | \\ \\  ");
+       LOGGER.info("|_____/ /_/   |_| |_|  \\_| |_|  \\_| |_____| |_|  \\_\\ ");
+       LOGGER.info("Welcome to Mohist Banner ! - Mohist Developement Group" + " - " + BannerServer.getVersion() + ", Java " + BannerServer.javaVersion);
+       LOGGER.info("Loading libraries, please wait...");
+       loadLibs();
     }
 
     public static void loadLibs() {
