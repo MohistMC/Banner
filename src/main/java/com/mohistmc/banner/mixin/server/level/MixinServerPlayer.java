@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.PlayerRespawnLogic;
@@ -16,6 +17,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.CombatTracker;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
@@ -23,12 +25,17 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.scores.Score;
 import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.WeatherType;
+import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R3.CraftWorldBorder;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -36,10 +43,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
 
 @Mixin(ServerPlayer.class)
 public abstract class MixinServerPlayer extends Player implements InjectionServerPlayer {
@@ -81,9 +91,18 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     public WeatherType weather = null;
     public boolean relativeTime = true;
     public String locale = "en_us"; // CraftBukkit - add, lowercase
+    private boolean banner$initialized = false;
 
     public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
         super(level, blockPos, f, gameProfile);
+    }
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    public void banner$init(CallbackInfo ci) {
+        this.displayName = this.getGameProfile() != null ? getScoreboardName() : "~FakePlayer~";
+        this.banner$setBukkitPickUpLoot(true);
+        this.maxHealthCache = this.getMaxHealth();
+        this.banner$initialized = true;
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("RETURN"))
@@ -96,11 +115,71 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         }
     }
 
+    @Redirect(method = "addAdditionalSaveData", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hasExactlyOnePlayerPassenger()Z"))
+    private boolean banner$nonPersistVehicle(Entity entity) {
+        Entity entity1 = this.getVehicle();
+        boolean persistVehicle = true;
+        if (entity1 != null) {
+            Entity vehicle;
+            for (vehicle = entity1; vehicle != null; vehicle = vehicle.getVehicle()) {
+                if (!vehicle.bridge$persist()) {
+                    persistVehicle = false;
+                    break;
+                }
+            }
+        }
+        return persistVehicle && entity.hasExactlyOnePlayerPassenger();
+    }
+
+
+    @Inject(method = "addAdditionalSaveData", at = @At("RETURN"))
+    private void banner$writeExtra(CompoundTag compound, CallbackInfo ci) {
+        this.getBukkitEntity().setExtraData(compound);
+    }
+
     @Inject(method = "tick", at = @At("HEAD"))
     private void banner$joining(CallbackInfo ci) {
         if (this.joining) {
             this.joining = false;
         }
+    }
+
+    @Redirect(method = "doTick", at = @At(value = "NEW", target = "net/minecraft/network/protocol/game/ClientboundSetHealthPacket"))
+    private ClientboundSetHealthPacket banner$useScaledHealth(float healthIn, int foodLevelIn, float saturationLevelIn) {
+        return new ClientboundSetHealthPacket(this.getBukkitEntity().getScaledHealth(), foodLevelIn, saturationLevelIn);
+    }
+
+    @Inject(method = "doTick", at = @At(value = "FIELD", target = "Lnet/minecraft/server/level/ServerPlayer;tickCount:I"))
+    private void banner$updateHealthAndExp(CallbackInfo ci) {
+        if (this.maxHealthCache != this.getMaxHealth()) {
+            this.getBukkitEntity().updateScaledHealth();
+        }
+        if (this.bridge$oldLevel() == -1) {
+            this.banner$setOldLevel(this.experienceLevel);
+        }
+        if (this.bridge$oldLevel() != this.experienceLevel) {
+            CraftEventFactory.callPlayerLevelChangeEvent(this.getBukkitEntity(), this.bridge$oldLevel(), this.experienceLevel);
+            this.banner$setOldLevel(this.experienceLevel);
+        }
+        if (this.getBukkitEntity().hasClientWorldBorder()) {
+            ((CraftWorldBorder) this.getBukkitEntity().getWorldBorder()).getHandle().tick();
+        }
+    }
+
+
+    @Redirect(method = "awardKillScore", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/scores/Scoreboard;forAllObjectives(Lnet/minecraft/world/scores/criteria/ObjectiveCriteria;Ljava/lang/String;Ljava/util/function/Consumer;)V"))
+    private void banner$useCustomScoreboard(Scoreboard instance, ObjectiveCriteria criteria, String scoreboardName, Consumer<Score> points) {
+        ((CraftServer) Bukkit.getServer()).getScoreboardManager().getScoreboardScores(criteria, scoreboardName, points);
+    }
+
+    @Redirect(method = "handleTeamKill", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/scores/Scoreboard;forAllObjectives(Lnet/minecraft/world/scores/criteria/ObjectiveCriteria;Ljava/lang/String;Ljava/util/function/Consumer;)V"))
+    private void banner$teamKill(Scoreboard instance, ObjectiveCriteria criteria, String scoreboardName, Consumer<Score> points) {
+        ((CraftServer) Bukkit.getServer()).getScoreboardManager().getScoreboardScores(criteria, scoreboardName, points);
+    }
+
+    @Inject(method = "isPvpAllowed", cancellable = true, at = @At("HEAD"))
+    private void banner$pvpMode(CallbackInfoReturnable<Boolean> cir) {
+        cir.setReturnValue((this.level.bridge$pvpMode()));
     }
 
     @Override
