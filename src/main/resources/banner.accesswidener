@@ -22,6 +22,8 @@ accessible class net/minecraft/server/MinecraftServer$TimeProfiler
 accessible class net/minecraft/world/level/block/entity/BeehiveBlockEntity$BeeData
 accessible class net/minecraft/server/commands/TeleportCommand$LookAt
 accessible class net/minecraft/server/network/ServerLoginPacketListenerImpl$State
+accessible method net/minecraft/server/level/Ticket <init> (Lnet/minecraft/server/level/TicketType;ILjava/lang/Object;)V
+accessible class net/minecraft/server/level/DistanceManager$ChunkTicketTracker
 
 # public methods
 accessible method net/minecraft/world/level/block/DispenserBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)V
@@ -174,6 +176,12 @@ accessible method net/minecraft/world/level/block/entity/HopperBlockEntity setCo
 accessible method net/minecraft/world/item/BlockItem updateState (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/properties/Property;Ljava/lang/String;)Lnet/minecraft/world/level/block/state/BlockState;
 accessible method net/minecraft/world/item/DebugStickItem handleInteraction (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;ZLnet/minecraft/world/item/ItemStack;)Z
 accessible method net/minecraft/world/entity/player/Player isImmobile ()Z
+accessible method net/minecraft/server/level/ChunkTracker update (JIZ)V
+accessible method net/minecraft/server/level/Ticket setCreatedTick (J)V
+accessible method net/minecraft/server/level/ChunkMap getUpdatingChunkIfPresent (J)Lnet/minecraft/server/level/ChunkHolder;
+accessible method net/minecraft/server/level/DistanceManager purgeStaleTickets ()V
+accessible method net/minecraft/server/level/ChunkMap tick (Ljava/util/function/BooleanSupplier;)V
+accessible method net/minecraft/server/level/ServerChunkCache runDistanceManagerUpdates ()Z
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C

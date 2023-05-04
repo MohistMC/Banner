@@ -13,6 +13,9 @@ import org.bukkit.event.entity.EntityExhaustionEvent;
 
 public interface InjectionPlayer {
 
+    default void pushExhaustReason(EntityExhaustionEvent.ExhaustionReason reason) {
+    }
+
     default CraftHumanEntity getBukkitEntity() {
         return null;
     }
@@ -20,11 +23,6 @@ public interface InjectionPlayer {
     default ItemEntity drop(ItemStack itemstack, boolean flag, boolean flag1, boolean callEvent) {
         return null;
     }
-
-    /**
-    default boolean damageEntity0(DamageSource damagesource, float f) {
-        return false;
-    }*/
 
     default Either<Player.BedSleepingProblem, Unit> startSleepInBed(BlockPos blockposition, boolean force) {
         return null;
