@@ -21,8 +21,6 @@ public class LevelEventDispatcher {
                         world.bridge$generator().getDefaultPopulators(
                                 world.getWorld()));
             }
-            Bukkit.getPluginManager().callEvent(new WorldInitEvent(world.getWorld()));
-            Bukkit.getPluginManager().callEvent(new WorldLoadEvent(world.getWorld()));
         });
 
         ServerWorldEvents.UNLOAD.register((server, world) -> {

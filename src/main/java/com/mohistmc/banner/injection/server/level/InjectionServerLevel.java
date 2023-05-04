@@ -13,6 +13,10 @@ import java.util.UUID;
 
 public interface InjectionServerLevel {
 
+    default  <T extends ParticleOptions> int sendParticles(T type, double posX, double posY, double posZ, int particleCount, double xOffset, double yOffset, double zOffset, double speed, boolean force) {
+        return particleCount;
+    }
+
     default LevelStorageSource.LevelStorageAccess bridge$convertable() {
         return null;
     }

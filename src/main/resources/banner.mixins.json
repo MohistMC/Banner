@@ -53,6 +53,7 @@
     "server.level.MixinDistanceManager",
     "server.level.MixinServerChunkCache",
     "server.level.MixinServerLevel",
+    "server.level.MixinServerLevel_EntityCallbacks",
     "server.level.MixinServerPlayer",
     "server.level.MixinServerPlayerGameMode",
     "server.level.MixinTicketType",

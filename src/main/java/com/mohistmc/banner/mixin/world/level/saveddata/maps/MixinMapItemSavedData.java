@@ -89,4 +89,8 @@ public class MixinMapItemSavedData implements InjectionMapItemSavedData {
     public void banner$setUniqueId(UUID uuid) {
         this.uniqueId = uuid;
     }
+
+    public void banner$setId(String id) {
+        this.id = id;
+    }
 }

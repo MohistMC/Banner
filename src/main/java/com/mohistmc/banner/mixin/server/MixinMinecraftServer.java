@@ -78,6 +78,8 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow public abstract boolean isSpawningAnimals();
     // @formatter:on
 
+    @Shadow private String localIp;
+    @Shadow private boolean onlineMode;
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
     public org.bukkit.craftbukkit.v1_19_R3.CraftServer server;
@@ -325,6 +327,17 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             }, chatExecutor);
         };
     }
+
+    // Banner start -- add to support plugins
+    public String u() {
+        return this.localIp;
+    }
+
+    public boolean U() {
+        return this.onlineMode;
+    }
+
+    // Banner end
 
     // Banner start
     @Override

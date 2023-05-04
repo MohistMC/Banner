@@ -20,4 +20,7 @@ public interface InjectionMapItemSavedData {
     default String bridge$id() {
         return null;
     }
+
+    default void banner$setId(String id) {
+    }
 }
