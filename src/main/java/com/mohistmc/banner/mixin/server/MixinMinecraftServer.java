@@ -180,7 +180,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         }
     }
 
-    @Inject(method = "loadLevel", at = @At("RETURN"))
+    @Inject(method = "prepareLevels", at = @At("TAIL"))
     public void banner$onLevelLoad(CallbackInfo ci) { // Calls from server's init method
         this.server.enablePlugins(PluginLoadOrder.POSTWORLD);
     }

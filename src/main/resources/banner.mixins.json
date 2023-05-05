@@ -214,6 +214,7 @@
     "world.item.MixinBoatItem",
     "world.item.MixinBoneMealItem",
     "world.item.MixinBowItem",
+    "world.item.MixinBucketItem",
     "world.item.MixinChorusFruitItem",
     "world.item.MixinCrossbowItem",
     "world.item.MixinDyeItem",
@@ -236,6 +237,7 @@
     "world.item.MixinSnowballItem",
     "world.item.MixinSpawnEggItem",
     "world.item.MixinStandingAndWallBlockItem",
+    "world.item.MixinTridentItem",
     "world.item.crafting.MixinBlastingRecipe",
     "world.item.crafting.MixinCampfireCookingRecipe",
     "world.item.crafting.MixinCustomRecipe",
@@ -332,7 +334,6 @@
     "world.level.block.MixinObserverBlock",
     "world.level.block.MixinPistonBaseBlock",
     "world.level.block.MixinPointedDripstoneBlock",
-    "world.level.block.MixinPortalInfo",
     "world.level.block.MixinPowderSnowBlock",
     "world.level.block.MixinPoweredRailBlock",
     "world.level.block.MixinPressurePlateBlock",
@@ -394,6 +395,8 @@
     "world.level.border.MixinWorldBorder",
     "world.level.chunk.MixinChunkAccess",
     "world.level.chunk.MixinLevelChunk",
+    "world.level.chunk.MixinLevelChunk_BoundTickingBlockEntity",
+    "world.level.chunk.MixinLevelChunkSection",
     "world.level.entity.MixinPersistentEntitySectionManager",
     "world.level.gameevent.MixinGameEventDispatcher",
     "world.level.gameevent.vibrations.MixinVibrationListener",
@@ -404,6 +407,8 @@
     "world.level.levelgen.structure.templatesystem.MixinStructureTemplate",
     "world.level.material.MixinFlowingFluid",
     "world.level.material.MixinLavaFluid",
+    "world.level.portal.MixinPortalForcer",
+    "world.level.portal.MixinPortalInfo",
     "world.level.redstone.MixinNeighborUpdater",
     "world.level.saveddata.maps.MixinMapItemSavedData",
     "world.level.saveddata.maps.MixinMapItemSavedData_HoldingPlayer",
@@ -414,6 +419,10 @@
     "world.level.storage.MixinPlayerDataStorage",
     "world.level.storage.MixinPrimaryLevelData",
     "world.level.storage.loot.MixinLootTable",
-    "world.level.storage.loot.MixinLootTables"
+    "world.level.storage.loot.MixinLootTables",
+    "world.level.storage.loot.entries.MixinLootEntry_Serializer",
+    "world.level.storage.loot.functions.MixinLootingEnchantFunction",
+    "world.level.storage.loot.predicates.MixinExplosionCondition",
+    "world.level.storage.loot.predicates.MixinRandomChanceWithLootingCondition"
   ]
 }

@@ -1,4 +1,4 @@
-package com.mohistmc.banner.injection.world.level.block;
+package com.mohistmc.banner.injection.world.level.portal;
 
 import net.minecraft.server.level.ServerLevel;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftPortalEvent;
