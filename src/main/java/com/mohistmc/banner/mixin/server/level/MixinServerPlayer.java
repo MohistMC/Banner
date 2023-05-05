@@ -473,4 +473,9 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     public void banner$setLocale(String locale) {
         this.locale = locale;
     }
+
+    @Override
+    public boolean banner$initialized() {
+        return  banner$initialized;
+    }
 }

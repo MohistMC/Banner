@@ -3,9 +3,15 @@ package com.mohistmc.banner.bukkit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.item.FallingBlockEntity;
+import net.minecraft.world.entity.monster.ZombieVillager;
+import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -15,10 +21,29 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityTransformEvent;
 
 public class BukkitExtraConstants {
 
     public static final LootContextParam<Integer> LOOTING_MOD = new LootContextParam<>(new ResourceLocation("bukkit:looting_mod")); // CraftBukkit
+
+    public static ZombieVillager zombifyVillager(ServerLevel level, Villager villager, BlockPos blockPosition, boolean silent, CreatureSpawnEvent.SpawnReason spawnReason) {
+        villager.level.pushAddEntityReason(spawnReason);
+        villager.bridge$pushTransformReason(EntityTransformEvent.TransformReason.INFECTION);
+        ZombieVillager zombieVillager = villager.convertTo(EntityType.ZOMBIE_VILLAGER, false);
+        if (zombieVillager != null) {
+            zombieVillager.finalizeSpawn(level, level.getCurrentDifficultyAt(zombieVillager.blockPosition()), MobSpawnType.CONVERSION, new net.minecraft.world.entity.monster.Zombie.ZombieGroupData(false, true), null);
+            zombieVillager.setVillagerData(villager.getVillagerData());
+            zombieVillager.setGossips(villager.getGossips().store(NbtOps.INSTANCE));
+            zombieVillager.setTradeOffers(villager.getOffers().createTag());
+            zombieVillager.setVillagerXp(villager.getVillagerXp());
+            if (!silent) {
+                level.levelEvent(null, 1026, blockPosition, 0);
+            }
+        }
+        return zombieVillager;
+    }
 
     public static BlockState getBlockState(BlockState blockState, CompoundTag nbt) {
         StateDefinition<Block, BlockState> statecontainer = blockState.getBlock().getStateDefinition();

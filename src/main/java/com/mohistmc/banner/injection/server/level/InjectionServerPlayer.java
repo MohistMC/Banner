@@ -24,6 +24,14 @@ import java.util.Set;
 
 public interface InjectionServerPlayer {
 
+    default int nextContainerCounterInt() {
+        return 0;
+    }
+
+    default boolean banner$initialized() {
+        return false;
+    }
+
     default String bridge$locale() {
         return null;
     }

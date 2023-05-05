@@ -30,7 +30,7 @@ Progress
     * [ ] CraftBukkit([**a7cfc778f**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/commits/a7cfc778f))
     * [ ] Spigot ([**d1bd3bd2**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/spigot/commits/d1bd3bd2))
         * [ ] Bukkit-Patches
-        * [ ] CraftBukkit-Patches (85%) - (029/030/091)
+        * [ ] CraftBukkit-Patches (93%) - (029/030/091)
 
 - [ ] Start Injection
     * [ ] NMS-Base-Empty-Methods (96%) - (029/030/091)
