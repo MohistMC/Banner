@@ -14,7 +14,9 @@ import org.bukkit.event.entity.EntityDropItemEvent;
 public class EntityEventDispatcher {
 
     public static void dispatchEntity() {
+        /**
         ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
+
             entity.damageEntity0(source, amount);
             return false;
         });
@@ -34,6 +36,6 @@ public class EntityEventDispatcher {
                 }
             }
             return InteractionResult.PASS;
-        });
+        });*/
     }
 }
