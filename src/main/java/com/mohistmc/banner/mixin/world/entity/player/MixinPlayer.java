@@ -3,14 +3,23 @@ package com.mohistmc.banner.mixin.world.entity.player;
 import com.mohistmc.banner.injection.world.entity.player.InjectionPlayer;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.stats.Stat;
+import net.minecraft.stats.Stats;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Unit;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Inventory;
@@ -18,19 +27,26 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftVector;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityExhaustionEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.scoreboard.Team;
+import org.bukkit.util.Vector;
 import org.spigotmc.SpigotWorldConfig;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -44,6 +60,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 //TODO fix inject methods
@@ -71,6 +88,16 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     @Shadow @Final private Inventory inventory;
 
     @Shadow public abstract Either<Player.BedSleepingProblem, net.minecraft.util.Unit> startSleepInBed(BlockPos bedPos);
+
+    @Shadow public abstract float getAttackStrengthScale(float adjustTicks);
+
+    @Shadow public abstract void sweepAttack();
+
+    @Shadow public abstract void crit(Entity entityHit);
+
+    @Shadow public abstract void magicCrit(Entity entityHit);
+
+    @Shadow public abstract void causeFoodExhaustion(float exhaustion);
 
     protected MixinPlayer(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
@@ -218,6 +245,18 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     }
 
     @Override
+    public void setItemSlot(EquipmentSlot slot, ItemStack stack, boolean silent) {
+        this.verifyEquippedItem(stack);
+        if (slot == EquipmentSlot.MAINHAND) {
+            this.equipEventAndSound(slot, this.inventory.items.set(this.inventory.selected, stack), stack, silent);
+        } else if (slot == EquipmentSlot.OFFHAND) {
+            this.equipEventAndSound(slot, this.inventory.offhand.set(0, stack), stack, silent);
+        } else if (slot.getType() == EquipmentSlot.Type.ARMOR) {
+            this.equipEventAndSound(slot, this.inventory.armor.set(slot.getIndex(), stack), stack, silent);
+        }
+    }
+
+    @Override
     public Either<Player.BedSleepingProblem, Unit> startSleepInBed(BlockPos blockposition, boolean force) {
         banner$forceSleep.set(force);
         try {
@@ -225,6 +264,12 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
         } finally {
             this.banner$forceSleep.set(false);
         }
+    }
+
+    @Inject(method = "actuallyHurt", cancellable = true, at = @At("HEAD"))
+    private void banner$damageEntityCustom(DamageSource damageSrc, float damageAmount, CallbackInfo ci) {
+        damageEntity0(damageSrc, damageAmount);
+        ci.cancel();
     }
 
     @Inject(method = "stopSleepInBed", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/player/Player;sleepCounter:I"))

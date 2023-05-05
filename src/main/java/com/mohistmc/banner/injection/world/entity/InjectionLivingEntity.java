@@ -16,6 +16,13 @@ import java.util.*;
 
 public interface InjectionLivingEntity {
 
+    default void equipEventAndSound(EquipmentSlot slot, ItemStack oldItem, ItemStack newItem, boolean silent) {
+    }
+
+    default Optional<EntityPotionEffectEvent.Cause> getEffectCause() {
+        return Optional.empty();
+    }
+
     default void pushHealReason(EntityRegainHealthEvent.RegainReason reason) {
 
     }

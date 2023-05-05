@@ -21,6 +21,8 @@ Notice
 * [ ] Fabric + Bukkit is more vanilla like than Forge + Bukkit
 * [ ] Fabric api use mixins to change minecraft indirectly
 * [ ] they are no a lot of breaking changes
+* [ ] Banner still has a lot of bug,so do not use it in production environment
+* [ ] Just download for testing,report bugs
 
 Progress
 ------
@@ -30,7 +32,7 @@ Progress
     * [ ] CraftBukkit([**a7cfc778f**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/commits/a7cfc778f))
     * [ ] Spigot ([**d1bd3bd2**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/spigot/commits/d1bd3bd2))
         * [ ] Bukkit-Patches
-        * [ ] CraftBukkit-Patches (99%) - (029/030/091)
+        * [ ] CraftBukkit-Patches (100%) - (029/030/091)
 
 - [ ] Running ?
     * [ ] It can be compilable, and running
