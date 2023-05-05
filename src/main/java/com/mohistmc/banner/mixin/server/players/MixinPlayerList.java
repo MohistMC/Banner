@@ -68,6 +68,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 // TODO fix inject method
 @Mixin(PlayerList.class)
@@ -114,7 +115,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     @Shadow public abstract ServerPlayer getPlayerForLogin(GameProfile profile);
 
     private CraftServer cserver;
-    private static final ThreadLocal<String> PROFILE_NAMES = new ThreadLocal<>();
+    private static final AtomicReference<String> PROFILE_NAMES = new AtomicReference<>();
 
     @Inject(method = "<init>", at = @At(value = "TAIL"))
     public void init(MinecraftServer minecraftServer, LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess, PlayerDataStorage playerDataStorage, int i, CallbackInfo ci) {
