@@ -350,6 +350,16 @@ public class CraftChunk implements Chunk {
         return getHandle(ChunkStatus.STRUCTURE_STARTS).bridge$persistentDataContainer();
     }
 
+
+    @Override
+    public LoadLevel getLoadLevel() {
+        net.minecraft.world.level.chunk.LevelChunk chunk = worldServer.getChunkIfLoaded(getX(), getZ());
+        if (chunk == null) {
+            return LoadLevel.UNLOADED;
+        }
+        return LoadLevel.values()[chunk.getFullStatus().ordinal()];
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

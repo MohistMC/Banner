@@ -122,7 +122,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         MinecraftServer banner$server = (DedicatedServer) minecraftServer;
         this.cserver = new CraftServer((DedicatedServer) banner$server, (PlayerList) (Object) this);
         banner$server.banner$setServer(cserver);
-        banner$server.banner$setConsole(new com.destroystokyo.paper.console.TerminalConsoleCommandSender());
+        banner$server.banner$setConsole(ColouredConsoleSender.getInstance());
         org.spigotmc.SpigotConfig.init((java.io.File) banner$server.bridge$options().valueOf("spigot-settings"));
         org.spigotmc.SpigotConfig.registerCommands();
         BannerServer.LOGGER.info("Loading Bukkit plugins, please wait...");

@@ -107,27 +107,8 @@ import org.bukkit.entity.Villager.Profession;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BellResonateEvent;
-import org.bukkit.event.block.BellRingEvent;
-import org.bukkit.event.block.BlockDamageAbortEvent;
-import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.block.BlockDropItemEvent;
-import org.bukkit.event.block.BlockFadeEvent;
-import org.bukkit.event.block.BlockFormEvent;
-import org.bukkit.event.block.BlockGrowEvent;
-import org.bukkit.event.block.BlockIgniteEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
-import org.bukkit.event.block.BlockMultiPlaceEvent;
-import org.bukkit.event.block.BlockPhysicsEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.block.BlockShearEntityEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
-import org.bukkit.event.block.EntityBlockFormEvent;
-import org.bukkit.event.block.FluidLevelChangeEvent;
-import org.bukkit.event.block.MoistureChangeEvent;
-import org.bukkit.event.block.NotePlayEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.ArrowBodyCountChangeEvent;
 import org.bukkit.event.entity.BatToggleSleepEvent;
@@ -1729,5 +1710,15 @@ public class CraftEventFactory {
         SpawnerSpawnEvent event = new SpawnerSpawnEvent(entity, (org.bukkit.block.CreatureSpawner) state);
         entity.getServer().getPluginManager().callEvent(event);
         return event;
+    }
+
+    public static boolean callTNTPrimeEvent(Level world, BlockPos pos, TNTPrimeEvent.PrimeCause cause, Entity causingEntity, BlockPos causePosition) {
+        org.bukkit.entity.Entity bukkitEntity = (causingEntity == null) ? null : causingEntity.getBukkitEntity();
+        org.bukkit.block.Block bukkitBlock = (causePosition == null) ? null : CraftBlock.at(world, causePosition);
+
+        TNTPrimeEvent event = new TNTPrimeEvent(CraftBlock.at(world, pos), cause, bukkitEntity, bukkitBlock);
+        Bukkit.getPluginManager().callEvent(event);
+
+        return !event.isCancelled();
     }
 }

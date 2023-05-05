@@ -24,6 +24,8 @@ import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.TntBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -37,6 +39,7 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
+import org.bukkit.event.block.TNTPrimeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -234,6 +237,17 @@ public abstract class MixinExplosion implements InjectionExplosion {
             for (BlockPos blockpos : this.toBlow) {
                 BlockState blockstate = this.level.getBlockState(blockpos);
                 Block block = blockstate.getBlock();
+
+                // CraftBukkit start - TNTPrimeEvent
+                if (block instanceof TntBlock) {
+                    Entity sourceEntity = source == null ? null : source;
+                    BlockPos sourceBlock = sourceEntity == null ? BlockPos.containing(this.x, this.y, this.z) : null;
+                    if (!CraftEventFactory.callTNTPrimeEvent(this.level, blockpos, TNTPrimeEvent.PrimeCause.EXPLOSION, sourceEntity, sourceBlock)) {
+                        this.level.sendBlockUpdated(blockpos, Blocks.AIR.defaultBlockState(), blockstate, 3); // Update the block on the client
+                        continue;
+                    }
+                }
+                // CraftBukkit end
                 if (!blockstate.isAir()) {
                     BlockPos blockpos1 = blockpos.immutable();
                     this.level.getProfiler().push("explosion_blocks");
