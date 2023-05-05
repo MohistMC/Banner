@@ -2,6 +2,7 @@ package com.mohistmc.banner.injection.server;
 
 import jline.console.ConsoleReader;
 import joptsimple.OptionSet;
+import net.minecraft.commands.Commands;
 import net.minecraft.server.WorldLoader;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.progress.ChunkProgressListener;
@@ -13,6 +14,10 @@ import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 
 public interface InjectionMinecraftServer {
+
+    default Commands bridge$getVanillaCommands() {
+        return null;
+    }
 
     default java.util.concurrent.ExecutorService bridge$chatExecutor() {
         return null;

@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.entity.moster.piglin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.mohistmc.banner.injection.world.entity.InjectionPiglin;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -26,7 +27,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mixin(Piglin.class)
-public abstract class MixinPiglin extends AbstractPiglin {
+public abstract class MixinPiglin extends AbstractPiglin implements InjectionPiglin {
 
     public Set<Item> allowedBarterItems = new HashSet<>();
     public Set<Item> interestItems = new HashSet<>();
@@ -60,5 +61,15 @@ public abstract class MixinPiglin extends AbstractPiglin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/piglin/PiglinAi;isLovedItem(Lnet/minecraft/world/item/ItemStack;)Z"))
     private boolean banner$customLoved(ItemStack stack) {
         return stack.is(ItemTags.PIGLIN_LOVED) || interestItems.contains(stack.getItem()) || allowedBarterItems.contains(stack.getItem());
+    }
+
+    @Override
+    public Set<Item> bridge$allowedBarterItems() {
+        return allowedBarterItems;
+    }
+
+    @Override
+    public Set<Item> bridge$interestItems() {
+        return interestItems;
     }
 }

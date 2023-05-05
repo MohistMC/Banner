@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.dedicated;
 
+import com.mohistmc.banner.BannerServer;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -20,6 +21,7 @@ import org.bukkit.craftbukkit.v1_19_R3.command.CraftRemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.util.ForwardLogHandler;
 import org.bukkit.event.server.RemoteServerCommandEvent;
 import org.bukkit.event.server.ServerCommandEvent;
+import org.bukkit.plugin.PluginLoadOrder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -39,6 +41,13 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
 
     public MixinDedicatedServer(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Proxy proxy, DataFixer dataFixer, Services services, ChunkProgressListenerFactory chunkProgressListenerFactory) {
         super(thread, levelStorageAccess, packRepository, worldStem, proxy, dataFixer, services, chunkProgressListenerFactory);
+    }
+
+    @Inject(method = "initServer", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/dedicated/DedicatedServer;setPlayerList(Lnet/minecraft/server/players/PlayerList;)V"))
+    private void banner$initServer(CallbackInfoReturnable<Boolean> cir) {
+        BannerServer.LOGGER.info("Loading Bukkit plugins, please wait...");
+        this.bridge$server().loadPlugins();
+        this.bridge$server().enablePlugins(PluginLoadOrder.STARTUP);
     }
 
     @Inject(method = "initServer",

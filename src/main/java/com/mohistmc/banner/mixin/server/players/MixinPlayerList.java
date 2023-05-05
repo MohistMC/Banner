@@ -126,9 +126,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         banner$server.banner$setConsole(ColouredConsoleSender.getInstance());
         org.spigotmc.SpigotConfig.init((java.io.File) banner$server.bridge$options().valueOf("spigot-settings"));
         org.spigotmc.SpigotConfig.registerCommands();
-        BannerServer.LOGGER.info("Loading Bukkit plugins, please wait...");
-        this.cserver.loadPlugins();
-        this.cserver.enablePlugins(PluginLoadOrder.STARTUP);
     }
 
     @Inject (method = "placeNewPlayer", at = @At (value = "INVOKE",
