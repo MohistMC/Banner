@@ -2,6 +2,7 @@ package com.mohistmc.banner.eventhandler.dispatcher;
 
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.core.BlockPos;
@@ -33,6 +34,10 @@ public class PlayerEventDispatcher {
                     return InteractionResult.PASS;
                 }
             }
+            return InteractionResult.PASS;
+        });
+        AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
+            BukkitCaptures.captureNextBlockBreakEventAsPrimaryEvent();
             return InteractionResult.PASS;
         });
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {

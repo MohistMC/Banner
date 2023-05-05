@@ -48,9 +48,6 @@ public class BukkitCaptures {
     public static Stack<BlockBreakEventContext> blockBreakEventStack = new Stack<>();
 
     public static void captureNextBlockBreakEventAsPrimaryEvent() {
-        // fix #674, some mod will implement their own "destroyBlock(...)"
-        // and its context cannot be tracked by Bukkit directly.
-        // This is used to tell whether the event is fired by vanilla destroyBlock.
         isPrimaryEvent = true;
     }
 
