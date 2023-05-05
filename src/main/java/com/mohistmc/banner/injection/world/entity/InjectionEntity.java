@@ -9,6 +9,10 @@ import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
 
 public interface InjectionEntity {
 
+    default boolean canCollideWith(Entity entity) {
+        return false;
+    }
+
     default boolean bridge$persist() {
         return false;
     }

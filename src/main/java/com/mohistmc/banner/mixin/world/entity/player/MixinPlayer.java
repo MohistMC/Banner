@@ -1,9 +1,12 @@
 package com.mohistmc.banner.mixin.world.entity.player;
 
 import com.mohistmc.banner.injection.world.entity.player.InjectionPlayer;
+import com.mojang.datafixers.util.Either;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.util.Unit;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
@@ -16,25 +19,32 @@ import net.minecraft.world.food.FoodData;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.bukkit.event.entity.EntityExhaustionEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.scoreboard.Team;
+import org.spigotmc.SpigotWorldConfig;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 //TODO fix inject methods
 @Mixin(Player.class)
@@ -60,12 +70,15 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
 
     @Shadow @Final private Inventory inventory;
 
+    @Shadow public abstract Either<Player.BedSleepingProblem, net.minecraft.util.Unit> startSleepInBed(BlockPos bedPos);
+
     protected MixinPlayer(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
     }
 
     public boolean fauxSleeping;
     public int oldLevel = -1;
+    protected AtomicReference<Boolean> banner$forceSleep = new AtomicReference<>();
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(CallbackInfo ci) {
@@ -201,6 +214,99 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
         EntityExhaustionEvent event = CraftEventFactory.callPlayerExhaustionEvent((net.minecraft.world.entity.player.Player) (Object) this, reason, amount);
         if (!event.isCancelled()) {
             this.foodData.addExhaustion(event.getExhaustion());
+        }
+    }
+
+    @Override
+    public Either<Player.BedSleepingProblem, Unit> startSleepInBed(BlockPos blockposition, boolean force) {
+        banner$forceSleep.set(force);
+        try {
+            return this.startSleepInBed(blockposition);
+        } finally {
+            this.banner$forceSleep.set(false);
+        }
+    }
+
+    @Inject(method = "stopSleepInBed", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/player/Player;sleepCounter:I"))
+    private void banner$wakeup(boolean flag, boolean flag1, CallbackInfo ci) {
+        BlockPos blockPos = this.getSleepingPos().orElse(null);
+        if (this.getBukkitEntity() instanceof org.bukkit.entity.Player player) {
+            org.bukkit.block.Block bed;
+            if (blockPos != null) {
+                bed = CraftBlock.at(this.level, blockPos);
+            } else {
+                bed =  this.level.getWorld().getBlockAt(player.getLocation());
+            }
+            PlayerBedLeaveEvent event = new PlayerBedLeaveEvent(player, bed, true);
+            Bukkit.getPluginManager().callEvent(event);
+        }
+    }
+
+    @ModifyArg(method = "jumpFromGround", index = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
+    private float banner$exhaustInfo(float f) {
+        SpigotWorldConfig config =  level.bridge$spigotConfig();
+        if (config != null) {
+            if (this.isSprinting()) {
+                f = config.jumpSprintExhaustion;
+                pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.JUMP_SPRINT);
+            } else {
+                f = config.jumpWalkExhaustion;
+                pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.JUMP);
+            }
+        }
+        return f;
+    }
+
+    @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;setSharedFlag(IZ)V"))
+    private void banner$toggleGlide(net.minecraft.world.entity.player.Player playerEntity, int flag, boolean set) {
+        if (playerEntity.getSharedFlag(flag) != set && !CraftEventFactory.callToggleGlideEvent((net.minecraft.world.entity.player.Player) (Object) this, set).isCancelled()) {
+            playerEntity.setSharedFlag(flag, set);
+        }
+    }
+
+    @Inject(method = "checkMovementStatistics", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
+    private void banner$exhauseCause1(double p_36379_, double p_36380_, double p_36381_, CallbackInfo ci) {
+        pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.SWIM);
+    }
+
+    @Inject(method = "checkMovementStatistics", at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
+    private void banner$exhauseCause2(double p_36379_, double p_36380_, double p_36381_, CallbackInfo ci) {
+        pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.WALK_UNDERWATER);
+    }
+
+    @Inject(method = "checkMovementStatistics", at = @At(value = "INVOKE", ordinal = 2, target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
+    private void banner$exhauseCause3(double p_36379_, double p_36380_, double p_36381_, CallbackInfo ci) {
+        pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.WALK_ON_WATER);
+    }
+
+    @Inject(method = "checkMovementStatistics", at = @At(value = "INVOKE", ordinal = 3, target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
+    private void banner$exhauseCause4(double p_36379_, double p_36380_, double p_36381_, CallbackInfo ci) {
+        pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.SPRINT);
+    }
+
+    @Inject(method = "checkMovementStatistics", at = @At(value = "INVOKE", ordinal = 4, target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
+    private void banner$exhauseCause5(double p_36379_, double p_36380_, double p_36381_, CallbackInfo ci) {
+        pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.CROUCH);
+    }
+
+    @Inject(method = "checkMovementStatistics", at = @At(value = "INVOKE", ordinal = 5, target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
+    private void banner$exhauseCause6(double p_36379_, double p_36380_, double p_36381_, CallbackInfo ci) {
+        pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.WALK);
+    }
+
+    @Inject(method = "startFallFlying", cancellable = true, at = @At("HEAD"))
+    private void banner$startGlidingEvent(CallbackInfo ci) {
+        if (CraftEventFactory.callToggleGlideEvent((net.minecraft.world.entity.player.Player) (Object) this, true).isCancelled()) {
+            this.setSharedFlag(7, true);
+            this.setSharedFlag(7, false);
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "stopFallFlying", cancellable = true, at = @At("HEAD"))
+    private void banner$stopGlidingEvent(CallbackInfo ci) {
+        if (CraftEventFactory.callToggleGlideEvent((net.minecraft.world.entity.player.Player) (Object) this, false).isCancelled()) {
+            ci.cancel();
         }
     }
 

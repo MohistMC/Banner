@@ -1,10 +1,9 @@
 package com.mohistmc.banner.injection.world.entity.player;
 
 import com.mojang.datafixers.util.Either;
-import com.mojang.datafixers.util.Unit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.util.Unit;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
