@@ -27,7 +27,7 @@ public abstract class MixinCraftingContainer implements Container, InjectionCraf
 
     @Shadow @Final public AbstractContainerMenu menu;
     // CraftBukkit start - add fields
-    public List<HumanEntity> transaction = new java.util.ArrayList<HumanEntity>();
+    public List<HumanEntity> transaction = new java.util.ArrayList<>();
     private Recipe<?> currentRecipe;
     public Container resultInventory;
     private Player owner;

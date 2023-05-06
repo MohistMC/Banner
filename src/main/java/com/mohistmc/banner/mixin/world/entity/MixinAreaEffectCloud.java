@@ -56,7 +56,7 @@ public abstract class MixinAreaEffectCloud extends Entity implements TraceableEn
     @Shadow public int reapplicationDelay;
     @Shadow public float radiusOnUse;
     @Shadow public int durationOnUse;
-    List<LivingEntity> bukkitEntities = new java.util.ArrayList<LivingEntity>(); // CraftBukkit
+    List<LivingEntity> bukkitEntities = new java.util.ArrayList<>(); // CraftBukkit
 
     public MixinAreaEffectCloud(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -156,7 +156,7 @@ public abstract class MixinAreaEffectCloud extends Entity implements TraceableEn
                 } else {
                     List<LivingEntity> list1 = this.level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox());
                     if (!list1.isEmpty()) {
-                        List<org.bukkit.entity.LivingEntity> entities = new java.util.ArrayList<org.bukkit.entity.LivingEntity>(); // CraftBukkit
+                        List<org.bukkit.entity.LivingEntity> entities = new java.util.ArrayList<>(); // CraftBukkit
                         for (LivingEntity livingentity : list1) {
                             if (!this.victims.containsKey(livingentity) && livingentity.isAffectedByPotions()) {
                                 double d8 = livingentity.getX() - this.getX();

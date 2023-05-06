@@ -171,7 +171,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
 
     public int expToDrop;
     public boolean forceDrops;
-    public ArrayList<org.bukkit.inventory.ItemStack> drops = new ArrayList<org.bukkit.inventory.ItemStack>();
+    public ArrayList<org.bukkit.inventory.ItemStack> drops = new ArrayList<>();
     public org.bukkit.craftbukkit.v1_19_R3.attribute.CraftAttributeMap craftAttributes;
     public boolean collides = true;
     public Set<UUID> collidableExemptions = new HashSet<>();

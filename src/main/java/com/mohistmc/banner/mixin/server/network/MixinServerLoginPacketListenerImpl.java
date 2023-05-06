@@ -91,7 +91,7 @@ public abstract class MixinServerLoginPacketListenerImpl {
                         if (asyncEvent.getResult() != PlayerPreLoginEvent.Result.ALLOWED) {
                             event.disallow(asyncEvent.getResult(), asyncEvent.getKickMessage());
                         }
-                        Waitable<PlayerPreLoginEvent.Result> waitable = new Waitable<PlayerPreLoginEvent.Result>() {
+                        Waitable<PlayerPreLoginEvent.Result> waitable = new Waitable<>() {
                             @Override
                             protected PlayerPreLoginEvent.Result evaluate() {
                                 server.getPluginManager().callEvent(event);

@@ -253,8 +253,7 @@ public abstract class MixinExplosion implements InjectionExplosion {
                     this.level.getProfiler().push("explosion_blocks");
                     if (block.dropFromExplosion(((Explosion) (Object) this))) {
                         Level var11 = this.level;
-                        if (var11 instanceof ServerLevel) {
-                            ServerLevel serverLevel = (ServerLevel)var11;
+                        if (var11 instanceof ServerLevel serverLevel) {
                             BlockEntity blockEntity = blockstate.hasBlockEntity() ? this.level.getBlockEntity(blockpos) : null;
                             LootContext.Builder builder = (new LootContext.Builder(serverLevel)).withRandom(this.level.random).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockpos)).withParameter(LootContextParams.TOOL, ItemStack.EMPTY).withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity).withOptionalParameter(LootContextParams.THIS_ENTITY, this.source);
                             if (this.blockInteraction == Explosion.BlockInteraction.DESTROY_WITH_DECAY) {

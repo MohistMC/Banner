@@ -96,7 +96,7 @@ public abstract class MixinEnchantmentMenu extends AbstractContainerMenu{
                     if (true || !list.isEmpty()) {
                         //player.onEnchantmentPerformed(itemStack, i);
                         boolean bl = itemStack.is(Items.BOOK);
-                        Map<org.bukkit.enchantments.Enchantment, Integer> enchants = new java.util.HashMap<org.bukkit.enchantments.Enchantment, Integer>();
+                        Map<org.bukkit.enchantments.Enchantment, Integer> enchants = new java.util.HashMap<>();
                         for (Object obj : list) {
                             EnchantmentInstance instance = (EnchantmentInstance) obj;
                             enchants.put(org.bukkit.enchantments.Enchantment.getByKey(CraftNamespacedKey.fromMinecraft(BuiltInRegistries.ENCHANTMENT.getKey(instance.enchantment))), instance.level);
@@ -182,10 +182,8 @@ public abstract class MixinEnchantmentMenu extends AbstractContainerMenu{
             if (!itemStack.isEmpty() && itemStack.isEnchantable()) {
                 this.access.execute((level, blockPos) -> {
                     int i = 0;
-                    Iterator var5 = EnchantmentTableBlock.BOOKSHELF_OFFSETS.iterator();
 
-                    while(var5.hasNext()) {
-                        BlockPos blockPos2 = (BlockPos)var5.next();
+                    for (BlockPos blockPos2 : EnchantmentTableBlock.BOOKSHELF_OFFSETS) {
                         if (EnchantmentTableBlock.isValidBookShelf(level, blockPos, blockPos2)) {
                             ++i;
                         }

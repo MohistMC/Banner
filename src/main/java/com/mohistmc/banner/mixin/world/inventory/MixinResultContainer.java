@@ -34,7 +34,7 @@ public abstract class MixinResultContainer implements Container {
 
     @Override
     public List<HumanEntity> getViewers() {
-        return new java.util.ArrayList<HumanEntity>();
+        return new java.util.ArrayList<>();
     }
 
     @Override

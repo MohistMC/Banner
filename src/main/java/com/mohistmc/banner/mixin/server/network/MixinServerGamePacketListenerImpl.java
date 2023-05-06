@@ -632,7 +632,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         this.player.resetLastActionTime();
         ServerboundPlayerActionPacket.Action packetplayinblockdig_enumplayerdigtype = packetplayinblockdig.getAction();
         switch (packetplayinblockdig_enumplayerdigtype) {
-            case SWAP_ITEM_WITH_OFFHAND: {
+            case SWAP_ITEM_WITH_OFFHAND -> {
                 if (!this.player.isSpectator()) {
                     ItemStack itemstack = this.player.getItemInHand(InteractionHand.OFF_HAND);
                     CraftItemStack mainHand = CraftItemStack.asCraftMirror(itemstack);
@@ -656,7 +656,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                 }
                 return;
             }
-            case DROP_ITEM: {
+            case DROP_ITEM -> {
                 if (!this.player.isSpectator()) {
                     if (this.lastDropTick != ServerUtils.currentTick) {
                         this.dropCount = 0;
@@ -673,24 +673,22 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                 }
                 return;
             }
-            case DROP_ALL_ITEMS: {
+            case DROP_ALL_ITEMS -> {
                 if (!this.player.isSpectator()) {
                     this.player.drop(true);
                 }
                 return;
             }
-            case RELEASE_USE_ITEM: {
+            case RELEASE_USE_ITEM -> {
                 this.player.releaseUsingItem();
                 return;
             }
-            case START_DESTROY_BLOCK:
-            case ABORT_DESTROY_BLOCK:
-            case STOP_DESTROY_BLOCK: {
+            case START_DESTROY_BLOCK, ABORT_DESTROY_BLOCK, STOP_DESTROY_BLOCK -> {
                 this.player.gameMode.handleBlockBreakAction(blockposition, packetplayinblockdig_enumplayerdigtype, packetplayinblockdig.getDirection(), this.player.level.getMaxBuildHeight(), packetplayinblockdig.getSequence());
                 this.player.connection.ackBlockChangesUpTo(packetplayinblockdig.getSequence());
                 return;
             }
-            default: {
+            default -> {
                 throw new IllegalArgumentException("Invalid player action");
             }
         }
