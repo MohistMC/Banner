@@ -274,7 +274,7 @@ public final class CraftServer implements Server {
             }
         }));
         vanillaCommandManager = console.getCommands();
-        this.serverVersion = "unknown";
+        this.serverVersion = BannerServer.getVersion();
         this.structureManager = new CraftStructureManager(console.getStructureManager());
         this.scoreboardManager = new CraftScoreboardManager(console, new ServerScoreboard(console));
         Bukkit.setServer(this);
