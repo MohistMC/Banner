@@ -78,11 +78,4 @@ public abstract class MixinHarvestFarmland extends Behavior<Villager> {
         }
         return banner$flag.get();
     }
-
-    @Inject(method = "tick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/npc/Villager;J)V", at = @At("TAIL"))
-    private void banner$unlockAtomic(ServerLevel level, Villager owner, long gameTime, CallbackInfo ci) {
-        banner$planted.set(null);
-        banner$flag.set(null);
-        banner$villager.set(null);
-    }
 }

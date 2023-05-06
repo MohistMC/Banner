@@ -194,8 +194,6 @@ public abstract class MixinServerPlayerGameMode {
     @Inject(method = "handleBlockBreakAction", at = @At("TAIL"))
     private void banner$fireEvent0(BlockPos pos, ServerboundPlayerActionPacket.Action action, Direction face, int maxBuildHeight, int sequence, CallbackInfo ci) {
         CraftEventFactory.callBlockDamageAbortEvent(this.player, pos, this.player.getInventory().getSelected()); // CraftBukkit
-        banner$actEvent.set(null);
-        banner$pos.set(null);
     }
 
     @Inject(method = "destroyBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;"), cancellable = true)
@@ -312,13 +310,6 @@ public abstract class MixinServerPlayerGameMode {
             banner$state.get().getBlock().popExperience(this.level, pos, banner$breakEvent.get().getExpToDrop());
         }
         cir.setReturnValue(true);
-        banner$destroyPos.set(null);
-        banner$bbBlock.set(null);
-        banner$flag1.set(null);
-        banner$flag2.set(null);
-        banner$breakEvent.set(null);
-        banner$state.set(null);
-        banner$bbState.set(null);
     }
 
     @Inject(method = "useItemOn", at = @At("HEAD"))
@@ -363,12 +354,6 @@ public abstract class MixinServerPlayerGameMode {
             MenuProvider menuProvider = blockState.getMenuProvider(level, blockPos);
             cancelledBlock.set(!(menuProvider instanceof MenuProvider));
         }
-    }
-
-    @Inject(method = "useItemOn", at = @At("TAIL"))
-    private void banner$clear(ServerPlayer player, Level level, ItemStack stack, InteractionHand hand, BlockHitResult hitResult, CallbackInfoReturnable<InteractionResult> cir) {
-        banner$result.set(null);
-        cancelledBlock.set(null);
     }
 
     @Redirect(method = "changeGameModeForPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;broadcastAll(Lnet/minecraft/network/protocol/Packet;)V"))
