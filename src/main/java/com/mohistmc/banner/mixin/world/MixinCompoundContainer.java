@@ -19,7 +19,7 @@ public abstract class MixinCompoundContainer implements Container {
 
     @Shadow @Final public Container container1;
     @Shadow @Final public Container container2;
-    public List<HumanEntity> transaction = new java.util.ArrayList<HumanEntity>();
+    public List<HumanEntity> transaction = new java.util.ArrayList<>();
 
     @Override
     public List<ItemStack> getContents() {

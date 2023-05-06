@@ -30,12 +30,12 @@ public abstract class MixinInventory implements Container, Nameable, InjectionIn
 
     @Shadow protected abstract boolean hasRemainingSpaceForItem(ItemStack destination, ItemStack origin);
 
-    public List<HumanEntity> transaction = new java.util.ArrayList<HumanEntity>();
+    public List<HumanEntity> transaction = new java.util.ArrayList<>();
     private int maxStack = LARGE_MAX_STACK_SIZE;
 
     @Override
     public List<ItemStack> getContents() {
-        List<ItemStack> combined = new ArrayList<ItemStack>(items.size() + armor.size() + offhand.size());
+        List<ItemStack> combined = new ArrayList<>(items.size() + armor.size() + offhand.size());
         for (List<net.minecraft.world.item.ItemStack> sub : this.compartments) {
             combined.addAll(sub);
         }

@@ -46,14 +46,13 @@ public abstract class MixinSpongeBlock extends Block {
             Direction[] var8 = Direction.values();
             int var9 = var8.length;
 
-            for(int var10 = 0; var10 < var9; ++var10) {
-                Direction direction = var8[var10];
+            for (Direction direction : var8) {
                 BlockPos blockPos2 = blockPos.relative(direction);
                 BlockState blockState = blockList.getBlockState(blockPos2);
                 FluidState fluidState = blockList.getFluidState(blockPos2);
                 Material material = blockState.getMaterial();
                 if (fluidState.is(FluidTags.WATER)) {
-                    if (blockState.getBlock() instanceof BucketPickup && !((BucketPickup)blockState.getBlock()).pickupBlock(blockList, blockPos2, blockState).isEmpty()) {
+                    if (blockState.getBlock() instanceof BucketPickup && !((BucketPickup) blockState.getBlock()).pickupBlock(blockList, blockPos2, blockState).isEmpty()) {
                         ++i;
                         if (j < 6) {
                             queue.add(new Tuple(blockPos2, j + 1));

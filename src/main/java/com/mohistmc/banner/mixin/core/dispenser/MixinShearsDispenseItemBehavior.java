@@ -93,10 +93,8 @@ public abstract class MixinShearsDispenseItemBehavior extends OptionalDispenseIt
     @Overwrite
     private static boolean tryShearLivingEntity(ServerLevel level, BlockPos pos) {
         List<LivingEntity> list = level.getEntitiesOfClass(LivingEntity.class, new AABB(pos), EntitySelector.NO_SPECTATORS);
-        Iterator var3 = list.iterator();
 
-        while (var3.hasNext()) {
-            LivingEntity livingEntity = (LivingEntity) var3.next();
+        for (LivingEntity livingEntity : list) {
             if (livingEntity instanceof Shearable shearable) {
                 if (shearable.readyForShearing()) {
                     // CraftBukkit start

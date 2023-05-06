@@ -6,18 +6,11 @@ import org.jetbrains.annotations.NonNls;
 /**
  * Encapsulates the identifying pieces of a library in a Maven repository, its group ID and
  * artifact ID. Can be safely used as a key in a map or within a set.
+ *
+ * @param groupId    The group ID of the library in a maven-style repo. Parts of the group ID must be separated by periods.
+ * @param artifactId The artifact ID of the library in a maven-style repo.
  */
-public class LibraryKey implements Comparable<LibraryKey> {
-
-    /**
-     * The group ID of the library in a maven-style repo. Parts of the group ID must be separated by periods.
-     */
-    public final String groupId;
-
-    /**
-     * The artifact ID of the library in a maven-style repo.
-     */
-    public final String artifactId;
+public record LibraryKey(String groupId, String artifactId) implements Comparable<LibraryKey> {
 
     public LibraryKey(@NonNls String groupId, @NonNls String artifactId) {
         this.groupId = groupId;

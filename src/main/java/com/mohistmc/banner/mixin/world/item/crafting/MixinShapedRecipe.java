@@ -45,45 +45,27 @@ public abstract class MixinShapedRecipe implements CraftingRecipe, InjectionShap
         recipe.setCategory(CraftRecipe.getCategory(this.category()));
 
         switch (this.height) {
-            case 1:
+            case 1 -> {
                 switch (this.width) {
-                    case 1:
-                        recipe.shape("a");
-                        break;
-                    case 2:
-                        recipe.shape("ab");
-                        break;
-                    case 3:
-                        recipe.shape("abc");
-                        break;
+                    case 1 -> recipe.shape("a");
+                    case 2 -> recipe.shape("ab");
+                    case 3 -> recipe.shape("abc");
                 }
-                break;
-            case 2:
+            }
+            case 2 -> {
                 switch (this.width) {
-                    case 1:
-                        recipe.shape("a","b");
-                        break;
-                    case 2:
-                        recipe.shape("ab","cd");
-                        break;
-                    case 3:
-                        recipe.shape("abc","def");
-                        break;
+                    case 1 -> recipe.shape("a", "b");
+                    case 2 -> recipe.shape("ab", "cd");
+                    case 3 -> recipe.shape("abc", "def");
                 }
-                break;
-            case 3:
+            }
+            case 3 -> {
                 switch (this.width) {
-                    case 1:
-                        recipe.shape("a","b","c");
-                        break;
-                    case 2:
-                        recipe.shape("ab","cd","ef");
-                        break;
-                    case 3:
-                        recipe.shape("abc","def","ghi");
-                        break;
+                    case 1 -> recipe.shape("a", "b", "c");
+                    case 2 -> recipe.shape("ab", "cd", "ef");
+                    case 3 -> recipe.shape("abc", "def", "ghi");
                 }
-                break;
+            }
         }
         char c = 'a';
         for (Ingredient list : this.recipeItems) {

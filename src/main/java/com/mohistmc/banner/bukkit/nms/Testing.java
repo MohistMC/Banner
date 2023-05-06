@@ -36,7 +36,7 @@ public class Testing implements MappingResolver {
     public Testing(Supplier<TinyTree> mappingsSupplier, String targetNamespace) {
         this.mappingsSupplier = mappingsSupplier;
         this.targetNamespace = targetNamespace;
-        namespaces = Collections.unmodifiableSet(new HashSet<>(mappingsSupplier.get().getMetadata().getNamespaces()));
+        namespaces = Set.copyOf(mappingsSupplier.get().getMetadata().getNamespaces());
     }
 
     public static MappingConfiguration getInstance() {return new MappingConfiguration();}

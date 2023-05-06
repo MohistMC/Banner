@@ -24,7 +24,7 @@ import java.util.List;
 public abstract class MixinShulkerBoxBlockEntity extends RandomizableContainerBlockEntity implements InjectionShulkerBoxBlockEntity {
 
     @Shadow private NonNullList<ItemStack> itemStacks;
-    public List<HumanEntity> transaction = new java.util.ArrayList<HumanEntity>();
+    public List<HumanEntity> transaction = new java.util.ArrayList<>();
     private int maxStack = 64;
     public boolean opened;
 

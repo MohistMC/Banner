@@ -69,7 +69,7 @@ public final class LibraryManager {
             LOGGER.error("Could not create libraries directory: " + directory);
 
         for (Library lib : libraries) {
-            String fn = lib.libraryKey.artifactId + "-" + lib.version + ".jar";
+            String fn = lib.libraryKey.artifactId() + "-" + lib.version + ".jar";
             File f = new File(directory, fn);
             if (f.isFile() && !(fn.contains("intermediary-adapter")) ) {
                 try {
@@ -88,7 +88,7 @@ public final class LibraryManager {
         if (repository == null) repository = defaultRepository;
         if (!repository.endsWith("/")) repository += "/";
 
-        String fileName = library.libraryKey.artifactId + '-' + library.version + ".jar";
+        String fileName = library.libraryKey.artifactId() + '-' + library.version + ".jar";
 
         File file = new File(directory, fileName);
         if (!file.exists()) {
@@ -99,8 +99,8 @@ public final class LibraryManager {
                 LOGGER.info("Downloading " + library.toString() + "...");
                 try {
                     URL downloadUrl;
-                    downloadUrl = new URL(repository + library.libraryKey.groupId.replace('.', '/') + '/' + library.libraryKey.artifactId + '/' + library.version
-                                + '/' + library.libraryKey.artifactId + '-' + library.version + ".jar");
+                    downloadUrl = new URL(repository + library.libraryKey.groupId().replace('.', '/') + '/' + library.libraryKey.artifactId() + '/' + library.version
+                                + '/' + library.libraryKey.artifactId() + '-' + library.version + ".jar");
                     URLConnection connection = getConn(downloadUrl.toString());
                     connection.setRequestProperty("User-Agent", "Mozilla/5.0 Chrome/90.0.4430.212");
 
@@ -139,7 +139,7 @@ public final class LibraryManager {
     void addToKnot(Library library, File file) {
         // Add to KnotClassLoader
         try {
-            if (!library.libraryKey.artifactId.contains("adapter")) {
+            if (!library.libraryKey.artifactId().contains("adapter")) {
                 KnotHelper.propose(file);
             }
         } catch (Exception e) {

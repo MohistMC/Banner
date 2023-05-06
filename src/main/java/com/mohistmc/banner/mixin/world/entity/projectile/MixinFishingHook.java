@@ -115,10 +115,8 @@ public abstract class MixinFishingHook extends Projectile {
                 LootTable lootTable = this.level.getServer().getLootTables().get(BuiltInLootTables.FISHING);
                 List<ItemStack> list = lootTable.getRandomItems(builder.create(LootContextParamSets.FISHING));
                 CriteriaTriggers.FISHING_ROD_HOOKED.trigger((ServerPlayer)player, stack, ((FishingHook) (Object) this), list);
-                Iterator var7 = list.iterator();
 
-                while(var7.hasNext()) {
-                    ItemStack itemStack = (ItemStack)var7.next();
+                for (ItemStack itemStack : list) {
                     ItemEntity itemEntity = new ItemEntity(this.level, this.getX(), this.getY(), this.getZ(), itemStack);
                     double d = player.getX() - this.getX();
                     double e = player.getY() - this.getY();

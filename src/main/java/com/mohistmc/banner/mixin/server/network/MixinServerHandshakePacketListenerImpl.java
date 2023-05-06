@@ -41,7 +41,7 @@ public class MixinServerHandshakePacketListenerImpl {
     public void handleIntention(ClientIntentionPacket packet) {
         this.connection.banner$setHostName(packet.hostName + ":" + packet.port); // CraftBukkit  - set hostname
         switch (packet.getIntention()) {
-            case LOGIN:
+            case LOGIN -> {
                 this.connection.setProtocol(ConnectionProtocol.LOGIN);
                 // CraftBukkit start - Connection throttle
                 try {
@@ -90,8 +90,8 @@ public class MixinServerHandshakePacketListenerImpl {
                 } else {
                     this.connection.setListener(new ServerLoginPacketListenerImpl(this.server, this.connection));
                 }
-                break;
-            case STATUS:
+            }
+            case STATUS -> {
                 ServerStatus serverStatus = this.server.getStatus();
                 if (this.server.repliesToStatus() && serverStatus != null) {
                     this.connection.setProtocol(ConnectionProtocol.STATUS);
@@ -99,9 +99,8 @@ public class MixinServerHandshakePacketListenerImpl {
                 } else {
                     this.connection.disconnect(IGNORE_STATUS_REASON);
                 }
-                break;
-            default:
-                throw new UnsupportedOperationException("Invalid intention " + packet.getIntention());
+            }
+            default -> throw new UnsupportedOperationException("Invalid intention " + packet.getIntention());
         }
 
     }

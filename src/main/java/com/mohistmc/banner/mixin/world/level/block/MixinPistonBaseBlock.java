@@ -79,8 +79,8 @@ public class MixinPistonBaseBlock extends DirectionalBlock {
             List<BlockPos> list = pistonStructureResolver.getToPush();
             List<BlockState> list2 = Lists.newArrayList();
 
-            for(int i = 0; i < list.size(); ++i) {
-                BlockPos blockPos2 = (BlockPos)list.get(i);
+            for (BlockPos value : list) {
+                BlockPos blockPos2 = (BlockPos) value;
                 BlockState blockState = level.getBlockState(blockPos2);
                 list2.add(blockState);
                 map.put(blockPos2, blockState);

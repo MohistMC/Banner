@@ -31,10 +31,8 @@ public interface MixinChangeOverTimeBlock<T extends Enum<T>> {
         int i = this.getAge().ordinal();
         int j = 0;
         int k = 0;
-        Iterator var8 = BlockPos.withinManhattan(pos, 4, 4, 4).iterator();
 
-        while(var8.hasNext()) {
-            BlockPos blockPos = (BlockPos)var8.next();
+        for (BlockPos blockPos : BlockPos.withinManhattan(pos, 4, 4, 4)) {
             int l = blockPos.distManhattan(pos);
             if (l > 4) {
                 break;
@@ -44,7 +42,7 @@ public interface MixinChangeOverTimeBlock<T extends Enum<T>> {
                 BlockState blockState = level.getBlockState(blockPos);
                 Block block = blockState.getBlock();
                 if (block instanceof ChangeOverTimeBlock) {
-                    Enum<?> enum_ = ((ChangeOverTimeBlock)block).getAge();
+                    Enum<?> enum_ = ((ChangeOverTimeBlock) block).getAge();
                     if (this.getAge().getClass() == enum_.getClass()) {
                         int m = enum_.ordinal();
                         if (m < i) {

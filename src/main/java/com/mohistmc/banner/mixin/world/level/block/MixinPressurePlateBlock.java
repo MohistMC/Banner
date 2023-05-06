@@ -39,21 +39,17 @@ public abstract class MixinPressurePlateBlock extends BasePressurePlateBlock {
         AABB aABB = TOUCH_AABB.move(pos);
         List list;
         switch (this.sensitivity) {
-            case EVERYTHING:
-                list = level.getEntities((Entity)null, aABB);
-                break;
-            case MOBS:
-                list = level.getEntitiesOfClass(LivingEntity.class, aABB);
-                break;
-            default:
+            case EVERYTHING -> list = level.getEntities((Entity) null, aABB);
+            case MOBS -> list = level.getEntitiesOfClass(LivingEntity.class, aABB);
+            default -> {
                 return 0;
+            }
         }
 
         if (!list.isEmpty()) {
-            Iterator var5 = list.iterator();
 
-            while(var5.hasNext()) {
-                Entity entity = (Entity)var5.next();
+            for (Object o : list) {
+                Entity entity = (Entity) o;
 
                 // CraftBukkit start - Call interact event when turning on a pressure plate
                 if (this.getSignalForState(level.getBlockState(pos)) == 0) {

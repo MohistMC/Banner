@@ -197,8 +197,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     @Overwrite
     public boolean canHarmPlayer(final net.minecraft.world.entity.player.Player entityhuman) {
         Team team;
-        if (entityhuman instanceof ServerPlayer) {
-            final ServerPlayer thatPlayer = (ServerPlayer) entityhuman;
+        if (entityhuman instanceof ServerPlayer thatPlayer) {
             team =  thatPlayer.getBukkitEntity().getScoreboard().getPlayerTeam((thatPlayer.getBukkitEntity()));
             if (team == null || team.allowFriendlyFire()) {
                 return true;

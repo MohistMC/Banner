@@ -34,8 +34,8 @@ public abstract class MixinPlayerHeadItem extends Item {
             // CraftBukkit start
         } else {
             net.minecraft.nbt.ListTag textures = compoundTag.getCompound("SkullOwner").getCompound("Properties").getList("textures", 10); // Safe due to method contracts
-            for (int i = 0; i < textures.size(); i++) {
-                if (textures.get(i) instanceof CompoundTag && !((CompoundTag) textures.get(i)).contains("Signature", 8) && ((CompoundTag) textures.get(i)).getString("Value").trim().isEmpty()) {
+            for (net.minecraft.nbt.Tag texture : textures) {
+                if (texture instanceof CompoundTag && !((CompoundTag) texture).contains("Signature", 8) && ((CompoundTag) texture).getString("Value").trim().isEmpty()) {
                     compoundTag.remove("SkullOwner");
                     break;
                 }

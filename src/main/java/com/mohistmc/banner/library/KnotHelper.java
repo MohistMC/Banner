@@ -68,7 +68,7 @@ public class KnotHelper {
         Version loaderVersion = FabricLoader.getInstance().getModContainer("fabricloader").get().getMetadata().getVersion();
         String verString = loaderVersion.getFriendlyString();
         verString = verString.substring(0, verString.lastIndexOf('.'));
-        double ver = Double.valueOf( verString );
+        double ver = Double.parseDouble( verString );
 
         propose_file(file, ver);
     }
