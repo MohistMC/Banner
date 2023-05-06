@@ -3,6 +3,7 @@ package org.bukkit.craftbukkit.v1_19_R3.entity;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.BaseEncoding;
+import com.mohistmc.banner.injection.network.protocol.game.InjectionClientboundSectionBlocksUpdatePacket;
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Pair;
 import io.netty.buffer.Unpooled;
@@ -605,10 +606,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         // Construct the packets using the data allocated above and send then to the players
         for (Map.Entry<SectionPos, ChunkSectionChanges> entry : changes.entrySet()) {
             ChunkSectionChanges chunkChanges = entry.getValue();
-            // Banner TODO
-            /**
-            ClientboundSectionBlocksUpdatePacket packet = new ClientboundSectionBlocksUpdatePacket(entry.getKey(), chunkChanges.positions(), chunkChanges.blockData().toArray(net.minecraft.world.level.block.state.BlockState[]::new), suppressLightUpdates);
-            getHandle().connection.send(packet);*/
+            // Banner start
+            ClientboundSectionBlocksUpdatePacket packet = new ClientboundSectionBlocksUpdatePacket(entry.getKey(), chunkChanges.positions(), null, suppressLightUpdates);
+            packet.putBukkitPacket(chunkChanges.blockData().toArray(net.minecraft.world.level.block.state.BlockState[]::new));
+            getHandle().connection.send(packet);
+            // Banner end
         }
     }
 
