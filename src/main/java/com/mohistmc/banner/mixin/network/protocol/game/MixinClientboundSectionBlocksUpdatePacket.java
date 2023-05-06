@@ -5,7 +5,6 @@ import it.unimi.dsi.fastutil.shorts.ShortSet;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -27,11 +26,7 @@ public class MixinClientboundSectionBlocksUpdatePacket implements InjectionClien
     }
 
     @Override
-    public ClientboundSectionBlocksUpdatePacket banner$init(SectionPos sectionposition, ShortSet shortset, BlockState[] states, boolean flag) {
-        this.sectionPos = sectionposition;
-        this.suppressLightUpdates = flag;
-        this.positions = shortset.toShortArray();
+    public void putBukkitPacket(BlockState[] states) {
         this.states = states;
-        return ((ClientboundSectionBlocksUpdatePacket) (Object) this);
     }
 }

@@ -1,13 +1,12 @@
 package com.mohistmc.banner.injection.network.protocol.game;
 
-import it.unimi.dsi.fastutil.shorts.ShortSet;
-import net.minecraft.core.SectionPos;
-import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
 import net.minecraft.world.level.block.state.BlockState;
 
+/**
+ * @author Mgazul by MohistMC
+ * @date 2023/5/6 20:46:36
+ */
 public interface InjectionClientboundSectionBlocksUpdatePacket {
 
-    default ClientboundSectionBlocksUpdatePacket banner$init(SectionPos sectionposition, ShortSet shortset, BlockState[] states, boolean flag) {
-        return null;
-    }
+    void putBukkitPacket(BlockState[] states);
 }
