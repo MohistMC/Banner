@@ -70,7 +70,7 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
-// TODO fix inject method
+// Banner - TODO fix inject method
 @Mixin(PlayerList.class)
 public abstract class MixinPlayerList implements InjectionPlayerList {
 
