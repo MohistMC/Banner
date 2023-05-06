@@ -5,10 +5,12 @@ import net.minecraft.world.item.crafting.Recipe;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftHumanEntity;
 import org.bukkit.inventory.InventoryView;
 
+import java.util.Collections;
+
 public interface InjectionContainer {
 
     default java.util.List<ItemStack> getContents() {
-        return null;
+        return Collections.emptyList();
     }
 
     default void onOpen(CraftHumanEntity who) {
@@ -18,7 +20,7 @@ public interface InjectionContainer {
     }
 
     default java.util.List<org.bukkit.entity.HumanEntity> getViewers() {
-        return null;
+        return Collections.emptyList();
     }
 
     default org.bukkit.inventory.InventoryHolder getOwner() {
