@@ -8,5 +8,6 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public interface InjectionClientboundSectionBlocksUpdatePacket {
 
-    void putBukkitPacket(BlockState[] states);
+    default void putBukkitPacket(BlockState[] states) {
+    }
 }
