@@ -28,6 +28,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+// Banner - TODO fix patches
 @Mixin(Mob.class)
 public abstract class MixinMob extends LivingEntity implements InjectionMob {
 

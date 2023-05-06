@@ -64,6 +64,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.List;
 import java.util.UUID;
 
+// Banner - TODO fix patches
 @Mixin(Entity.class)
 public abstract class MixinEntity implements Nameable, EntityAccess, CommandSource, InjectionEntity {
 
