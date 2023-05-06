@@ -46,6 +46,7 @@
       "net/minecraft/class_4836": ["com/mohistmc/banner/injection/world/entity/InjectionPiglin"],
       "net/minecraft/class_7298": ["com/mohistmc/banner/injection/world/entity/InjectionAllay"],
       "net/minecraft/class_1308": ["com/mohistmc/banner/injection/world/entity/InjectionMob"],
+      "net/minecraft/class_1496": ["com/mohistmc/banner/injection/world/entity/InjectionAbstractHorse"],
       "net/minecraft/class_1937": ["com/mohistmc/banner/injection/world/level/InjectionLevel"],
       "net/minecraft/class_1936": ["com/mohistmc/banner/injection/world/level/InjectionLevelAccessor"],
       "net/minecraft/class_3765": ["com/mohistmc/banner/injection/world/entity/raid/InjectionRaid"],

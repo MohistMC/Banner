@@ -185,6 +185,7 @@ accessible method net/minecraft/server/level/ChunkMap tick (Ljava/util/function/
 accessible method net/minecraft/server/level/ServerChunkCache runDistanceManagerUpdates ()Z
 accessible method net/minecraft/world/entity/animal/Bee$BeePollinateGoal stopPollinating ()V
 accessible method net/minecraft/world/entity/animal/Fox addTrustedUUID (Ljava/util/UUID;)V
+accessible method net/minecraft/world/entity/animal/sniffer/Sniffer calculateDigPosition ()Ljava/util/Optional;
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C

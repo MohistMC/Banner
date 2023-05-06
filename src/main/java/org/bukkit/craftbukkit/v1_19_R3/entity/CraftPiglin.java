@@ -34,8 +34,8 @@ public class CraftPiglin extends CraftPiglinAbstract implements Piglin {
         Preconditions.checkArgument(material != null, "material cannot be null");
 
         Item item = CraftMagicNumbers.getItem(material);
-        //TODO return getHandle().allowedBarterItems.add(item);
-        return false;
+        return getHandle().bridge$allowedBarterItems().add(item);
+
     }
 
     @Override
@@ -43,8 +43,7 @@ public class CraftPiglin extends CraftPiglinAbstract implements Piglin {
         Preconditions.checkArgument(material != null, "material cannot be null");
 
         Item item = CraftMagicNumbers.getItem(material);
-        //TODO return getHandle().allowedBarterItems.remove(item);
-        return false;
+        return getHandle().bridge$allowedBarterItems().remove(item);
     }
 
     @Override
@@ -52,8 +51,7 @@ public class CraftPiglin extends CraftPiglinAbstract implements Piglin {
         Preconditions.checkArgument(material != null, "material cannot be null");
 
         Item item = CraftMagicNumbers.getItem(material);
-        //TODO return getHandle().interestItems.add(item);
-        return false;
+        return getHandle().bridge$interestItems().add(item);
     }
 
     @Override
@@ -61,20 +59,17 @@ public class CraftPiglin extends CraftPiglinAbstract implements Piglin {
         Preconditions.checkArgument(material != null, "material cannot be null");
 
         Item item = CraftMagicNumbers.getItem(material);
-        //TODO return getHandle().interestItems.remove(item);
-        return false;
+        return getHandle().bridge$interestItems().remove(item);
     }
 
     @Override
     public Set<Material> getInterestList() {
-        //TODO return Collections.unmodifiableSet(getHandle().interestItems.stream().map(CraftMagicNumbers::getMaterial).collect(Collectors.toSet()));
-        return null;
+        return Collections.unmodifiableSet(getHandle().bridge$interestItems().stream().map(CraftMagicNumbers::getMaterial).collect(Collectors.toSet()));
     }
 
     @Override
     public Set<Material> getBarterList() {
-        //TODO return Collections.unmodifiableSet(getHandle().allowedBarterItems.stream().map(CraftMagicNumbers::getMaterial).collect(Collectors.toSet()));
-        return null;
+        return Collections.unmodifiableSet(getHandle().bridge$allowedBarterItems().stream().map(CraftMagicNumbers::getMaterial).collect(Collectors.toSet()));
     }
 
     @Override

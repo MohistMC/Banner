@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.animal.horse;
 
+import com.mohistmc.banner.injection.world.entity.InjectionAbstractHorse;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.EntityType;
@@ -21,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractHorse.class)
-public abstract class MixinAbstractHorse extends Animal {
+public abstract class MixinAbstractHorse extends Animal implements InjectionAbstractHorse {
 
     public int maxDomestication;
 
@@ -75,6 +76,16 @@ public abstract class MixinAbstractHorse extends Animal {
         if (event.isCancelled()) {
             ci.cancel();
         }
+    }
+
+    @Override
+    public int bridge$maxDomestication() {
+        return maxDomestication;
+    }
+
+    @Override
+    public void banner$setMaxDomestication(int maxDomestication) {
+        this.maxDomestication = maxDomestication;
     }
 
     /**
