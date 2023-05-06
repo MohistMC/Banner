@@ -605,10 +605,10 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         // Construct the packets using the data allocated above and send then to the players
         for (Map.Entry<SectionPos, ChunkSectionChanges> entry : changes.entrySet()) {
             ChunkSectionChanges chunkChanges = entry.getValue();
+            // Banner TODO
             /**
             ClientboundSectionBlocksUpdatePacket packet = new ClientboundSectionBlocksUpdatePacket(entry.getKey(), chunkChanges.positions(), chunkChanges.blockData().toArray(net.minecraft.world.level.block.state.BlockState[]::new), suppressLightUpdates);
             getHandle().connection.send(packet);*/
-            // Banner TODO
         }
     }
 
