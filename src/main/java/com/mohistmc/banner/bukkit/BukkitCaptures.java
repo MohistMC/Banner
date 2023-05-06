@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class BukkitCaptures {
 
@@ -248,17 +249,17 @@ public class BukkitCaptures {
         }
     }
 
-    private static transient WorldLoader.DataLoadContext dataLoadContext;
+    private static AtomicReference<WorldLoader.DataLoadContext> dataLoadContext = new AtomicReference<>();
 
     public static void captureDataLoadContext(WorldLoader.DataLoadContext context) {
-        dataLoadContext = context;
+        dataLoadContext.set(context);
     }
 
     public static WorldLoader.DataLoadContext getDataLoadContext() {
         try {
-            return Objects.requireNonNull(dataLoadContext, "dataLoadContext");
+            return Objects.requireNonNull(dataLoadContext.get(), "dataLoadContext");
         } finally {
-            dataLoadContext = null;
+            dataLoadContext.set(null);
         }
     }
 
