@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.item;
 
+import com.mohistmc.banner.injection.world.entity.InjectionPrimedTnt;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.PrimedTnt;
@@ -15,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PrimedTnt.class)
-public abstract class MixinPrimedTnt extends Entity implements TraceableEntity {
+public abstract class MixinPrimedTnt extends Entity implements TraceableEntity, InjectionPrimedTnt {
 
 
     public MixinPrimedTnt(EntityType<?> entityType, Level level) {
@@ -86,5 +87,25 @@ public abstract class MixinPrimedTnt extends Entity implements TraceableEntity {
         if (!event.isCancelled()) {
             this.level.explode((PrimedTnt) (Object) this, this.getX(), this.getY(0.0625), this.getZ(), event.getRadius(), event.getFire(), Level.ExplosionInteraction.TNT);
         }
+    }
+
+    @Override
+    public float bridge$yield() {
+        return yield;
+    }
+
+    @Override
+    public void banner$setYield(float yield) {
+        this.yield = yield;
+    }
+
+    @Override
+    public boolean bridge$isIncendiary() {
+        return isIncendiary;
+    }
+
+    @Override
+    public void banner$setIsIncendiary(boolean isIncendiary) {
+        this.isIncendiary = isIncendiary;
     }
 }

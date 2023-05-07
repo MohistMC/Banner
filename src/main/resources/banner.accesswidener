@@ -533,6 +533,9 @@ accessible field net/minecraft/world/inventory/EnchantmentMenu access Lnet/minec
 accessible field net/minecraft/world/inventory/GrindstoneMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
 accessible field net/minecraft/world/inventory/LoomMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
 accessible field net/minecraft/world/inventory/StonecutterMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
+accessible field net/minecraft/world/entity/vehicle/MinecartTNT fuse I
+accessible field net/minecraft/world/entity/animal/allay/Allay duplicationCooldown J
+accessible field net/minecraft/world/entity/animal/allay/Allay jukeboxPos Lnet/minecraft/core/BlockPos;
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;

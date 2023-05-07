@@ -27,8 +27,9 @@ public abstract class MixinAllay extends PathfinderMob implements InjectionAllay
 
     // @formatter:off
     @Shadow @Final private static EntityDataAccessor<Boolean> DATA_CAN_DUPLICATE;
-    @Shadow private void shadow$duplicateAllay() {}
     // @formatter:on
+
+    @Shadow protected abstract void duplicateAllay();
 
     protected MixinAllay(EntityType<? extends PathfinderMob> entityType, Level level) {
         super(entityType, level);
@@ -75,9 +76,9 @@ public abstract class MixinAllay extends PathfinderMob implements InjectionAllay
     }
 
     @Override
-    public Allay duplicateAllay() {
+    public Allay duplicateAllay0() {
         try {
-            this.shadow$duplicateAllay();
+            this.duplicateAllay();
             return banner$duplicate;
         } finally {
             banner$duplicate = null;

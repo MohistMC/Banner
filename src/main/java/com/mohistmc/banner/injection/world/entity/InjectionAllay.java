@@ -4,7 +4,7 @@ import net.minecraft.world.entity.animal.allay.Allay;
 
 public interface InjectionAllay {
 
-    default Allay duplicateAllay() {
+    default Allay duplicateAllay0() {
         return null;
     }
 
