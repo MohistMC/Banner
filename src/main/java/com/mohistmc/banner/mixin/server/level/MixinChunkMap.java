@@ -3,6 +3,7 @@ package com.mohistmc.banner.mixin.server.level;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
@@ -11,6 +12,7 @@ import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.LightChunkGetter;
 import net.minecraft.world.level.dimension.LevelStem;
@@ -38,6 +40,7 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 @Mixin(ChunkMap.class)
 public abstract class MixinChunkMap {
@@ -75,24 +78,22 @@ public abstract class MixinChunkMap {
         }
     }
 
-    @Overwrite
-    private static void postLoadProtoChunk(ServerLevel level, List<CompoundTag> list) {
-        if (!list.isEmpty()) {
-            // CraftBukkit start - these are spawned serialized (DefinedStructure) and we don't call an add event below at the moment due to ordering complexities
-            level.addWorldGenChunkEntities(EntityType.loadEntitiesRecursive(list, level).filter((entity) -> {
-                boolean needsRemoval = false;
-                net.minecraft.server.dedicated.DedicatedServer server = level.getCraftServer().getServer();
-                if (!server.areNpcsEnabled() && entity instanceof net.minecraft.world.entity.npc.Npc) {
-                    entity.discard();
-                    needsRemoval = true;
-                }
-                if (!server.isSpawningAnimals() && (entity instanceof net.minecraft.world.entity.animal.Animal || entity instanceof net.minecraft.world.entity.animal.WaterAnimal)) {
-                    entity.discard();
-                    needsRemoval = true;
-                }
-                return !needsRemoval;
-            }));
-            // CraftBukkit end
-        }
+    @Redirect(method = "postLoadProtoChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityType;loadEntitiesRecursive(Ljava/util/List;Lnet/minecraft/world/level/Level;)Ljava/util/stream/Stream;"))
+    private static Stream<Entity> banner$resetChunkMap(List<? extends Tag> tags, Level level) {
+        // CraftBukkit start - these are spawned serialized (DefinedStructure) and we don't call an add event below at the moment due to ordering complexities
+        return EntityType.loadEntitiesRecursive(tags, level).filter((entity) -> {
+            boolean needsRemoval = false;
+            net.minecraft.server.dedicated.DedicatedServer server = level.getCraftServer().getServer();
+            if (!server.areNpcsEnabled() && entity instanceof net.minecraft.world.entity.npc.Npc) {
+                entity.discard();
+                needsRemoval = true;
+            }
+            if (!server.isSpawningAnimals() && (entity instanceof net.minecraft.world.entity.animal.Animal || entity instanceof net.minecraft.world.entity.animal.WaterAnimal)) {
+                entity.discard();
+                needsRemoval = true;
+            }
+            return !needsRemoval;
+        });
+        // CraftBukkit end
     }
 }
