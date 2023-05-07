@@ -15,7 +15,6 @@ import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.server.level.progress.ChunkProgressListener;
-import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.Unit;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ForcedChunksSavedData;
@@ -38,11 +37,9 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_19_R3.scoreboard.CraftScoreboardManager;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_19_R3.util.LazyPlayerSet;
 import org.bukkit.event.player.AsyncPlayerChatPreviewEvent;
-import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.PluginLoadOrder;
 import org.fusesource.jansi.AnsiConsole;
@@ -51,7 +48,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -321,22 +317,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Inject(method = "haveTime", cancellable = true, at = @At("HEAD"))
     private void bannerforceAheadOfTime(CallbackInfoReturnable<Boolean> cir) {
         if (this.forceTicks) cir.setReturnValue(true);
-    }
-
-    @Redirect(method = "createLevels", at = @At(value = "INVOKE", remap = false, target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))
-    private Object banner$worldInit(Map<Object, Object> map, Object key, Object value) {
-        Object ret = map.put(key, value);
-        ServerLevel serverWorld = (ServerLevel) value;
-        if (((CraftServer) Bukkit.getServer()).scoreboardManager == null) {
-            ((CraftServer) Bukkit.getServer()).scoreboardManager = new CraftScoreboardManager((MinecraftServer) (Object) this, serverWorld.getScoreboard());
-        }
-        if (serverWorld.bridge$generator() != null) {
-            serverWorld.getWorld().getPopulators().addAll(
-                    serverWorld.bridge$generator().getDefaultPopulators(
-                           serverWorld.getWorld()));
-        }
-        Bukkit.getPluginManager().callEvent(new WorldInitEvent(serverWorld.getWorld()));
-        return ret;
     }
 
     // CraftBukkit start
