@@ -60,10 +60,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spigotmc.SpigotWorldConfig;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -75,6 +72,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 @Mixin(ServerLevel.class)
@@ -87,7 +85,6 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
     @Shadow public abstract List<ServerPlayer> players();
 
     @Shadow public abstract boolean sendParticles(ServerPlayer player, boolean longDistance, double posX, double posY, double posZ, Packet<?> packet);
-
     @Shadow @Final public ServerLevelData serverLevelData;
 
     @Shadow @NotNull public abstract MinecraftServer getServer();
@@ -100,12 +97,12 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
     @Shadow public abstract boolean addWithUUID(Entity entity);
 
     @Shadow @Final public PersistentEntitySectionManager<Entity> entityManager;
-
-    @Shadow public abstract boolean tryAddFreshEntityWithPassengers(Entity entity);
-
     @Shadow protected abstract void wakeUpAllPlayers();
 
     @Shadow @Final public static BlockPos END_SPAWN_POINT;
+
+    @Shadow public abstract boolean addFreshEntity(Entity entity);
+
     public LevelStorageSource.LevelStorageAccess convertable;
     public UUID uuid;
     public PrimaryLevelData serverLevelDataCB;
@@ -113,7 +110,7 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
 
     private transient boolean banner$force;
     private transient LightningStrikeEvent.Cause banner$cause;
-    private transient CreatureSpawnEvent.SpawnReason banner$reason;
+    private AtomicReference<CreatureSpawnEvent.SpawnReason> banner$reason = new AtomicReference<>();
     private transient boolean banner$timeSkipCancelled;
 
     protected MixinServerLevel(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean bl, boolean bl2, long l, int i) {
@@ -138,7 +135,7 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
     @Inject(method = "<init>", at = @At("TAIL"))
     private void banner$initWorldServer(MinecraftServer minecraftServer, Executor executor, LevelStorageSource.LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey resourceKey, LevelStem levelStem, ChunkProgressListener chunkProgressListener, boolean bl, long l, List list, boolean bl2, CallbackInfo ci) {
         this.banner$setPvpMode(minecraftServer.isPvpAllowed());
-        getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
+        //getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
         this.convertable = levelStorageAccess;
         if (serverLevelData instanceof PrimaryLevelData) {
             this.serverLevelDataCB = (PrimaryLevelData) serverLevelData;
@@ -233,7 +230,6 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
         }
     }
 
-
     @Inject(method = "save", at = @At("RETURN"))
     private void banner$saveLevelDat(ProgressListener progress, boolean flush, boolean skipSave, CallbackInfo ci) {
         if (this.serverLevelData instanceof PrimaryLevelData worldInfo) {
@@ -269,8 +265,8 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
 
     @Inject(method = "addEntity", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;addNewEntity(Lnet/minecraft/world/level/entity/EntityAccess;)Z"))
     private void banner$addEntityEvent(Entity entityIn, CallbackInfoReturnable<Boolean> cir) {
-        CreatureSpawnEvent.SpawnReason reason = banner$reason == null ? CreatureSpawnEvent.SpawnReason.DEFAULT : banner$reason;
-        banner$reason = null;
+        CreatureSpawnEvent.SpawnReason reason = banner$reason.get() == null ? CreatureSpawnEvent.SpawnReason.DEFAULT : banner$reason.get();
+        banner$reason.set(null);
         if (DistValidate.isValid((LevelAccessor) this) && !CraftEventFactory.doEntityAddEventCalling((ServerLevel) (Object) this, entityIn, reason)) {
             cir.setReturnValue(false);
         }
@@ -289,7 +285,7 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
 
     @Inject(method = "addEntity", at = @At("RETURN"))
     public void banner$resetReason(Entity entityIn, CallbackInfoReturnable<Boolean> cir) {
-        banner$reason = null;
+        banner$reason.set(null);
     }
 
     @Override
@@ -307,8 +303,9 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
     public boolean tryAddFreshEntityWithPassengers(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
         if (entity.getSelfAndPassengers().map(Entity::getUUID).anyMatch(this.entityManager::isLoaded)) {
             return false;
+        }else {
+            return this.addFreshEntity(entity, reason);
         }
-        return this.addFreshEntity(entity, reason);
     }
 
     /**
