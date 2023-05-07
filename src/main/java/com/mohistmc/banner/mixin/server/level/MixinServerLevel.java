@@ -93,6 +93,7 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
     @Shadow @NotNull public abstract MinecraftServer getServer();
 
     @Shadow public abstract DimensionDataStorage getDataStorage();
+    @Shadow public abstract boolean addEntity(Entity entity);
 
     @Shadow public abstract <T extends ParticleOptions> int sendParticles(T type, double posX, double posY, double posZ, int particleCount, double xOffset, double yOffset, double zOffset, double speed);
 
@@ -277,8 +278,13 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
 
     @Override
     public boolean addFreshEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
+        return addEntity(entity, reason);
+    }
+
+    @Override
+    public boolean addEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
         pushAddEntityReason(reason);
-        return addFreshEntity(entity);
+        return addEntity(entity);
     }
 
     @Inject(method = "addEntity", at = @At("RETURN"))

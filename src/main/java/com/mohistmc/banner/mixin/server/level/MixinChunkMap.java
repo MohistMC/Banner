@@ -2,12 +2,15 @@ package com.mohistmc.banner.mixin.server.level;
 
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.util.thread.BlockableEventLoop;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.LightChunkGetter;
 import net.minecraft.world.level.dimension.LevelStem;
@@ -18,9 +21,11 @@ import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import org.bukkit.craftbukkit.v1_19_R3.generator.CustomChunkGenerator;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,6 +34,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -66,6 +72,27 @@ public abstract class MixinChunkMap {
             this.randomState = RandomState.create(noisebasedchunkgenerator.generatorSettings().value(), this.level.registryAccess().lookupOrThrow(Registries.NOISE), this.level.getSeed());
         } else {
             this.randomState = RandomState.create(NoiseGeneratorSettings.dummy(), this.level.registryAccess().lookupOrThrow(Registries.NOISE), this.level.getSeed());
+        }
+    }
+
+    @Overwrite
+    private static void postLoadProtoChunk(ServerLevel level, List<CompoundTag> list) {
+        if (!list.isEmpty()) {
+            // CraftBukkit start - these are spawned serialized (DefinedStructure) and we don't call an add event below at the moment due to ordering complexities
+            level.addWorldGenChunkEntities(EntityType.loadEntitiesRecursive(list, level).filter((entity) -> {
+                boolean needsRemoval = false;
+                net.minecraft.server.dedicated.DedicatedServer server = level.getCraftServer().getServer();
+                if (!server.areNpcsEnabled() && entity instanceof net.minecraft.world.entity.npc.Npc) {
+                    entity.discard();
+                    needsRemoval = true;
+                }
+                if (!server.isSpawningAnimals() && (entity instanceof net.minecraft.world.entity.animal.Animal || entity instanceof net.minecraft.world.entity.animal.WaterAnimal)) {
+                    entity.discard();
+                    needsRemoval = true;
+                }
+                return !needsRemoval;
+            }));
+            // CraftBukkit end
         }
     }
 }

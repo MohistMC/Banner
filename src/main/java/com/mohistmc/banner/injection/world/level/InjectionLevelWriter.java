@@ -7,4 +7,8 @@ public interface InjectionLevelWriter {
     default boolean addFreshEntity(Entity entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason reason) {
         return false;
     }
+
+    default boolean addEntity(Entity entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason reason) {
+        return false;
+    }
 }
