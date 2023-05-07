@@ -7,7 +7,7 @@ import org.bukkit.event.server.ServerLoadEvent;
 public class ServerEventDispatcher {
 
     public static void dispatchServer() {
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+        ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             Bukkit.getPluginManager().callEvent(new ServerLoadEvent(ServerLoadEvent.LoadType.STARTUP));
         });
     }
