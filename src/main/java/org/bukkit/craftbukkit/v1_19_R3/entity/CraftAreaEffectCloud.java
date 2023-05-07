@@ -197,7 +197,7 @@ public class CraftAreaEffectCloud extends CraftEntity implements AreaEffectCloud
             return false;
         }
         getHandle().effects.remove(existing);
-        //TODO getHandle().refreshEffects();
+        getHandle().refreshEffects();
         return true;
     }
 
