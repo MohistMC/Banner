@@ -57,6 +57,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 @Mixin(Level.class)
@@ -95,6 +96,8 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     private org.spigotmc.SpigotWorldConfig spigotConfig; // Spigot
     protected org.bukkit.World.Environment environment;
     protected org.bukkit.generator.BiomeProvider biomeProvider;
+
+    private AtomicReference<Boolean> banner$validate = new AtomicReference<>();
 
     public void banner$constructor(WritableLevelData worldInfo, ResourceKey<Level> dimension, RegistryAccess registryAccess, final Holder<DimensionType> dimensionType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdate) {
         throw new RuntimeException();
@@ -306,21 +309,23 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         }
     }
 
-    @ModifyReturnValue(method = "getBlockEntity", at = @At("RETURN"))
-    private BlockEntity banner$changeBlockEntity(BlockPos pos) {
-        return getBlockEntity(pos, true);
+    @Inject(method = "getBlockEntity", at = @At("TAIL"), cancellable = true)
+    private void banner$changeBlockEntity(BlockPos pos, CallbackInfoReturnable<BlockEntity> cir) {
+        banner$validate.set(true);
+        if (capturedTileEntities.containsKey(pos)) {
+            cir.setReturnValue(capturedTileEntities.get(pos));
+        }
+        if (this.isOutsideBuildHeight(pos)) {
+            cir.setReturnValue(null);
+        } else {
+            cir.setReturnValue(!this.isClientSide && Thread.currentThread() != this.thread ? null : this.getChunkAt(pos).getBlockEntity(pos, LevelChunk.EntityCreationType.IMMEDIATE));
+        }
     }
 
     @Override
     public BlockEntity getBlockEntity(BlockPos blockposition, boolean validate) {
-        if (capturedTileEntities.containsKey(blockposition)) {
-            return capturedTileEntities.get(blockposition);
-        }
-        if (this.isOutsideBuildHeight(blockposition)) {
-            return null;
-        } else {
-            return !this.isClientSide && Thread.currentThread() != this.thread ? null : this.getChunkAt(blockposition).getBlockEntity(blockposition, LevelChunk.EntityCreationType.IMMEDIATE);
-        }
+        banner$validate.set(validate);
+        return getBlockEntity(blockposition);
     }
 
     @Inject(method = "setBlockEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getChunkAt(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/chunk/LevelChunk;",

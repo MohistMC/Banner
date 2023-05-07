@@ -12,10 +12,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(FriendlyByteBuf.class)
 public abstract class MixinFriendlyByteBuf {
 
+
+    // Banner - no need
+    /**
     @ModifyExpressionValue(method = "writeItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"))
     private boolean modifyReturn(ItemStack stack) {
         return stack.isEmpty() || stack.getItem() == null;
-    }
+    }*/
 
     @Inject(method = "writeItem",
             at = @At(value = "INVOKE",

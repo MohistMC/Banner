@@ -19,13 +19,13 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(PortalForcer.class)
 public abstract class MixinPortalForcer implements InjectionPortalForcer {
@@ -36,23 +36,18 @@ public abstract class MixinPortalForcer implements InjectionPortalForcer {
     @Shadow public abstract Optional<BlockUtil.FoundRectangle> findPortalAround(BlockPos p_192986_, boolean p_192987_, WorldBorder p_192988_);
     // @formatter:on
 
-    @ModifyVariable(method = "findPortalAround", index = 5, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/village/poi/PoiManager;ensureLoadedAndValid(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;I)V"))
-    private int banner$useSearchRadius(int i) {
-        return this.banner$searchRadius == -1 ? i : this.banner$searchRadius;
-    }
-
-    private transient int banner$searchRadius = -1;
+    private AtomicReference<Integer> banner$searchRadius = new AtomicReference<>();
     private transient BlockStateListPopulator banner$populator;
     private transient Entity banner$entity;
     private transient int banner$createRadius = -1;
 
     @Override
     public Optional<BlockUtil.FoundRectangle> findPortalAround(BlockPos pos, WorldBorder worldBorder, int searchRadius) {
-        this.banner$searchRadius = searchRadius;
+        this.banner$searchRadius.set(searchRadius);
         try {
             return this.findPortalAround(pos, false, worldBorder);
         } finally {
-            this.banner$searchRadius = -1;
+            this.banner$searchRadius.set(-1);
         }
     }
 

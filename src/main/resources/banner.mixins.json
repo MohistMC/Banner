@@ -14,7 +14,6 @@
   "mixinPriority": 500,
   "mixins": [
     "MixinCrashReport",
-    "MixinExtraBootstrapInjection",
     "advancement.MixinAdvancement",
     "commands.MixinCommandNode",
     "commands.MixinCommands",
