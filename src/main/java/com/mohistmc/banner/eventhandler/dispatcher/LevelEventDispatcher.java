@@ -4,7 +4,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.scoreboard.CraftScoreboardManager;
-import org.bukkit.event.world.WorldInitEvent;
 
 public class LevelEventDispatcher {
 
@@ -18,7 +17,6 @@ public class LevelEventDispatcher {
                         world.bridge$generator().getDefaultPopulators(
                                 world.getWorld()));
             }
-            Bukkit.getPluginManager().callEvent(new WorldInitEvent(world.getWorld()));
         });
     }
 }

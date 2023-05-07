@@ -9,6 +9,7 @@ import net.minecraft.ReportedException;
 import net.minecraft.Util;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.ChatDecorator;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerChunkCache;
@@ -19,6 +20,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ForcedChunksSavedData;
 import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WorldData;
@@ -40,6 +42,8 @@ import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_19_R3.util.LazyPlayerSet;
 import org.bukkit.event.player.AsyncPlayerChatPreviewEvent;
+import org.bukkit.event.server.ServerLoadEvent;
+import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.PluginLoadOrder;
 import org.fusesource.jansi.AnsiConsole;
@@ -181,11 +185,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         }
     }
 
-    @Inject(method = "prepareLevels", at = @At("TAIL"))
-    public void banner$onLevelLoad(CallbackInfo ci) { // Calls from server's init method
-        this.server.enablePlugins(PluginLoadOrder.POSTWORLD);
-    }
-
     @Inject(method = "stopServer", at = @At(value = "INVOKE", remap = false, ordinal = 0, shift = At.Shift.AFTER, target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V"))
     public void banner$unloadPlugins(CallbackInfo ci) {
         if (this.server != null) {
@@ -231,9 +230,19 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         this.levels.remove(level.dimension());
     }
 
+    @Inject(method = "createLevels",
+            at = @At(value = "INVOKE",
+                    target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$callInitEvent(ChunkProgressListener listener, CallbackInfo ci, ServerLevelData serverLevelData, boolean bl, Registry registry, WorldOptions worldOptions, long l, long m, List list, LevelStem levelStem, ServerLevel serverLevel) {
+        this.server.getPluginManager().callEvent(new WorldInitEvent(serverLevel.getWorld()));
+    }
+
     @Inject(method = "prepareLevels", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
     private void banner$loadEvent(ChunkProgressListener listener, CallbackInfo ci, ServerLevel serverLevel, BlockPos blockPos, ServerChunkCache serverChunkCache) {
-        Bukkit.getPluginManager().callEvent(new WorldLoadEvent(serverLevel.getWorld()));
+        this.server.getPluginManager().callEvent(new WorldLoadEvent(serverLevel.getWorld()));
+        this.server.enablePlugins(PluginLoadOrder.POSTWORLD);
+        this.server.getPluginManager().callEvent(new ServerLoadEvent(ServerLoadEvent.LoadType.STARTUP));
     }
 
     @Inject(method = "saveAllChunks", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;overworld()Lnet/minecraft/server/level/ServerLevel;"))
