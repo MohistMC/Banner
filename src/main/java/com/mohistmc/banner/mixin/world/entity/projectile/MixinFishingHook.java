@@ -1,5 +1,7 @@
 package com.mohistmc.banner.mixin.world.entity.projectile;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.mohistmc.banner.injection.world.entity.InjectionFishingHook;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -39,7 +41,7 @@ import java.util.Iterator;
 import java.util.List;
 
 @Mixin(FishingHook.class)
-public abstract class MixinFishingHook extends Projectile {
+public abstract class MixinFishingHook extends Projectile implements InjectionFishingHook {
 
 
     // @formatter:off
@@ -55,9 +57,16 @@ public abstract class MixinFishingHook extends Projectile {
 
     @Shadow protected abstract boolean shouldStopFishing(Player player);
 
+    @Shadow private float fishAngle;
     public int minWaitTime = 100;
     public int maxWaitTime = 600;
     public boolean applyLure = true;
+    public int minLureTime = 20;
+    public int maxLureTime = 80;
+    public float minLureAngle = 0.0F;
+    public float maxLureAngle = 360.0F;
+    public boolean rainInfluenced = true;
+    public boolean skyInfluenced = true;
 
     public MixinFishingHook(EntityType<? extends Projectile> entityType, Level level) {
         super(entityType, level);
@@ -86,9 +95,21 @@ public abstract class MixinFishingHook extends Projectile {
     @Inject(method = "catchingFish", at = @At("RETURN"))
     private void banner$modifyWaitingTime(BlockPos p_37146_, CallbackInfo ci) {
         if (this.nibble <= 0 && this.timeUntilHooked <= 0 && this.timeUntilLured <= 0) {
+            this.fishAngle = Mth.nextFloat(this.random, this.minLureAngle, this.maxLureAngle);
+            this.timeUntilHooked = Mth.nextInt(this.random, this.minLureTime, this.maxLureTime);
             this.timeUntilLured = Mth.nextInt(this.random, this.minWaitTime, this.maxWaitTime);
             this.timeUntilLured -= (this.applyLure) ? this.lureSpeed * 20 * 5 : 0;
         }
+    }
+
+    @ModifyExpressionValue(method = "catchingFish", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isRainingAt(Lnet/minecraft/core/BlockPos;)Z"))
+    private boolean addRainCheck(Level instance, BlockPos position) {
+        return this.rainInfluenced && this.random.nextFloat() < 0.25F && this.level.isRainingAt(position);
+    }
+
+    @ModifyExpressionValue(method = "catchingFish", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;canSeeSky(Lnet/minecraft/core/BlockPos;)Z"))
+    private boolean addSkyCheck(Level instance, BlockPos position) {
+        return this.skyInfluenced && this.random.nextFloat() < 0.25F && this.level.isRainingAt(position);
     }
 
     /**
@@ -156,5 +177,95 @@ public abstract class MixinFishingHook extends Projectile {
         } else {
             return 0;
         }
+    }
+
+    @Override
+    public int bridge$minWaitTime() {
+        return minWaitTime;
+    }
+
+    @Override
+    public void banner$setMinWaitTime(int minWaitTime) {
+        this.minWaitTime = minWaitTime;
+    }
+
+    @Override
+    public int bridge$maxWaitTime() {
+        return minWaitTime;
+    }
+
+    @Override
+    public void banner$setMaxWaitTime(int minWaitTime) {
+        this.minWaitTime = minWaitTime;
+    }
+
+    @Override
+    public boolean bridge$applyLure() {
+        return applyLure;
+    }
+
+    @Override
+    public void banner$setApplyLure(boolean applyLure) {
+        this.applyLure = applyLure;
+    }
+
+    @Override
+    public int bridge$minLureTime() {
+        return minLureTime;
+    }
+
+    @Override
+    public void banner$setMinLureTime(int minLureTime) {
+        this.minLureTime = minLureTime;
+    }
+
+    @Override
+    public int bridge$maxLureTime() {
+        return maxLureTime;
+    }
+
+    @Override
+    public void banner$setMaxLureTime(int maxLureTime) {
+        this.maxLureTime = maxLureTime;
+    }
+
+    @Override
+    public float bridge$minLureAngle() {
+        return minLureAngle;
+    }
+
+    @Override
+    public void banner$setMinLureAnglee(float minLureAngle) {
+        this.minLureAngle = minLureAngle;
+    }
+
+    @Override
+    public float bridge$maxLureAngle() {
+        return maxLureAngle;
+    }
+
+    @Override
+    public void banner$setMaxLureAnglee(float maxLureAngle) {
+        this.maxLureAngle = maxLureAngle;
+    }
+
+    @Override
+    public boolean bridge$rainInfluenced() {
+        return rainInfluenced;
+    }
+
+    @Override
+    public void banner$setRainInfluenced(boolean rainInfluenced) {
+        this.rainInfluenced = rainInfluenced;
+    }
+
+    @Override
+    public boolean bridge$skyInfluenced() {
+        return skyInfluenced;
+    }
+
+    @Override
+    public void banner$setSkyInfluenced(boolean skyInfluenced) {
+        this.skyInfluenced = skyInfluenced;
     }
 }
