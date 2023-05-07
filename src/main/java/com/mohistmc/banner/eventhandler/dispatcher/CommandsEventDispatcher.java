@@ -15,7 +15,6 @@ public class CommandsEventDispatcher {
             if (Bukkit.getServer() instanceof CraftServer craftServer) {
                 Commands bukkit$dispatcher = craftServer.getServer().getCommands();
                 ModCustomCommand wrapper = new ModCustomCommand(bukkit$dispatcher, dispatcher.getRoot());
-                craftServer.getCommandMap().register("fabric", wrapper);
                 ServerAPI.fabriccmdper.put(wrapper.getName(), wrapper.getPermission());
                 craftServer.helpMap.addTopic(new GenericCommandHelpTopic(wrapper));
                 Bukkit.getLogger().info("ModsCommandDispatcher register " + wrapper.getName());

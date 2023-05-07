@@ -38,9 +38,12 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R3.scoreboard.CraftScoreboardManager;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_19_R3.util.LazyPlayerSet;
 import org.bukkit.event.player.AsyncPlayerChatPreviewEvent;
+import org.bukkit.event.world.WorldInitEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.PluginLoadOrder;
 import org.fusesource.jansi.AnsiConsole;
 import org.spongepowered.asm.mixin.Final;
@@ -48,8 +51,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.io.File;
 import java.io.IOException;
@@ -230,6 +235,16 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         this.levels.remove(level.dimension());
     }
 
+    @Inject(method = "prepareLevels", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$loadEvent(ChunkProgressListener listener, CallbackInfo ci, ServerLevel serverLevel, BlockPos blockPos, ServerChunkCache serverChunkCache) {
+        Bukkit.getPluginManager().callEvent(new WorldLoadEvent(serverLevel.getWorld()));
+    }
+
+    @Inject(method = "saveAllChunks", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;overworld()Lnet/minecraft/server/level/ServerLevel;"))
+    private void banner$skipSave(boolean suppressLog, boolean flush, boolean forced, CallbackInfoReturnable<Boolean> cir) {
+        cir.setReturnValue(!this.levels.isEmpty());
+    }
+
     @Override
     public void initWorld(ServerLevel serverWorld, ServerLevelData worldInfo, WorldData saveData, WorldOptions worldOptions) {
         boolean flag = saveData.isDebugWorld();
@@ -301,6 +316,27 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     public void executeModerately() {
         this.runAllTasks();
         java.util.concurrent.locks.LockSupport.parkNanos("executing tasks", 1000L);
+    }
+
+    @Inject(method = "haveTime", cancellable = true, at = @At("HEAD"))
+    private void bannerforceAheadOfTime(CallbackInfoReturnable<Boolean> cir) {
+        if (this.forceTicks) cir.setReturnValue(true);
+    }
+
+    @Redirect(method = "createLevels", at = @At(value = "INVOKE", remap = false, target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))
+    private Object banner$worldInit(Map<Object, Object> map, Object key, Object value) {
+        Object ret = map.put(key, value);
+        ServerLevel serverWorld = (ServerLevel) value;
+        if (((CraftServer) Bukkit.getServer()).scoreboardManager == null) {
+            ((CraftServer) Bukkit.getServer()).scoreboardManager = new CraftScoreboardManager((MinecraftServer) (Object) this, serverWorld.getScoreboard());
+        }
+        if (serverWorld.bridge$generator() != null) {
+            serverWorld.getWorld().getPopulators().addAll(
+                    serverWorld.bridge$generator().getDefaultPopulators(
+                           serverWorld.getWorld()));
+        }
+        Bukkit.getPluginManager().callEvent(new WorldInitEvent(serverWorld.getWorld()));
+        return ret;
     }
 
     // CraftBukkit start
