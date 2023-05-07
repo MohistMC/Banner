@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server;
 
+import com.google.common.collect.Maps;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
@@ -195,7 +196,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Inject(method = "getServerModName", at = @At(value = "HEAD"), remap = false, cancellable = true)
     private void banner$setServerModName(CallbackInfoReturnable<String> cir) {
         if (this.server != null) {
-            cir.setReturnValue("Mohist Banner (Spigot+Fabric)");
+            cir.setReturnValue(server.getServer().getServerName());
         }
     }
 
@@ -222,12 +223,18 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Override
     public void addLevel(ServerLevel level) {
-        this.levels.put(level.dimension(), level);
+        Map<ResourceKey<net.minecraft.world.level.Level>, ServerLevel> oldLevels = this.levels;
+        Map<ResourceKey<net.minecraft.world.level.Level>, ServerLevel> newLevels = Maps.newLinkedHashMap(oldLevels);
+        newLevels.put(level.dimension(), level);
+        this.levels = Collections.unmodifiableMap(newLevels);
     }
 
     @Override
     public void removeLevel(ServerLevel level) {
-        this.levels.remove(level.dimension());
+        Map<ResourceKey<net.minecraft.world.level.Level>, ServerLevel> oldLevels = this.levels;
+        Map<ResourceKey<net.minecraft.world.level.Level>, ServerLevel> newLevels = Maps.newLinkedHashMap(oldLevels);
+        newLevels.remove(level.dimension(), level);
+        this.levels = Collections.unmodifiableMap(newLevels);
     }
 
     @Inject(method = "createLevels",
@@ -442,5 +449,10 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Override
     public java.util.concurrent.ExecutorService bridge$chatExecutor() {
         return chatExecutor;
+    }
+
+    @Override
+    public boolean isSameThread() {
+        return super.isSameThread(); //|| this.isStopped(); // CraftBukkit - MC-142590
     }
 }
