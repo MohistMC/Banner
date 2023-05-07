@@ -245,11 +245,13 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         this.server.getPluginManager().callEvent(new WorldInitEvent(serverLevel.getWorld()));
     }
 
-    @Inject(method = "prepareLevels", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$loadEvent(ChunkProgressListener listener, CallbackInfo ci, ServerLevel serverLevel, BlockPos blockPos, ServerChunkCache serverChunkCache) {
-        this.server.getPluginManager().callEvent(new WorldLoadEvent(serverLevel.getWorld()));
+    @Inject(method = "loadLevel", at = @At("TAIL"))
+    private void banner$initPlugins(CallbackInfo ci) {
         this.server.enablePlugins(PluginLoadOrder.POSTWORLD);
         this.server.getPluginManager().callEvent(new ServerLoadEvent(ServerLoadEvent.LoadType.STARTUP));
+        for (ServerLevel worldserver : ((MinecraftServer)(Object)this).getAllLevels()) {
+            this.server.getPluginManager().callEvent(new WorldLoadEvent(worldserver.getWorld()));
+        }
     }
 
     @Inject(method = "saveAllChunks", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;overworld()Lnet/minecraft/server/level/ServerLevel;"))
