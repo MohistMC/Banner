@@ -186,7 +186,7 @@ public abstract class MixinServerPlayerGameMode {
         // CraftBukkit end
     }
 
-    @Redirect(method = "handleBlockBreakAction", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V"))
+    @Redirect(method = "handleBlockBreakAction", remap = false, at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V"))
     private void banner$resetLogger(Logger instance, String s, Object o1, Object o2) {
         LOGGER.debug("Mismatch in destroy block pos: {} {}", this.destroyPos, banner$pos.get());
     }
