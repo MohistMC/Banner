@@ -49,14 +49,6 @@ public abstract class MixinHarvestFarmland extends Behavior<Villager> {
         banner$villager.set(owner);
     }
 
-    @Redirect(method = "tick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/npc/Villager;J)V",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
-    private boolean banner$getPlanted(ServerLevel instance, BlockPos pos, BlockState state) {
-        banner$planted.set(state.getBlock());
-        return false;
-    }
-
     @Inject(method = "tick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/npc/Villager;J)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"),
             slice = @Slice(to = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;gameEvent(Lnet/minecraft/world/level/gameevent/GameEvent;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/gameevent/GameEvent$Context;)V")),
@@ -69,6 +61,7 @@ public abstract class MixinHarvestFarmland extends Behavior<Villager> {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"),
     slice = @Slice(to = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;gameEvent(Lnet/minecraft/world/level/gameevent/GameEvent;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/gameevent/GameEvent$Context;)V")))
     private boolean banner$addPlantCheck(ServerLevel instance, BlockPos pos, BlockState state) {
+        banner$planted.set(state.getBlock());
         if (banner$planted.get() != null && !CraftEventFactory.callEntityChangeBlockEvent(banner$villager.get(), this.aboveFarmlandPos, banner$planted.get().defaultBlockState()).isCancelled()) {
             instance.setBlockAndUpdate(this.aboveFarmlandPos, banner$planted.get().defaultBlockState());
             instance.gameEvent(GameEvent.BLOCK_PLACE, this.aboveFarmlandPos, GameEvent.Context.of(banner$villager.get(), banner$planted.get().defaultBlockState()));
