@@ -14,14 +14,18 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.ChatDecorator;
+import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.server.level.progress.ChunkProgressListener;
+import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.Unit;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ForcedChunksSavedData;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldOptions;
@@ -67,6 +71,7 @@ import java.net.Proxy;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -89,6 +94,13 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Shadow private String localIp;
     @Shadow private boolean onlineMode;
+
+    @Shadow public abstract boolean isResourcePackRequired();
+
+    @Shadow private int tickCount;
+
+    @Shadow public abstract PlayerList getPlayerList();
+
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
     public org.bukkit.craftbukkit.v1_19_R3.CraftServer server;
@@ -191,6 +203,11 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Inject(method = "stopServer", at = @At(value = "INVOKE", remap = false, ordinal = 0, shift = At.Shift.AFTER, target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V"))
     public void banner$unloadPlugins(CallbackInfo ci) {
+        synchronized (this.stopLock) {
+            if (this.hasStopped)
+                return;
+            this.hasStopped = true;
+        }
         if (this.server != null) {
             this.server.disablePlugins();
         }
@@ -336,8 +353,30 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     }
 
     @Inject(method = "haveTime", cancellable = true, at = @At("HEAD"))
-    private void bannerforceAheadOfTime(CallbackInfoReturnable<Boolean> cir) {
+    private void banner$forceAheadOfTime(CallbackInfoReturnable<Boolean> cir) {
         if (this.forceTicks) cir.setReturnValue(true);
+    }
+
+    @Inject(method = "tickChildren", at = @At("HEAD"))
+    private void banner$processStart(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        server.getScheduler().mainThreadHeartbeat(this.tickCount);
+    }
+
+    @Inject(method = "tickChildren", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getAllLevels()Ljava/lang/Iterable;"))
+    private void banner$checkHeart(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        // CraftBukkit start
+        // Run tasks that are waiting on processing
+        while (!processQueue.isEmpty()) {
+            processQueue.remove().run();
+        }
+
+        // Send time updates to everyone, it will get the right time from the world the player is in.
+        if (this.tickCount % 20 == 0) {
+            for (int i = 0; i < this.getPlayerList().players.size(); ++i) {
+                ServerPlayer entityplayer = (ServerPlayer) this.getPlayerList().players.get(i);
+                entityplayer.connection.send(new ClientboundSetTimePacket(entityplayer.level.getGameTime(), entityplayer.getPlayerTime(), entityplayer.level.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT))); // Add support for per player time
+            }
+        }
     }
 
     // CraftBukkit start
