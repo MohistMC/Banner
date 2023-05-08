@@ -4,12 +4,15 @@ import com.mohistmc.banner.injection.world.level.chunk.InjectionLevelChunk;
 import com.mohistmc.banner.bukkit.DistValidate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.*;
 import net.minecraft.world.level.levelgen.blending.BlendingData;
@@ -18,19 +21,22 @@ import net.minecraft.world.ticks.LevelChunkTicks;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R3.CraftChunk;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import javax.annotation.Nullable;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(LevelChunk.class)
 public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLevelChunk {
-
 
     public MixinLevelChunk(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry<Biome> registry, long l, @org.jetbrains.annotations.Nullable LevelChunkSection[] levelChunkSections, @org.jetbrains.annotations.Nullable BlendingData blendingData) {
         super(chunkPos, upgradeData, levelHeightAccessor, registry, l, levelChunkSections, blendingData);
@@ -41,10 +47,17 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
     @Shadow @Final public Level level;
     // @formatter:on
 
+    @Shadow @org.jetbrains.annotations.Nullable protected abstract BlockEntity promotePendingBlockEntity(BlockPos pos, CompoundTag tag);
+
+    @Shadow @org.jetbrains.annotations.Nullable protected abstract BlockEntity createBlockEntity(BlockPos pos);
+
+    @Shadow public abstract void addAndRegisterBlockEntity(BlockEntity blockEntity);
+
     public boolean mustNotSave;
     public boolean needsDecoration;
     private transient boolean banner$doPlace;
     public ServerLevel q; // TODO check on update
+    private AtomicReference<Block> banner$block = new AtomicReference<>();
 
     @Inject(method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/ChunkPos;Lnet/minecraft/world/level/chunk/UpgradeData;Lnet/minecraft/world/ticks/LevelChunkTicks;Lnet/minecraft/world/ticks/LevelChunkTicks;J[Lnet/minecraft/world/level/chunk/LevelChunkSection;Lnet/minecraft/world/level/chunk/LevelChunk$PostLoadProcessor;Lnet/minecraft/world/level/levelgen/blending/BlendingData;)V", at = @At("RETURN"))
     private void banner$init(Level worldIn, ChunkPos p_196855_, UpgradeData p_196856_, LevelChunkTicks<Block> p_196857_, LevelChunkTicks<Fluid> p_196858_, long p_196859_, @Nullable LevelChunkSection[] p_196860_, @Nullable LevelChunk.PostLoadProcessor p_196861_, @Nullable BlendingData p_196862_, CallbackInfo ci) {
@@ -128,9 +141,57 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
         this.mustNotSave = !unloadEvent.isSaveChunk();
     }
 
+    @Inject(method = "setBlockState", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getBlock()Lnet/minecraft/world/level/block/Block;"))
+    private void banner$getState(BlockPos pos, BlockState state, boolean isMoving, CallbackInfoReturnable<BlockState> cir) {
+        banner$block.set(state.getBlock());
+    }
+
     @Redirect(method = "setBlockState", at = @At(value = "FIELD", ordinal = 1, target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
     public boolean banner$redirectIsRemote(Level world) {
-        return world.isClientSide && this.banner$doPlace;
+        return world.isClientSide && this.banner$doPlace && (!this.level.bridge$captureBlockStates()|| banner$block.get() instanceof BaseEntityBlock);
+    }
+
+    /**
+     * @author wdog5
+     * @reason
+     */
+    @Nullable
+    @Overwrite
+    public BlockEntity getBlockEntity(BlockPos pos, LevelChunk.EntityCreationType creationType) {
+        // CraftBukkit start
+        BlockEntity blockEntity = level.bridge$capturedTileEntities().get(pos);
+        if (blockEntity == null) {
+            blockEntity = (BlockEntity) this.blockEntities.get(pos);
+        }
+        // CraftBukkit end
+        if (blockEntity == null) {
+            CompoundTag compoundTag = (CompoundTag)this.pendingBlockEntities.remove(pos);
+            if (compoundTag != null) {
+                BlockEntity blockEntity2 = this.promotePendingBlockEntity(pos, compoundTag);
+                if (blockEntity2 != null) {
+                    return blockEntity2;
+                }
+            }
+        }
+
+        if (blockEntity == null) {
+            if (creationType == LevelChunk.EntityCreationType.IMMEDIATE) {
+                blockEntity = this.createBlockEntity(pos);
+                if (blockEntity != null) {
+                    this.addAndRegisterBlockEntity(blockEntity);
+                }
+            }
+        } else if (blockEntity.isRemoved()) {
+            this.blockEntities.remove(pos);
+            return null;
+        } else {
+            System.out.println("Attempted to place a tile entity (" + blockEntity + ") at " + blockEntity.getBlockPos().getX() + "," + blockEntity.getBlockPos().getY() + "," + blockEntity.getBlockPos().getZ()
+                    + " (" + getBlockState(pos) + ") where there was no entity tile!");
+            System.out.println("Chunk coordinates: " + (this.chunkPos.x * 16) + "," + (this.chunkPos.z * 16));
+            new Exception().printStackTrace();
+            // CraftBukkit end
+        }
+        return blockEntity;
     }
 
     @Override

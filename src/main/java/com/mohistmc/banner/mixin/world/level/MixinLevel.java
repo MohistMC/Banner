@@ -25,6 +25,7 @@ import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WritableLevelData;
@@ -338,15 +339,9 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     }
 
     @Override
-    public boolean addFreshEntity(Entity entity) {
-        this.pushAddEntityReason(getAddEntityReason());
-        return LevelAccessor.super.addFreshEntity(entity);
-    }
-
-    @Override
-    public boolean addFreshEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
+    public boolean addEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
         if (getWorld().getHandle() != (Object) this) {
-            return getWorld().getHandle().addFreshEntity(entity, reason);
+            return getWorld().getHandle().addEntity(entity, reason);
         } else {
             this.pushAddEntityReason(reason);
             return this.addFreshEntity(entity);

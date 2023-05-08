@@ -22,7 +22,6 @@ import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.util.ProgressListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.Container;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
@@ -90,7 +89,6 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
     @Shadow @NotNull public abstract MinecraftServer getServer();
 
     @Shadow public abstract DimensionDataStorage getDataStorage();
-    @Shadow public abstract boolean addEntity(Entity entity);
 
     @Shadow public abstract <T extends ParticleOptions> int sendParticles(T type, double posX, double posY, double posZ, int particleCount, double xOffset, double yOffset, double zOffset, double speed);
 
@@ -275,12 +273,6 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
     @Override
     public boolean addFreshEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
         return addEntity(entity, reason);
-    }
-
-    @Override
-    public boolean addEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
-        pushAddEntityReason(reason);
-        return addEntity(entity);
     }
 
     @Inject(method = "addEntity", at = @At("RETURN"))
