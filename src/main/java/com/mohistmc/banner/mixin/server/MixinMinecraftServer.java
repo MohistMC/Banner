@@ -1,7 +1,9 @@
 package com.mohistmc.banner.mixin.server;
 
 import com.google.common.collect.Maps;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
 import it.unimi.dsi.fastutil.longs.LongIterator;
@@ -21,6 +23,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.server.level.progress.ChunkProgressListener;
+import net.minecraft.server.network.ServerConnectionListener;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.Unit;
 import net.minecraft.world.level.ChunkPos;
@@ -60,6 +63,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -90,17 +94,15 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow private long nextTickTime;
     @Shadow public abstract boolean isSpawningMonsters();
     @Shadow public abstract boolean isSpawningAnimals();
-    // @formatter:on
-
     @Shadow private String localIp;
     @Shadow private boolean onlineMode;
-
-    @Shadow public abstract boolean isResourcePackRequired();
-
     @Shadow private int tickCount;
-
     @Shadow public abstract PlayerList getPlayerList();
+    @Shadow private long lastOverloadWarning;
+    @Shadow public abstract boolean isStopped();
+    // @formatter:on
 
+    @Shadow public ServerConnectionListener connection;
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
     public org.bukkit.craftbukkit.v1_19_R3.CraftServer server;
@@ -203,14 +205,35 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Inject(method = "stopServer", at = @At(value = "INVOKE", remap = false, ordinal = 0, shift = At.Shift.AFTER, target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V"))
     public void banner$unloadPlugins(CallbackInfo ci) {
+        if (this.server != null) {
+            this.server.disablePlugins();
+        }
+    }
+
+    @Inject(method = "stopServer", at = @At("HEAD"))
+    private void banner$stop(CallbackInfo ci) {
         synchronized (this.stopLock) {
             if (this.hasStopped)
                 return;
             this.hasStopped = true;
         }
-        if (this.server != null) {
-            this.server.disablePlugins();
-        }
+    }
+
+    @Inject(method = "stopServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;removeAll()V"))
+    private void banner$stopThread(CallbackInfo ci) {
+        try { Thread.sleep(100); } catch (InterruptedException ex) {} // CraftBukkit - SPIGOT-625 - give server at least a chance to send packets
+    }
+
+    @ModifyExpressionValue(method = "runServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;lastOverloadWarning:J", ordinal = 0))
+    private boolean banner$resetCKU(MinecraftServer instance) {
+        return this.lastOverloadWarning >= 30000L;
+    }
+
+    @WrapWithCondition(method = "runServer",remap = false,
+            at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V"),
+            slice = @Slice(to = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;lastOverloadWarning:J", ordinal = 1)))
+    private boolean banner$addCKUCheck() {
+        return server.getWarnOnOverload();
     }
 
     @Inject(method = "getServerModName", at = @At(value = "HEAD"), remap = false, cancellable = true)
@@ -218,6 +241,11 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         if (this.server != null) {
             cir.setReturnValue(server.getServer().getServerName());
         }
+    }
+
+    @Inject(method = "runServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;nextTickTime:J", shift = At.Shift.BEFORE))
+    private void banner$currentTick(CallbackInfo ci) {
+        ServerUtils.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
     }
 
     @Inject(method = "reloadResources", at = @At(value = "RETURN", target = "Ljava/util/concurrent/CompletableFuture;thenAcceptAsync(Ljava/util/function/Consumer;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
@@ -270,13 +298,39 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         this.server.enablePlugins(PluginLoadOrder.POSTWORLD);
         this.server.getPluginManager().callEvent(new ServerLoadEvent(ServerLoadEvent.LoadType.STARTUP));
         for (ServerLevel worldserver : ((MinecraftServer)(Object)this).getAllLevels()) {
+            this.prepareLevels(worldserver.getChunkSource().chunkMap.progressListener, worldserver);
+            worldserver.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API
             this.server.getPluginManager().callEvent(new WorldLoadEvent(worldserver.getWorld()));
+            this.connection.acceptConnections();
         }
     }
 
     @Inject(method = "saveAllChunks", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;overworld()Lnet/minecraft/server/level/ServerLevel;"))
     private void banner$skipSave(boolean suppressLog, boolean flush, boolean forced, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(!this.levels.isEmpty());
+    }
+
+    @Inject(method = "setInitialSpawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerChunkCache;getGenerator()Lnet/minecraft/world/level/chunk/ChunkGenerator;", shift = At.Shift.BEFORE), cancellable = true)
+    private static void banner$spawnInit(ServerLevel level, ServerLevelData levelData, boolean generateBonusChest, boolean debug, CallbackInfo ci) {
+        // CraftBukkit start
+        if (level.bridge$generator() != null) {
+            Random rand = new Random(level.getSeed());
+            org.bukkit.Location spawn = level.bridge$generator().getFixedSpawnLocation(level.getWorld(), rand);
+
+            if (spawn != null) {
+                if (spawn.getWorld() != level.getWorld()) {
+                    throw new IllegalStateException("Cannot set spawn point for " + levelData.getLevelName() + " to be in another world (" + spawn.getWorld().getName() + ")");
+                } else {
+                    levelData.setSpawn(new BlockPos(spawn.getBlockX(), spawn.getBlockY(), spawn.getBlockZ()), spawn.getYaw());
+                    ci.cancel();
+                }
+            }
+        }
+    }
+
+    @ModifyExpressionValue(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;tickCount:I", ordinal = 1))
+    private boolean banner$addTaskCheck() {
+        return autosavePeriod > 0 && this.tickCount % autosavePeriod == 0;
     }
 
     @Override
@@ -506,6 +560,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Override
     public boolean isSameThread() {
-        return super.isSameThread(); //|| this.isStopped(); // CraftBukkit - MC-142590
+        return super.isSameThread() || this.isStopped(); // CraftBukkit - MC-142590
     }
 }
