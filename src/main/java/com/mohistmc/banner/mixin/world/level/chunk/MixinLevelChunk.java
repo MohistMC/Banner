@@ -31,6 +31,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -184,14 +185,19 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
         } else if (blockEntity.isRemoved()) {
             this.blockEntities.remove(pos);
             return null;
-        } else {
+        }
+        return blockEntity;
+    }
+
+    @Inject(method = "setBlockEntity", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$addLogInfo(BlockEntity blockEntity, CallbackInfo ci, BlockPos blockPos, BlockEntity blockEntity2) {
+        if (!this.getBlockState(blockPos).hasBlockEntity() && blockEntity2 == null && blockEntity2 == blockEntity) {
             System.out.println("Attempted to place a tile entity (" + blockEntity + ") at " + blockEntity.getBlockPos().getX() + "," + blockEntity.getBlockPos().getY() + "," + blockEntity.getBlockPos().getZ()
-                    + " (" + getBlockState(pos) + ") where there was no entity tile!");
+                    + " (" + getBlockState(blockPos) + ") where there was no entity tile!");
             System.out.println("Chunk coordinates: " + (this.chunkPos.x * 16) + "," + (this.chunkPos.z * 16));
             new Exception().printStackTrace();
             // CraftBukkit end
         }
-        return blockEntity;
     }
 
     @Override
