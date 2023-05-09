@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.server.players;
 
 import com.google.common.collect.Lists;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mohistmc.banner.injection.server.players.InjectionPlayerList;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.ChatFormatting;
@@ -32,6 +33,7 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.storage.PlayerDataStorage;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.command.ColouredConsoleSender;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
@@ -39,6 +41,9 @@ import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.checkerframework.checker.units.qual.A;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
@@ -46,6 +51,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.net.SocketAddress;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
@@ -60,6 +66,23 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Shadow @Final private static Logger LOGGER;
     @Shadow @Final public PlayerDataStorage playerIo;
+    @Shadow @Final private UserBanList bans;
+
+    @Shadow public abstract UserBanList getBans();
+
+    @Shadow public abstract boolean isWhiteListed(GameProfile profile);
+
+    @Shadow @Final private IpBanList ipBans;
+    @Shadow @Final protected int maxPlayers;
+
+    @Shadow public abstract boolean canBypassPlayerLimit(GameProfile profile);
+
+    @Shadow @Final private static SimpleDateFormat BAN_DATE_FORMAT;
+
+    @Shadow public abstract IpBanList getIpBans();
+
+    @Shadow public abstract ServerPlayer getPlayerForLogin(GameProfile profile);
+
     private CraftServer cserver;
     private static final AtomicReference<String> PROFILE_NAMES = new AtomicReference<>();
     private static final AtomicReference<String> banner$joinMessage =new AtomicReference<>();
@@ -309,8 +332,12 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         return playerQuitEvent.getQuitMessage();
     }
 
+    private final AtomicReference<ServerLoginPacketListenerImpl> banner$handler = new AtomicReference<>();
+    private final AtomicReference<PlayerLoginEvent> banner$loginEvent = new AtomicReference<>();
+
     @Override
-    public ServerPlayer canPlayerLogin(SocketAddress socketAddress, GameProfile gameProfile, ServerLoginPacketListenerImpl handler) {
+    public ServerPlayer canPlayerLogin(ServerLoginPacketListenerImpl handler, GameProfile gameProfile) {
+        banner$handler.set(handler);
         // Moved from processLogin
         UUID uuid = UUIDUtil.getOrCreatePlayerUUID(gameProfile);
         List<ServerPlayer> list = Lists.newArrayList();
@@ -340,6 +367,63 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         ServerPlayer entity = new ServerPlayer(this.server, this.server.getLevel(Level.OVERWORLD), gameProfile);
         org.bukkit.entity.Player player = entity.getBukkitEntity();
         PlayerLoginEvent event = new PlayerLoginEvent(player, handler.connection.bridge$hostname(), ((java.net.InetSocketAddress) socketaddress).getAddress());
+        banner$loginEvent.set(event);
         return entity;
+    }
+
+    /**
+     * @author wdog5
+     * @reason
+     */
+    @Nullable
+    @Overwrite
+    public Component canPlayerLogin(SocketAddress socketAddress, GameProfile gameProfile) {
+        MutableComponent mutableComponent;
+        canPlayerLogin(banner$handler.get(), gameProfile);
+        if (this.bans.isBanned(gameProfile) && !getBans().get(gameProfile).hasExpired()) {
+            UserBanListEntry userBanListEntry = (UserBanListEntry)this.bans.get(gameProfile);
+            mutableComponent = Component.translatable("multiplayer.disconnect.banned.reason", new Object[]{userBanListEntry.getReason()});
+            if (userBanListEntry.getExpires() != null) {
+                mutableComponent.append(Component.translatable("multiplayer.disconnect.banned.expiration", new Object[]{BAN_DATE_FORMAT.format(userBanListEntry.getExpires())}));
+            }
+            banner$loginEvent.get().disallow(PlayerLoginEvent.Result.KICK_BANNED, CraftChatMessage.fromComponent(mutableComponent));
+        } else if (!this.isWhiteListed(gameProfile)) {
+            mutableComponent = Component.translatable("multiplayer.disconnect.not_whitelisted");
+            banner$loginEvent.get().disallow(PlayerLoginEvent.Result.KICK_WHITELIST, CraftChatMessage.fromComponent(mutableComponent));
+        } else if (this.ipBans.isBanned(socketAddress) && !getIpBans().get(socketAddress).hasExpired()) {
+            IpBanListEntry ipBanListEntry = this.ipBans.get(socketAddress);
+            mutableComponent = Component.translatable("multiplayer.disconnect.banned_ip.reason", new Object[]{ipBanListEntry.getReason()});
+            if (ipBanListEntry.getExpires() != null) {
+                mutableComponent.append(Component.translatable("multiplayer.disconnect.banned_ip.expiration", new Object[]{BAN_DATE_FORMAT.format(ipBanListEntry.getExpires())}));
+            }
+
+            // return mutableComponent;
+            banner$loginEvent.get().disallow(PlayerLoginEvent.Result.KICK_BANNED, CraftChatMessage.fromComponent(mutableComponent));
+        } else {
+            if (this.players.size() >= this.maxPlayers && !this.canBypassPlayerLimit(gameProfile)) {
+                banner$loginEvent.get().disallow(PlayerLoginEvent.Result.KICK_FULL, "The server is full");
+            }
+        }
+        cserver.getPluginManager().callEvent(banner$loginEvent.get());
+        if (banner$loginEvent.get().getResult() == PlayerLoginEvent.Result.ALLOWED) {
+            return null;
+        }else {
+            return Component.literal(banner$loginEvent.get().getKickMessage());
+        }
+    }
+
+    @Override
+    public ServerPlayer getPlayerForLogin(GameProfile gameprofile, ServerPlayer player) {
+        return player;
+    }
+
+    @Override
+    public CraftServer getCraftServer() {
+        return cserver;
+    }
+
+    @Override
+    public ServerPlayer respawn(ServerPlayer entityplayer, boolean flag, PlayerRespawnEvent.RespawnReason reason) {
+        return this.respawn(entityplayer, this.server.getLevel(entityplayer.getRespawnDimension()), flag, null, true, reason);
     }
 }
