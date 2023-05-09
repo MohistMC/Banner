@@ -51,13 +51,9 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
     private void banner$initServer(CallbackInfoReturnable<Boolean> cir) {
         BannerServer.LOGGER.info("Loading Bukkit plugins, please wait...");
         // CraftBukkit start
-        this.setPlayerList(new DedicatedPlayerList(((DedicatedServer) (Object) this), this.registries(), this.playerDataStorage));
         this.bridge$server().loadPlugins();
         this.bridge$server().enablePlugins(PluginLoadOrder.STARTUP);
     }
-
-    @Redirect(method = "initServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/dedicated/DedicatedServer;setPlayerList(Lnet/minecraft/server/players/PlayerList;)V"))
-    private void banner$moveUpPlayerList(DedicatedServer instance, PlayerList playerList) {}
 
     @Inject(method = "initServer",
             at = @At(value = "INVOKE",
