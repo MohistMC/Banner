@@ -66,7 +66,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     private final AtomicReference<String> banner$string2 = new AtomicReference<>();
 
     @Inject(method = "<init>", at = @At(value = "TAIL"))
-    public void banner$init(MinecraftServer minecraftServer, LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess, PlayerDataStorage playerDataStorage, int i, CallbackInfo ci) {
+    public void init(MinecraftServer minecraftServer, LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess, PlayerDataStorage playerDataStorage, int i, CallbackInfo ci) {
         this.players = new CopyOnWriteArrayList<>();
         MinecraftServer banner$server = (DedicatedServer) minecraftServer;
         this.cserver = new CraftServer((DedicatedServer) banner$server, (PlayerList) (Object) this);
