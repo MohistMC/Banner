@@ -29,12 +29,14 @@ import net.minecraft.server.players.*;
 import net.minecraft.stats.ServerStatsCounter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.command.ColouredConsoleSender;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
@@ -48,6 +50,7 @@ import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.net.SocketAddress;
@@ -56,6 +59,8 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 // Banner - TODO fix inject method
 @Mixin(PlayerList.class)
@@ -82,6 +87,8 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     @Shadow public abstract IpBanList getIpBans();
 
     @Shadow public abstract ServerPlayer getPlayerForLogin(GameProfile profile);
+
+    @Shadow public abstract void broadcastSystemMessage(Component message, boolean bypassHiddenChat);
 
     private CraftServer cserver;
     private static final AtomicReference<String> PROFILE_NAMES = new AtomicReference<>();
@@ -123,6 +130,24 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;[Ljava/lang/Object;)V"))
     private void banner$moveDownLogger(Logger instance, String s, Object[] objects) {} // CraftBukkit - Moved message to after join
+
+    @Inject(method = "placeNewPlayer",
+            locals = LocalCapture.CAPTURE_FAILHARD,
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerLevel;getLevelData()Lnet/minecraft/world/level/storage/LevelData;", shift = At.Shift.BEFORE))
+    private void banner$callSpawnEvent(Connection netManager, ServerPlayer player, CallbackInfo ci, GameProfile gameProfile, GameProfileCache gameProfileCache, Optional optional, String string, CompoundTag compoundTag, ResourceKey resourceKey, ServerLevel serverLevel, ServerLevel serverLevel2, String string2) {
+        // Spigot start - spawn location event
+        org.bukkit.entity.Player spawnPlayer = player.getBukkitEntity();
+        org.spigotmc.event.player.PlayerSpawnLocationEvent ev = new org.spigotmc.event.player.PlayerSpawnLocationEvent(spawnPlayer, spawnPlayer.getLocation());
+        cserver.getPluginManager().callEvent(ev);
+
+        Location loc = ev.getSpawnLocation();
+        serverLevel2 = ((CraftWorld) loc.getWorld()).getHandle();
+
+        player.spawnIn(serverLevel2);
+        player.gameMode.setLevel((ServerLevel) player.level);
+        player.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+    }
 
     @Inject(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V", ordinal = 0))
     private void banner$sendChannel(Connection netManager, ServerPlayer player, CallbackInfo ci) {
@@ -425,5 +450,85 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     @Override
     public ServerPlayer respawn(ServerPlayer entityplayer, boolean flag, PlayerRespawnEvent.RespawnReason reason) {
         return this.respawn(entityplayer, this.server.getLevel(entityplayer.getRespawnDimension()), flag, null, true, reason);
+    }
+
+    @Inject(method = "respawn", at = @At("HEAD"))
+    private void banner$respawnCheck(ServerPlayer player, boolean keepEverything, CallbackInfoReturnable<ServerPlayer> cir) {
+        player.stopRiding(); // CraftBukkit
+    }
+
+    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;broadcastAll(Lnet/minecraft/network/protocol/Packet;)V"))
+    private void banner$cancelText1(PlayerList instance, Packet<?> packet) {
+        // CraftBukkit start
+        for (int i = 0; i < this.players.size(); ++i) {
+            final ServerPlayer target = (ServerPlayer) this.players.get(i);
+
+            target.connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LATENCY), this.players.stream().filter(new Predicate<ServerPlayer>() {
+                @Override
+                public boolean test(ServerPlayer input) {
+                    return target.getBukkitEntity().canSee(input.getBukkitEntity());
+                }
+            }).collect(Collectors.toList())));
+        }
+        // CraftBukkit end
+    }
+
+    @Override
+    public void broadcastAll(Packet<?> packet, Player entityhuman) {
+        for (int i = 0; i < this.players.size(); ++i) {
+            ServerPlayer entityplayer =  this.players.get(i);
+            if (entityhuman != null && !entityplayer.getBukkitEntity().canSee(entityhuman.getBukkitEntity())) {
+                continue;
+            }
+            ((ServerPlayer) this.players.get(i)).connection.send(packet);
+        }
+    }
+
+    @Override
+    public void broadcastAll(Packet<?> packet, Level world) {
+        for (int i = 0; i < world.players().size(); ++i) {
+            ((ServerPlayer) world.players().get(i)).connection.send(packet);
+        }
+    }
+
+    @Inject(method = "sendPlayerPermissionLevel(Lnet/minecraft/server/level/ServerPlayer;I)V",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/commands/Commands;sendCommands(Lnet/minecraft/server/level/ServerPlayer;)V",
+                    shift = At.Shift.BEFORE))
+    private void banner$addPermCheck(ServerPlayer player, int permLevel, CallbackInfo ci) {
+        player.getBukkitEntity().recalculatePermissions(); // CraftBukkit
+    }
+
+    /**
+     * @author wdog5
+     * @reason
+     */
+    @Overwrite
+    public void broadcast(@Nullable Player except, double x, double y, double z, double radius, ResourceKey<Level> dimension, Packet<?> packet) {
+        for(int i = 0; i < this.players.size(); ++i) {
+            ServerPlayer serverPlayer = (ServerPlayer)this.players.get(i);
+
+            // CraftBukkit start - Test if player receiving packet can see the source of the packet
+            if (except != null && !serverPlayer.getBukkitEntity().canSee(except.getBukkitEntity())) {
+                continue;
+            }
+            // CraftBukkit end
+            if (serverPlayer != except && serverPlayer.level.dimension() == dimension) {
+                double d = x - serverPlayer.getX();
+                double e = y - serverPlayer.getY();
+                double f = z - serverPlayer.getZ();
+                if (d * d + e * e + f * f < radius * radius) {
+                    serverPlayer.connection.send(packet);
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public void broadcastMessage(Component[] iChatBaseComponents) {
+        for (Component component : iChatBaseComponents) {
+            broadcastSystemMessage(component, false);
+        }
     }
 }
