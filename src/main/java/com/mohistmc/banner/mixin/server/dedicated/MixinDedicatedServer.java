@@ -8,11 +8,9 @@ import net.minecraft.server.ConsoleInput;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.Services;
 import net.minecraft.server.WorldStem;
-import net.minecraft.server.dedicated.DedicatedPlayerList;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
 import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.server.players.PlayerList;
 import net.minecraft.server.rcon.RconConsoleSource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import org.apache.logging.log4j.LogManager;
@@ -41,7 +39,7 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
 
     @Shadow @Final public RconConsoleSource rconConsoleSource;
 
-    private AtomicReference<String> banner$command = new AtomicReference<>();
+    private final AtomicReference<String> banner$command = new AtomicReference<>();
 
     public MixinDedicatedServer(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Proxy proxy, DataFixer dataFixer, Services services, ChunkProgressListenerFactory chunkProgressListenerFactory) {
         super(thread, levelStorageAccess, packRepository, worldStem, proxy, dataFixer, services, chunkProgressListenerFactory);
@@ -51,13 +49,9 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
     private void banner$initServer(CallbackInfoReturnable<Boolean> cir) {
         BannerServer.LOGGER.info("Loading Bukkit plugins, please wait...");
         // CraftBukkit start
-        this.setPlayerList(new DedicatedPlayerList(((DedicatedServer) (Object) this), this.registries(), this.playerDataStorage));
         this.bridge$server().loadPlugins();
         this.bridge$server().enablePlugins(PluginLoadOrder.STARTUP);
     }
-
-    @Redirect(method = "initServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/dedicated/DedicatedServer;setPlayerList(Lnet/minecraft/server/players/PlayerList;)V"))
-    private void banner$moveUpPlayerList(DedicatedServer instance, PlayerList playerList) {}
 
     @Inject(method = "initServer",
             at = @At(value = "INVOKE",
