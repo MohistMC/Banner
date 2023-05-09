@@ -102,13 +102,15 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
 
     @Override
     public Component getTitle() {
-        Preconditions.checkState(this.title != null, "Title not set");
+        // Banner: null title -> empty title
+        if (this.title == null) {
+            this.title = Component.literal("");
+        }
         return this.title;
     }
 
     @Override
     public void setTitle(Component title) {
-        Preconditions.checkState(this.title == null, "Title already set");
         this.title = title;
     }
 
