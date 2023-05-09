@@ -163,24 +163,6 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         });
     }
 
-    @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z",
-            at = @At("HEAD"), cancellable = true)
-    private void banner$hooks(BlockPos pos, BlockState newState, int flags, CallbackInfoReturnable<Boolean> cir) {
-        if (!processCaptures(pos, newState, flags)) {
-            cir.setReturnValue(false);
-        }
-    }
-
-    private boolean processCaptures(BlockPos pos, BlockState newState, int flags) {
-        Entity entityChangeBlock = BukkitCaptures.getEntityChangeBlock();
-        if (entityChangeBlock != null) {
-            if (CraftEventFactory.callEntityChangeBlockEvent(entityChangeBlock, pos, newState).isCancelled()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At("HEAD"), cancellable = true)
     private void banner$captureTreeGeneration(BlockPos pos, BlockState state, int flags, int recursionLeft, CallbackInfoReturnable<Boolean> cir) {
         if (this.captureTreeGeneration) {
@@ -344,7 +326,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             return getWorld().getHandle().addEntity(entity, reason);
         } else {
             this.pushAddEntityReason(reason);
-            return this.addFreshEntity(entity);
+            return this.addFreshEntity(entity, reason);
         }
     }
 

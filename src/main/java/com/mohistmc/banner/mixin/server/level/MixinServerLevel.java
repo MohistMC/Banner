@@ -11,6 +11,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.resources.ResourceKey;
@@ -24,6 +25,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.*;
+import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -43,6 +45,7 @@ import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_19_R3.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_19_R3.generator.CustomWorldChunkManager;
 import org.bukkit.craftbukkit.v1_19_R3.util.BlockStateListPopulator;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
 import org.bukkit.craftbukkit.v1_19_R3.util.WorldUUID;
@@ -55,6 +58,7 @@ import org.bukkit.event.world.GenericGameEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.event.world.TimeSkipEvent;
 import org.bukkit.event.world.WorldSaveEvent;
+import org.checkerframework.checker.units.qual.A;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
@@ -71,11 +75,12 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 @Mixin(ServerLevel.class)
-public abstract class MixinServerLevel extends Level implements InjectionServerLevel {
+public abstract class MixinServerLevel extends Level implements WorldGenLevel, InjectionServerLevel {
 
     @Shadow public abstract LevelTicks<Block> getBlockTicks();
 
@@ -92,14 +97,16 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
 
     @Shadow public abstract <T extends ParticleOptions> int sendParticles(T type, double posX, double posY, double posZ, int particleCount, double xOffset, double yOffset, double zOffset, double speed);
 
-    @Shadow public abstract boolean addWithUUID(Entity entity);
-
     @Shadow @Final public PersistentEntitySectionManager<Entity> entityManager;
     @Shadow protected abstract void wakeUpAllPlayers();
 
     @Shadow @Final public static BlockPos END_SPAWN_POINT;
 
     @Shadow public abstract boolean addFreshEntity(Entity entity);
+
+    @Shadow public abstract void addDuringTeleport(Entity entity);
+
+    @Shadow public abstract boolean tryAddFreshEntityWithPassengers(Entity entity);
 
     public LevelStorageSource.LevelStorageAccess convertable;
     public UUID uuid;
@@ -109,7 +116,7 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
     private transient boolean banner$force;
     private transient LightningStrikeEvent.Cause banner$cause;
     private AtomicReference<CreatureSpawnEvent.SpawnReason> banner$reason = new AtomicReference<>();
-    private transient boolean banner$timeSkipCancelled;
+    private AtomicReference<Boolean> banner$timeSkipCancelled = new AtomicReference<>();
 
     protected MixinServerLevel(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean bl, boolean bl2, long l, int i) {
         super(writableLevelData, resourceKey, registryAccess, holder, supplier, bl, bl2, l, i);
@@ -270,6 +277,11 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
         }
     }
 
+    @Inject(method = "addFreshEntity", at = @At("HEAD"))
+    private void banner$addReason(Entity entity, CallbackInfoReturnable<Boolean> cir) {
+        pushAddEntityReason(CreatureSpawnEvent.SpawnReason.DEFAULT);
+    }
+
     @Override
     public boolean addFreshEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
         return addEntity(entity, reason);
@@ -283,12 +295,36 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
     @Override
     public boolean addWithUUID(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
         pushAddEntityReason(reason);
-        return addWithUUID(entity);
+        return this.addEntity(entity, reason);
+    }
+
+    @Redirect(method = "addWithUUID", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    private boolean banner$resetUUID(ServerLevel instance, Entity entity) {
+        return this.addWithUUID(entity, CreatureSpawnEvent.SpawnReason.DEFAULT);
+    }
+
+    @Redirect(method = "addDuringTeleport", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    private boolean banner$cancelDuringTp(ServerLevel instance, Entity entity){
+        return false;
+    }
+
+    @Inject(method = "addDuringTeleport", at = @At("RETURN"))
+    private void banner$resetDuringTp(Entity entity, CallbackInfo ci) {
+        addDuringTeleport(entity, null);
     }
 
     @Override
     public void addDuringTeleport(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
-        addFreshEntity(entity, reason);
+        pushAddEntityReason(reason);
+        addEntity(entity, reason);
+    }
+
+    @Redirect(method = "tryAddFreshEntityWithPassengers", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"))
+    private void banner$cancelTryAdd(ServerLevel instance, Entity entity) {}
+
+    @Inject(method = "tryAddFreshEntityWithPassengers", at = @At("TAIL"), cancellable = true)
+    private void banner$resetTryAdd(Entity entity, CallbackInfoReturnable<Boolean> cir) {
+        cir.setReturnValue(tryAddFreshEntityWithPassengers(entity, CreatureSpawnEvent.SpawnReason.DEFAULT));
     }
 
     @Override
@@ -296,7 +332,8 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
         if (entity.getSelfAndPassengers().map(Entity::getUUID).anyMatch(this.entityManager::isLoaded)) {
             return false;
         }else {
-            return this.addFreshEntity(entity, reason);
+            this.addFreshEntityWithPassengers(entity, reason);
+            return true;
         }
     }
 
@@ -332,7 +369,7 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
     private void banner$timeSkip(ServerLevel world, long time) {
         TimeSkipEvent event = new TimeSkipEvent(this.getWorld(), TimeSkipEvent.SkipReason.NIGHT_SKIP, (time - time % 24000L) - this.getDayTime());
         Bukkit.getPluginManager().callEvent(event);
-        banner$timeSkipCancelled = event.isCancelled();
+        banner$timeSkipCancelled.set(event.isCancelled());
         if (!event.isCancelled()) {
             world.setDayTime(this.getDayTime() + event.getSkipAmount());
         }
@@ -340,10 +377,10 @@ public abstract class MixinServerLevel extends Level implements InjectionServerL
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;wakeUpAllPlayers()V"))
     private void banner$notWakeIfCancelled(ServerLevel world) {
-        if (!banner$timeSkipCancelled) {
+        if (!banner$timeSkipCancelled.get()) {
             this.wakeUpAllPlayers();
         }
-        banner$timeSkipCancelled = false;
+        banner$timeSkipCancelled.set(false);
     }
 
     @ModifyVariable(method = "tickBlock", ordinal = 0, argsOnly = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;tick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/util/RandomSource;)V"))

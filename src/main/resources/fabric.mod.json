@@ -97,6 +97,7 @@
       "net/minecraft/class_3350": ["com/mohistmc/banner/injection/server/rcon/InjectionRconConsoleSource"],
       "net/minecraft/class_3244": ["com/mohistmc/banner/injection/server/network/InjectionServerGamePacketListenerImpl"],
       "net/minecraft/class_3242": ["com/mohistmc/banner/injection/server/network/InjectionServerConnectionListener"],
+      "net/minecraft/class_3248": ["com/mohistmc/banner/injection/server/network/InjectionServerLoginPacketListenerImpl"],
       "net/minecraft/class_52": ["com/mohistmc/banner/injection/world/level/storage/loot/InjectionLootTable"],
       "net/minecraft/class_60": ["com/mohistmc/banner/injection/world/level/storage/loot/InjectionLootTables"],
       "net/minecraft/class_29": ["com/mohistmc/banner/injection/world/level/storage/InjectionPlayerDataStorage"],

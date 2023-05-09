@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.network;
 
+import com.mohistmc.banner.injection.server.network.InjectionServerLoginPacketListenerImpl;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketSendListener;
@@ -21,7 +22,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(ServerLoginPacketListenerImpl.class)
-public abstract class MixinServerLoginPacketListenerImpl {
+public abstract class MixinServerLoginPacketListenerImpl implements InjectionServerLoginPacketListenerImpl {
 
     @Shadow public abstract void disconnect(Component reason);
 
@@ -43,6 +44,7 @@ public abstract class MixinServerLoginPacketListenerImpl {
 
     // CraftBukkit start
     @Deprecated
+    @Override
     public void disconnect(String s) {
         disconnect(Component.literal(s));
     }
