@@ -8,9 +8,11 @@ import net.minecraft.server.ConsoleInput;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.Services;
 import net.minecraft.server.WorldStem;
+import net.minecraft.server.dedicated.DedicatedPlayerList;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
 import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.players.PlayerList;
 import net.minecraft.server.rcon.RconConsoleSource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import org.apache.logging.log4j.LogManager;
@@ -24,7 +26,6 @@ import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.PluginLoadOrder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -33,11 +34,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.net.Proxy;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(DedicatedServer.class)
 public abstract class MixinDedicatedServer extends MinecraftServer {
 
     @Shadow @Final public RconConsoleSource rconConsoleSource;
+
+    private AtomicReference<String> banner$command = new AtomicReference<>();
 
     public MixinDedicatedServer(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Proxy proxy, DataFixer dataFixer, Services services, ChunkProgressListenerFactory chunkProgressListenerFactory) {
         super(thread, levelStorageAccess, packRepository, worldStem, proxy, dataFixer, services, chunkProgressListenerFactory);
@@ -46,9 +50,14 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
     @Inject(method = "initServer", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/dedicated/DedicatedServer;setPlayerList(Lnet/minecraft/server/players/PlayerList;)V"))
     private void banner$initServer(CallbackInfoReturnable<Boolean> cir) {
         BannerServer.LOGGER.info("Loading Bukkit plugins, please wait...");
+        // CraftBukkit start
+        this.setPlayerList(new DedicatedPlayerList(((DedicatedServer) (Object) this), this.registries(), this.playerDataStorage));
         this.bridge$server().loadPlugins();
         this.bridge$server().enablePlugins(PluginLoadOrder.STARTUP);
     }
+
+    @Redirect(method = "initServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/dedicated/DedicatedServer;setPlayerList(Lnet/minecraft/server/players/PlayerList;)V"))
+    private void banner$moveUpPlayerList(DedicatedServer instance, PlayerList playerList) {}
 
     @Inject(method = "initServer",
             at = @At(value = "INVOKE",
@@ -63,7 +72,12 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
             global.removeHandler(handler);
         }
         global.addHandler(new ForwardLogHandler());
-        final org.apache.logging.log4j.Logger logger = LogManager.getRootLogger();
+        final org.apache.logging.log4j.core.Logger logger = ((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger());
+        for (org.apache.logging.log4j.core.Appender appender : logger.getAppenders().values()) {
+            if (appender instanceof org.apache.logging.log4j.core.appender.ConsoleAppender) {
+                logger.removeAppender(appender);
+            }
+        }
 
         System.setOut(IoBuilder.forLogger(logger).setLevel(org.apache.logging.log4j.Level.INFO).buildPrintStream());
         System.setErr(IoBuilder.forLogger(logger).setLevel(org.apache.logging.log4j.Level.WARN).buildPrintStream());
@@ -114,34 +128,25 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         return 0;
     }
 
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    public String runCommand(String command) {
-        this.rconConsoleSource.prepareForCommand();
+    @Inject(method = "runCommand", at = @At("HEAD"))
+    private void banner$getCommandString(String command, CallbackInfoReturnable<String> cir) {
+        banner$command.set(command);
+    }
+
+    @Redirect(method = "runCommand", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/dedicated/DedicatedServer;executeBlocking(Ljava/lang/Runnable;)V"))
+    private void banner$callCommandEvent(DedicatedServer instance, Runnable runnable) {
         this.executeBlocking(() -> {
-            RemoteServerCommandEvent event = new RemoteServerCommandEvent(bridge$remoteConsole(), command);
+            RemoteServerCommandEvent event = new RemoteServerCommandEvent(bridge$remoteConsole(), banner$command.get());
             Bukkit.getPluginManager().callEvent(event);
             if (event.isCancelled()) {
                 return;
             }
             this.bridge$server().dispatchServerCommand(bridge$remoteConsole(), new ConsoleInput(event.getCommand(), this.rconConsoleSource.createCommandSourceStack()));
         });
-        return this.rconConsoleSource.getCommandResponse();
     }
 
     @Inject(method = "onServerExit", at = @At("RETURN"))
     public void banner$exitNow(CallbackInfo ci) {
-        new Thread(() -> {
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException ignored) {
-            } finally {
-                Runtime.getRuntime().halt(0);
-            }
-        }, "Exit Thread").start();
         System.exit(0);
     }
 
