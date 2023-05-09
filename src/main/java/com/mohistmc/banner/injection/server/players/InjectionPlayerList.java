@@ -26,7 +26,7 @@ public interface InjectionPlayerList {
         return null;
     }
 
-    default ServerPlayer canPlayerLogin( ServerLoginPacketListenerImpl handler, GameProfile gameProfile) {
+    default ServerPlayer canPlayerLogin(SocketAddress socketAddress, GameProfile gameProfile, ServerLoginPacketListenerImpl handler) {
         return null;
     }
 

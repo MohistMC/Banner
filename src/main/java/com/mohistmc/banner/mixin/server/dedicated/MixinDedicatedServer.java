@@ -8,11 +8,9 @@ import net.minecraft.server.ConsoleInput;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.Services;
 import net.minecraft.server.WorldStem;
-import net.minecraft.server.dedicated.DedicatedPlayerList;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
 import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.server.players.PlayerList;
 import net.minecraft.server.rcon.RconConsoleSource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import org.apache.logging.log4j.LogManager;
@@ -68,12 +66,7 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
             global.removeHandler(handler);
         }
         global.addHandler(new ForwardLogHandler());
-        final org.apache.logging.log4j.core.Logger logger = ((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger());
-        for (org.apache.logging.log4j.core.Appender appender : logger.getAppenders().values()) {
-            if (appender instanceof org.apache.logging.log4j.core.appender.ConsoleAppender) {
-                logger.removeAppender(appender);
-            }
-        }
+        final org.apache.logging.log4j.Logger logger = LogManager.getRootLogger();
 
         System.setOut(IoBuilder.forLogger(logger).setLevel(org.apache.logging.log4j.Level.INFO).buildPrintStream());
         System.setErr(IoBuilder.forLogger(logger).setLevel(org.apache.logging.log4j.Level.WARN).buildPrintStream());
