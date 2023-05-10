@@ -131,6 +131,11 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         Main.handleParser(parser, options);
         this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
         this.worldLoader = BukkitCaptures.getDataLoadContext();
+        // Try to see if we're actually running in a terminal, disable jline if not
+        if (System.console() == null && System.getProperty("jline.terminal") == null) {
+            System.setProperty("jline.terminal", "jline.UnsupportedTerminal");
+            org.bukkit.craftbukkit.Main.useJline = false;
+        }
     }
 
     @Inject(method = "stopServer", at = @At(value = "INVOKE", remap = false, ordinal = 0, shift = At.Shift.AFTER, target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V"))
