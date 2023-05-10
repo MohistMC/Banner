@@ -1,10 +1,19 @@
 package org.bukkit.craftbukkit;
 
 import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import joptsimple.util.PathConverter;
+import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
+import org.fusesource.jansi.AnsiConsole;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static java.util.Arrays.asList;
 
@@ -129,5 +138,73 @@ public class Main extends OptionParser {
                 .describedAs("Yml file");
 
         allowsUnrecognizedOptions();
+    }
+
+    public static void handleParser(OptionParser parser, OptionSet options) {
+        if ((options == null) || (options.has("?"))) {
+            try {
+                parser.printHelpOn(System.out);
+            } catch (IOException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else if (options.has("v")) {
+            System.out.println(CraftServer.class.getPackage().getImplementationVersion());
+        } else {
+            // Do you love Java using + and ! as string based identifiers? I sure do!
+            String path = new File(".").getAbsolutePath();
+            if (path.contains("!") || path.contains("+")) {
+                System.err.println("Cannot run server in a directory with ! or + in the pathname. Please rename the affected folders and try again.");
+                return;
+            }
+
+            float javaVersion = Float.parseFloat(System.getProperty("java.class.version"));
+            if (javaVersion < 61.0) {
+                System.err.println("Unsupported Java detected (" + javaVersion + "). This version of Minecraft requires at least Java 17. Check your Java version with the command 'java -version'.");
+                return;
+            }
+            if (javaVersion > 63) {
+                System.err.println("Unsupported Java detected (" + javaVersion + "). Only up to Java 19 is supported.");
+                return;
+            }
+
+            try {
+                // This trick bypasses Maven Shade's clever rewriting of our getProperty call when using String literals
+                String jline_UnsupportedTerminal = new String(new char[]{'j', 'l', 'i', 'n', 'e', '.', 'U', 'n', 's', 'u', 'p', 'p', 'o', 'r', 't', 'e', 'd', 'T', 'e', 'r', 'm', 'i', 'n', 'a', 'l'});
+                String jline_terminal = new String(new char[]{'j', 'l', 'i', 'n', 'e', '.', 't', 'e', 'r', 'm', 'i', 'n', 'a', 'l'});
+
+                Main.useJline = !(jline_UnsupportedTerminal).equals(System.getProperty(jline_terminal));
+
+                if (options.has("nojline")) {
+                    System.setProperty("user.language", "en");
+                    Main.useJline = false;
+                }
+
+                if (Main.useJline) {
+                    AnsiConsole.systemInstall();
+                } else {
+                    // This ensures the terminal literal will always match the jline implementation
+                    System.setProperty(jline.TerminalFactory.JLINE_TERMINAL, jline.UnsupportedTerminal.class.getName());
+                }
+
+                if (options.has("noconsole")) {
+                    Main.useConsole = false;
+                }
+
+                if (Main.class.getPackage().getImplementationVendor() != null && System.getProperty("IReallyKnowWhatIAmDoingISwear") == null) {
+                    Date buildDate = new Date(Integer.parseInt(Main.class.getPackage().getImplementationVendor()) * 1000L);
+
+                    Calendar deadline = Calendar.getInstance();
+                    deadline.add(Calendar.DAY_OF_YEAR, -28);
+                    if (buildDate.before(deadline.getTime())) {
+                        System.err.println("*** Error, this build is outdated ***");
+                        System.err.println("*** Please download a new build as per instructions from https://www.spigotmc.org/go/outdated-spigot ***");
+                        System.err.println("*** Server will start in 20 seconds ***");
+                        Thread.sleep(TimeUnit.SECONDS.toMillis(20));
+                    }
+                }
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
     }
 }

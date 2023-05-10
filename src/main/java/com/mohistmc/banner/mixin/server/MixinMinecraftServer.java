@@ -56,7 +56,6 @@ import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.PluginLoadOrder;
-import org.fusesource.jansi.AnsiConsole;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -68,13 +67,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.Proxy;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -132,75 +128,9 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         } catch (Exception ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, ex.getLocalizedMessage());
         }
-
-        if ((options == null) || (options.has("?"))) {
-            try {
-                parser.printHelpOn(System.out);
-            } catch (IOException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else if (options.has("v")) {
-            System.out.println(CraftServer.class.getPackage().getImplementationVersion());
-        } else {
-            // Do you love Java using + and ! as string based identifiers? I sure do!
-            String path = new File(".").getAbsolutePath();
-            if (path.contains("!") || path.contains("+")) {
-                System.err.println("Cannot run server in a directory with ! or + in the pathname. Please rename the affected folders and try again.");
-                return;
-            }
-
-            float javaVersion = Float.parseFloat(System.getProperty("java.class.version"));
-            if (javaVersion < 61.0) {
-                System.err.println("Unsupported Java detected (" + javaVersion + "). This version of Minecraft requires at least Java 17. Check your Java version with the command 'java -version'.");
-                return;
-            }
-            if (javaVersion > 63) {
-                System.err.println("Unsupported Java detected (" + javaVersion + "). Only up to Java 19 is supported.");
-                return;
-            }
-
-            try {
-                // This trick bypasses Maven Shade's clever rewriting of our getProperty call when using String literals
-                String jline_UnsupportedTerminal = new String(new char[]{'j', 'l', 'i', 'n', 'e', '.', 'U', 'n', 's', 'u', 'p', 'p', 'o', 'r', 't', 'e', 'd', 'T', 'e', 'r', 'm', 'i', 'n', 'a', 'l'});
-                String jline_terminal = new String(new char[]{'j', 'l', 'i', 'n', 'e', '.', 't', 'e', 'r', 'm', 'i', 'n', 'a', 'l'});
-
-                Main.useJline = !(jline_UnsupportedTerminal).equals(System.getProperty(jline_terminal));
-
-                if (options.has("nojline")) {
-                    System.setProperty("user.language", "en");
-                    Main.useJline = false;
-                }
-
-                if (Main.useJline) {
-                    AnsiConsole.systemInstall();
-                } else {
-                    // This ensures the terminal literal will always match the jline implementation
-                    System.setProperty(jline.TerminalFactory.JLINE_TERMINAL, jline.UnsupportedTerminal.class.getName());
-                }
-
-                if (options.has("noconsole")) {
-                    Main.useConsole = false;
-                }
-
-                if (Main.class.getPackage().getImplementationVendor() != null && System.getProperty("IReallyKnowWhatIAmDoingISwear") == null) {
-                    Date buildDate = new Date(Integer.parseInt(Main.class.getPackage().getImplementationVendor()) * 1000L);
-
-                    Calendar deadline = Calendar.getInstance();
-                    deadline.add(Calendar.DAY_OF_YEAR, -28);
-                    if (buildDate.before(deadline.getTime())) {
-                        System.err.println("*** Error, this build is outdated ***");
-                        System.err.println("*** Please download a new build as per instructions from https://www.spigotmc.org/go/outdated-spigot ***");
-                        System.err.println("*** Server will start in 20 seconds ***");
-                        Thread.sleep(TimeUnit.SECONDS.toMillis(20));
-                    }
-                }
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-
-            this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
-            this.worldLoader = BukkitCaptures.getDataLoadContext();
-        }
+        Main.handleParser(parser, options);
+        this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
+        this.worldLoader = BukkitCaptures.getDataLoadContext();
     }
 
     @Inject(method = "stopServer", at = @At(value = "INVOKE", remap = false, ordinal = 0, shift = At.Shift.AFTER, target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V"))
@@ -298,7 +228,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         this.server.enablePlugins(PluginLoadOrder.POSTWORLD);
         this.server.getPluginManager().callEvent(new ServerLoadEvent(ServerLoadEvent.LoadType.STARTUP));
         for (ServerLevel worldserver : ((MinecraftServer)(Object)this).getAllLevels()) {
-            this.prepareLevels(worldserver.getChunkSource().chunkMap.progressListener, worldserver);
             worldserver.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API
             this.server.getPluginManager().callEvent(new WorldLoadEvent(worldserver.getWorld()));
             this.connection.acceptConnections();
@@ -365,25 +294,21 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Override
     public void prepareLevels(ChunkProgressListener listener, ServerLevel serverWorld) {
-        if (!serverWorld.getWorld().getKeepSpawnInMemory()) {
-            return;
-        }
-        this.forceTicks = true;
-        LOGGER.info("Preparing start region for dimension {}", serverWorld.dimension().location());
-        BlockPos blockpos = serverWorld.getSharedSpawnPos();
-        listener.updateSpawnPos(new ChunkPos(blockpos));
         ServerChunkCache serverchunkprovider = serverWorld.getChunkSource();
-        serverchunkprovider.getLightEngine().setTaskPerBatch(500);
-        this.nextTickTime = Util.getMillis();
-        serverchunkprovider.addRegionTicket(TicketType.START, new ChunkPos(blockpos), 11, Unit.INSTANCE);
+        this.forceTicks = true;
+        if (serverWorld.getWorld().getKeepSpawnInMemory()) {
+            LOGGER.info("Preparing start region for dimension {}", serverWorld.dimension().location());
+            BlockPos blockpos = serverWorld.getSharedSpawnPos();
+            listener.updateSpawnPos(new ChunkPos(blockpos));
+            this.nextTickTime = Util.getMillis();
+            serverchunkprovider.addRegionTicket(TicketType.START, new ChunkPos(blockpos), 11, Unit.INSTANCE);
 
-        while (serverchunkprovider.getTickingGenerated() < 441) {
-            this.executeModerately();
+            while (serverchunkprovider.getTickingGenerated() < 441) {
+                this.executeModerately();
+            }
         }
-
-        this.executeModerately();
-
         ForcedChunksSavedData forcedchunkssavedata = serverWorld.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
+
         if (forcedchunkssavedata != null) {
             LongIterator longiterator = forcedchunkssavedata.getChunks().iterator();
 
@@ -393,8 +318,11 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                 serverWorld.getChunkSource().updateChunkForced(chunkpos, true);
             }
         }
+
         this.executeModerately();
-        listener.stop();
+        if (serverWorld.getWorld().getKeepSpawnInMemory()) {
+            listener.stop();
+        }
         serverchunkprovider.getLightEngine().setTaskPerBatch(5);
         serverWorld.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
         this.forceTicks = false;
