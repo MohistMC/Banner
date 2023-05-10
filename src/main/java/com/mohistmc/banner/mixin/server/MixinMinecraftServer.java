@@ -269,12 +269,13 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Override
     public void initWorld(ServerLevel serverWorld, ServerLevelData worldInfo, WorldData saveData, WorldOptions worldOptions) {
-        boolean flag = saveData.isDebugWorld();
+        //boolean flag = saveData.isDebugWorld();
         if ((serverWorld.bridge$generator() != null)) {
             serverWorld.getWorld().getPopulators().addAll(
-                    (serverWorld.bridge$generator().getDefaultPopulators(
-                            (serverWorld.getWorld()))));
+                    serverWorld.bridge$generator().getDefaultPopulators(
+                            (serverWorld.getWorld())));
         }
+        /**
         WorldBorder worldborder = serverWorld.getWorldBorder();
         worldborder.applySettings(worldInfo.getWorldBorder());
         if (!worldInfo.isInitialized()) {
@@ -294,11 +295,12 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                 throw new ReportedException(crashreport);
             }
             worldInfo.setInitialized(true);
-        }
+        }*/
     }
 
     @Override
     public void prepareLevels(ChunkProgressListener listener, ServerLevel serverWorld) {
+        /**
         ServerChunkCache serverchunkprovider = serverWorld.getChunkSource();
         this.forceTicks = true;
         if (serverWorld.getWorld().getKeepSpawnInMemory()) {
@@ -329,8 +331,9 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             listener.stop();
         }
         serverchunkprovider.getLightEngine().setTaskPerBatch(5);
-        serverWorld.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
+        //serverWorld.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
         this.forceTicks = false;
+        */
     }
 
     @Override
