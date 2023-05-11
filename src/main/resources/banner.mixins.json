@@ -469,7 +469,7 @@
     "world.level.chunk.storage.MixinRegionFileStorage",
     "world.level.entity.MixinPersistentEntitySectionManager",
     "world.level.gameevent.MixinGameEventDispatcher",
-    "world.level.gameevent.vibrations.MixinVibrationListener",
+    "world.level.gameevent.vibrations.MixinVibrationSystem_Listener",
     "world.level.levelgen.MixinPatrolSpawner",
     "world.level.levelgen.MixinPhantomSpawner",
     "world.level.levelgen.MixinWanderingTraderSpawner",

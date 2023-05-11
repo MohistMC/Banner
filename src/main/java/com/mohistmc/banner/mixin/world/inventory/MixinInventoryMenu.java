@@ -20,7 +20,7 @@ public abstract class MixinInventoryMenu extends RecipeBookMenu<CraftingContaine
 
 
     // @formatter:off
-    @Shadow @Final private CraftingContainer craftSlots = new TransientCraftingContainer(this, 2, 2);
+    @Shadow @Final private CraftingContainer craftSlots;
     @Shadow @Final private ResultContainer resultSlots;
     // @formatter:on
 
@@ -35,8 +35,10 @@ public abstract class MixinInventoryMenu extends RecipeBookMenu<CraftingContaine
     public void banner$init(Inventory playerInventory, boolean localWorld, Player playerIn, CallbackInfo ci) {
         this.playerInventory = playerInventory;
          this.craftSlots.setOwner(playerInventory.player.getBukkitEntity());
-         this.craftSlots.bridge$setResultInventory(this.resultSlots);
-        this.setTitle(Component.translatable("container.crafting"));
+         if (craftSlots instanceof TransientCraftingContainer craftingContainer) {
+             craftingContainer.bridge$setResultInventory(this.resultSlots);
+         }
+         this.setTitle(Component.translatable("container.crafting"));
     }
 
     @Inject(method = "slotsChanged", at = @At("HEAD"))

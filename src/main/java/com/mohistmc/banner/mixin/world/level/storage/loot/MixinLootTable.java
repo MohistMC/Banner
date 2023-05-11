@@ -49,6 +49,7 @@ public abstract class MixinLootTable implements InjectionLootTable {
         } else {
             return event.getLoot().stream().map(CraftItemStack::asNMSCopy).collect(ObjectArrayList.toList());
         }*/
+        return list;
     }
 
     @Override

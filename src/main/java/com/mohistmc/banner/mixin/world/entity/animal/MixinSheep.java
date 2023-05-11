@@ -4,6 +4,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.ResultContainer;
+import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.Level;
 import org.bukkit.Bukkit;
@@ -44,6 +45,8 @@ public abstract class MixinSheep extends Animal {
 
     @Inject(method = "makeContainer", locals = LocalCapture.CAPTURE_FAILHARD, at = @At("RETURN"))
     private static void banner$resultInv(DyeColor color, DyeColor color1, CallbackInfoReturnable<CraftingContainer> cir, CraftingContainer craftingInventory) {
-         craftingInventory.bridge$setResultInventory(new ResultContainer());
+         if (craftingInventory instanceof TransientCraftingContainer craftingContainer) {
+             craftingContainer.bridge$setResultInventory(new ResultContainer());
+         }
     }
 }

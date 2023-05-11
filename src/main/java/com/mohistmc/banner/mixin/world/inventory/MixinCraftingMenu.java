@@ -29,14 +29,13 @@ import java.util.Optional;
 public abstract class MixinCraftingMenu extends RecipeBookMenu<CraftingContainer> {
 
     // @formatter:off
-    @Mutable @Shadow @Final private CraftingContainer craftSlots;
     @Shadow @Final private ResultContainer resultSlots;
+
+    @Shadow @Final public CraftingContainer craftSlots;
 
     public MixinCraftingMenu(MenuType<?> menuType, int i) {
         super(menuType, i);
     }
-
-    @Accessor("access") public abstract ContainerLevelAccess bridge$getWorldPos();
     // @formatter:on
 
     private CraftInventoryView bukkitEntity;
@@ -68,7 +67,9 @@ public abstract class MixinCraftingMenu extends RecipeBookMenu<CraftingContainer
     @Inject(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V", at = @At("RETURN"))
     public void banner$init(int i, Inventory playerInventory, ContainerLevelAccess callable, CallbackInfo ci) {
          this.craftSlots.setOwner(playerInventory.getOwner());
-         this.craftSlots.bridge$setResultInventory(this.resultSlots);
+         if (this.craftSlots instanceof TransientCraftingContainer craftingContainer) {
+             craftingContainer.bridge$setResultInventory(this.resultSlots);
+         }
          this.playerInventory = playerInventory;
     }
 
