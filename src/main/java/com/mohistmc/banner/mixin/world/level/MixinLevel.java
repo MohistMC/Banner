@@ -1,7 +1,5 @@
 package com.mohistmc.banner.mixin.world.level;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import com.mohistmc.banner.injection.world.level.InjectionLevel;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
@@ -25,7 +23,6 @@ import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WritableLevelData;
@@ -35,7 +32,6 @@ import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.block.CapturedBlockState;
 import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_19_R3.generator.CraftWorldInfo;
 import org.bukkit.craftbukkit.v1_19_R3.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.v1_19_R3.generator.CustomWorldChunkManager;
@@ -100,7 +96,6 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     protected org.bukkit.generator.BiomeProvider biomeProvider;
 
     private final AtomicReference<Boolean> banner$validate = new AtomicReference<>();
-    private AtomicReference<Integer> banner$flag = new AtomicReference<>();
 
     public void banner$constructor(WritableLevelData worldInfo, ResourceKey<Level> dimension, RegistryAccess registryAccess, final Holder<DimensionType> dimensionType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdate) {
         throw new RuntimeException();
@@ -167,7 +162,6 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
 
     @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At("HEAD"), cancellable = true)
     private void banner$captureTreeGeneration(BlockPos pos, BlockState state, int flags, int recursionLeft, CallbackInfoReturnable<Boolean> cir) {
-        banner$flag.set(flags);
         if (this.captureTreeGeneration) {
             CapturedBlockState blockstate = capturedBlockStates.get(pos);
             if (blockstate == null) {
@@ -220,11 +214,6 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         if (!this.captureBlockStates) { // Don't notify clients or update physics while capturing blockstates
             notifyAndUpdatePhysics(pos, this.getChunkAt(pos), banner$blockState, this.getBlockState(pos), this.getBlockState(pos), flags, recursionLeft);
         }
-    }
-
-    @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/LevelChunk;setBlockState(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;"))
-    private BlockState banner$noFlagSet(LevelChunk instance, BlockPos pos, BlockState state, boolean isMoving) {
-        return instance.setBlockState(pos, state, (banner$flag.get() & 64) != 0, (banner$flag.get() & 1024) == 0); // CraftBukkit custom NO_PLACE flag
     }
 
     @Inject(method = "getBlockState", at = @At("HEAD"), cancellable = true)
