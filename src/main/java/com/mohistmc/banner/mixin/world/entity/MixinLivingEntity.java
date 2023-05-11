@@ -208,15 +208,15 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         double banner$d = Math.min((double)(0.2F + banner$f / 15.0F), 2.5);
         int banner$i = (int)(150.0 * banner$d);
         if (((LivingEntity) (Object) this) instanceof ServerPlayer) {
-            return ((ServerLevel) this.level).sendParticles((ServerPlayer) (Object) this, new BlockParticleOption(ParticleTypes.BLOCK, banner$FallState.get()), this.getX(), this.getY(), this.getZ(), banner$i, 0.0D, 0.0D, 0.0D, 0.15000000596046448D, false);
+            return ((ServerLevel) this.level()).sendParticles((ServerPlayer) (Object) this, new BlockParticleOption(ParticleTypes.BLOCK, banner$FallState.get()), this.getX(), this.getY(), this.getZ(), banner$i, 0.0D, 0.0D, 0.0D, 0.15000000596046448D, false);
         } else {
-            return ((ServerLevel) this.level).sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, banner$FallState.get()), this.getX(), this.getY(), this.getZ(), banner$i, 0.0D, 0.0D, 0.0D, 0.15000000596046448D);
+            return ((ServerLevel) this.level()).sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, banner$FallState.get()), this.getX(), this.getY(), this.getZ(), banner$i, 0.0D, 0.0D, 0.0D, 0.15000000596046448D);
         }
     }
 
     @ModifyExpressionValue(method = "onEquipItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isClientSide()Z"))
     private boolean banner$addSilentCheck(EquipmentSlot equipmentSlot, ItemStack itemStack, ItemStack itemStack2, CallbackInfo ci) {
-        return !this.level.isClientSide() && !banner$silent.get();
+        return !this.level().isClientSide() && !banner$silent.get();
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("HEAD"))
@@ -269,7 +269,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
                 if (!effectinstance.tick((LivingEntity) (Object) this, () -> {
                     onEffectUpdated(effectinstance, true, null);
                 })) {
-                    if (!this.level.isClientSide) {
+                    if (!this.level().isClientSide) {
 
                         EntityPotionEffectEvent event = CraftEventFactory.callEntityPotionEffectChangeEvent((LivingEntity) (Object) this, effectinstance, null, EntityPotionEffectEvent.Cause.EXPIRATION);
                         if (event.isCancelled()) {
@@ -299,7 +299,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         effectsToProcess.clear();
 
         if (this.effectsDirty) {
-            if (!this.level.isClientSide) {
+            if (!this.level().isClientSide) {
                 this.updateInvisibilityStatus();
             }
 
@@ -324,7 +324,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
                 double d0 = (double) (i >> 16 & 255) / 255.0D;
                 double d1 = (double) (i >> 8 & 255) / 255.0D;
                 double d2 = (double) (i >> 0 & 255) / 255.0D;
-                this.level.addParticle(flag1 ? ParticleTypes.AMBIENT_ENTITY_EFFECT : ParticleTypes.ENTITY_EFFECT, this.getX() + (this.random.nextDouble() - 0.5D) * (double) this.getBbWidth(), this.getY() + this.random.nextDouble() * (double) this.getBbHeight(), this.getZ() + (this.random.nextDouble() - 0.5D) * (double) this.getBbWidth(), d0, d1, d2);
+                this.level().addParticle(flag1 ? ParticleTypes.AMBIENT_ENTITY_EFFECT : ParticleTypes.ENTITY_EFFECT, this.getX() + (this.random.nextDouble() - 0.5D) * (double) this.getBbWidth(), this.getY() + this.random.nextDouble() * (double) this.getBbHeight(), this.getZ() + (this.random.nextDouble() - 0.5D) * (double) this.getBbWidth(), d0, d1, d2);
             }
         }
     }
@@ -398,7 +398,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
 
     @Override
     public int getExpReward() {
-        if (this.level instanceof ServerLevel && !this.wasExperienceConsumed() && (this.isAlwaysExperienceDropper() || this.lastHurtByPlayerTime > 0 && this.shouldDropExperience() && this.level.getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT))) {
+        if (this.level() instanceof ServerLevel && !this.wasExperienceConsumed() && (this.isAlwaysExperienceDropper() || this.lastHurtByPlayerTime > 0 && this.shouldDropExperience() && this.level().getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT))) {
             int exp = this.getExperienceReward();
             return exp;
         } else {
@@ -498,7 +498,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
 
             // Apply blocking code // PAIL: steal from above
             if (event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0) {
-                this.level.broadcastEntityEvent((Entity) (Object) this, (byte) 29); // SPIGOT-4635 - shield damage sound
+                this.level().broadcastEntityEvent((Entity) (Object) this, (byte) 29); // SPIGOT-4635 - shield damage sound
                 if (shieldTakesDamage) {
                     this.hurtCurrentlyUsedShield((float) -event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING));
                 }
@@ -655,7 +655,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
                 pushEffectCause(EntityPotionEffectEvent.Cause.TOTEM);
                 this.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 100, 1), EntityPotionEffectEvent.Cause.TOTEM);
                 this.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 800, 1), EntityPotionEffectEvent.Cause.TOTEM);
-                this.level.broadcastEntityEvent((Entity) (Object) this, (byte) 35);
+                this.level().broadcastEntityEvent((Entity) (Object) this, (byte) 35);
             }
             return !event.isCancelled();
         }
@@ -735,8 +735,8 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     @Eject(method = "randomTeleport", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/world/entity/LivingEntity;teleportTo(DDD)V"))
     private void banner$entityTeleport(LivingEntity entity, double x, double y, double z, CallbackInfoReturnable<
             Boolean> cir) {
-        EntityTeleportEvent event = new EntityTeleportEvent(getBukkitEntity(), new Location(this.level.getWorld(), this.getX(), this.getY(), this.getZ()),
-                new Location(this.level.getWorld(), x, y, z));
+        EntityTeleportEvent event = new EntityTeleportEvent(getBukkitEntity(), new Location(this.level().getWorld(), this.getX(), this.getY(), this.getZ()),
+                new Location(this.level().getWorld(), x, y, z));
         Bukkit.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
             this.teleportTo(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
@@ -776,8 +776,8 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         if (!flag && !ItemStack.isSameItemSameTags(oldItem, newItem) && !this.firstTick) {
             Equipable equipable = Equipable.get(newItem);
             if (equipable != null && !this.isSpectator() && equipable.getEquipmentSlot() == slot) {
-                if (!this.level.isClientSide() && !this.isSilent() && !silent) {
-                    this.level.playSound(null, this.getX(), this.getY(), this.getZ(), equipable.getEquipSound(), this.getSoundSource(), 1.0F, 1.0F);
+                if (!this.level().isClientSide() && !this.isSilent() && !silent) {
+                    this.level().playSound(null, this.getX(), this.getY(), this.getZ(), equipable.getEquipSound(), this.getSoundSource(), 1.0F, 1.0F);
                 }
 
                 if (this.doesEmitEquipEvent(slot)) {

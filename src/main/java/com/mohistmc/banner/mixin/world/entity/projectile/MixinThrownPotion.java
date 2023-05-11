@@ -55,7 +55,7 @@ public abstract class MixinThrownPotion extends ThrowableItemProjectile {
     @Overwrite
     private void applySplash(List<MobEffectInstance> list, @Nullable Entity entity) {
         AABB axisalignedbb = this.getBoundingBox().inflate(4.0, 2.0, 4.0);
-        List<LivingEntity> list2 = this.level.getEntitiesOfClass(LivingEntity.class, axisalignedbb);
+        List<LivingEntity> list2 = this.level().getEntitiesOfClass(LivingEntity.class, axisalignedbb);
         Map<org.bukkit.entity.LivingEntity, Double> affected = new HashMap<>();
         if (!list2.isEmpty()) {
             for (LivingEntity entityliving : list2) {
@@ -82,7 +82,7 @@ public abstract class MixinThrownPotion extends ThrowableItemProjectile {
                 double d2 = event.getIntensity(victim);
                 for (MobEffectInstance mobeffect : list) {
                     MobEffect mobeffectlist = mobeffect.getEffect();
-                    if (!this.level.bridge$pvpMode() && this.getOwner() instanceof ServerPlayer && entityliving2 instanceof ServerPlayer && entityliving2 != this.getOwner()) {
+                    if (!this.level().bridge$pvpMode() && this.getOwner() instanceof ServerPlayer && entityliving2 instanceof ServerPlayer && entityliving2 != this.getOwner()) {
                         int i = MobEffect.getId(mobeffectlist);
                         if (i == 2 || i == 4 || i == 7 || i == 15 || i == 17 || i == 18) {
                             continue;

@@ -24,7 +24,7 @@ public abstract class MixinSitWhenOrderedToGoal extends Goal {
             return this.mob.isOrderedToSit() && this.mob.getTarget() == null; // CraftBukkit - Allow sitting for wild animals
         } else if (this.mob.isInWaterOrBubble()) {
             return false;
-        } else if (!this.mob.isOnGround()) {
+        } else if (!this.mob.onGround()) {
             return false;
         } else {
             LivingEntity livingEntity = this.mob.getOwner();

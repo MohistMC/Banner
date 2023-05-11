@@ -40,7 +40,7 @@ public abstract class MixinWitherSkull extends AbstractHurtingProjectile {
         ExplosionPrimeEvent event = new ExplosionPrimeEvent(this.getBukkitEntity(), explosionRadius, causesFire);
         Bukkit.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            return this.level.explode((WitherSkull) (Object) this, xIn, yIn, zIn, event.getRadius(), event.getFire(), interaction);
+            return this.level().explode((WitherSkull) (Object) this, xIn, yIn, zIn, event.getRadius(), event.getFire(), interaction);
         }
         return null;
     }

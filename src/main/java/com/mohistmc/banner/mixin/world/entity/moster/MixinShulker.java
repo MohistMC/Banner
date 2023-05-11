@@ -50,12 +50,12 @@ public abstract class MixinShulker extends AbstractGolem {
 
             for(int i = 0; i < 5; ++i) {
                 BlockPos blockPos2 = blockPos.offset(Mth.randomBetweenInclusive(this.random, -8, 8), Mth.randomBetweenInclusive(this.random, -8, 8), Mth.randomBetweenInclusive(this.random, -8, 8));
-                if (blockPos2.getY() > this.level.getMinBuildHeight() && this.level.isEmptyBlock(blockPos2) && this.level.getWorldBorder().isWithinBounds(blockPos2) && this.level.noCollision(this, (new AABB(blockPos2)).deflate(1.0E-6))) {
+                if (blockPos2.getY() > this.level().getMinBuildHeight() && this.level().isEmptyBlock(blockPos2) && this.level().getWorldBorder().isWithinBounds(blockPos2) && this.level().noCollision(this, (new AABB(blockPos2)).deflate(1.0E-6))) {
                     Direction direction = this.findAttachableSurface(blockPos2);
                     if (direction != null) {
                         // CraftBukkit start
-                        EntityTeleportEvent teleport = new EntityTeleportEvent(this.getBukkitEntity(), this.getBukkitEntity().getLocation(), CraftLocation.toBukkit(blockPos2, this.level.getWorld()));
-                        this.level.getCraftServer().getPluginManager().callEvent(teleport);
+                        EntityTeleportEvent teleport = new EntityTeleportEvent(this.getBukkitEntity(), this.getBukkitEntity().getLocation(), CraftLocation.toBukkit(blockPos2, this.level().getWorld()));
+                        this.level().getCraftServer().getPluginManager().callEvent(teleport);
                         if (!teleport.isCancelled()) {
                             Location to = teleport.getTo();
                             blockPos2 = BlockPos.containing(to.getX(), to.getY(), to.getZ());
@@ -67,7 +67,7 @@ public abstract class MixinShulker extends AbstractGolem {
                         this.setAttachFace(direction);
                         this.playSound(SoundEvents.SHULKER_TELEPORT, 1.0F, 1.0F);
                         this.setPos((double)blockPos2.getX() + 0.5, (double)blockPos2.getY(), (double)blockPos2.getZ() + 0.5);
-                        this.level.gameEvent(GameEvent.TELEPORT, blockPos, GameEvent.Context.of(this));
+                        this.level().gameEvent(GameEvent.TELEPORT, blockPos, GameEvent.Context.of(this));
                         this.entityData.set(DATA_PEEK_ID, (byte)0);
                         this.setTarget((LivingEntity)null);
                         return true;
@@ -83,6 +83,6 @@ public abstract class MixinShulker extends AbstractGolem {
 
     @Inject(method = "hitByShulkerBullet", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
     private void banner$breedCause(CallbackInfo ci) {
-         this.level.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.BREEDING);
+         this.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.BREEDING);
     }
 }

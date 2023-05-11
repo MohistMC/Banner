@@ -54,13 +54,13 @@ public abstract class MixinCreeper extends Monster implements PowerableMob {
      */
     @Overwrite
     public final void explodeCreeper() {
-        if (!this.level.isClientSide) {
+        if (!this.level().isClientSide) {
             final float f = this.isPowered() ? 2.0f : 1.0f;
             final ExplosionPrimeEvent event = new ExplosionPrimeEvent(this.getBukkitEntity(), this.explosionRadius * f, false);
             Bukkit.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 this.dead = true;
-                this.level.explode((Creeper) (Object) this, this.getX(), this.getY(), this.getZ(), event.getRadius(), event.getFire(), Level.ExplosionInteraction.MOB);
+                this.level().explode((Creeper) (Object) this, this.getX(), this.getY(), this.getZ(), event.getRadius(), event.getFire(), Level.ExplosionInteraction.MOB);
                 this.discard();
                 this.spawnLingeringCloud();
             } else {
@@ -72,7 +72,7 @@ public abstract class MixinCreeper extends Monster implements PowerableMob {
     @Inject(method = "spawnLingeringCloud", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
     private void banner$creeperCloud(CallbackInfo ci, Collection<MobEffectInstance> collection, AreaEffectCloud areaeffectcloudentity) {
         areaeffectcloudentity.setOwner((Creeper) (Object) this);
-         this.level.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.EXPLOSION);
+         this.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.EXPLOSION);
     }
 
     public void setPowered(boolean power) {

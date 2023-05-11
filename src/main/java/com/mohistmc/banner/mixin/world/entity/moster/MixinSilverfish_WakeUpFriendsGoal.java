@@ -31,7 +31,7 @@ public abstract class MixinSilverfish_WakeUpFriendsGoal extends Goal {
     public void tick() {
         --this.lookForFriends;
         if (this.lookForFriends <= 0) {
-            Level level = this.silverfish.level;
+            Level level = this.silverfish.level();
             RandomSource randomSource = this.silverfish.getRandom();
             BlockPos blockPos = this.silverfish.blockPosition();
 

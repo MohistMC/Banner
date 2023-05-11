@@ -19,7 +19,6 @@ import java.util.List;
 @Mixin(MobEffectUtil.class)
 public class MixinMobEffectUtil {
 
-    /**
     @Inject(method = "addEffectToPlayersAround", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Ljava/util/List;forEach(Ljava/util/function/Consumer;)V"))
     private static void banner$pushCause(ServerLevel level, Entity source, Vec3 pos, double radius, MobEffectInstance effect, int durate, CallbackInfoReturnable<List<ServerPlayer>> cir, int duration, MobEffect mobEffect, List<ServerPlayer> list) {
         var cause = BukkitCaptures.getEffectCause();
@@ -28,5 +27,5 @@ public class MixinMobEffectUtil {
                  player.pushEffectCause(cause);
             }
         }
-    }*/
+    }
 }

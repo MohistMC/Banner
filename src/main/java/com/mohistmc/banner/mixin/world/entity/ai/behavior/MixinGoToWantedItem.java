@@ -32,7 +32,7 @@ public class MixinGoToWantedItem {
             return instance.group(instance.registered(MemoryModuleType.LOOK_TARGET), behaviorBuilder, instance.present(MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM), instance.registered(MemoryModuleType.ITEM_PICKUP_COOLDOWN_TICKS)).apply(instance, (memoryAccessor, memoryAccessor2, memoryAccessor3, memoryAccessor4) -> {
                 return (serverLevel, livingEntity, l) -> {
                     ItemEntity itemEntity = (ItemEntity)instance.get(memoryAccessor3);
-                    if (instance.tryGet(memoryAccessor4).isEmpty() && canWalkToItem.test(livingEntity) && itemEntity.closerThan(livingEntity, (double)maxDistToWalk) && livingEntity.level.getWorldBorder().isWithinBounds(itemEntity.blockPosition())) {
+                    if (instance.tryGet(memoryAccessor4).isEmpty() && canWalkToItem.test(livingEntity) && itemEntity.closerThan(livingEntity, (double)maxDistToWalk) && livingEntity.level().getWorldBorder().isWithinBounds(itemEntity.blockPosition())) {
                         // CraftBukkit start
                         if (livingEntity instanceof net.minecraft.world.entity.animal.allay.Allay) {
                             EntityTargetEvent event = CraftEventFactory.callEntityTargetEvent(livingEntity, itemEntity, org.bukkit.event.entity.EntityTargetEvent.TargetReason.CLOSEST_ENTITY);

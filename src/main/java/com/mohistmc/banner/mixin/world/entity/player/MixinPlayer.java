@@ -3,23 +3,13 @@ package com.mohistmc.banner.mixin.world.entity.player;
 import com.mohistmc.banner.injection.world.entity.player.InjectionPlayer;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.stats.Stat;
-import net.minecraft.stats.Stats;
 import net.minecraft.tags.DamageTypeTags;
-import net.minecraft.util.Mth;
 import net.minecraft.util.Unit;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Inventory;
@@ -27,26 +17,18 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
-import org.bukkit.craftbukkit.v1_19_R3.util.CraftVector;
-import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityExhaustionEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.scoreboard.Team;
-import org.bukkit.util.Vector;
 import org.spigotmc.SpigotWorldConfig;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -60,7 +42,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 //TODO fix inject methods
@@ -88,16 +69,6 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     @Shadow @Final private Inventory inventory;
 
     @Shadow public abstract Either<Player.BedSleepingProblem, net.minecraft.util.Unit> startSleepInBed(BlockPos bedPos);
-
-    @Shadow public abstract float getAttackStrengthScale(float adjustTicks);
-
-    @Shadow public abstract void sweepAttack();
-
-    @Shadow public abstract void crit(Entity entityHit);
-
-    @Shadow public abstract void magicCrit(Entity entityHit);
-
-    @Shadow public abstract void causeFoodExhaustion(float exhaustion);
 
     protected MixinPlayer(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
@@ -166,16 +137,16 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
                 return false;
             } else {
                 if (source.scalesWithDifficulty()) {
-                    if (this.level.getDifficulty() == Difficulty.PEACEFUL) {
+                    if (this.level().getDifficulty() == Difficulty.PEACEFUL) {
                         // amount = 0.0F;
                         return false;
                     }
 
-                    if (this.level.getDifficulty() == Difficulty.EASY) {
+                    if (this.level().getDifficulty() == Difficulty.EASY) {
                         amount = Math.min(amount / 2.0F + 1.0F, amount);
                     }
 
-                    if (this.level.getDifficulty() == Difficulty.HARD) {
+                    if (this.level().getDifficulty() == Difficulty.HARD) {
                         amount = amount * 3.0F / 2.0F;
                     }
                 }
@@ -221,7 +192,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
      */
     @Overwrite
     protected void removeEntitiesOnShoulder() {
-        if (this.timeEntitySatOnShoulder + 20L < this.level.getGameTime()) {
+        if (this.timeEntitySatOnShoulder + 20L < this.level().getGameTime()) {
             if (this.spawnEntityFromShoulder(this.getShoulderEntityLeft())) {
                 this.setShoulderEntityLeft(new CompoundTag());
             }
@@ -277,9 +248,9 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
         if (this.getBukkitEntity() instanceof org.bukkit.entity.Player player) {
             org.bukkit.block.Block bed;
             if (blockPos != null) {
-                bed = CraftBlock.at(this.level, blockPos);
+                bed = CraftBlock.at(this.level(), blockPos);
             } else {
-                bed =  this.level.getWorld().getBlockAt(player.getLocation());
+                bed =  this.level().getWorld().getBlockAt(player.getLocation());
             }
             PlayerBedLeaveEvent event = new PlayerBedLeaveEvent(player, bed, true);
             Bukkit.getPluginManager().callEvent(event);
@@ -288,7 +259,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
 
     @ModifyArg(method = "jumpFromGround", index = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
     private float banner$exhaustInfo(float f) {
-        SpigotWorldConfig config =  level.bridge$spigotConfig();
+        SpigotWorldConfig config =  level().bridge$spigotConfig();
         if (config != null) {
             if (this.isSprinting()) {
                 f = config.jumpSprintExhaustion;

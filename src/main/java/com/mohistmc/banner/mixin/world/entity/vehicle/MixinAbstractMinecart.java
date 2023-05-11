@@ -92,7 +92,7 @@ public abstract class MixinAbstractMinecart extends Entity {
      */
     @Overwrite
     public boolean hurt(DamageSource source, float amount) {
-        if (this.level.isClientSide || this.isRemoved()) {
+        if (this.level().isClientSide || this.isRemoved()) {
             return true;
         }
         if (this.isInvulnerableTo(source)) {
@@ -146,10 +146,8 @@ public abstract class MixinAbstractMinecart extends Entity {
         if (this.getDamage() > 0.0f) {
             this.setDamage(this.getDamage() - 1.0f);
         }
-        if (this.getY() < -64.0) {
-            this.outOfWorld();
-        }
-        if (this.level.isClientSide) {
+
+        if (this.level().isClientSide) {
             if (this.lSteps > 0) {
                 double d0 = this.getX() + (this.lx - this.getX()) / this.lSteps;
                 double d2 = this.getY() + (this.ly - this.getY()) / this.lSteps;
@@ -176,11 +174,11 @@ public abstract class MixinAbstractMinecart extends Entity {
             int i = Mth.floor(this.getX());
             int j = Mth.floor(this.getY());
             int k = Mth.floor(this.getZ());
-            if (this.level.getBlockState(new BlockPos(i, j - 1, k)).is(BlockTags.RAILS)) {
+            if (this.level().getBlockState(new BlockPos(i, j - 1, k)).is(BlockTags.RAILS)) {
                 --j;
             }
             BlockPos blockposition = new BlockPos(i, j, k);
-            BlockState blockstate = this.level.getBlockState(blockposition);
+            BlockState blockstate = this.level().getBlockState(blockposition);
             if (BaseRailBlock.isRail(blockstate)) {
                 this.moveAlongTrack(blockposition, blockstate);
                 if (blockstate.getBlock() instanceof PoweredRailBlock && blockstate.is(Blocks.ACTIVATOR_RAIL)) {
@@ -205,7 +203,7 @@ public abstract class MixinAbstractMinecart extends Entity {
                 this.flipped = !this.flipped;
             }
             this.setRot(this.getYRot(), this.getXRot());
-            org.bukkit.World bworld = this.level.getWorld();
+            org.bukkit.World bworld = this.level().getWorld();
             Location from = new Location(bworld, prevX, prevY, prevZ, prevYaw, prevPitch);
             Location to = new Location(bworld, this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
             Vehicle vehicle = (Vehicle) this.getBukkitEntity();
@@ -214,7 +212,7 @@ public abstract class MixinAbstractMinecart extends Entity {
                 Bukkit.getPluginManager().callEvent(new VehicleMoveEvent(vehicle, from, to));
             }
             if (this.getMinecartType() == AbstractMinecart.Type.RIDEABLE && this.getDeltaMovement().horizontalDistanceSqr() > 0.01) {
-                List<Entity> list = this.level.getEntities((AbstractMinecart) (Object) this, this.getBoundingBox().inflate(0.20000000298023224, 0.0, 0.20000000298023224), EntitySelector.pushableBy((AbstractMinecart) (Object) this));
+                List<Entity> list = this.level().getEntities((AbstractMinecart) (Object) this, this.getBoundingBox().inflate(0.20000000298023224, 0.0, 0.20000000298023224), EntitySelector.pushableBy((AbstractMinecart) (Object) this));
                 if (!list.isEmpty()) {
                     for (Entity entity : list) {
                         if (!(entity instanceof Player) && !(entity instanceof IronGolem) && !(entity instanceof AbstractMinecart) && !this.isVehicle() && !entity.isPassenger()) {
@@ -236,7 +234,7 @@ public abstract class MixinAbstractMinecart extends Entity {
                     }
                 }
             } else {
-                for (Entity entity2 : this.level.getEntities((AbstractMinecart) (Object) this, this.getBoundingBox().inflate(0.20000000298023224, 0.0, 0.20000000298023224))) {
+                for (Entity entity2 : this.level().getEntities((AbstractMinecart) (Object) this, this.getBoundingBox().inflate(0.20000000298023224, 0.0, 0.20000000298023224))) {
                     if (!this.hasPassenger(entity2) && entity2.isPushable() && entity2 instanceof AbstractMinecart) {
                         VehicleEntityCollisionEvent collisionEvent2 = new VehicleEntityCollisionEvent(vehicle,  entity2.getBukkitEntity());
                         Bukkit.getPluginManager().callEvent(collisionEvent2);

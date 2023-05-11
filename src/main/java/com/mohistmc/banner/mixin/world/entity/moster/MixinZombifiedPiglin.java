@@ -40,7 +40,7 @@ public abstract class MixinZombifiedPiglin extends Zombie {
     private void alertOthers() {
         double d0 = this.getAttributeValue(Attributes.FOLLOW_RANGE);
         AABB axisalignedbb = AABB.unitCubeFromLowerCorner(this.position()).inflate(d0, 10.0D, d0);
-        for (ZombifiedPiglin piglinEntity : this.level.getEntitiesOfClass(ZombifiedPiglin.class, axisalignedbb)) {
+        for (ZombifiedPiglin piglinEntity : this.level().getEntitiesOfClass(ZombifiedPiglin.class, axisalignedbb)) {
             if (piglinEntity != (Object) this) {
                 if (piglinEntity.getTarget() == null) {
                     if (!piglinEntity.isAlliedTo(this.getTarget())) {
@@ -54,7 +54,7 @@ public abstract class MixinZombifiedPiglin extends Zombie {
 
     @ModifyArg(method = "startPersistentAngerTimer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/ZombifiedPiglin;setRemainingPersistentAngerTime(I)V"))
     private int banner$pigAngry(int time) {
-        Entity entity = ((ServerLevel) this.level).getEntity(this.getPersistentAngerTarget());
+        Entity entity = ((ServerLevel) this.level()).getEntity(this.getPersistentAngerTarget());
         PigZombieAngerEvent event = new PigZombieAngerEvent((PigZombie) this.getBukkitEntity(), entity == null ? null : entity.getBukkitEntity(), time);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {

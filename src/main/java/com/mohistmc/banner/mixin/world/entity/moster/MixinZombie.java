@@ -37,7 +37,7 @@ public abstract class MixinZombie extends Monster {
     @Inject(method = "convertToZombieType", at = @At("HEAD"))
     private void banner$transformReason(EntityType<? extends net.minecraft.world.entity.monster.Zombie> entityType, CallbackInfo ci) {
         this.bridge$pushTransformReason(EntityTransformEvent.TransformReason.DROWNED);
-        this.level.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.DROWNED);
+        this.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.DROWNED);
     }
 
     @Inject(method = "convertToZombieType", locals = LocalCapture.CAPTURE_FAILHARD, at = @At("RETURN"))
@@ -64,9 +64,9 @@ public abstract class MixinZombie extends Monster {
         }
     }
 
-    @Eject(method = "wasKilled", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;convertTo(Lnet/minecraft/world/entity/EntityType;Z)Lnet/minecraft/world/entity/Mob;"))
+    @Eject(method = "killedEntity(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;convertTo(Lnet/minecraft/world/entity/EntityType;Z)Lnet/minecraft/world/entity/Mob;"))
     private <T extends Mob> T banner$transform(Villager villagerEntity, EntityType<T> entityType, boolean flag, CallbackInfoReturnable<Boolean> cir) {
-         villagerEntity.level.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.INFECTION);
+         villagerEntity.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.INFECTION);
          villagerEntity.bridge$pushTransformReason(EntityTransformEvent.TransformReason.INFECTION);
         T t = villagerEntity.convertTo(entityType, flag);
         if (t == null) {
@@ -81,7 +81,7 @@ public abstract class MixinZombie extends Monster {
     }
 
     private static ZombieVillager zombifyVillager(ServerLevel level, Villager villager, BlockPos blockPosition, boolean silent, CreatureSpawnEvent.SpawnReason spawnReason) {
-        villager.level.pushAddEntityReason(spawnReason);
+        villager.level().pushAddEntityReason(spawnReason);
         villager.bridge$pushTransformReason(EntityTransformEvent.TransformReason.INFECTION);
         ZombieVillager zombieVillager = villager.convertTo(EntityType.ZOMBIE_VILLAGER, false);
         if (zombieVillager != null) {

@@ -27,7 +27,7 @@ public abstract class MixinEnderCrystal extends Entity {
 
     @Inject(method = "tick", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
     private void banner$blockIgnite(CallbackInfo ci) {
-        if (CraftEventFactory.callBlockIgniteEvent(this.level, this.blockPosition(), (EndCrystal) (Object) this).isCancelled()) {
+        if (CraftEventFactory.callBlockIgniteEvent(this.level(), this.blockPosition(), (EndCrystal) (Object) this).isCancelled()) {
             ci.cancel();
         }
     }

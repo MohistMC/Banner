@@ -43,7 +43,7 @@ public abstract class MixinBee extends Animal {
         } else {
             Entity entity = source.getEntity();
             boolean ret = super.hurt(source, amount);
-            if (ret && !this.level.isClientSide) {
+            if (ret && !this.level().isClientSide) {
                 this.beePollinateGoal.stopPollinating();
             }
             return ret;

@@ -28,7 +28,7 @@ public abstract class MixinPig extends Animal {
         if (CraftEventFactory.callPigZapEvent((Pig) (Object) this, lightningBolt, piglin).isCancelled()) {
             ci.cancel();
         } else {
-            this.level.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.LIGHTNING);
+            this.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.LIGHTNING);
         }
     }
 }

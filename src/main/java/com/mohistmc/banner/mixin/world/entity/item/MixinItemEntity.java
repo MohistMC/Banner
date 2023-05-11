@@ -62,7 +62,7 @@ public abstract class MixinItemEntity extends Entity {
      */
     @Overwrite
     public void playerTouch(final Player entity) {
-        if (!this.level.isClientSide) {
+        if (!this.level().isClientSide) {
             if (this.pickupDelay > 0) return;
             ItemStack itemstack = this.getItem();
             int i = itemstack.getCount();
@@ -122,7 +122,7 @@ public abstract class MixinItemEntity extends Entity {
 
     @Redirect(method = "mergeWithNeighbours", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/AABB;inflate(DDD)Lnet/minecraft/world/phys/AABB;"))
     private AABB banner$mergeRadius(AABB instance, double pX, double pY, double pZ) {
-        double radius = level.bridge$spigotConfig().itemMerge;
+        double radius = level().bridge$spigotConfig().itemMerge;
         return instance.inflate(radius);
     }
 }

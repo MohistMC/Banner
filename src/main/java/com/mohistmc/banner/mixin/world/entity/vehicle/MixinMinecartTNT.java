@@ -19,7 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(MinecartTNT.class)
 public abstract class MixinMinecartTNT extends AbstractMinecart {
 
-    @Shadow private int fuse;
+    @Shadow
+    public int fuse;
 
     protected MixinMinecartTNT(EntityType<?> entityType, Level level) {
         super(entityType, level);

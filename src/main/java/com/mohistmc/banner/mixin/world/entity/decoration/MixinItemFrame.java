@@ -53,7 +53,7 @@ public abstract class MixinItemFrame extends HangingEntity implements InjectionI
             this.playSound(SoundEvents.ITEM_FRAME_ADD_ITEM, 1.0f, 1.0f);
         }
         if (flag && this.pos != null) {
-            this.level.updateNeighbourForOutputSignal(this.pos, Blocks.AIR);
+            this.level().updateNeighbourForOutputSignal(this.pos, Blocks.AIR);
         }
     }
 

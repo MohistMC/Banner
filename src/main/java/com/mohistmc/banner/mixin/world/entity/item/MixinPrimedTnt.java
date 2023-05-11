@@ -63,14 +63,14 @@ public abstract class MixinPrimedTnt extends Entity implements TraceableEntity, 
 
         this.setFuse(i);
         if (i <= 0) {
-            if (!this.level.isClientSide) {
+            if (!this.level().isClientSide) {
                 this.explode();
             }
             this.discard();
         } else {
             this.updateInWaterStateAndDoFluidPushing();
-            if (this.level.isClientSide) {
-                this.level.addParticle(ParticleTypes.SMOKE, this.getX(), this.getY() + 0.5D, this.getZ(), 0.0D, 0.0D, 0.0D);
+            if (this.level().isClientSide) {
+                this.level().addParticle(ParticleTypes.SMOKE, this.getX(), this.getY() + 0.5D, this.getZ(), 0.0D, 0.0D, 0.0D);
             }
         }
 
@@ -85,7 +85,7 @@ public abstract class MixinPrimedTnt extends Entity implements TraceableEntity, 
         ExplosionPrimeEvent event = new ExplosionPrimeEvent((Explosive) this.getBukkitEntity());
         Bukkit.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-            this.level.explode((PrimedTnt) (Object) this, this.getX(), this.getY(0.0625), this.getZ(), event.getRadius(), event.getFire(), Level.ExplosionInteraction.TNT);
+            this.level().explode((PrimedTnt) (Object) this, this.getX(), this.getY(0.0625), this.getZ(), event.getRadius(), event.getFire(), Level.ExplosionInteraction.TNT);
         }
     }
 

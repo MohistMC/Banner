@@ -26,8 +26,8 @@ public abstract class MixinGoat extends Animal {
     }
 
     @Eject(method = "mobInteract", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemUtils;createFilledResult(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;"))
-    private ItemStack banner$bucketFill(ItemStack handItem, Player player, ItemStack p_41816_, CallbackInfoReturnable<InteractionResult> cir, Player p_149379_, InteractionHand hand) {
-        var event = CraftEventFactory.callPlayerBucketFillEvent((ServerLevel) player.level, player, this.blockPosition(), this.blockPosition(), null, handItem, Items.MILK_BUCKET, hand);
+    private ItemStack banner$bucketFill(ItemStack handItem, Player player, ItemStack stack, CallbackInfoReturnable<InteractionResult> cir, Player player1, InteractionHand hand) {
+        var event = CraftEventFactory.callPlayerBucketFillEvent((ServerLevel) player.level(), player, this.blockPosition(), this.blockPosition(), null, handItem, Items.MILK_BUCKET, hand);
 
         if (event.isCancelled()) {
             cir.setReturnValue(InteractionResult.PASS);

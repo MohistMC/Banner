@@ -27,7 +27,7 @@ public class MixinSkeletonTrapGoal {
     @Inject(method = "*", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"),
             slice = @Slice(to = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/horse/SkeletonTrapGoal;createHorse(Lnet/minecraft/world/DifficultyInstance;)Lnet/minecraft/world/entity/animal/horse/AbstractHorse;")))
     private void banner$thunder(CallbackInfo ci) {
-        this.horse.level.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.TRAP);
+        this.horse.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.TRAP);
     }
 
     @Redirect(method = "*", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
@@ -39,6 +39,6 @@ public class MixinSkeletonTrapGoal {
     @Inject(method = "*", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"),
             slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/horse/SkeletonTrapGoal;createHorse(Lnet/minecraft/world/DifficultyInstance;)Lnet/minecraft/world/entity/animal/horse/AbstractHorse;")))
     private void banner$jockey(CallbackInfo ci) {
-         this.horse.level.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.JOCKEY);
+         this.horse.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.JOCKEY);
     }
 }

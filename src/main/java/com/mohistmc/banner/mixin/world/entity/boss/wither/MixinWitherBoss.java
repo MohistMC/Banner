@@ -61,10 +61,10 @@ public abstract class MixinWitherBoss extends Monster {
                 ExplosionPrimeEvent event = new ExplosionPrimeEvent(this.getBukkitEntity(), 7.0F, false);
                 Bukkit.getPluginManager().callEvent(event);
                 if (!event.isCancelled()) {
-                    this.level.explode((WitherBoss) (Object) this, this.getX(), this.getEyeY(), this.getZ(), event.getRadius(), event.getFire(), Level.ExplosionInteraction.MOB);
+                    this.level().explode((WitherBoss) (Object) this, this.getX(), this.getEyeY(), this.getZ(), event.getRadius(), event.getFire(), Level.ExplosionInteraction.MOB);
                 }
                 if (!this.isSilent()) {
-                    this.level.globalLevelEvent(1023, this.blockPosition(), 0);
+                    this.level().globalLevelEvent(1023, this.blockPosition(), 0);
                 }
             }
 
@@ -80,7 +80,7 @@ public abstract class MixinWitherBoss extends Monster {
             for (int i = 1; i < 3; ++i) {
                 if (this.tickCount >= this.nextHeadUpdate[i - 1]) {
                     this.nextHeadUpdate[i - 1] = this.tickCount + 10 + this.random.nextInt(10);
-                    if (this.level.getDifficulty() == Difficulty.NORMAL || this.level.getDifficulty() == Difficulty.HARD) {
+                    if (this.level().getDifficulty() == Difficulty.NORMAL || this.level().getDifficulty() == Difficulty.HARD) {
                         int i3 = i - 1;
                         int j3 = this.idleHeadUpdates[i - 1];
                         this.idleHeadUpdates[i3] = this.idleHeadUpdates[i - 1] + 1;
@@ -95,7 +95,7 @@ public abstract class MixinWitherBoss extends Monster {
 
                     int l1 = this.getAlternativeTarget(i);
                     if (l1 > 0) {
-                        LivingEntity livingentity = (LivingEntity) this.level.getEntity(l1);
+                        LivingEntity livingentity = (LivingEntity) this.level().getEntity(l1);
                         if (livingentity != null && this.canAttack(livingentity) && !(this.distanceToSqr(livingentity) > 900.0D) && this.hasLineOfSight(livingentity)) {
                             this.performRangedAttack(i + 1, livingentity);
                             this.nextHeadUpdate[i - 1] = this.tickCount + 40 + this.random.nextInt(20);
@@ -106,7 +106,7 @@ public abstract class MixinWitherBoss extends Monster {
                             this.setAlternativeTarget(i, 0);
                         }
                     } else {
-                        List<LivingEntity> list = this.level.getNearbyEntities(LivingEntity.class, TARGETING_CONDITIONS, (WitherBoss) (Object) this, this.getBoundingBox().inflate(20.0D, 8.0D, 20.0D));
+                        List<LivingEntity> list = this.level().getNearbyEntities(LivingEntity.class, TARGETING_CONDITIONS, (WitherBoss) (Object) this, this.getBoundingBox().inflate(20.0D, 8.0D, 20.0D));
                         if (!list.isEmpty()) {
                             LivingEntity livingentity1 = list.get(this.random.nextInt(list.size()));
                             if (CraftEventFactory.callEntityTargetLivingEvent((WitherBoss) (Object) this, livingentity1, EntityTargetEvent.TargetReason.CLOSEST_ENTITY).isCancelled())
@@ -125,7 +125,7 @@ public abstract class MixinWitherBoss extends Monster {
 
             if (this.destroyBlocksTick > 0) {
                 --this.destroyBlocksTick;
-                if (this.destroyBlocksTick == 0 && this.level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+                if (this.destroyBlocksTick == 0 && this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
                     int j1 = Mth.floor(this.getY());
                     int i2 = Mth.floor(this.getX());
                     int j2 = Mth.floor(this.getZ());
@@ -138,19 +138,19 @@ public abstract class MixinWitherBoss extends Monster {
                                 int l = j1 + k;
                                 int i1 = j2 + k2;
                                 BlockPos blockpos = new BlockPos(l2, l, i1);
-                                BlockState blockstate = this.level.getBlockState(blockpos);
+                                BlockState blockstate = this.level().getBlockState(blockpos);
                                 if (canDestroy(blockstate)) {
                                     if (CraftEventFactory.callEntityChangeBlockEvent((WitherBoss) (Object) this, blockpos, Blocks.AIR.defaultBlockState()).isCancelled()) {
                                         continue;
                                     }
-                                    flag = this.level.destroyBlock(blockpos, true, (WitherBoss) (Object) this) || flag;
+                                    flag = this.level().destroyBlock(blockpos, true, (WitherBoss) (Object) this) || flag;
                                 }
                             }
                         }
                     }
 
                     if (flag) {
-                        this.level.levelEvent(null, 1022, this.blockPosition(), 0);
+                        this.level().levelEvent(null, 1022, this.blockPosition(), 0);
                     }
                 }
             }

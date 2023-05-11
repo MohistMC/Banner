@@ -235,7 +235,7 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
                     return;
                 }
 
-                for (ItemStack itemstack9 = this.quickMoveStack(player, slotId); !itemstack9.isEmpty() && ItemStack.isSame(slot6.getItem(), itemstack9); itemstack9 = this.quickMoveStack(player, slotId)) {
+                for (ItemStack itemstack9 = this.quickMoveStack(player, slotId); !itemstack9.isEmpty() && ItemStack.isSameItem(slot6.getItem(), itemstack9); itemstack9 = this.quickMoveStack(player, slotId)) {
                 }
             } else {
                 if (slotId < 0) {

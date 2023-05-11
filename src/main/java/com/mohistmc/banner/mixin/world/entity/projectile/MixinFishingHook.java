@@ -104,12 +104,12 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
 
     @ModifyExpressionValue(method = "catchingFish", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isRainingAt(Lnet/minecraft/core/BlockPos;)Z"))
     private boolean addRainCheck(Level instance, BlockPos position) {
-        return this.rainInfluenced && this.random.nextFloat() < 0.25F && this.level.isRainingAt(position);
+        return this.rainInfluenced && this.random.nextFloat() < 0.25F && this.level().isRainingAt(position);
     }
 
     @ModifyExpressionValue(method = "catchingFish", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;canSeeSky(Lnet/minecraft/core/BlockPos;)Z"))
     private boolean addSkyCheck(Level instance, BlockPos position) {
-        return this.skyInfluenced && this.random.nextFloat() < 0.25F && this.level.isRainingAt(position);
+        return this.skyInfluenced && this.random.nextFloat() < 0.25F && this.level().isRainingAt(position);
     }
 
     /**
@@ -119,7 +119,7 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
     @Overwrite
     public int retrieve(ItemStack stack) {
         Player player = this.getPlayerOwner();
-        if (!this.level.isClientSide && player != null && !this.shouldStopFishing(player)) {
+        if (!this.level().isClientSide && player != null && !this.shouldStopFishing(player)) {
             int i = 0;
             if (this.hookedIn != null) {
                 PlayerFishEvent fishEvent = new PlayerFishEvent(((ServerPlayer) player).getBukkitEntity(),  this.hookedIn.getBukkitEntity(), (FishHook) this.getBukkitEntity(), PlayerFishEvent.State.CAUGHT_ENTITY);
@@ -129,29 +129,31 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
                 }
                 this.pullEntity(this.hookedIn);
                 CriteriaTriggers.FISHING_ROD_HOOKED.trigger((ServerPlayer)player, stack, ((FishingHook) (Object) this), Collections.emptyList());
-                this.level.broadcastEntityEvent(this, (byte)31);
+                this.level().broadcastEntityEvent(this, (byte)31);
                 i = this.hookedIn instanceof ItemEntity ? 3 : 5;
             } else if (this.nibble > 0) {
-                LootContext.Builder builder = (new LootContext.Builder((ServerLevel)this.level)).withParameter(LootContextParams.ORIGIN, this.position()).withParameter(LootContextParams.TOOL, stack).withParameter(LootContextParams.THIS_ENTITY, this).withRandom(this.random).withLuck((float)this.luck + player.getLuck());
-                LootTable lootTable = this.level.getServer().getLootTables().get(BuiltInLootTables.FISHING);
+                // Banner TODO - fixed when spigot updated
+                /**
+                LootContext.Builder builder = (new LootContext.Builder((ServerLevel)this.level())).withParameter(LootContextParams.ORIGIN, this.position()).withParameter(LootContextParams.TOOL, stack).withParameter(LootContextParams.THIS_ENTITY, this).withRandom(this.random).withLuck((float)this.luck + player.getLuck());
+                LootTable lootTable = this.level().getServer().getLootTables().get(BuiltInLootTables.FISHING);
                 List<ItemStack> list = lootTable.getRandomItems(builder.create(LootContextParamSets.FISHING));
                 CriteriaTriggers.FISHING_ROD_HOOKED.trigger((ServerPlayer)player, stack, ((FishingHook) (Object) this), list);
 
                 for (ItemStack itemStack : list) {
-                    ItemEntity itemEntity = new ItemEntity(this.level, this.getX(), this.getY(), this.getZ(), itemStack);
+                    ItemEntity itemEntity = new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), itemStack);
                     double d = player.getX() - this.getX();
                     double e = player.getY() - this.getY();
                     double f = player.getZ() - this.getZ();
                     double g = 0.1;
                     itemEntity.setDeltaMovement(d * 0.1, e * 0.1 + Math.sqrt(Math.sqrt(d * d + e * e + f * f)) * 0.08, f * 0.1);
-                    this.level.addFreshEntity(itemEntity);
-                    player.level.addFreshEntity(new ExperienceOrb(player.level, player.getX(), player.getY() + 0.5, player.getZ() + 0.5, this.random.nextInt(6) + 1));
+                    this.level().addFreshEntity(itemEntity);
+                    player.level().addFreshEntity(new ExperienceOrb(player.level(), player.getX(), player.getY() + 0.5, player.getZ() + 0.5, this.random.nextInt(6) + 1));
                     if (itemStack.is(ItemTags.FISHES)) {
                         player.awardStat(Stats.FISH_CAUGHT, 1);
                     }
                 }
 
-                i = 1;
+                i = 1;*/
             }
 
             if (this.onGround) {

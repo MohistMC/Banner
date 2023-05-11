@@ -35,7 +35,7 @@ public abstract class MixinStopAttackingIfTargetInvalid {
             return instance.group(instance.present(MemoryModuleType.ATTACK_TARGET), instance.registered(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE)).apply(instance, (memoryAccessor, memoryAccessor2) -> {
                 return (serverLevel, mob, l) -> {
                     LivingEntity livingEntity = (LivingEntity)instance.get(memoryAccessor);
-                    if (mob.canAttack(livingEntity) && (!canGrowTiredOfTryingToReachTarget || !isTiredOfTryingToReachTarget(mob, instance.tryGet(memoryAccessor2))) && livingEntity.isAlive() && livingEntity.level == mob.level && !canStopAttacking.test(livingEntity)) {
+                    if (mob.canAttack(livingEntity) && (!canGrowTiredOfTryingToReachTarget || !isTiredOfTryingToReachTarget(mob, instance.tryGet(memoryAccessor2))) && livingEntity.isAlive() && livingEntity.level() == mob.level() && !canStopAttacking.test(livingEntity)) {
                         return true;
                     } else {
                         // CraftBukkit start

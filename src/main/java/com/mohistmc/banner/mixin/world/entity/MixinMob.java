@@ -140,7 +140,7 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
                 ctarget = (CraftLivingEntity) livingEntity.getBukkitEntity();
             }
             EntityTargetLivingEntityEvent event = new EntityTargetLivingEntityEvent(this.getBukkitEntity(), ctarget, reason);            Bukkit.getPluginManager().callEvent(event);
-            level.getCraftServer().getPluginManager().callEvent(event);
+            level().getCraftServer().getPluginManager().callEvent(event);
             if (event.isCancelled()) {
                 banner$targetSuccess = false;
                 return;
@@ -264,7 +264,7 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
 
     @Inject(method = "convertTo", at = @At("RETURN"))
     private <T extends Mob> void banner$cleanReason(EntityType<T> p_233656_1_, boolean p_233656_2_, CallbackInfoReturnable<T> cir) {
-        this.level.pushAddEntityReason(null);
+        this.level().pushAddEntityReason(null);
         this.banner$transform = null;
     }
 
@@ -279,7 +279,7 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
 
     @Override
     public <T extends Mob> T convertTo(EntityType<T> entitytypes, boolean flag, EntityTransformEvent.TransformReason transformReason, CreatureSpawnEvent.SpawnReason spawnReason) {
-        this.level.pushAddEntityReason(spawnReason);
+        this.level().pushAddEntityReason(spawnReason);
         bridge$pushTransformReason(transformReason);
         return this.convertTo(entitytypes, flag);
     }

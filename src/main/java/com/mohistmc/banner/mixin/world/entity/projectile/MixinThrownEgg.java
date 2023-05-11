@@ -30,7 +30,7 @@ public abstract class MixinThrownEgg extends ThrowableItemProjectile {
     @Overwrite
     protected void onHit(final HitResult result) {
         super.onHit(result);
-        if (!this.level.isClientSide) {
+        if (!this.level().isClientSide) {
             boolean hatching = this.random.nextInt(8) == 0;
             byte b0 = 1;
             if (this.random.nextInt(32) == 0) {
@@ -50,17 +50,17 @@ public abstract class MixinThrownEgg extends ThrowableItemProjectile {
             }
             if (hatching) {
                 for (int i = 0; i < b0; ++i) {
-                    Entity entity = this.level.getWorld().createEntity(new Location(this.level.getWorld(), this.getX(), this.getY(), this.getZ(), this.getYRot(), 0.0f), hatchingType.getEntityClass());
+                    Entity entity = this.level().getWorld().createEntity(new Location(this.level().getWorld(), this.getX(), this.getY(), this.getZ(), this.getYRot(), 0.0f), hatchingType.getEntityClass());
                     if (entity != null) {
                         if (entity.getBukkitEntity() instanceof Ageable) {
                             ((Ageable) ((Entity) entity).getBukkitEntity()).setBaby();
                         }
-                        this.level.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.EGG);
-                        this.level.addFreshEntity(entity);
+                        this.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.EGG);
+                        this.level().addFreshEntity(entity);
                     }
                 }
             }
-            this.level.broadcastEntityEvent((ThrownEgg) (Object) this, (byte) 3);
+            this.level().broadcastEntityEvent((ThrownEgg) (Object) this, (byte) 3);
             this.discard();
         }
     }

@@ -23,18 +23,18 @@ import java.util.stream.Collectors;
 @Mixin(PiglinAi.class)
 public abstract class MixinPiglinAi {
 
-    @Shadow protected static void throwItems(Piglin pilgin, List<ItemStack> stacks) {}
-    @Shadow protected static List<ItemStack> getBarterResponseItems(Piglin piglin) {return null;}
-    @Shadow protected static boolean isBarterCurrency(ItemStack stack) {return false;}
+    @Shadow private static void throwItems(Piglin pilgin, List<ItemStack> stacks) {}
+    @Shadow private static List<ItemStack> getBarterResponseItems(Piglin piglin) {return null;}
+    @Shadow private static boolean isBarterCurrency(ItemStack stack) {return false;}
     @Shadow protected static boolean isLovedItem(ItemStack item) {return false;}
-    @Shadow protected static void putInInventory(Piglin piglin, ItemStack stack) {}
-    @Shadow protected static void eat(Piglin piglin) {}
-    @Shadow protected static boolean hasEatenRecently(Piglin piglin) {return false;}
-    @Shadow protected static boolean isFood(ItemStack stack) {return false;}
-    @Shadow protected static void admireGoldItem(LivingEntity piglin) {}
-    @Shadow protected static void holdInOffhand(Piglin piglin, ItemStack stack) {}
-    @Shadow protected static ItemStack removeOneItemFromItemEntity(ItemEntity itemEntity) {return null;}
-    @Shadow protected static void stopWalking(Piglin piglin) {}
+    @Shadow private static void putInInventory(Piglin piglin, ItemStack stack) {}
+    @Shadow private static void eat(Piglin piglin) {}
+    @Shadow private static boolean hasEatenRecently(Piglin piglin) {return false;}
+    @Shadow private static boolean isFood(ItemStack stack) {return false;}
+    @Shadow private static void admireGoldItem(LivingEntity piglin) {}
+    @Shadow private static void holdInOffhand(Piglin piglin, ItemStack stack) {}
+    @Shadow private static ItemStack removeOneItemFromItemEntity(ItemEntity itemEntity) {return null;}
+    @Shadow private static void stopWalking(Piglin piglin) {}
 
     /**
      * @author wdog5

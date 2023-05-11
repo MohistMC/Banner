@@ -437,7 +437,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
                 bworld = (((CraftServer) server).getServer().getLevel(Level.OVERWORLD)).getWorld();
             }
 
-            ((ServerPlayer) (Object) this).setLevel(bworld == null ? null : ((CraftWorld) bworld).getHandle());
+            ((ServerPlayer) (Object) this).setServerLevel(bworld == null ? null : ((CraftWorld) bworld).getHandle());
         }
         this.getBukkitEntity().readBukkitValues(compound);
         if (compound.contains("Bukkit.invisible")) {

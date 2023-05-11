@@ -39,7 +39,7 @@ public abstract class MixinSlime extends Mob {
     @Override
     public void remove(Entity.RemovalReason reason) {
         int i = this.getSize();
-        if (!this.level.isClientSide && i > 1 && this.isDeadOrDying()) {
+        if (!this.level().isClientSide && i > 1 && this.isDeadOrDying()) {
             Component itextcomponent = this.getCustomName();
             boolean flag = this.isNoAi();
             float f = (float) i / 4.0F;
@@ -58,7 +58,7 @@ public abstract class MixinSlime extends Mob {
             for (int l = 0; l < k; ++l) {
                 float f1 = ((float) (l % 2) - 0.5F) * f;
                 float f2 = ((float) (l / 2) - 0.5F) * f;
-                net.minecraft.world.entity.monster.Slime slimeentity = this.getType().create(this.level);
+                net.minecraft.world.entity.monster.Slime slimeentity = this.getType().create(this.level());
                 if (slimeentity == null) continue;
                 if (this.isPersistenceRequired()) {
                     slimeentity.setPersistenceRequired();
@@ -76,8 +76,8 @@ public abstract class MixinSlime extends Mob {
                 return;
             }
             for (LivingEntity living : slimes) {
-                this.level.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.SLIME_SPLIT);
-                this.level.addFreshEntity(living);
+                this.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.SLIME_SPLIT);
+                this.level().addFreshEntity(living);
             }
         }
         super.remove(reason);

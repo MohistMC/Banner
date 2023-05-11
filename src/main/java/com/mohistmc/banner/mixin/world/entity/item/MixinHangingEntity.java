@@ -36,7 +36,7 @@ public abstract class MixinHangingEntity extends Entity{
 
     @Inject(method = "tick", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/HangingEntity;discard()V"))
     private void banner$hangingBreak(CallbackInfo ci) {
-        Material material = this.level.getBlockState(new BlockPos(this.blockPosition())).getMaterial();
+        Material material = this.level().getBlockState(new BlockPos(this.blockPosition())).getMaterial();
         HangingBreakEvent.RemoveCause cause;
         if (!material.equals(Material.AIR)) {
             cause = HangingBreakEvent.RemoveCause.OBSTRUCTION;

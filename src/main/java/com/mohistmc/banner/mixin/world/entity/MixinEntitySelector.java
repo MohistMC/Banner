@@ -28,7 +28,7 @@ public class MixinEntitySelector {
         return (Predicate)(collisionRule == Team.CollisionRule.NEVER ? Predicates.alwaysFalse() : NO_SPECTATORS.and((entity2) -> {
             if (!entity2.canCollideWithBukkit(entity) || !entity.canCollideWithBukkit(entity2)) { // CraftBukkit - collidable API
                 return false;
-            } else if (entity.level.isClientSide && (!(entity2 instanceof Player) || !((Player)entity2).isLocalPlayer())) {
+            } else if (entity.level().isClientSide && (!(entity2 instanceof Player) || !((Player)entity2).isLocalPlayer())) {
                 return false;
             } else {
                 Team team2 = entity2.getTeam();

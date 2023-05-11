@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.dimension.end.EndDragonFight;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -39,9 +40,9 @@ import java.util.List;
 @Mixin(EnderDragon.class)
 public abstract class MixinEnderDragon extends Mob {
 
-    @Shadow @Final @Nullable private EndDragonFight dragonFight;
+    @Shadow @Nullable private EndDragonFight dragonFight;
 
-    private final Explosion explosionSource = new Explosion(this.level, (EnderDragon) (Object) this, null, null, Double.NaN, Double.NaN, Double.NaN, Float.NaN, true, Explosion.BlockInteraction.DESTROY);
+    private final Explosion explosionSource = new Explosion(this.level(), (EnderDragon) (Object) this, null, null, Double.NaN, Double.NaN, Double.NaN, Float.NaN, true, Explosion.BlockInteraction.DESTROY);
 
     protected MixinEnderDragon(EntityType<? extends Mob> entityType, Level level) {
         super(entityType, level);
@@ -82,11 +83,11 @@ public abstract class MixinEnderDragon extends Mob {
             for (int l2 = j; l2 <= i2; ++l2) {
                 for (int i3 = k; i3 <= j2; ++i3) {
                     final BlockPos blockposition = new BlockPos(k2, l2, i3);
-                    final BlockState iblockdata = this.level.getBlockState(blockposition);
+                    final BlockState iblockdata = this.level().getBlockState(blockposition);
                     if (!iblockdata.isAir() && !iblockdata.is(BlockTags.DRAGON_TRANSPARENT)) {
-                        if (this.level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) && !iblockdata.is(BlockTags.DRAGON_IMMUNE)) {
+                        if (this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) && !iblockdata.is(BlockTags.DRAGON_IMMUNE)) {
                             flag2 = true;
-                            destroyedBlocks.add(CraftBlock.at(this.level, blockposition));
+                            destroyedBlocks.add(CraftBlock.at(this.level(), blockposition));
                         } else {
                             flag = true;
                         }
@@ -105,7 +106,7 @@ public abstract class MixinEnderDragon extends Mob {
         }
         if (event.getYield() == 0.0f) {
             for (final org.bukkit.block.Block block2 : event.blockList()) {
-                this.level.removeBlock(new BlockPos(block2.getX(), block2.getY(), block2.getZ()), false);
+                this.level().removeBlock(new BlockPos(block2.getX(), block2.getY(), block2.getZ()), false);
             }
         } else {
             for (final org.bukkit.block.Block block2 : event.blockList()) {
@@ -117,21 +118,22 @@ public abstract class MixinEnderDragon extends Mob {
                 final BlockPos blockposition2 = craftBlock.getPosition();
                 final net.minecraft.world.level.block.Block nmsBlock = craftBlock.getNMS().getBlock();
                 if (nmsBlock.dropFromExplosion(this.explosionSource)) {
-                    BlockEntity tileentity = craftBlock.getNMS().hasBlockEntity() ? this.level.getBlockEntity(blockposition2) : null;
-                    LootContext.Builder loottableinfo_builder = new LootContext.Builder((ServerLevel) this.level).withRandom(this.level.random).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockposition2)).withParameter(LootContextParams.TOOL, ItemStack.EMPTY).withParameter(LootContextParams.EXPLOSION_RADIUS, 1.0f / event.getYield()).withOptionalParameter(LootContextParams.BLOCK_ENTITY, tileentity);
+                    BlockEntity tileentity = craftBlock.getNMS().hasBlockEntity() ? this.level().getBlockEntity(blockposition2) : null;
+                    // Banner TODO
+                    /**LootParams.Builder loottableinfo_builder = new LootParams.Builder((ServerLevel) this.level()).withDynamicDrop(this.level().random).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockposition2)).withParameter(LootContextParams.TOOL, ItemStack.EMPTY).withParameter(LootContextParams.EXPLOSION_RADIUS, 1.0f / event.getYield()).withOptionalParameter(LootContextParams.BLOCK_ENTITY, tileentity);
                     for (ItemStack stack : craftBlock.getNMS().getDrops(loottableinfo_builder)) {
-                        Block.popResource(this.level, blockposition2, stack);
-                    }
-                    craftBlock.getNMS().spawnAfterBreak((ServerLevel) this.level, blockposition2, ItemStack.EMPTY, false);
+                        Block.popResource(this.level(), blockposition2, stack);
+                    }*/
+                    craftBlock.getNMS().spawnAfterBreak((ServerLevel) this.level(), blockposition2, ItemStack.EMPTY, false);
                     // net.minecraft.block.Block.spawnDrops(craftBlock.getNMS(), loottableinfo_builder);
                 }
-                nmsBlock.wasExploded(this.level, blockposition2, this.explosionSource);
-                this.level.removeBlock(blockposition2, false);
+                nmsBlock.wasExploded(this.level(), blockposition2, this.explosionSource);
+                this.level().removeBlock(blockposition2, false);
             }
         }
         if (flag2) {
             final BlockPos blockposition3 = new BlockPos(i + this.random.nextInt(l - i + 1), j + this.random.nextInt(i2 - j + 1), k + this.random.nextInt(j2 - k + 1));
-            this.level.levelEvent(2008, blockposition3, 0);
+            this.level().levelEvent(2008, blockposition3, 0);
         }
         return flag;
     }
@@ -140,7 +142,7 @@ public abstract class MixinEnderDragon extends Mob {
     @Override
     public int getExpReward() {
         // CraftBukkit - Moved from #tickDeath method
-        boolean flag = this.level.getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT);
+        boolean flag = this.level().getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT);
         short short0 = 500;
 
         if (this.dragonFight != null && !this.dragonFight.hasPreviouslyKilledDragon()) {
