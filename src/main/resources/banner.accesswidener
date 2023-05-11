@@ -427,9 +427,9 @@ accessible field net/minecraft/world/level/block/SoundType hitSound Lnet/minecra
 accessible field net/minecraft/world/level/block/entity/ChiseledBookShelfBlockEntity lastInteractedSlot I
 accessible field net/minecraft/world/level/block/entity/SculkSensorBlockEntity lastVibrationFrequency I
 accessible field net/minecraft/world/level/block/entity/SculkShriekerBlockEntity warningLevel I
-accessible field net/minecraft/world/level/block/entity/SuspiciousSandBlockEntity item Lnet/minecraft/world/item/ItemStack;
-accessible field net/minecraft/world/level/block/entity/SuspiciousSandBlockEntity lootTable Lnet/minecraft/resources/ResourceLocation;
-accessible field net/minecraft/world/level/block/entity/SuspiciousSandBlockEntity lootTableSeed J
+accessible field net/minecraft/world/level/block/entity/BrushableBlockEntity item Lnet/minecraft/world/item/ItemStack;
+accessible field net/minecraft/world/level/block/entity/BrushableBlockEntity lootTable Lnet/minecraft/resources/ResourceLocation;
+accessible field net/minecraft/world/level/block/entity/BrushableBlockEntity lootTableSeed J
 accessible field net/minecraft/world/level/block/entity/BannerBlockEntity baseColor Lnet/minecraft/world/item/DyeColor;
 accessible field net/minecraft/world/level/block/entity/BannerBlockEntity itemPatterns Lnet/minecraft/nbt/ListTag;
 accessible field net/minecraft/world/level/block/entity/BarrelBlockEntity openersCounter Lnet/minecraft/world/level/block/entity/ContainerOpenersCounter;

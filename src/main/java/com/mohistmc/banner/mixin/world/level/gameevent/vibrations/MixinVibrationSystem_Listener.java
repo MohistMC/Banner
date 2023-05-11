@@ -19,10 +19,12 @@ import java.util.Optional;
 @Mixin(VibrationSystem.Listener.class)
 public interface MixinVibrationSystem_Listener {
 
+    // Banner - TODO
     /**
      * @author wdog5
      * @reason
      */
+    /**
     @Overwrite
     default boolean handleGameEvent(ServerLevel level, GameEvent gameEvent, GameEvent.Context context, Vec3 pos) {
         VibrationSystem.Data data = this.system.getVibrationData();
@@ -39,7 +41,7 @@ public interface MixinVibrationSystem_Listener {
                 Vec3 vec3 = (Vec3)optional.get();
 
                 // CraftBukkit start
-                boolean defaultCancel = !this..shouldListen(worldserver, (VibrationListener) (Object) this, BlockPos.containing(vec3d), gameevent, gameevent_a);
+                boolean defaultCancel = !this.shouldListen(worldserver, (VibrationListener) (Object) this, BlockPos.containing(vec3d), gameevent, gameevent_a);
                 Entity entity = gameevent_a.sourceEntity();
                 BlockReceiveGameEvent event = new BlockReceiveGameEvent(org.bukkit.GameEvent.getByKey(CraftNamespacedKey.fromMinecraft(BuiltInRegistries.GAME_EVENT.getKey(gameevent))), CraftBlock.at(worldserver, BlockPos.containing(vec3d1)), (entity == null) ? null : entity.getBukkitEntity());
                 event.setCancelled(defaultCancel);
@@ -55,5 +57,5 @@ public interface MixinVibrationSystem_Listener {
                 }
             }
         }
-    }
+    }*/
 }

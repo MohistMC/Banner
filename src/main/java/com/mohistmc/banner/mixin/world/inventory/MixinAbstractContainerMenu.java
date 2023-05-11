@@ -66,10 +66,6 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
         return false;
     }
 
-    @Shadow
-    public static void getQuickCraftSlotCount(Set<Slot> dragSlots, int dragMode, ItemStack stack, int slotStackSize) {
-    }
-
     @Shadow public abstract void setCarried(ItemStack stack);
 
     @Shadow public abstract void sendAllDataToRemote();
@@ -168,7 +164,7 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
                         if (slot8 != null && canItemQuickReplace(slot8, itemstack13, true) && slot8.mayPlace(itemstack13) && (this.quickcraftType == 2 || itemstack13.getCount() >= this.quickcraftSlots.size()) && this.canDragTo(slot8)) {
                             ItemStack itemstack14 = itemstack9.copy();
                             int j3 = slot8.hasItem() ? slot8.getItem().getCount() : 0;
-                            getQuickCraftSlotCount(this.quickcraftSlots, this.quickcraftType, itemstack14, j3);
+                            //getQuickCraftSlotCount(this.quickcraftSlots, this.quickcraftType, itemstack14, j3); - Banner TODO
                             int k3 = Math.min(itemstack14.getMaxStackSize(), slot8.getMaxStackSize(itemstack14));
                             if (itemstack14.getCount() > k3) {
                                 itemstack14.setCount(k3);

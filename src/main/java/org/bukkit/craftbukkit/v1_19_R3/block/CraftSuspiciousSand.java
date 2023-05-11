@@ -1,7 +1,7 @@
 package org.bukkit.craftbukkit.v1_19_R3.block;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.entity.SuspiciousSandBlockEntity;
+import net.minecraft.world.level.block.entity.BrushableBlockEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.SuspiciousSand;
@@ -10,9 +10,9 @@ import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootTable;
 
-public class CraftSuspiciousSand extends CraftBlockEntityState<SuspiciousSandBlockEntity> implements SuspiciousSand {
+public class CraftSuspiciousSand extends CraftBlockEntityState<BrushableBlockEntity> implements SuspiciousSand {
 
-    public CraftSuspiciousSand(World world, SuspiciousSandBlockEntity tileEntity) {
+    public CraftSuspiciousSand(World world, BrushableBlockEntity tileEntity) {
         super(world, tileEntity);
     }
 
@@ -27,7 +27,7 @@ public class CraftSuspiciousSand extends CraftBlockEntityState<SuspiciousSandBlo
     }
 
     @Override
-    public void applyTo(SuspiciousSandBlockEntity lootable) {
+    public void applyTo(BrushableBlockEntity lootable) {
         super.applyTo(lootable);
 
         if (this.getSnapshot().lootTable == null) {

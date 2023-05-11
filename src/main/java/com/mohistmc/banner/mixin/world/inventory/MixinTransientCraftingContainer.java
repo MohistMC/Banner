@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.List;
 
 @Mixin(TransientCraftingContainer.class)
-public abstract class MixinTransientTransientCraftingContainer implements Container, InjectionTransientCraftingContainer {
+public abstract class MixinTransientCraftingContainer implements Container, InjectionTransientCraftingContainer {
 
     @Shadow
     @Final
