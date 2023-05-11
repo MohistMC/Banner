@@ -108,6 +108,8 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
 
     @Shadow public abstract boolean tryAddFreshEntityWithPassengers(Entity entity);
 
+    @Shadow public abstract boolean addWithUUID(Entity entity);
+
     public LevelStorageSource.LevelStorageAccess convertable;
     public UUID uuid;
     public PrimaryLevelData serverLevelDataCB;
@@ -295,36 +297,28 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     @Override
     public boolean addWithUUID(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
         pushAddEntityReason(reason);
-        return this.addEntity(entity, reason);
+        return this.addWithUUID(entity);
     }
 
-    @Redirect(method = "addWithUUID", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addEntity(Lnet/minecraft/world/entity/Entity;)Z"))
-    private boolean banner$resetUUID(ServerLevel instance, Entity entity) {
-        return this.addWithUUID(entity, CreatureSpawnEvent.SpawnReason.DEFAULT);
+    @Inject(method = "addWithUUID", at = @At("HEAD"))
+    private void banner$addUUIDReason(Entity entity, CallbackInfoReturnable<Boolean> cir) {
+        pushAddEntityReason(CreatureSpawnEvent.SpawnReason.DEFAULT);
     }
 
-    @Redirect(method = "addDuringTeleport", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addEntity(Lnet/minecraft/world/entity/Entity;)Z"))
-    private boolean banner$cancelDuringTp(ServerLevel instance, Entity entity){
-        return false;
-    }
-
-    @Inject(method = "addDuringTeleport", at = @At("RETURN"))
+    @Inject(method = "addDuringTeleport", at = @At("HEAD"))
     private void banner$resetDuringTp(Entity entity, CallbackInfo ci) {
-        addDuringTeleport(entity, null);
+        pushAddEntityReason(CreatureSpawnEvent.SpawnReason.DEFAULT);
     }
 
     @Override
     public void addDuringTeleport(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
         pushAddEntityReason(reason);
-        addEntity(entity, reason);
+        addDuringTeleport(entity);
     }
 
-    @Redirect(method = "tryAddFreshEntityWithPassengers", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"))
-    private void banner$cancelTryAdd(ServerLevel instance, Entity entity) {}
-
-    @Inject(method = "tryAddFreshEntityWithPassengers", at = @At("TAIL"), cancellable = true)
+    @Inject(method = "tryAddFreshEntityWithPassengers", at = @At("HEAD"))
     private void banner$resetTryAdd(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(tryAddFreshEntityWithPassengers(entity, CreatureSpawnEvent.SpawnReason.DEFAULT));
+        pushAddEntityReason(CreatureSpawnEvent.SpawnReason.DEFAULT);
     }
 
     @Override
@@ -332,7 +326,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         if (entity.getSelfAndPassengers().map(Entity::getUUID).anyMatch(this.entityManager::isLoaded)) {
             return false;
         }else {
-            this.addFreshEntityWithPassengers(entity, reason);
+            this.tryAddFreshEntityWithPassengers(entity);
             return true;
         }
     }
