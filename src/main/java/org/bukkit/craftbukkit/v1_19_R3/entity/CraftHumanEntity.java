@@ -134,7 +134,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         Preconditions.checkArgument(location.getWorld().equals(getWorld()), "Cannot sleep across worlds");
 
         BlockPos blockposition = CraftLocation.toBlockPosition(location);
-        BlockState iblockdata = getHandle().level.getBlockState(blockposition);
+        BlockState iblockdata = getHandle().level().getBlockState(blockposition);
         if (!(iblockdata.getBlock() instanceof BedBlock)) {
             return false;
         }
@@ -145,7 +145,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
 
         // From BedBlock
         iblockdata = iblockdata.setValue(BedBlock.OCCUPIED, true);
-        getHandle().level.setBlock(blockposition, iblockdata, 4);
+        getHandle().level().setBlock(blockposition, iblockdata, 4);
 
         return true;
     }
@@ -292,7 +292,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
             if (iinventory instanceof BlockEntity) {
                 BlockEntity te = (BlockEntity) iinventory;
                 if (!te.hasLevel()) {
-                    te.setLevel(getHandle().level);
+                    te.setLevel(getHandle().level());
                 }
             }
         }
@@ -337,7 +337,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
                 return null;
             }
         }
-        getHandle().openMenu(((CraftingTableBlock) Blocks.CRAFTING_TABLE).getMenuProvider(null, getHandle().level, CraftLocation.toBlockPosition(location)));
+        getHandle().openMenu(((CraftingTableBlock) Blocks.CRAFTING_TABLE).getMenuProvider(null, getHandle().level(), CraftLocation.toBlockPosition(location)));
         if (force) {
             getHandle().containerMenu.banner$setCheckReachable(false);
         }
@@ -358,7 +358,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
 
         // If there isn't an enchant table we can force create one, won't be very useful though.
         BlockPos pos = CraftLocation.toBlockPosition(location);
-        getHandle().openMenu(((EnchantmentTableBlock) Blocks.ENCHANTING_TABLE).getMenuProvider(null, getHandle().level, pos));
+        getHandle().openMenu(((EnchantmentTableBlock) Blocks.ENCHANTING_TABLE).getMenuProvider(null, getHandle().level(), pos));
 
         if (force) {
             getHandle().containerMenu.banner$setCheckReachable(false);
@@ -539,7 +539,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
 
     private Collection<net.minecraft.world.item.crafting.Recipe<?>> bukkitKeysToMinecraftRecipes(Collection<NamespacedKey> recipeKeys) {
         Collection<net.minecraft.world.item.crafting.Recipe<?>> recipes = new ArrayList<>();
-        RecipeManager manager = getHandle().level.getServer().getRecipeManager();
+        RecipeManager manager = getHandle().level().getServer().getRecipeManager();
 
         for (NamespacedKey recipeKey : recipeKeys) {
             Optional<? extends net.minecraft.world.item.crafting.Recipe<?>> recipe = manager.byKey(CraftNamespacedKey.toMinecraft(recipeKey));
@@ -556,7 +556,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
     @Override
     public org.bukkit.entity.Entity getShoulderEntityLeft() {
         if (!getHandle().getShoulderEntityLeft().isEmpty()) {
-            Optional<Entity> shoulder = net.minecraft.world.entity.EntityType.create(getHandle().getShoulderEntityLeft(), getHandle().level);
+            Optional<Entity> shoulder = net.minecraft.world.entity.EntityType.create(getHandle().getShoulderEntityLeft(), getHandle().level());
 
             return (!shoulder.isPresent()) ? null : shoulder.get().getBukkitEntity();
         }
@@ -575,7 +575,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
     @Override
     public org.bukkit.entity.Entity getShoulderEntityRight() {
         if (!getHandle().getShoulderEntityRight().isEmpty()) {
-            Optional<Entity> shoulder = net.minecraft.world.entity.EntityType.create(getHandle().getShoulderEntityRight(), getHandle().level);
+            Optional<Entity> shoulder = net.minecraft.world.entity.EntityType.create(getHandle().getShoulderEntityRight(), getHandle().level());
 
             return (!shoulder.isPresent()) ? null : shoulder.get().getBukkitEntity();
         }
@@ -676,8 +676,8 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         Preconditions.checkArgument(fireworkItemStack != null, "fireworkItemStack must not be null");
         Preconditions.checkArgument(fireworkItemStack.getType() == Material.FIREWORK_ROCKET, "fireworkItemStack must be of type %s", Material.FIREWORK_ROCKET);
 
-        FireworkRocketEntity fireworks = new FireworkRocketEntity(getHandle().level, CraftItemStack.asNMSCopy(fireworkItemStack), getHandle());
-        boolean success = getHandle().level.addFreshEntity(fireworks, SpawnReason.CUSTOM);
+        FireworkRocketEntity fireworks = new FireworkRocketEntity(getHandle().level(), CraftItemStack.asNMSCopy(fireworkItemStack), getHandle());
+        boolean success = getHandle().level().addFreshEntity(fireworks, SpawnReason.CUSTOM);
         return success ? (Firework) fireworks.getBukkitEntity() : null;
     }
 }

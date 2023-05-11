@@ -860,7 +860,7 @@ public abstract class CraftRegionAccessor implements RegionAccessor {
                 final BlockPos pos = BlockPos.containing(x, y, z);
                 for (BlockFace dir : faces) {
                     net.minecraft.world.level.block.state.BlockState nmsBlock = getHandle().getBlockState(pos.relative(CraftBlock.blockFaceToNotch(dir)));
-                    if (nmsBlock.getMaterial().isSolid() || net.minecraft.world.level.block.DiodeBlock.isDiode(nmsBlock)) {
+                    if (nmsBlock.isSolid() || net.minecraft.world.level.block.DiodeBlock.isDiode(nmsBlock)) {
                         boolean taken = false;
                         AABB bb = (ItemFrame.class.isAssignableFrom(clazz))
                                 ? BukkitExtraConstants.recalculateBoundingBox(null, pos, CraftBlock.blockFaceToNotch(dir).getOpposite(), width, height)

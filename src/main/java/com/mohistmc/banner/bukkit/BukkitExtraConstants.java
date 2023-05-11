@@ -29,7 +29,7 @@ public class BukkitExtraConstants {
     public static final LootContextParam<Integer> LOOTING_MOD = new LootContextParam<>(new ResourceLocation("bukkit:looting_mod")); // CraftBukkit
 
     public static ZombieVillager zombifyVillager(ServerLevel level, Villager villager, BlockPos blockPosition, boolean silent, CreatureSpawnEvent.SpawnReason spawnReason) {
-        villager.level.pushAddEntityReason(spawnReason);
+        villager.level().pushAddEntityReason(spawnReason);
         villager.bridge$pushTransformReason(EntityTransformEvent.TransformReason.INFECTION);
         ZombieVillager zombieVillager = villager.convertTo(EntityType.ZOMBIE_VILLAGER, false);
         if (zombieVillager != null) {

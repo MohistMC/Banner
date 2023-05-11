@@ -15,7 +15,7 @@ public final class CraftSuspiciousSand extends org.bukkit.craftbukkit.v1_19_R3.b
 
     // org.bukkit.craftbukkit.block.data.type.CraftSuspiciousSand
 
-    private static final net.minecraft.world.level.block.state.properties.IntegerProperty DUSTED = getInteger(net.minecraft.world.level.block.SuspiciousSandBlock.class, "dusted");
+    private static final net.minecraft.world.level.block.state.properties.IntegerProperty DUSTED = getInteger(net.minecraft.world.level.block.BrushableBlock.class, "dusted");
 
     @Override
     public int getDusted() {

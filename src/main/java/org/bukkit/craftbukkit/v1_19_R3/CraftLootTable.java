@@ -45,6 +45,8 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
     public Collection<ItemStack> populateLoot(Random random, LootContext context) {
         Preconditions.checkArgument(context != null, "LootContext cannot be null");
         net.minecraft.world.level.storage.loot.LootContext nmsContext = convertContext(context, random);
+        // Banner - TODO
+        /**
         List<net.minecraft.world.item.ItemStack> nmsItems = handle.getRandomItems(nmsContext);
         Collection<ItemStack> bukkit = new ArrayList<>(nmsItems.size());
 
@@ -55,7 +57,8 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
             bukkit.add(CraftItemStack.asBukkitCopy(item));
         }
 
-        return bukkit;
+        return bukkit;*/
+        return null;
     }
 
     @Override
@@ -81,6 +84,8 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
         Preconditions.checkArgument(loc.getWorld() != null, "LootContext.getLocation#getWorld cannot be null");
         ServerLevel handle = ((CraftWorld) loc.getWorld()).getHandle();
 
+        // Banner - TODO
+        /**
         net.minecraft.world.level.storage.loot.LootContext.Builder builder = new net.minecraft.world.level.storage.loot.LootContext.Builder(handle);
         if (random != null) {
             builder = builder.withRandom(new RandomSourceWrapper(random));
@@ -121,14 +126,15 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
                 nmsBuilder.optional(param);
             }
         }
-        nmsBuilder.optional(ServerUtils.LOOTING_MOD);
+        nmsBuilder.optional(ServerUtils.LOOTING_MOD);*/
 
-        return builder.create(nmsBuilder.build());
+        //return builder.create(nmsBuilder.build()); Banner - TODO
+        return null;
     }
 
     private <T> void setMaybe(net.minecraft.world.level.storage.loot.LootContext.Builder builder, LootContextParam<T> param, T value) {
         if (getHandle().getParamSet().getRequired().contains(param) || getHandle().getParamSet().getAllowed().contains(param)) {
-            builder.withParameter(param, value);
+            //builder.withParameter(param, value); Banner - TODO
         }
     }
 

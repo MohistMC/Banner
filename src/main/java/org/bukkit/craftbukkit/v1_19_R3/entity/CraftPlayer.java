@@ -607,9 +607,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         for (Map.Entry<SectionPos, ChunkSectionChanges> entry : changes.entrySet()) {
             ChunkSectionChanges chunkChanges = entry.getValue();
             // Banner start
-            ClientboundSectionBlocksUpdatePacket packet = new ClientboundSectionBlocksUpdatePacket(entry.getKey(), chunkChanges.positions(), null, suppressLightUpdates);
+            /**
+            ClientboundSectionBlocksUpdatePacket packet = new ClientboundSectionBlocksUpdatePacket(entry.getKey(), chunkChanges.positions(), );
             packet.putBukkitPacket(chunkChanges.blockData().toArray(net.minecraft.world.level.block.state.BlockState[]::new));
-            getHandle().connection.send(packet);
+            getHandle().connection.send(packet);*/
+            // Banner - TODO
             // Banner end
         }
     }
@@ -701,9 +703,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
         Component[] components = CraftSign.sanitizeLines(lines);
         SignBlockEntity sign = new SignBlockEntity(CraftLocation.toBlockPosition(loc), Blocks.OAK_SIGN.defaultBlockState());
-        sign.setColor(net.minecraft.world.item.DyeColor.byId(dyeColor.getWoolData()));
+        //sign.setColor(net.minecraft.world.item.DyeColor.byId(dyeColor.getWoolData())); Banner - TODO
         for (int i = 0; i < components.length; i++) {
-            sign.setMessage(i, components[i]);
+            //sign.setMessage(i, components[i]); Banner - TODO
         }
 
         getHandle().connection.send(sign.getUpdatePacket());
@@ -1308,7 +1310,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     private void untrackAndHideEntity(org.bukkit.entity.Entity entity) {
 
         // Remove this player from the hidden player's EntityTrackerEntry
-        ChunkMap tracker = ((ServerLevel) getHandle().level).getChunkSource().chunkMap;
+        ChunkMap tracker = ((ServerLevel) getHandle().level()).getChunkSource().chunkMap;
         Entity other = ((CraftEntity) entity).getHandle();
         ChunkMap.TrackedEntity entry = tracker.entityMap.get(other.getId());
         if (entry != null) {
@@ -1387,7 +1389,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     }
 
     private void trackAndShowEntity(org.bukkit.entity.Entity entity) {
-        ChunkMap tracker = ((ServerLevel) getHandle().level).getChunkSource().chunkMap;
+        ChunkMap tracker = ((ServerLevel) getHandle().level()).getChunkSource().chunkMap;
         Entity other = ((CraftEntity) entity).getHandle();
 
         if (other instanceof ServerPlayer) {

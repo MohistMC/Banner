@@ -186,6 +186,14 @@ accessible method net/minecraft/server/level/ServerChunkCache runDistanceManager
 accessible method net/minecraft/world/entity/animal/Bee$BeePollinateGoal stopPollinating ()V
 accessible method net/minecraft/world/entity/animal/Fox addTrustedUUID (Ljava/util/UUID;)V
 accessible method net/minecraft/world/entity/animal/sniffer/Sniffer calculateDigPosition ()Ljava/util/Optional;
+accessible method net/minecraft/world/entity/Display$TextDisplay getFlags ()B
+accessible method net/minecraft/world/entity/Display$TextDisplay getLineWidth ()I
+accessible method net/minecraft/world/entity/Display$TextDisplay getText ()Lnet/minecraft/network/chat/Component;
+accessible method net/minecraft/world/entity/Display$BlockDisplay getBlockState ()Lnet/minecraft/world/level/block/state/BlockState;
+accessible method net/minecraft/world/entity/Display$BlockDisplay setBlockState (Lnet/minecraft/world/level/block/state/BlockState;)V
+accessible method net/minecraft/world/entity/Display getBillboardConstraints ()Lnet/minecraft/world/entity/Display$BillboardConstraints;
+accessible method net/minecraft/world/entity/Display$ItemDisplay getItemStack ()Lnet/minecraft/world/item/ItemStack;
+accessible method net/minecraft/world/entity/Display$ItemDisplay getItemTransform ()Lnet/minecraft/world/item/ItemDisplayContext;
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C
@@ -387,7 +395,7 @@ accessible field net/minecraft/world/inventory/DispenserMenu dispenser Lnet/mine
 accessible field net/minecraft/world/inventory/CraftingMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
 accessible field net/minecraft/world/inventory/CraftingMenu craftSlots Lnet/minecraft/world/inventory/CraftingContainer;
 accessible field net/minecraft/world/inventory/CraftingMenu resultSlots Lnet/minecraft/world/inventory/ResultContainer;
-accessible field net/minecraft/world/inventory/CraftingContainer menu Lnet/minecraft/world/inventory/AbstractContainerMenu;
+accessible field net/minecraft/world/inventory/TransientCraftingContainer menu Lnet/minecraft/world/inventory/AbstractContainerMenu;
 accessible field net/minecraft/world/inventory/MerchantContainer selectionHint I
 accessible field net/minecraft/world/inventory/Slot slot I
 accessible field net/minecraft/world/item/StandingAndWallBlockItem wallBlock Lnet/minecraft/world/level/block/Block;
@@ -502,7 +510,6 @@ accessible field net/minecraft/world/level/levelgen/structure/placement/Structur
 accessible field net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplate entityInfoList Ljava/util/List;
 accessible field net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplate palettes Ljava/util/List;
 accessible field net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplateManager structureRepository Ljava/util/Map;
-accessible field net/minecraft/world/level/material/MaterialColor MATERIAL_COLORS [Lnet/minecraft/world/level/material/MaterialColor;
 accessible field net/minecraft/world/level/saveddata/maps/MapItemSavedData carriedBy Ljava/util/List;
 accessible field net/minecraft/world/level/saveddata/maps/MapItemSavedData carriedByPlayers Ljava/util/Map;
 accessible field net/minecraft/world/level/saveddata/maps/MapItemSavedData decorations Ljava/util/Map;

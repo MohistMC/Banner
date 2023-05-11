@@ -46,7 +46,7 @@ public class CraftItemFrame extends CraftHanging implements ItemFrame {
 
         // update redstone
         if (!getHandle().bridge$generation()) {
-            getHandle().getLevel().updateNeighbourForOutputSignal(getHandle().pos, Blocks.AIR);
+            getHandle().level().updateNeighbourForOutputSignal(getHandle().pos, Blocks.AIR);
         }
     }
 

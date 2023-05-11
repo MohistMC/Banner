@@ -15,6 +15,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.Commands;
 import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.inventory.*;
 import org.bukkit.craftbukkit.Main;
 import com.mohistmc.banner.util.ReloadUtils;
 import com.mohistmc.banner.util.ServerUtils;
@@ -61,10 +62,6 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.npc.CatSpawner;
 import net.minecraft.world.entity.npc.WanderingTraderSpawner;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.inventory.CraftingMenu;
-import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -1256,7 +1253,7 @@ public final class CraftServer implements Server {
                 return net.minecraft.world.item.ItemStack.EMPTY;
             }
         };
-        CraftingContainer inventoryCrafting = new CraftingContainer(container, 3, 3);
+        CraftingContainer inventoryCrafting = new TransientCraftingContainer(container, 3, 3);
 
         return getNMSRecipe(craftingMatrix, inventoryCrafting, (CraftWorld) world).map(net.minecraft.world.item.crafting.Recipe::toBukkitRecipe).orElse(null);
     }
@@ -2237,8 +2234,11 @@ public final class CraftServer implements Server {
     public LootTable getLootTable(NamespacedKey key) {
         Validate.notNull(key, "NamespacedKey cannot be null");
 
+        /**
         net.minecraft.world.level.storage.loot.LootTables registry = getServer().getLootTables();
-        return new CraftLootTable(key, registry.get(CraftNamespacedKey.toMinecraft(key)));
+        return new CraftLootTable(key, registry.get(CraftNamespacedKey.toMinecraft(key)));*/
+        return null;
+        // Banner - TODO
     }
 
     @Override

@@ -386,7 +386,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
         if (entity instanceof net.minecraft.world.entity.projectile.AbstractArrow) {
             return ((net.minecraft.world.entity.projectile.AbstractArrow) entity).inGround;
         }
-        return entity.isOnGround();
+        return entity.onGround();
     }
 
     @Override
@@ -396,7 +396,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
 
     @Override
     public World getWorld() {
-        return entity.level.getWorld();
+        return entity.level().getWorld();
     }
 
     @Override
@@ -460,7 +460,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
     @Override
     public List<org.bukkit.entity.Entity> getNearbyEntities(double x, double y, double z) {
         Preconditions.checkState(!entity.bridge$generation(), "Cannot get nearby entities during world generation");
-        List<Entity> notchEntityList = entity.level.getEntities(entity, entity.getBoundingBox().inflate(x, y, z), Predicates.alwaysTrue());
+        List<Entity> notchEntityList = entity.level().getEntities(entity, entity.getBoundingBox().inflate(x, y, z), Predicates.alwaysTrue());
         List<org.bukkit.entity.Entity> bukkitEntityList = new java.util.ArrayList<org.bukkit.entity.Entity>(notchEntityList.size());
 
         for (Entity e : notchEntityList) {
@@ -664,7 +664,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
         Preconditions.checkState(!entity.bridge$generation(), "Cannot play effect during world generation");
 
         if (type.getApplicable().isInstance(this)) {
-            this.getHandle().level.broadcastEntityEvent(getHandle(), type.getData());
+            this.getHandle().level().broadcastEntityEvent(getHandle(), type.getData());
         }
     }
 

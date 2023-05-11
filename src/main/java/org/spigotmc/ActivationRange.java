@@ -170,7 +170,7 @@ public class ActivationRange
         }
         if ( !( entity instanceof AbstractArrow ) )
         {
-            if ( !entity.isOnGround() || !entity.passengers.isEmpty() || entity.isPassenger() )
+            if ( !entity.onGround() || !entity.passengers.isEmpty() || entity.isPassenger() )
             {
                 return true;
             }

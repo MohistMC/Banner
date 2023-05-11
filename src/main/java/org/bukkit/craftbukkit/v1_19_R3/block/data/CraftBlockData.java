@@ -503,7 +503,7 @@ public class CraftBlockData implements BlockData {
         register(net.minecraft.world.level.block.SculkShriekerBlock.class, org.bukkit.craftbukkit.v1_19_R3.block.impl.CraftSculkShrieker::new);
         register(net.minecraft.world.level.block.SculkVeinBlock.class, org.bukkit.craftbukkit.v1_19_R3.block.impl.CraftSculkVein::new);
         register(net.minecraft.world.level.block.SmallDripleafBlock.class, org.bukkit.craftbukkit.v1_19_R3.block.impl.CraftSmallDripleaf::new);
-        register(net.minecraft.world.level.block.SuspiciousSandBlock.class, org.bukkit.craftbukkit.v1_19_R3.block.impl.CraftSuspiciousSand::new);
+        register(net.minecraft.world.level.block.BrushableBlock.class, org.bukkit.craftbukkit.v1_19_R3.block.impl.CraftSuspiciousSand::new);
         register(net.minecraft.world.level.block.TallSeagrassBlock.class, org.bukkit.craftbukkit.v1_19_R3.block.impl.CraftTallSeagrass::new);
         register(net.minecraft.world.level.block.TorchflowerCropBlock.class, org.bukkit.craftbukkit.v1_19_R3.block.impl.CraftTorchflowerCrop::new);
         register(net.minecraft.world.level.block.WallHangingSignBlock.class, org.bukkit.craftbukkit.v1_19_R3.block.impl.CraftWallHangingSign::new);

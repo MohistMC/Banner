@@ -23,8 +23,8 @@ public class PlayerEventDispatcher {
 
     public static void dispatcherPlayer() {
         EntitySleepEvents.START_SLEEPING.register((entity, sleepingPos) -> {
-            if (!entity.getLevel().dimensionType().bedWorks()) {
-                explodeBed(entity.getBlockStateOn(), entity.getLevel(), entity.getOnPos());
+            if (!entity.level().dimensionType().bedWorks()) {
+                explodeBed(entity.getBlockStateOn(), entity.level(), entity.getOnPos());
             }
         });
         UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {

@@ -164,6 +164,6 @@ static String ci_version() {
 		def number = data.substring(data.indexOf("number")).split(",")
 		return Integer.valueOf(number[0].replace("number=", "")).intValue()
 	} catch (Exception ignored) {
-		return '1.19.4'
+		return '1.20'
 	}
 }

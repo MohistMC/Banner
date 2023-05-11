@@ -129,8 +129,6 @@ public class CraftContainer extends AbstractContainerMenu {
                 return MenuType.BEACON;
             case ANVIL:
                 return MenuType.ANVIL;
-            case SMITHING:
-                return MenuType.LEGACY_SMITHING;
             case HOPPER:
                 return MenuType.HOPPER;
             case DROPPER:

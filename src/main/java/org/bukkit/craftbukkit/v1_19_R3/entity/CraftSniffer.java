@@ -34,7 +34,7 @@ public class CraftSniffer extends CraftAnimals implements Sniffer {
 
     @Override
     public Collection<Location> getExploredLocations() {
-        return this.getHandle().getExploredPositions().map(blockPosition -> CraftLocation.toBukkit(blockPosition, this.getLocation().getWorld())).collect(Collectors.toList());
+        return this.getHandle().getExploredPositions().map(blockPosition -> CraftLocation.toBukkit(blockPosition.pos(), this.getLocation().getWorld())).collect(Collectors.toList());
     }
 
     @Override
