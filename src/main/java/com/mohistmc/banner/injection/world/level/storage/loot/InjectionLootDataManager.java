@@ -5,7 +5,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.Map;
 
-public interface InjectionLootTables {
+public interface InjectionLootDataManager {
 
     default Map<LootTable, ResourceLocation> bridge$lootTableToKey() {
         return null;

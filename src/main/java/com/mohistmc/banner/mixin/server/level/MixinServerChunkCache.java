@@ -46,15 +46,18 @@ public abstract class MixinServerChunkCache implements InjectionServerChunkCache
         if (flag) {
             ChunkHolder chunkholder = this.getVisibleChunkIfPresent(ChunkPos.asLong(chunkX, chunkZ));
             if (chunkholder != null) {
+                /**
                 ChunkHolder.FullChunkStatus chunkStatus = ChunkHolder.getFullChunkStatus(chunkholder.oldTicketLevel);
                 ChunkHolder.FullChunkStatus currentStatus = ChunkHolder.getFullChunkStatus(chunkholder.getTicketLevel());
                 return !chunkStatus.isOrAfter(ChunkHolder.FullChunkStatus.BORDER) || currentStatus.isOrAfter(ChunkHolder.FullChunkStatus.BORDER);
             } else {
                 return true;
-            }
-        } else {
+            }*/
+        //} else {
             return false;
         }
+        }
+        return false;
     }
 
     @Redirect(method = "tickChunks", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z"))

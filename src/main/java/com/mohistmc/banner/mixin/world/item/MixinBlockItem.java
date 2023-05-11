@@ -39,7 +39,8 @@ public abstract class MixinBlockItem {
 
     // @formatter:off
     @Shadow protected abstract boolean mustSurvive();
-    @Shadow private static <T extends Comparable<T>> BlockState updateState(BlockState p_219988_0_, Property<T> p_219988_1_, String p_219988_2_) { return null; }
+    @Shadow
+    public static <T extends Comparable<T>> BlockState updateState(BlockState p_219988_0_, Property<T> p_219988_1_, String p_219988_2_) { return null; }
     // @formatter:on
 
     private AtomicReference<org.bukkit.block.BlockState> banner$state = new AtomicReference<>();

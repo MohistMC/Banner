@@ -6,9 +6,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.enchantment.FrostWalkerEnchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FrostedIceBlock;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,7 +23,7 @@ public class MixinFrostWalkerEnchantment {
      */
     @Overwrite
     public static void onEntityMoved(LivingEntity living, Level worldIn, BlockPos pos, int level) {
-        if (living.isOnGround()) {
+        if (living.onGround()) {
             BlockState blockstate = Blocks.FROSTED_ICE.defaultBlockState();
             int f = Math.min(16, 2 + level);
             BlockPos.MutableBlockPos blockpos$mutable = new BlockPos.MutableBlockPos();
@@ -35,7 +35,7 @@ public class MixinFrostWalkerEnchantment {
                     if (blockstate1.isAir()) {
                         BlockState blockstate2 = worldIn.getBlockState(blockpos);
                         boolean isFull = blockstate2.getBlock() == Blocks.WATER && blockstate2.getValue(LiquidBlock.LEVEL) == 0;
-                        if (blockstate2.getMaterial() == Material.WATER && isFull && blockstate.canSurvive(worldIn, blockpos) && worldIn.isUnobstructed(blockstate, blockpos, CollisionContext.empty())) {
+                        if (blockstate2 == FrostedIceBlock.meltsInto() && isFull && blockstate.canSurvive(worldIn, blockpos) && worldIn.isUnobstructed(blockstate, blockpos, CollisionContext.empty())) {
                             if (CraftEventFactory.handleBlockFormEvent(worldIn, blockpos, blockstate, living)) {
                                 worldIn.scheduleTick(blockpos, Blocks.FROSTED_ICE, Mth.nextInt(living.getRandom(), 60, 120));
                             }

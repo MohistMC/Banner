@@ -17,9 +17,6 @@ public class MixinMerchantOffer implements InjectionMerchantOffer {
     @Shadow public ItemStack baseCostA;
     // @formatter:on
 
-    @Shadow
-    private int demand;
-
     private CraftMerchantRecipe bukkitHandle;
 
     public void banner$constructor(ItemStack buyingStackFirstIn, ItemStack buyingStackSecondIn, ItemStack sellingStackIn, int usesIn, int maxUsesIn, int givenEXPIn, float priceMultiplierIn, int demand) {

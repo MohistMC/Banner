@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.network;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
@@ -11,14 +10,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(FriendlyByteBuf.class)
 public abstract class MixinFriendlyByteBuf {
-
-
-    // Banner - no need
-    /**
-    @ModifyExpressionValue(method = "writeItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"))
-    private boolean modifyReturn(ItemStack stack) {
-        return stack.isEmpty() || stack.getItem() == null;
-    }*/
 
     @Inject(method = "writeItem",
             at = @At(value = "INVOKE",

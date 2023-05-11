@@ -222,13 +222,13 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
      */
     @Overwrite
     public void handleMoveVehicle(final ServerboundMoveVehiclePacket packetplayinvehiclemove) {
-        PacketUtils.ensureRunningOnSameThread(packetplayinvehiclemove, (ServerGamePacketListenerImpl) (Object) this, this.player.getLevel());
+        PacketUtils.ensureRunningOnSameThread(packetplayinvehiclemove, (ServerGamePacketListenerImpl) (Object) this, this.player.serverLevel());
         if (containsInvalidValues(packetplayinvehiclemove.getX(), packetplayinvehiclemove.getY(), packetplayinvehiclemove.getZ(), packetplayinvehiclemove.getYRot(), packetplayinvehiclemove.getXRot())) {
             this.disconnect(Component.translatable("multiplayer.disconnect.invalid_vehicle_movement"));
         } else {
             Entity entity = this.player.getRootVehicle();
             if (entity != this.player && entity.getControllingPassenger() == this.player && entity == this.lastVehicle) {
-                ServerLevel worldserver = this.player.getLevel();
+                ServerLevel worldserver = this.player.serverLevel();
                 double d0 = entity.getX();
                 double d2 = entity.getY();
                 double d3 = entity.getZ();
@@ -338,7 +338,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                         }
                     }
                 }
-                this.player.getLevel().getChunkSource().move(this.player);
+                this.player.serverLevel().getChunkSource().move(this.player);
                 this.player.checkMovementStatistics(this.player.getX() - d0, this.player.getY() - d2, this.player.getZ() - d3);
                 this.clientVehicleIsFloating = d12 >= -0.03125 && !this.server.isFlightAllowed() && this.noBlocksAround(entity);
                 this.vehicleLastGoodX = entity.getX();
@@ -353,7 +353,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
             slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;isChangingDimension()Z")))
     private void banner$updateLoc(ServerboundAcceptTeleportationPacket packetIn, CallbackInfo ci) {
         if (this.player.bridge$valid()) {
-            this.player.getLevel().getChunkSource().move(this.player);
+            this.player.serverLevel().getChunkSource().move(this.player);
         }
     }
 
@@ -433,11 +433,11 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
      */
     @Overwrite
     public void handleMovePlayer(ServerboundMovePlayerPacket packetplayinflying) {
-        PacketUtils.ensureRunningOnSameThread(packetplayinflying, (ServerGamePacketListenerImpl) (Object) this, this.player.getLevel());
+        PacketUtils.ensureRunningOnSameThread(packetplayinflying, (ServerGamePacketListenerImpl) (Object) this, this.player.serverLevel());
         if (containsInvalidValues(packetplayinflying.getX(0.0D), packetplayinflying.getY(0.0D), packetplayinflying.getZ(0.0D), packetplayinflying.getYRot(0.0F), packetplayinflying.getXRot(0.0F))) {
             this.disconnect(Component.translatable("multiplayer.disconnect.invalid_player_movement"));
         } else {
-            ServerLevel worldserver = this.player.getLevel();
+            ServerLevel worldserver = this.player.serverLevel();
             if (!this.player.wonGame && ! this.player.isImmobile()) {
                 if (this.tickCount == 0) {
                     this.resetPosition();
@@ -458,7 +458,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
 
                     if (this.player.isPassenger()) {
                         this.player.absMoveTo(this.player.getX(), this.player.getY(), this.player.getZ(), f, f1);
-                        this.player.getLevel().getChunkSource().move(this.player);
+                        this.player.serverLevel().getChunkSource().move(this.player);
                         this.allowedPlayerTicks = 20; // CraftBukkit
                     } else {
                         // CraftBukkit - Make sure the move is valid but then reset it for plugins to modify
@@ -509,7 +509,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                                 speed = player.getAbilities().walkingSpeed * 10f;
                             }
 
-                            if (!this.player.isChangingDimension() && (!this.player.getLevel().getGameRules().getBoolean(GameRules.RULE_DISABLE_ELYTRA_MOVEMENT_CHECK) || !this.player.isFallFlying())) {
+                            if (!this.player.isChangingDimension() && (!this.player.serverLevel().getGameRules().getBoolean(GameRules.RULE_DISABLE_ELYTRA_MOVEMENT_CHECK) || !this.player.isFallFlying())) {
                                 float f2 = this.player.isFallFlying() ? 300.0F : 100.0F;
 
                                 if (d11 - d10 > Math.max(f2, Math.pow((double) (org.spigotmc.SpigotConfig.movedTooQuicklyMultiplier * (float) i * speed), 2)) && !this.isSingleplayerOwner()) {
@@ -527,7 +527,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                             d9 = d2 - this.lastGoodZ;
                             boolean flag = d8 > 0.0D;
 
-                            if (this.player.isOnGround() && !packetplayinflying.isOnGround() && flag) {
+                            if (this.player.onGround() && !packetplayinflying.isOnGround() && flag) {
                                 this.player.jumpFromGround();
                             }
 
@@ -599,7 +599,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                                 // MC-135989, SPIGOT-5564: isRiptiding
                                 this.clientIsFloating = d12 >= -0.03125D && this.player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR && !this.server.isFlightAllowed() && !this.player.getAbilities().mayfly && !this.player.hasEffect(MobEffects.LEVITATION) && !this.player.isFallFlying() && this.noBlocksAround((Entity) this.player) && !this.player.isAutoSpinAttack();
                                 // CraftBukkit end
-                                this.player.getLevel().getChunkSource().move(this.player);
+                                this.player.serverLevel().getChunkSource().move(this.player);
                                 this.player.doCheckFallDamage(this.player.getY() - d6, packetplayinflying.isOnGround());
                                 this.player.setOnGround(packetplayinflying.isOnGround());
                                 if (flag) {
@@ -624,7 +624,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
      */
     @Overwrite
     public void handlePlayerAction(ServerboundPlayerActionPacket packetplayinblockdig) {
-        PacketUtils.ensureRunningOnSameThread(packetplayinblockdig, (ServerGamePacketListenerImpl) (Object) this, this.player.getLevel());
+        PacketUtils.ensureRunningOnSameThread(packetplayinblockdig, (ServerGamePacketListenerImpl) (Object) this, this.player.serverLevel());
         if (this.player.isImmobile()) {
             return;
         }
@@ -684,7 +684,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                 return;
             }
             case START_DESTROY_BLOCK, ABORT_DESTROY_BLOCK, STOP_DESTROY_BLOCK -> {
-                this.player.gameMode.handleBlockBreakAction(blockposition, packetplayinblockdig_enumplayerdigtype, packetplayinblockdig.getDirection(), this.player.level.getMaxBuildHeight(), packetplayinblockdig.getSequence());
+                this.player.gameMode.handleBlockBreakAction(blockposition, packetplayinblockdig_enumplayerdigtype, packetplayinblockdig.getDirection(), this.player.level().getMaxBuildHeight(), packetplayinblockdig.getSequence());
                 this.player.connection.ackBlockChangesUpTo(packetplayinblockdig.getSequence());
                 return;
             }

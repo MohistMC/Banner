@@ -56,8 +56,8 @@ public abstract class MixinSculkSensorBlock extends Block {
     @Unique private static int newCurrent;
 
     @Inject(method = "activate", cancellable = true, at = @At("HEAD"))
-    private static void banner$activate(Entity p_222126_, Level level, BlockPos pos, BlockState state, int i, CallbackInfo ci) {
-        BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(CraftBlock.at(level, pos), state.getValue(SculkSensorBlock.POWER), i);
+    private static void banner$activate(Entity entity, Level level, BlockPos blockPos, BlockState blockState, int i, int j, CallbackInfo ci) {
+        BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(CraftBlock.at(level, blockPos), blockState.getValue(SculkSensorBlock.POWER), i);
         Bukkit.getPluginManager().callEvent(eventRedstone);
         if (eventRedstone.getNewCurrent() <= 0) {
             ci.cancel();

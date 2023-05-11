@@ -11,7 +11,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.Material;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlockState;
 import org.bukkit.craftbukkit.v1_19_R3.util.BlockStateListPopulator;
 import org.bukkit.event.block.SpongeAbsorbEvent;
@@ -50,7 +49,6 @@ public abstract class MixinSpongeBlock extends Block {
                 BlockPos blockPos2 = blockPos.relative(direction);
                 BlockState blockState = blockList.getBlockState(blockPos2);
                 FluidState fluidState = blockList.getFluidState(blockPos2);
-                Material material = blockState.getMaterial();
                 if (fluidState.is(FluidTags.WATER)) {
                     if (blockState.getBlock() instanceof BucketPickup && !((BucketPickup) blockState.getBlock()).pickupBlock(blockList, blockPos2, blockState).isEmpty()) {
                         ++i;
@@ -63,7 +61,7 @@ public abstract class MixinSpongeBlock extends Block {
                         if (j < 6) {
                             queue.add(new Tuple(blockPos2, j + 1));
                         }
-                    } else if (material == Material.WATER_PLANT || material == Material.REPLACEABLE_WATER_PLANT) {
+                    } else if (!blockState.is(Blocks.KELP) && !blockState.is(Blocks.KELP_PLANT) && !blockState.is(Blocks.SEAGRASS) && !blockState.is(Blocks.TALL_SEAGRASS)) {
                         // CraftBukkit start
                         // BlockEntity blockEntity = blockState.hasBlockEntity() ? level.getBlockEntity(blockPos2) : null;
                         // dropResources(blockState, level, blockPos2, blockEntity);
@@ -97,14 +95,12 @@ public abstract class MixinSpongeBlock extends Block {
                 BlockPos blockposition2 = block.getPosition();
                 BlockState iblockdata = level.getBlockState(blockposition2);
                 FluidState fluid = level.getFluidState(blockposition2);
-                Material material = iblockdata.getMaterial();
-
                 if (fluid.is(Fluids.WATER)) {
                     if (iblockdata.getBlock() instanceof BucketPickup && !((BucketPickup) iblockdata.getBlock()).pickupBlock(blockList, blockposition2, iblockdata).isEmpty()) {
                         // NOP
                     } else if (iblockdata.getBlock() instanceof LiquidBlock) {
                         // NOP
-                    } else if (material == Material.WATER_PLANT || material == Material.REPLACEABLE_WATER_PLANT) {
+                    } else if (!iblockdata.is(Blocks.KELP) && !iblockdata.is(Blocks.KELP_PLANT) && !iblockdata.is(Blocks.SEAGRASS) && !iblockdata.is(Blocks.TALL_SEAGRASS)) {
                         BlockEntity tileentity = iblockdata.hasBlockEntity() ? level.getBlockEntity(blockposition2) : null;
                         dropResources(iblockdata, level, blockposition2, tileentity);
                     }

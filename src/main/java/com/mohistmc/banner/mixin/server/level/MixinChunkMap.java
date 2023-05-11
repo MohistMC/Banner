@@ -46,7 +46,8 @@ import java.util.stream.Stream;
 public abstract class MixinChunkMap {
 
     // @formatter:off
-    @Shadow @Nullable protected abstract ChunkHolder getUpdatingChunkIfPresent(long chunkPosIn);
+    @Shadow @Nullable
+    public abstract ChunkHolder getUpdatingChunkIfPresent(long chunkPosIn);
     @Shadow protected abstract Iterable<ChunkHolder> getChunks();
     @Shadow protected abstract void tick();
     @Shadow @Mutable public ChunkGenerator generator;

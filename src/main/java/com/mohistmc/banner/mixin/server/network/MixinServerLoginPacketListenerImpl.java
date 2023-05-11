@@ -26,19 +26,22 @@ public abstract class MixinServerLoginPacketListenerImpl implements InjectionSer
 
     @Shadow public abstract void disconnect(Component reason);
 
-    @Shadow @Nullable private GameProfile gameProfile;
+    @Shadow @Nullable GameProfile gameProfile;
 
     @Shadow protected abstract GameProfile createFakeProfile(GameProfile original);
 
-    @Shadow @Final private MinecraftServer server;
+    @Shadow @Final
+    MinecraftServer server;
 
     @Shadow @Final public Connection connection;
 
-    @Shadow private ServerLoginPacketListenerImpl.State state;
+    @Shadow
+    ServerLoginPacketListenerImpl.State state;
 
     @Shadow @Nullable private ServerPlayer delayedAcceptPlayer;
 
-    @Shadow @Final private static Logger LOGGER;
+    @Shadow @Final
+    static Logger LOGGER;
 
     @Shadow protected abstract void placeNewPlayer(ServerPlayer serverPlayer);
 

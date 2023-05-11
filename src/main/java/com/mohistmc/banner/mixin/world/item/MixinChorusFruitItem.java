@@ -26,7 +26,7 @@ public abstract class MixinChorusFruitItem extends Item {
     }
 
     /**
-     * @author
+     * @author wdog5
      * @reason
      */
     @Overwrite

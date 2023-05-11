@@ -255,7 +255,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                 this.setBlocksDirty(blockposition, iblockdata1, iblockdata2);
             }
 
-            if ((i & 2) != 0 && (!this.isClientSide || (i & 4) == 0) && (this.isClientSide || chunk == null || (chunk.getFullStatus() != null && chunk.getFullStatus().isOrAfter(ChunkHolder.FullChunkStatus.TICKING)))) { // allow chunk to be null here as chunk.isReady() is false when we send our notification during block placement
+            if ((i & 2) != 0 && (!this.isClientSide || (i & 4) == 0) && (this.isClientSide || chunk == null || (chunk.getFullStatus() != null)))  // Banner - TODO /**&& chunk.getFullStatus().isOrAfter(ChunkHolder.FullChunkStatus.TICKING)*/))) { // allow chunk to be null here as chunk.isReady() is false when we send our notification during block placement
                 this.sendBlockUpdated(blockposition, iblockdata1, iblockdata, i);
             }
 
@@ -289,7 +289,6 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                     this.onBlockStateChange(blockposition, iblockdata1, iblockdata2);
                 }
             }
-        }
     }
 
     @Inject(method = "getBlockEntity", at = @At("TAIL"), cancellable = true)

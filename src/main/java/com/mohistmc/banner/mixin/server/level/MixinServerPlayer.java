@@ -72,6 +72,10 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Shadow public abstract float getRespawnAngle();
 
+    @Shadow public abstract void setServerLevel(ServerLevel serverLevel);
+
+    @Shadow public abstract ServerLevel serverLevel();
+
     // CraftBukkit start
     public String displayName;
     public Component listName;
@@ -179,12 +183,12 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Inject(method = "isPvpAllowed", cancellable = true, at = @At("HEAD"))
     private void banner$pvpMode(CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue((this.level.bridge$pvpMode()));
+        cir.setReturnValue((this.level().bridge$pvpMode()));
     }
 
     @Override
     public void spawnIn(Level world) {
-        this.level = world;
+        this.setLevel(world);
         if (world == null) {
             this.unsetRemoved();
             Vec3 position = null;
@@ -198,7 +202,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
                 world = ((CraftWorld) Bukkit.getServer().getWorlds().get(0)).getHandle();
                 position = Vec3.atCenterOf(((ServerLevel) world).getSharedSpawnPos());
             }
-            this.level = world;
+            this.setLevel(world);
             this.setPos(position.x(), position.y(), position.z());
         }
         this.gameMode.setLevel((ServerLevel) world);
@@ -207,7 +211,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Override
     public void resetPlayerWeather() {
         this.weather = null;
-        this.setPlayerWeather(this.level.getLevelData().isRaining() ? WeatherType.DOWNFALL : WeatherType.CLEAR, false);
+        this.setPlayerWeather(this.level().getLevelData().isRaining() ? WeatherType.DOWNFALL : WeatherType.CLEAR, false);
     }
 
     @Override
@@ -242,7 +246,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Override
     public Either<BedSleepingProblem, Unit> getBedResult(BlockPos blockposition, Direction enumdirection) {
         if (!this.isSleeping() && this.isAlive()) {
-            if (!this.level.dimensionType().natural() || !this.level.dimensionType().bedWorks()) {
+            if (!this.level().dimensionType().natural() || !this.level().dimensionType().bedWorks()) {
                 return Either.left(Player.BedSleepingProblem.NOT_POSSIBLE_HERE);
             }
             if (!this.bedInRange(blockposition, enumdirection)) {
@@ -251,15 +255,15 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             if (this.bedBlocked(blockposition, enumdirection)) {
                 return Either.left(Player.BedSleepingProblem.OBSTRUCTED);
             }
-            this.setRespawnPosition(this.level.dimension(), blockposition, this.getYRot(), false, true);
-            if (this.level.isDay()) {
+            this.setRespawnPosition(this.level().dimension(), blockposition, this.getYRot(), false, true);
+            if (this.level().isDay()) {
                 return Either.left(Player.BedSleepingProblem.NOT_POSSIBLE_NOW);
             }
             if (!this.isCreative()) {
                 double d0 = 8.0;
                 double d1 = 5.0;
                 Vec3 vec3d = Vec3.atBottomCenterOf(blockposition);
-                List<Monster> list = this.level.getEntitiesOfClass(Monster.class, new AABB(vec3d.x() - 8.0, vec3d.y() - 5.0, vec3d.z() - 8.0, vec3d.x() + 8.0, vec3d.y() + 5.0, vec3d.z() + 8.0), entitymonster -> entitymonster.isPreventingPlayerRest((ServerPlayer) (Object) this));
+                List<Monster> list = this.level().getEntitiesOfClass(Monster.class, new AABB(vec3d.x() - 8.0, vec3d.y() - 5.0, vec3d.z() - 8.0, vec3d.x() + 8.0, vec3d.y() + 5.0, vec3d.z() + 8.0), entitymonster -> entitymonster.isPreventingPlayerRest((ServerPlayer) (Object) this));
                 if (!list.isEmpty()) {
                     return Either.left(Player.BedSleepingProblem.NOT_SAFE);
                 }

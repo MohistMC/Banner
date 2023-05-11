@@ -44,7 +44,6 @@ public abstract class MixinLavaFluid {
                     BlockState blockState = level.getBlockState(blockPos);
                     if (blockState.isAir()) {
                         if (this.hasFlammableNeighbours(level, blockPos)) {
-                            /**
                             // CraftBukkit start - Prevent lava putting something on fire
                             if (level.getBlockState(blockPos).getBlock() != Blocks.FIRE) {
                                 if (org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callBlockIgniteEvent(level, blockPos, pos).isCancelled()) {
@@ -55,7 +54,7 @@ public abstract class MixinLavaFluid {
                             level.setBlockAndUpdate(blockPos, BaseFireBlock.getState(level, blockPos));
                             return;
                         }
-                    } else if (blockState.getMaterial().blocksMotion()) {
+                    } else if (blockState.blocksMotion()) {
                         return;
                     }
                 }

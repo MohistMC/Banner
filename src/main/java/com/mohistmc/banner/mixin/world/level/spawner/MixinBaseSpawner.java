@@ -116,7 +116,7 @@ public abstract class MixinBaseSpawner {
                             if (spawnData.getEntityToSpawn().size() == 1 && spawnData.getEntityToSpawn().contains("id", 8)) {
                                 ((Mob)entity).finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.SPAWNER, (SpawnGroupData)null, (CompoundTag)null);
                             }
-                            if (mob.level.bridge$spigotConfig().nerfSpawnerMobs) {
+                            if (mob.level().bridge$spigotConfig().nerfSpawnerMobs) {
                                  mob.banner$setAware(false);
                             }
                         }

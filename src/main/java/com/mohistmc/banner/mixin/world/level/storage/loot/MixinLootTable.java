@@ -7,6 +7,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
@@ -34,18 +35,20 @@ public abstract class MixinLootTable implements InjectionLootTable {
     static Logger LOGGER;
 
     @Eject(method = "fill", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/loot/LootTable;getRandomItems(Lnet/minecraft/world/level/storage/loot/LootContext;)Lit/unimi/dsi/fastutil/objects/ObjectArrayList;"))
-    private ObjectArrayList<ItemStack> banner$nonPluginEvent(LootTable lootTable, LootContext context, CallbackInfo ci, Container inv) {
-        ObjectArrayList<ItemStack> list = lootTable.getRandomItems(context);
-        if (!context.hasParam(LootContextParams.ORIGIN) && !context.hasParam(LootContextParams.THIS_ENTITY)) {
+    private ObjectArrayList<ItemStack> banner$nonPluginEvent(LootTable lootTable, LootParams lootParams, CallbackInfo ci, Container inv) {
+        ObjectArrayList<ItemStack> list = lootTable.getRandomItems(lootParams);
+        if (!lootParams.hasParam(LootContextParams.ORIGIN) && !lootParams.hasParam(LootContextParams.THIS_ENTITY)) {
             return list;
         }
-        LootGenerateEvent event = CraftEventFactory.callLootGenerateEvent(inv, (LootTable) (Object) this, context, list, false);
+        // Banner * TODO
+        /**
+        LootGenerateEvent event = CraftEventFactory.callLootGenerateEvent(inv, (LootTable) (Object) this, lootParams, list, false);
         if (event.isCancelled()) {
             ci.cancel();
             return null;
         } else {
             return event.getLoot().stream().map(CraftItemStack::asNMSCopy).collect(ObjectArrayList.toList());
-        }
+        }*/
     }
 
     @Override

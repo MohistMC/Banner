@@ -33,9 +33,11 @@ public abstract class MixinChunkHolder implements InjectionChunkHolder {
 
     @Override
     public LevelChunk getFullChunkNow() {
+        // Banner TODO - wait for spigot
+        /**
         if (!ChunkHolder.getFullChunkStatus(this.oldTicketLevel).isOrAfter(ChunkHolder.FullChunkStatus.BORDER)) {
             return null; // note: using oldTicketLevel for isLoaded checks
-        }
+        }*/
         return this.getFullChunkNowUnchecked();
     }
 

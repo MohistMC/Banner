@@ -145,7 +145,7 @@ public abstract class MixinServerPlayerGameMode {
                 this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, pos));
             } else if (!blockState.isAir()) {
                 blockState.attack(this.level, pos, this.player);
-                f = blockState.getDestroyProgress(this.player, this.player.level, pos);
+                f = blockState.getDestroyProgress(this.player, this.player.level(), pos);
             }
         }
     }

@@ -134,7 +134,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             locals = LocalCapture.CAPTURE_FAILHARD,
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/server/level/ServerLevel;getLevelData()Lnet/minecraft/world/level/storage/LevelData;", shift = At.Shift.BEFORE))
-    private void banner$callSpawnEvent(Connection netManager, ServerPlayer player, CallbackInfo ci, GameProfile gameProfile, GameProfileCache gameProfileCache, Optional optional, String string, CompoundTag compoundTag, ResourceKey resourceKey, ServerLevel serverLevel, ServerLevel serverLevel2, String string2) {
+    private void banner$callSpawnEvent(Connection netManager, ServerPlayer player, CallbackInfo ci, GameProfile gameProfile, GameProfileCache gameProfileCache, String string, CompoundTag compoundTag, ResourceKey resourceKey, ServerLevel serverLevel, ServerLevel serverLevel2, String string2) {
         // Spigot start - spawn location event
         org.bukkit.entity.Player spawnPlayer = player.getBukkitEntity();
         org.spigotmc.event.player.PlayerSpawnLocationEvent ev = new org.spigotmc.event.player.PlayerSpawnLocationEvent(spawnPlayer, spawnPlayer.getLocation());
@@ -144,18 +144,8 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         serverLevel2 = ((CraftWorld) loc.getWorld()).getHandle();
 
         player.spawnIn(serverLevel2);
-        player.gameMode.setLevel((ServerLevel) player.level);
+        player.gameMode.setLevel((ServerLevel) player.level());
         player.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-    }
-
-    @Inject (method = "placeNewPlayer", at = @At (value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerPlayer;setLevel(Lnet/minecraft/server/level/ServerLevel;)V"),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$print(Connection netManager, ServerPlayer player, CallbackInfo ci, GameProfile gameProfile, GameProfileCache gameProfileCache, Optional optional, String string, CompoundTag compoundTag, ResourceKey resourceKey, ServerLevel serverLevel, ServerLevel serverLevel2) {
-        if (compoundTag != null && compoundTag.contains("bukkit")) {
-            CompoundTag bukkit = compoundTag.getCompound("bukkit");
-            PROFILE_NAMES.set(bukkit.contains("lastKnownName", 8) ? bukkit.getString("lastKnownName") : string);
-        }
     }
 
     @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))
@@ -165,19 +155,19 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         cserver.getPluginManager().callEvent(event);
         Location loc = event.getSpawnLocation();
         ServerLevel world = ((CraftWorld) loc.getWorld()).getHandle();
-        playerIn.setLevel(world);
+        playerIn.setServerLevel(world);
         playerIn.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         return world;
     }
 
     @Redirect(method = "placeNewPlayer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/players/PlayerList;viewDistance:I"))
     private int banner$spigotViewDistance(PlayerList playerList, Connection netManager, ServerPlayer playerIn) {
-        return playerIn.getLevel().bridge$spigotConfig().viewDistance;
+        return playerIn.level().bridge$spigotConfig().viewDistance;
     }
 
     @Redirect(method = "placeNewPlayer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/players/PlayerList;simulationDistance:I"))
     private int banner$spigotSimDistance(PlayerList instance, Connection netManager, ServerPlayer playerIn) {
-        return playerIn.getLevel().bridge$spigotConfig().simulationDistance;
+        return playerIn.level().bridge$spigotConfig().simulationDistance;
     }
 
     @Eject(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V"))
@@ -201,14 +191,14 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
     private void banner$addNewPlayer(ServerLevel instance, ServerPlayer player) {
-        if (player.level == instance && !instance.players().contains(player)) {
+        if (player.level() == instance && !instance.players().contains(player)) {
             instance.addNewPlayer(player);
         }
     }
 
     @ModifyVariable(method = "placeNewPlayer", ordinal = 1, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
     private ServerLevel banner$handleWorldChanges(ServerLevel value, Connection connection, ServerPlayer player) {
-        return player.getLevel();
+        return player.serverLevel();
     }
 
     @Inject(method = "save", cancellable = true, at = @At("HEAD"))
@@ -299,7 +289,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     public ServerPlayer respawn(ServerPlayer playerIn, ServerLevel worldIn, boolean flag, Location location, boolean avoidSuffocation, PlayerRespawnEvent.RespawnReason respawnReason) {
         playerIn.stopRiding();
         this.players.remove(playerIn);
-        playerIn.getLevel().removePlayerImmediately(playerIn, Entity.RemovalReason.DISCARDED);
+        playerIn.serverLevel().removePlayerImmediately(playerIn, Entity.RemovalReason.DISCARDED);
         BlockPos pos = playerIn.getRespawnPosition();
         float f = playerIn.getRespawnAngle();
         boolean flag2 = playerIn.isRespawnForced();
@@ -370,10 +360,11 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             playerIn.setPos(playerIn.getX(), playerIn.getY() + 1.0, playerIn.getZ());
         }
         LevelData worlddata = serverWorld.getLevelData();
-        playerIn.connection.send(new ClientboundRespawnPacket(serverWorld.dimensionTypeId(), serverWorld.dimension(), BiomeManager.obfuscateSeed(serverWorld.getSeed()), playerIn.gameMode.getGameModeForPlayer(), playerIn.gameMode.getPreviousGameModeForPlayer(), serverWorld.isDebug(), serverWorld.isFlat(), (byte) (flag ? 1 : 0), playerIn.getLastDeathLocation()));
+        byte b = (byte) (flag ? 1 : 0);
+        playerIn.connection.send(new ClientboundRespawnPacket(playerIn.level().dimensionTypeId(), playerIn.level().dimension(), BiomeManager.obfuscateSeed(playerIn.serverLevel().getSeed()), playerIn.gameMode.getGameModeForPlayer(), playerIn.gameMode.getPreviousGameModeForPlayer(), playerIn.level().isDebug(), playerIn.serverLevel().isFlat(), (byte)b, playerIn.getLastDeathLocation(), playerIn.getPortalCooldown()));
         playerIn.connection.send(new ClientboundSetChunkCacheRadiusPacket((serverWorld.bridge$spigotConfig().viewDistance)));
         playerIn.connection.send(new ClientboundSetSimulationDistancePacket(serverWorld.bridge$spigotConfig().simulationDistance));
-        playerIn.setLevel(serverWorld);
+        playerIn.setServerLevel(serverWorld);
         playerIn.connection.teleport(new Location(serverWorld.getWorld(), playerIn.getX(), playerIn.getY(), playerIn.getZ(), playerIn.getYRot(), playerIn.getXRot()));
         playerIn.setShiftKeyDown(false);
         playerIn.connection.send(new ClientboundSetDefaultSpawnPositionPacket(serverWorld.getSharedSpawnPos(), serverWorld.getSharedSpawnAngle()));
@@ -425,7 +416,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         banner$respawnReason = null;
         playerIn.stopRiding();
         this.players.remove(playerIn);
-        playerIn.getLevel().removePlayerImmediately(playerIn, Entity.RemovalReason.DISCARDED);
+        playerIn.serverLevel().removePlayerImmediately(playerIn, Entity.RemovalReason.DISCARDED);
         BlockPos pos = playerIn.getRespawnPosition();
         float f = playerIn.getRespawnAngle();
         boolean flag2 = playerIn.isRespawnForced();
@@ -515,11 +506,11 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             serverplayerentity.setPos(serverplayerentity.getX(), serverplayerentity.getY() + 1.0D, serverplayerentity.getZ());
         }
 
-        LevelData iworldinfo = serverplayerentity.level.getLevelData();
-        serverplayerentity.connection.send(new ClientboundRespawnPacket(serverplayerentity.level.dimensionTypeId(), serverplayerentity.level.dimension(), BiomeManager.obfuscateSeed(serverplayerentity.getLevel().getSeed()), serverplayerentity.gameMode.getGameModeForPlayer(), serverplayerentity.gameMode.getPreviousGameModeForPlayer(), serverplayerentity.getLevel().isDebug(), serverplayerentity.getLevel().isFlat(), (byte) (conqueredEnd ? 1 : 0), serverplayerentity.getLastDeathLocation()));
+        LevelData iworldinfo = serverplayerentity.level().getLevelData();
+        serverplayerentity.connection.send(new ClientboundRespawnPacket(serverplayerentity.level().dimensionTypeId(), serverplayerentity.level().dimension(), BiomeManager.obfuscateSeed(serverplayerentity.serverLevel().getSeed()), serverplayerentity.gameMode.getGameModeForPlayer(), serverplayerentity.gameMode.getPreviousGameModeForPlayer(), serverplayerentity.level().isDebug(), serverplayerentity.serverLevel().isFlat(), (byte) (conqueredEnd ? 1 : 0), serverplayerentity.getLastDeathLocation(), serverplayerentity.getPortalCooldown()));
         serverplayerentity.connection.send(new ClientboundSetChunkCacheRadiusPacket(serverWorld.bridge$spigotConfig().viewDistance));
         serverplayerentity.connection.send(new ClientboundSetSimulationDistancePacket(serverWorld.bridge$spigotConfig().simulationDistance));
-        serverplayerentity.setLevel(serverWorld);
+        serverplayerentity.setServerLevel(serverWorld);
         serverplayerentity.connection.teleport(new Location(serverWorld.getWorld(), serverplayerentity.getX(), serverplayerentity.getY(), serverplayerentity.getZ(), serverplayerentity.getYRot(), serverplayerentity.getXRot()));
         serverplayerentity.setShiftKeyDown(false);
         serverplayerentity.connection.send(new ClientboundSetDefaultSpawnPositionPacket(serverWorld.getSharedSpawnPos(), serverWorld.getSharedSpawnAngle()));
@@ -557,20 +548,8 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     @Inject(method = "placeNewPlayer", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
             ordinal = 1), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$sendSupported(Connection netManager, ServerPlayer player, CallbackInfo ci, GameProfile gameProfile, GameProfileCache gameProfileCache, Optional optional, String string, CompoundTag compoundTag, ResourceKey resourceKey, ServerLevel serverLevel, ServerLevel serverLevel2, String string2, LevelData levelData, ServerGamePacketListenerImpl serverGamePacketListenerImpl) {
+    private void banner$sendSupported(Connection netManager, ServerPlayer player, CallbackInfo ci, GameProfile gameProfile, GameProfileCache gameProfileCache, String string, CompoundTag compoundTag, ResourceKey resourceKey, ServerLevel serverLevel, ServerLevel serverLevel2, String string2, LevelData levelData, ServerGamePacketListenerImpl serverGamePacketListenerImpl) {
         player.getBukkitEntity().sendSupportedChannels();
-    }
-
-    @ModifyVariable(method = "placeNewPlayer", at = @At (value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerPlayer;setLevel(Lnet/minecraft/server/level/ServerLevel;)V"),
-            index = 6, ordinal = 0)
-    private String banner$renameDetection(String name) {
-        String val = PROFILE_NAMES.get();
-        if (val != null) {
-            PROFILE_NAMES.set(null);
-            return val;
-        }
-        return name;
     }
 
     @Inject(method = "sendPlayerPermissionLevel(Lnet/minecraft/server/level/ServerPlayer;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getCommands()Lnet/minecraft/commands/Commands;"))
@@ -582,9 +561,9 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     private void banner$useScaledHealth(ServerPlayer playerEntity) {
         playerEntity.getBukkitEntity().updateScaledHealth();
         playerEntity.getEntityData().refresh(playerEntity);
-        int i = playerEntity.level.getGameRules().getBoolean(GameRules.RULE_REDUCEDDEBUGINFO) ? 22 : 23;
+        int i = playerEntity.level().getGameRules().getBoolean(GameRules.RULE_REDUCEDDEBUGINFO) ? 22 : 23;
         playerEntity.connection.send(new ClientboundEntityEventPacket(playerEntity, (byte) i));
-        float immediateRespawn = playerEntity.level.getGameRules().getBoolean(GameRules.RULE_DO_IMMEDIATE_RESPAWN) ? 1.0f : 0.0f;
+        float immediateRespawn = playerEntity.level().getGameRules().getBoolean(GameRules.RULE_DO_IMMEDIATE_RESPAWN) ? 1.0f : 0.0f;
         playerEntity.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.IMMEDIATE_RESPAWN, immediateRespawn));
     }
 

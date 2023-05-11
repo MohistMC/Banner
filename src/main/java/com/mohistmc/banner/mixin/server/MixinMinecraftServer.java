@@ -364,7 +364,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         if (this.tickCount % 20 == 0) {
             for (int i = 0; i < this.getPlayerList().players.size(); ++i) {
                 ServerPlayer entityplayer = (ServerPlayer) this.getPlayerList().players.get(i);
-                entityplayer.connection.send(new ClientboundSetTimePacket(entityplayer.level.getGameTime(), entityplayer.getPlayerTime(), entityplayer.level.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT))); // Add support for per player time
+                entityplayer.connection.send(new ClientboundSetTimePacket(entityplayer.level().getGameTime(), entityplayer.getPlayerTime(), entityplayer.level().getGameRules().getBoolean(GameRules.RULE_DAYLIGHT))); // Add support for per player time
             }
         }
     }

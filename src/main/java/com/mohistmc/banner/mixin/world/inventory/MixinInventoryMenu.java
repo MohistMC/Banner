@@ -20,7 +20,7 @@ public abstract class MixinInventoryMenu extends RecipeBookMenu<CraftingContaine
 
 
     // @formatter:off
-    @Shadow @Final private CraftingContainer craftSlots;
+    @Shadow @Final private CraftingContainer craftSlots = new TransientCraftingContainer(this, 2, 2);
     @Shadow @Final private ResultContainer resultSlots;
     // @formatter:on
 

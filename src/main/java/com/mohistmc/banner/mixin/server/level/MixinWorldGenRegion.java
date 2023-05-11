@@ -14,7 +14,7 @@ public abstract class MixinWorldGenRegion implements WorldGenLevel {
 
     @Inject(method = "addFreshEntity", at = @At("HEAD"))
     private void banner$addReason(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-        entity.getLevel().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.DEFAULT);
+        entity.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.DEFAULT);
     }
 
     @Override
