@@ -56,7 +56,7 @@ public abstract class MixinSculkSensorBlock extends Block {
     @Unique private static int newCurrent;
 
     @Inject(method = "activate", cancellable = true, at = @At("HEAD"))
-    private static void banner$activate(Entity entity, Level level, BlockPos blockPos, BlockState blockState, int i, int j, CallbackInfo ci) {
+    private void banner$activate(Entity entity, Level level, BlockPos blockPos, BlockState blockState, int i, int j, CallbackInfo ci) {
         BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(CraftBlock.at(level, blockPos), blockState.getValue(SculkSensorBlock.POWER), i);
         Bukkit.getPluginManager().callEvent(eventRedstone);
         if (eventRedstone.getNewCurrent() <= 0) {
@@ -66,7 +66,7 @@ public abstract class MixinSculkSensorBlock extends Block {
     }
 
     @ModifyVariable(method = "activate", ordinal = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"), argsOnly = true)
-    private static int banner$updateCurrent(int old) {
+    private int banner$updateCurrent(int old) {
         return newCurrent;
     }
 

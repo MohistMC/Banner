@@ -81,7 +81,7 @@ public abstract class MixinPrimedTnt extends Entity implements TraceableEntity, 
      * @reason
      */
     @Overwrite
-    protected void explode() {
+    private void explode() {
         ExplosionPrimeEvent event = new ExplosionPrimeEvent((Explosive) this.getBukkitEntity());
         Bukkit.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {

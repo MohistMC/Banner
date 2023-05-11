@@ -88,8 +88,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow public WorldData worldData;
     @Shadow @Final public static org.slf4j.Logger LOGGER;
     @Shadow private long nextTickTime;
-    @Shadow public abstract boolean isSpawningMonsters();
-    @Shadow public abstract boolean isSpawningAnimals();
     @Shadow private String localIp;
     @Shadow private boolean onlineMode;
     @Shadow private int tickCount;
@@ -244,6 +242,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         cir.setReturnValue(!this.levels.isEmpty());
     }
 
+    /**
     @Inject(method = "setInitialSpawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerChunkCache;getGenerator()Lnet/minecraft/world/level/chunk/ChunkGenerator;", shift = At.Shift.BEFORE), cancellable = true)
     private static void banner$spawnInit(ServerLevel level, ServerLevelData levelData, boolean generateBonusChest, boolean debug, CallbackInfo ci) {
         // CraftBukkit start
@@ -260,7 +259,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                 }
             }
         }
-    }
+    }*/
 
     @ModifyExpressionValue(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;tickCount:I", ordinal = 1))
     private boolean banner$addTaskCheck() {
