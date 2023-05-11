@@ -52,6 +52,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -98,7 +99,8 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     protected org.bukkit.World.Environment environment;
     protected org.bukkit.generator.BiomeProvider biomeProvider;
 
-    private AtomicReference<Boolean> banner$validate = new AtomicReference<>();
+    private final AtomicReference<Boolean> banner$validate = new AtomicReference<>();
+    private AtomicReference<Integer> banner$flag = new AtomicReference<>();
 
     public void banner$constructor(WritableLevelData worldInfo, ResourceKey<Level> dimension, RegistryAccess registryAccess, final Holder<DimensionType> dimensionType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdate) {
         throw new RuntimeException();
@@ -165,6 +167,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
 
     @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At("HEAD"), cancellable = true)
     private void banner$captureTreeGeneration(BlockPos pos, BlockState state, int flags, int recursionLeft, CallbackInfoReturnable<Boolean> cir) {
+        banner$flag.set(flags);
         if (this.captureTreeGeneration) {
             CapturedBlockState blockstate = capturedBlockStates.get(pos);
             if (blockstate == null) {
@@ -172,9 +175,30 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                 this.capturedBlockStates.put(pos.immutable(), blockstate);
             }
             blockstate.setData(state);
+            cir.setReturnValue(true);
         }
-        cir.setReturnValue(true);
     }
+
+    @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlocksDirty(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;)V"))
+    private void banner$cancelDirty(Level instance, BlockPos blockPos, BlockState oldState, BlockState newState) {}
+
+    @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;sendBlockUpdated(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;I)V"))
+    private void banner$cancelUpdate(Level instance, BlockPos pos, BlockState state, BlockState state1, int i) {}
+
+    @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;blockUpdated(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;)V"))
+    private void banner$cancelUpdatedBlock(Level instance, BlockPos pos, Block block){}
+
+    @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;updateNeighbourForOutputSignal(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;)V"))
+    private void banner$cancelUpdateSignal(Level instance, BlockPos pos, Block block) {}
+
+    @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;updateIndirectNeighbourShapes(Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;II)V"))
+    private void banner$cancelUpdateShape(BlockState instance, LevelAccessor levelAccessor, BlockPos pos, int i, int j) {}
+
+    @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;updateNeighbourShapes(Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;II)V"))
+    private void banner$cancelUpdateShape0(BlockState instance, LevelAccessor levelAccessor, BlockPos pos, int i, int j) {}
+
+    @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;onBlockStateChange(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;)V"))
+    private void banner$cancelChangeBlock(Level instance, BlockPos pos, BlockState blockState, BlockState newState) {}
 
     @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getBlock()Lnet/minecraft/world/level/block/Block;",
@@ -196,6 +220,11 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         if (!this.captureBlockStates) { // Don't notify clients or update physics while capturing blockstates
             notifyAndUpdatePhysics(pos, this.getChunkAt(pos), banner$blockState, this.getBlockState(pos), this.getBlockState(pos), flags, recursionLeft);
         }
+    }
+
+    @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/LevelChunk;setBlockState(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;"))
+    private BlockState banner$noFlagSet(LevelChunk instance, BlockPos pos, BlockState state, boolean isMoving) {
+        return instance.setBlockState(pos, state, (banner$flag.get() & 64) != 0, (banner$flag.get() & 1024) == 0); // CraftBukkit custom NO_PLACE flag
     }
 
     @Inject(method = "getBlockState", at = @At("HEAD"), cancellable = true)
