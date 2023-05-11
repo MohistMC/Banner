@@ -459,8 +459,6 @@ accessible field net/minecraft/world/level/block/entity/LecternBlockEntity bookA
 accessible field net/minecraft/world/level/block/entity/RandomizableContainerBlockEntity lootTable Lnet/minecraft/resources/ResourceLocation;
 accessible field net/minecraft/world/level/block/entity/RandomizableContainerBlockEntity lootTableSeed J
 accessible field net/minecraft/world/level/block/entity/ShulkerBoxBlockEntity openCount I
-accessible field net/minecraft/world/level/block/entity/SignBlockEntity isEditable Z
-accessible field net/minecraft/world/level/block/entity/SignBlockEntity messages [Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/world/level/block/entity/SkullBlockEntity noteBlockSound Lnet/minecraft/resources/ResourceLocation;
 accessible field net/minecraft/world/level/block/entity/SkullBlockEntity owner Lcom/mojang/authlib/GameProfile;
 accessible field net/minecraft/world/level/block/entity/StructureBlockEntity author Ljava/lang/String;
