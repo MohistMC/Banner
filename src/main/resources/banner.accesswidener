@@ -25,6 +25,8 @@ accessible class net/minecraft/server/network/ServerLoginPacketListenerImpl$Stat
 accessible method net/minecraft/server/level/Ticket <init> (Lnet/minecraft/server/level/TicketType;ILjava/lang/Object;)V
 accessible class net/minecraft/server/level/DistanceManager$ChunkTicketTracker
 accessible class net/minecraft/world/entity/animal/Bee$BeePollinateGoal
+accessible class net/minecraft/server/commands/LootCommand$Callback
+accessible class net/minecraft/server/commands/SpreadPlayersCommand$Position
 
 # public methods
 accessible method net/minecraft/world/level/block/DispenserBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)V
