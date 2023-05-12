@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.server.level;
 
 import com.google.common.collect.Lists;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.DistValidate;
 import com.mohistmc.banner.fabric.BannerDerivedWorldInfo;
@@ -20,6 +21,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.util.ProgressListener;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
@@ -197,6 +199,11 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     @Redirect(method = "tickChunk", at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
     private boolean banner$thunder(ServerLevel serverWorld, Entity entityIn) {
         return strikeLightning(entityIn, LightningStrikeEvent.Cause.WEATHER);
+    }
+
+    @ModifyExpressionValue(method = "tickChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/RandomSource;nextInt(I)I", ordinal = 0))
+    private boolean banner$thunderChance(LevelChunk chunk, int randomTickSpeed, CallbackInfo ci) {
+        return this.isRaining() && this.isThundering() && this.bridge$spigotConfig().thunderChance > 0 && this.random.nextInt(this.bridge$spigotConfig().thunderChance) == 0;
     }
 
     @Override

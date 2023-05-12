@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.network;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.injection.server.network.InjectionServerGamePacketListenerImpl;
 import com.mohistmc.banner.util.ServerUtils;
@@ -31,6 +32,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.inventory.MerchantMenu;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
@@ -60,6 +62,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -697,5 +700,16 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     @Override
     public boolean isDisconnected() {
         return !this.player.bridge$joining() && !this.connection.isConnected();
+    }
+
+    @ModifyExpressionValue(method = "handleSetCreativeModeSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"))
+    private boolean banner$permCheck(ItemStack itemStack) {
+        CompoundTag banner$tag = BlockItem.getBlockEntityData(itemStack);
+        return !itemStack.isEmpty()
+                && banner$tag != null
+                && banner$tag.contains("x")
+                && banner$tag.contains("y")
+                && banner$tag.contains("z")
+                && this.player.getBukkitEntity().hasPermission("minecraft.nbt.copy"); // Spigot
     }
 }

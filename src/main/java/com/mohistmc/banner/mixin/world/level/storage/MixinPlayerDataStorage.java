@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.File;
@@ -24,6 +25,11 @@ public class MixinPlayerDataStorage implements InjectionPlayerDataStorage {
     @Shadow @Final private File playerDir;
 
     @Shadow @Final private static Logger LOGGER;
+
+    @Inject(method = "save", at = @At("HEAD"), cancellable = true)
+    private void banner$allowDataSaving(Player player, CallbackInfo ci) {
+        if (org.spigotmc.SpigotConfig.disablePlayerDataSaving) ci.cancel(); // Spigot
+    }
 
     @Inject(method = "load", at = @At(value = "INVOKE", target = "Lnet/minecraft/nbt/NbtUtils;getDataVersion(Lnet/minecraft/nbt/CompoundTag;I)I"))
     private void banner$lastSeenTime(Player player, CallbackInfoReturnable<CompoundTag> cir) {

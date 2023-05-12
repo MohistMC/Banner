@@ -52,6 +52,7 @@ import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -164,6 +165,8 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     @Shadow public abstract int getArrowCount();
 
     @Shadow protected abstract boolean doesEmitEquipEvent(EquipmentSlot slot);
+
+    @Shadow @Final private static Logger LOGGER;
 
     public MixinLivingEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -593,6 +596,11 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     @Inject(method = "heal", at = @At(value = "RETURN"))
     public void banner$resetReason(float healAmount, CallbackInfo ci) {
         banner$regainReason = null;
+    }
+
+    @Redirect(method = "die", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V"))
+    private void banner$logNamedDeaths(Logger instance, String s, Object o1, Object o2) {
+        if (org.spigotmc.SpigotConfig.logNamedDeaths) LOGGER.info("Named entity {} died: {}", ((LivingEntity) (Object) this), this.getCombatTracker().getDeathMessage().getString()); // Spigot
     }
 
     @Override

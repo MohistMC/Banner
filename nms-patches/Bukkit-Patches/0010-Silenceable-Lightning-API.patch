@@ -1,0 +1,62 @@
+From 345aa612bc8c2f3c9d6d45b334818c19a93ad271 Mon Sep 17 00:00:00 2001
+From: drXor <mcyoungsota@gmail.com>
+Date: Sun, 23 Feb 2014 16:16:29 -0400
+Subject: [PATCH] Silenceable Lightning API
+
+
+diff --git a/src/main/java/org/bukkit/World.java b/src/main/java/org/bukkit/World.java
+index 4f780808..4eef5ed3 100644
+--- a/src/main/java/org/bukkit/World.java
++++ b/src/main/java/org/bukkit/World.java
+@@ -2685,6 +2685,29 @@ public interface World extends RegionAccessor, WorldInfo, PluginMessageRecipient
+     // Spigot start
+     public class Spigot {
+ 
++        /**
++         * Strikes lightning at the given {@link Location} and possibly without sound
++         *
++         * @param loc The location to strike lightning
++         * @param isSilent Whether this strike makes no sound
++         * @return The lightning entity.
++         */
++        @NotNull
++        public LightningStrike strikeLightning(@NotNull Location loc, boolean isSilent) {
++            throw new UnsupportedOperationException("Not supported yet.");
++        }
++
++        /**
++         * Strikes lightning at the given {@link Location} without doing damage and possibly without sound
++         *
++         * @param loc The location to strike lightning
++         * @param isSilent Whether this strike makes no sound
++         * @return The lightning entity.
++         */
++        @NotNull
++        public LightningStrike strikeLightningEffect(@NotNull Location loc, boolean isSilent) {
++            throw new UnsupportedOperationException("Not supported yet.");
++        }
+     }
+ 
+     @NotNull
+diff --git a/src/main/java/org/bukkit/entity/LightningStrike.java b/src/main/java/org/bukkit/entity/LightningStrike.java
+index 4d308c5a..be347c3d 100644
+--- a/src/main/java/org/bukkit/entity/LightningStrike.java
++++ b/src/main/java/org/bukkit/entity/LightningStrike.java
+@@ -17,6 +17,14 @@ public interface LightningStrike extends Entity {
+     // Spigot start
+     public class Spigot extends Entity.Spigot {
+ 
++        /*
++         * Returns whether the strike is silent.
++         *
++         * @return whether the strike is silent.
++         */
++        public boolean isSilent() {
++            throw new UnsupportedOperationException("Not supported yet.");
++        }
+     }
+ 
+     @NotNull
+-- 
+2.40.0
+

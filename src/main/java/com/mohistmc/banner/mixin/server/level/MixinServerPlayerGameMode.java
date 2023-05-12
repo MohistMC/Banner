@@ -360,4 +360,18 @@ public abstract class MixinServerPlayerGameMode {
     private void banner$changeMessage(PlayerList instance, Packet<?> packet) {
         this.player.server.getPlayerList().broadcastAll(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_GAME_MODE, this.player), this.player);
     }
+
+    @Inject(method = "handleBlockBreakAction",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerPlayer;blockActionRestricted(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/GameType;)Z",
+            shift = At.Shift.BEFORE), cancellable = true)
+    private void banner$permCheck(BlockPos pos, ServerboundPlayerActionPacket.Action action, Direction face, int maxBuildHeight, int sequence, CallbackInfo ci) {
+        // Spigot start - handle debug stick left click for non-creative
+        if (this.player.getMainHandItem().is(net.minecraft.world.item.Items.DEBUG_STICK)
+                && ((net.minecraft.world.item.DebugStickItem) net.minecraft.world.item.Items.DEBUG_STICK).handleInteraction(this.player, this.level.getBlockState(pos), this.level, pos, false, this.player.getMainHandItem())) {
+            this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, pos));
+            ci.cancel();
+        }
+        // Spigot end
+    }
 }

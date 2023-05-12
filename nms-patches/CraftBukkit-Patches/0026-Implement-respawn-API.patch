@@ -1,0 +1,29 @@
+From eb19e8d14bc3025163ca8382581ccd3ec4981991 Mon Sep 17 00:00:00 2001
+From: ninja- <xninja@openmailbox.org>
+Date: Tue, 8 Oct 2013 14:34:49 +0200
+Subject: [PATCH] Implement respawn API.
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index 8971dfa0a..86b70e119 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -2107,6 +2107,15 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         public void setCollidesWithEntities(boolean collides) {
+             CraftPlayer.this.setCollidable(collides);
+         }
++
++        @Override
++        public void respawn()
++        {
++            if ( getHealth() <= 0 && isOnline() )
++            {
++                server.getServer().getPlayerList().respawn( getHandle(), false, RespawnReason.PLUGIN );
++            }
++        }
+     };
+ 
+     public Player.Spigot spigot()
+-- 
+2.40.0
+

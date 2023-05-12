@@ -1,0 +1,39 @@
+From 311c1e504d75c8387aefeaf4d0942669e260dc7d Mon Sep 17 00:00:00 2001
+From: Dylan Xaldin <Puremin0rez515@gmail.com>
+Date: Thu, 12 Dec 2013 18:05:03 -0600
+Subject: [PATCH] Allow Disabling Zombie Villager Aggression
+
+Ability to configure if Zombies will be aggressive towards Villagers.
+
+diff --git a/src/main/java/net/minecraft/world/entity/monster/EntityZombie.java b/src/main/java/net/minecraft/world/entity/monster/EntityZombie.java
+index 52864f9f6..a184f8cc6 100644
+--- a/src/main/java/net/minecraft/world/entity/monster/EntityZombie.java
++++ b/src/main/java/net/minecraft/world/entity/monster/EntityZombie.java
+@@ -120,7 +120,7 @@ public class EntityZombie extends EntityMonster {
+         this.goalSelector.addGoal(7, new PathfinderGoalRandomStrollLand(this, 1.0D));
+         this.targetSelector.addGoal(1, (new PathfinderGoalHurtByTarget(this, new Class[0])).setAlertOthers(EntityPigZombie.class));
+         this.targetSelector.addGoal(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityHuman.class, true));
+-        this.targetSelector.addGoal(3, new PathfinderGoalNearestAttackableTarget<>(this, EntityVillagerAbstract.class, false));
++        if ( level.spigotConfig.zombieAggressiveTowardsVillager ) this.targetSelector.addGoal(3, new PathfinderGoalNearestAttackableTarget<>(this, EntityVillagerAbstract.class, false)); // Spigot
+         this.targetSelector.addGoal(3, new PathfinderGoalNearestAttackableTarget<>(this, EntityIronGolem.class, true));
+         this.targetSelector.addGoal(5, new PathfinderGoalNearestAttackableTarget<>(this, EntityTurtle.class, 10, true, false, EntityTurtle.BABY_ON_LAND_SELECTOR));
+     }
+diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
+index 4894096ae..457a8e84b 100644
+--- a/src/main/java/org/spigotmc/SpigotWorldConfig.java
++++ b/src/main/java/org/spigotmc/SpigotWorldConfig.java
+@@ -255,4 +255,11 @@ public class SpigotWorldConfig
+         tridentDespawnRate = getInt( "trident-despawn-rate", arrowDespawnRate );
+         log( "Arrow Despawn Rate: " + arrowDespawnRate + " Trident Respawn Rate:" + tridentDespawnRate );
+     }
++
++    public boolean zombieAggressiveTowardsVillager;
++    private void zombieAggressiveTowardsVillager()
++    {
++        zombieAggressiveTowardsVillager = getBoolean( "zombie-aggressive-towards-villager", true );
++        log( "Zombie Aggressive Towards Villager: " + zombieAggressiveTowardsVillager );
++    }
+ }
+-- 
+2.40.0
+

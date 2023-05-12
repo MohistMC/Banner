@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.item;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mohistmc.banner.bukkit.DistValidate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -13,6 +14,7 @@ import net.minecraft.world.item.SolidBucketItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -43,6 +45,8 @@ public abstract class MixinBlockItem {
     // @formatter:on
 
     private AtomicReference<org.bukkit.block.BlockState> banner$state = new AtomicReference<>();
+    private static final AtomicReference<BlockPos> banner$pos = new AtomicReference<>();
+    private static final AtomicReference<net.minecraft.world.entity.player.Player> banner$player = new AtomicReference<>();
 
     @Inject(method = "place", locals = LocalCapture.CAPTURE_FAILHARD,
             at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/item/BlockItem;getPlacementState(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;"))
@@ -95,5 +99,24 @@ public abstract class MixinBlockItem {
         BlockCanBuildEvent event = new BlockCanBuildEvent(CraftBlock.at(context.getLevel(), context.getClickedPos()), player, CraftBlockData.fromData(state), original);
         if (DistValidate.isValid(context)) Bukkit.getPluginManager().callEvent(event);
         return event.isBuildable();
+    }
+
+    @Inject(method = "updateCustomBlockEntityTag(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;)Z",
+            at = @At("HEAD"))
+    private static void banner$getPos(Level level, net.minecraft.world.entity.player.Player player, BlockPos pos, ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
+        banner$pos.set(pos);
+        banner$player.set(player);
+    }
+    @ModifyExpressionValue(method = "updateCustomBlockEntityTag(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;)Z",
+            at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
+    private static boolean banner$checkPerm(Level level) {
+        BlockEntity banner$tileEntity = level.getBlockEntity(banner$pos.get());
+        return banner$tileEntity != null
+                && !level.isClientSide
+                && banner$tileEntity.onlyOpCanSetNbt()
+                && (banner$player.get() == null
+                || !banner$player.get().canUseGameMasterBlocks())
+                || (banner$player.get().getAbilities().instabuild
+                && banner$player.get().getBukkitEntity().hasPermission("minecraft.nbt.place"));
     }
 }
