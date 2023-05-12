@@ -84,8 +84,7 @@ public abstract class MixinMain {
 
     @Inject(method = "main", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/server/packs/repository/ServerPacksSource;createPackRepository(Ljava/nio/file/Path;)Lnet/minecraft/server/packs/repository/PackRepository;"),
-            remap = false,
-            locals = LocalCapture.CAPTURE_FAILHARD)
+            locals = LocalCapture.CAPTURE_FAILEXCEPTION)
     private static void banner$createBukkitDatapack(String[] strings, CallbackInfo ci, OptionParser optionParser, OptionSpec optionSpec, OptionSpec optionSpec2, OptionSpec optionSpec3, OptionSpec optionSpec4, OptionSpec optionSpec5, OptionSpec optionSpec6, OptionSpec optionSpec7, OptionSpec optionSpec8, OptionSpec optionSpec9, OptionSpec optionSpec10, OptionSpec optionSpec11, OptionSpec optionSpec12, OptionSpec optionSpec13, OptionSpec optionSpec14, OptionSpec optionSpec15, OptionSpec optionSpec16, OptionSet optionSet, Path path, Path path2, DedicatedServerSettings dedicatedServerSettings, Path path3, Eula eula, File file, Services services, String string, LevelStorageSource levelStorageSource, LevelStorageSource.LevelStorageAccess levelStorageAccess, LevelSummary levelSummary, boolean bl) {
         // CraftBukkit start
         File bukkitDataPackFolder = new File(levelStorageAccess.getLevelPath(LevelResource.DATAPACK_DIR).toFile(), "bukkit");

@@ -18,7 +18,8 @@ public class MixinDataFixers {
     @Inject(method = "addFixers",
             at = @At(value = "INVOKE",
             target = "Lcom/mojang/datafixers/DataFixerBuilder;addSchema(ILjava/util/function/BiFunction;)Lcom/mojang/datafixers/schemas/Schema;",
-            ordinal = 38), remap = false, locals = LocalCapture.CAPTURE_FAILHARD)
+            remap = false,
+            ordinal = 38), locals = LocalCapture.CAPTURE_FAILHARD)
     private static void banner$addFix(DataFixerBuilder builder, CallbackInfo ci,
                                       Schema schema, Schema schema2, Schema schema3,
                                       Schema schema4, Schema schema5, Schema schema6,
