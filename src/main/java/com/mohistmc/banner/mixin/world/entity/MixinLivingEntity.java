@@ -598,7 +598,10 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         banner$regainReason = null;
     }
 
-    @Redirect(method = "die", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V"))
+    @Redirect(method = "die",
+            remap = false,
+            at = @At(value = "INVOKE",
+            target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V"))
     private void banner$logNamedDeaths(Logger instance, String s, Object o1, Object o2) {
         if (org.spigotmc.SpigotConfig.logNamedDeaths) LOGGER.info("Named entity {} died: {}", ((LivingEntity) (Object) this), this.getCombatTracker().getDeathMessage().getString()); // Spigot
     }

@@ -15,7 +15,10 @@ public class MixinConnection implements InjectionConnection {
     @Shadow public Channel channel;
     public String hostname = ""; // CraftBukkit - add field
 
-    @Redirect(method = "disconnect", at = @At(value = "INVOKE", target = "Lio/netty/channel/ChannelFuture;awaitUninterruptibly()Lio/netty/channel/ChannelFuture;"))
+    @Redirect(method = "disconnect",
+            remap = false,
+            at = @At(value = "INVOKE",
+            target = "Lio/netty/channel/ChannelFuture;awaitUninterruptibly()Lio/netty/channel/ChannelFuture;"))
     private ChannelFuture banner$recallClose(ChannelFuture instance) {
         return this.channel.close(); // We can't wait as this may be called from an event loop.
     }

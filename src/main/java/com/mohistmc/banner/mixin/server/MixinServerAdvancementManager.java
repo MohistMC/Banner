@@ -36,7 +36,9 @@ public class MixinServerAdvancementManager {
 
     @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V",
             at = @At(value = "NEW", target = "Lnet/minecraft/advancements/AdvancementList;<init>()V", shift = At.Shift.BEFORE),
-            locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+            locals = LocalCapture.CAPTURE_FAILHARD,
+            remap = false,
+            cancellable = true)
     private void banner$forEachNew(Map<ResourceLocation, JsonElement> object, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci, Map map) {
         object.forEach((resourceLocation, jsonElement) -> {
             // Spigot start

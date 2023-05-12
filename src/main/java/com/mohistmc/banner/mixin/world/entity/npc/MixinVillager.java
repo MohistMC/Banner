@@ -84,7 +84,7 @@ public abstract class MixinVillager extends AbstractVillager {
         banner$damageSource.set(damageSource);
     }
 
-    @Redirect(method = "die", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V"))
+    @Redirect(method = "die", remap = false, at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V"))
     private void banner$logVillagerDeaths(Logger instance, String s, Object o1, Object o2) {
         if (org.spigotmc.SpigotConfig.logVillagerDeaths)
             LOGGER.info("Villager {} died, message: '{}'", ((net.minecraft.world.entity.npc.Villager) (Object) this), banner$damageSource.get().getLocalizedDeathMessage(this).getString()); // Spigot
