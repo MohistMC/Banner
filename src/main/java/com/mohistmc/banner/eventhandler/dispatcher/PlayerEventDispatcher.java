@@ -1,13 +1,9 @@
 package com.mohistmc.banner.eventhandler.dispatcher;
 
-import com.mohistmc.banner.bukkit.BukkitCaptures;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
@@ -36,18 +32,6 @@ public class PlayerEventDispatcher {
             }
             return InteractionResult.PASS;
         });
-        AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
-            BukkitCaptures.captureNextBlockBreakEventAsPrimaryEvent();
-            return InteractionResult.PASS;
-        });
-        UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            BukkitCaptures.capturePlaceEventDirection(hitResult.getDirection());
-            BukkitCaptures.capturePlaceEventDirection(hitResult.getDirection());
-            BukkitCaptures.capturePlaceEventHand(hand);
-            BukkitCaptures.getPlaceEventHand(InteractionHand.MAIN_HAND);
-            return InteractionResult.PASS;
-        });
-
     }
 
 

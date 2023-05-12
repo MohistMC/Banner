@@ -1,10 +1,6 @@
 pluginManagement {
     repositories {
         maven {
-            name = "Lss233's.Mirror();"
-            url = 'https://crystal.app.lss233.com/repositories/minecraft/'
-        }
-        maven {
             name = 'Fabric'
             url = 'https://maven.fabricmc.net/'
         }
