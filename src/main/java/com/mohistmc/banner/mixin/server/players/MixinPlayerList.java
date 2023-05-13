@@ -157,18 +157,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         player.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
     }
 
-    @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))
-    private ServerLevel banner$spawnLocationEvent(MinecraftServer minecraftServer, ResourceKey<Level> dimension, Connection netManager, ServerPlayer playerIn) {
-        CraftPlayer player = playerIn.getBukkitEntity();
-        PlayerSpawnLocationEvent event = new PlayerSpawnLocationEvent(player, player.getLocation());
-        cserver.getPluginManager().callEvent(event);
-        Location loc = event.getSpawnLocation();
-        ServerLevel world = ((CraftWorld) loc.getWorld()).getHandle();
-        playerIn.setLevel(world);
-        playerIn.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        return world;
-    }
-
     @Redirect(method = "placeNewPlayer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/players/PlayerList;viewDistance:I"))
     private int banner$spigotViewDistance(PlayerList playerList, Connection netManager, ServerPlayer playerIn) {
         return playerIn.getLevel().bridge$spigotConfig().viewDistance;
