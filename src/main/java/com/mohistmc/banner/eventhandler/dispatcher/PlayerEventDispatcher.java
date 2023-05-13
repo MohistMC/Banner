@@ -1,11 +1,17 @@
 package com.mohistmc.banner.eventhandler.dispatcher;
 
+import com.mohistmc.banner.bukkit.BukkitCaptures;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.level.ExplosionDamageCalculator;
@@ -13,7 +19,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
+import org.bukkit.event.block.BlockBreakEvent;
+
+import java.util.List;
 
 public class PlayerEventDispatcher {
 
@@ -32,8 +43,31 @@ public class PlayerEventDispatcher {
             }
             return InteractionResult.PASS;
         });
+        PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, blockEntity) -> {
+            BukkitCaptures.captureNextBlockBreakEventAsPrimaryEvent();
+            return false;
+        });
+        PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, blockEntity) -> {
+            BukkitCaptures.captureNextBlockBreakEventAsPrimaryEvent();
+            BukkitCaptures.BlockBreakEventContext breakEventContext = BukkitCaptures.popSecondaryBlockBreakEvent();
+            while (breakEventContext != null) {
+                Block block = breakEventContext.getEvent().getBlock();
+                handleBlockDrop(breakEventContext, new BlockPos(block.getX(), block.getY(), block.getZ()), world, (ServerPlayer) player);
+                breakEventContext = BukkitCaptures.popSecondaryBlockBreakEvent();
+            }
+        });
     }
 
+    private static void handleBlockDrop(BukkitCaptures.BlockBreakEventContext breakEventContext, BlockPos pos, Level world, ServerPlayer player) {
+        BlockBreakEvent breakEvent = breakEventContext.getEvent();
+        List<ItemEntity> blockDrops = breakEventContext.getBlockDrops();
+        org.bukkit.block.BlockState state = breakEventContext.getBlockBreakPlayerState();
+
+        if (blockDrops != null && (breakEvent == null || breakEvent.isDropItems())) {
+            CraftBlock craftBlock = CraftBlock.at(world, pos);
+            CraftEventFactory.handleBlockDropItemEvent(craftBlock, state, player, blockDrops);
+        }
+    }
 
     // CraftBukkit start
     private static void explodeBed(BlockState iblockdata, Level world, BlockPos blockposition) {
