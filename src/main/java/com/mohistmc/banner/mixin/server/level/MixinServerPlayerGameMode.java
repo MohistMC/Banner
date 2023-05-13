@@ -351,10 +351,10 @@ public abstract class MixinServerPlayerGameMode {
                 InteractionResult interactionResult2;
                 if (this.isCreative()) {
                     int i = stack.getCount();
-                    interactionResult2 = stack.useOn(useOnContext, hand);
+                    interactionResult2 = stack.useOn(useOnContext);// Banner - remove Hand
                     stack.setCount(i);
                 } else {
-                    interactionResult2 = stack.useOn(useOnContext, hand);
+                    interactionResult2 = stack.useOn(useOnContext);// Banner - remove Hand
                 }
 
                 if (interactionResult2.consumesAction()) {

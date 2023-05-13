@@ -6,6 +6,7 @@ import com.mohistmc.banner.bukkit.DistValidate;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import org.bukkit.event.entity.EntityExhaustionEvent;
 import org.spongepowered.asm.mixin.Mixin;
 
 import net.minecraft.core.BlockPos;
@@ -76,5 +77,27 @@ public abstract class MixinBlock extends BlockBehaviour implements InjectionBloc
             }
         }
         return 0;
+    }
+
+    @Inject(method = "playerDestroy", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
+    private void banner$reason(Level level, Player player, BlockPos pos, BlockState state, BlockEntity blockEntity, ItemStack tool, CallbackInfo ci) {
+       player.pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.BLOCK_MINED);
+    }
+
+    @Inject(method = "playerDestroy", at = @At("RETURN"))
+    private void banner$handleBlockDrops(Level worldIn, Player player, BlockPos pos, BlockState blockState, BlockEntity te, ItemStack stack, CallbackInfo ci) {
+        BukkitCaptures.BlockBreakEventContext breakEventContext = BukkitCaptures.popPrimaryBlockBreakEvent();
+
+        if (breakEventContext != null) {
+            BlockBreakEvent breakEvent = breakEventContext.getEvent();
+            List<ItemEntity> blockDrops = breakEventContext.getBlockDrops();
+            org.bukkit.block.BlockState state = breakEventContext.getBlockBreakPlayerState();
+
+            if (player instanceof ServerPlayer && blockDrops != null && (breakEvent == null || breakEvent.isDropItems())
+                    && DistValidate.isValid(worldIn)) {
+                CraftBlock craftBlock = CraftBlock.at(((CraftWorld) state.getWorld()).getHandle(), pos);
+                CraftEventFactory.handleBlockDropItemEvent(craftBlock, state, ((ServerPlayer) player), blockDrops);
+            }
+        }
     }
 }
