@@ -98,6 +98,13 @@ public abstract class MixinBlock extends BlockBehaviour implements InjectionBloc
                 CraftBlock craftBlock = CraftBlock.at(((CraftWorld) state.getWorld()).getHandle(), pos);
                 CraftEventFactory.handleBlockDropItemEvent(craftBlock, state, ((ServerPlayer) player), blockDrops);
             }
+            worldIn.banner$setCaptureDrops(null);
+            // Drop event experience
+            if (breakEvent != null) {
+                if (worldIn instanceof ServerLevel serverLevel) {
+                    blockState.getBlock().popExperience(serverLevel, pos, breakEvent.getExpToDrop());
+                }
+            }
         }
     }
 }

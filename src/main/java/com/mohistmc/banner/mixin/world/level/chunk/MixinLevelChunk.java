@@ -149,7 +149,7 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
 
     @Redirect(method = "setBlockState", at = @At(value = "FIELD", ordinal = 1, target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
     public boolean banner$redirectIsRemote(Level world) {
-        return world.isClientSide && this.banner$doPlace && (!this.level.bridge$captureBlockStates()|| banner$block.get() instanceof BaseEntityBlock);
+        return world.isClientSide && this.banner$doPlace && (!this.level.bridge$captureBlockStates() || banner$block.get() instanceof BaseEntityBlock);
     }
 
     /**
