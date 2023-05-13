@@ -8,6 +8,8 @@ import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.minecraft.CrashReport;
+import net.minecraft.ReportedException;
 import net.minecraft.Util;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
@@ -268,13 +270,12 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Override
     public void initWorld(ServerLevel serverWorld, ServerLevelData worldInfo, WorldData saveData, WorldOptions worldOptions) {
-        //boolean flag = saveData.isDebugWorld();
+        boolean flag = saveData.isDebugWorld();
         if ((serverWorld.bridge$generator() != null)) {
             serverWorld.getWorld().getPopulators().addAll(
                     serverWorld.bridge$generator().getDefaultPopulators(
                             (serverWorld.getWorld())));
         }
-        /**
         WorldBorder worldborder = serverWorld.getWorldBorder();
         worldborder.applySettings(worldInfo.getWorldBorder());
         if (!worldInfo.isInitialized()) {
@@ -294,7 +295,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                 throw new ReportedException(crashreport);
             }
             worldInfo.setInitialized(true);
-        }*/
+        }
     }
 
     @Override
@@ -331,7 +332,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             listener.stop();
         }
         serverchunkprovider.getLightEngine().setTaskPerBatch(5);
-        //serverWorld.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
+        serverWorld.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
         this.forceTicks = false;
     }
 
