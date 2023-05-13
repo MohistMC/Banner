@@ -292,11 +292,6 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         }
     }
 
-    @Inject(method = "addFreshEntity", at = @At("HEAD"))
-    private void banner$addReason(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-        pushAddEntityReason(CreatureSpawnEvent.SpawnReason.DEFAULT);
-    }
-
     @Override
     public boolean addFreshEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
         return addEntity(entity, reason);
@@ -313,25 +308,10 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         return this.addWithUUID(entity);
     }
 
-    @Inject(method = "addWithUUID", at = @At("HEAD"))
-    private void banner$addUUIDReason(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-        pushAddEntityReason(CreatureSpawnEvent.SpawnReason.DEFAULT);
-    }
-
-    @Inject(method = "addDuringTeleport", at = @At("HEAD"))
-    private void banner$resetDuringTp(Entity entity, CallbackInfo ci) {
-        pushAddEntityReason(CreatureSpawnEvent.SpawnReason.DEFAULT);
-    }
-
     @Override
     public void addDuringTeleport(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
         pushAddEntityReason(reason);
         addDuringTeleport(entity);
-    }
-
-    @Inject(method = "tryAddFreshEntityWithPassengers", at = @At("HEAD"))
-    private void banner$resetTryAdd(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-        pushAddEntityReason(CreatureSpawnEvent.SpawnReason.DEFAULT);
     }
 
     @Override
@@ -339,8 +319,8 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         if (entity.getSelfAndPassengers().map(Entity::getUUID).anyMatch(this.entityManager::isLoaded)) {
             return false;
         }else {
-            this.tryAddFreshEntityWithPassengers(entity);
-            return true;
+           pushAddEntityReason(reason);
+           return this.tryAddFreshEntityWithPassengers(entity);
         }
     }
 

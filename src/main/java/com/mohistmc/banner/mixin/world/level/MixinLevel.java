@@ -158,6 +158,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         });
     }
 
+    /**
     @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At("HEAD"), cancellable = true)
     private void banner$captureTreeGeneration(BlockPos pos, BlockState state, int flags, int recursionLeft, CallbackInfoReturnable<Boolean> cir) {
         if (this.captureTreeGeneration) {
@@ -169,8 +170,9 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             blockstate.setData(state);
             cir.setReturnValue(true);
         }
-    }
+    }*/
 
+    /**
     @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getBlock()Lnet/minecraft/world/level/block/Block;",
                     ordinal = 0, shift = At.Shift.AFTER))
@@ -189,10 +191,12 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         }
 
         if (!this.captureBlockStates) { // Don't notify clients or update physics while capturing blockstates
-            notifyAndUpdatePhysics(pos, this.getChunkAt(pos), banner$blockState, this.getBlockState(pos), this.getBlockState(pos), flags, recursionLeft);
+            // Banner - TODO
+            //notifyAndUpdatePhysics(pos, this.getChunkAt(pos), banner$blockState, this.getBlockState(pos), this.getBlockState(pos), flags, recursionLeft);
         }
-    }
+    }*/
 
+    /**
     @Inject(method = "getBlockState", at = @At("HEAD"), cancellable = true)
     private void banner$injectBlockState(BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
         if (captureTreeGeneration) {
@@ -201,7 +205,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                 cir.setReturnValue(previous.getHandle());
             }
         }
-    }
+    }*/
 
     @Override
     public CraftWorld getWorld() {
@@ -287,6 +291,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         }
     }
 
+    /**
     @Inject(method = "getBlockEntity", at = @At("TAIL"), cancellable = true)
     private void banner$changeBlockEntity(BlockPos pos, CallbackInfoReturnable<BlockEntity> cir) {
         banner$validate.set(true);
@@ -298,14 +303,16 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         } else {
             cir.setReturnValue(!this.isClientSide && Thread.currentThread() != this.thread ? null : this.getChunkAt(pos).getBlockEntity(pos, LevelChunk.EntityCreationType.IMMEDIATE));
         }
-    }
+    }*/
 
+    /**
     @Override
     public BlockEntity getBlockEntity(BlockPos blockposition, boolean validate) {
         banner$validate.set(validate);
         return getBlockEntity(blockposition);
-    }
+    }*/
 
+    /**
     @Inject(method = "setBlockEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getChunkAt(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/chunk/LevelChunk;",
             shift =  At.Shift.BEFORE), cancellable = true)
     private void banner$addTreeCapture(BlockEntity blockEntity, CallbackInfo ci) {
@@ -313,7 +320,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             capturedTileEntities.put(blockEntity.getBlockPos().immutable(), blockEntity);
             ci.cancel();
         }
-    }
+    }*/
 
     @Override
     public boolean addEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
@@ -321,7 +328,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             return getWorld().getHandle().addEntity(entity, reason);
         } else {
             this.pushAddEntityReason(reason);
-            return this.addFreshEntity(entity, reason);
+            return this.addFreshEntity(entity);
         }
     }
 
