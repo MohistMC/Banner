@@ -90,8 +90,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Shadow @Final private MinecraftServer server;
 
-    @Shadow @Final private static Logger LOGGER;
-
     @Shadow public abstract UserBanList getBans();
 
     @Shadow @Final private UserBanList bans;
@@ -112,12 +110,9 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Shadow public abstract void sendAllPlayerInfo(ServerPlayer player);
 
-    @Shadow @Final private PlayerDataStorage playerIo;
 
     @Shadow public abstract ServerPlayer getPlayerForLogin(GameProfile profile);
-
     private CraftServer cserver;
-    private static final AtomicReference<String> PROFILE_NAMES = new AtomicReference<>();
 
     @Inject(method = "<init>", at = @At(value = "TAIL"))
     public void banner$init(MinecraftServer minecraftServer, LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess, PlayerDataStorage playerDataStorage, int i, CallbackInfo ci) {
@@ -128,6 +123,20 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         banner$server.banner$setConsole(ColouredConsoleSender.getInstance());
         org.spigotmc.SpigotConfig.init((java.io.File) banner$server.bridge$options().valueOf("spigot-settings"));
         org.spigotmc.SpigotConfig.registerCommands();
+    }
+
+    @Inject(method = "placeNewPlayer",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/dimension/DimensionType;parseLegacy(Lcom/mojang/serialization/Dynamic;)Lcom/mojang/serialization/DataResult;",
+            shift = At.Shift.BEFORE),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$changeProfile(Connection netManager, ServerPlayer player, CallbackInfo ci, GameProfile gameProfile, GameProfileCache gameProfileCache, Optional optional, String string, CompoundTag compoundTag) {
+        // CraftBukkit start - Better rename detection
+        if (compoundTag.contains("bukkit")) {
+            CompoundTag bukkit = compoundTag.getCompound("bukkit");
+            string = bukkit.contains("lastKnownName", 8) ? bukkit.getString("lastKnownName") : string;
+        }
+        // CraftBukkit end
     }
 
     @Inject(method = "placeNewPlayer",
@@ -146,16 +155,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         player.spawnIn(serverLevel2);
         player.gameMode.setLevel((ServerLevel) player.level);
         player.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-    }
-
-    @Inject (method = "placeNewPlayer", at = @At (value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerPlayer;setLevel(Lnet/minecraft/server/level/ServerLevel;)V"),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$print(Connection netManager, ServerPlayer player, CallbackInfo ci, GameProfile gameProfile, GameProfileCache gameProfileCache, Optional optional, String string, CompoundTag compoundTag, ResourceKey resourceKey, ServerLevel serverLevel, ServerLevel serverLevel2) {
-        if (compoundTag != null && compoundTag.contains("bukkit")) {
-            CompoundTag bukkit = compoundTag.getCompound("bukkit");
-            PROFILE_NAMES.set(bukkit.contains("lastKnownName", 8) ? bukkit.getString("lastKnownName") : string);
-        }
     }
 
     @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))
@@ -559,18 +558,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             ordinal = 1), locals = LocalCapture.CAPTURE_FAILHARD)
     private void banner$sendSupported(Connection netManager, ServerPlayer player, CallbackInfo ci, GameProfile gameProfile, GameProfileCache gameProfileCache, Optional optional, String string, CompoundTag compoundTag, ResourceKey resourceKey, ServerLevel serverLevel, ServerLevel serverLevel2, String string2, LevelData levelData, ServerGamePacketListenerImpl serverGamePacketListenerImpl) {
         player.getBukkitEntity().sendSupportedChannels();
-    }
-
-    @ModifyVariable(method = "placeNewPlayer", at = @At (value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerPlayer;setLevel(Lnet/minecraft/server/level/ServerLevel;)V"),
-            index = 6, ordinal = 0)
-    private String banner$renameDetection(String name) {
-        String val = PROFILE_NAMES.get();
-        if (val != null) {
-            PROFILE_NAMES.set(null);
-            return val;
-        }
-        return name;
     }
 
     @Inject(method = "sendPlayerPermissionLevel(Lnet/minecraft/server/level/ServerPlayer;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getCommands()Lnet/minecraft/commands/Commands;"))
