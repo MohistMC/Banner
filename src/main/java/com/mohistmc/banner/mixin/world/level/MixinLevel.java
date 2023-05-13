@@ -78,7 +78,6 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     @Shadow public abstract DimensionType dimensionType();
     // @formatter:on
 
-    @Shadow @Final private ResourceKey<Level> dimension;
     private CraftWorld world;
     public boolean pvpMode;
     public boolean keepSpawnInMemory = true;
@@ -172,27 +171,6 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         }
     }
 
-    @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlocksDirty(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;)V"))
-    private void banner$cancelDirty(Level instance, BlockPos blockPos, BlockState oldState, BlockState newState) {}
-
-    @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;sendBlockUpdated(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;I)V"))
-    private void banner$cancelUpdate(Level instance, BlockPos pos, BlockState state, BlockState state1, int i) {}
-
-    @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;blockUpdated(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;)V"))
-    private void banner$cancelUpdatedBlock(Level instance, BlockPos pos, Block block){}
-
-    @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;updateNeighbourForOutputSignal(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;)V"))
-    private void banner$cancelUpdateSignal(Level instance, BlockPos pos, Block block) {}
-
-    @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;updateIndirectNeighbourShapes(Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;II)V"))
-    private void banner$cancelUpdateShape(BlockState instance, LevelAccessor levelAccessor, BlockPos pos, int i, int j) {}
-
-    @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;updateNeighbourShapes(Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;II)V"))
-    private void banner$cancelUpdateShape0(BlockState instance, LevelAccessor levelAccessor, BlockPos pos, int i, int j) {}
-
-    @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;onBlockStateChange(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;)V"))
-    private void banner$cancelChangeBlock(Level instance, BlockPos pos, BlockState blockState, BlockState newState) {}
-
     @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getBlock()Lnet/minecraft/world/level/block/Block;",
                     ordinal = 0, shift = At.Shift.AFTER))
@@ -235,7 +213,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                 generator = getCraftServer().getGenerator(((ServerLevelData) this.getLevelData()).getLevelName());
                 if (generator != null && ((Level) (Object) this) instanceof ServerLevel serverWorld) {
                     org.bukkit.generator.WorldInfo worldInfo = new CraftWorldInfo((ServerLevelData) getLevelData(),
-                            serverWorld.bridge$convertable(), environment, this.dimensionType());
+                            ((ServerLevel) (Object) this).bridge$convertable(), environment, this.dimensionType());
                     if (biomeProvider == null && generator != null) {
                         biomeProvider = generator.getDefaultBiomeProvider(worldInfo);
                     }
