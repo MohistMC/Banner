@@ -137,6 +137,13 @@ public class Main extends OptionParser {
                 .defaultsTo(new File("spigot.yml"))
                 .describedAs("Yml file");
 
+        // Banner Start
+        acceptsAll(asList("B", "banner-settings"), "File for banner settings")
+                .withRequiredArg()
+                .ofType(File.class)
+                .defaultsTo(new File("banner.yml"))
+                .describedAs("Yml file");
+
         allowsUnrecognizedOptions();
     }
 

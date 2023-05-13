@@ -59,6 +59,14 @@ public abstract class MixinMain {
                 .defaultsTo(new File("spigot.yml"))
                 .describedAs("Yml file");
         // Spigot End
+
+        // Spigot Start
+        optionParser.acceptsAll(Arrays.asList("B", "banner-settings"), "File for banner settings")
+                .withRequiredArg()
+                .ofType(File.class)
+                .defaultsTo(new File("banner.yml"))
+                .describedAs("Yml file");
+        // Spigot End
     }
 
     @Inject(method = "main", at = @At(value = "INVOKE",

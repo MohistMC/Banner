@@ -78,6 +78,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     @Shadow public abstract DimensionType dimensionType();
     // @formatter:on
 
+    @Shadow @Final private ResourceKey<Level> dimension;
     private CraftWorld world;
     public boolean pvpMode;
     public boolean keepSpawnInMemory = true;
@@ -94,7 +95,6 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     private org.spigotmc.SpigotWorldConfig spigotConfig; // Spigot
     protected org.bukkit.World.Environment environment;
     protected org.bukkit.generator.BiomeProvider biomeProvider;
-
     private final AtomicReference<Boolean> banner$validate = new AtomicReference<>();
 
     public void banner$constructor(WritableLevelData worldInfo, ResourceKey<Level> dimension, RegistryAccess registryAccess, final Holder<DimensionType> dimensionType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdate) {
@@ -111,7 +111,6 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(WritableLevelData info, ResourceKey<Level> dimension, RegistryAccess registryAccess, Holder<DimensionType> dimType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdates, CallbackInfo ci) {
-        //this.getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
         for (SpawnCategory spawnCategory : SpawnCategory.values()) {
             if (CraftSpawnCategory.isValidForLimits(spawnCategory)) {
                 this.ticksPerSpawnCategory.put(spawnCategory, this.getCraftServer().getTicksPerSpawns(spawnCategory));
@@ -234,9 +233,9 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             }
             if (generator == null) {
                 generator = getCraftServer().getGenerator(((ServerLevelData) this.getLevelData()).getLevelName());
-                if (generator != null && (Object) this instanceof ServerLevel serverWorld) {
+                if (generator != null && ((Level) (Object) this) instanceof ServerLevel serverWorld) {
                     org.bukkit.generator.WorldInfo worldInfo = new CraftWorldInfo((ServerLevelData) getLevelData(),
-                            ((ServerLevel) (Object) this).bridge$convertable(), environment, this.dimensionType());
+                            serverWorld.bridge$convertable(), environment, this.dimensionType());
                     if (biomeProvider == null && generator != null) {
                         biomeProvider = generator.getDefaultBiomeProvider(worldInfo);
                     }

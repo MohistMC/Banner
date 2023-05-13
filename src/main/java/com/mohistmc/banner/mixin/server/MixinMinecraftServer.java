@@ -7,8 +7,7 @@ import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
 import it.unimi.dsi.fastutil.longs.LongIterator;
-import net.minecraft.CrashReport;
-import net.minecraft.ReportedException;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.Util;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
@@ -269,12 +268,13 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Override
     public void initWorld(ServerLevel serverWorld, ServerLevelData worldInfo, WorldData saveData, WorldOptions worldOptions) {
-        boolean flag = saveData.isDebugWorld();
+        //boolean flag = saveData.isDebugWorld();
         if ((serverWorld.bridge$generator() != null)) {
             serverWorld.getWorld().getPopulators().addAll(
                     serverWorld.bridge$generator().getDefaultPopulators(
                             (serverWorld.getWorld())));
         }
+        /**
         WorldBorder worldborder = serverWorld.getWorldBorder();
         worldborder.applySettings(worldInfo.getWorldBorder());
         if (!worldInfo.isInitialized()) {
@@ -294,17 +294,19 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                 throw new ReportedException(crashreport);
             }
             worldInfo.setInitialized(true);
-        }
+        }*/
     }
 
     @Override
     public void prepareLevels(ChunkProgressListener listener, ServerLevel serverWorld) {
+        ServerWorldEvents.LOAD.invoker().onWorldLoad(((MinecraftServer) (Object) this), serverWorld);
         ServerChunkCache serverchunkprovider = serverWorld.getChunkSource();
         this.forceTicks = true;
         if (serverWorld.getWorld().getKeepSpawnInMemory()) {
             LOGGER.info("Preparing start region for dimension {}", serverWorld.dimension().location());
             BlockPos blockpos = serverWorld.getSharedSpawnPos();
             listener.updateSpawnPos(new ChunkPos(blockpos));
+            serverchunkprovider.getLightEngine().setTaskPerBatch(500);
             this.nextTickTime = Util.getMillis();
             serverchunkprovider.addRegionTicket(TicketType.START, new ChunkPos(blockpos), 11, Unit.INSTANCE);
 
@@ -329,7 +331,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             listener.stop();
         }
         serverchunkprovider.getLightEngine().setTaskPerBatch(5);
-        serverWorld.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
+        //serverWorld.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
         this.forceTicks = false;
     }
 
@@ -399,17 +401,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Redirect(method = "saveAllChunks", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;saveDataTag(Lnet/minecraft/core/RegistryAccess;Lnet/minecraft/world/level/storage/WorldData;Lnet/minecraft/nbt/CompoundTag;)V"))
     private void banner$cancel2(LevelStorageSource.LevelStorageAccess instance, RegistryAccess registries, WorldData serverConfiguration, CompoundTag hostPlayerNBT) {}
-
-    // Banner start -- add to support plugins
-    public String u() {
-        return this.localIp;
-    }
-
-    public boolean U() {
-        return this.onlineMode;
-    }
-
-    // Banner end
 
     // Banner start
     @Override

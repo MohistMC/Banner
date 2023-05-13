@@ -51,7 +51,7 @@ public class SpigotConfig
         config = new YamlConfiguration();
         try
         {
-            config.load( CONFIG_FILE );
+            config.load(CONFIG_FILE);
         } catch ( IOException ex )
         {
         } catch ( InvalidConfigurationException ex )

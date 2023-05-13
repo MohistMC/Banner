@@ -21,12 +21,12 @@ public class ServerAPI {
 
     public static HashSet<String> modlists_Client = new HashSet<>();
     public static HashSet<String> modlists_Server = new HashSet<>();
-    public static Set<String> modlists_Inside = Set.of("minecraft", "forge", "mohist");
+    public static Set<String> modlists_Inside = Set.of("minecraft", "banner");
     public static HashSet<String> modlists_All = new HashSet<>();
 
     public static HashSet<String> channels = new HashSet<>();
     public static Map<String, String> fabriccmdper = new ConcurrentHashMap<>();
-    public static List<Command> forgecmd = new ArrayList<>();
+    public static List<Command> fabriccmd = new ArrayList<>();
     public static Map<net.minecraft.world.entity.EntityType<?>, String> entityTypeMap = new ConcurrentHashMap<>();
 
     static {

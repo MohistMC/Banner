@@ -3,6 +3,7 @@ package com.mohistmc.banner.mixin.server.players;
 import com.google.common.collect.Lists;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
+import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import com.mohistmc.banner.injection.server.players.InjectionPlayerList;
 import com.mojang.authlib.GameProfile;
 import io.izzel.arclight.mixin.Eject;
@@ -120,8 +121,10 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         MinecraftServer banner$server = (DedicatedServer) minecraftServer;
         this.cserver = new CraftServer((DedicatedServer) banner$server, (PlayerList) (Object) this);
         banner$server.banner$setServer(cserver);
+        FabricInjectBukkit.init();
         banner$server.banner$setConsole(ColouredConsoleSender.getInstance());
         org.spigotmc.SpigotConfig.init((java.io.File) banner$server.bridge$options().valueOf("spigot-settings"));
+        com.mohistmc.banner.BannerConfig.init((java.io.File) banner$server.bridge$options().valueOf("banner-settings"));
         org.spigotmc.SpigotConfig.registerCommands();
     }
 

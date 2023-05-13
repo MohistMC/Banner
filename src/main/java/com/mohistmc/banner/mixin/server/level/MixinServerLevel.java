@@ -2,16 +2,19 @@ package com.mohistmc.banner.mixin.server.level;
 
 import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.DistValidate;
 import com.mohistmc.banner.fabric.BannerDerivedWorldInfo;
 import com.mohistmc.banner.injection.server.level.InjectionServerLevel;
+import com.mohistmc.banner.injection.world.level.storage.InjectionLevelStorageAccess;
 import com.mohistmc.banner.util.ServerUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.resources.ResourceKey;
@@ -21,7 +24,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.util.ProgressListener;
-import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
@@ -89,8 +91,6 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
 
     @Shadow @NotNull public abstract MinecraftServer getServer();
 
-    @Shadow public abstract DimensionDataStorage getDataStorage();
-
     @Shadow public abstract <T extends ParticleOptions> int sendParticles(T type, double posX, double posY, double posZ, int particleCount, double xOffset, double yOffset, double zOffset, double speed);
 
     @Shadow @Final public PersistentEntitySectionManager<Entity> entityManager;
@@ -109,12 +109,12 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     public LevelStorageSource.LevelStorageAccess convertable;
     public UUID uuid;
     public PrimaryLevelData serverLevelDataCB;
-    public ResourceKey<LevelStem> typeKey;
 
     private transient boolean banner$force;
     private transient LightningStrikeEvent.Cause banner$cause;
-    private AtomicReference<CreatureSpawnEvent.SpawnReason> banner$reason = new AtomicReference<>();
-    private AtomicReference<Boolean> banner$timeSkipCancelled = new AtomicReference<>();
+    private final AtomicReference<CreatureSpawnEvent.SpawnReason> banner$reason = new AtomicReference<>();
+    private final AtomicReference<Boolean> banner$timeSkipCancelled = new AtomicReference<>();
+    public ResourceKey<LevelStem> typeKey;
 
     protected MixinServerLevel(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean bl, boolean bl2, long l, int i) {
         super(writableLevelData, resourceKey, registryAccess, holder, supplier, bl, bl2, l, i);
@@ -135,11 +135,23 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         getWorld();
     }
 
-    @Inject(method = "<init>", at = @At("TAIL"))
-    private void banner$initWorldServer(MinecraftServer minecraftServer, Executor executor, LevelStorageSource.LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey resourceKey, LevelStem levelStem, ChunkProgressListener chunkProgressListener, boolean bl, long l, List list, boolean bl2, CallbackInfo ci) {
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void banner$initWorldServer(MinecraftServer minecraftServer, Executor executor, LevelStorageSource.LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey<Level> resourceKey, LevelStem levelStem, ChunkProgressListener chunkProgressListener, boolean bl, long l, List list, boolean bl2, CallbackInfo ci) {
         this.banner$setPvpMode(minecraftServer.isPvpAllowed());
-        //getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
         this.convertable = levelStorageAccess;
+        var typeKey = ((InjectionLevelStorageAccess) levelStorageAccess).bridge$getTypeKey();
+        if (typeKey != null) {
+            this.typeKey = typeKey;
+        } else {
+            var dimensions = ServerUtils.getServer().registryAccess().registryOrThrow(Registries.LEVEL_STEM);
+            var key = dimensions.getResourceKey(levelStem);
+            if (key.isPresent()) {
+                this.typeKey = key.get();
+            } else {
+                BannerServer.LOGGER.warn("Assign {} to unknown level stem {}", resourceKey.location(), levelStem);
+                this.typeKey = ResourceKey.create(Registries.LEVEL_STEM, resourceKey.location());
+            }
+        }
         if (serverLevelData instanceof PrimaryLevelData) {
             this.serverLevelDataCB = (PrimaryLevelData) serverLevelData;
         } else if (serverLevelData instanceof DerivedLevelData) {

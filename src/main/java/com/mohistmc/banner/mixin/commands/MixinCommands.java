@@ -4,7 +4,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import com.mohistmc.banner.injection.commands.InjectionCommandNode;
 import com.mohistmc.banner.injection.commands.InjectionCommands;
-import com.mohistmc.banner.bukkit.BukkitDispatcher;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.tree.CommandNode;
@@ -36,7 +35,6 @@ public abstract class MixinCommands implements InjectionCommands {
     @Shadow protected abstract void fillUsableCommands(CommandNode<CommandSourceStack> rootCommandSource, CommandNode<SharedSuggestionProvider> rootSuggestion, CommandSourceStack source, Map<CommandNode<CommandSourceStack>, CommandNode<SharedSuggestionProvider>> commandNodeToSuggestionNode);
 
     public void banner$constructor() {
-        this.dispatcher = new BukkitDispatcher((Commands) (Object) this);
         this.dispatcher.setConsumer((context, b, i) -> context.getSource().onCommandComplete(context, b, i));
     }
 
