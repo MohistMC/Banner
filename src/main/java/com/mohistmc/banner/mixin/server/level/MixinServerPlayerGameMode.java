@@ -17,15 +17,14 @@ import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.CakeBlock;
-import net.minecraft.world.level.block.DoorBlock;
-import net.minecraft.world.level.block.TrapDoorBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
@@ -249,39 +248,68 @@ public abstract class MixinServerPlayerGameMode {
         }
     }
 
-    @Inject(method = "destroyBlock", at = @At("RETURN"))
-    public void banner$resetBlockBreak(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        BukkitCaptures.BlockBreakEventContext breakEventContext = BukkitCaptures.popPrimaryBlockBreakEvent();
-
-        if (breakEventContext != null) {
-            handleBlockDrop(breakEventContext, pos);
-        }
-    }
-
-    @Inject(method = {"tick", "destroyAndAck"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayerGameMode;destroyBlock(Lnet/minecraft/core/BlockPos;)Z"))
-    public void banner$clearCaptures(CallbackInfo ci) {
-        // clear the event stack in case that interrupted events are left here unhandled
-        // it should be a new event capture session each time destroyBlock is called from these two contexts
-        BukkitCaptures.clearBlockBreakEventContexts();
-    }
-
-    private void handleBlockDrop(BukkitCaptures.BlockBreakEventContext breakEventContext, BlockPos pos) {
-        BlockBreakEvent breakEvent = breakEventContext.getEvent();
-        List<ItemEntity> blockDrops = breakEventContext.getBlockDrops();
-        org.bukkit.block.BlockState state = breakEventContext.getBlockBreakPlayerState();
-
-        if (blockDrops != null && (breakEvent == null || breakEvent.isDropItems())) {
-            CraftBlock craftBlock = CraftBlock.at(this.level, pos);
-            CraftEventFactory.handleBlockDropItemEvent(craftBlock, state, this.player, blockDrops);
-        }
-    }
-
     // CraftBukkit start - whole method
     public boolean interactResult = false;
     public boolean firedInteract = false;
     public BlockPos interactPosition;
     public InteractionHand interactHand;
     public ItemStack interactItemStack;
+
+    @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
+    private void banner$fireBlockBreakEvent(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        // CraftBukkit start - fire BlockBreakEvent
+        org.bukkit.block.Block bblock = CraftBlock.at(level, pos);
+        BlockBreakEvent event = null;
+
+        if (this.player instanceof ServerPlayer) {
+            // Sword + Creative mode pre-cancel
+            boolean isSwordNoBreak = !this.player.getMainHandItem().getItem().canAttackBlock(this.level.getBlockState(pos), this.level, pos, this.player);
+
+            // Tell client the block is gone immediately then process events
+            // Don't tell the client if its a creative sword break because its not broken!
+            if (level.getBlockEntity(pos) == null && !isSwordNoBreak) {
+                ClientboundBlockUpdatePacket packet = new ClientboundBlockUpdatePacket(pos, Blocks.AIR.defaultBlockState());
+                this.player.connection.send(packet);
+            }
+
+            event = new BlockBreakEvent(bblock, this.player.getBukkitEntity());
+
+            // Sword + Creative mode pre-cancel
+            event.setCancelled(isSwordNoBreak);
+
+            // Calculate default block experience
+            BlockState nmsData = this.level.getBlockState(pos);
+            Block nmsBlock = nmsData.getBlock();
+
+            ItemStack itemstack = this.player.getItemBySlot(EquipmentSlot.MAINHAND);
+
+            if (nmsBlock != null && !event.isCancelled() && !this.isCreative() && this.player.hasCorrectToolForDrops(nmsBlock.defaultBlockState())) {
+                event.setExpToDrop(nmsBlock.getExpDrop(nmsData, this.level, pos, itemstack, true));
+            }
+
+            this.level.getCraftServer().getPluginManager().callEvent(event);
+
+            if (event.isCancelled()) {
+                if (isSwordNoBreak) {
+                    cir.setReturnValue(false);
+                }
+                // Let the client know the block still exists
+                this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, pos));
+            }
+            // Brute force all possible updates
+            for (Direction dir : Direction.values()) {
+                this.player.connection.send(new ClientboundBlockUpdatePacket(level, pos.relative(dir)));
+            }
+
+            // Update any tile entity data for this block
+            BlockEntity tileentity = this.level.getBlockEntity(pos);
+            if (tileentity != null) {
+                this.player.connection.send(tileentity.getUpdatePacket());
+            }
+            cir.setReturnValue(false);
+        }
+        BukkitCaptures.captureBlockBreakPlayer(event);
+    }
 
     /**
      * @author wdog4
