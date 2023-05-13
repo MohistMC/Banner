@@ -13,6 +13,10 @@ import java.util.UUID;
 
 public interface InjectionServerLevel {
 
+    default boolean addEntitySerialized(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
+        return false;
+    }
+
     default  <T extends ParticleOptions> int sendParticles(T type, double posX, double posY, double posZ, int particleCount, double xOffset, double yOffset, double zOffset, double speed, boolean force) {
         return particleCount;
     }

@@ -38,10 +38,7 @@ import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftVector;
-import org.bukkit.event.entity.EntityCombustByEntityEvent;
-import org.bukkit.event.entity.EntityExhaustionEvent;
-import org.bukkit.event.entity.EntityPotionEffectEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
@@ -229,6 +226,17 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
                 this.setShoulderEntityRight(new CompoundTag());
             }
         }
+    }
+
+    @Override
+    public boolean spawnEntityFromShoulder(CompoundTag nbttagcompound) {
+        return this.level.isClientSide || nbttagcompound.isEmpty() || EntityType.create(nbttagcompound, this.level).map(entity -> {
+            if (entity instanceof TamableAnimal) {
+                ((TamableAnimal) entity).setOwnerUUID(this.uuid);
+            }
+            entity.setPos(this.getX(), this.getY() + 0.699999988079071, this.getZ());
+            return ((ServerLevel) this.level).addEntitySerialized(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
+        }).orElse(true);
     }
 
     private EntityExhaustionEvent.ExhaustionReason banner$exhaustReason;

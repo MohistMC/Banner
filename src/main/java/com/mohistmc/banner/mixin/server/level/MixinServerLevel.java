@@ -294,7 +294,8 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
 
     @Override
     public boolean addFreshEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
-        return addEntity(entity, reason);
+        pushAddEntityReason(reason);
+        return addFreshEntity(entity);
     }
 
     @Inject(method = "addEntity", at = @At("RETURN"))
@@ -320,8 +321,13 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
             return false;
         }else {
            pushAddEntityReason(reason);
-           return this.tryAddFreshEntityWithPassengers(entity);
+           return this.addAllEntities(entity, reason);
         }
+    }
+
+    @Override
+    public boolean addEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
+        return addFreshEntity(entity, reason);
     }
 
     /**
@@ -450,6 +456,11 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     private Entity banner$resetTickingPassenger(Entity entity) {
         BukkitCaptures.resetTickingEntity();
         return entity;
+    }
+
+    @Override
+    public boolean addEntitySerialized(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
+        return addWithUUID(entity, reason);
     }
 
     @Override
