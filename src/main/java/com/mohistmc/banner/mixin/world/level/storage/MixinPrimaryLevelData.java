@@ -50,16 +50,6 @@ public abstract class MixinPrimaryLevelData implements InjectionPrimaryLevelData
         return WorldGenSettings.encode(ops, options, new WorldDimensions(this.customDimensions != null ? this.customDimensions : registry.registryOrThrow(Registries.LEVEL_STEM)));
     }
 
-    @Inject(method = "setTagData", at = @At("RETURN"))
-    private void banner$addTagData(RegistryAccess registry, CompoundTag nbt, CompoundTag playerNBT, CallbackInfo ci) {
-        if (this.world != null) {
-            if (this.world.getServer().bridge$server() != null) {
-                nbt.putString("Bukkit.Version", Bukkit.getName() + "/" + Bukkit.getVersion() + "/" + Bukkit.getBukkitVersion()); // CraftBukkit
-            }
-            world.getWorld().storeBukkitValues(nbt); // CraftBukkit - add pdc
-        }
-    }
-
     @Inject(method = "setThundering", cancellable = true, at = @At("HEAD"))
     private void banner$thunder(boolean thunderingIn, CallbackInfo ci) {
         if (this.thundering == thunderingIn) {
@@ -122,12 +112,7 @@ public abstract class MixinPrimaryLevelData implements InjectionPrimaryLevelData
     // CraftBukkit start - Add world and pdc
     @Override
     public void setWorld(ServerLevel world) {
-        if (this.world != null) {
-            return;
-        }
         this.world = world;
-        world.getWorld().readBukkitValues(pdc);
-        pdc = null;
     }
     // CraftBukkit end
 }

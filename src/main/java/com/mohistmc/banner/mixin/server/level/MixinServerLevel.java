@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.DistValidate;
+import com.mohistmc.banner.bukkit.LevelPersistentData;
 import com.mohistmc.banner.fabric.BannerDerivedWorldInfo;
 import com.mohistmc.banner.injection.server.level.InjectionServerLevel;
 import com.mohistmc.banner.injection.world.level.storage.InjectionLevelStorageAccess;
@@ -106,6 +107,8 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
 
     @Shadow public abstract boolean addWithUUID(Entity entity);
 
+    @Shadow public abstract DimensionDataStorage getDataStorage();
+
     public LevelStorageSource.LevelStorageAccess convertable;
     public UUID uuid;
     public PrimaryLevelData serverLevelDataCB;
@@ -161,6 +164,15 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         this.banner$setSpigotConfig(new SpigotWorldConfig(serverLevelDataCB.getLevelName()));
         this.uuid = WorldUUID.getUUID(levelStorageAccess.getDimensionPath(this.dimension()).toFile());
         this.chunkSource.setViewDistance(bridge$spigotConfig().viewDistance);
+        var data = this.getDataStorage().computeIfAbsent(LevelPersistentData::new,
+                () -> new LevelPersistentData(null), "bukkit_pdc");
+        this.getWorld().readBukkitValues(data.getTag());
+    }
+
+    @Inject(method = "saveLevelData", at = @At("RETURN"))
+    private void banner$savePdc(CallbackInfo ci) {
+        var data = this.getDataStorage().computeIfAbsent(LevelPersistentData::new, () -> new LevelPersistentData(null), "bukkit_pdc");
+        data.save(this.getWorld());
     }
 
     @Inject(method = "gameEvent", cancellable = true, at = @At("HEAD"))
