@@ -52,6 +52,7 @@ import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_19_R3.util.LazyPlayerSet;
+import org.bukkit.craftbukkit.v1_19_R3.util.ServerShutdownThread;
 import org.bukkit.event.player.AsyncPlayerChatPreviewEvent;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.event.world.WorldInitEvent;
@@ -132,11 +133,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         Main.handleParser(parser, options);
         this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
         this.worldLoader = BukkitCaptures.getDataLoadContext();
-        // Try to see if we're actually running in a terminal, disable jline if not
-        if (System.console() == null && System.getProperty("jline.terminal") == null) {
-            System.setProperty("jline.terminal", "jline.UnsupportedTerminal");
-            org.bukkit.craftbukkit.Main.useJline = false;
-        }
+        Runtime.getRuntime().addShutdownHook(new ServerShutdownThread(((MinecraftServer) (Object) this)));
     }
 
     @Inject(method = "stopServer", at = @At(value = "INVOKE", remap = false, ordinal = 0, shift = At.Shift.AFTER, target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V"))
@@ -219,6 +216,13 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         Map<ResourceKey<net.minecraft.world.level.Level>, ServerLevel> newLevels = Maps.newLinkedHashMap(oldLevels);
         newLevels.remove(level.dimension(), level);
         this.levels = Collections.unmodifiableMap(newLevels);
+    }
+
+    @Inject(method = "runServer",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/MinecraftServer;onServerExit()V"))
+    private void banner$runTimeReturn(CallbackInfo ci) {
+        Runtime.getRuntime().halt(0);
     }
 
     @Inject(method = "createLevels",
