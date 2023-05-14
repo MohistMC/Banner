@@ -1,6 +1,7 @@
 plugins {
 	id 'fabric-loom' version '1.1-SNAPSHOT'
 	id 'maven-publish'
+	id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 version = ci_version()
@@ -31,6 +32,10 @@ repositories {
 		name = "Sponge"
 		url = 'https://repo.spongepowered.org/maven'
 	}
+}
+
+configurations {
+	extraLibs
 }
 
 dependencies {
@@ -102,9 +107,10 @@ dependencies {
 	modImplementation "org.jline:jline-terminal-jansi:3.12.1"
 	modImplementation "net.minecrell:terminalconsoleappender:1.3.0"
 
-	include "org.jline:jline-terminal:3.12.1"
-	include "org.jline:jline-terminal-jansi:3.12.1"
-	include "net.minecrell:terminalconsoleappender:1.3.0"
+	extraLibs group: "org.jline", name: "jline-terminal", version: "3.12.1"
+	extraLibs group: "org.jline", name: "jline-terminal-jansi", version: "3.12.1"
+	extraLibs group: "org.jline", name: "jline-terminal-jansi", version: "3.12.1"
+	extraLibs group: "net.minecrell", name: "terminalconsoleappender", version: "1.3.0"
 
 	//class modify
 	modImplementation "com.github.LlamaLad7:MixinExtras:0.1.1"
@@ -112,11 +118,12 @@ dependencies {
 	modImplementation 'com.github.1798643961:mixin-tools:1.0.1'
 	annotationProcessor 'com.github.1798643961:mixin-tools:1.0.1'
 	implementation "com.github.phase:SrgLib:master-SNAPSHOT"
-	include "com.github.phase:SrgLib:master-SNAPSHOT"
 
-	include "com.github.1798643961:mixin-tools:1.0.1"
-	include "com.github.LlamaLad7:MixinExtras:0.1.1"
+	extraLibs group: "com.github.phase", name: "SrgLib", version: "master-SNAPSHOT"
+	extraLibs group: "com.github.1798643961", name: "mixin-tools", version: "1.0.1"
+	extraLibs group: "com.github.LlamaLad7", name: "MixinExtras", version: "0.1.1"
 
+	configurations.api.extendsFrom( (configurations.extraLibs) )
 }
 
 base {
@@ -146,18 +153,10 @@ java {
 }
 
 jar {
-	from("LICENSE") 
-}
-
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
-		}
-	}
-
-	repositories {
-
+	duplicatesStrategy = DuplicatesStrategy.WARN
+	from("LICENSE")
+	from {
+		(configurations.extraLibs).filter{ it.exists() }.collect { it.isDirectory() ? it : zipTree(it) }
 	}
 }
 
