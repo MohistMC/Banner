@@ -60,6 +60,7 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.PluginLoadOrder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -101,6 +102,11 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     // @formatter:on
 
     @Shadow public ServerConnectionListener connection;
+
+    @Shadow public abstract ServerLevel overworld();
+
+    @Shadow protected abstract void updateMobSpawningFlags();
+
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
     public org.bukkit.craftbukkit.v1_19_R3.CraftServer server;
@@ -115,6 +121,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     public Commands vanillaCommandDispatcher;
     private boolean hasStopped = false;
     private final Object stopLock = new Object();
+    public final double[] recentTps = new double[3];
     // CraftBukkit end
 
     public MixinMinecraftServer(String string) {
@@ -169,16 +176,23 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         return server.getWarnOnOverload();
     }
 
+    @Inject(method = "runServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;nextTickTime:J", shift = At.Shift.BEFORE))
+    private void banner$currentTick(CallbackInfo ci) {
+        ServerUtils.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
+    }
+
+    @Inject(method = "runServer",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/MinecraftServer;onServerExit()V"))
+    private void banner$runTimeReturn(CallbackInfo ci) {
+        Runtime.getRuntime().halt(0);
+    }
+
     @Inject(method = "getServerModName", at = @At(value = "HEAD"), remap = false, cancellable = true)
     private void banner$setServerModName(CallbackInfoReturnable<String> cir) {
         if (this.server != null) {
             cir.setReturnValue(server.getServer().getServerName());
         }
-    }
-
-    @Inject(method = "runServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;nextTickTime:J", shift = At.Shift.BEFORE))
-    private void banner$currentTick(CallbackInfo ci) {
-        ServerUtils.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
     }
 
     @Inject(method = "reloadResources", at = @At(value = "RETURN", target = "Ljava/util/concurrent/CompletableFuture;thenAcceptAsync(Ljava/util/function/Consumer;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
@@ -216,13 +230,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         Map<ResourceKey<net.minecraft.world.level.Level>, ServerLevel> newLevels = Maps.newLinkedHashMap(oldLevels);
         newLevels.remove(level.dimension(), level);
         this.levels = Collections.unmodifiableMap(newLevels);
-    }
-
-    @Inject(method = "runServer",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/MinecraftServer;onServerExit()V"))
-    private void banner$runTimeReturn(CallbackInfo ci) {
-        Runtime.getRuntime().halt(0);
     }
 
     @Inject(method = "createLevels",
@@ -302,25 +309,71 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         }
     }
 
-    @Override
-    public void prepareLevels(ChunkProgressListener listener, ServerLevel serverWorld) {
-        ServerWorldEvents.LOAD.invoker().onWorldLoad(((MinecraftServer) (Object) this), serverWorld);
-        ServerChunkCache serverchunkprovider = serverWorld.getChunkSource();
+    /**
+     * @author wdog5
+     * @reason
+     */
+    @Overwrite
+    public final void prepareLevels(ChunkProgressListener listener) {
+        ServerLevel serverworld = this.overworld();
         this.forceTicks = true;
-        if (serverWorld.getWorld().getKeepSpawnInMemory()) {
-            LOGGER.info("Preparing start region for dimension {}", serverWorld.dimension().location());
-            BlockPos blockpos = serverWorld.getSharedSpawnPos();
-            listener.updateSpawnPos(new ChunkPos(blockpos));
-            serverchunkprovider.getLightEngine().setTaskPerBatch(500);
-            this.nextTickTime = Util.getMillis();
-            serverchunkprovider.addRegionTicket(TicketType.START, new ChunkPos(blockpos), 11, Unit.INSTANCE);
+        LOGGER.info("Preparing start region for dimension {}", serverworld.dimension().location());
+        BlockPos blockpos = serverworld.getSharedSpawnPos();
+        listener.updateSpawnPos(new ChunkPos(blockpos));
+        ServerChunkCache serverchunkprovider = serverworld.getChunkSource();
+        serverchunkprovider.getLightEngine().setTaskPerBatch(500);
+        this.nextTickTime = Util.getMillis();
+        serverchunkprovider.addRegionTicket(TicketType.START, new ChunkPos(blockpos), 11, Unit.INSTANCE);
 
-            while (serverchunkprovider.getTickingGenerated() < 441) {
-                this.executeModerately();
+        while (serverchunkprovider.getTickingGenerated() < 441) {
+            this.executeModerately();
+        }
+
+        this.executeModerately();
+
+        for (ServerLevel serverWorld : this.levels.values()) {
+            if (serverWorld.getWorld().getKeepSpawnInMemory()) {
+                ForcedChunksSavedData forcedchunkssavedata = serverWorld.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
+                if (forcedchunkssavedata != null) {
+                    LongIterator longiterator = forcedchunkssavedata.getChunks().iterator();
+
+                    while (longiterator.hasNext()) {
+                        long i = longiterator.nextLong();
+                        ChunkPos chunkpos = new ChunkPos(i);
+                        serverWorld.getChunkSource().updateChunkForced(chunkpos, true);
+                    }
+                }
             }
         }
-        ForcedChunksSavedData forcedchunkssavedata = serverWorld.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
 
+        this.executeModerately();
+        listener.stop();
+        serverchunkprovider.getLightEngine().setTaskPerBatch(5);
+        this.updateMobSpawningFlags();
+        this.forceTicks = false;
+    }
+
+    @Override
+    public void prepareLevels(ChunkProgressListener listener, ServerLevel serverWorld) {
+        if (!serverWorld.getWorld().getKeepSpawnInMemory()) {
+            return;
+        }
+        this.forceTicks = true;
+        LOGGER.info("Preparing start region for dimension {}", serverWorld.dimension().location());
+        BlockPos blockpos = serverWorld.getSharedSpawnPos();
+        listener.updateSpawnPos(new ChunkPos(blockpos));
+        ServerChunkCache serverchunkprovider = serverWorld.getChunkSource();
+        serverchunkprovider.getLightEngine().setTaskPerBatch(500);
+        this.nextTickTime = Util.getMillis();
+        serverchunkprovider.addRegionTicket(TicketType.START, new ChunkPos(blockpos), 11, Unit.INSTANCE);
+
+        while (serverchunkprovider.getTickingGenerated() < 441) {
+            this.executeModerately();
+        }
+
+        this.executeModerately();
+
+        ForcedChunksSavedData forcedchunkssavedata = serverWorld.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
         if (forcedchunkssavedata != null) {
             LongIterator longiterator = forcedchunkssavedata.getChunks().iterator();
 
@@ -330,12 +383,10 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                 serverWorld.getChunkSource().updateChunkForced(chunkpos, true);
             }
         }
-
         this.executeModerately();
-        if (serverWorld.getWorld().getKeepSpawnInMemory()) {
-            listener.stop();
-        }
+        listener.stop();
         serverchunkprovider.getLightEngine().setTaskPerBatch(5);
+        // this.updateMobSpawningFlags();
         serverWorld.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
         this.forceTicks = false;
     }
