@@ -275,7 +275,6 @@ public final class CraftServer implements Server {
                 return player.getBukkitEntity();
             }
         }));
-        vanillaCommandManager = console.getCommands();
         this.serverVersion = BannerServer.getVersion();
         this.structureManager = new CraftStructureManager(console.getStructureManager());
         this.scoreboardManager = new CraftScoreboardManager(console, new ServerScoreboard(console));
@@ -445,22 +444,12 @@ public final class CraftServer implements Server {
         pluginManager.disablePlugins();
     }
 
-    public static Commands vanillaCommandManager;
-
     private void setVanillaCommands(boolean first) { // Spigot
-        Commands dispatcher = (vanillaCommandManager = console.getCommands());
+        Commands dispatcher = console.bridge$getVanillaCommands();
+
         // Build a list of all Vanilla commands and create wrappers
         for (CommandNode<CommandSourceStack> cmd : dispatcher.getDispatcher().getRoot().getChildren()) {
-            // Spigot start
-            VanillaCommandWrapper wrapper = new VanillaCommandWrapper(dispatcher, cmd);
-            if (org.spigotmc.SpigotConfig.replaceCommands.contains(wrapper.getName())) {
-                if (first) {
-                    commandMap.register("minecraft", wrapper);
-                }
-            } else if (!first) {
-                commandMap.register("minecraft", wrapper);
-            }
-            // Spigot end
+            commandMap.register("minecraft", new VanillaCommandWrapper(dispatcher, cmd));
         }
     }
 

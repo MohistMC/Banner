@@ -93,7 +93,7 @@ public abstract class MixinCommands implements InjectionCommands {
         Map<CommandNode<CommandSourceStack>, CommandNode<SharedSuggestionProvider>> map = Maps.newIdentityHashMap();
         RootCommandNode vanillaRoot = new RootCommandNode();
 
-        RootCommandNode<CommandSourceStack> vanilla = CraftServer.vanillaCommandManager.getDispatcher().getRoot();
+        RootCommandNode<CommandSourceStack> vanilla = player.getServer().bridge$getVanillaCommands().getDispatcher().getRoot();
         map.put(vanilla, vanillaRoot);
         this.fillUsableCommands(vanilla, vanillaRoot, player.createCommandSourceStack(), (Map) map);
 
