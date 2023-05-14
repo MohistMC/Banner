@@ -182,6 +182,12 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.potion.PotionEffect;
 
 public class CraftEventFactory {
+
+    // Banner start - add DamageSource Types
+    public static final ResourceKey<DamageType> MELTING = DamageTypes.ON_FIRE;
+    public static final ResourceKey<DamageType> POISON = DamageTypes.MAGIC;
+    // Banner end
+
     public static org.bukkit.block.Block blockDamage; // For use in EntityDamageByBlockEvent
     public static Entity entityDamage; // For use in EntityDamageByEntityEvent
 
@@ -908,9 +914,26 @@ public class CraftEventFactory {
                 cause = DamageCause.MAGIC;
             } else if (source.is(DamageTypes.IN_FIRE)) {
                 cause = DamageCause.FIRE;
+            // Banner start - handle missing damage types
+            } else if (source.is(DamageTypes.ON_FIRE)) {
+                cause = DamageCause.FIRE_TICK;
+            } else if (source.is(DamageTypes.LAVA)) {
+                cause = DamageCause.LAVA;
+            } else if (damager instanceof LightningStrike) {
+                cause = DamageCause.LIGHTNING;
+            } else if (source.is(MELTING)) {
+                cause = DamageCause.MELTING;
+            } else if (source.is(POISON)) {
+                cause = DamageCause.POISON;
+            } else if (source.is(DamageTypes.LIGHTNING_BOLT)) {
+                cause = DamageCause.LIGHTNING;
+            } else if (source.is(DamageTypes.GENERIC)) {
+                cause = DamageCause.CUSTOM;
             } else {
-                throw new IllegalStateException(String.format("Unhandled damage of %s by %s from %s", entity, damager, source.getMsgId()));
+                cause = DamageCause.CUSTOM; // Banner - handle unknown cause
             }
+            // Banner end
+
             EntityDamageEvent event = new EntityDamageByBlockEvent(damager, entity.getBukkitEntity(), cause, modifiers, modifierFunctions);
             event.setCancelled(cancelled);
             blockDamage = null; // SPIGOT-6639: Clear blockDamage to allow other entity damage during event call
@@ -936,9 +959,23 @@ public class CraftEventFactory {
                 cause = DamageCause.DRAGON_BREATH;
             } else if (source.is(DamageTypes.MAGIC)) {
                 cause = DamageCause.MAGIC;
+            // Banner start - handle missing damage types
+            } else if (source.is(DamageTypes.CACTUS)) {
+                cause = DamageCause.CONTACT;
+            } else if (source.is(DamageTypes.IN_FIRE)) {
+                cause = DamageCause.FIRE;
+            } else if (source.is(DamageTypes.ON_FIRE)) {
+                cause = DamageCause.FIRE_TICK;
+            } else if (source.is(DamageTypes.LAVA)) {
+                cause = DamageCause.LAVA;
+            } else if (source.is(MELTING)) {
+                cause = DamageCause.MELTING;
+            } else if (source.is(POISON)) {
+                cause = DamageCause.POISON;
             } else {
-                throw new IllegalStateException(String.format("Unhandled damage of %s by %s from %s", entity, damager.getHandle(), source.getMsgId()));
+                cause = DamageCause.CUSTOM; // Banner - handle unknown cause
             }
+            // Banner end
             EntityDamageEvent event = new EntityDamageByEntityEvent(damager, entity.getBukkitEntity(), cause, modifiers, modifierFunctions);
             event.setCancelled(cancelled);
             callEvent(event);
