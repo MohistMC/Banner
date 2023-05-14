@@ -534,5 +534,15 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     public void banner$setSpigotConfig(SpigotWorldConfig spigotWorldConfig) {
         this.spigotConfig = spigotWorldConfig;
     }
+
+    @Override
+    public boolean bridge$preventPoiUpdated() {
+        return preventPoiUpdated;
+    }
+
+    @Override
+    public void banner$setPreventPoiUpdated(boolean preventPoiUpdated) {
+        this.preventPoiUpdated = preventPoiUpdated;
+    }
 }
 

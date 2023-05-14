@@ -20,6 +20,13 @@ import java.util.Map;
 
 public interface InjectionLevel {
 
+    default boolean bridge$preventPoiUpdated() {
+        return false;
+    }
+
+    default void banner$setPreventPoiUpdated(boolean preventPoiUpdated) {
+    }
+
     default org.bukkit.generator.BiomeProvider bridge$biomeProvider() {
         return null;
     }
