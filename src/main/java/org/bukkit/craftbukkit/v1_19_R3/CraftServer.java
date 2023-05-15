@@ -478,23 +478,6 @@ public final class CraftServer implements Server {
             } else {
                 new BukkitCommandWrapper(this, entry.getValue()).register(dispatcher.getDispatcher(), label);
             }
-            // Banner start - handle mod command
-            if (command instanceof ModCustomCommand) {
-                LiteralCommandNode<CommandSourceStack> node = (LiteralCommandNode<CommandSourceStack>) ((ModCustomCommand) command).vanillaCommand;
-                if (!node.getLiteral().equals(label)) {
-                    LiteralCommandNode<CommandSourceStack> clone = new LiteralCommandNode(label, node.getCommand(), node.getRequirement(), node.getRedirect(), node.getRedirectModifier(), node.isFork());
-
-                    for (CommandNode<CommandSourceStack> child : node.getChildren()) {
-                        clone.addChild(child);
-                    }
-                    node = clone;
-                }
-
-                dispatcher.getDispatcher().getRoot().addChild(node);
-            } else {
-                new BukkitCommandWrapper(this, entry.getValue()).register(dispatcher.getDispatcher(), label);
-            }
-            // Banner end
         }
 
         // Refresh commands
