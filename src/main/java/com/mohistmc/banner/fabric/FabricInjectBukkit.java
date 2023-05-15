@@ -70,7 +70,7 @@ public class FabricInjectBukkit {
                 int id = i - 1;
                 environment1 = MohistDynamEnum.addEnum(World.Environment.class, name, new Class[]{Integer.TYPE}, new Object[]{id});
                 DIM_MAP.put(key, environment1);
-                BannerServer.LOGGER.debug("Registered fabric DimensionType as environment {}", environment1);
+                BannerServer.LOGGER.info("Registered fabric DimensionType as environment {}", environment1);
                 i++;
             }
         }
@@ -89,7 +89,7 @@ public class FabricInjectBukkit {
                 if (material != null) {
                     CraftMagicNumbers.ITEM_MATERIAL.put(item, material);
                     CraftMagicNumbers.MATERIAL_ITEM.put(material, item);
-                    BannerServer.LOGGER.debug("Save-ITEM: " + material.name() + " - " + materialName);
+                    BannerServer.LOGGER.info("Save-ITEM: " + material.name() + " - " + materialName);
                 }
             }
         }
@@ -108,7 +108,7 @@ public class FabricInjectBukkit {
                 if (material != null) {
                     CraftMagicNumbers.BLOCK_MATERIAL.put(block, material);
                     CraftMagicNumbers.MATERIAL_BLOCK.put(material, block);
-                    BannerServer.LOGGER.debug("Save-BLOCK:" + material.name() + " - " + materialName);
+                    BannerServer.LOGGER.info("Save-BLOCK:" + material.name() + " - " + materialName);
                 }
             }
         }
@@ -137,7 +137,7 @@ public class FabricInjectBukkit {
                 MobEffectInstance effectInstance = potion.getEffects().isEmpty() ? null : potion.getEffects().get(0);
                 PotionType potionType = MohistDynamEnum.addEnum0(PotionType.class, name, new Class[]{PotionEffectType.class, Boolean.TYPE, Boolean.TYPE}, effectInstance == null ? null : PotionEffectType.getById(MobEffect.getId(effectInstance.getEffect())), false, false);
                 if (potionType != null) {
-                    BannerServer.LOGGER.debug("Save-PotionType:" + name + " - " + potionType.name());
+                    BannerServer.LOGGER.info("Save-PotionType:" + name + " - " + potionType.name());
                 }
             }
         }
@@ -152,7 +152,7 @@ public class FabricInjectBukkit {
                 Particle particle = MohistDynamEnum.addEnum0(Particle.class, name, new Class[0]);
                 if (particle != null) {
                     org.bukkit.craftbukkit.v1_19_R3.CraftParticle.putParticles(particle, resourceLocation);
-                    BannerServer.LOGGER.debug("Save-ParticleType:" + name + " - " + particle.name());
+                    BannerServer.LOGGER.info("Save-ParticleType:" + name + " - " + particle.name());
                 }
             }
         }
@@ -167,7 +167,7 @@ public class FabricInjectBukkit {
             if (!isMINECRAFT(resourceLocation) && !map.contains(biomeName)) {
                 map.add(biomeName);
                 org.bukkit.block.Biome biomeCB = MohistDynamEnum.addEnum0(org.bukkit.block.Biome.class, biomeName, new Class[0]);
-                BannerServer.LOGGER.debug("Save-BIOME:" + biomeCB.name() + " - " + biomeName);
+                BannerServer.LOGGER.info("Save-BIOME:" + biomeCB.name() + " - " + biomeName);
             }
         }
         map.clear();
@@ -196,7 +196,7 @@ public class FabricInjectBukkit {
                 String name = normalizeName(resourceLocation.toString());
                 Villager.Profession vp = MohistDynamEnum.addEnum0(Villager.Profession.class, name, new Class[0]);
                 profession.put(vp, resourceLocation);
-                BannerServer.LOGGER.debug("Registered fabric VillagerProfession as Profession {}", vp.name());
+                BannerServer.LOGGER.info("Registered fabric VillagerProfession as Profession {}", vp.name());
             }
         }
     }
@@ -209,7 +209,7 @@ public class FabricInjectBukkit {
             if (!isMINECRAFT(resourceLocation)) {
                 Fluid fluid = MohistDynamEnum.addEnum0(Fluid.class, name, new Class[0]);
                 CraftMagicNumbers.FLUIDTYPE_FLUID.put(fluidType, fluid);
-                BannerServer.LOGGER.debug("Registered fabric Fluid as Fluid(Bukkit) {}", fluid.name());
+                BannerServer.LOGGER.info("Registered fabric Fluid as Fluid(Bukkit) {}", fluid.name());
             }
         }
     }
