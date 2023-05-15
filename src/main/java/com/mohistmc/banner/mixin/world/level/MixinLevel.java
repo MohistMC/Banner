@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.level;
 
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import com.mohistmc.banner.injection.world.level.InjectionLevel;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
@@ -53,6 +54,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,6 +120,50 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         for (SpawnCategory spawnCategory : SpawnCategory.values()) {
             if (CraftSpawnCategory.isValidForLimits(spawnCategory)) {
                 this.ticksPerSpawnCategory.put(spawnCategory, this.getCraftServer().getTicksPerSpawns(spawnCategory));
+            }
+        }
+    }
+
+    @Inject(method = "<init>", at = @At("TAIL"))
+    private void banner$handleWorldFolder(WritableLevelData writableLevelData, ResourceKey resourceKey, RegistryAccess registryAccess, Holder holder, Supplier supplier, boolean bl, boolean bl2, long l, int i, CallbackInfo ci) {
+        if ((((Level) (Object) this) instanceof ServerLevel)) {
+            ServerLevel nms = ((ServerLevel) (Object) this);
+            String name = ((ServerLevelData) nms.getLevelData()).getLevelName();
+
+            File fi = new File(name + "_the_end");
+            File van = new File(new File(name), "DIM1");
+
+            if (fi.exists()) {
+                File dim = new File(fi, "DIM1");
+                if (dim.exists()) {
+                    BannerServer.LOGGER.info("------ Migration of world file: " + name + "_the_end !");
+                    BannerServer.LOGGER.info("Banner is currently migrating the world back to the vanilla format!");
+                    BannerServer.LOGGER.info("Do to the differences between Spigot & Fabric world folders, we require migration.");
+                    if (dim.renameTo(van)) {
+                        BannerServer.LOGGER.info("---- Migration of old bukkit format folder complete ----");
+                    } else {
+                        BannerServer.LOGGER.info("---- Migration of old bukkit format folder FAILED! ----");
+                    }
+                    fi.delete();
+                }
+            }
+
+            File fi2 = new File(name + "_nether");
+            File van2 = new File(new File(name), "DIM-1");
+
+            if (fi2.exists()) {
+                File dim = new File(fi2, "DIM-1");
+                if (dim.exists()) {
+                    BannerServer.LOGGER.info("------ Migration of world file: " + fi2.getName() + " !");
+                    BannerServer.LOGGER.info("Banner is currently migrating the world back to the vanilla format!");
+                    BannerServer.LOGGER.info("Do to the differences between Spigot & Fabric world folders, we require migration.");
+                    if (dim.renameTo(van2)) {
+                        BannerServer.LOGGER.info("---- Migration of old bukkit format folder complete ----");
+                    } else {
+                        BannerServer.LOGGER.info("---- Migration of old bukkit format folder FAILED! ----");
+                    }
+                    fi.delete();
+                }
             }
         }
     }
