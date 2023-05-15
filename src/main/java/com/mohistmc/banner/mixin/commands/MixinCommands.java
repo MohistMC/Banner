@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.commands;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import com.mohistmc.banner.injection.commands.InjectionCommandNode;
 import com.mohistmc.banner.injection.commands.InjectionCommands;
@@ -13,9 +12,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.protocol.game.ClientboundCommandsPacket;
 import net.minecraft.server.level.ServerPlayer;
-import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.event.player.PlayerCommandSendEvent;
-import org.bukkit.event.server.ServerCommandEvent;
 import org.spongepowered.asm.mixin.*;
 
 import java.util.Collection;
@@ -50,38 +47,7 @@ public abstract class MixinCommands implements InjectionCommands {
 
     @Override
     public int dispatchServerCommand(CommandSourceStack sender, String command) {
-        Joiner joiner = Joiner.on(" ");
-        if (command.startsWith("/")) {
-            command = command.substring(1);
-        }
-
-        ServerCommandEvent event = new ServerCommandEvent(sender.getBukkitSender(), command);
-        org.bukkit.Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return 0;
-        }
-        command = event.getCommand();
-
-        String[] args = command.split(" ");
-
-        String cmd = args[0];
-        if (cmd.startsWith("minecraft:")) cmd = cmd.substring("minecraft:".length());
-        if (cmd.startsWith("bukkit:")) cmd = cmd.substring("bukkit:".length());
-
-        // Block disallowed commands
-        if (cmd.equalsIgnoreCase("stop") || cmd.equalsIgnoreCase("kick") || cmd.equalsIgnoreCase("op")
-                || cmd.equalsIgnoreCase("deop") || cmd.equalsIgnoreCase("ban") || cmd.equalsIgnoreCase("ban-ip")
-                || cmd.equalsIgnoreCase("pardon") || cmd.equalsIgnoreCase("pardon-ip") || cmd.equalsIgnoreCase("reload")) {
-            return 0;
-        }
-
-        // Handle vanilla commands;
-        if (sender.getLevel().getCraftServer().getCommandBlockOverride(args[0])) {
-            args[0] = "minecraft:" + args[0];
-        }
-
-        String newCommand = joiner.join(args);
-        return this.performPrefixedCommand(sender, newCommand, newCommand);
+        return this.performPrefixedCommand(sender, command);  // Banner - use vanilla like commands instead of bukkit like commands
     }
 
     /**

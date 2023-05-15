@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.world.entity.vehicle.MinecartCommandBlock;
 import org.apache.commons.lang3.Validate;
@@ -43,7 +42,7 @@ public final class VanillaCommandWrapper extends BukkitCommand {
         if (!testPermission(sender)) return true;
 
         CommandSourceStack icommandlistener = getListener(sender);
-        dispatcher.dispatchServerCommand(icommandlistener, toDispatcher(args, commandLabel));
+        dispatcher.performPrefixedCommand(icommandlistener, toDispatcher(args, commandLabel));// Banner - use vanilla command handle
         return true;
     }
 
