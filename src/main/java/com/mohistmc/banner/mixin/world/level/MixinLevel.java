@@ -122,7 +122,6 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                 this.ticksPerSpawnCategory.put(spawnCategory, this.getCraftServer().getTicksPerSpawns(spawnCategory));
             }
         }
-        this.getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
     }
 
     @Inject(method = "<init>", at = @At("TAIL"))
@@ -173,8 +172,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             target = "Lnet/minecraft/world/damagesource/DamageSources;<init>(Lnet/minecraft/core/RegistryAccess;)V",
             shift = At.Shift.AFTER))
     private void banner$addWorldBorder(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder holder, Supplier supplier, boolean bl, boolean bl2, long l, int i, CallbackInfo ci) {
-        //this.getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
-        /*
+        this.getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
         // CraftBukkit start
         getWorldBorder().addListener(new BorderChangeListener() {
             @Override
@@ -208,7 +206,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
 
             @Override
             public void onBorderSetDamageSafeZOne(WorldBorder border, double damageSafeZone) {}
-        });*/
+        });
     }
 
     @Override
