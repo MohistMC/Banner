@@ -1,8 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
-import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.injection.world.level.block.InjectionBlock;
-import com.mohistmc.banner.bukkit.DistValidate;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -11,7 +9,6 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -21,16 +18,11 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
 import java.util.function.Supplier;
 
 @Mixin(Block.class)
@@ -84,27 +76,4 @@ public abstract class MixinBlock extends BlockBehaviour implements InjectionBloc
        player.pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.BLOCK_MINED);
     }
 
-    @Inject(method = "playerDestroy", at = @At("RETURN"))
-    private void banner$handleBlockDrops(Level worldIn, Player player, BlockPos pos, BlockState blockState, BlockEntity te, ItemStack stack, CallbackInfo ci) {
-        BukkitCaptures.BlockBreakEventContext breakEventContext = BukkitCaptures.popPrimaryBlockBreakEvent();
-
-        if (breakEventContext != null) {
-            BlockBreakEvent breakEvent = breakEventContext.getEvent();
-            List<ItemEntity> blockDrops = breakEventContext.getBlockDrops();
-            org.bukkit.block.BlockState state = breakEventContext.getBlockBreakPlayerState();
-
-            if (player instanceof ServerPlayer && blockDrops != null && (breakEvent == null || breakEvent.isDropItems())
-                    && DistValidate.isValid(worldIn)) {
-                CraftBlock craftBlock = CraftBlock.at(((CraftWorld) state.getWorld()).getHandle(), pos);
-                CraftEventFactory.handleBlockDropItemEvent(craftBlock, state, ((ServerPlayer) player), blockDrops);
-            }
-            worldIn.banner$setCaptureDrops(null);
-            // Drop event experience
-            if (breakEvent != null) {
-                if (worldIn instanceof ServerLevel serverLevel) {
-                    blockState.getBlock().popExperience(serverLevel, pos, breakEvent.getExpToDrop());
-                }
-            }
-        }
-    }
 }

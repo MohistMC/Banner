@@ -107,6 +107,7 @@ public abstract class MixinBlockItem {
         banner$pos.set(pos);
         banner$player.set(player);
     }
+
     @ModifyExpressionValue(method = "updateCustomBlockEntityTag(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;)Z",
             at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
     private static boolean banner$checkPerm(Level level) {

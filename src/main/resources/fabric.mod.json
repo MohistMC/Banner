@@ -3,7 +3,7 @@
   "id": "banner",
   "version": "${version}",
 
-  "name": "Banner Mod",
+  "name": "Banner",
   "description": "The Bukkit/Spigot/Paper API implementation for Fabric!",
   "authors": [
     "Mohist Dev Team"
