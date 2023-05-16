@@ -1,7 +1,7 @@
 package com.mohistmc.banner.mixin.server.level;
 
 import com.google.common.collect.Lists;
-import com.mohistmc.banner.util.ServerUtils;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
@@ -89,7 +89,7 @@ public abstract class MixinServerEntity {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(ServerLevel serverWorld, Entity entity, int updateFrequency, boolean sendVelocityUpdates, Consumer<Packet<?>> packetConsumer, CallbackInfo ci) {
         trackedPlayers = new HashSet<>();
-        lastTick = ServerUtils.currentTick - 1;
+        lastTick = BukkitExtraConstants.currentTick - 1;
         lastUpdate = lastPosUpdate = lastMapUpdate = -1;
     }
 
@@ -120,11 +120,11 @@ public abstract class MixinServerEntity {
                 }
             });
         }
-        int elapsedTicks = ServerUtils.currentTick - this.lastTick;
+        int elapsedTicks = BukkitExtraConstants.currentTick - this.lastTick;
         if (elapsedTicks < 0) {
             elapsedTicks = 0;
         }
-        this.lastTick = ServerUtils.currentTick;
+        this.lastTick = BukkitExtraConstants.currentTick;
         if (this.entity instanceof ItemFrame itemFrame) {
             ItemStack itemstack = itemFrame.getItem();
             if (this.tickCount / 10 != this.lastMapUpdate && itemstack.getItem() instanceof MapItem) {

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.mohistmc.banner.util.BannerLecternInventory;
+import com.mohistmc.banner.bukkit.BannerLecternInventory;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.MerchantContainer;

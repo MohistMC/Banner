@@ -1,7 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.injection.world.level.block.InjectionSaplingBlock;
-import com.mohistmc.banner.util.BlockUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -34,8 +34,8 @@ public class MixinSaplingBlock implements InjectionSaplingBlock {
             this.treeGrower.growTree(level, level.getChunkSource().getGenerator(), pos, state, random);
             level.banner$setCaptureTreeGeneration(false);
             if (level.bridge$capturedBlockStates().size() > 0) {
-                TreeType treeType = BlockUtils.treeType;
-                BlockUtils.treeType = null;
+                TreeType treeType = BukkitExtraConstants.treeType;
+                BukkitExtraConstants.treeType = null;
                 Location location = CraftLocation.toBukkit(pos, level.getWorld());
                 java.util.List<org.bukkit.block.BlockState> blocks = new java.util.ArrayList<>(level.bridge$capturedBlockStates().values());
                 level.bridge$capturedBlockStates().clear();

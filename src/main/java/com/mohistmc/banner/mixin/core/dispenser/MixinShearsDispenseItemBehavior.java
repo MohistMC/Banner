@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.core.dispenser;
 
-import com.mohistmc.banner.bukkit.BukkitEventConstants;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
@@ -26,7 +26,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-import java.util.Iterator;
 import java.util.List;
 
 @Mixin(ShearsDispenseItemBehavior.class)
@@ -51,7 +50,7 @@ public abstract class MixinShearsDispenseItemBehavior extends OptionalDispenseIt
         CraftItemStack craftItem = CraftItemStack.asCraftMirror(stack);
 
         BlockDispenseEvent event = new BlockDispenseEvent(bukkitBlock, craftItem.clone(), new org.bukkit.util.Vector(0, 0, 0));
-        if (!BukkitEventConstants.dispenser_eventFired) {
+        if (!BukkitExtraConstants.dispenser_eventFired) {
             level.getCraftServer().getPluginManager().callEvent(event);
         }
 

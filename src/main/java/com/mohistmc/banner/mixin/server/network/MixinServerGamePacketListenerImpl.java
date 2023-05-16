@@ -2,8 +2,8 @@ package com.mohistmc.banner.mixin.server.network;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.injection.server.network.InjectionServerGamePacketListenerImpl;
-import com.mohistmc.banner.util.ServerUtils;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
@@ -458,13 +458,13 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     @Inject(method = "handleEditBook", at = @At("HEAD"))
     private void banner$editBookSpam(ServerboundEditBookPacket packetIn, CallbackInfo ci) {
         if (this.lastBookTick == 0) {
-            this.lastBookTick = ServerUtils.currentTick - 20;
+            this.lastBookTick = BukkitExtraConstants.currentTick - 20;
         }
-        if (this.lastBookTick + 20 > ServerUtils.currentTick) {
+        if (this.lastBookTick + 20 > BukkitExtraConstants.currentTick) {
             this.disconnect("Book edited too quickly!");
             return;
         }
-        this.lastBookTick = ServerUtils.currentTick;
+        this.lastBookTick = BukkitExtraConstants.currentTick;
     }
 
     /**
@@ -740,9 +740,9 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
             }
             case DROP_ITEM: {
                 if (!this.player.isSpectator()) {
-                    if (this.lastDropTick != ServerUtils.currentTick) {
+                    if (this.lastDropTick != BukkitExtraConstants.currentTick) {
                         this.dropCount = 0;
-                        this.lastDropTick = ServerUtils.currentTick;
+                        this.lastDropTick = BukkitExtraConstants.currentTick;
                     } else {
                         ++this.dropCount;
                         if (this.dropCount >= 20) {

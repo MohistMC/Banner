@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.item;
 
-import com.mohistmc.banner.bukkit.BukkitEventConstants;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
@@ -45,7 +45,7 @@ public class MixinArmorItem {
             CraftItemStack craftItem = CraftItemStack.asCraftMirror(itemStack);
 
             BlockDispenseArmorEvent event = new BlockDispenseArmorEvent(block, craftItem.clone(), (CraftLivingEntity) livingEntity.getBukkitEntity());
-            if (!BukkitEventConstants.dispenser_eventFired) {
+            if (!BukkitExtraConstants.dispenser_eventFired) {
                 world.getCraftServer().getPluginManager().callEvent(event);
             }
 

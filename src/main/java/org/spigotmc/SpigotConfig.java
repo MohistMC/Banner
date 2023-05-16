@@ -9,7 +9,7 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.logging.Level;
 
-import com.mohistmc.banner.util.ServerUtils;
+import com.mohistmc.banner.BannerServer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -74,7 +74,7 @@ public class SpigotConfig
     public static void registerCommands()
     {
         for ( Map.Entry<String, Command> entry : commands.entrySet() ) {
-            Objects.requireNonNull(ServerUtils.getServer()).bridge$server().getCommandMap().register(entry.getKey(), "Spigot", entry.getValue());
+            Objects.requireNonNull(BannerServer.getServer()).bridge$server().getCommandMap().register(entry.getKey(), "Spigot", entry.getValue());
         }
     }
 

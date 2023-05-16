@@ -5,6 +5,9 @@ import com.mohistmc.i18n.i18n;
 import com.llamalad7.mixinextras.MixinExtrasBootstrap;
 import io.izzel.arclight.mixin.injector.EjectorInfo;
 import net.fabricmc.api.DedicatedServerModInitializer;
+import net.minecraft.server.MinecraftServer;
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.injection.struct.InjectionInfo;
@@ -30,5 +33,9 @@ public class BannerServer implements DedicatedServerModInitializer {
 
     public static String getVersion() {
         return (BannerServer.class.getPackage().getImplementationVersion() != null) ? BannerServer.class.getPackage().getImplementationVersion() : "unknown";
+    }
+
+    public static MinecraftServer getServer() {
+        return Bukkit.getServer() instanceof CraftServer ? ((CraftServer) Bukkit.getServer()).getServer() : null;
     }
 }

@@ -1,9 +1,8 @@
 package com.mohistmc.banner.mixin.world.item;
 
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.injection.world.item.InjectionItemStack;
-import com.mohistmc.banner.util.BlockUtils;
-import com.mohistmc.banner.util.ServerUtils;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -17,8 +16,6 @@ import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.Stats;
@@ -41,7 +38,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.bukkit.Location;
-import org.bukkit.SoundCategory;
 import org.bukkit.TreeType;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlockState;
@@ -106,7 +102,7 @@ public abstract class MixinItemStack implements InjectionItemStack {
         if (0 < version && version < CraftMagicNumbers.INSTANCE.getDataVersion()) {
             CompoundTag savedStack = new CompoundTag();
             this.save(savedStack);
-            savedStack = (CompoundTag) ServerUtils.getServer().fixerUpper.update(References.ITEM_STACK, new Dynamic(NbtOps.INSTANCE, savedStack), version, CraftMagicNumbers.INSTANCE.getDataVersion()).getValue();
+            savedStack = (CompoundTag) BannerServer.getServer().fixerUpper.update(References.ITEM_STACK, new Dynamic(NbtOps.INSTANCE, savedStack), version, CraftMagicNumbers.INSTANCE.getDataVersion()).getValue();
             this.load(savedStack);
         }
     }
@@ -259,8 +255,8 @@ public abstract class MixinItemStack implements InjectionItemStack {
             if (interactionResult.consumesAction() && world.bridge$captureTreeGeneration() && world.bridge$capturedBlockStates().size() > 0) {
                 world.banner$setCaptureTreeGeneration(false);
                 Location location = CraftLocation.toBukkit(blockPos, world.getWorld());
-                TreeType treeType = BlockUtils.treeType;
-                BlockUtils.treeType = null;
+                TreeType treeType = BukkitExtraConstants.treeType;
+                BukkitExtraConstants.treeType = null;
                 List<CraftBlockState> blocks = new java.util.ArrayList<>(world.bridge$capturedBlockStates().values());
                 world.bridge$capturedBlockStates().clear();
                 StructureGrowEvent structureEvent = null;

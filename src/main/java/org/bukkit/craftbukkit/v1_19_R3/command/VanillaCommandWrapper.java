@@ -1,7 +1,7 @@
 package org.bukkit.craftbukkit.v1_19_R3.command;
 
 import com.google.common.base.Joiner;
-import com.mohistmc.banner.util.ServerUtils;
+import com.mohistmc.banner.BannerServer;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.tree.CommandNode;
 import java.util.ArrayList;
@@ -74,7 +74,7 @@ public final class VanillaCommandWrapper extends BukkitCommand {
             return ((MinecartCommandBlock) ((CraftMinecartCommand) sender).getHandle()).getCommandBlock().createCommandSourceStack();
         }
         if (sender instanceof RemoteConsoleCommandSender) {
-            return ((DedicatedServer) ServerUtils.getServer()).rconConsoleSource.createCommandSourceStack();
+            return ((DedicatedServer) BannerServer.getServer()).rconConsoleSource.createCommandSourceStack();
         }
         if (sender instanceof ConsoleCommandSender) {
             return ((CraftServer) sender.getServer()).getServer().createCommandSourceStack();

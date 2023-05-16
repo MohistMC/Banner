@@ -9,7 +9,6 @@ import com.mohistmc.banner.bukkit.LevelPersistentData;
 import com.mohistmc.banner.fabric.BannerDerivedWorldInfo;
 import com.mohistmc.banner.injection.server.level.InjectionServerLevel;
 import com.mohistmc.banner.injection.world.level.storage.InjectionLevelStorageAccess;
-import com.mohistmc.banner.util.ServerUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
@@ -143,7 +142,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         if (typeKey != null) {
             this.typeKey = typeKey;
         } else {
-            var dimensions = ServerUtils.getServer().registryAccess().registryOrThrow(Registries.LEVEL_STEM);
+            var dimensions = BannerServer.getServer().registryAccess().registryOrThrow(Registries.LEVEL_STEM);
             var key = dimensions.getResourceKey(levelStem);
             if (key.isPresent()) {
                 this.typeKey = key.get();
@@ -263,8 +262,8 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     private void banner$saveLevelDat(ProgressListener progress, boolean flush, boolean skipSave, CallbackInfo ci) {
         if (this.serverLevelData instanceof PrimaryLevelData worldInfo) {
             worldInfo.setWorldBorder(this.getWorldBorder().createSettings());
-            worldInfo.setCustomBossEvents(ServerUtils.getServer().getCustomBossEvents().save());
-            this.convertable.saveDataTag(ServerUtils.getServer().registryAccess(), worldInfo, ServerUtils.getServer().getPlayerList().getSingleplayerData());
+            worldInfo.setCustomBossEvents(BannerServer.getServer().getCustomBossEvents().save());
+            this.convertable.saveDataTag(BannerServer.getServer().registryAccess(), worldInfo, BannerServer.getServer().getPlayerList().getSingleplayerData());
         }
     }
 
@@ -346,7 +345,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     @Overwrite
     @Nullable
     public MapItemSavedData getMapData(String mapName) {
-        return ServerUtils.getServer().overworld().getDataStorage().get((nbt) -> {
+        return BannerServer.getServer().overworld().getDataStorage().get((nbt) -> {
             MapItemSavedData newMap = MapItemSavedData.load(nbt);
             newMap.banner$setId(mapName);
             MapInitializeEvent event = new MapInitializeEvent(newMap.bridge$mapView());

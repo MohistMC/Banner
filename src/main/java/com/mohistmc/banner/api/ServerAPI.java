@@ -1,6 +1,6 @@
 package com.mohistmc.banner.api;
 
-import com.mohistmc.banner.util.ServerUtils;
+import com.mohistmc.banner.BannerServer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModEnvironment;
@@ -58,6 +58,6 @@ public class ServerAPI {
     }
 
     public static MinecraftServer getNMSServer() {
-        return ServerUtils.getServer();
+        return BannerServer.getServer();
     }
 }

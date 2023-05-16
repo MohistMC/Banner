@@ -1,4 +1,4 @@
-package com.mohistmc.banner.util;
+package com.mohistmc.banner.bukkit;
 
 import net.minecraft.world.Container;
 import net.minecraft.world.level.block.entity.LecternBlockEntity;

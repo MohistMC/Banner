@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.core.dispenser;
 
-import com.mohistmc.banner.bukkit.BukkitEventConstants;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
@@ -68,7 +68,7 @@ public class MixinDefaultDispenseItemBehavior {
         CraftItemStack craftItem = CraftItemStack.asCraftMirror(stack);
 
         BlockDispenseEvent event = new BlockDispenseEvent(block, craftItem.clone(), CraftVector.toBukkit(banner$itemEntity.getDeltaMovement()));
-        if (!BukkitEventConstants.dispenser_eventFired) {
+        if (!BukkitExtraConstants.dispenser_eventFired) {
             level.getCraftServer().getPluginManager().callEvent(event);
         }
 

@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
@@ -37,7 +38,6 @@ import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WorldData;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.Main;
-import com.mohistmc.banner.util.ServerUtils;
 import com.mojang.datafixers.DataFixer;
 import jline.console.ConsoleReader;
 import joptsimple.OptionParser;
@@ -114,9 +114,9 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     public org.bukkit.command.ConsoleCommandSender console;
     public org.bukkit.command.RemoteConsoleCommandSender remoteConsole;
     public ConsoleReader reader;
-    private static int currentTick = ServerUtils.getCurrentTick();
-    public java.util.Queue<Runnable> processQueue = ServerUtils.bridge$processQueue;
-    public int autosavePeriod = ServerUtils.bridge$autosavePeriod;
+    private static int currentTick = BukkitExtraConstants.currentTick;
+    public java.util.Queue<Runnable> processQueue = BukkitExtraConstants.bridge$processQueue;
+    public int autosavePeriod = BukkitExtraConstants.bridge$autosavePeriod;
     private boolean forceTicks;
     public Commands vanillaCommandDispatcher;
     private boolean hasStopped = false;
@@ -178,7 +178,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Inject(method = "runServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;nextTickTime:J", shift = At.Shift.BEFORE))
     private void banner$currentTick(CallbackInfo ci) {
-        ServerUtils.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
+        BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
     }
 
     @Inject(method = "runServer",

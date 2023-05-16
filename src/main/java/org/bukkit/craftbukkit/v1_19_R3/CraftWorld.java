@@ -5,7 +5,6 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
-import com.mohistmc.banner.util.ServerUtils;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
@@ -267,7 +266,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
     @Override
     public boolean unloadChunkRequest(int x, int z) {
         if (isChunkLoaded(x, z)) {
-            world.getChunkSource().removeRegionTicket(ServerUtils.PLUGIN, new ChunkPos(x, z), 1, Unit.INSTANCE);
+            world.getChunkSource().removeRegionTicket(BukkitExtraConstants.PLUGIN, new ChunkPos(x, z), 1, Unit.INSTANCE);
         }
 
         return true;
@@ -348,7 +347,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         }
 
         if (chunk instanceof net.minecraft.world.level.chunk.LevelChunk) {
-            world.getChunkSource().addRegionTicket(ServerUtils.PLUGIN, new ChunkPos(x, z), 1, Unit.INSTANCE);
+            world.getChunkSource().addRegionTicket(BukkitExtraConstants.PLUGIN, new ChunkPos(x, z), 1, Unit.INSTANCE);
             return true;
         }
 
@@ -376,7 +375,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
         DistanceManager chunkDistanceManager = this.world.getChunkSource().chunkMap.distanceManager;
 
-        if (chunkDistanceManager.addRegionTicketAtDistance(ServerUtils.PLUGIN_TICKET, new ChunkPos(x, z), 2, plugin)) { // keep in-line with force loading, add at level 31
+        if (chunkDistanceManager.addRegionTicketAtDistance(BukkitExtraConstants.PLUGIN_TICKET, new ChunkPos(x, z), 2, plugin)) { // keep in-line with force loading, add at level 31
             this.getChunkAt(x, z); // ensure loaded
             return true;
         }
@@ -389,7 +388,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         Preconditions.checkNotNull(plugin, "null plugin");
 
         DistanceManager chunkDistanceManager = this.world.getChunkSource().chunkMap.distanceManager;
-        return chunkDistanceManager.removeRegionTicketAtDistance(ServerUtils.PLUGIN_TICKET, new ChunkPos(x, z), 2, plugin); // keep in-line with force loading, remove at level 31
+        return chunkDistanceManager.removeRegionTicketAtDistance(BukkitExtraConstants.PLUGIN_TICKET, new ChunkPos(x, z), 2, plugin); // keep in-line with force loading, remove at level 31
     }
 
     @Override
@@ -397,7 +396,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         Preconditions.checkNotNull(plugin, "null plugin");
 
         DistanceManager chunkDistanceManager = this.world.getChunkSource().chunkMap.distanceManager;
-        chunkDistanceManager.removeAllTicketsFor(ServerUtils.PLUGIN_TICKET, 31, plugin); // keep in-line with force loading, remove at level 31
+        chunkDistanceManager.removeAllTicketsFor(BukkitExtraConstants.PLUGIN_TICKET, 31, plugin); // keep in-line with force loading, remove at level 31
     }
 
     @Override
@@ -411,7 +410,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
         ImmutableList.Builder<Plugin> ret = ImmutableList.builder();
         for (Ticket<?> ticket : tickets) {
-            if (ticket.getType() == ServerUtils.PLUGIN_TICKET) {
+            if (ticket.getType() == BukkitExtraConstants.PLUGIN_TICKET) {
                 ret.add((Plugin) ticket.key);
             }
         }
@@ -430,7 +429,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
             Chunk chunk = null;
             for (Ticket<?> ticket : tickets) {
-                if (ticket.getType() != ServerUtils.PLUGIN_TICKET) {
+                if (ticket.getType() != BukkitExtraConstants.PLUGIN_TICKET) {
                     continue;
                 }
 

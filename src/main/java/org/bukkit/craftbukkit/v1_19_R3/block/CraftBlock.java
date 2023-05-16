@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.mohistmc.banner.util.BlockUtils;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -495,12 +495,12 @@ public class CraftBlock implements Block {
 
         // SPIGOT-6895: Call StructureGrowEvent and BlockFertilizeEvent
         world.banner$setCaptureTreeGeneration(true);
-        InteractionResult result = BlockUtils.applyBonemeal(context);
+        InteractionResult result = BukkitExtraConstants.applyBonemeal(context);
         world.banner$setCaptureTreeGeneration(false);
 
         if (world.bridge$capturedBlockStates().size() > 0) {
-            TreeType treeType = BlockUtils.treeType;
-            BlockUtils.treeType = null;
+            TreeType treeType = BukkitExtraConstants.treeType;
+            BukkitExtraConstants.treeType = null;
             List<BlockState> blocks = new ArrayList<>(world.bridge$capturedBlockStates().values());
             world.bridge$capturedBlockStates().clear();
             StructureGrowEvent structureEvent = null;

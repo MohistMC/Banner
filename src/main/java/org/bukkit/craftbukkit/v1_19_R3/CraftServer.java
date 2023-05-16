@@ -9,15 +9,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.api.ServerAPI;
-import com.mohistmc.banner.fabric.ModCustomCommand;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.Commands;
 import net.minecraft.world.flag.FeatureFlagSet;
 import org.bukkit.craftbukkit.Main;
-import com.mohistmc.banner.util.ReloadUtils;
-import com.mohistmc.banner.util.ServerUtils;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -332,9 +330,9 @@ public final class CraftServer implements Server {
         ignoreVanillaPermissions = commandsConfiguration.getBoolean("ignore-vanilla-permissions");
         pluginManager.useTimings(configuration.getBoolean("settings.plugin-profiling"));
         overrideSpawnLimits();
-        ServerUtils.bridge$autosavePeriod = configuration.getInt("ticks-per.autosave");
+        BukkitExtraConstants.bridge$autosavePeriod = configuration.getInt("ticks-per.autosave");
         warningState = WarningState.value(configuration.getString("settings.deprecated-verbose"));
-        ServerUtils.PLUGIN.timeout = configuration.getInt("chunk-gc.period-in-ticks");
+        BukkitExtraConstants.PLUGIN.timeout = configuration.getInt("chunk-gc.period-in-ticks");
         minimumAPI = configuration.getString("settings.minimum-api");
         loadIcon();
 
@@ -886,7 +884,7 @@ public final class CraftServer implements Server {
 
     @Override
     public void reloadData() {
-        ReloadUtils.reload(console);
+        BukkitExtraConstants.reload(console);
     }
 
     private void loadIcon() {
