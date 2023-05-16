@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.server.level;
 
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -352,8 +351,8 @@ public abstract class MixinServerPlayerGameMode {
         level.banner$setCaptureDrops(new ArrayList<>());
     }
 
-    @Inject(method = "destroyBlock", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
-    private void banner$fireDropEvent(BlockPos pos, CallbackInfoReturnable<Boolean> cir, BlockState blockState) {
+    @Inject(method = "destroyBlock", at = @At("TAIL"), cancellable = true)
+    private void banner$fireDropEvent(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         org.bukkit.block.BlockState state = CraftBlock.at(level, pos).getState();
         if (banner$event.get().isDropItems()) {
             CraftEventFactory.handleBlockDropItemEvent(CraftBlock.at(level, pos), state, this.player, level.bridge$captureDrops());
@@ -362,7 +361,7 @@ public abstract class MixinServerPlayerGameMode {
 
         // Drop event experience
         if (this.level.removeBlock(pos, false) && banner$event.get() != null) {
-            blockState.getBlock().popExperience(this.level, pos, banner$event.get().getExpToDrop());
+            this.level.getBlockState(pos).getBlock().popExperience(this.level, pos, banner$event.get().getExpToDrop());
         }
         cir.setReturnValue(true);
     }
@@ -386,11 +385,13 @@ public abstract class MixinServerPlayerGameMode {
         return false;
     }
 
-    @WrapWithCondition(method = "destroyBlock",
+    @Redirect(method = "destroyBlock",
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/block/Block;playerDestroy(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/BlockEntity;Lnet/minecraft/world/item/ItemStack;)V"))
-    private boolean banner$addEventCheck() {
-        return banner$event.get().isDropItems();
+    private void banner$addEventCheck(Block block, Level level, Player player, BlockPos pos, BlockState blockState, BlockEntity blockEntity, ItemStack itemStack2) {
+        if (banner$event.get().isDropItems()) {
+            block.playerDestroy(this.level, this.player, pos, blockState, blockEntity, itemStack2);
+        }
     }
 
     /**
