@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.level;
 
+import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -16,7 +17,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DoubleHighBlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.GameType;
@@ -47,11 +50,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
-@Mixin(value = ServerPlayerGameMode.class, priority = 400)
+@Mixin(ServerPlayerGameMode.class)
 public abstract class MixinServerPlayerGameMode {
 
     @Shadow
@@ -275,12 +280,15 @@ public abstract class MixinServerPlayerGameMode {
     public InteractionHand interactHand;
     public ItemStack interactItemStack;
 
-    /**
-     * @author wdog5
-     * @reason functionally replaced
-     */
-    @Overwrite
-    public boolean destroyBlock(BlockPos blockposition) {
+    private final AtomicReference<BlockBreakEvent> banner$event = new AtomicReference<>();
+
+    @Inject(method = "destroyBlock", at = @At("HEAD"))
+    private void banner$destoryBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+
+    }
+
+    @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
+    private void banner$fireBreakEvent(BlockPos blockposition, CallbackInfoReturnable<Boolean> cir) {
         BlockState iblockdata = this.level.getBlockState(blockposition);
         // CraftBukkit start - fire BlockBreakEvent
         org.bukkit.block.Block bblock = CraftBlock.at(level, blockposition);
@@ -316,7 +324,7 @@ public abstract class MixinServerPlayerGameMode {
 
             if (event.isCancelled()) {
                 if (isSwordNoBreak) {
-                    return false;
+                    cir.setReturnValue(false);
                 }
                 // Let the client know the block still exists
                 this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, blockposition));
@@ -331,70 +339,64 @@ public abstract class MixinServerPlayerGameMode {
                 if (tileentity != null) {
                     this.player.connection.send(tileentity.getUpdatePacket());
                 }
-                return false;
+                cir.setReturnValue(false);
             }
         }
-        // CraftBukkit end
+        banner$event.set(event);
+    }
 
-        if (false && !this.player.getMainHandItem().getItem().canAttackBlock(iblockdata, this.level, blockposition, this.player)) { // CraftBukkit - false
-            return false;
-        } else {
-            iblockdata = this.level.getBlockState(blockposition); // CraftBukkit - update state from plugins
-            if (iblockdata.isAir()) return false; // CraftBukkit - A plugin set block to air without cancelling
-            BlockEntity tileentity = this.level.getBlockEntity(blockposition);
-            Block block = iblockdata.getBlock();
+    @Inject(method = "destroyBlock", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/block/Block;playerWillDestroy(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/player/Player;)V",
+            shift = At.Shift.BEFORE))
+    private void banner$setDrops(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        level.banner$setCaptureDrops(new ArrayList<>());
+    }
 
-            if (block instanceof GameMasterBlock && !this.player.canUseGameMasterBlocks()) {
-                this.level.sendBlockUpdated(blockposition, iblockdata, iblockdata, 3);
-                return false;
-            } else if (this.player.blockActionRestricted(this.level, blockposition, this.gameModeForPlayer)) {
-                return false;
-            } else {
-                // CraftBukkit start
-                org.bukkit.block.BlockState state = bblock.getState();
-                level.banner$setCaptureDrops(new ArrayList<>());
-                // CraftBukkit end
-                block.playerWillDestroy(this.level, blockposition, iblockdata, this.player);
-                boolean flag = this.level.removeBlock(blockposition, false);
-
-                if (flag) {
-                    block.destroy(this.level, blockposition, iblockdata);
-                }
-
-                if (this.isCreative()) {
-                    // return true; // CraftBukkit
-                } else {
-                    ItemStack itemstack = this.player.getMainHandItem();
-                    ItemStack itemstack1 = itemstack.copy();
-                    boolean flag1 = this.player.hasCorrectToolForDrops(iblockdata);
-
-                    itemstack.mineBlock(this.level, iblockdata, blockposition, this.player);
-                    if (flag && flag1 && event.isDropItems()) { // CraftBukkit - Check if block should drop items
-                        block.playerDestroy(this.level, this.player, blockposition, iblockdata, tileentity, itemstack1);
-                    }
-
-                    // return true; // CraftBukkit
-                }
-                // CraftBukkit start
-                if (event.isDropItems()) {
-                    CraftEventFactory.handleBlockDropItemEvent(bblock, state, this.player, level.bridge$captureDrops());
-                }
-                level.banner$setCaptureDrops(null);
-
-                // Drop event experience
-                if (flag && event != null) {
-                    iblockdata.getBlock().popExperience(this.level, blockposition, event.getExpToDrop());
-                }
-
-                return true;
-                // CraftBukkit end
-            }
+    @Inject(method = "destroyBlock", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    private void banner$fireDropEvent(BlockPos pos, CallbackInfoReturnable<Boolean> cir, BlockState blockState) {
+        org.bukkit.block.BlockState state = CraftBlock.at(level, pos).getState();
+        if (banner$event.get().isDropItems()) {
+            CraftEventFactory.handleBlockDropItemEvent(CraftBlock.at(level, pos), state, this.player, level.bridge$captureDrops());
         }
+        level.banner$setCaptureDrops(null);
+
+        // Drop event experience
+        if (this.level.removeBlock(pos, false) && banner$event.get() != null) {
+            blockState.getBlock().popExperience(this.level, pos, banner$event.get().getExpToDrop());
+        }
+        cir.setReturnValue(true);
+    }
+
+    @Redirect(method = "destroyBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/Item;canAttackBlock(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;)Z"))
+    private boolean banner$addFalse(Item instance, BlockState state, Level level, BlockPos pos, Player player) {
+        return false && !this.player.getMainHandItem().getItem().canAttackBlock(state, this.level, pos, this.player);
+    }
+
+    @Inject(method = "destroyBlock",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerLevel;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;",
+            shift = At.Shift.BEFORE), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    private void banner$resetState(BlockPos pos, CallbackInfoReturnable<Boolean> cir, BlockState blockState) {
+        blockState = this.level.getBlockState(pos); // CraftBukkit - update state from plugins
+        if (blockState.isAir()) cir.setReturnValue(false); // CraftBukkit - A plugin set block to air without cancelling
+    }
+
+    @Redirect(method = "destroyBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayerGameMode;isCreative()Z"))
+    private boolean banner$setFalseCreative(ServerPlayerGameMode instance) {
+        return false;
+    }
+
+    @WrapWithCondition(method = "destroyBlock",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/block/Block;playerDestroy(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/BlockEntity;Lnet/minecraft/world/item/ItemStack;)V"))
+    private boolean banner$addEventCheck() {
+        return banner$event.get().isDropItems();
     }
 
     /**
      * @author wdog4
      * @reason
+     * @null
      */
     @Overwrite
     public InteractionResult useItemOn(ServerPlayer player, Level level, ItemStack stack, InteractionHand hand, BlockHitResult hitResult) {
