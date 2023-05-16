@@ -894,6 +894,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
 
     /**
      * @author wdog5
+     * @reason bukkit
      */
     @Overwrite
     public void handleSetCarriedItem(ServerboundSetCarriedItemPacket packet) {

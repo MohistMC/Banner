@@ -24,7 +24,7 @@ repositories {
 		url = 'https://maven.parchmentmc.org'
 	}
 	maven {
-		name = 'JirPack'
+		name = 'JitPack'
 		url = 'https://jitpack.io'
 	}
 	maven {
