@@ -38,6 +38,7 @@
     "network.protocol.game.MixinClientboundSetBorderCenterPacket",
     "network.protocol.game.MixinClientboundSystemChatPacket",
     "network.protocol.game.MixinServerboundContainerClosePacket",
+    "network.protocol.game.MixinServerboundUseItemOnPacket",
     "network.syncher.MixinSynchedEntityData",
     "server.MixinMain",
     "server.MixinMinecraftServer",

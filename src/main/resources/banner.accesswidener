@@ -27,6 +27,7 @@ accessible class net/minecraft/server/level/DistanceManager$ChunkTicketTracker
 accessible class net/minecraft/world/entity/animal/Bee$BeePollinateGoal
 accessible class net/minecraft/server/commands/LootCommand$Callback
 accessible class net/minecraft/server/commands/SpreadPlayersCommand$Position
+accessible class net/minecraft/server/network/ServerGamePacketListenerImpl$EntityInteraction
 
 # public methods
 accessible method net/minecraft/world/level/block/DispenserBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)V
@@ -188,6 +189,7 @@ accessible method net/minecraft/server/level/ServerChunkCache runDistanceManager
 accessible method net/minecraft/world/entity/animal/Bee$BeePollinateGoal stopPollinating ()V
 accessible method net/minecraft/world/entity/animal/Fox addTrustedUUID (Ljava/util/UUID;)V
 accessible method net/minecraft/world/entity/animal/sniffer/Sniffer calculateDigPosition ()Ljava/util/Optional;
+accessible method net/minecraft/server/network/ServerGamePacketListenerImpl$EntityInteraction run (Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C

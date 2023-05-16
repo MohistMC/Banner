@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.level;
 
+import com.mohistmc.banner.injection.server.level.InjectionServerPlayerGameMode;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -56,7 +57,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(ServerPlayerGameMode.class)
-public abstract class MixinServerPlayerGameMode {
+public abstract class MixinServerPlayerGameMode implements InjectionServerPlayerGameMode {
 
     @Shadow
     @Final
@@ -477,5 +478,20 @@ public abstract class MixinServerPlayerGameMode {
             }
         }
         return enuminteractionresult;
+    }
+
+    @Override
+    public boolean bridge$isFiredInteract() {
+        return firedInteract;
+    }
+
+    @Override
+    public void bridge$setFiredInteract(boolean firedInteract) {
+        this.firedInteract = firedInteract;
+    }
+
+    @Override
+    public boolean bridge$getInteractResult() {
+        return interactResult;
     }
 }
