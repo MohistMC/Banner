@@ -139,8 +139,8 @@
       "net/minecraft/class_1915": ["com/mohistmc/banner/injection/world/item/trading/InjectionMerchant"],
       "net/minecraft/class_1914": ["com/mohistmc/banner/injection/world/item/trading/InjectionMerchantOffer"],
       "net/minecraft/class_1799": ["com/mohistmc/banner/injection/world/item/InjectionItemStack"],
-      "net/minecraft/class_2637": ["com/mohistmc/banner/injection/network/protocol/game/InjectionServerboundUseItemOnPacket"],
-      "net/minecraft/class_2885": ["com/mohistmc/banner/injection/network/protocol/game/InjectionClientboundSectionBlocksUpdatePacket"]
+      "net/minecraft/class_2885": ["com/mohistmc/banner/injection/network/protocol/game/InjectionServerboundUseItemOnPacket"],
+      "net/minecraft/class_2637": ["com/mohistmc/banner/injection/network/protocol/game/InjectionClientboundSectionBlocksUpdatePacket"]
     }
   }
 }
