@@ -27,7 +27,6 @@ import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.util.ProgressListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.Container;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
@@ -72,7 +71,6 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.List;
 import java.util.UUID;
@@ -104,9 +102,6 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     @Shadow public abstract boolean addFreshEntity(Entity entity);
 
     @Shadow public abstract void addDuringTeleport(Entity entity);
-
-    @Shadow public abstract boolean tryAddFreshEntityWithPassengers(Entity entity);
-
     @Shadow public abstract boolean addWithUUID(Entity entity);
 
     @Shadow public abstract DimensionDataStorage getDataStorage();
