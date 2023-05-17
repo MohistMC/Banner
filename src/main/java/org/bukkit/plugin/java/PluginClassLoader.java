@@ -20,6 +20,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.logging.Level;
+
+import com.mohistmc.banner.bukkit.pluginfix.PluginFixManager;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.SimplePluginManager;
@@ -163,6 +165,7 @@ final class PluginClassLoader extends URLClassLoader {
 
                 try (InputStream is = jar.getInputStream(entry)) {
                     classBytes = ByteStreams.toByteArray(is);
+                    classBytes = PluginFixManager.injectPluginFix(name, classBytes); // Banner - Inject plugin fix
                 } catch (IOException ex) {
                     throw new ClassNotFoundException(name, ex);
                 }

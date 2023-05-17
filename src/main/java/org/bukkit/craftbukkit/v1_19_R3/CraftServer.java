@@ -372,7 +372,7 @@ public final class CraftServer implements Server {
         File pluginFolder = (File) console.bridge$options().valueOf("plugins");
 
         if (pluginFolder.exists()) {
-            if (pluginFolder.exists()) {
+            if (pluginFolder.listFiles() != null) {
                 for (File f : pluginFolder.listFiles()) {
                     if (f.getName().endsWith(".jar")) {
                         try {

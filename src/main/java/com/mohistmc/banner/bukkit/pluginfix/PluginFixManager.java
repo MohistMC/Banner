@@ -15,8 +15,14 @@ public class PluginFixManager {
         if (className.endsWith("PaperLib")) {
             return PluginFixManager.removePaper(clazz);
         }
+        if (className.equals("com.earth2me.essentials.utils.VersionUtil")) {
+            return helloWorld(clazz, "net.fabricmc.loader.launch.knot.KnotServer", "hello.World");
+        }
         if (className.equals("com.sk89q.worldedit.bukkit.adapter.Refraction")) {
             return helloWorld(clazz, "net.minecraft.nbt.ListTag", "hello.World");
+        }
+        if (className.endsWith("net.ess3.nms.refl.providers.ReflServerStateProvider")) {
+            return helloWorld(clazz, "u", "method_3828");
         }
         return clazz;
     }
