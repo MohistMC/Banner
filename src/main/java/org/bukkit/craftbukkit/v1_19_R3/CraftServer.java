@@ -213,7 +213,7 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 
 public final class CraftServer implements Server {
-    private final String serverName = "Mohist Banner";
+    private final String serverName = "Banner";
     public static String serverVersion;
     private final String bukkitVersion = Versioning.getBukkitVersion();
     private final Logger logger = Logger.getLogger("Minecraft");
@@ -2295,20 +2295,20 @@ public final class CraftServer implements Server {
 
         @Override
         public void restart() {
-            throw new UnsupportedOperationException("Mohist Banner Not supported yet, This causes unknown issues with the mod.");
+            org.spigotmc.RestartCommand.restart();
         }
 
         @Override
         public void broadcast(BaseComponent component) {
             for (Player player : getOnlinePlayers()) {
-                //player.spigot().sendMessage(component);
+                player.spigot().sendMessage(component);
             }
         }
 
         @Override
         public void broadcast(BaseComponent... components) {
             for (Player player : getOnlinePlayers()) {
-                //player.spigot().sendMessage(components);
+                player.spigot().sendMessage(components);
             }
         }
     };
