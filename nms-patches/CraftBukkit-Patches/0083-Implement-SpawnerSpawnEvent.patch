@@ -1,11 +1,11 @@
-From 61ba409650c2b8941ec49fa6b70293222eed1d1c Mon Sep 17 00:00:00 2001
+From 91f3e80acf15cbb434ae2df0753b3c8b3efc68c6 Mon Sep 17 00:00:00 2001
 From: md_5 <git@md-5.net>
 Date: Thu, 3 Mar 2016 19:45:46 +1100
 Subject: [PATCH] Implement SpawnerSpawnEvent.
 
 
 diff --git a/src/main/java/net/minecraft/world/level/MobSpawnerAbstract.java b/src/main/java/net/minecraft/world/level/MobSpawnerAbstract.java
-index 50df2abbf..470b3ab71 100644
+index 50df2abbf6..470b3ab71e 100644
 --- a/src/main/java/net/minecraft/world/level/MobSpawnerAbstract.java
 +++ b/src/main/java/net/minecraft/world/level/MobSpawnerAbstract.java
 @@ -158,6 +158,18 @@ public abstract class MobSpawnerAbstract {
@@ -28,10 +28,10 @@ index 50df2abbf..470b3ab71 100644
                          if (!worldserver.tryAddFreshEntityWithPassengers(entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.SPAWNER)) { // CraftBukkit
                              this.delay(worldserver, blockposition);
 diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-index 1523b7d96..6140540cb 100644
+index 27bd89fedc..b0bcbc0385 100644
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-@@ -236,6 +236,8 @@ import org.bukkit.inventory.InventoryView;
+@@ -238,6 +238,8 @@ import org.bukkit.inventory.InventoryView;
  import org.bukkit.inventory.meta.BookMeta;
  import org.bukkit.potion.PotionEffect;
  
@@ -40,7 +40,7 @@ index 1523b7d96..6140540cb 100644
  public class CraftEventFactory {
      public static org.bukkit.block.Block blockDamage; // For use in EntityDamageByBlockEvent
      public static Entity entityDamage; // For use in EntityDamageByEntityEvent
-@@ -1527,6 +1529,21 @@ public class CraftEventFactory {
+@@ -1536,6 +1538,21 @@ public class CraftEventFactory {
          return event;
      }
  
@@ -63,5 +63,5 @@ index 1523b7d96..6140540cb 100644
          EntityToggleGlideEvent event = new EntityToggleGlideEvent((LivingEntity) entity.getBukkitEntity(), gliding);
          entity.level.getCraftServer().getPluginManager().callEvent(event);
 -- 
-2.40.0
+2.40.1
 

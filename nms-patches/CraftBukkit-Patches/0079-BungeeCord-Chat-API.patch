@@ -1,11 +1,11 @@
-From 2b2c0474033be443df6f4a72132de2c7542af40a Mon Sep 17 00:00:00 2001
+From c51f6b678b58ae4b23b6aa750604f532d02cff2c Mon Sep 17 00:00:00 2001
 From: md_5 <git@md-5.net>
 Date: Sat, 13 Dec 2014 03:06:05 +0100
 Subject: [PATCH] BungeeCord Chat API
 
 
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSystemChatPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSystemChatPacket.java
-index b5a12f0de..03a73f00f 100644
+index b5a12f0de3..03a73f00f6 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSystemChatPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSystemChatPacket.java
 @@ -5,7 +5,17 @@ import net.minecraft.network.PacketDataSerializer;
@@ -37,7 +37,7 @@ index b5a12f0de..03a73f00f 100644
      }
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index eba59887f..84015796a 100644
+index eba59887fd..84015796aa 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -255,6 +255,8 @@ import org.yaml.snakeyaml.Yaml;
@@ -71,7 +71,7 @@ index eba59887f..84015796a 100644
  
      public org.bukkit.Server.Spigot spigot()
 diff --git a/src/main/java/org/bukkit/craftbukkit/command/ServerCommandSender.java b/src/main/java/org/bukkit/craftbukkit/command/ServerCommandSender.java
-index 74558e852..13008357b 100644
+index 74558e852e..13008357b4 100644
 --- a/src/main/java/org/bukkit/craftbukkit/command/ServerCommandSender.java
 +++ b/src/main/java/org/bukkit/craftbukkit/command/ServerCommandSender.java
 @@ -103,6 +103,29 @@ public abstract class ServerCommandSender implements CommandSender {
@@ -105,7 +105,7 @@ index 74558e852..13008357b 100644
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-index e90064b5e..9b48d6cb2 100644
+index e90064b5e7..9b48d6cb28 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 @@ -194,6 +194,8 @@ import org.bukkit.util.BoundingBox;
@@ -145,10 +145,10 @@ index e90064b5e..9b48d6cb2 100644
  
      public org.bukkit.entity.Entity.Spigot spigot()
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 4e3587073..e4214a0e3 100644
+index f67fbec2e6..0e6818699a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -161,6 +161,8 @@ import org.bukkit.plugin.messaging.StandardMessenger;
+@@ -163,6 +163,8 @@ import org.bukkit.plugin.messaging.StandardMessenger;
  import org.bukkit.profile.PlayerProfile;
  import org.bukkit.scoreboard.Scoreboard;
  
@@ -157,7 +157,7 @@ index 4e3587073..e4214a0e3 100644
  @DelegateDeserialization(CraftOfflinePlayer.class)
  public class CraftPlayer extends CraftHumanEntity implements Player {
      private long firstPlayed = 0;
-@@ -2145,6 +2147,48 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2157,6 +2159,48 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
              return java.util.Collections.unmodifiableSet( ret );
          }
@@ -207,7 +207,7 @@ index 4e3587073..e4214a0e3 100644
  
      public Player.Spigot spigot()
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaBook.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaBook.java
-index 82c1487db..ea96eab4e 100644
+index 82c1487db7..ea96eab4e4 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaBook.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaBook.java
 @@ -22,6 +22,9 @@ import org.bukkit.inventory.meta.BookMeta;
@@ -316,5 +316,5 @@ index 82c1487db..ea96eab4e 100644
  
      @Override
 -- 
-2.40.0
+2.40.1
 

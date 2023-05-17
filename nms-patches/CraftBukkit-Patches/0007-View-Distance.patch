@@ -1,4 +1,4 @@
-From f9a2d86fb41bbeda1f0e2313699f4f5d759448fa Mon Sep 17 00:00:00 2001
+From ea249d7e1eade611c65daf4cfbb5ebef4d174f49 Mon Sep 17 00:00:00 2001
 From: md_5 <md_5@live.com.au>
 Date: Sat, 23 Mar 2013 09:52:41 +1100
 Subject: [PATCH] View Distance
@@ -6,7 +6,7 @@ Subject: [PATCH] View Distance
 This commit allows the user to select per world view distances.
 
 diff --git a/src/main/java/net/minecraft/server/level/WorldServer.java b/src/main/java/net/minecraft/server/level/WorldServer.java
-index 6e38b63bf..d6aae074c 100644
+index 6e38b63bf9..d6aae074c7 100644
 --- a/src/main/java/net/minecraft/server/level/WorldServer.java
 +++ b/src/main/java/net/minecraft/server/level/WorldServer.java
 @@ -275,8 +275,8 @@ public class WorldServer extends World implements GeneratorAccessSeed {
@@ -21,7 +21,7 @@ index 6e38b63bf..d6aae074c 100644
  
          Objects.requireNonNull(this.entityManager);
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 7f8261c34..ef05008c7 100644
+index 7f8261c342..ef05008c71 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -238,7 +238,8 @@ public abstract class PlayerList {
@@ -44,10 +44,10 @@ index 7f8261c34..ef05008c7 100644
          entityplayer1.unsetRemoved();
          entityplayer1.connection.teleport(CraftLocation.toBukkit(entityplayer1.position(), worldserver1.getWorld(), entityplayer1.getYRot(), entityplayer1.getXRot()));
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index c43f5f5ac..ddf14e5f6 100644
+index 6153d1ee9b..e53b53fdc8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-@@ -1933,6 +1933,18 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -1918,6 +1918,18 @@ public class CraftWorld extends CraftRegionAccessor implements World {
          }
      }
  
@@ -67,7 +67,7 @@ index c43f5f5ac..ddf14e5f6 100644
      private final org.bukkit.World.Spigot spigot = new org.bukkit.World.Spigot()
      {
 diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-index 5ff085b9e..acaf90301 100644
+index 5ff085b9e6..acaf903011 100644
 --- a/src/main/java/org/spigotmc/SpigotWorldConfig.java
 +++ b/src/main/java/org/spigotmc/SpigotWorldConfig.java
 @@ -148,4 +148,36 @@ public class SpigotWorldConfig
@@ -108,5 +108,5 @@ index 5ff085b9e..acaf90301 100644
 +    }
  }
 -- 
-2.40.0
+2.40.1
 

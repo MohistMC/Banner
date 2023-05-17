@@ -1,11 +1,11 @@
-From 354604a637873998ffe204782eff0447514a54e7 Mon Sep 17 00:00:00 2001
+From 359b4fd43131b83c94ca435824039883fd4716a5 Mon Sep 17 00:00:00 2001
 From: drXor <mcyoungsota@gmail.com>
 Date: Sun, 23 Feb 2014 16:16:59 -0400
 Subject: [PATCH] Implement Silenceable Lightning API
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/EntityLightning.java b/src/main/java/net/minecraft/world/entity/EntityLightning.java
-index 6cfecdd9b..0d75880e0 100644
+index 6cfecdd9b1..0d75880e0d 100644
 --- a/src/main/java/net/minecraft/world/entity/EntityLightning.java
 +++ b/src/main/java/net/minecraft/world/entity/EntityLightning.java
 @@ -46,6 +46,7 @@ public class EntityLightning extends Entity {
@@ -26,10 +26,10 @@ index 6cfecdd9b..0d75880e0 100644
                  this.level.playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEffects.LIGHTNING_BOLT_THUNDER, SoundCategory.WEATHER, 10000.0F, 0.8F + this.random.nextFloat() * 0.2F, false);
                  this.level.playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEffects.LIGHTNING_BOLT_IMPACT, SoundCategory.WEATHER, 2.0F, 0.5F + this.random.nextFloat() * 0.2F, false);
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index ddf14e5f6..67e1eeb6d 100644
+index e53b53fdc8..9aa39b9f57 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-@@ -1948,6 +1948,27 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -1933,6 +1933,27 @@ public class CraftWorld extends CraftRegionAccessor implements World {
      // Spigot start
      private final org.bukkit.World.Spigot spigot = new org.bukkit.World.Spigot()
      {
@@ -58,7 +58,7 @@ index ddf14e5f6..67e1eeb6d 100644
  
      public org.bukkit.World.Spigot spigot()
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftLightningStrike.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftLightningStrike.java
-index e63833dcd..8819f7684 100644
+index e63833dcda..8819f7684e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftLightningStrike.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftLightningStrike.java
 @@ -33,6 +33,11 @@ public class CraftLightningStrike extends CraftEntity implements LightningStrike
@@ -74,5 +74,5 @@ index e63833dcd..8819f7684 100644
  
      @Override
 -- 
-2.40.0
+2.40.1
 
