@@ -702,7 +702,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                         this.dropCount = 0;
                         this.lastDropTick = BukkitExtraConstants.currentTick;
                     } else {
-                        ++this.dropCount;
+                        this.dropCount++;
                         if (this.dropCount >= 20) {
                             LOGGER.warn(this.player.getScoreboardName() + " dropped their items too quickly!");
                             this.disconnect("You dropped your items too quickly (Hacking?)");
@@ -797,21 +797,23 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
             float f8 = f3 * f5;
             double d4 = (this.player.gameMode.getGameModeForPlayer() == GameType.CREATIVE) ? 5.0 : 4.5;
             Vec3 vec3d2 = vec3d.add(f7 * d4, f6 * d4, f8 * d4);
-            BlockHitResult movingobjectposition = this.player.level.clip(new ClipContext(vec3d, vec3d2, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, this.player));
+            HitResult movingobjectposition = this.player.level.clip(new ClipContext(vec3d, vec3d2, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, this.player));
             boolean cancelled;
             if (movingobjectposition == null || movingobjectposition.getType() != HitResult.Type.BLOCK) {
                 PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent(this.player, Action.RIGHT_CLICK_AIR, itemstack, enumhand);
                 cancelled = (event.useItemInHand() == Event.Result.DENY);
-            } else if (this.player.gameMode.bridge$isFiredInteract()) {
-                 this.player.gameMode.bridge$setFiredInteract(false);
-                cancelled = this.player.gameMode.bridge$getInteractResult();
             } else {
-                BlockHitResult movingobjectpositionblock = movingobjectposition;
-                PlayerInteractEvent event2 = CraftEventFactory.callPlayerInteractEvent(this.player, Action.RIGHT_CLICK_BLOCK, movingobjectpositionblock.getBlockPos(), movingobjectpositionblock.getDirection(), itemstack, true, enumhand);
-                cancelled = (event2.useItemInHand() == Event.Result.DENY);
+                BlockHitResult movingobjectpositionblock = (BlockHitResult) movingobjectposition;
+                if (this.player.gameMode.bridge$isFiredInteract() && player.gameMode.bridge$getinteractPosition().equals(movingobjectpositionblock.getBlockPos()) && player.gameMode.bridge$getinteractHand() == enumhand && ItemStack.tagMatches(player.gameMode.bridge$getinteractItemStack(), itemstack)) {
+                    cancelled = this.player.gameMode.bridge$getInteractResult();
+                } else {
+                    PlayerInteractEvent event2 = CraftEventFactory.callPlayerInteractEvent(this.player, Action.RIGHT_CLICK_BLOCK, movingobjectpositionblock.getBlockPos(), movingobjectpositionblock.getDirection(), itemstack, true, enumhand);
+                    cancelled = (event2.useItemInHand() == Event.Result.DENY);
+                }
+                this.player.gameMode.bridge$setFiredInteract(false);
             }
             if (cancelled) {
-                this.player.getBukkitEntity().updateInventory();
+                this.player.getBukkitEntity().updateInventory(); // SPIGOT-2524
                 return;
             }
             itemstack = this.player.getItemInHand(enumhand); // Update in case it was changed in the event

@@ -112,20 +112,6 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
         this.player.server.getPlayerList().broadcastAll(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_GAME_MODE, this.player), this.player);
     }
 
-    @Inject(method = "handleBlockBreakAction",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/level/ServerPlayer;blockActionRestricted(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/GameType;)Z",
-                    shift = At.Shift.BEFORE), cancellable = true)
-    private void banner$permCheck(BlockPos pos, ServerboundPlayerActionPacket.Action action, Direction face, int maxBuildHeight, int sequence, CallbackInfo ci) {
-        // Spigot start - handle debug stick left click for non-creative
-        if (this.player.getMainHandItem().is(net.minecraft.world.item.Items.DEBUG_STICK)
-                && ((net.minecraft.world.item.DebugStickItem) net.minecraft.world.item.Items.DEBUG_STICK).handleInteraction(this.player, this.level.getBlockState(pos), this.level, pos, false, this.player.getMainHandItem())) {
-            this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, pos));
-            ci.cancel();
-        }
-        // Spigot end
-    }
-
     /**
      * @author wdog5
      * @reason functionally replaced
@@ -138,7 +124,6 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
             this.player.connection.send(new ClientboundBlockUpdatePacket(pos, this.level.getBlockState(pos)));
             this.debugLogging(pos, false, sequence, "too high");
         } else {
-            BlockState blockState;
             if (action == net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK) {
                 if (!this.level.mayInteract(this.player, pos)) {
                     // CraftBukkit start - fire PlayerInteractEvent
@@ -180,7 +165,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
 
                 this.destroyProgressStart = this.gameTicks;
                 float f = 1.0F;
-                blockState = this.level.getBlockState(pos);
+                BlockState blockState = this.level.getBlockState(pos);
                 // CraftBukkit start - Swings at air do *NOT* exist.
                 if (event.useInteractedBlock() == Event.Result.DENY) {
                     // If we denied a door from opening, we need to send a correcting update to the client, as it already opened the door.
@@ -236,7 +221,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
             } else if (action == net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK) {
                 if (pos.equals(this.destroyPos)) {
                     int j = this.gameTicks - this.destroyProgressStart;
-                    blockState = this.level.getBlockState(pos);
+                    BlockState blockState = this.level.getBlockState(pos);
                     if (!blockState.isAir()) {
                         float g = blockState.getDestroyProgress(this.player, this.player.level, pos) * (float) (j + 1);
                         if (g >= 0.7F) {
@@ -282,10 +267,6 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
 
     private final AtomicReference<BlockBreakEvent> banner$event = new AtomicReference<>();
 
-    @Inject(method = "destroyBlock", at = @At("HEAD"))
-    private void banner$destoryBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-
-    }
 
     @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
     private void banner$fireBreakEvent(BlockPos blockposition, CallbackInfoReturnable<Boolean> cir) {
@@ -493,5 +474,20 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
     @Override
     public boolean bridge$getInteractResult() {
         return interactResult;
+    }
+
+    @Override
+    public BlockPos bridge$getinteractPosition() {
+        return interactPosition;
+    }
+
+    @Override
+    public InteractionHand bridge$getinteractHand() {
+        return interactHand;
+    }
+
+    @Override
+    public ItemStack bridge$getinteractItemStack() {
+        return interactItemStack;
     }
 }
