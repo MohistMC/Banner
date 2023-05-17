@@ -1,6 +1,7 @@
 plugins {
 	id 'fabric-loom' version '1.2-SNAPSHOT'
 	id 'maven-publish'
+	id 'org.ajoberstar.grgit' version '3.1.1'
 }
 
 version = ci_version()
@@ -111,7 +112,7 @@ dependencies {
 	annotationProcessor "com.github.LlamaLad7:MixinExtras:0.1.1"
 	modImplementation 'com.github.1798643961:mixin-tools:1.0.1'
 	annotationProcessor 'com.github.1798643961:mixin-tools:1.0.1'
-	implementation "com.github.phase:SrgLib:master-SNAPSHOT"
+	modImplementation "com.github.phase:SrgLib:master-SNAPSHOT"
 	include "com.github.phase:SrgLib:master-SNAPSHOT"
 
 	include "com.github.1798643961:mixin-tools:1.0.1"
@@ -146,7 +147,17 @@ java {
 }
 
 jar {
-	from("LICENSE") 
+	from("LICENSE")
+	manifest {
+		attributes(
+				'Specification-Title'   : 'Mohist Banner',
+				'Specification-Vendor'  : 'MohistMC',
+				'Specification-Version' : ci_version(),
+				'Implementation-Title'  : 'Mohist Banner',
+				'Implementation-Version': '1.19.4-' + ci_version(),
+				'Implementation-Vendor' : 'MohistMC'
+		)
+	}
 }
 
 publishing {
