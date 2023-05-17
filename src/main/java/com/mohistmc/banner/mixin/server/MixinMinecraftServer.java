@@ -14,6 +14,7 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import net.minecraft.CrashReport;
 import net.minecraft.ReportedException;
+import net.minecraft.SystemReport;
 import net.minecraft.Util;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
@@ -22,6 +23,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.ChatDecorator;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
+import net.minecraft.network.protocol.status.ServerStatus;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.*;
 import net.minecraft.server.level.ServerChunkCache;
@@ -34,6 +36,8 @@ import net.minecraft.server.network.ServerConnectionListener;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.Unit;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.util.profiling.jfr.JvmProfiler;
 import net.minecraft.util.thread.ReentrantBlockableEventLoop;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ForcedChunksSavedData;
@@ -57,6 +61,7 @@ import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.PluginLoadOrder;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -69,6 +74,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.Proxy;
 import java.util.*;
@@ -103,6 +110,53 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow public abstract ServerLevel overworld();
 
     @Shadow protected abstract void updateMobSpawningFlags();
+
+    @Shadow protected abstract boolean initServer() throws IOException;
+
+    @Shadow
+    private static CrashReport constructOrExtractCrashReport(Throwable cause) {return null;}
+
+    @Shadow public abstract SystemReport fillSystemReport(SystemReport systemReport);
+
+    @Shadow @Nullable private ServerStatus.Favicon statusIcon;
+    @Shadow @Nullable private ServerStatus status;
+
+    @Shadow protected abstract ServerStatus buildServerStatus();
+
+    @Shadow protected abstract Optional<ServerStatus.Favicon> loadStatusIcon();
+
+    @Shadow private volatile boolean running;
+    @Shadow private boolean debugCommandProfilerDelayStart;
+    @Shadow @Nullable private MinecraftServer.TimeProfiler debugCommandProfiler;
+
+    @Shadow protected abstract void startMetricsRecordingTick();
+
+    @Shadow private ProfilerFiller profiler;
+
+    @Shadow public abstract void tickServer(BooleanSupplier hasTimeLeft);
+
+    @Shadow protected abstract boolean haveTime();
+
+    @Shadow private boolean mayHaveDelayedTasks;
+    @Shadow private long delayedTasksMaxNextTickTime;
+
+    @Shadow protected abstract void waitUntilNextTick();
+
+    @Shadow protected abstract void endMetricsRecordingTick();
+    @Shadow private volatile boolean isReady;
+    @Shadow private float averageTickTime;
+
+    @Shadow public abstract File getServerDirectory();
+
+    @Shadow public abstract void onServerCrash(CrashReport report);
+
+    @Shadow private boolean stopped;
+
+    @Shadow public abstract void stopServer();
+
+    @Shadow @Final protected Services services;
+
+    @Shadow public abstract void onServerExit();
 
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
@@ -161,28 +215,88 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         try { Thread.sleep(100); } catch (InterruptedException ex) {} // CraftBukkit - SPIGOT-625 - give server at least a chance to send packets
     }
 
-    @ModifyExpressionValue(method = "runServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;lastOverloadWarning:J", ordinal = 0))
-    private boolean banner$resetCKU(MinecraftServer instance) {
-        return this.lastOverloadWarning >= 30000L;
-    }
+    /**
+     * @author wdog5
+     * @reason functionally replaced
+     */
+    @Overwrite
+    protected void runServer() {
+        try {
+            if (!this.initServer()) {
+                throw new IllegalStateException("Failed to initialize server");
+            }
 
-    @WrapWithCondition(method = "runServer",remap = false,
-            at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V"),
-            slice = @Slice(to = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;lastOverloadWarning:J", ordinal = 1)))
-    private boolean banner$addCKUCheck() {
-        return server.getWarnOnOverload();
-    }
+            this.nextTickTime = Util.getMillis();
+            this.statusIcon = (ServerStatus.Favicon) this.loadStatusIcon().orElse(null); // CraftBukkit - decompile error
+            this.status = this.buildServerStatus();
 
-    @Inject(method = "runServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;nextTickTime:J", shift = At.Shift.BEFORE))
-    private void banner$currentTick(CallbackInfo ci) {
-        BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
-    }
+            while (this.running) {
+                long i = Util.getMillis() - this.nextTickTime;
 
-    @Inject(method = "runServer",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/MinecraftServer;onServerExit()V"))
-    private void banner$runTimeReturn(CallbackInfo ci) {
-        Runtime.getRuntime().halt(0);
+                if (i > 5000L && this.nextTickTime - this.lastOverloadWarning >= 30000L) { // CraftBukkit
+                    long j = i / 50L;
+
+                    if (server.getWarnOnOverload()) // CraftBukkit
+                        MinecraftServer.LOGGER.warn("Can't keep up! Is the server overloaded? Running {}ms or {} ticks behind", i, j);
+                    this.nextTickTime += j * 50L;
+                    this.lastOverloadWarning = this.nextTickTime;
+                }
+
+                if (this.debugCommandProfilerDelayStart) {
+                    this.debugCommandProfilerDelayStart = false;
+                    this.debugCommandProfiler = new MinecraftServer.TimeProfiler(Util.getNanos(), this.tickCount);
+                }
+
+                BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
+                this.nextTickTime += 50L;
+                this.startMetricsRecordingTick();
+                this.profiler.push("tick");
+                this.tickServer(this::haveTime);
+                this.profiler.popPush("nextTickWait");
+                this.mayHaveDelayedTasks = true;
+                this.delayedTasksMaxNextTickTime = Math.max(Util.getMillis() + 50L, this.nextTickTime);
+                this.waitUntilNextTick();
+                this.profiler.pop();
+                this.endMetricsRecordingTick();
+                this.isReady = true;
+                JvmProfiler.INSTANCE.onServerTick(this.averageTickTime);
+            }
+        } catch (Throwable throwable) {
+            LOGGER.error("Encountered an unexpected exception", throwable);
+            CrashReport crashreport = constructOrExtractCrashReport(throwable);
+
+            this.fillSystemReport(crashreport.getSystemReport());
+            File file = new File(new File(this.getServerDirectory(), "crash-reports"), "crash-" + Util.getFilenameFormattedDateTime() + "-server.txt");
+
+            if (crashreport.saveToFile(file)) {
+                LOGGER.error("This crash report has been saved to: {}", file.getAbsolutePath());
+            } else {
+                LOGGER.error("We were unable to save this crash report to disk.");
+            }
+
+            this.onServerCrash(crashreport);
+        } finally {
+            try {
+                this.stopped = true;
+                this.stopServer();
+            } catch (Throwable throwable1) {
+                MinecraftServer.LOGGER.error("Exception stopping the server", throwable1);
+            } finally {
+                if (this.services.profileCache() != null) {
+                    this.services.profileCache().clearExecutor();
+                }
+
+                // CraftBukkit start - Restore terminal to original settings
+                try {
+                    reader.getTerminal().restore();
+                } catch (Exception ignored) {
+                }
+                // CraftBukkit end
+                this.onServerExit();
+            }
+
+        }
+
     }
 
     @Inject(method = "getServerModName", at = @At(value = "HEAD"), remap = false, cancellable = true)
@@ -210,10 +324,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Override
     public void addLevel(ServerLevel level) {
-        Map<ResourceKey<net.minecraft.world.level.Level>, ServerLevel> oldLevels = this.levels;
-        Map<ResourceKey<net.minecraft.world.level.Level>, ServerLevel> newLevels = Maps.newLinkedHashMap(oldLevels);
-        newLevels.put(level.dimension(), level);
-        this.levels = Collections.unmodifiableMap(newLevels);
+        this.levels.put(level.dimension(), level);
     }
 
     @Override
