@@ -41,7 +41,7 @@ public class MixinTntBlock {
         banner$fromPos.set(fromPos);
     }
 
-    @ModifyExpressionValue(method = "neighborChanged", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;hasNeighborSignal(Lnet/minecraft/core/BlockPos;)Z"))
+    @Redirect(method = "neighborChanged", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;hasNeighborSignal(Lnet/minecraft/core/BlockPos;)Z"))
     private boolean banner$addTntCheck0(Level level, BlockPos pos) {
         return level.hasNeighborSignal(pos) && CraftEventFactory.callTNTPrimeEvent(level, pos, TNTPrimeEvent.PrimeCause.REDSTONE, null, banner$fromPos.get()); // CraftBukkit - TNTPrimeEvent
     }
@@ -52,7 +52,7 @@ public class MixinTntBlock {
         banner$useTntPlayer.set(player);
     }
 
-    @ModifyExpressionValue(method = "playerWillDestroy", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isClientSide()Z"))
+    @Redirect(method = "playerWillDestroy", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isClientSide()Z"))
     private boolean banner$addTntCheck1(Level level) {
         return !level.isClientSide() && CraftEventFactory.callTNTPrimeEvent(level, banner$originPos.get(), TNTPrimeEvent.PrimeCause.BLOCK_BREAK, banner$useTntPlayer.get(), null); // CraftBukkit - TNTPrimeEvent
     }
