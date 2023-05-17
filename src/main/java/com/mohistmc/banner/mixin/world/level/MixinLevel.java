@@ -284,34 +284,6 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                     this.getChunkSource().getLightEngine().checkBlock(pos);
                     this.getProfiler().pop();
                 }
-
-                /*
-                if (blockState2 == state) {
-                    if (blockState != blockState2) {
-                        this.setBlocksDirty(pos, blockState, blockState2);
-                    }
-
-                    if ((flags & 2) != 0 && (!this.isClientSide || (flags & 4) == 0) && (this.isClientSide || levelChunk.getFullStatus() != null && levelChunk.getFullStatus().isOrAfter(ChunkHolder.FullChunkStatus.TICKING))) {
-                        this.sendBlockUpdated(pos, blockState, state, flags);
-                    }
-
-                    if ((flags & 1) != 0) {
-                        this.blockUpdated(pos, blockState.getBlock());
-                        if (!this.isClientSide && state.hasAnalogOutputSignal()) {
-                            this.updateNeighbourForOutputSignal(pos, block);
-                        }
-                    }
-
-                    if ((flags & 16) == 0 && recursionLeft > 0) {
-                        int i = flags & -34;
-                        blockState.updateIndirectNeighbourShapes(this, pos, i, recursionLeft - 1);
-                        state.updateNeighbourShapes(this, pos, i, recursionLeft - 1);
-                        state.updateIndirectNeighbourShapes(this, pos, i, recursionLeft - 1);
-                    }
-
-                    this.onBlockStateChange(pos, blockState, blockState2);
-                }*/
-
                 // CraftBukkit start
                 if (!this.captureBlockStates) { // Don't notify clients or update physics while capturing blockstates
                     // Modularize client and physic updates

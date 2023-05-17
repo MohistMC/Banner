@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.vehicle;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.HasCustomInventoryScreen;
 import net.minecraft.world.entity.vehicle.Boat;

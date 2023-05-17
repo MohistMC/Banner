@@ -1,9 +1,9 @@
 package com.mohistmc.banner.bukkit.nms;
 
-import java.io.File;
-
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
+
+import java.io.File;
 
 public interface Provider {
 

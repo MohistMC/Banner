@@ -3,7 +3,6 @@ package com.mohistmc.banner.mixin.world.level.block.entity;
 import com.mohistmc.banner.injection.world.level.block.entity.InjectionBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.Container;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.bukkit.DistValidate;
 import com.mohistmc.banner.bukkit.LevelPersistentData;
 import com.mohistmc.banner.fabric.BannerDerivedWorldInfo;
@@ -27,7 +28,10 @@ import net.minecraft.util.ProgressListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.*;
+import net.minecraft.world.level.CustomSpawner;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -63,7 +67,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spigotmc.SpigotWorldConfig;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -142,7 +149,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         if (typeKey != null) {
             this.typeKey = typeKey;
         } else {
-            var dimensions = BannerServer.getServer().registryAccess().registryOrThrow(Registries.LEVEL_STEM);
+            var dimensions = BukkitExtraConstants.getServer().registryAccess().registryOrThrow(Registries.LEVEL_STEM);
             var key = dimensions.getResourceKey(levelStem);
             if (key.isPresent()) {
                 this.typeKey = key.get();
@@ -262,8 +269,8 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     private void banner$saveLevelDat(ProgressListener progress, boolean flush, boolean skipSave, CallbackInfo ci) {
         if (this.serverLevelData instanceof PrimaryLevelData worldInfo) {
             worldInfo.setWorldBorder(this.getWorldBorder().createSettings());
-            worldInfo.setCustomBossEvents(BannerServer.getServer().getCustomBossEvents().save());
-            this.convertable.saveDataTag(BannerServer.getServer().registryAccess(), worldInfo, BannerServer.getServer().getPlayerList().getSingleplayerData());
+            worldInfo.setCustomBossEvents(BukkitExtraConstants.getServer().getCustomBossEvents().save());
+            this.convertable.saveDataTag(BukkitExtraConstants.getServer().registryAccess(), worldInfo, BukkitExtraConstants.getServer().getPlayerList().getSingleplayerData());
         }
     }
 
@@ -345,7 +352,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     @Overwrite
     @Nullable
     public MapItemSavedData getMapData(String mapName) {
-        return BannerServer.getServer().overworld().getDataStorage().get((nbt) -> {
+        return BukkitExtraConstants.getServer().overworld().getDataStorage().get((nbt) -> {
             MapItemSavedData newMap = MapItemSavedData.load(nbt);
             newMap.banner$setId(mapName);
             MapInitializeEvent event = new MapInitializeEvent(newMap.bridge$mapView());

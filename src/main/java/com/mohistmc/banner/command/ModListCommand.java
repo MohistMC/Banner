@@ -8,8 +8,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 public class ModListCommand extends BukkitCommand {

@@ -1,6 +1,8 @@
 package com.mohistmc.banner.fabric;
 
-import com.google.common.collect.*;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableMap;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.api.ServerAPI;
 import com.mohistmc.banner.entity.MohistModsEntity;

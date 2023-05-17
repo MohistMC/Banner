@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.inventory;
 
-import com.google.common.base.Preconditions;
 import com.mohistmc.banner.injection.world.inventory.InjectionAbstractContainerMenu;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;

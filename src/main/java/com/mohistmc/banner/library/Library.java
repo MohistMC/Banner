@@ -1,10 +1,10 @@
 package com.mohistmc.banner.library;
 
 import com.google.common.collect.ComparisonChain;
-import java.util.Objects;
-
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NonNls;
+
+import java.util.Objects;
 
 /**
  * Represents a library that will be injected into the PluginClassLoader at runtime.

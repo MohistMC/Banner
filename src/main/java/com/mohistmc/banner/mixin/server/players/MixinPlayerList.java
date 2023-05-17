@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.server.players;
 
 import com.google.common.collect.Lists;
-import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import com.mohistmc.banner.injection.server.players.InjectionPlayerList;
@@ -37,8 +36,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.border.BorderChangeListener;
-import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.PlayerDataStorage;
@@ -48,17 +45,16 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.command.ColouredConsoleSender;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.*;
-import org.bukkit.plugin.PluginLoadOrder;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 import org.spigotmc.SpigotConfig;
-import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 import org.spongepowered.asm.mixin.*;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -71,7 +67,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicReference;
 
 // Banner - TODO fix inject method
 @Mixin(PlayerList.class)

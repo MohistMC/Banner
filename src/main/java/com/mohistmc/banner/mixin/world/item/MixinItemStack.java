@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.item;
 
-import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.injection.world.item.InjectionItemStack;
 import com.mojang.serialization.Dynamic;
@@ -102,7 +101,7 @@ public abstract class MixinItemStack implements InjectionItemStack {
         if (0 < version && version < CraftMagicNumbers.INSTANCE.getDataVersion()) {
             CompoundTag savedStack = new CompoundTag();
             this.save(savedStack);
-            savedStack = (CompoundTag) BannerServer.getServer().fixerUpper.update(References.ITEM_STACK, new Dynamic(NbtOps.INSTANCE, savedStack), version, CraftMagicNumbers.INSTANCE.getDataVersion()).getValue();
+            savedStack = (CompoundTag) BukkitExtraConstants.getServer().fixerUpper.update(References.ITEM_STACK, new Dynamic(NbtOps.INSTANCE, savedStack), version, CraftMagicNumbers.INSTANCE.getDataVersion()).getValue();
             this.load(savedStack);
         }
     }

@@ -1,6 +1,6 @@
 package com.mohistmc.banner.api;
 
-import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -47,7 +47,7 @@ public class PlayerAPI {
     }
 
     public static boolean isOp(ServerPlayer ep) {
-        return BannerServer.getServer().getPlayerList().isOp(ep.getGameProfile());
+        return BukkitExtraConstants.getServer().getPlayerList().isOp(ep.getGameProfile());
     }
 
     public static SocketAddress getRemoteAddress(Player player) {

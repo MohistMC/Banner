@@ -23,14 +23,10 @@ import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.*;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(Commands.class)
 public abstract class MixinCommands implements InjectionCommands {

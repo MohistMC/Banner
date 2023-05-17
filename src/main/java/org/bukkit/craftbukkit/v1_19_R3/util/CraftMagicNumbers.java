@@ -7,6 +7,7 @@ import com.google.common.io.Files;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Dynamic;
 import java.io.File;
@@ -251,7 +252,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
     }
 
     private static File getBukkitDataPackFolder() {
-        return new File(Objects.requireNonNull(BannerServer.getServer()).getWorldPath(LevelResource.DATAPACK_DIR).toFile(), "bukkit");
+        return new File(Objects.requireNonNull(BukkitExtraConstants.getServer()).getWorldPath(LevelResource.DATAPACK_DIR).toFile(), "bukkit");
     }
 
     @Override
@@ -263,9 +264,9 @@ public final class CraftMagicNumbers implements UnsafeValues {
 
         JsonElement jsonelement = ServerAdvancementManager.GSON.fromJson(advancement, JsonElement.class);
         JsonObject jsonobject = GsonHelper.convertToJsonObject(jsonelement, "advancement");
-        net.minecraft.advancements.Advancement.Builder nms = net.minecraft.advancements.Advancement.Builder.fromJson(jsonobject, new DeserializationContext(minecraftkey, BannerServer.getServer().getPredicateManager()));
+        net.minecraft.advancements.Advancement.Builder nms = net.minecraft.advancements.Advancement.Builder.fromJson(jsonobject, new DeserializationContext(minecraftkey, BukkitExtraConstants.getServer().getPredicateManager()));
         if (nms != null) {
-            BannerServer.getServer().getAdvancements().advancements.add(Maps.newHashMap(Collections.singletonMap(minecraftkey, nms)));
+            BukkitExtraConstants.getServer().getAdvancements().advancements.add(Maps.newHashMap(Collections.singletonMap(minecraftkey, nms)));
             Advancement bukkit = Bukkit.getAdvancement(key);
 
             if (bukkit != null) {
@@ -278,7 +279,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
                     Bukkit.getLogger().log(Level.SEVERE, "Error saving advancement " + key, ex);
                 }
 
-                BannerServer.getServer().getPlayerList().reloadResources();
+                BukkitExtraConstants.getServer().getPlayerList().reloadResources();
 
                 return bukkit;
             }
@@ -297,7 +298,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
 
     @Override
     public void checkSupported(PluginDescriptionFile pdf) throws InvalidPluginException {
-        String minimumVersion = BannerServer.getServer().bridge$server().minimumAPI;
+        String minimumVersion = BukkitExtraConstants.getServer().bridge$server().minimumAPI;
         int minimumIndex = SUPPORTED_API.indexOf(minimumVersion);
 
         if (pdf.getAPIVersion() != null) {

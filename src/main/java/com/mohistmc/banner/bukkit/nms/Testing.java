@@ -1,19 +1,17 @@
 package com.mohistmc.banner.bukkit.nms;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Supplier;
-
 import net.fabricmc.loader.api.MappingResolver;
 import net.fabricmc.loader.launch.common.MappingConfiguration;
 import net.fabricmc.mapping.tree.ClassDef;
 import net.fabricmc.mapping.tree.Descriptored;
 import net.fabricmc.mapping.tree.TinyTree;
 import net.fabricmc.mappings.EntryTriple;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
 
 public class Testing implements MappingResolver {
 

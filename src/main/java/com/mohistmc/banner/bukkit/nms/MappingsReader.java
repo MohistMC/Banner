@@ -1,6 +1,14 @@
 package com.mohistmc.banner.bukkit.nms;
 
 
+import net.fabricmc.loader.api.FabricLoader;
+import net.techcable.srglib.FieldData;
+import net.techcable.srglib.JavaType;
+import net.techcable.srglib.format.MappingsFormat;
+import net.techcable.srglib.mappings.Mappings;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,15 +17,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import net.fabricmc.loader.api.FabricLoader;
-import net.techcable.srglib.FieldData;
-import net.techcable.srglib.JavaType;
-import net.techcable.srglib.format.MappingsFormat;
-import net.techcable.srglib.mappings.Mappings;
 
 public class MappingsReader {
 

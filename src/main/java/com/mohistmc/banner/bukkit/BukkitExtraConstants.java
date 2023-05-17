@@ -29,7 +29,9 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.storage.WorldData;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.phys.AABB;
+import org.bukkit.Bukkit;
 import org.bukkit.TreeType;
+import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
 
@@ -151,4 +153,7 @@ public class BukkitExtraConstants {
         minecraftserver.reloadResources(collection1);
     }
 
+    public static MinecraftServer getServer() {
+        return Bukkit.getServer() instanceof CraftServer ? ((CraftServer) Bukkit.getServer()).getServer() : null;
+    }
 }

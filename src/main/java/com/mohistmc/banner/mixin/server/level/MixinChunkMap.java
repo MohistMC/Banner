@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.server.level;
 
-import com.mohistmc.banner.bukkit.BukkitCallbackExecutor;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.Tag;

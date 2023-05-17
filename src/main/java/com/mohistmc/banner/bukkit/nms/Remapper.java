@@ -1,5 +1,9 @@
 package com.mohistmc.banner.bukkit.nms;
 
+import com.mohistmc.banner.BannerServer;
+import net.fabricmc.loader.api.FabricLoader;
+import net.md_5.specialsource.SpecialSource;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,10 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.mohistmc.banner.BannerServer;
-import net.fabricmc.loader.api.FabricLoader;
-import net.md_5.specialsource.SpecialSource;
 
 public class Remapper {
 

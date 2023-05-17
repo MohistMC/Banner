@@ -1,14 +1,10 @@
 package com.mohistmc.banner.bukkit;
 
 import net.minecraft.world.Container;
-import net.minecraft.world.level.block.entity.LecternBlockEntity;
-import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_19_R3.util.CraftLocation;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.LecternInventory;
 
 import java.util.ArrayList;
 import java.util.List;

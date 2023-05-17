@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.network;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;

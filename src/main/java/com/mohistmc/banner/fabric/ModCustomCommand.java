@@ -1,7 +1,7 @@
 package com.mohistmc.banner.fabric;
 
 import com.google.common.base.Joiner;
-import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.tree.CommandNode;
 import net.minecraft.commands.CommandSourceStack;
@@ -9,11 +9,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.server.dedicated.DedicatedServer;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
-import org.bukkit.command.BlockCommandSender;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.command.ProxiedCommandSender;
-import org.bukkit.command.RemoteConsoleCommandSender;
+import org.bukkit.command.*;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.command.CraftBlockCommandSender;
@@ -50,7 +46,7 @@ public class ModCustomCommand extends BukkitCommand {
             return ((CraftMinecartCommand) sender).getHandle().getCommandBlock().createCommandSourceStack();
         }
         if (sender instanceof RemoteConsoleCommandSender) {
-            return ((DedicatedServer) BannerServer.getServer()).rconConsoleSource.createCommandSourceStack();
+            return ((DedicatedServer) BukkitExtraConstants.getServer()).rconConsoleSource.createCommandSourceStack();
         }
         if (sender instanceof ConsoleCommandSender) {
             return ((CraftServer) sender.getServer()).getServer().createCommandSourceStack();

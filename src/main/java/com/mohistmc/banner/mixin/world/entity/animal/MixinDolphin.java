@@ -1,15 +1,15 @@
 package com.mohistmc.banner.mixin.world.entity.animal;
 
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.Dolphin;
 import net.minecraft.world.entity.animal.WaterAnimal;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.world.entity.animal.Dolphin;
-import net.minecraft.world.entity.item.ItemEntity;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Dolphin.class)
