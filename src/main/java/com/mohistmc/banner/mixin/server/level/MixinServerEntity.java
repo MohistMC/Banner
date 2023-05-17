@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.server.level;
 
 import com.google.common.collect.Lists;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.injection.server.level.InjectionServerEntity;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
@@ -39,7 +40,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 @Mixin(ServerEntity.class)
-public abstract class MixinServerEntity {
+public abstract class MixinServerEntity implements InjectionServerEntity {
 
 
     // @formatter:off
@@ -75,12 +76,12 @@ public abstract class MixinServerEntity {
         lastUpdate = lastPosUpdate = lastMapUpdate = -1;
     }
 
-    public void ServerUtils$constructor(ServerLevel serverWorld, Entity entity, int updateFrequency, boolean sendVelocityUpdates, Consumer<Packet<?>> packetConsumer) {
+    public void banner$constructor(ServerLevel serverWorld, Entity entity, int updateFrequency, boolean sendVelocityUpdates, Consumer<Packet<?>> packetConsumer) {
         throw new NullPointerException();
     }
 
-    public void ServerUtils$constructor(ServerLevel serverWorld, Entity entity, int updateFrequency, boolean sendVelocityUpdates, Consumer<Packet<?>> packetConsumer, Set<ServerPlayerConnection> set) {
-        ServerUtils$constructor(serverWorld, entity, updateFrequency, sendVelocityUpdates, packetConsumer);
+    public void banner$constructor(ServerLevel serverWorld, Entity entity, int updateFrequency, boolean sendVelocityUpdates, Consumer<Packet<?>> packetConsumer, Set<ServerPlayerConnection> set) {
+        banner$constructor(serverWorld, entity, updateFrequency, sendVelocityUpdates, packetConsumer);
         this.trackedPlayers = set;
     }
 
@@ -307,5 +308,10 @@ public abstract class MixinServerEntity {
         if (this.entity instanceof ServerPlayer player) {
             player.getBukkitEntity().injectScaledMaxHealth(set, false);
         }
+    }
+
+    @Override
+    public void setTrackedPlayers(Set<ServerPlayerConnection> trackedPlayers) {
+        this.trackedPlayers = trackedPlayers;
     }
 }

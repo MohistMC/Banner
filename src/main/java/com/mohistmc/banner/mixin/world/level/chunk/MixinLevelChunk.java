@@ -161,35 +161,39 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
      */
     @Nullable
     @Overwrite
-    public BlockEntity getBlockEntity(BlockPos pos, LevelChunk.EntityCreationType creationType) {
+    public BlockEntity getBlockEntity(BlockPos blockposition, LevelChunk.EntityCreationType creationType) {
         // CraftBukkit start
-        BlockEntity blockEntity = level.bridge$capturedTileEntities().get(pos);
-        if (blockEntity == null) {
-            blockEntity = (BlockEntity) this.blockEntities.get(pos);
+        BlockEntity tileentity = level.bridge$capturedTileEntities().get(blockposition);
+        if (tileentity == null) {
+            tileentity = (BlockEntity) this.blockEntities.get(blockposition);
         }
         // CraftBukkit end
-        if (blockEntity == null) {
-            CompoundTag compoundTag = (CompoundTag)this.pendingBlockEntities.remove(pos);
-            if (compoundTag != null) {
-                BlockEntity blockEntity2 = this.promotePendingBlockEntity(pos, compoundTag);
-                if (blockEntity2 != null) {
-                    return blockEntity2;
+
+        if (tileentity == null) {
+            CompoundTag nbttagcompound = (CompoundTag) this.pendingBlockEntities.remove(blockposition);
+
+            if (nbttagcompound != null) {
+                BlockEntity tileentity1 = this.promotePendingBlockEntity(blockposition, nbttagcompound);
+
+                if (tileentity1 != null) {
+                    return tileentity1;
                 }
             }
         }
 
-        if (blockEntity == null) {
+        if (tileentity == null) {
             if (creationType == LevelChunk.EntityCreationType.IMMEDIATE) {
-                blockEntity = this.createBlockEntity(pos);
-                if (blockEntity != null) {
-                    this.addAndRegisterBlockEntity(blockEntity);
+                tileentity = this.createBlockEntity(blockposition);
+                if (tileentity != null) {
+                    this.addAndRegisterBlockEntity(tileentity);
                 }
             }
-        } else if (blockEntity.isRemoved()) {
-            this.blockEntities.remove(pos);
+        } else if (tileentity.isRemoved()) {
+            this.blockEntities.remove(blockposition);
             return null;
         }
-        return blockEntity;
+
+        return tileentity;
     }
 
     @Inject(method = "setBlockEntity", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)

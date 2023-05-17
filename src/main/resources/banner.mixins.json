@@ -65,6 +65,7 @@
     "server.gui.MixinMinecraftServerGui",
     "server.level.MixinChunkHolder",
     "server.level.MixinChunkMap",
+    "server.level.MixinChunkMap_TrackedEntity",
     "server.level.MixinDistanceManager",
     "server.level.MixinServerChunkCache",
     "server.level.MixinServerEntity",

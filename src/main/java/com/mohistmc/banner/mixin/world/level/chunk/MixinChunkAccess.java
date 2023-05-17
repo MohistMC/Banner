@@ -30,7 +30,7 @@ public abstract class MixinChunkAccess implements InjectionChunkAccess {
     public Registry<Biome> biomeRegistry;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void banner$init(ChunkPos p_187621_, UpgradeData p_187622_, LevelHeightAccessor p_187623_, Registry<Biome> registry, long p_187625_, LevelChunkSection[] p_187626_, BlendingData p_187627_, CallbackInfo ci) {
+    private void banner$init(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry<Biome>  registry, long l, LevelChunkSection[] levelChunkSections, BlendingData blendingData, CallbackInfo ci) {
         this.biomeRegistry = registry;
     }
 
