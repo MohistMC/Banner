@@ -3,6 +3,7 @@ package org.bukkit.craftbukkit.v1_19_R3.inventory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Optional;
 
 import com.mohistmc.banner.bukkit.BannerLecternInventory;
 import net.minecraft.world.Container;
@@ -535,6 +536,16 @@ public class CraftInventory implements Inventory {
 
     @Override
     public Location getLocation() {
-        return inventory.getLocation();
+        // Banner start - handle modded blockentity location
+        try {
+            return inventory.getLocation();
+        } catch (AbstractMethodError e) {
+            if (inventory instanceof BlockEntity tileEntity) {
+                return new Location(tileEntity.getLevel().getWorld(), tileEntity.getBlockPos().getX(), tileEntity.getBlockPos().getY(), tileEntity.getBlockPos().getZ());
+            }else {
+                return null;
+            }
+            // Banner end
+        }
     }
 }
