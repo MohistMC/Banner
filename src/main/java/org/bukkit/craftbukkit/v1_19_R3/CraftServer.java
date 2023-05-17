@@ -143,19 +143,7 @@ import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_19_R3.generator.CraftWorldInfo;
 import org.bukkit.craftbukkit.v1_19_R3.generator.OldCraftChunkData;
 import org.bukkit.craftbukkit.v1_19_R3.help.SimpleHelpMap;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftBlastingRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftCampfireRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftFurnaceRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemFactory;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftMerchantCustom;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftShapedRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftShapelessRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftSmithingRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftSmokingRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftStonecuttingRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.RecipeIterator;
+import org.bukkit.craftbukkit.v1_19_R3.inventory.*;
 import org.bukkit.craftbukkit.v1_19_R3.inventory.util.CraftInventoryCreator;
 import org.bukkit.craftbukkit.v1_19_R3.map.CraftMapView;
 import org.bukkit.craftbukkit.v1_19_R3.metadata.EntityMetadataStore;
@@ -1227,9 +1215,9 @@ public final class CraftServer implements Server {
             } else if (recipe instanceof SmithingRecipe) {
                 toAdd = CraftSmithingRecipe.fromBukkitRecipe((SmithingRecipe) recipe);
             } else if (recipe instanceof SmithingTransformRecipe) {
-                toAdd = CraftSmithingRecipe.fromBukkitRecipe((SmithingTransformRecipe) recipe);
+                toAdd = CraftSmithingTransformRecipe.fromBukkitRecipe((SmithingTransformRecipe) recipe);
             } else if (recipe instanceof SmithingTrimRecipe) {
-                toAdd = CraftSmithingRecipe.fromBukkitRecipe((SmithingTrimRecipe) recipe);
+                toAdd = CraftSmithingTrimRecipe.fromBukkitRecipe((SmithingTrimRecipe) recipe);
             } else if (recipe instanceof ComplexRecipe) {
                 throw new UnsupportedOperationException("Cannot add custom complex recipe");
             } else {
