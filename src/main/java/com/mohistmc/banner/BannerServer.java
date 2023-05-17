@@ -29,6 +29,11 @@ public class BannerServer implements DedicatedServerModInitializer {
     }
 
     public static String getVersion() {
-        return (BannerServer.class.getPackage().getImplementationVersion() != null) ? BannerServer.class.getPackage().getImplementationVersion() : "unknown";
+        try {
+            Class<?> version = Class.forName("com.mohistmc.banner.VersionInfo");
+            return (String) version.getField("VERSION").get(null);
+        } catch (ClassNotFoundException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+            return "unknown";
+        }
     }
 }

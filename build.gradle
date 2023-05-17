@@ -2,6 +2,15 @@ plugins {
 	id 'fabric-loom' version '1.2-SNAPSHOT'
 	id 'maven-publish'
 	id 'org.ajoberstar.grgit' version '3.1.1'
+	id "com.peterabeles.gversion" version "1.8.3"
+}
+
+project.compileJava.dependsOn(createVersionFile)
+
+gversion {
+	srcDir = "src/main/java/"
+	classPackage = "com.mohistmc.banner"
+	className = "VersionInfo"
 }
 
 version = ci_version()
@@ -148,10 +157,10 @@ jar {
 	from("LICENSE")
 	manifest {
 		attributes(
-				'Specification-Title'   : 'Mohist Banner',
+				'Specification-Title'   : 'Banner',
 				'Specification-Vendor'  : 'MohistMC',
 				'Specification-Version' : ci_version(),
-				'Implementation-Title'  : 'Mohist Banner',
+				'Implementation-Title'  : 'Banner',
 				'Implementation-Version': '1.19.4-' + ci_version(),
 				'Implementation-Vendor' : 'MohistMC'
 		)
