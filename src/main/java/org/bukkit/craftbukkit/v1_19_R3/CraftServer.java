@@ -10,6 +10,7 @@ import com.google.common.collect.MapMaker;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.api.ServerAPI;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.nms.utils.RemapUtils;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.commands.CommandBuildContext;
@@ -367,22 +368,12 @@ public final class CraftServer implements Server {
     }
 
     public void loadPlugins() {
+        RemapUtils.init();
         pluginManager.registerInterface(JavaPluginLoader.class);
 
         File pluginFolder = (File) console.bridge$options().valueOf("plugins");
 
         if (pluginFolder.exists()) {
-            if (pluginFolder.listFiles() != null) {
-                for (File f : pluginFolder.listFiles()) {
-                    if (f.getName().endsWith(".jar")) {
-                        try {
-                            com.mohistmc.banner.bukkit.nms.Remapper.remap(f); // Banner: Remap Jar file
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
             Plugin[] plugins = pluginManager.loadPlugins(pluginFolder);
             for (Plugin plugin : plugins) {
                 try {

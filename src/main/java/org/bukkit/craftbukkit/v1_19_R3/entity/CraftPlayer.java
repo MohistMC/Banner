@@ -18,6 +18,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nullable;
+
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -102,6 +104,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.messaging.StandardMessenger;
 import org.bukkit.profile.PlayerProfile;
 import org.bukkit.scoreboard.Scoreboard;
+import org.jetbrains.annotations.NotNull;
 
 @DelegateDeserialization(CraftOfflinePlayer.class)
 public class CraftPlayer extends CraftHumanEntity implements Player {
@@ -2059,7 +2062,12 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     // Spigot start
     private final Player.Spigot spigot = new Player.Spigot()
     {
-        /**
+        @Override
+        public InetSocketAddress getRawAddress()
+        {
+            return (InetSocketAddress) getHandle().connection.connection.getRawAddress();
+        }
+
         @Override
         public boolean getCollidesWithEntities() {
             return CraftPlayer.this.isCollidable();
@@ -2071,31 +2079,70 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         }
 
         @Override
-        public InetSocketAddress getRawAddress()
-        {
-            return (InetSocketAddress) getHandle().connection.connection.getRawAddress();
-        }
-
-        @Override
         public void respawn()
         {
             if ( getHealth() <= 0 && isOnline() )
             {
-                server.getServer().getPlayerList().respawn( getHandle(), false );
+                server.getServer().getPlayerList().respawn( getHandle(), false, PlayerRespawnEvent.RespawnReason.PLUGIN );
             }
         }
 
         @Override
-        public Set<Player> getHiddenPlayers() {
+        public Set<Player> getHiddenPlayers()
+        {
             Set<Player> ret = new HashSet<>();
-            for (Player p : getServer().getOnlinePlayers()) {
-                if (!CraftPlayer.this.canSee(p)) {
-                    ret.add(p);
+            for ( Player p : getServer().getOnlinePlayers() )
+            {
+                if ( !CraftPlayer.this.canSee(p) )
+                {
+                    ret.add( p );
                 }
             }
-            return java.util.Collections.unmodifiableSet(ret);
-        }*/
 
+            return java.util.Collections.unmodifiableSet( ret );
+        }
+
+        @Override
+        public void sendMessage(BaseComponent component) {
+            sendMessage( new BaseComponent[] { component } );
+        }
+
+        @Override
+        public void sendMessage(BaseComponent... components) {
+            this.sendMessage(net.md_5.bungee.api.ChatMessageType.SYSTEM, components);
+        }
+
+        @Override
+        public void sendMessage(UUID sender, BaseComponent component) {
+            this.sendMessage(net.md_5.bungee.api.ChatMessageType.CHAT, sender, component);
+        }
+
+        @Override
+        public void sendMessage(UUID sender, BaseComponent... components) {
+            this.sendMessage(net.md_5.bungee.api.ChatMessageType.CHAT, sender, components);
+        }
+
+        @Override
+        public void sendMessage(net.md_5.bungee.api.ChatMessageType position, BaseComponent component) {
+            sendMessage( position, new BaseComponent[] { component } );
+        }
+
+        @Override
+        public void sendMessage(net.md_5.bungee.api.ChatMessageType position, BaseComponent... components) {
+            this.sendMessage(position, null, components);
+        }
+
+        @Override
+        public void sendMessage(net.md_5.bungee.api.ChatMessageType position, UUID sender, BaseComponent component) {
+            sendMessage( position, sender, new BaseComponent[] { component } );
+        }
+
+        @Override
+        public void sendMessage(net.md_5.bungee.api.ChatMessageType position, UUID sender, BaseComponent... components) {
+            if ( getHandle().connection == null ) return;
+            Component component = Component.literal(net.md_5.bungee.chat.ComponentSerializer.toString(components));
+            getHandle().connection.send(new net.minecraft.network.protocol.game.ClientboundSystemChatPacket(component, position == net.md_5.bungee.api.ChatMessageType.ACTION_BAR));
+        }
     };
 
     public Player.Spigot spigot()
