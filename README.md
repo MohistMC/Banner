@@ -20,10 +20,10 @@
 Notice
 ------
 * [ ] Fabric + Bukkit is more vanilla like than Forge + Bukkit
-* [ ] Fabric api use mixins to change minecraft indirectly
-* [ ] they are no a lot of breaking changes
-* [ ] Banner still has a lot of bug,so do not use it in production environment
-* [ ] Just download for testing,report bugs
+* [ ] Fabric api uses mixins to change minecraft indirectly
+* [ ] there are no a lot of breaking changes
+* [ ] Banner still has a lot of bugs,so do not use it in production environment
+* [ ] Just download for testing, report bugs
 
 Progress
 ------
@@ -36,13 +36,13 @@ Progress
         * [ ] CraftBukkit-Patches (100%) - (029/030/091)
 
 - [ ] Running ?
-    * [ ] It can be compilable, and running
+    * [ ] It can be compilable and running
     * [ ] But the compatibility with plugins is poor
 
 Using
 ------
-- Please putting it in mods folder
-- Remember that Banner is still in WIP,Do not use it in production environment
+- Please put it in the mods folder
+- Remember that Banner is still in WIP, Do not use it in production environment
   
 Upstream Projects
 ------
@@ -65,4 +65,4 @@ A Special Thanks To:
 
 ![YourKit-Logo](https://www.yourkit.com/images/yklogo.png)
 
-[YourKit](http://www.yourkit.com/), makers of the outstanding java profiler, support open source projects of all kinds with their full featured [Java](https://www.yourkit.com/java/profiler/index.jsp) and [.NET](https://www.yourkit.com/.net/profiler/index.jsp) application profilers. We thank them for granting Mohist an OSS license so that we can make our software the best it can be.
+[YourKit](http://www.yourkit.com/), makers of the outstanding java profiler, support open source projects of all kinds with their full-featured [Java](https://www.yourkit.com/java/profiler/index.jsp) and [.NET](https://www.yourkit.com/.net/profiler/index.jsp) application profilers. We thank them for granting Mohist an OSS license so that we can make our software the best it can be.
