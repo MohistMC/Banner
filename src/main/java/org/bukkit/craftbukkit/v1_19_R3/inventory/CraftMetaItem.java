@@ -383,9 +383,11 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
 
         Set<String> keys = tag.getAllKeys();
         for (String key : keys) {
-            if (!getHandledTags().contains(key)) {
+            // Mohist start - handle modded tags
+            if (handleModdedTags(key)) {
                 unhandledTags.put(key, tag.get(key).copy());
             }
+            //Mohist end
         }
     }
 
@@ -538,6 +540,15 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
         Map nbtMap = SerializableMeta.getObject(Map.class, map, BUKKIT_CUSTOM_TAG.BUKKIT, true);
         if (nbtMap != null) {
             this.persistentDataContainer.putAll((CompoundTag) CraftNBTTagConfigSerializer.deserialize(nbtMap));
+        }
+    }
+
+    // Banner start - handle modded Tags
+    private boolean handleModdedTags(String key) {
+        if (this instanceof CraftMetaItem) {
+            return true;
+        } else {
+            return !getHandledTags().contains(key);
         }
     }
 
