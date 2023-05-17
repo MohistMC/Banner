@@ -92,8 +92,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow private long nextTickTime;
     @Shadow public abstract boolean isSpawningMonsters();
     @Shadow public abstract boolean isSpawningAnimals();
-    @Shadow private String localIp;
-    @Shadow private boolean onlineMode;
     @Shadow private int tickCount;
     @Shadow public abstract PlayerList getPlayerList();
     @Shadow private long lastOverloadWarning;
@@ -192,11 +190,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         if (this.server != null) {
             cir.setReturnValue(server.getServer().getServerName());
         }
-    }
-
-    @Inject(method = "reloadResources", at = @At(value = "RETURN", target = "Ljava/util/concurrent/CompletableFuture;thenAcceptAsync(Ljava/util/function/Consumer;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
-    private void banner$syncCommand(Collection<String> selectedIds, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
-        this.server.syncCommands();
     }
 
     @Override

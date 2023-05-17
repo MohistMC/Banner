@@ -17,6 +17,7 @@ import org.bukkit.event.block.TNTPrimeEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -29,7 +30,7 @@ public class MixinTntBlock {
     private AtomicReference<BlockPos> banner$originPos = new AtomicReference<>();
     private AtomicReference<Player> banner$useTntPlayer = new AtomicReference<>();
 
-    @ModifyExpressionValue(method = "onPlace", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;hasNeighborSignal(Lnet/minecraft/core/BlockPos;)Z"))
+    @Redirect(method = "onPlace", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;hasNeighborSignal(Lnet/minecraft/core/BlockPos;)Z"))
     private boolean banner$addTntCheck(Level level, BlockPos pos) {
         return level.hasNeighborSignal(pos)
                 && CraftEventFactory.callTNTPrimeEvent(level, pos, TNTPrimeEvent.PrimeCause.REDSTONE, null, null); // CraftBukkit - TNTPrimeEvent

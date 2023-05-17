@@ -220,9 +220,9 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         }
     }
 
-    @ModifyExpressionValue(method = "onEquipItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isClientSide()Z"))
-    private boolean banner$addSilentCheck(EquipmentSlot equipmentSlot, ItemStack itemStack, ItemStack itemStack2, CallbackInfo ci) {
-        return !this.level.isClientSide() && !banner$silent.get();
+    @Redirect(method = "onEquipItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isClientSide()Z"))
+    private boolean banner$addSilentCheck(Level instance) {
+        return !this.level.isClientSide() && !this.isSilent() && !banner$silent.get();
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("HEAD"))
