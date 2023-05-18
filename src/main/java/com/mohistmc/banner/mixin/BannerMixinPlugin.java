@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.mohistmc.banner.BannerServer;
-import com.mohistmc.banner.compat.LithiumCompat;
 import com.mohistmc.banner.library.Library;
 import com.mohistmc.banner.library.LibraryManager;
 import net.fabricmc.loader.api.FabricLoader;
@@ -93,15 +92,6 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
         LOGGER.info("Welcome to Mohist Banner ! - Mohist Developement Group" + " - " + BannerServer.getVersion() + ", Java " + BannerServer.javaVersion);
         LOGGER.info("Loading libraries, please wait...");
         loadLibs();
-        try {
-            fixCompat();
-        } catch (IOException e) {
-            LOGGER.error("Failed to fix mod compat...");
-        }
-    }
-
-    protected static void fixCompat() throws IOException {
-        LithiumCompat.changeLithiumConf();
     }
 
     public static void loadLibs() {
