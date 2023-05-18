@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.inventory;
 
+import com.mohistmc.banner.bukkit.BukkitContainer;
 import com.mohistmc.banner.injection.world.inventory.InjectionAbstractContainerMenu;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
@@ -59,6 +60,7 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
 
     @Shadow @Final private Set<Slot> quickcraftSlots;
     @Shadow public NonNullList<Slot> slots;
+    private InventoryView bukkitView;
 
     @Shadow
     public static boolean canItemQuickReplace(@Nullable Slot slot, ItemStack stack, boolean stackSizeMatters) {
@@ -389,5 +391,13 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
     @Override
     public void banner$setCheckReachable(boolean checkReachable) {
         this.checkReachable = checkReachable;
+    }
+
+    @Override
+    public InventoryView getBukkitView() {
+        if (bukkitView == null) {
+            bukkitView = BukkitContainer.createInvView((AbstractContainerMenu) (Object) this);
+        }
+        return bukkitView;
     }
 }

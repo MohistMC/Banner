@@ -117,7 +117,7 @@ public interface InjectionServerPlayer {
     }
 
     default Integer bridge$clientViewDistance() {
-        return null;
+        return 0;
     }
 
     default void banner$setClientViewDistance(Integer clientViewDistance) {
