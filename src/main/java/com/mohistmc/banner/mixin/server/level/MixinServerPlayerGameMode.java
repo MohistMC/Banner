@@ -287,6 +287,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
             }
 
             event = new BlockBreakEvent(bblock, this.player.getBukkitEntity());
+            banner$event.set(event);
 
             // Sword + Creative mode pre-cancel
             event.setCancelled(isSwordNoBreak);
@@ -323,7 +324,6 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
                 cir.setReturnValue(false);
             }
         }
-        banner$event.set(event);
     }
 
     @Inject(method = "destroyBlock", at = @At(value = "INVOKE",
