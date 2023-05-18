@@ -8,18 +8,27 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientboundCommandsPacket;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(Commands.class)
 public abstract class MixinCommands implements InjectionCommands {
@@ -50,9 +59,28 @@ public abstract class MixinCommands implements InjectionCommands {
         return this.performCommand(this.dispatcher.parse(s, commandlistenerwrapper), s, label);
     }
 
+    private AtomicReference<String> banner$performLabel = new AtomicReference<>();
+    private AtomicReference<String> banner$command = new AtomicReference<>();
+
     @Override
     public int performCommand(ParseResults<CommandSourceStack> parseResults, String command, String label) {
+        this.banner$performLabel.set(label);
         return performCommand(parseResults, command);
+    }
+
+    @Inject(method = "performCommand", at = @At("HEAD"))
+    private void banner$getCommandInfo(ParseResults<CommandSourceStack> parseResults, String command, CallbackInfoReturnable<Integer> cir) {
+        banner$command.set(command);
+    }
+
+    @Redirect(method = "performCommand", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;"))
+    private MutableComponent banner$resetCommandLabel(MutableComponent instance, ChatFormatting format) {
+        var label = this.banner$performLabel.get();
+        label = label == null ? "/" + banner$command.get() : label;
+        String finalLabel = label;
+        return Component.empty().withStyle(ChatFormatting.GRAY).withStyle((style) ->
+                style.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, finalLabel)));
     }
 
     @Override
