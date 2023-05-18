@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;

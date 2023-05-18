@@ -1,6 +1,5 @@
 package com.mohistmc.banner;
 
-import com.llamalad7.mixinextras.MixinExtrasBootstrap;
 import com.mohistmc.banner.eventhandler.BannerEventDispatcherRegistry;
 import com.mohistmc.i18n.i18n;
 import io.izzel.arclight.mixin.injector.EjectorInfo;
@@ -23,7 +22,6 @@ public class BannerServer implements DedicatedServerModInitializer {
         if (System.getProperty("log4j.configurationFile") == null) {
             System.setProperty("log4j.configurationFile", "log4j2_banner.xml");
         }
-        MixinExtrasBootstrap.init();
         InjectionInfo.register(EjectorInfo.class);
         BannerEventDispatcherRegistry.registerEventDispatchers();
     }

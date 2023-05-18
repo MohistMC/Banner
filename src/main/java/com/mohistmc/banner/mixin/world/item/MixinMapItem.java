@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.item;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
@@ -9,7 +8,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.bukkit.Bukkit;
 import org.bukkit.event.server.MapInitializeEvent;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -17,10 +18,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(MapItem.class)
 public class MixinMapItem {
 
-    @ModifyReturnValue(method = "getMapId", at = @At("RETURN"))
-    private static Integer banner$clearMapId(ItemStack stack, CallbackInfoReturnable<Integer> cir) {
-        CompoundTag banner$compoundTag = stack.getTag();
-        return banner$compoundTag != null && banner$compoundTag.contains("map", 99) ? banner$compoundTag.getInt("map") : -1; // CraftBukkit - make new maps for no tag
+    /**
+     * @author wdog5
+     * @reason functionally replaced
+     */
+    @Nullable
+    @Overwrite
+    public static Integer getMapId(ItemStack stack) {
+        CompoundTag compoundTag = stack.getTag();
+        return compoundTag != null && compoundTag.contains("map", 99) ? compoundTag.getInt("map") : -1; // CraftBukkit - make new maps for no tag
     }
 
     @Inject(method = "createNewSavedData", at = @At("RETURN"))

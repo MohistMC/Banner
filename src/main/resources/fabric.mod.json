@@ -21,6 +21,9 @@
   "entrypoints": {
     "server": [
       "com.mohistmc.banner.BannerServer"
+    ],
+    "preLaunch": [
+      "com.mohistmc.banner.BannerPreLaunch::init"
     ]
   },
   "mixins": [

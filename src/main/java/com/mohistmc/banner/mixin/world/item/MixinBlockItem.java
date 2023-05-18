@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.item;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mohistmc.banner.bukkit.DistValidate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -31,6 +30,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -108,12 +108,12 @@ public abstract class MixinBlockItem {
         banner$player.set(player);
     }
 
-    @ModifyExpressionValue(method = "updateCustomBlockEntityTag(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;)Z",
+    @Redirect(method = "updateCustomBlockEntityTag(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;)Z",
             at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
-    private static boolean banner$checkPerm(Level level) {
-        BlockEntity banner$tileEntity = level.getBlockEntity(banner$pos.get());
+    private static boolean banner$checkPerm(Level instance) {
+        BlockEntity banner$tileEntity = instance.getBlockEntity(banner$pos.get());
         return banner$tileEntity != null
-                && !level.isClientSide
+                && !instance.isClientSide
                 && banner$tileEntity.onlyOpCanSetNbt()
                 && (banner$player.get() == null
                 || !banner$player.get().canUseGameMasterBlocks())

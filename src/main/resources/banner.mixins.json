@@ -332,7 +332,6 @@
     "world.item.crafting.MixinSmokingRecipe",
     "world.item.crafting.MixinStonecutterRecipe",
     "world.item.enchantment.MixinDamageEnchantment",
-    "world.item.enchantment.MixinEnchantments",
     "world.item.enchantment.MixinFrostWalkerEnchantment",
     "world.item.trading.MixinMerchant",
     "world.item.trading.MixinMerchantOffer",

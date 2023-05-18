@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.server.network;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.injection.server.network.InjectionServerGamePacketListenerImpl;
@@ -85,6 +84,7 @@ import org.spigotmc.SpigotConfig;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -94,6 +94,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -1089,83 +1090,21 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         this.detectRateSpam();
     }
 
-    /**
-     * @author wdog5
-     * @reason
-     */
-    /*
-    @Overwrite
-    public void handleAnimate(ServerboundSwingPacket packet) {
-        PacketUtils.ensureRunningOnSameThread(packet, (ServerGamePacketListenerImpl) (Object) this, this.player.getLevel());
-        if (this.player.isImmobile()) {
-            return;
-        }
-        this.player.resetLastActionTime();
-        float f1 = this.player.getXRot();
-        float f2 = this.player.getYRot();
-        double d0 = this.player.getX();
-        double d2 = this.player.getY() + this.player.getEyeHeight();
-        double d3 = this.player.getZ();
-        Vec3 vec3d = new Vec3(d0, d2, d3);
-        float f3 = Mth.cos(-f2 * 0.017453292f - 3.1415927f);
-        float f4 = Mth.sin(-f2 * 0.017453292f - 3.1415927f);
-        float f5 = -Mth.cos(-f1 * 0.017453292f);
-        float f6 = Mth.sin(-f1 * 0.017453292f);
-        float f7 = f4 * f5;
-        float f8 = f3 * f5;
-        double d4 = this.player.getY() + (double) this.player.getEyeHeight();
-        Vec3 vec3d2 = vec3d.add(f7 * d4, f6 * d4, f8 * d4);
-        HitResult result = this.player.level.clip(new ClipContext(vec3d, vec3d2, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, this.player));
-        if (result == null || result.getType() != HitResult.Type.BLOCK) {
-            CraftEventFactory.callPlayerInteractEvent(this.player, Action.LEFT_CLICK_AIR, this.player.getInventory().getSelected(), InteractionHand.MAIN_HAND);
-        }
-        PlayerAnimationEvent event = new PlayerAnimationEvent(this.getCraftPlayer(), packet.getHand() == InteractionHand.MAIN_HAND ? PlayerAnimationType.ARM_SWING : PlayerAnimationType.OFF_ARM_SWING);
-        this.cserver.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return;
-        }
-        this.player.swing(packet.getHand());
-    }*/
-    //Banner -TODO
-
     @Override
     public boolean isDisconnected() {
         return !this.player.bridge$joining() && !this.connection.isConnected();
     }
 
-    @ModifyExpressionValue(method = "handleSetCreativeModeSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"))
-    private boolean banner$permCheck(ItemStack itemStack) {
-        CompoundTag banner$tag = BlockItem.getBlockEntityData(itemStack);
-        return !itemStack.isEmpty()
+    @Redirect(method = "handleSetCreativeModeSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"))
+    private boolean banner$permCheck(ItemStack instance) {
+        CompoundTag banner$tag = BlockItem.getBlockEntityData(instance);
+        return !instance.isEmpty()
                 && banner$tag != null
                 && banner$tag.contains("x")
                 && banner$tag.contains("y")
                 && banner$tag.contains("z")
                 && this.player.getBukkitEntity().hasPermission("minecraft.nbt.copy"); // Spigot
     }
-
-    //Banner -TODO
-    /*
-    @Inject(method = "handlePlayerCommand", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;resetLastActionTime()V"))
-    private void banner$toggleAction(ServerboundPlayerCommandPacket packetIn, CallbackInfo ci) {
-        if (this.player.isRemoved()) {
-            ci.cancel();
-            return;
-        }
-        if (packetIn.getAction() == ServerboundPlayerCommandPacket.Action.PRESS_SHIFT_KEY || packetIn.getAction() == ServerboundPlayerCommandPacket.Action.RELEASE_SHIFT_KEY) {
-            PlayerToggleSneakEvent event = new PlayerToggleSneakEvent(this.getCraftPlayer(), packetIn.getAction() == ServerboundPlayerCommandPacket.Action.PRESS_SHIFT_KEY);
-            this.cserver.getPluginManager().callEvent(event);
-            if (event.isCancelled()) {
-                ci.cancel();
-            }
-        } else if (packetIn.getAction() == ServerboundPlayerCommandPacket.Action.START_SPRINTING || packetIn.getAction() == ServerboundPlayerCommandPacket.Action.STOP_SPRINTING) {
-            PlayerToggleSprintEvent e2 = new PlayerToggleSprintEvent(this.getCraftPlayer(), packetIn.getAction() == ServerboundPlayerCommandPacket.Action.START_SPRINTING);
-            this.cserver.getPluginManager().callEvent(e2);
-            if (e2.isCancelled()) {
-                ci.cancel();
-            }
-        }
-    }*/
 
     /**
      * @author wdog5

@@ -84,15 +84,15 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void onLoad(String mixinPackage) {
-       LOGGER.info(" _____       ___   __   _   __   _   _____   _____   ");
-       LOGGER.info("|  _  \\     /   | |  \\ | | |  \\ | | | ____| |  _  \\  ");
-       LOGGER.info("| |_| |    / /| | |   \\| | |   \\| | | |__   | |_| |  ");
-       LOGGER.info("|  _  {   / / | | | |\\   | | |\\   | |  __|  |  _  /  ");
-       LOGGER.info("| |_| |  / /  | | | | \\  | | | \\  | | |___  | | \\ \\  ");
-       LOGGER.info("|_____/ /_/   |_| |_|  \\_| |_|  \\_| |_____| |_|  \\_\\ ");
-       LOGGER.info("Welcome to Mohist Banner ! - Mohist Developement Group" + " - " + BannerServer.getVersion() + ", Java " + BannerServer.javaVersion);
-       LOGGER.info("Loading libraries, please wait...");
-       loadLibs();
+        LOGGER.info(" _____       ___   __   _   __   _   _____   _____   ");
+        LOGGER.info("|  _  \\     /   | |  \\ | | |  \\ | | | ____| |  _  \\  ");
+        LOGGER.info("| |_| |    / /| | |   \\| | |   \\| | | |__   | |_| |  ");
+        LOGGER.info("|  _  {   / / | | | |\\   | | |\\   | |  __|  |  _  /  ");
+        LOGGER.info("| |_| |  / /  | | | | \\  | | | \\  | | |___  | | \\ \\  ");
+        LOGGER.info("|_____/ /_/   |_| |_|  \\_| |_|  \\_| |_____| |_|  \\_\\ ");
+        LOGGER.info("Welcome to Mohist Banner ! - Mohist Developement Group" + " - " + BannerServer.getVersion() + ", Java " + BannerServer.javaVersion);
+        LOGGER.info("Loading libraries, please wait...");
+        loadLibs();
         try {
             fixCompat();
         } catch (IOException e) {

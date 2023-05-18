@@ -2,7 +2,6 @@ package com.mohistmc.banner.mixin.world.entity;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mohistmc.banner.bukkit.ProcessableEffect;
 import com.mohistmc.banner.injection.world.entity.InjectionLivingEntity;
 import io.izzel.arclight.mixin.Eject;

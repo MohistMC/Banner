@@ -1,9 +1,7 @@
 package com.mohistmc.banner.mixin.server;
 
 import com.google.common.collect.Maps;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
@@ -61,10 +59,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -94,7 +89,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow public abstract boolean isSpawningAnimals();
     @Shadow private int tickCount;
     @Shadow public abstract PlayerList getPlayerList();
-    @Shadow private long lastOverloadWarning;
     @Shadow public abstract boolean isStopped();
     // @formatter:on
 
@@ -161,16 +155,9 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         try { Thread.sleep(100); } catch (InterruptedException ex) {} // CraftBukkit - SPIGOT-625 - give server at least a chance to send packets
     }
 
-    @ModifyExpressionValue(method = "runServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;lastOverloadWarning:J", ordinal = 0))
-    private boolean banner$resetCKU(MinecraftServer instance) {
-        return this.lastOverloadWarning >= 30000L;
-    }
-
-    @WrapWithCondition(method = "runServer",remap = false,
-            at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V"),
-            slice = @Slice(to = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;lastOverloadWarning:J", ordinal = 1)))
-    private boolean banner$addCKUCheck() {
-        return server.getWarnOnOverload();
+    @ModifyConstant(method = "runServer", constant = @Constant(longValue = 15000L))
+    private long banner$changeWarningValue(long constant) {
+        return 30000L;
     }
 
     @Inject(method = "runServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;nextTickTime:J", shift = At.Shift.BEFORE))
@@ -264,11 +251,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                 }
             }
         }
-    }
-
-    @ModifyExpressionValue(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;tickCount:I", ordinal = 1))
-    private boolean banner$addTaskCheck() {
-        return autosavePeriod > 0 && this.tickCount % autosavePeriod == 0;
     }
 
     @Override
@@ -421,7 +403,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             new com.google.common.util.concurrent.ThreadFactoryBuilder().setDaemon(true).setNameFormat("Async Chat Thread - #%d").build());
 
     @ModifyReturnValue(method = "getChatDecorator", at = @At("RETURN"))
-    private ChatDecorator banner$fireChatEvent() {
+    private ChatDecorator banner$fireChatEvent(ChatDecorator decorator) {
         return (entityplayer, ichatbasecomponent) -> {
             // SPIGOT-7127: Console /say and similar
             if (entityplayer == null) {

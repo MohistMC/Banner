@@ -1,19 +1,25 @@
 package com.mohistmc.banner.mixin.world.entity;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mohistmc.banner.injection.world.entity.InjectionAgeableMob;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AgeableMob.class)
-public class MixinAgeableMob implements InjectionAgeableMob {
+public abstract class MixinAgeableMob extends PathfinderMob implements InjectionAgeableMob {
 
     public boolean ageLocked; // CraftBukkit
+
+    protected MixinAgeableMob(EntityType<? extends PathfinderMob> entityType, Level level) {
+        super(entityType, level);
+    }
 
     @Inject(method = "addAdditionalSaveData", at = @At("RETURN"))
     private void banner$writeAgeLocked(CompoundTag compound, CallbackInfo ci) {
@@ -25,9 +31,9 @@ public class MixinAgeableMob implements InjectionAgeableMob {
         ageLocked = compound.getBoolean("AgeLocked");
     }
 
-    @ModifyExpressionValue(method = "aiStep", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
-    private boolean banner$tickIfNotLocked(Level world) {
-        return world.isClientSide || ageLocked;
+    @Redirect(method = "aiStep", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
+    private boolean banner$tickIfNotLocked(Level instance) {
+        return this.level.isClientSide || ageLocked;
     }
 
     @Override

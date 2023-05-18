@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.entity.projectile;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mohistmc.banner.injection.world.entity.InjectionFishingHook;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -101,14 +100,14 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
         }
     }
 
-    @ModifyExpressionValue(method = "catchingFish", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isRainingAt(Lnet/minecraft/core/BlockPos;)Z"))
+    @Redirect(method = "catchingFish", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isRainingAt(Lnet/minecraft/core/BlockPos;)Z"))
     private boolean addRainCheck(Level instance, BlockPos position) {
         return this.rainInfluenced && this.random.nextFloat() < 0.25F && this.level.isRainingAt(position);
     }
 
-    @ModifyExpressionValue(method = "catchingFish", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;canSeeSky(Lnet/minecraft/core/BlockPos;)Z"))
-    private boolean addSkyCheck(Level instance, BlockPos position) {
-        return this.skyInfluenced && this.random.nextFloat() < 0.25F && this.level.isRainingAt(position);
+    @Redirect(method = "catchingFish", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;canSeeSky(Lnet/minecraft/core/BlockPos;)Z"))
+    private boolean addSkyCheck(Level instance, BlockPos pos) {
+        return this.skyInfluenced && this.random.nextFloat() < 0.25F && this.level.isRainingAt(pos);
     }
 
     /**
