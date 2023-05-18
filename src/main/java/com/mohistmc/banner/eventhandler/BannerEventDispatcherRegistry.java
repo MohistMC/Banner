@@ -9,7 +9,6 @@ public class BannerEventDispatcherRegistry {
         BannerServer.LOGGER.info("Registering Banner Event Dispatchers...");
         LevelEventDispatcher.dispatchLevel();
         PlayerEventDispatcher.dispatcherPlayer();
-        CommandsEventDispatcher.onCommandDispatch();
         EntityEventDispatcher.dispatchEntity();
         ReloadEventDispatcher.dispatchReload();
     }
