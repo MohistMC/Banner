@@ -112,6 +112,7 @@ public class SpigotWorldConfig
 
         return modifier;
     }
+
     private void growthModifiers()
     {
         cactusModifier = getAndValidateGrowth( "Cactus" );

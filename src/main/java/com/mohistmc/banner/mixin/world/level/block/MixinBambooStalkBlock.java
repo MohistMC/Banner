@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BambooStalkBlock;
@@ -15,11 +16,11 @@ import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(BambooStalkBlock.class)
 public abstract class MixinBambooStalkBlock extends Block {
@@ -83,5 +84,17 @@ public abstract class MixinBambooStalkBlock extends Block {
             }
         }
         // CraftBukkit end
+    }
+
+    private AtomicReference<ServerLevel> banner$level = new AtomicReference<>();
+
+    @Inject(method = "randomTick", at = @At("HEAD"))
+    private void banner$setLevel(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, CallbackInfo ci) {
+        banner$level.set(level);
+    }
+
+    @ModifyConstant(method = "randomTick", constant = @Constant(intValue = 3))
+    private int banner$corpRate(int constant) {
+        return banner$level.get().bridge$spigotConfig().bambooModifier / 100;
     }
 }
