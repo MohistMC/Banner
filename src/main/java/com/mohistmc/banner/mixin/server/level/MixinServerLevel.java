@@ -23,6 +23,7 @@ import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.progress.ChunkProgressListener;
+import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.ProgressListener;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -141,8 +142,11 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         getWorld();
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void banner$initWorldServer(MinecraftServer minecraftServer, Executor executor, LevelStorageSource.LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey<Level> resourceKey, LevelStem levelStem, ChunkProgressListener chunkProgressListener, boolean bl, long l, List list, boolean bl2, CallbackInfo ci) {
+    @Inject(method = "<init>", at = @At(value = "INVOKE",
+            target = "Lcom/google/common/collect/Lists;newArrayList()Ljava/util/ArrayList;",
+            remap = false,
+            shift = At.Shift.BEFORE))
+    private void banner$preInitWorldServer(MinecraftServer minecraftServer, Executor executor, LevelStorageSource.LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey resourceKey, LevelStem levelStem, ChunkProgressListener chunkProgressListener, boolean bl, long l, List list, boolean bl2, CallbackInfo ci) {
         this.banner$setPvpMode(minecraftServer.isPvpAllowed());
         this.convertable = levelStorageAccess;
         var typeKey = ((InjectionLevelStorageAccess) levelStorageAccess).bridge$getTypeKey();
@@ -165,11 +169,26 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
             serverLevelDataCB.setWorld((ServerLevel) (Object) this);
         }
         this.banner$setSpigotConfig(new SpigotWorldConfig(serverLevelDataCB.getLevelName()));
+    }
+
+    @Inject(method = "<init>", at = @At(value = "RETURN"))
+    private void banner$initWorldServer(MinecraftServer minecraftServer, Executor executor, LevelStorageSource.LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey<Level> resourceKey, LevelStem levelStem, ChunkProgressListener chunkProgressListener, boolean bl, long l, List list, boolean bl2, CallbackInfo ci) {
         this.uuid = WorldUUID.getUUID(levelStorageAccess.getDimensionPath(this.dimension()).toFile());
-        this.chunkSource.setViewDistance(bridge$spigotConfig().viewDistance);
         var data = this.getDataStorage().computeIfAbsent(LevelPersistentData::new,
                 () -> new LevelPersistentData(null), "bukkit_pdc");
         this.getWorld().readBukkitValues(data.getTag());
+    }
+
+    @Redirect(method = "<init>", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/players/PlayerList;getViewDistance()I"))
+    private int banner$setViewDistance(PlayerList instance) {
+        return this.bridge$spigotConfig().viewDistance;
+    }
+
+    @Redirect(method = "<init>", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/players/PlayerList;getSimulationDistance()I"))
+    private int banner$setSimulationDistance(PlayerList instance) {
+        return this.bridge$spigotConfig().simulationDistance;
     }
 
     @Inject(method = "saveLevelData", at = @At("RETURN"))
