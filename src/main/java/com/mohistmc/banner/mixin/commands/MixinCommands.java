@@ -6,22 +6,15 @@ import com.mohistmc.banner.injection.commands.InjectionCommandNode;
 import com.mohistmc.banner.injection.commands.InjectionCommands;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
-import net.minecraft.ChatFormatting;
-import net.minecraft.SharedConstants;
-import net.minecraft.Util;
-import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.network.chat.*;
 import net.minecraft.network.protocol.game.ClientboundCommandsPacket;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.server.ServerCommandEvent;
-import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.*;
 
 import java.util.Collection;
@@ -35,7 +28,7 @@ public abstract class MixinCommands implements InjectionCommands {
 
     @Shadow protected abstract void fillUsableCommands(CommandNode<CommandSourceStack> rootCommandSource, CommandNode<SharedSuggestionProvider> rootSuggestion, CommandSourceStack source, Map<CommandNode<CommandSourceStack>, CommandNode<SharedSuggestionProvider>> commandNodeToSuggestionNode);
 
-    @Shadow @Final private static Logger LOGGER;
+    @Shadow public abstract int performCommand(ParseResults<CommandSourceStack> parseResults, String command);
 
     public void banner$constructor() {
         this.dispatcher.setConsumer((context, b, i) -> context.getSource().onCommandComplete(context, b, i));
@@ -59,77 +52,7 @@ public abstract class MixinCommands implements InjectionCommands {
 
     @Override
     public int performCommand(ParseResults<CommandSourceStack> parseResults, String command, String label) {
-        CommandSourceStack commandSourceStack = (CommandSourceStack)parseResults.getContext().getSource();
-        commandSourceStack.getServer().getProfiler().push(() -> {
-            return "/" + command;
-        });
-
-        byte var18;
-        try {
-            int var4 = this.dispatcher.execute(parseResults);
-            return var4;
-        } catch (CommandRuntimeException var13) {
-            commandSourceStack.sendFailure(var13.getComponent());
-            var18 = 0;
-            return var18;
-        } catch (CommandSyntaxException var14) {
-            commandSourceStack.sendFailure(ComponentUtils.fromMessage(var14.getRawMessage()));
-            if (var14.getInput() != null && var14.getCursor() >= 0) {
-                int i = Math.min(var14.getInput().length(), var14.getCursor());
-                MutableComponent mutableComponent = Component.empty().withStyle(ChatFormatting.GRAY).withStyle((style) -> {
-                    return style.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, label));
-                });
-                if (i > 10) {
-                    mutableComponent.append(CommonComponents.ELLIPSIS);
-                }
-
-                mutableComponent.append(var14.getInput().substring(Math.max(0, i - 10), i));
-                if (i < var14.getInput().length()) {
-                    Component component = Component.literal(var14.getInput().substring(i)).withStyle(new ChatFormatting[]{ChatFormatting.RED, ChatFormatting.UNDERLINE});
-                    mutableComponent.append(component);
-                }
-
-                mutableComponent.append(Component.translatable("command.context.here").withStyle(new ChatFormatting[]{ChatFormatting.RED, ChatFormatting.ITALIC}));
-                commandSourceStack.sendFailure(mutableComponent);
-            }
-
-            var18 = 0;
-        } catch (Exception var15) {
-            MutableComponent mutableComponent2 = Component.literal(var15.getMessage() == null ? var15.getClass().getName() : var15.getMessage());
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.error("Command exception: /{}", command, var15);
-                StackTraceElement[] stackTraceElements = var15.getStackTrace();
-
-                for(int j = 0; j < Math.min(stackTraceElements.length, 3); ++j) {
-                    mutableComponent2.append("\n\n").append(stackTraceElements[j].getMethodName()).append("\n ").append(stackTraceElements[j].getFileName()).append(":").append(String.valueOf(stackTraceElements[j].getLineNumber()));
-                }
-            }
-
-            commandSourceStack.sendFailure(Component.translatable("command.failed").withStyle((style) -> {
-                return style.withHoverEvent(new HoverEvent(net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT, mutableComponent2));
-            }));
-            if (SharedConstants.IS_RUNNING_IN_IDE) {
-                commandSourceStack.sendFailure(Component.literal(Util.describeError(var15)));
-                LOGGER.error("'/{}' threw an exception", command, var15);
-            }
-
-            byte var19 = 0;
-            return var19;
-        } finally {
-            commandSourceStack.getServer().getProfiler().pop();
-        }
-
-        return var18;
-    }
-
-    /**
-     * @author wdog5
-     * @reason functionally replaced
-     * TODO changed in inject and redirect
-     */
-    @Overwrite
-    public int performCommand(ParseResults<CommandSourceStack> parseResults, String command) {
-        return this.performCommand(parseResults, command, command);
+        return performCommand(parseResults, command);
     }
 
     @Override
