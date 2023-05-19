@@ -34,7 +34,6 @@ import org.bukkit.GameMode;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.slf4j.Logger;
@@ -111,21 +110,23 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
      * @reason functionally replaced
      */
     @Overwrite
-    public void handleBlockBreakAction(BlockPos pos, ServerboundPlayerActionPacket.Action action, Direction face, int maxBuildHeight, int sequence) {
-        if (this.player.getEyePosition().distanceToSqr(Vec3.atCenterOf(pos)) > ServerGamePacketListenerImpl.MAX_INTERACTION_DISTANCE) {
-            this.debugLogging(pos, false, sequence, "too far");
-        } else if (pos.getY() >= maxBuildHeight) {
-            this.player.connection.send(new ClientboundBlockUpdatePacket(pos, this.level.getBlockState(pos)));
-            this.debugLogging(pos, false, sequence, "too high");
+    public void handleBlockBreakAction(BlockPos blockposition, ServerboundPlayerActionPacket.Action packetplayinblockdig_enumplayerdigtype, Direction enumdirection, int i, int j) {
+        if (this.player.getEyePosition().distanceToSqr(Vec3.atCenterOf(blockposition)) > ServerGamePacketListenerImpl.MAX_INTERACTION_DISTANCE) {
+            this.debugLogging(blockposition, false, j, "too far");
+        } else if (blockposition.getY() >= i) {
+            this.player.connection.send(new ClientboundBlockUpdatePacket(blockposition, this.level.getBlockState(blockposition)));
+            this.debugLogging(blockposition, false, j, "too high");
         } else {
-            if (action == net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK) {
-                if (!this.level.mayInteract(this.player, pos)) {
+            BlockState iblockdata;
+
+            if (packetplayinblockdig_enumplayerdigtype == ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK) {
+                if (!this.level.mayInteract(this.player, blockposition)) {
                     // CraftBukkit start - fire PlayerInteractEvent
-                    CraftEventFactory.callPlayerInteractEvent(this.player, Action.LEFT_CLICK_BLOCK, pos, face, this.player.getInventory().getSelected(), InteractionHand.MAIN_HAND);
-                    this.player.connection.send(new ClientboundBlockUpdatePacket(pos, this.level.getBlockState(pos)));
-                    this.debugLogging(pos, false, sequence, "may not interact");
+                    CraftEventFactory.callPlayerInteractEvent(this.player, Action.LEFT_CLICK_BLOCK, blockposition, enumdirection, this.player.getInventory().getSelected(), InteractionHand.MAIN_HAND);
+                    this.player.connection.send(new ClientboundBlockUpdatePacket(blockposition, this.level.getBlockState(blockposition)));
+                    this.debugLogging(blockposition, false, j, "may not interact");
                     // Update any tile entity data for this block
-                    BlockEntity tileentity = level.getBlockEntity(pos);
+                    BlockEntity tileentity = level.getBlockEntity(blockposition);
                     if (tileentity != null) {
                         this.player.connection.send(tileentity.getUpdatePacket());
                     }
@@ -134,61 +135,63 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
                 }
 
                 // CraftBukkit start
-                PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent(this.player, Action.LEFT_CLICK_BLOCK, pos, face, this.player.getInventory().getSelected(), InteractionHand.MAIN_HAND);
+                PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent(this.player, Action.LEFT_CLICK_BLOCK, blockposition, enumdirection, this.player.getInventory().getSelected(), InteractionHand.MAIN_HAND);
                 if (event.isCancelled()) {
                     // Let the client know the block still exists
-                    this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, pos));
+                    this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, blockposition));
                     // Update any tile entity data for this block
-                    BlockEntity tileentity = this.level.getBlockEntity(pos);
+                    BlockEntity tileentity = this.level.getBlockEntity(blockposition);
                     if (tileentity != null) {
                         this.player.connection.send(tileentity.getUpdatePacket());
                     }
                     return;
                 }
                 // CraftBukkit end
+
                 if (this.isCreative()) {
-                    this.destroyAndAck(pos, sequence, "creative destroy");
+                    this.destroyAndAck(blockposition, j, "creative destroy");
                     return;
                 }
 
-                if (this.player.blockActionRestricted(this.level, pos, this.gameModeForPlayer)) {
-                    this.player.connection.send(new ClientboundBlockUpdatePacket(pos, this.level.getBlockState(pos)));
-                    this.debugLogging(pos, false, sequence, "block action restricted");
+                if (this.player.blockActionRestricted(this.level, blockposition, this.gameModeForPlayer)) {
+                    this.player.connection.send(new ClientboundBlockUpdatePacket(blockposition, this.level.getBlockState(blockposition)));
+                    this.debugLogging(blockposition, false, j, "block action restricted");
                     return;
                 }
 
                 this.destroyProgressStart = this.gameTicks;
                 float f = 1.0F;
-                BlockState blockState = this.level.getBlockState(pos);
+
+                iblockdata = this.level.getBlockState(blockposition);
                 // CraftBukkit start - Swings at air do *NOT* exist.
                 if (event.useInteractedBlock() == Event.Result.DENY) {
                     // If we denied a door from opening, we need to send a correcting update to the client, as it already opened the door.
-                    BlockState data = this.level.getBlockState(pos);
+                    BlockState data = this.level.getBlockState(blockposition);
                     if (data.getBlock() instanceof DoorBlock) {
                         // For some reason *BOTH* the bottom/top part have to be marked updated.
                         boolean bottom = data.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER;
-                        this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, pos));
-                        this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, bottom ? pos.above() : pos.below()));
+                        this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, blockposition));
+                        this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, bottom ? blockposition.above() : blockposition.below()));
                     } else if (data.getBlock() instanceof TrapDoorBlock) {
-                        this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, pos));
+                        this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, blockposition));
                     }
-                } else if (!blockState.isAir()) {
-                    blockState.attack(this.level, pos, this.player);
-                    f = blockState.getDestroyProgress(this.player, this.player.level, pos);
+                } else if (!iblockdata.isAir()) {
+                    iblockdata.attack(this.level, blockposition, this.player);
+                    f = iblockdata.getDestroyProgress(this.player, this.player.level, blockposition);
                 }
 
                 if (event.useItemInHand() == Event.Result.DENY) {
                     // If we 'insta destroyed' then the client needs to be informed.
                     if (f > 1.0f) {
-                        this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, pos));
+                        this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, blockposition));
                     }
                     return;
                 }
-                BlockDamageEvent blockEvent = CraftEventFactory.callBlockDamageEvent(this.player, pos, this.player.getInventory().getSelected(), f >= 1.0f);
+                org.bukkit.event.block.BlockDamageEvent blockEvent = CraftEventFactory.callBlockDamageEvent(this.player, blockposition, this.player.getInventory().getSelected(), f >= 1.0f);
 
                 if (blockEvent.isCancelled()) {
                     // Let the client know the block still exists
-                    this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, pos));
+                    this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, blockposition));
                     return;
                 }
 
@@ -197,56 +200,59 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
                 }
                 // CraftBukkit end
 
-                if (!blockState.isAir() && f >= 1.0F) {
-                    this.destroyAndAck(pos, sequence, "insta mine");
+                if (!iblockdata.isAir() && f >= 1.0F) {
+                    this.destroyAndAck(blockposition, j, "insta mine");
                 } else {
                     if (this.isDestroyingBlock) {
                         this.player.connection.send(new ClientboundBlockUpdatePacket(this.destroyPos, this.level.getBlockState(this.destroyPos)));
-                        this.debugLogging(pos, false, sequence, "abort destroying since another started (client insta mine, server disagreed)");
+                        this.debugLogging(blockposition, false, j, "abort destroying since another started (client insta mine, server disagreed)");
                     }
 
                     this.isDestroyingBlock = true;
-                    this.destroyPos = pos.immutable();
-                    int i = (int) (f * 10.0F);
-                    this.level.destroyBlockProgress(this.player.getId(), pos, i);
-                    this.debugLogging(pos, true, sequence, "actual start of destroying");
-                    this.lastSentState = i;
+                    this.destroyPos = blockposition.immutable();
+                    int k = (int) (f * 10.0F);
+
+                    this.level.destroyBlockProgress(this.player.getId(), blockposition, k);
+                    this.debugLogging(blockposition, true, j, "actual start of destroying");
+                    this.lastSentState = k;
                 }
-            } else if (action == net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK) {
-                if (pos.equals(this.destroyPos)) {
-                    int j = this.gameTicks - this.destroyProgressStart;
-                    BlockState blockState = this.level.getBlockState(pos);
-                    if (!blockState.isAir()) {
-                        float g = blockState.getDestroyProgress(this.player, this.player.level, pos) * (float) (j + 1);
-                        if (g >= 0.7F) {
+            } else if (packetplayinblockdig_enumplayerdigtype == ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK) {
+                if (blockposition.equals(this.destroyPos)) {
+                    int l = this.gameTicks - this.destroyProgressStart;
+
+                    iblockdata = this.level.getBlockState(blockposition);
+                    if (!iblockdata.isAir()) {
+                        float f1 = iblockdata.getDestroyProgress(this.player, this.player.level, blockposition) * (float) (l + 1);
+
+                        if (f1 >= 0.7F) {
                             this.isDestroyingBlock = false;
-                            this.level.destroyBlockProgress(this.player.getId(), pos, -1);
-                            this.destroyAndAck(pos, sequence, "destroyed");
+                            this.level.destroyBlockProgress(this.player.getId(), blockposition, -1);
+                            this.destroyAndAck(blockposition, j, "destroyed");
                             return;
                         }
 
                         if (!this.hasDelayedDestroy) {
                             this.isDestroyingBlock = false;
                             this.hasDelayedDestroy = true;
-                            this.delayedDestroyPos = pos;
+                            this.delayedDestroyPos = blockposition;
                             this.delayedTickStart = this.destroyProgressStart;
                         }
                     }
                 }
 
-                this.debugLogging(pos, true, sequence, "stopped destroying");
-            } else if (action == net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.ABORT_DESTROY_BLOCK) {
+                this.debugLogging(blockposition, true, j, "stopped destroying");
+            } else if (packetplayinblockdig_enumplayerdigtype == ServerboundPlayerActionPacket.Action.ABORT_DESTROY_BLOCK) {
                 this.isDestroyingBlock = false;
-                if (!Objects.equals(this.destroyPos, pos)) {
-                    LOGGER.warn("Mismatch in destroy block pos: {} {}", this.destroyPos, pos);// Banner - remain warning
+                if (!Objects.equals(this.destroyPos, blockposition)) {
+                    LOGGER.debug("Mismatch in destroy block pos: {} {}", this.destroyPos, blockposition); // CraftBukkit - SPIGOT-5457 sent by client when interact event cancelled
                     this.level.destroyBlockProgress(this.player.getId(), this.destroyPos, -1);
-                    this.debugLogging(pos, true, sequence, "aborted mismatched destroying");
+                    this.debugLogging(blockposition, true, j, "aborted mismatched destroying");
                 }
 
-                this.level.destroyBlockProgress(this.player.getId(), pos, -1);
-                this.debugLogging(pos, true, sequence, "aborted destroying");
+                this.level.destroyBlockProgress(this.player.getId(), blockposition, -1);
+                this.debugLogging(blockposition, true, j, "aborted destroying");
 
-                CraftEventFactory.callBlockDamageAbortEvent(this.player, pos, this.player.getInventory().getSelected()); // CraftBukkit
+                CraftEventFactory.callBlockDamageAbortEvent(this.player, blockposition, this.player.getInventory().getSelected()); // CraftBukkit
             }
 
         }
