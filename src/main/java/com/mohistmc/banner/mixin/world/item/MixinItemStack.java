@@ -148,11 +148,6 @@ public abstract class MixinItemStack implements InjectionItemStack {
         }
     }
 
-    @Inject(method = "updateEmptyCacheFlag", at = @At("HEAD"))
-    private void banner$checkCache(CallbackInfo ci) {
-        if (this.emptyCacheFlag && ((ItemStack) (Object) this) == ItemStack.EMPTY) throw new AssertionError("TRAP"); // CraftBukkit
-    }
-
     @Override
     public void load(CompoundTag nbttagcompound) {
         this.loadNbt(nbttagcompound);

@@ -334,7 +334,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
 
     /**
      * @author wdog5
-     * @reason a bad way to handle destroy(use bug to fix bug)
+     * @reason a bad way to handle destroy(use bug to fix bug), bugs help bugs
      * TODO fix both of bugs
      */
     @Overwrite
