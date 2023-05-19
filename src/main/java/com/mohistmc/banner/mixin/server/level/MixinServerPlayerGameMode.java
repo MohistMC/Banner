@@ -1,6 +1,9 @@
 package com.mohistmc.banner.mixin.server.level;
 
+import com.ibm.icu.impl.coll.Collation;
 import com.mohistmc.banner.injection.server.level.InjectionServerPlayerGameMode;
+import com.mojang.datafixers.util.Pair;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -17,17 +20,21 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
@@ -47,10 +54,13 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -69,9 +79,6 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
 
     @Shadow
     protected abstract void debugLogging(BlockPos blockPos, boolean bl, int i, String string);
-
-    @Shadow
-    public abstract void destroyAndAck(BlockPos pos, int i, String string);
 
     @Shadow
     private GameType gameModeForPlayer;
@@ -95,6 +102,8 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
     @Shadow
     @Final
     private static Logger LOGGER;
+
+    @Shadow public abstract boolean destroyBlock(BlockPos pos);
 
     @Inject(method = "changeGameModeForPlayer", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayerGameMode;setGameModeForPlayer(Lnet/minecraft/world/level/GameType;Lnet/minecraft/world/level/GameType;)V"))
     private void banner$gameModeEvent(GameType gameType, CallbackInfoReturnable<Boolean> cir) {
@@ -322,6 +331,55 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
             }
         }
     }
+
+    /**
+     * @author wdog5
+     * @reason a bad way to handle destroy(use bug to fix bug)
+     * TODO fix both of bugs
+     */
+    @Overwrite
+    public void destroyAndAck(BlockPos pos, int i, String string) {
+        if (!player.isSpectator()) {
+            this.destroyBlock(pos);
+            if (!player.isCreative()) {
+                ObjectArrayList<Pair<ItemStack, BlockPos>> objectarraylist = new ObjectArrayList<>();
+                BlockState state = this.level.getBlockState(pos);
+                BlockEntity blockEntity = state.hasBlockEntity() ? this.level.getBlockEntity(pos) : null;
+                LootContext.Builder builder = (new LootContext.Builder(level))
+                        .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
+                        .withParameter(LootContextParams.TOOL, ItemStack.EMPTY)
+                        .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity);
+                state.spawnAfterBreak(level, pos, ItemStack.EMPTY, true);
+                state.getDrops(builder).forEach((itemStack) -> {
+                    banner$addBlockDrops(objectarraylist, itemStack, pos);
+                });
+                for (Pair<ItemStack, BlockPos> pair : objectarraylist) {
+                    Block.popResource(this.level, pair.getSecond(), pair.getFirst());
+                }
+                this.level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+            }
+        }
+    }
+
+    // Banner start - fool block drops adding
+    private static void banner$addBlockDrops(ObjectArrayList<Pair<ItemStack, BlockPos>> dropPositionArray, ItemStack stack, BlockPos pos) {
+        int i = dropPositionArray.size();
+
+        for(int j = 0; j < i; ++j) {
+            Pair<ItemStack, BlockPos> pair = (Pair)dropPositionArray.get(j);
+            ItemStack itemStack = (ItemStack)pair.getFirst();
+            if (ItemEntity.areMergable(itemStack, stack)) {
+                ItemStack itemStack2 = ItemEntity.merge(itemStack, stack, 16);
+                dropPositionArray.set(j, Pair.of(itemStack2, (BlockPos)pair.getSecond()));
+                if (stack.isEmpty()) {
+                    return;
+                }
+            }
+        }
+
+        dropPositionArray.add(Pair.of(stack, pos));
+    }
+    // Banner end
 
     @Inject(method = "destroyBlock", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/block/Block;playerWillDestroy(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/player/Player;)V",
