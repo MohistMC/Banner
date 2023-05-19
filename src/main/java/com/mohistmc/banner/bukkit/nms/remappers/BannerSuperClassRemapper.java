@@ -15,6 +15,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
+
 public class BannerSuperClassRemapper {
     public static Map<String, Class<?>> defineClass = Maps.newHashMap();
 
@@ -22,51 +23,45 @@ public class BannerSuperClassRemapper {
 
         boolean remapSpClass = false;
         switch (node.superName) {
-            case ASMUtils.urlclassLoaderdesc:
+            case ASMUtils.urlclassLoaderdesc -> {
                 node.superName = Type.getInternalName(DelegateURLClassLoder.class);
                 remapSpClass = true;
-                break;
-            case ASMUtils.classLoaderdesc:
+            }
+            case ASMUtils.classLoaderdesc -> {
                 defineClass.put(node.name + ";defineClass", DelegateClassLoder.class);
                 node.superName = Type.getInternalName(DelegateClassLoder.class);
                 remapSpClass = true;
-                break;
+            }
         }
         // https://github.com/Maxqia/ReflectionRemapper/blob/a75046eb0a864ad1f20b8f723ed467db614fff98/src/main/java/com/maxqia/ReflectionRemapper/Transformer.java#L68
         for (MethodNode method : node.methods) { // Taken from SpecialSource
             for (AbstractInsnNode next : method.instructions) {
-                if (next instanceof TypeInsnNode && next.getOpcode() == Opcodes.NEW) { // remap new URLClassLoader
-                    TypeInsnNode insn = (TypeInsnNode) next;
+                if (next instanceof TypeInsnNode insn && next.getOpcode() == Opcodes.NEW) { // remap new URLClassLoader
                     switch (insn.desc) {
-                        case ASMUtils.urlclassLoaderdesc:
+                        case ASMUtils.urlclassLoaderdesc -> {
                             insn.desc = Type.getInternalName(DelegateURLClassLoder.class);
                             remapSpClass = true;
-                            break;
-                        case ASMUtils.classLoaderdesc:
+                        }
+                        case ASMUtils.classLoaderdesc -> {
                             insn.desc = Type.getInternalName(DelegateClassLoder.class);
                             remapSpClass = true;
-                            break;
+                        }
                     }
                 }
 
-                if (next instanceof MethodInsnNode) {
-                    MethodInsnNode ins = (MethodInsnNode) next;
+                if (next instanceof MethodInsnNode ins) {
                     switch (ins.getOpcode()) {
-                        case Opcodes.INVOKEVIRTUAL:
-                            remapVirtual(next);
-                            break;
-                        case Opcodes.INVOKESPECIAL:
+                        case Opcodes.INVOKEVIRTUAL -> remapVirtual(next);
+                        case Opcodes.INVOKESPECIAL -> {
                             if (remapSpClass && ins.name.equals("<init>")) {
                                 switch (ins.owner) {
-                                    case ASMUtils.urlclassLoaderdesc:
-                                        ins.owner = Type.getInternalName(DelegateURLClassLoder.class);
-                                        break;
-                                    case ASMUtils.classLoaderdesc:
-                                        ins.owner = Type.getInternalName(DelegateClassLoder.class);
-                                        break;
+                                    case ASMUtils.urlclassLoaderdesc ->
+                                            ins.owner = Type.getInternalName(DelegateURLClassLoder.class);
+                                    case ASMUtils.classLoaderdesc ->
+                                            ins.owner = Type.getInternalName(DelegateClassLoder.class);
                                 }
                             }
-                            break;
+                        }
                     }
                 }
             }
