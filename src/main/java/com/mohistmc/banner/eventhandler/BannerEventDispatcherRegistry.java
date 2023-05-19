@@ -8,6 +8,7 @@ public class BannerEventDispatcherRegistry {
     public static void registerEventDispatchers() {
         BannerServer.LOGGER.info("Registering Banner Event Dispatchers...");
         LevelEventDispatcher.dispatchLevel();
+        BlockEventDispatcher.dispatchBlockEvents();
         PlayerEventDispatcher.dispatcherPlayer();
         EntityEventDispatcher.dispatchEntity();
         ReloadEventDispatcher.dispatchReload();

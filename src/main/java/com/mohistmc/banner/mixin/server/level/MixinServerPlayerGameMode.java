@@ -16,7 +16,6 @@ import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.Item;
@@ -32,11 +31,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -48,13 +45,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.ArrayList;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(ServerPlayerGameMode.class)
 public abstract class MixinServerPlayerGameMode implements InjectionServerPlayerGameMode {
@@ -265,89 +259,6 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
     public InteractionHand interactHand;
     public ItemStack interactItemStack;
 
-    private final AtomicReference<BlockBreakEvent> banner$event = new AtomicReference<>();
-
-
-    @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
-    private void banner$fireBreakEvent(BlockPos blockposition, CallbackInfoReturnable<Boolean> cir) {
-        BlockState iblockdata = this.level.getBlockState(blockposition);
-        // CraftBukkit start - fire BlockBreakEvent
-        org.bukkit.block.Block bblock = CraftBlock.at(level, blockposition);
-        BlockBreakEvent event = null;
-
-        if (this.player instanceof ServerPlayer) {
-            // Sword + Creative mode pre-cancel
-            boolean isSwordNoBreak = !this.player.getMainHandItem().getItem().canAttackBlock(iblockdata, this.level, blockposition, this.player);
-
-            // Tell client the block is gone immediately then process events
-            // Don't tell the client if its a creative sword break because its not broken!
-            if (level.getBlockEntity(blockposition) == null && !isSwordNoBreak) {
-                ClientboundBlockUpdatePacket packet = new ClientboundBlockUpdatePacket(blockposition, Blocks.AIR.defaultBlockState());
-                this.player.connection.send(packet);
-            }
-
-            event = new BlockBreakEvent(bblock, this.player.getBukkitEntity());
-            banner$event.set(event);
-
-            // Sword + Creative mode pre-cancel
-            event.setCancelled(isSwordNoBreak);
-
-            // Calculate default block experience
-            BlockState nmsData = this.level.getBlockState(blockposition);
-            Block nmsBlock = nmsData.getBlock();
-
-            ItemStack itemstack = this.player.getItemBySlot(EquipmentSlot.MAINHAND);
-
-            if (nmsBlock != null && !event.isCancelled() && !this.isCreative() && this.player.hasCorrectToolForDrops(nmsBlock.defaultBlockState())) {
-                event.setExpToDrop(nmsBlock.getExpDrop(nmsData, this.level, blockposition, itemstack, true));
-            }
-
-            this.level.getCraftServer().getPluginManager().callEvent(event);
-
-            if (event.isCancelled()) {
-                if (isSwordNoBreak) {
-                    cir.setReturnValue(false);
-                }
-                // Let the client know the block still exists
-                this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, blockposition));
-
-                // Brute force all possible updates
-                for (Direction dir : Direction.values()) {
-                    this.player.connection.send(new ClientboundBlockUpdatePacket(level, blockposition.relative(dir)));
-                }
-
-                // Update any tile entity data for this block
-                BlockEntity tileentity = this.level.getBlockEntity(blockposition);
-                if (tileentity != null) {
-                    this.player.connection.send(tileentity.getUpdatePacket());
-                }
-                cir.setReturnValue(false);
-            }
-        }
-    }
-
-    @Inject(method = "destroyBlock", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/block/Block;playerWillDestroy(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/player/Player;)V",
-            shift = At.Shift.BEFORE))
-    private void banner$setDrops(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        level.banner$setCaptureDrops(new ArrayList<>());
-    }
-
-    @Inject(method = "destroyBlock", at = @At("TAIL"), cancellable = true)
-    private void banner$fireDropEvent(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        org.bukkit.block.BlockState state = CraftBlock.at(level, pos).getState();
-        if (banner$event.get().isDropItems()) {
-            CraftEventFactory.handleBlockDropItemEvent(CraftBlock.at(level, pos), state, this.player, level.bridge$captureDrops());
-        }
-        level.banner$setCaptureDrops(null);
-
-        // Drop event experience
-        if (this.level.removeBlock(pos, false) && banner$event.get() != null) {
-            this.level.getBlockState(pos).getBlock().popExperience(this.level, pos, banner$event.get().getExpToDrop());
-        }
-        cir.setReturnValue(true);
-    }
-
     @Redirect(method = "destroyBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/Item;canAttackBlock(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;)Z"))
     private boolean banner$addFalse(Item instance, BlockState state, Level level, BlockPos pos, Player player) {
         return false && !this.player.getMainHandItem().getItem().canAttackBlock(state, this.level, pos, this.player);
@@ -356,30 +267,15 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
     @Inject(method = "destroyBlock",
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/server/level/ServerLevel;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;",
-            shift = At.Shift.BEFORE), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+            shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private void banner$resetState(BlockPos pos, CallbackInfoReturnable<Boolean> cir, BlockState blockState) {
         blockState = this.level.getBlockState(pos); // CraftBukkit - update state from plugins
         if (blockState.isAir()) cir.setReturnValue(false); // CraftBukkit - A plugin set block to air without cancelling
     }
 
-    @Redirect(method = "destroyBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayerGameMode;isCreative()Z"))
-    private boolean banner$setFalseCreative(ServerPlayerGameMode instance) {
-        return false;
-    }
-
-    @Redirect(method = "destroyBlock",
-            at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/block/Block;playerDestroy(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/BlockEntity;Lnet/minecraft/world/item/ItemStack;)V"))
-    private void banner$addEventCheck(Block block, Level level, Player player, BlockPos pos, BlockState blockState, BlockEntity blockEntity, ItemStack itemStack2) {
-        if (banner$event.get().isDropItems()) {
-            block.playerDestroy(this.level, this.player, pos, blockState, blockEntity, itemStack2);
-        }
-    }
-
     /**
      * @author wdog4
      * @reason
-     * @null
      */
     @Overwrite
     public InteractionResult useItemOn(ServerPlayer player, Level level, ItemStack stack, InteractionHand hand, BlockHitResult hitResult) {

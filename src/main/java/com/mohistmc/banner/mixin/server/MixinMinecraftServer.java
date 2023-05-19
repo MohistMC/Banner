@@ -10,8 +10,6 @@ import it.unimi.dsi.fastutil.longs.LongIterator;
 import jline.console.ConsoleReader;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import net.minecraft.CrashReport;
-import net.minecraft.ReportedException;
 import net.minecraft.Util;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
@@ -80,9 +78,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow public MinecraftServer.ReloadableResources resources;
 
     @Shadow public Map<ResourceKey<net.minecraft.world.level.Level>, ServerLevel> levels;
-    @Shadow private static void setInitialSpawn(ServerLevel level, ServerLevelData levelData, boolean generateBonusChest, boolean debug) {}
-    @Shadow protected abstract void setupDebugLevel(WorldData worldData);
-    @Shadow public WorldData worldData;
     @Shadow @Final public static org.slf4j.Logger LOGGER;
     @Shadow private long nextTickTime;
     @Shadow public abstract boolean isSpawningMonsters();
@@ -255,31 +250,10 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Override
     public void initWorld(ServerLevel serverWorld, ServerLevelData worldInfo, WorldData saveData, WorldOptions worldOptions) {
-        boolean flag = saveData.isDebugWorld();
         if ((serverWorld.bridge$generator() != null)) {
             serverWorld.getWorld().getPopulators().addAll(
                     serverWorld.bridge$generator().getDefaultPopulators(
                             (serverWorld.getWorld())));
-        }
-        WorldBorder worldborder = serverWorld.getWorldBorder();
-        worldborder.applySettings(worldInfo.getWorldBorder());
-        if (!worldInfo.isInitialized()) {
-            try {
-                setInitialSpawn(serverWorld, worldInfo, worldOptions.generateBonusChest(), flag);
-                worldInfo.setInitialized(true);
-                if (flag) {
-                    this.setupDebugLevel(this.worldData);
-                }
-            } catch (Throwable throwable) {
-                CrashReport crashreport = CrashReport.forThrowable(throwable, "Exception initializing level");
-                try {
-                    serverWorld.fillReportDetails(crashreport);
-                } catch (Throwable throwable2) {
-                    // empty catch block
-                }
-                throw new ReportedException(crashreport);
-            }
-            worldInfo.setInitialized(true);
         }
     }
 

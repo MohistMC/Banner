@@ -285,7 +285,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                     this.getProfiler().pop();
                 }
                 // CraftBukkit start
-                if (!this.captureBlockStates) { // Don't notify clients or update physics while capturing blockstates
+               if (!this.captureBlockStates) { // Don't notify clients or update physics while capturing blockstates
                     // Modularize client and physic updates
                     notifyAndUpdatePhysics(pos, levelChunk, blockState, state, blockState2, flags, recursionLeft);
                 }
@@ -387,11 +387,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     @Overwrite
     @Nullable
     public BlockEntity getBlockEntity(BlockPos pos) {
-        if (this.isOutsideBuildHeight(pos)) {
-            return null;
-        } else {
-            return !this.isClientSide && Thread.currentThread() != this.thread ? null : this.getChunkAt(pos).getBlockEntity(pos, LevelChunk.EntityCreationType.IMMEDIATE);
-        }
+        return getBlockEntity(pos, true);
     }
 
     @Override

@@ -94,7 +94,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -479,16 +478,18 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
             this.disconnect(Component.translatable("multiplayer.disconnect.invalid_player_movement"));
         } else {
             ServerLevel worldserver = this.player.getLevel();
-            if (!this.player.wonGame && ! this.player.isImmobile()) {
+
+            if (!this.player.wonGame && !this.player.isImmobile()) { // CraftBukkit
                 if (this.tickCount == 0) {
                     this.resetPosition();
                 }
+
                 if (this.awaitingPositionFromClient != null) {
                     if (this.tickCount - this.awaitingTeleportTime > 20) {
                         this.awaitingTeleportTime = this.tickCount;
                         this.teleport(this.awaitingPositionFromClient.x, this.awaitingPositionFromClient.y, this.awaitingPositionFromClient.z, this.player.getYRot(), this.player.getXRot());
                     }
-                    this.allowedPlayerTicks = 20;
+                    this.allowedPlayerTicks = 20; // CraftBukkit
                 } else {
                     this.awaitingTeleportTime = this.tickCount;
                     double d0 = clampHorizontal(packetplayinflying.getX(this.player.getX()));
@@ -553,9 +554,9 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                             if (!this.player.isChangingDimension() && (!this.player.getLevel().getGameRules().getBoolean(GameRules.RULE_DISABLE_ELYTRA_MOVEMENT_CHECK) || !this.player.isFallFlying())) {
                                 float f2 = this.player.isFallFlying() ? 300.0F : 100.0F;
 
-                                if (d11 - d10 > Math.max(f2, Math.pow((double) (org.spigotmc.SpigotConfig.movedTooQuicklyMultiplier * (float) i * speed), 2)) && !this.isSingleplayerOwner()) {
+                                if (d11 - d10 > Math.max(f2, Math.pow((double) (10.0F * (float) i * speed), 2)) && !this.isSingleplayerOwner()) {
                                     // CraftBukkit end
-                                    LOGGER.warn("{} moved too quickly! {},{},{}", this.player.getName().getString(), d7, d8, d9);
+                                    LOGGER.warn("{} moved too quickly! {},{},{}", new Object[]{this.player.getName().getString(), d7, d8, d9});
                                     this.teleport(this.player.getX(), this.player.getY(), this.player.getZ(), this.player.getYRot(), this.player.getXRot());
                                     return;
                                 }
@@ -572,8 +573,10 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                                 this.player.jumpFromGround();
                             }
 
+                            boolean flag1 = this.player.verticalCollisionBelow;
+
                             this.player.move(MoverType.PLAYER, new Vec3(d7, d8, d9));
-                            this.player.onGround = packetplayinflying.isOnGround();
+                            this.player.onGround = packetplayinflying.isOnGround(); // CraftBukkit - SPIGOT-5810, SPIGOT-5835, SPIGOT-6828: reset by this.player.move
                             double d12 = d8;
 
                             d7 = d0 - this.player.getX();
@@ -584,51 +587,72 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
 
                             d9 = d2 - this.player.getZ();
                             d11 = d7 * d7 + d8 * d8 + d9 * d9;
-                            boolean flag1 = false;
+                            boolean flag2 = false;
 
-                            if (!this.player.isChangingDimension() && d11 > org.spigotmc.SpigotConfig.movedWronglyThreshold && !this.player.isSleeping() && !this.player.gameMode.isCreative() && this.player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR) { // Spigot
-                                flag1 = true;
+                            if (!this.player.isChangingDimension() && d11 > 0.0625D && !this.player.isSleeping() && !this.player.gameMode.isCreative() && this.player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR) {
+                                flag2 = true;
                                 LOGGER.warn("{} moved wrongly!", this.player.getName().getString());
                             }
 
                             this.player.absMoveTo(d0, d1, d2, f, f1);
-                            if (!this.player.noPhysics && !this.player.isSleeping() && (flag1 && worldserver.noCollision(this.player, axisalignedbb) || this.isPlayerCollidingWithAnythingNew((LevelReader) worldserver, axisalignedbb))) {
+                            if (!this.player.noPhysics && !this.player.isSleeping() && (flag2 && worldserver.noCollision(this.player, axisalignedbb) || this.isPlayerCollidingWithAnythingNew(worldserver, axisalignedbb))) {
                                 this.internalTeleport(d3, d4, d5, f, f1, Collections.emptySet()); // CraftBukkit - SPIGOT-1807: Don't call teleport event, when the client thinks the player is falling, because the chunks are not loaded on the client yet.
                                 this.player.doCheckFallDamage(this.player.getY() - d6, packetplayinflying.isOnGround());
                             } else {
+                                // CraftBukkit start - fire PlayerMoveEvent
+                                // Rest to old location first
                                 this.player.absMoveTo(prevX, prevY, prevZ, prevYaw, prevPitch);
-                                CraftPlayer player = this.getCraftPlayer();
-                                Location from = new Location(player.getWorld(), this.lastPosX, this.lastPosY, this.lastPosZ, this.lastYaw, this.lastPitch);
-                                Location to = player.getLocation().clone();
+
+                                Player player = this.getCraftPlayer();
+                                Location from = new Location(player.getWorld(), lastPosX, lastPosY, lastPosZ, lastYaw, lastPitch); // Get the Players previous Event location.
+                                Location to = player.getLocation().clone(); // Start off the To location as the Players current location.
+
+                                // If the packet contains movement information then we update the To location with the correct XYZ.
                                 if (packetplayinflying.hasPos) {
                                     to.setX(packetplayinflying.x);
                                     to.setY(packetplayinflying.y);
                                     to.setZ(packetplayinflying.z);
                                 }
+
+                                // If the packet contains look information then we update the To location with the correct Yaw & Pitch.
                                 if (packetplayinflying.hasRot) {
                                     to.setYaw(packetplayinflying.yRot);
                                     to.setPitch(packetplayinflying.xRot);
                                 }
-                                double delta = Math.pow(this.lastPosX - to.getX(), 2.0) + Math.pow(this.lastPosY - to.getY(), 2.0) + Math.pow(this.lastPosZ - to.getZ(), 2.0);
+
+                                // Prevent 40 event-calls for less than a single pixel of movement >.>
+                                double delta = Math.pow(this.lastPosX - to.getX(), 2) + Math.pow(this.lastPosY - to.getY(), 2) + Math.pow(this.lastPosZ - to.getZ(), 2);
                                 float deltaAngle = Math.abs(this.lastYaw - to.getYaw()) + Math.abs(this.lastPitch - to.getPitch());
-                                if ((delta > 1f / 256 || deltaAngle > 10f) && ! this.player.isImmobile()) {
+
+                                if ((delta > 1f / 256 || deltaAngle > 10f) && !this.player.isImmobile()) {
                                     this.lastPosX = to.getX();
                                     this.lastPosY = to.getY();
                                     this.lastPosZ = to.getZ();
                                     this.lastYaw = to.getYaw();
                                     this.lastPitch = to.getPitch();
+
+                                    // Skip the first time we do this
                                     if (from.getX() != Double.MAX_VALUE) {
                                         Location oldTo = to.clone();
                                         PlayerMoveEvent event = new PlayerMoveEvent(player, from, to);
                                         this.cserver.getPluginManager().callEvent(event);
+
+                                        // If the event is cancelled we move the player back to their old location.
                                         if (event.isCancelled()) {
-                                            this.teleport(from);
+                                            teleport(from);
                                             return;
                                         }
+
+                                        // If a Plugin has changed the To destination then we teleport the Player
+                                        // there to avoid any 'Moved wrongly' or 'Moved too quickly' errors.
+                                        // We only do this if the Event was not cancelled.
                                         if (!oldTo.equals(event.getTo()) && !event.isCancelled()) {
-                                            getCraftPlayer().teleport(event.getTo(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                                            this.player.getBukkitEntity().teleport(event.getTo(), PlayerTeleportEvent.TeleportCause.PLUGIN);
                                             return;
                                         }
+
+                                        // Check to see if the Players Location has some how changed during the call of the event.
+                                        // This can happen due to a plugin teleporting the player instead of using .setTo()
                                         if (!from.equals(this.getCraftPlayer().getLocation()) && this.justTeleported) {
                                             this.justTeleported = false;
                                             return;
@@ -636,10 +660,9 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                                     }
                                 }
                                 this.player.absMoveTo(d0, d1, d2, f, f1); // Copied from above
-
-                                // MC-135989, SPIGOT-5564: isRiptiding
-                                this.clientIsFloating = d12 >= -0.03125D && this.player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR && !this.server.isFlightAllowed() && !this.player.getAbilities().mayfly && !this.player.hasEffect(MobEffects.LEVITATION) && !this.player.isFallFlying() && this.noBlocksAround((Entity) this.player) && !this.player.isAutoSpinAttack();
                                 // CraftBukkit end
+
+                                this.clientIsFloating = d12 >= -0.03125D && !flag1 && this.player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR && !this.server.isFlightAllowed() && !this.player.getAbilities().mayfly && !this.player.hasEffect(MobEffects.LEVITATION) && !this.player.isFallFlying() && !this.player.isAutoSpinAttack() && this.noBlocksAround(this.player);
                                 this.player.getLevel().getChunkSource().move(this.player);
                                 this.player.doCheckFallDamage(this.player.getY() - d6, packetplayinflying.isOnGround());
                                 this.player.setOnGround(packetplayinflying.isOnGround());
