@@ -19,9 +19,6 @@ public class BannerServer implements DedicatedServerModInitializer {
 
     @Override
     public void onInitializeServer() {
-        if (System.getProperty("log4j.configurationFile") == null) {
-            System.setProperty("log4j.configurationFile", "log4j2_banner.xml");
-        }
         InjectionInfo.register(EjectorInfo.class);
         BannerEventDispatcherRegistry.registerEventDispatchers();
     }

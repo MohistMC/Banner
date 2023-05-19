@@ -83,6 +83,9 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void onLoad(String mixinPackage) {
+        if (System.getProperty("log4j.configurationFile") == null) {
+            System.setProperty("log4j.configurationFile", "log4j2_banner.xml");
+        }
         LOGGER.info(" _____       ___   __   _   __   _   _____   _____   ");
         LOGGER.info("|  _  \\     /   | |  \\ | | |  \\ | | | ____| |  _  \\  ");
         LOGGER.info("| |_| |    / /| | |   \\| | |   \\| | | |__   | |_| |  ");
