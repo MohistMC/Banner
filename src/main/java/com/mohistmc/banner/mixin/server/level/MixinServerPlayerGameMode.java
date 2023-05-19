@@ -45,7 +45,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Objects;
 
@@ -270,6 +269,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
         return false && !this.player.getMainHandItem().getItem().canAttackBlock(state, this.level, pos, this.player);
     }
 
+    /*
     @Inject(method = "destroyBlock",
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/server/level/ServerLevel;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;",
@@ -277,7 +277,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
     private void banner$resetState(BlockPos pos, CallbackInfoReturnable<Boolean> cir, BlockState blockState) {
         blockState = this.level.getBlockState(pos); // CraftBukkit - update state from plugins
         if (blockState.isAir()) cir.setReturnValue(false); // CraftBukkit - A plugin set block to air without cancelling
-    }
+    }*/
 
     /**
      * @author wdog4
