@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.server.players;
 
 import com.google.common.collect.Lists;
+import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import com.mohistmc.banner.injection.server.players.InjectionPlayerList;
@@ -184,11 +185,9 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         }
     }
 
-    @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
-    private void banner$addNewPlayer(ServerLevel instance, ServerPlayer player) {
-        if (player.level == instance && !instance.players().contains(player)) {
-            instance.addNewPlayer(player);
-        }
+    @WrapWithCondition(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
+    private boolean banner$addNewPlayer(ServerLevel instance, ServerPlayer player) {
+        return player.level == instance && !instance.players().contains(player);
     }
 
     @ModifyVariable(method = "placeNewPlayer", ordinal = 1, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))

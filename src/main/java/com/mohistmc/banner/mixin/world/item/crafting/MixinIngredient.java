@@ -9,19 +9,18 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(Ingredient.class)
+@Mixin(value = Ingredient.class)
 public abstract class MixinIngredient implements InjectionIngredient {
 
     @Shadow public abstract ItemStack[] getItems();
 
     public boolean exact; // CraftBukkit
 
-    @Inject(method = "test(Lnet/minecraft/world/item/ItemStack;)Z", at = @At(value = "INVOKE",
-    target = "Lnet/minecraft/world/item/crafting/Ingredient;getItems()[Lnet/minecraft/world/item/ItemStack;",
-    shift = At.Shift.BEFORE), cancellable = true)
+    @Inject(method = "test(Lnet/minecraft/world/item/ItemStack;)Z",
+            at = @At("HEAD"),
+            cancellable = true)
     private void banner$test(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        ItemStack[] banner$items = this.getItems();
-        for (ItemStack banner$stack : banner$items) {
+        for (ItemStack banner$stack : this.getItems()) {
             // CraftBukkit start
             if (exact) {
                 if (banner$stack.getItem() == banner$stack.getItem() && ItemStack.tagMatches(stack, banner$stack)) {
