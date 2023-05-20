@@ -259,7 +259,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
         }
     }
 
-    @Inject(method = "actuallyHurt", cancellable = true, at = @At("HEAD"))
+    @Inject(method = "actuallyHurt", at = @At("HEAD"), cancellable = true)
     private void banner$damageEntityCustom(DamageSource damageSrc, float damageAmount, CallbackInfo ci) {
         damageEntity0(damageSrc, damageAmount);
         ci.cancel();
