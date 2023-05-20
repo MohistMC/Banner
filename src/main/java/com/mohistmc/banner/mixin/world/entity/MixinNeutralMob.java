@@ -34,4 +34,8 @@ public interface MixinNeutralMob extends InjectionNeutralMob {
         this.setTarget((LivingEntity) null);
         this.setRemainingPersistentAngerTime(0);
     }
+
+    @Override
+    boolean setTarget(@Nullable LivingEntity entityliving, EntityTargetEvent.TargetReason reason, boolean fireEvent);
+
 }

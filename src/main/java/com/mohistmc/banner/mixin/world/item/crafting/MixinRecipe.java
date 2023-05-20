@@ -6,4 +6,8 @@ import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(Recipe.class)
 public interface MixinRecipe extends InjectionRecipe {
+
+    @Override
+   org.bukkit.inventory.Recipe toBukkitRecipe();
+
 }

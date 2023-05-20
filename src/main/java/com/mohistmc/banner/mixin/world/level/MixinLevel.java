@@ -24,6 +24,7 @@ import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WritableLevelData;
@@ -472,6 +473,9 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         }
         return null;
     }
+
+    @Override
+    public abstract ResourceKey<LevelStem> getTypeKey();
 
     @Override
     public BiomeProvider bridge$biomeProvider() {
