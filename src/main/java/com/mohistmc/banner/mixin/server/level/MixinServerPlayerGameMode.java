@@ -342,6 +342,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
         if (!player.isSpectator()) {
             this.destroyBlock(pos);
             BlockState state = this.level.getBlockState(pos);
+            this.level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
             player.connection.send(new ClientboundBlockUpdatePacket(pos, state)); // Banner - let client know this block has been updated
             if (!player.isCreative()) {
                 ObjectArrayList<Pair<ItemStack, BlockPos>> objectarraylist = new ObjectArrayList<>();
@@ -358,6 +359,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
                     Block.popResource(this.level, pair.getSecond(), pair.getFirst());
                 }
                 this.level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+                player.connection.send(new ClientboundBlockUpdatePacket(pos, state)); // Banner - let client know this block has been updated
             }
         }
     }
