@@ -287,11 +287,55 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                 // CraftBukkit start
                if (!this.captureBlockStates) { // Don't notify clients or update physics while capturing blockstates
                     // Modularize client and physic updates
-                    notifyAndUpdatePhysics(pos, levelChunk, blockState, state, blockState2, flags, recursionLeft);
-                }
+                   // Banner start - copy method content to this to compat mixins
+                   BlockState iblockdata = state;
+                   BlockState iblockdata1 = blockState;
+                   BlockState iblockdata2 = blockState2;
+                   if (iblockdata2 == iblockdata) {
+                       if (iblockdata1 != iblockdata2) {
+                           this.setBlocksDirty(pos, iblockdata1, iblockdata2);
+                       }
+
+                       if ((flags & 2) != 0 && (!this.isClientSide || (flags & 4) == 0) && (this.isClientSide || levelChunk == null || (levelChunk.getFullStatus() != null && levelChunk.getFullStatus().isOrAfter(ChunkHolder.FullChunkStatus.TICKING)))) { // allow chunk to be null here as chunk.isReady() is false when we send our notification during block placement
+                           this.sendBlockUpdated(pos, iblockdata1, iblockdata, flags);
+                       }
+
+                       if ((flags & 1) != 0) {
+                           this.blockUpdated(pos, iblockdata1.getBlock());
+                           if (!this.isClientSide && iblockdata.hasAnalogOutputSignal()) {
+                               this.updateNeighbourForOutputSignal(pos, state.getBlock());
+                           }
+                       }
+
+                       if ((flags & 16) == 0 && recursionLeft > 0) {
+                           int k = flags & -34;
+
+                           // CraftBukkit start
+                           iblockdata1.updateIndirectNeighbourShapes(((Level) (Object) this), pos, k, recursionLeft - 1); // Don't call an event for the old block to limit event spam
+                           CraftWorld world = ((ServerLevel) (Object) this).getWorld();
+                           if (world != null) {
+                               BlockPhysicsEvent event = new BlockPhysicsEvent(world.getBlockAt(pos.getX(), pos.getY(), pos.getZ()), CraftBlockData.fromData(iblockdata));
+                               this.getCraftServer().getPluginManager().callEvent(event);
+
+                               if (event.isCancelled()) {
+                                   return false;
+                               }
+                           }
+                           // CraftBukkit end
+                           iblockdata.updateNeighbourShapes(((Level) (Object) this), pos, k, recursionLeft - 1);
+                           iblockdata.updateIndirectNeighbourShapes(((Level) (Object) this), pos, k, recursionLeft - 1);
+                       }
+
+                       // CraftBukkit start - SPIGOT-5710
+                       if (!preventPoiUpdated) {
+                           this.onBlockStateChange(pos, iblockdata1, iblockdata2);
+                       }
+                       // CraftBukkit end
+                   }                }
                 // CraftBukkit end
                 return true;
             }
+            // Banner end
         }
     }
 

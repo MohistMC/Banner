@@ -46,8 +46,7 @@ Using
   
 Compatiblity
 ------
-If you use c2me, should change the config value of c2me "noTickViewDistance" to false
-if you use lithium,should write the config value of it, "mixin.block.hopper" to false
+- If you use lithium,should write the config value of it, "mixin.block.hopper" to false
 
 Upstream Projects
 ------

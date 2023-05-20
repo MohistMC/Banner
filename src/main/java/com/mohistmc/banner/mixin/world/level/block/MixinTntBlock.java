@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
+import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -29,10 +30,14 @@ public class MixinTntBlock {
     private AtomicReference<BlockPos> banner$originPos = new AtomicReference<>();
     private AtomicReference<Player> banner$useTntPlayer = new AtomicReference<>();
 
-    @Redirect(method = "onPlace", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;hasNeighborSignal(Lnet/minecraft/core/BlockPos;)Z"))
-    private boolean banner$addTntCheck(Level level, BlockPos pos) {
-        return level.hasNeighborSignal(pos)
-                && CraftEventFactory.callTNTPrimeEvent(level, pos, TNTPrimeEvent.PrimeCause.REDSTONE, null, null); // CraftBukkit - TNTPrimeEvent
+    @WrapWithCondition(method = "onPlace", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/TntBlock;explode(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V"))
+    private boolean banner$warpTntEvent(Level level, BlockPos pos) {
+        return CraftEventFactory.callTNTPrimeEvent(level, pos, TNTPrimeEvent.PrimeCause.REDSTONE, null, null); // CraftBukkit - TNTPrimeEvent
+    }
+
+    @WrapWithCondition(method = "onPlace", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;removeBlock(Lnet/minecraft/core/BlockPos;Z)Z"))
+    private boolean banner$warpTntEvent0(Level level, BlockPos pos, boolean isMoving) {
+        return CraftEventFactory.callTNTPrimeEvent(level, pos, TNTPrimeEvent.PrimeCause.REDSTONE, null, null); // CraftBukkit - TNTPrimeEvent
     }
 
     @Inject(method = "neighborChanged", at = @At("HEAD"))
