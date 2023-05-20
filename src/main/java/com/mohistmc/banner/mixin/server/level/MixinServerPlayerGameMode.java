@@ -341,10 +341,10 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
     public void destroyAndAck(BlockPos pos, int i, String string) {
         if (!player.isSpectator()) {
             this.destroyBlock(pos);
-            this.level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+            BlockState state = this.level.getBlockState(pos);
+            player.connection.send(new ClientboundBlockUpdatePacket(pos, state)); // Banner - let client know this block has been updated
             if (!player.isCreative()) {
                 ObjectArrayList<Pair<ItemStack, BlockPos>> objectarraylist = new ObjectArrayList<>();
-                BlockState state = this.level.getBlockState(pos);
                 BlockEntity blockEntity = state.hasBlockEntity() ? this.level.getBlockEntity(pos) : null;
                 LootContext.Builder builder = (new LootContext.Builder(level))
                         .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
