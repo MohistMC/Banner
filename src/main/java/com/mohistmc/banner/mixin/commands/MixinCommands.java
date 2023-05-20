@@ -111,10 +111,9 @@ public abstract class MixinCommands implements InjectionCommands {
         }
 
         // Handle vanilla commands;
-        /*
         if (sender.getLevel().getCraftServer().getCommandBlockOverride(args[0])) {
             args[0] = "minecraft:" + args[0];
-        }*/
+        }
 
         String newCommand = joiner.join(args);
         return this.performPrefixedCommand(sender, newCommand, newCommand);
