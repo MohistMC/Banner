@@ -44,6 +44,11 @@ Using
 - Please put it in the mods folder
 - Remember that Banner is still in WIP, Do not use it in production environment
   
+Compatiblity
+------
+If you use c2me, should change the config value of c2me "noTickViewDistance" to false
+if you use lithium,should write the config value of it, "mixin.block.hopper" to false
+
 Upstream Projects
 ------
 * [**FabricLoader**](https://github.com/FabricMC/fabric-loader.git) - mod load support.
