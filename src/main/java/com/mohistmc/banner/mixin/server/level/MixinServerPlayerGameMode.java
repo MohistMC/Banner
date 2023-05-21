@@ -339,7 +339,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
      */
     @Overwrite
     public void destroyAndAck(BlockPos pos, int i, String string) {
-        if (!player.isSpectator()) {
+        if (!player.isSpectator() && this.level.mayInteract(player, pos)) {
             this.destroyBlock(pos);
             BlockState state = this.level.getBlockState(pos);
             this.level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
