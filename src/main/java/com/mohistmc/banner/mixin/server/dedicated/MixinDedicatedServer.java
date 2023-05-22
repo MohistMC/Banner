@@ -73,7 +73,7 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         // CraftBukkit end
     }
 
-    @Inject(method = "initServer", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/rcon/thread/RconThread;create(Lnet/minecraft/server/ServerInterface;)Lnet/minecraft/server/rcon/thread/RconThread;"))
+    @Inject(method = "initServer", at = @At(value = "FIELD", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/dedicated/DedicatedServerProperties;enableRcon:Z"))
     public void banner$setRcon(CallbackInfoReturnable<Boolean> cir) {
         this.banner$setRemoteConsole(new CraftRemoteConsoleCommandSender(this.rconConsoleSource));
     }
