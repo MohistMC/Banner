@@ -59,7 +59,7 @@ public class MixinAbstractTreeGrower implements InjectionAbstractTreeGrower {
         } else if (worldgentreeabstract == TreeFeatures.CHERRY || worldgentreeabstract == TreeFeatures.CHERRY_BEES_005) {
             BukkitExtraConstants.treeType = TreeType.CHERRY;
         } else {
-            throw new IllegalArgumentException("Unknown tree generator " +  worldgentreeabstract);
+           BukkitExtraConstants.treeType = TreeType.CUSTOM;// Banner - add field to handle modded trees
         }
     }
     // CraftBukkit end
