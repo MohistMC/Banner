@@ -39,6 +39,17 @@ Progress
     * [ ] It can be compilable and running
     * [ ] But the compatibility with plugins is poor
 
+
+install (for Linux)
+------
+- Need `wget` and `curl`
+```bash
+cd ./<your-server-folder>
+wget https://gist.github.com/8MiYile/388bca9fe4a59c9b2f889dd7760d3e8f/raw/97740e34de136753ecf80cec435368166ee03b2f/banner-launcher
+chmod +x ./banner-launcher
+./banner-launcher -i
+```
+
 Using
 ------
 - Please put it in the mods folder
