@@ -29,17 +29,22 @@ public class MixinHangingEntityItem {
 
     @Inject(method = "useOn", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD,
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/HangingEntity;playPlacementSound()V"))
-    public void banner$hangingPlace(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir, BlockPos blockPos, Direction direction, BlockPos blockPos1, net.minecraft.world.entity.player.Player playerEntity, ItemStack itemStack, Level world, HangingEntity hangingEntity) {
-        if (!DistValidate.isValid(context)) return;
+    public void banner$hangingPlace(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir,
+                                    BlockPos blockPos, Direction direction, BlockPos blockPos1,
+                                    net.minecraft.world.entity.player.Player playerEntity,
+                                    ItemStack itemStack, Level world, HangingEntity hangingEntity) {
+        // CraftBukkit start - fire HangingPlaceEvent
         Player who = (context.getPlayer() == null) ? null : (Player) context.getPlayer().getBukkitEntity();
-        Block blockClicked = CraftBlock.at(world, blockPos);
-        BlockFace blockFace = CraftBlock.notchToBlockFace(direction);
+        org.bukkit.block.Block blockClicked = world.getWorld().getBlockAt(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+        org.bukkit.block.BlockFace blockFace = CraftBlock.notchToBlockFace(direction);
+        org.bukkit.inventory.EquipmentSlot hand = CraftEquipmentSlot.getHand(context.getHand());
 
-        HangingPlaceEvent event = new HangingPlaceEvent((Hanging) hangingEntity.getBukkitEntity(), who, blockClicked, blockFace, CraftEquipmentSlot.getHand(context.getHand()), CraftItemStack.asBukkitCopy(itemStack));
-        Bukkit.getPluginManager().callEvent(event);
+        HangingPlaceEvent event = new HangingPlaceEvent((org.bukkit.entity.Hanging) ((HangingEntity) hangingEntity).getBukkitEntity(), who, blockClicked, blockFace, hand, CraftItemStack.asBukkitCopy(itemStack));
+        world.getCraftServer().getPluginManager().callEvent(event);
 
         if (event.isCancelled()) {
             cir.setReturnValue(InteractionResult.FAIL);
         }
+        // CraftBukkit end
     }
 }

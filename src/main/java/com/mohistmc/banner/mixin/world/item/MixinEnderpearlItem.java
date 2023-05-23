@@ -1,21 +1,21 @@
 package com.mohistmc.banner.mixin.world.item;
 
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrownEnderpearl;
 import net.minecraft.world.item.EnderpearlItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(EnderpearlItem.class)
 public class MixinEnderpearlItem extends Item {
@@ -24,33 +24,24 @@ public class MixinEnderpearlItem extends Item {
         super(properties);
     }
 
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    public @NotNull InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, @NotNull InteractionHand handIn) {
-        ItemStack itemstack = playerIn.getItemInHand(handIn);
-        if (!worldIn.isClientSide) {
-            ThrownEnderpearl enderpearlentity = new ThrownEnderpearl(worldIn, playerIn);
-            enderpearlentity.setItem(itemstack);
-            enderpearlentity.shootFromRotation(playerIn, playerIn.getXRot(), playerIn.getYRot(), 0.0F, 1.5F, 1.0F);
-            if (!worldIn.addFreshEntity(enderpearlentity)) {
-                if (playerIn instanceof ServerPlayer) {
-                    ((ServerPlayer) playerIn).getBukkitEntity().updateInventory();
-                }
-                return new InteractionResultHolder<>(InteractionResult.FAIL, itemstack);
+    @Redirect(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    private boolean banner$cancelEntityAdd(Level instance, Entity entity) {
+        return false;
+    }
+
+    @Inject(method = "use", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z",
+            shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    private void banner$handleAdding(Level level, Player player, InteractionHand usedHand,
+                                     CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir,
+                                     ItemStack itemStack, ThrownEnderpearl thrownEnderpearl) {
+        // CraftBukkit start - change order
+        if (!level.addFreshEntity(thrownEnderpearl)) {
+            if (player instanceof ServerPlayer) {
+                ((ServerPlayer) player).getBukkitEntity().updateInventory();
             }
+            cir.setReturnValue(InteractionResultHolder.fail(itemStack));
         }
-
-        worldIn.playSound(null, playerIn.getX(), playerIn.getY(), playerIn.getZ(), SoundEvents.ENDER_PEARL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (worldIn.getRandom().nextFloat() * 0.4F + 0.8F));
-        playerIn.getCooldowns().addCooldown(this, 20);
-
-        playerIn.awardStat(Stats.ITEM_USED.get(this));
-        if (!playerIn.getAbilities().instabuild) {
-            itemstack.shrink(1);
-        }
-
-        return InteractionResultHolder.sidedSuccess(itemstack, worldIn.isClientSide());
+        // CraftBukkit end
     }
 }
