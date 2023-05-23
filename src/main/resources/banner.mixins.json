@@ -63,6 +63,7 @@
     "server.commands.MixinSpreadPlayersCommand",
     "server.commands.MixinSummonCommand",
     "server.commands.MixinTimeCommand",
+    "server.commands.MixinTriggerCommand",
     "server.dedicated.MixinDedicatedServer",
     "server.gui.MixinMinecraftServerGui",
     "server.level.MixinChunkHolder",
