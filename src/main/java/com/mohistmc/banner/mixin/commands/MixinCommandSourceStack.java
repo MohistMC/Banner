@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Mixin(CommandSourceStack.class)
 public abstract class MixinCommandSourceStack implements InjectionCommandSourceStack {
 
@@ -29,7 +30,6 @@ public abstract class MixinCommandSourceStack implements InjectionCommandSourceS
     @Shadow @Final public CommandSource source;
     public volatile CommandNode currentCommand; // CraftBukkit
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     @Inject(method = "hasPermission", cancellable = true, at = @At("HEAD"))
     public void banner$checkPermission(int level, CallbackInfoReturnable<Boolean> cir) {
         CommandNode currentCommand =  this.currentCommand;

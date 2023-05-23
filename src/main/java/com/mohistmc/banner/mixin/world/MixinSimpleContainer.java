@@ -22,8 +22,8 @@ public abstract class MixinSimpleContainer implements Container, StackedContents
 
     // @formatter:off
     @Shadow @Final public NonNullList<ItemStack> items;
+    @Shadow @Final private int size;
     // @formatter:on
-    private static final int MAX_STACK = 64;
     private int maxStack = MAX_STACK;
     protected InventoryHolder bukkitOwner;
     public List<HumanEntity> transaction = new ArrayList<>();
@@ -35,6 +35,13 @@ public abstract class MixinSimpleContainer implements Container, StackedContents
     public void banner$constructor(int numSlots, InventoryHolder owner) {
         this.banner$constructor(numSlots);
         this.bukkitOwner = owner;
+    }
+
+    public void banner$constructor(SimpleContainer original) {
+        this.banner$constructor(this.size);
+        for (int slot = 0; slot < this.size; slot++) {
+            this.items.set(slot, original.items.get(slot).copy());
+        }
     }
 
     @Override

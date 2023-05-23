@@ -66,6 +66,6 @@ public abstract class MixinCompoundContainer implements Container {
 
     @Override
     public Location getLocation() {
-        return this.container1.getLocation();
+        return this.container1.getLocation(); // TODO: right?
     }
 }

@@ -15,6 +15,7 @@
   "mixins": [
     "MixinCrashReport",
     "advancement.MixinAdvancement",
+    "advancement.MixinAdvancementList",
     "commands.MixinCommandNode",
     "commands.MixinCommands",
     "commands.MixinCommandSource",
@@ -22,6 +23,7 @@
     "commands.MixinCommandSourceStack",
     "commands.arguments.MixinEntityArgument",
     "commands.arguments.blocks.MixinBlockStateParser",
+    "commands.arguments.selector.MixinEntitySelector",
     "commands.arguments.selector.MixinEntitySelectorParser",
     "core.dispenser.MixinAbstractProjectileDispenseBehavior",
     "core.dispenser.MixinBoatDispenseItemBehavior",
