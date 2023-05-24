@@ -32,6 +32,7 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
@@ -275,7 +276,7 @@ public abstract class MixinItemStack implements InjectionItemStack {
                     }
                     player.awardStat(Stats.ITEM_USED.get(item)); // SPIGOT-7236 - award stat
                 }
-                //ItemSign.openSign = null; // SPIGOT-6758 - Reset on early return // Banner - cancel
+                BukkitExtraConstants.openSign = null; // SPIGOT-6758 - Reset on early return // Banner - cancel
                 return interactionResult;
             }
             world.banner$setCaptureTreeGeneration(false);
@@ -306,7 +307,7 @@ public abstract class MixinItemStack implements InjectionItemStack {
                     for (Direction dir : Direction.values()) {
                         ((ServerPlayer) player).connection.send(new ClientboundBlockUpdatePacket(world, placedPos.relative(dir)));
                     }
-                    //ItemSign.openSign = null; // SPIGOT-6758 - Reset on early return // Banner - cancel
+                    BukkitExtraConstants.openSign = null; // SPIGOT-6758 - Reset on early return // Banner - cancel
                 } else {
                     // Change the stack to its new contents if it hasn't been tampered with.
                     if (this.getCount() == oldCount && Objects.equals(this.tag, oldData)) {
@@ -370,17 +371,14 @@ public abstract class MixinItemStack implements InjectionItemStack {
                         }
                     }
 
-                    // Banner start
-                    /*
                     // SPIGOT-4678
-                    if (this.item instanceof ItemSign && ItemSign.openSign != null) {
+                    if (this.item instanceof SignItem && BukkitExtraConstants.openSign != null) {
                         try {
-                            entityhuman.openTextEdit((TileEntitySign) world.getBlockEntity(ItemSign.openSign));
+                            player.openTextEdit((SignBlockEntity) world.getBlockEntity(BukkitExtraConstants.openSign));
                         } finally {
-                            ItemSign.openSign = null;
+                            BukkitExtraConstants.openSign = null;
                         }
-                    }*/
-                    // Banner end
+                    }
 
                     // SPIGOT-7315: Moved from BlockBed#setPlacedBy
                     if (placeEvent != null && this.item instanceof BedItem) {

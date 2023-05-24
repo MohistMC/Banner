@@ -8,10 +8,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MerchantOffer.class)
-public class MixinMerchantOffer implements InjectionMerchantOffer {
+public abstract class MixinMerchantOffer implements InjectionMerchantOffer {
 
     // @formatter:off
     @Shadow public ItemStack baseCostA;
@@ -19,6 +20,8 @@ public class MixinMerchantOffer implements InjectionMerchantOffer {
 
     @Shadow
     private int demand;
+
+    @Shadow public abstract ItemStack getCostA();
 
     private CraftMerchantRecipe bukkitHandle;
 
@@ -41,5 +44,15 @@ public class MixinMerchantOffer implements InjectionMerchantOffer {
         if (this.baseCostA.getCount() <= 0) {
             cir.setReturnValue(ItemStack.EMPTY);
         }
+    }
+
+    @Redirect(method = "take", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/item/ItemStack;shrink(I)V"))
+    private void banner$shrink(ItemStack instance, int decrement) {
+        // CraftBukkit start
+        if (!this.getCostA().isEmpty()) {
+            instance.shrink(this.getCostA().getCount());
+        }
+        // CraftBukkit end
     }
 }

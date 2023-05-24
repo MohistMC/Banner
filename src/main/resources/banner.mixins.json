@@ -315,6 +315,7 @@
     "world.item.MixinPlayerHeadItem",
     "world.item.MixinPotionItem",
     "world.item.MixinRecordItem",
+    "world.item.MixinSignItem",
     "world.item.MixinSnowballItem",
     "world.item.MixinSpawnEggItem",
     "world.item.MixinStandingAndWallBlockItem",

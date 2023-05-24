@@ -43,6 +43,13 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
                                     ),
                                     ImmutableList.of()
                             )
+                    ).put("net.minecraft.world.item.SignItem",
+                            Maps.immutableEntry(
+                                    ImmutableList.of(
+                                            new FieldNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.T_BOOLEAN, "openSign", "Lnet/minecraft/core/BlockPos;", null, null)
+                                    ),
+                                    ImmutableList.of()
+                            )
                     )
                     .put("net.minecraft.world.level.block.ComposterBlock",
                             Maps.immutableEntry(

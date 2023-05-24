@@ -41,6 +41,7 @@ import java.util.Comparator;
 public class BukkitExtraConstants {
 
     public static TreeType treeType; // CraftBukkit
+    public static BlockPos openSign; // CraftBukkit
     public static int bridge$autosavePeriod;
     public static java.util.Queue<Runnable> bridge$processQueue =
             new java.util.concurrent.ConcurrentLinkedQueue<>();

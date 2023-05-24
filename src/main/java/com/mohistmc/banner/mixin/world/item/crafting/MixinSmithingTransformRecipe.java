@@ -31,10 +31,12 @@ public abstract class MixinSmithingTransformRecipe implements SmithingRecipe {
     @Shadow @Final
     ItemStack result;
 
+    // CraftBukkit start
     @Override
     public Recipe toBukkitRecipe() {
         CraftItemStack result = CraftItemStack.asCraftMirror(this.result);
         CraftSmithingTransformRecipe recipe = new CraftSmithingTransformRecipe(CraftNamespacedKey.fromMinecraft(this.id), result, CraftRecipe.toBukkit(this.template), CraftRecipe.toBukkit(this.base), CraftRecipe.toBukkit(this.addition));
         return recipe;
     }
+    // CraftBukkit end
 }
