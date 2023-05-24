@@ -22,7 +22,7 @@ public class PluginFixManager {
             return helloWorld(clazz, "net.minecraft.nbt.ListTag", "hello.World");
         }
         if (className.equals("net.ess3.nms.refl.providers.ReflServerStateProvider")) {
-            return helloWorld(clazz, "u", "method_3828");
+            return helloWorld(clazz, "u", "U");
         }
         return clazz;
     }
