@@ -82,7 +82,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -269,11 +272,9 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         return this.isRaining() && this.isThundering() && this.bridge$spigotConfig().thunderChance > 0;
     }
 
-    @Redirect(method = "tickChunk", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/util/RandomSource;nextInt(I)I",
-            ordinal = 0))
-    private int banner$resetChance(RandomSource instance, int i) {
-        return this.random.nextInt(this.bridge$spigotConfig().thunderChance);
+    @ModifyConstant(method = "tickChunk", constant = @Constant(intValue = 100000))
+    private int banner$configChane(int constant) {
+        return this.bridge$spigotConfig().thunderChance;
     }
 
     @Override
