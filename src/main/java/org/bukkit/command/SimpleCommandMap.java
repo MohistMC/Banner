@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.mohistmc.banner.command.DumpCommand;
 import com.mohistmc.banner.command.ModListCommand;
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -38,7 +39,8 @@ public class SimpleCommandMap implements CommandMap {
         register("bukkit", new ReloadCommand("reload"));
         register("bukkit", new PluginsCommand("plugins"));
         register("bukkit", new TimingsCommand("timings"));
-        register("bukkit", new ModListCommand("fabricmods"));
+        register("banner", new ModListCommand("fabricmods"));
+        register("banner", new DumpCommand("dump"));
     }
 
     public void setFallbackCommands() {
