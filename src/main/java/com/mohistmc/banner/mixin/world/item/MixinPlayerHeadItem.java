@@ -19,9 +19,8 @@ public abstract class MixinPlayerHeadItem extends Item {
         super(properties);
     }
 
-    @Inject(method = "verifyTagAfterLoad", at = @At("TAIL"),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$verifyTag(CompoundTag compoundTag, CallbackInfo ci, GameProfile gameProfile) {
+    @Inject(method = "verifyTagAfterLoad", at = @At("TAIL"))
+    private void banner$verifyTag(CompoundTag compoundTag, CallbackInfo ci) {
       if (!compoundTag.contains("SkullOwner", 8) && StringUtils.isBlank(compoundTag.getString("SkullOwner"))) {
           ListTag textures = compoundTag.getCompound("SkullOwner").getCompound("Properties").getList("textures", 10); // Safe due to method contracts
           for (net.minecraft.nbt.Tag texture : textures) {

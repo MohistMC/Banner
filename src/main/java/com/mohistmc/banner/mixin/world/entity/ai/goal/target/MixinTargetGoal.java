@@ -1,4 +1,4 @@
-package com.mohistmc.banner.mixin.world.entity.ai.goal;
+package com.mohistmc.banner.mixin.world.entity.ai.goal.target;
 
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;

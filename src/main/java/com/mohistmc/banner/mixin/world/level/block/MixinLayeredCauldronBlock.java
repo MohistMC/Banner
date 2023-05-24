@@ -36,17 +36,17 @@ public class MixinLayeredCauldronBlock {
 
     @Redirect(method = "lowerFillLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
     private static boolean banner$lowerFill(Level level, BlockPos pos, BlockState state, BlockState old) {
-        return BukkitCauldronHooks.changeLevel(old, level, pos, state, BukkitCauldronHooks.getEntity(), BukkitCauldronHooks.getReason());
+        return BukkitCauldronHooks.changeLevel(level, pos, state, BukkitCauldronHooks.getEntity(), BukkitCauldronHooks.getReason());
     }
 
     @Redirect(method = "handlePrecipitation", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
     private boolean banner$precipitation(Level level, BlockPos pos, BlockState state, BlockState old) {
-        return BukkitCauldronHooks.changeLevel(old, level, pos, state, null, CauldronLevelChangeEvent.ChangeReason.NATURAL_FILL);
+        return BukkitCauldronHooks.changeLevel(level, pos, state, null, CauldronLevelChangeEvent.ChangeReason.NATURAL_FILL);
     }
 
     @Eject(method = "receiveStalactiteDrip", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
     private boolean banner$drip(Level level, BlockPos pos, BlockState state, CallbackInfo ci, BlockState old) {
-        if (BukkitCauldronHooks.changeLevel(old, level, pos, state, null, CauldronLevelChangeEvent.ChangeReason.NATURAL_FILL)) {
+        if (BukkitCauldronHooks.changeLevel(level, pos, state, null, CauldronLevelChangeEvent.ChangeReason.NATURAL_FILL)) {
             return true;
         } else {
             ci.cancel();
