@@ -190,6 +190,9 @@ accessible method net/minecraft/world/entity/animal/Bee$BeePollinateGoal stopPol
 accessible method net/minecraft/world/entity/animal/Fox addTrustedUUID (Ljava/util/UUID;)V
 accessible method net/minecraft/world/entity/animal/sniffer/Sniffer calculateDigPosition ()Ljava/util/Optional;
 accessible method net/minecraft/server/network/ServerGamePacketListenerImpl$EntityInteraction run (Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;
+accessible method net/minecraft/world/level/NaturalSpawner$SpawnState canSpawn (Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/chunk/ChunkAccess;)Z
+accessible method net/minecraft/world/level/NaturalSpawner$SpawnState afterSpawn (Lnet/minecraft/world/entity/Mob;Lnet/minecraft/world/level/chunk/ChunkAccess;)V
+accessible method net/minecraft/world/level/NaturalSpawner$SpawnState canSpawnForCategory (Lnet/minecraft/world/entity/MobCategory;Lnet/minecraft/world/level/ChunkPos;)Z
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C
@@ -540,6 +543,7 @@ accessible field net/minecraft/world/inventory/StonecutterMenu access Lnet/minec
 accessible field net/minecraft/world/entity/vehicle/MinecartTNT fuse I
 accessible field net/minecraft/world/entity/animal/allay/Allay duplicationCooldown J
 accessible field net/minecraft/world/entity/animal/allay/Allay jukeboxPos Lnet/minecraft/core/BlockPos;
+accessible field net/minecraft/world/level/NaturalSpawner MAGIC_NUMBER I
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;

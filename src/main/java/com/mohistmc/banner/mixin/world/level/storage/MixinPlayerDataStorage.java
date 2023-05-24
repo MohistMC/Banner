@@ -56,8 +56,10 @@ public class MixinPlayerDataStorage implements InjectionPlayerDataStorage {
         return null;
     }
 
+    // CraftBukkit start
     @Override
     public File getPlayerDir() {
         return this.playerDir;
     }
+    // CraftBukkit end
 }
