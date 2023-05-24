@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.spawner;
 
+import com.mohistmc.banner.injection.world.level.spawner.InjectionSpawnState;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.ChunkPos;
@@ -10,7 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(NaturalSpawner.SpawnState.class)
-public class MixinNaturalSpawner_SpawnState {
+public class MixinNaturalSpawner_SpawnState implements InjectionSpawnState {
 
     @Shadow @Final private int spawnableChunkCount;
 
@@ -19,7 +20,8 @@ public class MixinNaturalSpawner_SpawnState {
     @Shadow @Final private LocalMobCapCalculator localMobCapCalculator;
 
     // CraftBukkit start
-    boolean canSpawnForCategory(MobCategory enumcreaturetype, ChunkPos chunkcoordintpair, int limit) {
+    @Override
+    public boolean canSpawnForCategory(MobCategory enumcreaturetype, ChunkPos chunkcoordintpair, int limit) {
         int i = limit * this.spawnableChunkCount / NaturalSpawner.MAGIC_NUMBER;
         // CraftBukkit end
 

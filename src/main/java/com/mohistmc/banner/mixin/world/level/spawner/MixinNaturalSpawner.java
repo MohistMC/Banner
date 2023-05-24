@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.spawner;
 
+import com.mohistmc.banner.injection.world.level.spawner.InjectionSpawnState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
@@ -103,7 +104,7 @@ public abstract class MixinNaturalSpawner {
                 continue;
             }
 
-            if ((flag || !enumcreaturetype.isFriendly()) && (flag1 || enumcreaturetype.isFriendly()) && (flag2 || !enumcreaturetype.isPersistent()) && spawnercreature_d.canSpawnForCategory(enumcreaturetype, chunk.getPos())) {
+            if ((flag || !enumcreaturetype.isFriendly()) && (flag1 || enumcreaturetype.isFriendly()) && (flag2 || !enumcreaturetype.isPersistent()) && ((InjectionSpawnState) spawnercreature_d).canSpawnForCategory(enumcreaturetype, chunk.getPos(), limit)) {
                 // CraftBukkit end
                 Objects.requireNonNull(spawnercreature_d);
                 NaturalSpawner.SpawnPredicate spawnercreature_c = spawnercreature_d::canSpawn;
