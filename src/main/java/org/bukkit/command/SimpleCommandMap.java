@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.mohistmc.banner.command.DumpCommand;
+import com.mohistmc.banner.command.GetPluginListCommand;
 import com.mohistmc.banner.command.ModListCommand;
+import com.mohistmc.banner.command.PluginCommand;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.command.defaults.BukkitCommand;
@@ -41,6 +43,8 @@ public class SimpleCommandMap implements CommandMap {
         register("bukkit", new TimingsCommand("timings"));
         register("banner", new ModListCommand("fabricmods"));
         register("banner", new DumpCommand("dump"));
+        register("banner", new PluginCommand("plugin"));
+        register("banner", new GetPluginListCommand("getpluginlist"));
     }
 
     public void setFallbackCommands() {
@@ -283,4 +287,10 @@ public class SimpleCommandMap implements CommandMap {
             }
         }
     }
+
+    // Banner start - add methods to support plugin manager
+    public Map<String, Command> getKnownCommands() {
+        return knownCommands;
+    }
+    // Banner - end
 }

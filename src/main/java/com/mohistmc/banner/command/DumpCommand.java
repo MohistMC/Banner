@@ -14,6 +14,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
@@ -25,9 +26,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class DumpCommand extends Command {
+public class DumpCommand extends BukkitCommand {
     private final List<String> tab_cmd = Arrays.asList("potions", "enchants", "cbcmds", "entitytypes", "biomes", "pattern", "worldtype", "bukkit_material", "vanilla_material");
-    private final List<String> tab_mode = Arrays.asList("file", "web");
+    private final List<String> tab_mode = List.of("file");
 
     public DumpCommand(String name) {
         super(name);
@@ -189,10 +190,6 @@ public class DumpCommand extends Command {
 
     private void dumpmsg(CommandSender sender, File file, String type) {
         sender.sendMessage("Successfully dump " + type + ", output path: " + file.getAbsolutePath());
-    }
-
-    private void dumpmsg(CommandSender sender, String web, String type) {
-        sender.sendMessage("Successfully dump " + type + ", output path: " + web);
     }
 
     private void dump(CommandSender sender, String type, StringBuilder sb, String mode) {

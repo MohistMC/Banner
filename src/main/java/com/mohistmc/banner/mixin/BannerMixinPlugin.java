@@ -8,6 +8,7 @@ import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.library.Library;
 import com.mohistmc.banner.library.LibraryManager;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.server.Main;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.Opcodes;
@@ -97,6 +98,11 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void onLoad(String mixinPackage) {
+        try {
+            com.mohistmc.banner.BannerConfig.init(new File("banner.yml"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         if (System.getProperty("log4j.configurationFile") == null) {
             System.setProperty("log4j.configurationFile", "log4j2_banner.xml");
         }

@@ -115,4 +115,9 @@ public class BannerConfig {
         return config.getDouble( path, config.getDouble( path ) );
     }
 
+    public static String banner_lang;
+
+    private static void getLang() {
+        banner_lang = getString("banner.lang", "xx_XX");
+    }
 }
