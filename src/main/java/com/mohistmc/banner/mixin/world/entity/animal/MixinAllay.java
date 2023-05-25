@@ -48,7 +48,7 @@ public abstract class MixinAllay extends PathfinderMob implements InjectionAllay
     }
 
     @Inject(method = "mobInteract", cancellable = true, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/animal/allay/Allay;duplicateAllay()V"))
-    private void banner$cancelDuplicate(Player p_218361_, InteractionHand p_218362_, CallbackInfoReturnable<InteractionResult> cir) {
+    private void banner$cancelDuplicate(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
         var allay = banner$duplicate;
         banner$duplicate = null;
         if (allay == null) {

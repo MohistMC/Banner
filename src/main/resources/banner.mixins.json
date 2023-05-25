@@ -177,7 +177,7 @@
     "world.entity.animal.MixinWolf",
     "world.entity.animal.axolotl.MixinAxolotl",
     "world.entity.animal.frog.MixinTadpole",
-    "world.entity.animal.goal.MixinGoat",
+    "world.entity.animal.goat.MixinGoat",
     "world.entity.animal.horse.MixinAbstractHorse",
     "world.entity.animal.horse.MixinLlama",
     "world.entity.animal.horse.MixinTraderLlama_FollowTraderGoal",
