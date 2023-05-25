@@ -20,8 +20,7 @@ public class MixinClientboundSetBorderCenterPacket {
 
     @Inject(method = "<init>(Lnet/minecraft/world/level/border/WorldBorder;)V", at = @At("RETURN"))
     private void banner$nether(WorldBorder border, CallbackInfo ci) {
-        var level =  border.bridge$world();
-        this.newCenterX = border.getCenterX() * (level != null ? level.dimensionType().coordinateScale() : 1.0);
-        this.newCenterZ = border.getCenterZ() * (level != null ? level.dimensionType().coordinateScale() : 1.0);
+        this.newCenterX = border.getCenterX() * (border.bridge$world() != null ? border.bridge$world().dimensionType().coordinateScale() : 1.0);
+        this.newCenterZ = border.getCenterZ() * (border.bridge$world() != null ? border.bridge$world().dimensionType().coordinateScale() : 1.0);
     }
 }

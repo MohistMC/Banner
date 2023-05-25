@@ -51,6 +51,13 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
                                     ),
                                     ImmutableList.of()
                             )
+                    ).put("net.minecraft.network.chat.ChatType",
+                            Maps.immutableEntry(
+                                    ImmutableList.of(
+                                            new FieldNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, "RAW", "Lnet/minecraft/resources/ResourceKey;", null, null)
+                                    ),
+                                    ImmutableList.of()
+                            )
                     )
                     .put("net.minecraft.world.level.block.ComposterBlock",
                             Maps.immutableEntry(

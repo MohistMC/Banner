@@ -1748,4 +1748,14 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     public void teleport(Location dest) {
         this.internalTeleport(dest.getX(), dest.getY(), dest.getZ(), dest.getYaw(), dest.getPitch(), Collections.emptySet());
     }
+
+    @Override
+    public boolean bridge$processedDisconnect() {
+        return processedDisconnect;
+    }
+
+    @Override
+    public void setProcessedDisconnect(boolean processedDisconnect) {
+        this.processedDisconnect = processedDisconnect;
+    }
 }

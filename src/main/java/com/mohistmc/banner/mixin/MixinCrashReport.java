@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin;
 
 import net.minecraft.CrashReport;
 import net.minecraft.SystemReport;
+import org.bukkit.craftbukkit.v1_19_R3.CraftCrashReport;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,6 +17,6 @@ public abstract class MixinCrashReport {
 
     @Inject(method = "<init>", at = @At(value = "TAIL"))
     private void banner$init(CallbackInfo ci) {
-        this.systemReport.setDetail("CraftBukkit Information", new org.bukkit.craftbukkit.v1_19_R3.CraftCrashReport()); // CraftBukkit
+        this.systemReport.setDetail("CraftBukkit Information", new CraftCrashReport()); // CraftBukkit
     }
 }

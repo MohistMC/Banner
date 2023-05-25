@@ -23,7 +23,12 @@ public abstract class MixinLegacySmithingMenu extends ItemCombinerMenu {
         super(menuType, i, inventory, containerLevelAccess);
     }
 
-    @Redirect(method = "createResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/ResultContainer;setItem(ILnet/minecraft/world/item/ItemStack;)V"))
+    @Redirect(method = "createResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/ResultContainer;setItem(ILnet/minecraft/world/item/ItemStack;)V", ordinal = 0))
+    private void banner$prepareSmithing0(ResultContainer instance, int slot, ItemStack stack) {
+        CraftEventFactory.callPrepareSmithingEvent(getBukkitView(), ItemStack.EMPTY);
+    }
+
+    @Redirect(method = "createResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/ResultContainer;setItem(ILnet/minecraft/world/item/ItemStack;)V", ordinal = 1))
     private void banner$prepareSmithing(ResultContainer craftResultInventory, int index, ItemStack stack) {
         CraftEventFactory.callPrepareSmithingEvent(getBukkitView(), stack);
     }
