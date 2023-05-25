@@ -76,7 +76,7 @@ public abstract class MixinEnchantmentMenu extends AbstractContainerMenu{
 
     /**
      * @author wdog5
-     * @reason
+     * @reason bukkit
      */
     @Overwrite
     public boolean clickMenuButton(net.minecraft.world.entity.player.Player player, int id) {
@@ -172,7 +172,7 @@ public abstract class MixinEnchantmentMenu extends AbstractContainerMenu{
 
     /**
      * @author wdog5
-     * @reason
+     * @reason bukkit
      */
     @Overwrite
     public void slotsChanged(Container container) {

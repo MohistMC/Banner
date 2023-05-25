@@ -26,7 +26,7 @@ public abstract class MixinBarrelBlockEntity extends RandomizableContainerBlockE
 
     // CraftBukkit start - add fields and methods
     public List<HumanEntity> transaction = new ArrayList<>();
-    private int maxStack = LARGE_MAX_STACK_SIZE;
+    private int maxStack = MAX_STACK;
 
     @Override
     public List<ItemStack> getContents() {

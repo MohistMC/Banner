@@ -29,7 +29,7 @@ public abstract class MixinDispenserBlockEntity extends RandomizableContainerBlo
     // @formatter:on
 
     public List<HumanEntity> transaction = new ArrayList<>();
-    private int maxStack = LARGE_MAX_STACK_SIZE;
+    private int maxStack = MAX_STACK;
 
     @Override
     public List<ItemStack> getContents() {
@@ -57,7 +57,7 @@ public abstract class MixinDispenserBlockEntity extends RandomizableContainerBlo
 
     @Override
     public int getMaxStackSize() {
-        if (maxStack == 0) maxStack = LARGE_MAX_STACK_SIZE;
+        if (maxStack == 0) maxStack = MAX_STACK;
         return maxStack;
     }
 

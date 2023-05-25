@@ -33,7 +33,7 @@ public abstract class MixinBrewingStandBlockEntity extends BaseContainerBlockEnt
 
     @Shadow private NonNullList<ItemStack> items;
     public List<HumanEntity> transaction = new ArrayList<>();
-    private int maxStack = LARGE_MAX_STACK_SIZE;
+    private int maxStack = MAX_STACK;
 
     protected MixinBrewingStandBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
@@ -105,7 +105,7 @@ public abstract class MixinBrewingStandBlockEntity extends BaseContainerBlockEnt
 
     @Override
     public int getMaxStackSize() {
-        if (maxStack == 0) maxStack = LARGE_MAX_STACK_SIZE;
+        if (maxStack == 0) maxStack = MAX_STACK;
         return maxStack;
     }
 

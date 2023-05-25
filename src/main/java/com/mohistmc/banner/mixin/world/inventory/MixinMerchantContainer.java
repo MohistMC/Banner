@@ -62,7 +62,7 @@ public abstract class MixinMerchantContainer implements Container {
 
     @Override
     public int getMaxStackSize() {
-        if (maxStack == 0) maxStack = LARGE_MAX_STACK_SIZE;
+        if (maxStack == 0) maxStack = MAX_STACK;
         return this.maxStack;
     }
 

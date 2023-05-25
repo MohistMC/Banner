@@ -24,7 +24,7 @@ public abstract class MixinChestBoat extends Boat implements HasCustomInventoryS
     @Shadow private NonNullList<ItemStack> itemStacks;
 
     public List<HumanEntity> transaction = new ArrayList<>();
-    private int maxStack = LARGE_MAX_STACK_SIZE;
+    private int maxStack = MAX_STACK;
 
     public MixinChestBoat(EntityType<? extends Boat> entityType, Level level) {
         super(entityType, level);

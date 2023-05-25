@@ -293,6 +293,7 @@
     "world.inventory.MixinPlayerEnderChestContainer",
     "world.inventory.MixinResultContainer",
     "world.inventory.MixinShulkerBoxMenu",
+    "world.inventory.MixinSmithingMenu",
     "world.inventory.MixinStonecutterMenu",
     "world.inventory.MixinStonecutterMenu1",
     "world.item.MixinArmorItem",

@@ -62,7 +62,7 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
     // @formatter:on
 
     public List<HumanEntity> transaction = new ArrayList<>();
-    private int maxStack = LARGE_MAX_STACK_SIZE;
+    private int maxStack = MAX_STACK;
     private static AbstractFurnaceBlockEntity banner$captureFurnace;
     private static Player banner$capturePlayer;
     private static ItemStack banner$item;
@@ -170,7 +170,7 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
 
     @Override
     public int getMaxStackSize() {
-        if (maxStack == 0) maxStack = LARGE_MAX_STACK_SIZE;
+        if (maxStack == 0) maxStack = MAX_STACK;
         return maxStack;
     }
 

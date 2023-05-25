@@ -21,8 +21,8 @@ import java.util.function.Function;
 @Mixin(BabyFollowAdult.class)
 public class MixinBabyFollowAdult {
 
-    @Inject(method = "method_46900", at = @At(value = "NEW",
-            target = "Lnet/minecraft/world/entity/ai/memory/WalkTarget;<init>(Lnet/minecraft/world/entity/ai/behavior/PositionTracker;FI)V"),
+    @Inject(method = "method_46900", require = 2, at = @At(value = "NEW",
+            args = "class=net/minecraft/world/entity/ai/memory/WalkTarget"),
             locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private static void banner$targetEvent(BehaviorBuilder.Instance instance, MemoryAccessor memoryAccessor,
                                            UniformInt uniformInt, Function function, MemoryAccessor memoryAccessor2,

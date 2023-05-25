@@ -31,7 +31,7 @@ public abstract class MixinCraftingContainer implements Container, InjectionCraf
     private Recipe<?> currentRecipe;
     public Container resultInventory;
     private Player owner;
-    private int maxStack = LARGE_MAX_STACK_SIZE;
+    private int maxStack = MAX_STACK;
 
     public void banner$constructor(AbstractContainerMenu eventHandlerIn, int width, int height) {
         throw new RuntimeException();

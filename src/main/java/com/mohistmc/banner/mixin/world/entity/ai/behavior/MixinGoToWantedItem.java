@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 public class MixinGoToWantedItem {
 
     @Inject(method = "method_46945", at = @At(value = "NEW",
-            target = "Lnet/minecraft/world/entity/ai/memory/WalkTarget;<init>(Lnet/minecraft/world/entity/ai/behavior/PositionTracker;FI)V"),
+            args = "class=net/minecraft/world/entity/ai/memory/WalkTarget"),
             locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private static void banner$targetEvent(BehaviorBuilder.Instance instance, MemoryAccessor memoryAccessor,
                                            MemoryAccessor memoryAccessor2, Predicate predicate, int i, float f,
