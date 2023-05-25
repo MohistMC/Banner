@@ -34,7 +34,10 @@ public abstract class MixinSculkShriekerBlock extends Block {
 
     @Override
     public int getExpDrop(BlockState blockState, ServerLevel world, BlockPos blockPos, ItemStack itemStack, boolean flag) {
-        return this.banner$tryDropExperience(world, blockPos, itemStack, ConstantInt.of(5));
+        if (flag) {
+            return this.banner$tryDropExperience(world, blockPos, itemStack, ConstantInt.of(5));
+        }
+        return 0;
     }
 
 }

@@ -9,12 +9,12 @@ import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.bukkit.craftbukkit.v1_19_R3.map.RenderData;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
 import org.bukkit.map.MapCursor;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -38,7 +38,7 @@ public abstract class MixinMapItemSavedData_HoldingPlayer {
 
     /**
      * @author wdog5
-     * @reason
+     * @reason bukkit
      */
     @Overwrite
     @Nullable

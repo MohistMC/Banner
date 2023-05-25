@@ -20,8 +20,8 @@ public interface MixinNeighborUpdater {
 
     @Inject(method = "executeUpdate",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/block/state/BlockState;neighborChanged(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;Lnet/minecraft/core/BlockPos;Z)V",
-                    shift = At.Shift.BEFORE), cancellable = true)
+                    target = "Lnet/minecraft/world/level/block/state/BlockState;neighborChanged(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;Lnet/minecraft/core/BlockPos;Z)V"),
+            cancellable = true)
     private static void banner$redstoneEvent(Level level, BlockState state, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving, CallbackInfo ci) {
         // CraftBukkit start
         CraftWorld cworld = ((ServerLevel) level).getWorld();
