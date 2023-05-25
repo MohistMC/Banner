@@ -134,7 +134,7 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
         libraries.add(new Library("org.fusesource.jansi", "jansi", "1.18", MD5, "6ee32de8880da9f02552474f60ab6fbd"));
         libraries.add(new Library("jline", "jline", "2.14.6", MD5, "480423551649bc6980b43f09e4717272"));
         libraries.add(new Library("com.googlecode.json-simple", "json-simple", "1.1.1", MD5, "5cc2c478d73e8454b4c369cee66c5bc7"));
-        libraries.add(new Library("org.xerial", "sqlite-jdbc", "3.41.0.0", MD5, "0d63ee5b583e9a75ea1717ffce63fed8"));
+        libraries.add(new Library("org.xerial", "sqlite-jdbc", "3.42.0.0", MD5, "6a46db3a6f38043ffb7e6782708cd401"));
         libraries.add(new Library("com.mysql", "mysql-connector-j", "8.0.32", MD5, "25bf3b3cd262065283962078dc82e99c"));
         libraries.add(new Library("net.md-5", "SpecialSource", "1.11.0", MD5, "815529d90faff79cb61c12f47a4259b5"));
         libraries.add(new Library("net.md-5", "bungeecord-chat", "1.16-R0.4", MD5, "bf6464395a0951675c3bca47d3e1a13a"));

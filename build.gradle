@@ -65,7 +65,7 @@ dependencies {
 	modImplementation "org.fusesource.jansi:jansi:1.18"
 	modImplementation "jline:jline:2.14.6"
 	modImplementation "com.googlecode.json-simple:json-simple:1.1.1"
-	modImplementation "org.xerial:sqlite-jdbc:3.41.0.0"
+	modImplementation "org.xerial:sqlite-jdbc:3.42.0.0"
 	modImplementation "com.mysql:mysql-connector-j:8.0.32"
 
 	modImplementation "net.md-5:SpecialSource:1.11.0"

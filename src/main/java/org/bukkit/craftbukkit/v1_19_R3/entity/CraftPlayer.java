@@ -70,6 +70,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.sign.Side;
 import org.bukkit.configuration.serialization.DelegateDeserialization;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
@@ -2047,6 +2048,10 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         CraftSign.openSign(sign, this);
     }
 
+    @Override
+    public void openSign(@NotNull Sign sign, @NotNull Side side) {
+        openSign(sign); // todo implement per side
+    }
     @Override
     public void showDemoScreen() {
         if (getHandle().connection == null) return;
