@@ -35,7 +35,7 @@ public abstract class MixinVibrationListener {
 
     /**
      * @author wdog5
-     * @reason
+     * @reason bukkit
      */
     @Overwrite
     public boolean handleGameEvent(ServerLevel worldserver, GameEvent gameevent, GameEvent.Context gameevent_a, Vec3 vec3d) {
