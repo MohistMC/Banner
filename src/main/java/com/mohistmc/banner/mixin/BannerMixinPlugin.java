@@ -98,11 +98,6 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void onLoad(String mixinPackage) {
-        try {
-            com.mohistmc.banner.BannerConfig.init(new File("banner.yml"));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
         if (System.getProperty("log4j.configurationFile") == null) {
             System.setProperty("log4j.configurationFile", "log4j2_banner.xml");
         }
@@ -115,6 +110,11 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
         LOGGER.info("Welcome to Mohist Banner ! - Mohist Developement Group" + " - " + BannerServer.getVersion() + ", Java " + BannerServer.javaVersion);
         LOGGER.info("Loading libraries, please wait...");
         loadLibs();
+        try {
+            com.mohistmc.banner.BannerConfig.init(new File("banner.yml"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void loadLibs() {
