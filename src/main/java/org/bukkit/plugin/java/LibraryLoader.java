@@ -1,128 +1,104 @@
 // CHECKSTYLE:OFF
 package org.bukkit.plugin.java;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.bukkit.nms.proxy.DelegateURLClassLoder;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.util.thread.NamedThreadFactory;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.collection.CollectRequest;
-import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
-import org.eclipse.aether.graph.Dependency;
-import org.eclipse.aether.impl.DefaultServiceLocator;
-import org.eclipse.aether.repository.LocalRepository;
-import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.repository.RepositoryPolicy;
-import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.resolution.DependencyRequest;
-import org.eclipse.aether.resolution.DependencyResolutionException;
-import org.eclipse.aether.resolution.DependencyResult;
-import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
-import org.eclipse.aether.spi.connector.transport.TransporterFactory;
-import org.eclipse.aether.transfer.AbstractTransferListener;
-import org.eclipse.aether.transfer.TransferCancelledException;
-import org.eclipse.aether.transfer.TransferEvent;
-import org.eclipse.aether.transport.http.HttpTransporterFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-class LibraryLoader
-{
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-    private final Logger logger;
-    private final RepositorySystem repository;
-    private final DefaultRepositorySystemSession session;
-    private final List<RemoteRepository> repositories;
+class LibraryLoader {
 
-    public LibraryLoader(@NotNull Logger logger)
-    {
-        this.logger = logger;
 
-        DefaultServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
-        locator.addService( RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class );
-        locator.addService( TransporterFactory.class, HttpTransporterFactory.class );
+    public static final ScheduledExecutorService LIBRARYLOADER = new ScheduledThreadPoolExecutor(10, new NamedThreadFactory("LibraryLoader"));
 
-        this.repository = locator.getService( RepositorySystem.class );
-        this.session = MavenRepositorySystemUtils.newSession();
-
-        session.setChecksumPolicy( RepositoryPolicy.CHECKSUM_POLICY_FAIL );
-        session.setLocalRepositoryManager( repository.newLocalRepositoryManager( session, new LocalRepository( "libraries" ) ) );
-        session.setTransferListener( new AbstractTransferListener()
-        {
-            @Override
-            public void transferStarted(@NotNull TransferEvent event) throws TransferCancelledException
-            {
-                logger.log( Level.INFO, "Downloading {0}", event.getResource().getRepositoryUrl() + event.getResource().getResourceName() );
-            }
-        } );
-        session.setReadOnly();
-
-        this.repositories = repository.newResolutionRepositories( session, Arrays.asList( new RemoteRepository.Builder( "central", "default", "https://repo.maven.apache.org/maven2" ).build() ) );
+    public LibraryLoader() {
     }
 
     @Nullable
-    public ClassLoader createLoader(@NotNull PluginDescriptionFile desc)
-    {
-        if ( desc.getLibraries().isEmpty() )
-        {
+    public ClassLoader createLoader(@NotNull PluginDescriptionFile desc) {
+        if (desc.getLibraries().isEmpty()) {
             return null;
         }
-        logger.log( Level.INFO, "[{0}] Loading {1} libraries... please wait", new Object[]
-        {
-            desc.getName(), desc.getLibraries().size()
-        } );
+        BannerServer.LOGGER.info("[{}] Loading {} libraries... please wait", desc.getName(), desc.getLibraries().size());
 
         List<Dependency> dependencies = new ArrayList<>();
-        for ( String library : desc.getLibraries() )
-        {
-            Artifact artifact = new DefaultArtifact( library );
-            Dependency dependency = new Dependency( artifact, null );
+        for (String libraries : desc.getLibraries()) {
+            String[] args = libraries.split(":");
+            if (args.length > 1) {
+                Dependency dependency = new Dependency(args[0], args[1], args[2]);
+                dependencies.add(dependency);
+            }
 
-            dependencies.add( dependency );
         }
 
-        DependencyResult result;
-        try
-        {
-            result = repository.resolveDependencies( session, new DependencyRequest( new CollectRequest( (Dependency) null, dependencies, repositories ), null ) );
-        } catch ( DependencyResolutionException ex )
-        {
-            throw new RuntimeException( "Error resolving libraries", ex );
+        List<File> libraries = new ArrayList<>();
+
+        for (Dependency dependency : dependencies) {
+            String group = dependency.group().replaceAll("\\.", "/");
+            String fileName = "%s-%s.jar".formatted(dependency.name(), dependency.version());
+            String mavenUrl = "https://repo.maven.apache.org/maven2/%s/%s/%s/%s".formatted(group, dependency.name(), dependency.version(), fileName);
+
+
+            File file = new File(new File(FabricLoader.getInstance().getGameDir().toFile(), "libraries/spigot-lib"), "%s/%s/%s/%s".formatted(group, dependency.name(), dependency.version(), fileName));
+
+            if (file.exists()) {
+                BannerServer.LOGGER.info("[{}] Found libraries {}", desc.getName(), file);
+                libraries.add(file);
+                continue;
+            }
+
+            Future<Boolean> future = LIBRARYLOADER.submit(() -> {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+
+                try {
+                    InputStream inputStream = new URL(mavenUrl).openStream();
+                    Files.copy(inputStream, file.toPath());
+                    libraries.add(file);
+                    return true;
+                } catch (IOException e) {
+                    return false;
+                }
+            });
+
+
+            try {
+                if (future.get()) {
+                    BannerServer.LOGGER.info("[{}] Downloading libraries {}", desc.getName(), mavenUrl);
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         List<URL> jarFiles = new ArrayList<>();
-        for ( ArtifactResult artifact : result.getArtifactResults() )
-        {
-            File file = artifact.getArtifact().getFile();
-
-            URL url;
-            try
-            {
-                url = file.toURI().toURL();
-            } catch ( MalformedURLException ex )
-            {
-                throw new AssertionError( ex );
+        for (File file : libraries) {
+            try {
+                jarFiles.add(file.toURI().toURL());
+                BannerServer.LOGGER.info("[{}] Loaded libraries {}", desc.getName(), file);
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
             }
-
-            jarFiles.add( url );
-            logger.log( Level.INFO, "[{0}] Loaded library {1}", new Object[]
-            {
-                desc.getName(), file
-            } );
         }
 
-        URLClassLoader loader = new URLClassLoader( jarFiles.toArray( new URL[ jarFiles.size() ] ), getClass().getClassLoader() );
-
-        return loader;
+        return new DelegateURLClassLoder(jarFiles.toArray(new URL[0]), getClass().getClassLoader());
     }
+
+    public record Dependency(String group, String name, String version) {}
 }

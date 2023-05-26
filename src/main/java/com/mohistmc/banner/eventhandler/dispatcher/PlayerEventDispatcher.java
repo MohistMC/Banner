@@ -13,7 +13,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BedBlock;
@@ -36,10 +35,8 @@ public class PlayerEventDispatcher {
         });
         UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
             ItemStack heldStack = player.getUseItem();
-            if (heldStack.getItem() instanceof ShearsItem) {
-                if (!CraftEventFactory.handlePlayerShearEntityEvent(player, entity, heldStack, hand)) {
-                    return InteractionResult.PASS;
-                }
+            if (!CraftEventFactory.handlePlayerShearEntityEvent(player, entity, heldStack, hand)) {
+                return InteractionResult.PASS;
             }
             return InteractionResult.PASS;
         });
