@@ -1,4 +1,4 @@
-package com.mohistmc.banner;
+package com.mohistmc.banner.config;
 
 import com.google.common.base.Throwables;
 import org.bukkit.Bukkit;
@@ -113,11 +113,5 @@ public class BannerConfig {
     {
         config.addDefault( path, def );
         return config.getDouble( path, config.getDouble( path ) );
-    }
-
-    public static String banner_lang;
-
-    private static void getLang() {
-        banner_lang = getString("banner.lang", "xx_XX");
     }
 }

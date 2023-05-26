@@ -41,10 +41,12 @@ repositories {
 		name = "Sponge"
 		url = 'https://repo.spongepowered.org/maven'
 	}
+	mavenCentral()
 }
 
 dependencies {
 	implementation 'org.projectlombok:lombok:1.18.26'
+	annotationProcessor 'org.projectlombok:lombok:1.18.26'
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings loom.layered() {
 		officialMojangMappings()
@@ -54,77 +56,76 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// bukkit
-	modImplementation "org.yaml:snakeyaml:1.33"
-	modImplementation "org.apache.maven:maven-resolver-provider:3.8.5"
-	modImplementation "org.apache.maven.resolver:maven-resolver-connector-basic:1.7.3"
-	modImplementation "org.apache.maven.resolver:maven-resolver-transport-http:1.7.3"
+	implementation "org.yaml:snakeyaml:1.33"
+	// LibraryLoader start
+	implementation "org.apache.maven:maven-resolver-provider:3.8.5"
+	implementation "org.apache.maven.resolver:maven-resolver-connector-basic:1.7.3"
+	implementation "org.apache.maven.resolver:maven-resolver-transport-http:1.7.3"
+	implementation "org.apache.maven:maven-artifact:3.8.5"
+	implementation "org.apache.maven:maven-builder-support:3.8.5"
+	implementation "org.apache.maven:maven-model:3.8.5"
+	implementation "org.apache.maven:maven-model-builder:3.8.5"
+	implementation "org.apache.maven:maven-repository-metadata:3.8.5"
 	compileOnly "org.jetbrains:annotations:21.0.1"
-	modImplementation "com.mohistmc:i18n:0.2"
+	implementation(include("com.mohistmc:i18n:0.2"))
 
 	// craftbukkit
-	modImplementation "org.fusesource.jansi:jansi:1.18"
-	modImplementation "jline:jline:2.14.6"
-	modImplementation "com.googlecode.json-simple:json-simple:1.1.1"
-	modImplementation "org.xerial:sqlite-jdbc:3.42.0.0"
-	modImplementation "com.mysql:mysql-connector-j:8.0.32"
+	implementation "org.fusesource.jansi:jansi:1.18"
+	implementation "jline:jline:2.14.6"
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"
+	implementation "org.xerial:sqlite-jdbc:3.42.0.0"
+	implementation "com.mysql:mysql-connector-j:8.0.32"
 
-	modImplementation "net.md-5:SpecialSource:1.11.0"
+	implementation "net.md-5:SpecialSource:1.11.0"
 
 	// spigot
-	modImplementation "net.md-5:bungeecord-chat:1.16-R0.4"
-	modImplementation "io.izzel:tools:1.3.0"
-	modImplementation "com.mohistmc:dynamicenum:0.1"
+	implementation "net.md-5:bungeecord-chat:1.16-R0.4"
+	implementation "io.izzel:tools:1.3.0"
+	implementation "com.mohistmc:dynamicenum:0.1"
 
-	modImplementation "com.google.guava:failureaccess:1.0.1"
-	modImplementation "com.google.guava:guava:31.0.1-jre"
-	modImplementation "com.google.code.gson:gson:2.10"
-	modImplementation "com.mojang:authlib:3.17.30"
-	modImplementation "com.mojang:logging:1.1.1"
+	implementation "com.google.guava:failureaccess:1.0.1"
+	implementation "com.google.guava:guava:31.0.1-jre"
+	implementation "com.google.code.gson:gson:2.10"
+	implementation "com.mojang:authlib:3.17.30"
+	implementation "com.mojang:logging:1.1.1"
 	compileOnly "commons-lang:commons-lang:2.6"
-	modImplementation "org.slf4j:slf4j-api:2.0.6"
+	implementation "org.slf4j:slf4j-api:2.0.6"
 
-	modImplementation "org.apache.logging.log4j:log4j-core:2.20.0"
-	modImplementation "org.apache.logging.log4j:log4j-iostreams:2.20.0"
-	modImplementation "org.apache.logging.log4j:log4j-api:2.20.0"
-	modImplementation "org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0"
-	modImplementation "org.apache.commons:commons-lang3:3.12.0"
-	modImplementation "net.sf.jopt-simple:jopt-simple:5.0.4"
-	modImplementation "net.java.dev.jna:jna-platform:5.13.0"
-	modImplementation "net.java.dev.jna:jna:5.13.0"
-	modImplementation "it.unimi.dsi:fastutil:8.5.12"
-	modImplementation "commons-io:commons-io:2.11.0"
-	modImplementation "com.mojang:javabridge:2.0.25"
-	modImplementation "com.mojang:datafixerupper:6.0.6"
-	modImplementation "com.mojang:brigadier:1.0.18"
-	modImplementation "com.github.oshi:oshi-core:6.4.0"
+	implementation "org.apache.logging.log4j:log4j-core:2.20.0"
+	implementation "org.apache.logging.log4j:log4j-iostreams:2.20.0"
+	implementation "org.apache.logging.log4j:log4j-api:2.20.0"
+	implementation "org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0"
+	implementation "org.apache.commons:commons-lang3:3.12.0"
+	implementation "net.sf.jopt-simple:jopt-simple:5.0.4"
+	implementation "net.java.dev.jna:jna-platform:5.13.0"
+	implementation "net.java.dev.jna:jna:5.13.0"
+	implementation "it.unimi.dsi:fastutil:8.5.12"
+	implementation "commons-io:commons-io:2.11.0"
+	implementation "com.mojang:javabridge:2.0.25"
+	implementation "com.mojang:datafixerupper:6.0.6"
+	implementation "com.mojang:brigadier:1.0.18"
+	implementation "com.github.oshi:oshi-core:6.4.0"
 
-	modImplementation "io.netty:netty-buffer:4.1.82.Final"
-	modImplementation "io.netty:netty-codec:4.1.82.Final"
-	modImplementation "io.netty:netty-common:4.1.82.Final"
-	modImplementation "io.netty:netty-handler:4.1.82.Final"
-	modImplementation "io.netty:netty-resolver:4.1.82.Final"
-	modImplementation "io.netty:netty-transport:4.1.82.Final"
-	modImplementation "io.netty:netty-transport-classes-epoll:4.1.82.Final"
-	modImplementation "io.netty:netty-transport-native-unix-common:4.1.82.Final"
+	implementation "io.netty:netty-buffer:4.1.82.Final"
+	implementation "io.netty:netty-codec:4.1.82.Final"
+	implementation "io.netty:netty-common:4.1.82.Final"
+	implementation "io.netty:netty-handler:4.1.82.Final"
+	implementation "io.netty:netty-resolver:4.1.82.Final"
+	implementation "io.netty:netty-transport:4.1.82.Final"
+	implementation "io.netty:netty-transport-classes-epoll:4.1.82.Final"
+	implementation "io.netty:netty-transport-native-unix-common:4.1.82.Final"
 
 	// jansi support
-	modImplementation "org.jline:jline-terminal:3.12.1"
-	modImplementation "org.jline:jline-terminal-jansi:3.12.1"
-	modImplementation "net.minecrell:terminalconsoleappender:1.3.0"
-
-	include "org.jline:jline-terminal:3.12.1"
-	include "org.jline:jline-terminal-jansi:3.12.1"
-	include "net.minecrell:terminalconsoleappender:1.3.0"
+	implementation(include("org.jline:jline-terminal:3.12.1"))
+	implementation(include("org.jline:jline-terminal-jansi:3.12.1"))
+	implementation(include("net.minecrell:terminalconsoleappender:1.3.0"))
 
 	//class modify
-	modImplementation "com.github.LlamaLad7:MixinExtras:0.1.1"
 	annotationProcessor "com.github.LlamaLad7:MixinExtras:0.1.1"
-	modImplementation 'com.github.1798643961:mixin-tools:1.0.1'
+	modImplementation(include("com.github.1798643961:mixin-tools:1.0.1"))
+	modImplementation(include("com.github.LlamaLad7:MixinExtras:0.1.1"))
+
 	annotationProcessor 'com.github.1798643961:mixin-tools:1.0.1'
-
-	include "com.github.1798643961:mixin-tools:1.0.1"
-	include "com.github.LlamaLad7:MixinExtras:0.1.1"
-
 }
 
 base {

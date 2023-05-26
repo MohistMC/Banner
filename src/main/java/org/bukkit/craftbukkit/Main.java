@@ -142,7 +142,7 @@ public class Main extends OptionParser {
         acceptsAll(asList("B", "banner-settings"), "File for banner settings")
                 .withRequiredArg()
                 .ofType(File.class)
-                .defaultsTo(new File("banner.yml"))
+                .defaultsTo(new File("banner-config","banner.yml"))
                 .describedAs("Yml file");
 
         allowsUnrecognizedOptions();

@@ -23,7 +23,7 @@
       "com.mohistmc.banner.BannerServer"
     ],
     "preLaunch": [
-      "com.mohistmc.banner.BannerPreLaunch::init"
+      "com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
     ]
   },
   "mixins": [

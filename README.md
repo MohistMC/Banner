@@ -69,8 +69,7 @@ Upstream Projects
 * [**Paper**](https://github.com/PaperMC/Paper.git) - plugin support.
 * [**Arclight**](https://github.com/IzzelAliz/Arclight.git) - Some code.
 * [**Mohist**](https://github.com/MohistMC/Mohist.git) - Some code.
-* [**CardBoard**](https://github.com/CardboardPowered/cardboard.git) - KnotHelper.
-* [**GlowStone**](https://glowstone.net/) - library loader.
+* [**CardBoard**](https://github.com/CardboardPowered/cardboard.git) - KnotLibraryHelper.
 
 A Special Thanks To:
 -------------

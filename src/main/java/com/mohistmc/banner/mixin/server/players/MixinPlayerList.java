@@ -3,6 +3,7 @@ package com.mohistmc.banner.mixin.server.players;
 import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
+import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import com.mohistmc.banner.injection.server.players.InjectionPlayerList;
 import com.mojang.authlib.GameProfile;
@@ -120,7 +121,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         FabricInjectBukkit.init();
         banner$server.banner$setConsole(ColouredConsoleSender.getInstance());
         org.spigotmc.SpigotConfig.init((java.io.File) banner$server.bridge$options().valueOf("spigot-settings"));
-        com.mohistmc.banner.BannerConfig.init((java.io.File) banner$server.bridge$options().valueOf("banner-settings"));
+        BannerConfig.init((java.io.File) banner$server.bridge$options().valueOf("banner-settings"));
         org.spigotmc.SpigotConfig.registerCommands();
     }
 
