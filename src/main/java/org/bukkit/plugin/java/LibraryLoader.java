@@ -24,8 +24,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 class LibraryLoader {
 
-
-    public static final ScheduledExecutorService LIBRARYLOADER = new ScheduledThreadPoolExecutor(10, new NamedThreadFactory("LibraryLoader"));
+    public static final ScheduledExecutorService LIBRARY_LOADER = new ScheduledThreadPoolExecutor(10, new NamedThreadFactory("LibraryLoader"));
 
     public LibraryLoader() {
     }
@@ -63,7 +62,7 @@ class LibraryLoader {
                 continue;
             }
 
-            Future<Boolean> future = LIBRARYLOADER.submit(() -> {
+            Future<Boolean> future = LIBRARY_LOADER.submit(() -> {
                 file.getParentFile().mkdirs();
                 file.createNewFile();
 
