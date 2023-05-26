@@ -91,7 +91,7 @@ public class KnotHelper {
      * Allowed packages.
      * Prevents loading class errors.
      */
-    private static String[] getPackages() {
+    public static String[] getPackages() {
         String[] args = {
                         "org.bukkit",
                         "org.bukkit.advancement",
@@ -161,8 +161,22 @@ public class KnotHelper {
                         "net.",
                         "org.",
                         "me.",
+                        "org.eclipse.aether.",
+                        "org.eclipse.aether.transport.http",
+                        "org.eclipse.aether.connector.basic.",
+                        "org.eclipse.aether.spi.",
                         "io.izzel",
-                        "jline."
+                        "jline.",
+                        "org.yaml.",
+                        "org.fusesource.jansi.",
+                        "com.googlecode.json-simple.",
+                        "org.xerial.",
+                        "com.mysql.",
+                        "org.apache.logging.log4j.",
+                        "org.apache.maven.repository.internal.",
+                        "commons-io.",
+                        "commons-lang.",
+                        "org.checkerframework."
                 };
         return args;
     }

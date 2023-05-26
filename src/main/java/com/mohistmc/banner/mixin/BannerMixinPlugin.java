@@ -127,10 +127,6 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
     public static void loadLibs() {
         List<Library> libraries = new ArrayList<>();
         libraries.add(new Library("org.yaml", "snakeyaml", "1.33", MD5, "e0164a637c691c8cf01d29f90a709c02"));
-        libraries.add(new Library("org.apache.maven", "maven-resolver-provider", "3.8.5", MD5, "9021a5ebbabc4a591bab0331589f6614"));
-
-        libraries.add(new Library("org.apache.maven.resolver", "maven-resolver-connector-basic", "1.7.3", MD5, "c73f00574fa73f7d1c0842050abf765a"));
-        libraries.add(new Library("org.apache.maven.resolver", "maven-resolver-transport-http", "1.7.3", MD5, "da0fb93034859a03f9e7baf4215e4bec"));
         libraries.add(new Library("org.fusesource.jansi", "jansi", "1.18", MD5, "6ee32de8880da9f02552474f60ab6fbd"));
         libraries.add(new Library("jline", "jline", "2.14.6", MD5, "480423551649bc6980b43f09e4717272"));
         libraries.add(new Library("com.googlecode.json-simple", "json-simple", "1.1.1", MD5, "5cc2c478d73e8454b4c369cee66c5bc7"));
@@ -144,6 +140,11 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
         libraries.add(new Library("org.apache.logging.log4j", "log4j-iostreams", "2.20.0", MD5, "d612855f572573a409bb59957c7c24c8"));
         libraries.add(new Library("commons-io", "commons-io", "2.11.0", MD5, "3b4b7ccfaeceeac240b804839ee1a1ca"));
         libraries.add(new Library("commons-lang", "commons-lang", "2.6-mohist", MD5, "755f5cdb5de00d072215340e8370daff"));
+        libraries.add(new Library("org.checkerframework", "checker-qual", "2.0.0", MD5, "94fe1af76c10006fbc5b988180b71bf0"));
+        libraries.add(new Library("org.apache.maven", "maven-artifact", "3.8.5", MD5, "ce473b0d9fbfd10fe147f03fe8707d67"));
+        libraries.add(new Library("org.apache.maven", "maven-resolver-provider", "3.8.5", MD5, "9021a5ebbabc4a591bab0331589f6614"));
+        libraries.add(new Library("org.apache.maven.resolver", "maven-resolver-connector-basic", "1.7.3", MD5, "c73f00574fa73f7d1c0842050abf765a"));
+        libraries.add(new Library("org.apache.maven.resolver", "maven-resolver-transport-http", "1.7.3", MD5, "da0fb93034859a03f9e7baf4215e4bec"));
         File libDir = new File(FabricLoader.getInstance().getGameDir().toFile(), "libraries/banner-lib");
         new LibraryManager(getRepository(), libDir.toString(), true, 6, libraries).run();
     }
