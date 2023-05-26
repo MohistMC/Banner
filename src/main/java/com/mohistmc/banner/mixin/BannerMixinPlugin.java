@@ -93,8 +93,9 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
     public void onLoad(String mixinPackage) {
         try {
             BannerMCStart.run();
-        } catch (Exception e) {
-            BannerMCStart.LOGGER.error("Failed to load BannerServer...");
+        } catch (Exception ex) {
+            BannerMCStart.LOGGER.error("Failed to load BannerServer..., caused by " + ex.getCause());
+            throw new RuntimeException(ex);
         }
     }
 
