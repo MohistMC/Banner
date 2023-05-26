@@ -7,13 +7,14 @@ import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import com.mohistmc.banner.injection.server.players.InjectionPlayerList;
 import com.mojang.authlib.GameProfile;
-import io.izzel.arclight.mixin.Eject;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.resources.ResourceKey;
@@ -47,6 +48,7 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.command.ColouredConsoleSender;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.*;
@@ -69,6 +71,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 // Banner - TODO fix inject method
 @Mixin(PlayerList.class)
@@ -127,8 +130,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Inject(method = "placeNewPlayer",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/dimension/DimensionType;parseLegacy(Lcom/mojang/serialization/Dynamic;)Lcom/mojang/serialization/DataResult;",
-            shift = At.Shift.BEFORE),
+            target = "Lnet/minecraft/world/level/dimension/DimensionType;parseLegacy(Lcom/mojang/serialization/Dynamic;)Lcom/mojang/serialization/DataResult;"),
             locals = LocalCapture.CAPTURE_FAILHARD)
     private void banner$changeProfile(Connection netManager, ServerPlayer player, CallbackInfo ci, GameProfile gameProfile, GameProfileCache gameProfileCache, Optional optional, String string, CompoundTag compoundTag) {
         // CraftBukkit start - Better rename detection
@@ -167,23 +169,87 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         return playerIn.getLevel().bridge$spigotConfig().simulationDistance;
     }
 
-    @Eject(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V"))
-    private void banner$playerJoin(PlayerList playerList, Component component, boolean flag, CallbackInfo ci, Connection netManager, ServerPlayer playerIn) {
-        PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent(playerIn.getBukkitEntity(), CraftChatMessage.fromComponent(component));
-        this.players.add(playerIn);
-        this.playersByUUID.put(playerIn.getUUID(), playerIn);
-        this.cserver.getPluginManager().callEvent(playerJoinEvent);
-        this.players.remove(playerIn);
-        if (!playerIn.connection.connection.isConnected()) {
+    @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V"))
+    private void banner$cancelMessage(PlayerList instance, Component message, boolean bypassHiddenChat) {
+
+    }
+
+    private AtomicReference<String> banner$joinMsg = new AtomicReference<>();
+
+    @Inject(method = "placeNewPlayer",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V"),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$playerJoin(Connection netManager, ServerPlayer player, CallbackInfo ci,
+                                   GameProfile gameProfile, GameProfileCache gameProfileCache,
+                                   Optional optional, String string, CompoundTag compoundTag,
+                                   ResourceKey resourceKey, ServerLevel serverLevel,
+                                   ServerLevel serverLevel2, String string2,
+                                   LevelData levelData,
+                                   ServerGamePacketListenerImpl serverGamePacketListenerImpl,
+                                   GameRules gameRules,
+                                   boolean bl, boolean bl2,
+                                   MutableComponent mutableComponent) {
+        // CraftBukkit start
+        mutableComponent.withStyle(ChatFormatting.YELLOW);
+        String joinMessage = CraftChatMessage.fromComponent(mutableComponent);
+        banner$joinMsg.set(joinMessage);
+    }
+
+    @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/players/PlayerList;broadcastAll(Lnet/minecraft/network/protocol/Packet;)V"))
+    private void banner$cancelBroadcast(PlayerList instance, Packet<?> packet) {}
+
+    @Inject(method = "placeNewPlayer", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/players/PlayerList;sendLevelInfo(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/level/ServerLevel;)V"),
+            locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    private void banner$joinEvent(Connection netManager, ServerPlayer player, CallbackInfo ci,
+                                  GameProfile gameProfile, GameProfileCache gameProfileCache,
+                                  Optional optional, String string, CompoundTag compoundTag,
+                                  ResourceKey resourceKey, ServerLevel serverLevel,
+                                  ServerLevel serverLevel2, String string2,
+                                  LevelData levelData, ServerGamePacketListenerImpl serverGamePacketListenerImpl) {
+        // CraftBukkit start
+        CraftPlayer bukkitPlayer = player.getBukkitEntity();
+
+        // Ensure that player inventory is populated with its viewer
+        player.containerMenu.transferTo(player.containerMenu, bukkitPlayer);
+
+        PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent(bukkitPlayer, banner$joinMsg.get());
+        cserver.getPluginManager().callEvent(playerJoinEvent);
+
+        if (!player.connection.isAcceptingMessages()) {
             ci.cancel();
-            return;
         }
-        String joinMessage = playerJoinEvent.getJoinMessage();
-        if (joinMessage != null && joinMessage.length() > 0) {
-            for (Component line : CraftChatMessage.fromString(joinMessage)) {
-                this.server.getPlayerList().broadcastSystemMessage(line, flag);
+
+        banner$joinMsg.set(playerJoinEvent.getJoinMessage());
+        if (banner$joinMsg.get() != null && banner$joinMsg.get().length() > 0) {
+            for (Component line : CraftChatMessage.fromString(banner$joinMsg.get())) {
+                server.getPlayerList().broadcastSystemMessage(line, false);
             }
         }
+        // CraftBukkit end
+
+        // CraftBukkit start - sendAll above replaced with this loop
+        ClientboundPlayerInfoUpdatePacket packet = ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(player));
+
+        for (int i = 0; i < this.players.size(); ++i) {
+            ServerPlayer entityplayer1 = (ServerPlayer) this.players.get(i);
+
+            if (entityplayer1.getBukkitEntity().canSee(bukkitPlayer)) {
+                entityplayer1.connection.send(packet);
+            }
+
+            if (!bukkitPlayer.canSee(entityplayer1.getBukkitEntity())) {
+                continue;
+            }
+
+            player.connection.send(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(entityplayer1)));
+        }
+        player.banner$setSentListPacket(true);
+        // CraftBukkit end
+
+        player.getEntityData().refresh(player); // CraftBukkit - BungeeCord#2321, send complete data to self on spawn
     }
 
     @WrapWithCondition(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
@@ -587,6 +653,15 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         for (Component component : components) {
             broadcastSystemMessage(component, false);
         }
+    }
+
+    /**
+     * @author wdog5
+     * @reason bukkit
+     */
+    @Overwrite
+    public ServerStatsCounter getPlayerStats(net.minecraft.world.entity.player.Player player) {
+        return getPlayerStats((ServerPlayer) player);
     }
 
     @Override

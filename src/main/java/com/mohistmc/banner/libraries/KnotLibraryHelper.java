@@ -108,7 +108,10 @@ public class KnotLibraryHelper {
                 "org.apache.maven.repository.internal.",
                 "commons-io.",
                 "commons-lang.",
-                "org.checkerframework."
+                "org.checkerframework.",
+                "net.md_5.bungee",
+                "net.md_5.bungee.",
+                "net.md_5.bungee.chat."
         };
     }
 }
