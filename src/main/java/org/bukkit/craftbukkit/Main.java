@@ -1,5 +1,6 @@
 package org.bukkit.craftbukkit;
 
+import com.mohistmc.banner.BannerMCStart;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.util.PathConverter;
@@ -185,7 +186,7 @@ public class Main extends OptionParser {
                 useJline = false;
                 System.setProperty(TerminalConsoleAppender.JLINE_OVERRIDE_PROPERTY, "false");
             }
-            System.out.println("Loading libraries, please wait...");
+            System.out.println(BannerMCStart.I18N.get("load.libraries"));
         }
     }
 }
