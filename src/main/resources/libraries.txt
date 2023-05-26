@@ -11,7 +11,6 @@ libraries/org/apache/maven/resolver/maven-resolver-spi/1.7.3/maven-resolver-spi-
 libraries/org/apache/maven/resolver/maven-resolver-transport-http/1.7.3/maven-resolver-transport-http-1.7.3.jar|da0fb93034859a03f9e7baf4215e4bec
 libraries/org/apache/maven/resolver/maven-resolver-util/1.7.3/maven-resolver-util-1.7.3.jar|016477b1a29cebc7c47b0894128837fe
 libraries/org/eclipse/sisu/org.eclipse.sisu.inject/0.3.5/org.eclipse.sisu.inject-0.3.5.jar|1b296b0ddd911ed3750b3df93b395cd5
-libraries/org/yaml/snakeyaml/1.33/snakeyaml-1.33.jar|e0164a637c691c8cf01d29f90a709c02
 libraries/org/fusesource/jansi/jansi/1.18/jansi-1.18.jar|6ee32de8880da9f02552474f60ab6fbd
 libraries/jline/jline/2.14.6/jline-2.14.6.jar|480423551649bc6980b43f09e4717272
 libraries/com/googlecode/json-simple/json-simple/1.1.1/json-simple-1.1.1.jar|5cc2c478d73e8454b4c369cee66c5bc7
