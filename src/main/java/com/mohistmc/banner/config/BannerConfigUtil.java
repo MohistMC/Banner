@@ -72,13 +72,6 @@ public class BannerConfigUtil {
         BannerMCStart.I18N = new i18n(BannerMCStart.class.getClassLoader(), new Locale(l, c));
     }
 
-    public static String setLangCN() {
-        if (isCN()) {
-            yml.set("banner.lang", "zh_CN");
-        }
-        return yml.getString("banner.lang", "xx_XX");
-    }
-
     public static boolean showLogo() {
         String key = "banner.show_logo";
         if (yml.get(key) == null) {

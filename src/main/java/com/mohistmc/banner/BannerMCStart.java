@@ -1,6 +1,5 @@
 package com.mohistmc.banner;
 
-import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.config.BannerConfigUtil;
 import com.mohistmc.banner.libraries.DefaultLibraries;
 import com.mohistmc.banner.network.download.UpdateUtils;
@@ -19,7 +18,6 @@ public class BannerMCStart {
 
     public static void run() throws Exception {
         BannerConfigUtil.copyBannerConfig();
-        BannerConfigUtil.setLangCN();
         BannerConfigUtil.i18n();
         if (BannerConfigUtil.showLogo()) {
             LOGGER.info(" _____       ___   __   _   __   _   _____   _____   ");
