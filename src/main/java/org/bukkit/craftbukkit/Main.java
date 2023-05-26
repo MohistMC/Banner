@@ -185,6 +185,7 @@ public class Main extends OptionParser {
                 useJline = false;
                 System.setProperty(TerminalConsoleAppender.JLINE_OVERRIDE_PROPERTY, "false");
             }
+            System.out.println("Loading libraries, please wait...");
         }
     }
 }

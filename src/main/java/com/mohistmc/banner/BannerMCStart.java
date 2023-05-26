@@ -27,7 +27,6 @@ public class BannerMCStart {
             LOGGER.info("| |_| |  / /  | | | | \\  | | | \\  | | |___  | | \\ \\  ");
             LOGGER.info("|_____/ /_/   |_| |_|  \\_| |_|  \\_| |_____| |_|  \\_\\ ");
             LOGGER.info(I18N.get("banner.launch.welcomemessage") + " - " + getVersion() + ", Java " + javaVersion);
-            LOGGER.info("Loading libraries, please wait...");
         }
         if (System.getProperty("log4j.configurationFile") == null) {
             System.setProperty("log4j.configurationFile", "log4j2_banner.xml");
