@@ -4,27 +4,20 @@ package org.bukkit.plugin.java;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.nms.proxy.DelegateURLClassLoder;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.util.thread.NamedThreadFactory;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 class LibraryLoader {
-
-    public static final ScheduledExecutorService LIBRARY_LOADER = new ScheduledThreadPoolExecutor(10, new NamedThreadFactory("LibraryLoader"));
 
     public LibraryLoader() {
     }
@@ -53,7 +46,6 @@ class LibraryLoader {
             String fileName = "%s-%s.jar".formatted(dependency.name(), dependency.version());
             String mavenUrl = "https://repo.maven.apache.org/maven2/%s/%s/%s/%s".formatted(group, dependency.name(), dependency.version(), fileName);
 
-
             File file = new File(new File(FabricLoader.getInstance().getGameDir().toFile(), "libraries/spigot-lib"), "%s/%s/%s/%s".formatted(group, dependency.name(), dependency.version(), fileName));
 
             if (file.exists()) {
@@ -62,27 +54,21 @@ class LibraryLoader {
                 continue;
             }
 
-            Future<Boolean> future = LIBRARY_LOADER.submit(() -> {
+            try {
                 file.getParentFile().mkdirs();
                 file.createNewFile();
-
-                try {
-                    InputStream inputStream = new URL(mavenUrl).openStream();
-                    Files.copy(inputStream, file.toPath());
-                    libraries.add(file);
-                    return true;
-                } catch (IOException e) {
-                    return false;
+                InputStream inputStream = new URL(mavenUrl).openStream();
+                try (FileOutputStream outputStream = new FileOutputStream(file)) {
+                    byte[] buffer = new byte[8 * 1024];
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                    }
                 }
-            });
 
-
-            try {
-                if (future.get()) {
-                    BannerServer.LOGGER.info("[{}] Downloading libraries {}", desc.getName(), mavenUrl);
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
+                libraries.add(file);
+            } catch (IOException e) {
+                BannerServer.LOGGER.error(String.valueOf(e));
             }
         }
 
