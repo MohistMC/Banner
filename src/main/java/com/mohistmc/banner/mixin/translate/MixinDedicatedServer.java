@@ -29,7 +29,7 @@ public class MixinDedicatedServer {
         return BannerMCStart.I18N.get("mc.server.start_on");
     }
 
-    @ModifyConstant(method = "initServer", constant = @Constant(stringValue = "Starting Minecraft server on {}:{}"))
+    @ModifyConstant(method = "initServer", constant = @Constant(stringValue = "Done ({})! For help, type \"help\""))
     private String banner$localStartDone(String constant) {
         return BannerMCStart.I18N.get("server.start.done");
     }
