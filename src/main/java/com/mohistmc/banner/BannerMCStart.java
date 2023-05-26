@@ -1,6 +1,7 @@
 package com.mohistmc.banner;
 
 import com.mohistmc.banner.config.BannerConfigUtil;
+import com.mohistmc.banner.libraries.CustomLibraries;
 import com.mohistmc.banner.libraries.DefaultLibraries;
 import com.mohistmc.banner.network.download.UpdateUtils;
 import com.mohistmc.banner.util.EulaUtil;
@@ -36,6 +37,7 @@ public class BannerMCStart {
             DefaultLibraries.run();
         }
         DefaultLibraries.proposeFabricLibs();
+        CustomLibraries.loadCustomLibs();
         if (!EulaUtil.hasAcceptedEULA()) {
             System.out.println(I18N.get("eula"));
             while (!"true".equals(new Scanner(System.in).next()));
