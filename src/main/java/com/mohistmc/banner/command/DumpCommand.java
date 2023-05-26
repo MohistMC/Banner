@@ -17,6 +17,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Villager;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
@@ -27,13 +28,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class DumpCommand extends BukkitCommand {
-    private final List<String> tab_cmd = Arrays.asList("potions", "enchants", "cbcmds", "entitytypes", "biomes", "pattern", "worldtype", "bukkit_material", "vanilla_material");
+    private final List<String> tab_cmd = Arrays.asList("potions", "enchants", "cbcmds", "entitytypes", "biomes", "pattern", "worldtype", "bukkit_material", "vanilla_material", "profession");
     private final List<String> tab_mode = List.of("file");
 
     public DumpCommand(String name) {
         super(name);
         this.description = "Universal Dump, which will print the information you need locally!";
-        this.usageMessage = "/dump <file> [potions|enchants|cbcmds|entitytypes|biomes|pattern|worldtype|bukkit_material|vanilla_material]";
+        this.usageMessage = "/dump <file> [potions|enchants|cbcmds|entitytypes|biomes|pattern|worldtype|bukkit_material|vanilla_material|profession]";
         this.setPermission("banner.command.dump");
     }
 
@@ -82,6 +83,7 @@ public class DumpCommand extends BukkitCommand {
                 case "worldtype" -> dumpWorldType(sender, mode);
                 case "bukkit_material" -> dumpBukkitMaterial(sender, mode);
                 case "vanilla_material" -> dumpVanillaMaterial(sender, mode);
+                case "profession" -> dumpVillageProfession(sender, mode);
                 default -> {
                     return false;
                 }
@@ -166,6 +168,15 @@ public class DumpCommand extends BukkitCommand {
             sb.append(material).append("-").append(key).append("\n");
         }
         dump(sender, "bukkit_material", sb, mode);
+    }
+
+    private void dumpVillageProfession(CommandSender sender, String mode) {
+        StringBuilder sb = new StringBuilder();
+        for (Villager.Profession profession : Villager.Profession.values()) {
+            String key = profession.name();
+            sb.append(profession).append("-").append(key).append("\n");
+        }
+        dump(sender, "profession", sb, mode);
     }
 
     private void dumpVanillaMaterial(CommandSender sender, String mode) {
