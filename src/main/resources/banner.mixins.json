@@ -94,6 +94,7 @@
     "server.players.MixinStoredUserList",
     "server.rcon.MixinRconConsoleSource",
     "stats.MixinStatsCounter",
+    "translate.MixinDedicatedServer",
     "util.MixinSpawnUtil",
     "util.datafix.MixinDataFixers",
     "world.MixinBlockGetter",
