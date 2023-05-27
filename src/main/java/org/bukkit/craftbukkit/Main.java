@@ -186,7 +186,6 @@ public class Main extends OptionParser {
                 useJline = false;
                 System.setProperty(TerminalConsoleAppender.JLINE_OVERRIDE_PROPERTY, "false");
             }
-            BannerMCStart.LOGGER.info(BannerMCStart.I18N.get("load.libraries"));
         }
     }
 }

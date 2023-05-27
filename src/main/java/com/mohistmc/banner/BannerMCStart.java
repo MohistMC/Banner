@@ -38,6 +38,7 @@ public class BannerMCStart {
         }
         DefaultLibraries.proposeFabricLibs();
         CustomLibraries.loadCustomLibs();
+        BannerMCStart.LOGGER.info(BannerMCStart.I18N.get("load.libraries"));
         if (!EulaUtil.hasAcceptedEULA()) {
             System.out.println(I18N.get("eula"));
             while (!"true".equals(new Scanner(System.in).next()));

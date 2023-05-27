@@ -2,7 +2,6 @@ package com.mohistmc.banner.mixin.server.players;
 
 import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
-import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import com.mohistmc.banner.injection.server.players.InjectionPlayerList;
@@ -19,7 +18,9 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.RegistryLayer;
+import net.minecraft.server.bossevents.CustomBossEvents;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -29,10 +30,12 @@ import net.minecraft.server.players.*;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.ServerStatsCounter;
+import net.minecraft.stats.Stats;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
@@ -53,7 +56,7 @@ import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.*;
 import org.jetbrains.annotations.Nullable;
-import org.spigotmc.SpigotConfig;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -63,15 +66,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.io.File;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
+import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 // Banner - TODO fix inject method
 @Mixin(PlayerList.class)
@@ -82,8 +90,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Shadow @Nullable public abstract CompoundTag load(ServerPlayer player);
     @Shadow @Final private Map<UUID, ServerPlayer> playersByUUID;
-
-    @Shadow protected abstract void save(ServerPlayer player);
 
     @Shadow public abstract void broadcastSystemMessage(Component message, boolean bypassHiddenChat);
 
@@ -111,8 +117,12 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Shadow public abstract void sendAllPlayerInfo(ServerPlayer player);
 
+    @Shadow @Final public PlayerDataStorage playerIo;
+    @Shadow @Final private static Logger LOGGER;
+    @Shadow @Final private Map<UUID, PlayerAdvancements> advancements;
 
     @Shadow public abstract ServerPlayer getPlayerForLogin(GameProfile profile);
+
     private CraftServer cserver;
 
     @Inject(method = "<init>", at = @At(value = "TAIL"))
@@ -171,7 +181,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V"))
     private void banner$cancelMessage(PlayerList instance, Component message, boolean bypassHiddenChat) {
-
     }
 
     private AtomicReference<String> banner$joinMsg = new AtomicReference<>();
@@ -252,40 +261,123 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         player.getEntityData().refresh(player); // CraftBukkit - BungeeCord#2321, send complete data to self on spawn
     }
 
+    private AtomicReference<ServerLevel> banner$level = new AtomicReference<>();
+
     @WrapWithCondition(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
-    private boolean banner$addNewPlayer(ServerLevel instance, ServerPlayer player) {
+    private boolean banner$wrapAddNewPlayer(ServerLevel instance, ServerPlayer player) {
+        banner$level.set(instance);
         return player.level == instance && !instance.players().contains(player);
+    }
+
+    @WrapWithCondition(method = "placeNewPlayer", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/bossevents/CustomBossEvents;onPlayerConnect(Lnet/minecraft/server/level/ServerPlayer;)V"))
+    private boolean banner$wrapAddNewPlayer0(CustomBossEvents instance, ServerPlayer player) {
+        return player.level == banner$level.get() && !banner$level.get().players().contains(player);
     }
 
     @ModifyVariable(method = "placeNewPlayer", ordinal = 1, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
     private ServerLevel banner$handleWorldChanges(ServerLevel value, Connection connection, ServerPlayer player) {
-        return player.getLevel();
+        return player.getLevel();// CraftBukkit - Update in case join event changed it
     }
 
-    @Inject(method = "save", cancellable = true, at = @At("HEAD"))
-    private void banner$returnIfNotPersist(ServerPlayer playerIn, CallbackInfo ci) {
-        if (!playerIn.bridge$persist()) {
-            ci.cancel();
+    @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/EntityType;loadEntityRecursive(Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/world/level/Level;Ljava/util/function/Function;)Lnet/minecraft/world/entity/Entity;"))
+    private Entity banner$loadRecursive(CompoundTag compound, Level level, Function<Entity, Entity> entityFunction) {
+        // CraftBukkit start
+        ServerLevel finalWorldServer = banner$level.get();
+        finalWorldServer = finalWorldServer == null ? ((ServerLevel) level) : finalWorldServer;
+        ServerLevel finalWorldServer1 = finalWorldServer;
+        return EntityType.loadEntityRecursive(compound.getCompound("Entity"), finalWorldServer, (entityx) -> {
+            return !finalWorldServer1.addWithUUID(entityx) ? null : entityx;
+        });
+    }
+
+    /**
+     * @author wdog5
+     * @reason bukkit
+     */
+    @Overwrite
+    protected void save(ServerPlayer player) {
+        if (player.getBukkitEntity().isPersistent()) {
+            return;
         }
+        this.playerIo.save(player);
+        ServerStatsCounter serverStatsCounter = (ServerStatsCounter)player.getStats(); // CraftBukkit
+        if (serverStatsCounter != null) {
+            serverStatsCounter.save();
+        }
+
+        PlayerAdvancements playerAdvancements = (PlayerAdvancements)player.getAdvancements(); // CraftBukkit
+        if (playerAdvancements != null) {
+            playerAdvancements.save();
+        }
+
     }
 
-    @Inject(method = "remove", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;save(Lnet/minecraft/server/level/ServerPlayer;)V"))
-    private void banner$playerQuitPre(ServerPlayer playerIn, CallbackInfo ci) {
-        this.remove(playerIn);
+    /**
+     * @author wdog5
+     * @reason bukkit
+     */
+    @Overwrite
+    public void remove(ServerPlayer player) {
+        ServerLevel serverLevel = player.getLevel();
+        player.awardStat(Stats.LEAVE_GAME);
+        this.extra$remove(player);
+        this.save(player);
+        if (player.isPassenger()) {
+            Entity entity = player.getRootVehicle();
+            if (entity.hasExactlyOnePlayerPassenger()) {
+                LOGGER.debug("Removing player mount");
+                player.stopRiding();
+                entity.getPassengersAndSelf().forEach((entityx) -> {
+                    entityx.setRemoved(Entity.RemovalReason.UNLOADED_WITH_PLAYER);
+                });
+            }
+        }
+
+        player.unRide();
+        serverLevel.removePlayerImmediately(player, Entity.RemovalReason.UNLOADED_WITH_PLAYER);
+        player.getAdvancements().stopListening();
+        this.players.remove(player);
+        this.server.getCustomBossEvents().onPlayerDisconnect(player);
+        UUID uUID = player.getUUID();
+        ServerPlayer serverPlayer = (ServerPlayer)this.playersByUUID.get(uUID);
+        if (serverPlayer == player) {
+            this.playersByUUID.remove(uUID);
+            // this.stats.remove(uUID);
+            // this.advancements.remove(uUID);
+        }
+        // CraftBukkit start
+        ClientboundPlayerInfoRemovePacket packet = new ClientboundPlayerInfoRemovePacket(List.of(serverPlayer.getUUID()));
+        for (int i = 0; i < players.size(); i++) {
+            ServerPlayer entityplayer2 = (ServerPlayer) this.players.get(i);
+
+            if (entityplayer2.getBukkitEntity().canSee(player.getBukkitEntity())) {
+                entityplayer2.connection.send(packet);
+            } else {
+                entityplayer2.getBukkitEntity().onEntityRemove(player);
+            }
+        }
+        // This removes the scoreboard (and player reference) for the specific player in the manager
+        cserver.getScoreboardManager().removePlayer(player.getBukkitEntity());
+        // CraftBukkit end
     }
 
     @Override
-    public String remove(ServerPlayer playerIn) {
-        if (playerIn.inventoryMenu != playerIn.containerMenu) {
-            playerIn.getBukkitEntity().closeInventory();
+    public String extra$remove(ServerPlayer playerIn) {
+        // CraftBukkit start - Quitting must be before we do final save of data, in case plugins need to modify it
+        // See SPIGOT-5799, SPIGOT-6145
+        if (playerIn.containerMenu != playerIn.inventoryMenu) {
+            playerIn.closeContainer();
         }
-        var quitMessage = BukkitCaptures.getQuitMessage();
-        PlayerQuitEvent playerQuitEvent = new PlayerQuitEvent(playerIn.getBukkitEntity(), quitMessage != null ? quitMessage : "\u00A7e" + playerIn.getScoreboardName() + " left the game");
+
+        PlayerQuitEvent playerQuitEvent = new PlayerQuitEvent(playerIn.getBukkitEntity(), playerIn.bridge$kickLeaveMessage() != null ?
+                playerIn.bridge$kickLeaveMessage() : "\u00A7e" + playerIn.getScoreboardName() + " left the game");
         cserver.getPluginManager().callEvent(playerQuitEvent);
         playerIn.getBukkitEntity().disconnect(playerQuitEvent.getQuitMessage());
-        BukkitCaptures.captureQuitMessage(playerQuitEvent.getQuitMessage());
-        cserver.getScoreboardManager().removePlayer(playerIn.getBukkitEntity());
-        return playerQuitEvent.getQuitMessage(); // CraftBukkit
+        playerIn.doTick(); // SPIGOT-924
+        // CraftBukkit end
+        return playerQuitEvent.getQuitMessage();
     }
 
     @Override
@@ -299,48 +391,65 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     }
 
     @Override
-    public ServerPlayer canPlayerLogin(SocketAddress socketAddress, GameProfile gameProfile, ServerLoginPacketListenerImpl handler) {
+    public ServerPlayer canPlayerLogin(ServerLoginPacketListenerImpl handler, GameProfile gameProfile) {
+        MutableComponent mutablecomponent1 = Component.empty();
+        // Moved from processLogin
         UUID uuid = UUIDUtil.getOrCreatePlayerUUID(gameProfile);
         List<ServerPlayer> list = Lists.newArrayList();
-        for (ServerPlayer entityplayer : this.players) {
+
+        ServerPlayer entityplayer;
+
+        for (int i = 0; i < this.players.size(); ++i) {
+            entityplayer = (ServerPlayer) this.players.get(i);
             if (entityplayer.getUUID().equals(uuid)) {
                 list.add(entityplayer);
             }
         }
-        for (ServerPlayer entityplayer : list) {
-            this.save(entityplayer);
+
+        Iterator iterator = list.iterator();
+        while (iterator.hasNext()) {
+            entityplayer = (ServerPlayer) iterator.next();
+            save(entityplayer); // CraftBukkit - Force the player's inventory to be saved
             entityplayer.connection.disconnect(Component.translatable("multiplayer.disconnect.duplicate_login"));
         }
+
+        // Instead of kicking then returning, we need to store the kick reason
+        // in the event, check with plugins to see if it's ok, and THEN kick
+        // depending on the outcome.
+
+        SocketAddress socketaddress = handler.connection.getRemoteAddress();
         ServerPlayer entity = new ServerPlayer(this.server, this.server.getLevel(Level.OVERWORLD), gameProfile);
-        Player player = entity.getBukkitEntity();
+        org.bukkit.entity.Player player = entity.getBukkitEntity();
+        PlayerLoginEvent event = new PlayerLoginEvent(player, handler.connection.bridge$hostname(), ((java.net.InetSocketAddress) socketaddress).getAddress());
 
-        String hostname = handler == null ? "" : handler.connection.bridge$hostname();
-
-        PlayerLoginEvent event = new PlayerLoginEvent(player, hostname, ((InetSocketAddress) socketAddress).getAddress());
-        if (this.getBans().isBanned(gameProfile) && !this.getBans().get(gameProfile).hasExpired()) {
-            UserBanListEntry gameprofilebanentry = this.bans.get(gameProfile);
-            var chatmessage = Component.translatable("multiplayer.disconnect.banned.reason", gameprofilebanentry.getReason());
-            if (gameprofilebanentry.getExpires() != null) {
-                chatmessage.append(Component.translatable("multiplayer.disconnect.banned.expiration", BAN_DATE_FORMAT.format(gameprofilebanentry.getExpires())));
+        if (getBans().isBanned(gameProfile) && !getBans().get(gameProfile).hasExpired()) {
+            UserBanListEntry userbanlistentry = this.bans.get(gameProfile);
+            mutablecomponent1 = Component.translatable("multiplayer.disconnect.banned.reason", userbanlistentry.getReason());
+            if (userbanlistentry.getExpires() != null) {
+                mutablecomponent1.append(Component.translatable("multiplayer.disconnect.banned.expiration", BAN_DATE_FORMAT.format(userbanlistentry.getExpires())));
             }
-            event.disallow(PlayerLoginEvent.Result.KICK_BANNED, CraftChatMessage.fromComponent(chatmessage));
+
+            event.disallow(PlayerLoginEvent.Result.KICK_BANNED, org.spigotmc.SpigotConfig.whitelistMessage); // Spigot
         } else if (!this.isWhiteListed(gameProfile)) {
-            event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, SpigotConfig.whitelistMessage);
-        } else if (this.getIpBans().isBanned(socketAddress) && !this.getIpBans().get(socketAddress).hasExpired()) {
-            IpBanListEntry ipbanentry = this.ipBans.get(socketAddress);
-            var chatmessage = Component.translatable("multiplayer.disconnect.banned_ip.reason", ipbanentry.getReason());
-            if (ipbanentry.getExpires() != null) {
-                chatmessage.append(Component.translatable("multiplayer.disconnect.banned_ip.expiration", BAN_DATE_FORMAT.format(ipbanentry.getExpires())));
+            mutablecomponent1 = Component.translatable("multiplayer.disconnect.not_whitelisted");
+            event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, CraftChatMessage.fromComponent(mutablecomponent1));
+        } else if (getIpBans().isBanned(socketaddress) && !getIpBans().get(socketaddress).hasExpired()) {
+            IpBanListEntry ipbanlistentry = this.ipBans.get(socketaddress);
+            mutablecomponent1 = Component.translatable("multiplayer.disconnect.banned_ip.reason", ipbanlistentry.getReason());
+            if (ipbanlistentry.getExpires() != null) {
+                mutablecomponent1.append(Component.translatable("multiplayer.disconnect.banned_ip.expiration", BAN_DATE_FORMAT.format(ipbanlistentry.getExpires())));
             }
-            event.disallow(PlayerLoginEvent.Result.KICK_BANNED, CraftChatMessage.fromComponent(chatmessage));
-        } else if (this.players.size() >= this.maxPlayers && !this.canBypassPlayerLimit(gameProfile)) {
-            event.disallow(PlayerLoginEvent.Result.KICK_FULL, SpigotConfig.serverFullMessage);
+
+            event.disallow(PlayerLoginEvent.Result.KICK_BANNED, CraftChatMessage.fromComponent(mutablecomponent1));
+        } else {
+            if (this.players.size() >= this.maxPlayers && !this.canBypassPlayerLimit(gameProfile)) {
+                event.disallow(PlayerLoginEvent.Result.KICK_FULL, org.spigotmc.SpigotConfig.serverFullMessage); // Spigot
+            }
         }
-        this.cserver.getPluginManager().callEvent(event);
+
+        cserver.getPluginManager().callEvent(event);
         if (event.getResult() != PlayerLoginEvent.Result.ALLOWED) {
-            if (handler != null) {
-                handler.disconnect(CraftChatMessage.fromStringOrNull(event.getKickMessage()));
-            }
+            handler.disconnect(event.getKickMessage());
             return null;
         }
         return entity;
@@ -655,6 +764,23 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         }
     }
 
+    @Redirect(method = "tick", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/players/PlayerList;broadcastAll(Lnet/minecraft/network/protocol/Packet;)V"))
+    private void banner$castMsg(PlayerList instance, Packet<?> packet) {
+        // CraftBukkit start
+        for (int i = 0; i < this.players.size(); ++i) {
+            final ServerPlayer target = (ServerPlayer) this.players.get(i);
+
+            target.connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LATENCY), this.players.stream().filter(new Predicate<ServerPlayer>() {
+                @Override
+                public boolean test(ServerPlayer input) {
+                    return target.getBukkitEntity().canSee(input.getBukkitEntity());
+                }
+            }).collect(Collectors.toList())));
+            // CraftBukkit end
+        }
+    }
+
     /**
      * @author wdog5
      * @reason bukkit
@@ -685,6 +811,24 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             serverstatisticmanager = new ServerStatsCounter(this.server, file1);
         }
         return serverstatisticmanager;
+    }
+
+    /**
+     * @author wdog5
+     * @reason functionally replaced
+     */
+    @Overwrite
+    public PlayerAdvancements getPlayerAdvancements(ServerPlayer player) {
+        UUID uUID = player.getUUID();
+        PlayerAdvancements playerAdvancements = (PlayerAdvancements)player.getAdvancements();// CraftBukkit
+        if (playerAdvancements == null) {
+            Path path = this.server.getWorldPath(LevelResource.PLAYER_ADVANCEMENTS_DIR).resolve("" + uUID + ".json");
+            playerAdvancements = new PlayerAdvancements(this.server.getFixerUpper(), ((PlayerList) (Object) this), this.server.getAdvancements(), path, player);
+            // this.advancements.put(uUID, playerAdvancements);
+        }
+
+        playerAdvancements.setPlayer(player);
+        return playerAdvancements;
     }
 
 }

@@ -20,7 +20,6 @@ public class KnotLibraryHelper {
             FabricLauncher launcher = FabricLauncherBase.getLauncher();
             if (!FabricLoader.getInstance().isDevelopmentEnvironment()) {
                 launcher.addToClassPath(UrlUtil.asPath(file.toURI().toURL()));
-                LOGGER.info((BannerMCStart.I18N.get("lib.loading") + file.getName()));
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
