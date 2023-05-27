@@ -19,8 +19,8 @@ public class MixinServerConnectionListener implements InjectionServerConnectionL
     @Shadow @Final private List<ChannelFuture> channels;
 
     @Redirect(method = "startTcpServerListener", at = @At(value = "INVOKE",
-            target = "Lio/netty/bootstrap/ServerBootstrap;bind()Lio/netty/channel/ChannelFuture;"),
-            remap = false)
+            target = "Lio/netty/bootstrap/ServerBootstrap;bind()Lio/netty/channel/ChannelFuture;",
+            remap = false))
     public ChannelFuture banner$bind(ServerBootstrap bootstrap) {
         return bootstrap.option(ChannelOption.AUTO_READ, false).bind();
     }
