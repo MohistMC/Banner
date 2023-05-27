@@ -91,9 +91,9 @@ public abstract class MixinBucketItem extends Item {
         return emptyContents(player, level, pos, result, result.getDirection(), pos, banner$usedStack.get(), banner$usedHand.get());
     }
 
-    private AtomicReference<Direction> banner$direction = new AtomicReference<>(null);
-    private AtomicReference<BlockPos> banner$clicked = new AtomicReference<>(null);
-    private AtomicReference<ItemStack> banner$stack = new AtomicReference<>(null);
+    private AtomicReference<Direction> banner$direction = new AtomicReference<>();
+    private AtomicReference<BlockPos> banner$clicked = new AtomicReference<>();
+    private AtomicReference<ItemStack> banner$stack = new AtomicReference<>();
     private AtomicReference<InteractionHand> banner$hand = new AtomicReference<>(InteractionHand.MAIN_HAND);
 
     public boolean emptyContents(Player entityhuman, Level world, BlockPos blockposition, @Nullable BlockHitResult movingobjectpositionblock, Direction enumdirection, BlockPos clicked, ItemStack itemstack, InteractionHand enumhand) {
@@ -109,11 +109,26 @@ public abstract class MixinBucketItem extends Item {
             shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private void banner$handleEmptyContents(Player player, Level level, BlockPos pos, BlockHitResult result,
                                             CallbackInfoReturnable<Boolean> cir, BlockState blockState, Block block) {
+        // Banner start - handle NPE
+        Direction direction = banner$direction.get();
+        direction = direction == null ? result.getDirection() : direction;
+        Direction finalDirection = direction;
+        BlockPos clicked = banner$clicked.get();
+        clicked = clicked == null ? result.getBlockPos() : clicked;
+        BlockPos finalClicked = clicked;
+        ItemStack stack = banner$stack.get();
+        stack = stack == null ? player.getUseItem().getItem().getDefaultInstance() : stack;
+        ItemStack finalStack = stack;
+        InteractionHand hand = banner$hand.get();
+        hand = hand == null ? player.getUsedItemHand() : hand;
+        InteractionHand finalHand = hand;
+        // Banner end
+
         boolean banner$flag = blockState.canBeReplaced(this.content);
         boolean banner$flag2 = blockState.isAir() || banner$flag || block instanceof LiquidBlockContainer && ((LiquidBlockContainer)block).canPlaceLiquid(level, pos, blockState, this.content);
         // CraftBukkit start
         if (banner$flag2 && player != null) {
-            PlayerBucketEmptyEvent event = CraftEventFactory.callPlayerBucketEmptyEvent((ServerLevel) level, player, pos, banner$clicked.get(), banner$direction.get(), banner$stack.get(), banner$hand.get());
+            PlayerBucketEmptyEvent event = CraftEventFactory.callPlayerBucketEmptyEvent((ServerLevel) level, player, pos, finalClicked, finalDirection, finalStack, finalHand);
             if (event.isCancelled()) {
                 ((ServerPlayer) player).connection.send(new ClientboundBlockUpdatePacket(level, pos)); // SPIGOT-4238: needed when looking through entity
                 ((ServerPlayer) player).getBukkitEntity().updateInventory(); // SPIGOT-4541
@@ -126,6 +141,20 @@ public abstract class MixinBucketItem extends Item {
     @Redirect(method = "emptyContents", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/item/BucketItem;emptyContents(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/BlockHitResult;)Z"))
     private boolean banner$reuseEmptyContent0(BucketItem instance, Player player, Level level, BlockPos pos, BlockHitResult result) {
-        return emptyContents(player, level, pos, result, banner$direction.get(), banner$clicked.get(), banner$stack.get(), banner$hand.get());
+        // Banner start - handle NPE
+        Direction direction = banner$direction.get();
+        direction = direction == null ? result.getDirection() : direction;
+        Direction finalDirection = direction;
+        BlockPos clicked = banner$clicked.get();
+        clicked = clicked == null ? result.getBlockPos() : clicked;
+        BlockPos finalClicked = clicked;
+        ItemStack stack = banner$stack.get();
+        stack = stack == null ? player.getUseItem().getItem().getDefaultInstance() : stack;
+        ItemStack finalStack = stack;
+        InteractionHand hand = banner$hand.get();
+        hand = hand == null ? player.getUsedItemHand() : hand;
+        InteractionHand finalHand = hand;
+        // Banner end
+        return emptyContents(player, level, pos, result, finalDirection, finalClicked, finalStack, finalHand);
     }
 }
