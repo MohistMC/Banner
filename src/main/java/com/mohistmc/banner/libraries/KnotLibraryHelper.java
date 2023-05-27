@@ -1,6 +1,5 @@
 package com.mohistmc.banner.libraries;
 
-import com.mohistmc.banner.BannerMCStart;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.impl.launch.FabricLauncher;
 import net.fabricmc.loader.impl.launch.FabricLauncherBase;

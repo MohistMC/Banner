@@ -125,17 +125,13 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     private CraftServer cserver;
 
-    @Inject(method = "<init>", at = @At(value = "TAIL"))
+    @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/server/players/PlayerList;bans:Lnet/minecraft/server/players/UserBanList;"))
     public void banner$init(MinecraftServer minecraftServer, LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess, PlayerDataStorage playerDataStorage, int i, CallbackInfo ci) {
         this.players = new CopyOnWriteArrayList<>();
-        MinecraftServer banner$server = (DedicatedServer) minecraftServer;
-        this.cserver = new CraftServer((DedicatedServer) banner$server, (PlayerList) (Object) this);
-        banner$server.banner$setServer(cserver);
+        minecraftServer.banner$setServer(this.cserver =
+                new CraftServer((DedicatedServer) minecraftServer, ((PlayerList) (Object) this)));
         FabricInjectBukkit.init();
-        banner$server.banner$setConsole(ColouredConsoleSender.getInstance());
-        org.spigotmc.SpigotConfig.init((java.io.File) banner$server.bridge$options().valueOf("spigot-settings"));
-        BannerConfig.init((java.io.File) banner$server.bridge$options().valueOf("banner-settings"));
-        org.spigotmc.SpigotConfig.registerCommands();
+        minecraftServer.banner$setConsole(ColouredConsoleSender.getInstance());
     }
 
     @Inject(method = "placeNewPlayer",

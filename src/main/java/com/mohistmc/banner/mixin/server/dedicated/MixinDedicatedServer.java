@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.server.dedicated;
 
 import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.config.BannerConfig;
+import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -8,15 +10,19 @@ import net.minecraft.server.ConsoleInput;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.Services;
 import net.minecraft.server.WorldStem;
+import net.minecraft.server.dedicated.DedicatedPlayerList;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
 import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.players.PlayerList;
 import net.minecraft.server.rcon.RconConsoleSource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R3.command.ColouredConsoleSender;
 import org.bukkit.craftbukkit.v1_19_R3.command.CraftRemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.util.ForwardLogHandler;
 import org.bukkit.event.server.RemoteServerCommandEvent;
@@ -31,7 +37,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Proxy;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(DedicatedServer.class)
@@ -45,12 +55,70 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         super(thread, levelStorageAccess, packRepository, worldStem, proxy, dataFixer, services, chunkProgressListenerFactory);
     }
 
-    @Inject(method = "initServer", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/dedicated/DedicatedServer;setPlayerList(Lnet/minecraft/server/players/PlayerList;)V"))
+    @Inject(method = "initServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/dedicated/DedicatedServer;usesAuthentication()Z", ordinal = 0))
     private void banner$initServer(CallbackInfoReturnable<Boolean> cir) {
         BannerServer.LOGGER.info("Loading Bukkit plugins, please wait...");
         // CraftBukkit start
+        this.setPlayerList(new DedicatedPlayerList((DedicatedServer) (Object) this, this.registries(), this.playerDataStorage));
         this.bridge$server().loadPlugins();
         this.bridge$server().enablePlugins(PluginLoadOrder.STARTUP);
+        org.spigotmc.SpigotConfig.init((java.io.File) this.bridge$options().valueOf("spigot-settings"));
+        BannerConfig.init((java.io.File) this.bridge$options().valueOf("banner-settings"));
+        org.spigotmc.SpigotConfig.registerCommands();
+    }
+
+    @Redirect(method = "initServer", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/dedicated/DedicatedServer;setPlayerList(Lnet/minecraft/server/players/PlayerList;)V"))
+    private void banner$moveUpPlayerList(DedicatedServer instance, PlayerList playerList) {}
+
+    @Redirect(method = "initServer", at = @At(value = "NEW",target = "(Ljava/lang/Runnable;)Ljava/lang/Thread;", ordinal = 0))
+    private Thread banner$newThread(Runnable target) {
+        return  new Thread("Server console handler") {
+            public void run() {
+                // CraftBukkit start
+                if (!org.bukkit.craftbukkit.Main.useConsole) {
+                    return;
+                }
+                jline.console.ConsoleReader bufferedreader = bridge$reader();
+
+                // MC-33041, SPIGOT-5538: if System.in is not valid due to javaw, then return
+                try {
+                    System.in.available();
+                } catch (IOException ex) {
+                    return;
+                }
+                // CraftBukkit end
+
+                String s;
+
+                try {
+                    // CraftBukkit start - JLine disabling compatibility
+                    while (!((DedicatedServer) (Object) this).isStopped() && ((DedicatedServer) (Object) this).isRunning()) {
+                        if (org.bukkit.craftbukkit.Main.useJline) {
+                            s = bufferedreader.readLine(">", null);
+                        } else {
+                            s = bufferedreader.readLine();
+                        }
+
+                        // SPIGOT-5220: Throttle if EOF (ctrl^d) or stdin is /dev/null
+                        if (s == null) {
+                            try {
+                                Thread.sleep(50L);
+                            } catch (InterruptedException ex) {
+                                Thread.currentThread().interrupt();
+                            }
+                            continue;
+                        }
+                        if (s.trim().length() > 0) { // Trim to filter lines which are just spaces
+                            ((DedicatedServer) (Object) this).handleConsoleInput(s, ((DedicatedServer) (Object) this).createCommandSourceStack());
+                        }
+                        // CraftBukkit end
+                    }
+                } catch (IOException ioexception) {
+                    LOGGER.error("Exception handling console input", ioexception);
+                }
+            }
+        };
     }
 
     @Inject(method = "initServer",
@@ -134,9 +202,9 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         });
     }
 
-    @Inject(method = "onServerExit", at = @At("RETURN"))
+    @Inject(method = "onServerExit", at = @At("TAIL"))
     public void banner$exitNow(CallbackInfo ci) {
-        System.exit(0);
+        Runtime.getRuntime().halt(0);
     }
 
     @Override
