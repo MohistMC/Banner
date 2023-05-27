@@ -17,7 +17,7 @@
   "icon": "assets/banner/logo.png",
 
   "accessWidener": "banner.accesswidener",
-  "environment": "*",
+  "environment": "server",
   "entrypoints": {
     "server": [
       "com.mohistmc.banner.BannerServer"
@@ -27,7 +27,8 @@
     ]
   },
   "mixins": [
-    "banner.mixins.json"
+    "banner.core.mixins.json",
+    "banner.locale.mixins.json"
   ],
 
   "depends": {
