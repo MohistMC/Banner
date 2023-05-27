@@ -19,8 +19,7 @@ public class MixinPrepareRamNearestTarget {
     @Inject(method = "method_36270",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/ai/behavior/PrepareRamNearestTarget;chooseRamPosition(Lnet/minecraft/world/entity/PathfinderMob;Lnet/minecraft/world/entity/LivingEntity;)V"), cancellable = true)
-    private void banner$targetEvent(PathfinderMob pathfinderMob,
-                                    LivingEntity livingEntity, CallbackInfo ci) {
+    private void banner$targetEvent(PathfinderMob pathfinderMob, LivingEntity livingEntity, CallbackInfo ci) {
         // CraftBukkit start
         EntityTargetEvent event = CraftEventFactory.callEntityTargetLivingEvent(pathfinderMob, livingEntity, (livingEntity instanceof ServerPlayer) ? EntityTargetEvent.TargetReason.CLOSEST_PLAYER : EntityTargetEvent.TargetReason.CLOSEST_ENTITY);
         if (event.isCancelled() || event.getTarget() == null) {
