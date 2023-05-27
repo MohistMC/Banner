@@ -131,8 +131,6 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
             this.player.connection.send(new ClientboundBlockUpdatePacket(blockposition, this.level.getBlockState(blockposition)));
             this.debugLogging(blockposition, false, j, "too high");
         } else {
-            BlockState iblockdata;
-
             if (packetplayinblockdig_enumplayerdigtype == ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK) {
                 if (!this.level.mayInteract(this.player, blockposition)) {
                     // CraftBukkit start - fire PlayerInteractEvent
@@ -176,7 +174,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
                 this.destroyProgressStart = this.gameTicks;
                 float f = 1.0F;
 
-                iblockdata = this.level.getBlockState(blockposition);
+                BlockState iblockdata = this.level.getBlockState(blockposition);
                 // CraftBukkit start - Swings at air do *NOT* exist.
                 if (event.useInteractedBlock() == Event.Result.DENY) {
                     // If we denied a door from opening, we need to send a correcting update to the client, as it already opened the door.
@@ -234,7 +232,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
                 if (blockposition.equals(this.destroyPos)) {
                     int l = this.gameTicks - this.destroyProgressStart;
 
-                    iblockdata = this.level.getBlockState(blockposition);
+                    BlockState iblockdata = this.level.getBlockState(blockposition);
                     if (!iblockdata.isAir()) {
                         float f1 = iblockdata.getDestroyProgress(this.player, this.player.level, blockposition) * (float) (l + 1);
 

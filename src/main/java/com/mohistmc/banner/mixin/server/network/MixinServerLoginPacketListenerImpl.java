@@ -163,7 +163,7 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
                     } else if (server.isSingleplayer()) {
                         LOGGER.warn("Failed to verify username but will let them in anyway!");
                         gameProfile = createFakeProfile(gameprofile);
-                        state = ServerLoginPacketListenerImpl.State.NEGOTIATING;
+                        state = ServerLoginPacketListenerImpl.State.READY_TO_ACCEPT;
                     } else {
                         disconnect(Component.translatable("multiplayer.disconnect.unverified_username"));
                         LOGGER.error("Username '{}' tried to join with an invalid session", gameprofile.getName());
@@ -172,7 +172,7 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
                     if (server.isSingleplayer()) {
                         LOGGER.warn("Authentication servers are down but will let them in anyway!");
                         gameProfile = createFakeProfile(gameprofile);
-                        state = ServerLoginPacketListenerImpl.State.NEGOTIATING;
+                        state = ServerLoginPacketListenerImpl.State.READY_TO_ACCEPT;
                     } else {
                         disconnect(Component.translatable("multiplayer.disconnect.authservers_down"));
                         LOGGER.error("Couldn't verify username because servers are unavailable");
@@ -223,6 +223,6 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
             return;
         }
         LOGGER.info("UUID of player {} is {}", gameProfile.getName(), gameProfile.getId());
-        state = ServerLoginPacketListenerImpl.State.NEGOTIATING;
+        state = ServerLoginPacketListenerImpl.State.READY_TO_ACCEPT;
     }
 }
