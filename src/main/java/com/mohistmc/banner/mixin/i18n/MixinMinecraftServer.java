@@ -14,6 +14,11 @@ public class MixinMinecraftServer {
         return BannerMCStart.I18N.get("server.chunk.saving");
     }
 
+    @ModifyConstant(method = "initializeKeyPair", constant = @Constant(stringValue = "Generating keypair"))
+    private String localKeyPair(String constant){
+        return BannerMCStart.I18N.get("server.key.pair");
+    }
+
     @ModifyConstant(method = "saveAllChunks", constant = @Constant(stringValue = "ThreadedAnvilChunkStorage ({}): All chunks are saved"))
     private String localSaveAnvil(String constant){
         return BannerMCStart.I18N.get("server.chunk.saved");

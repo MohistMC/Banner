@@ -4,6 +4,7 @@
   "package": "com.mohistmc.banner.mixin.i18n",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "MixinAdvancementList",
     "MixinDedicatedServer",
     "MixinMinecraftServer"
   ]
