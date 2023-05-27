@@ -365,7 +365,6 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
         return (CraftHumanEntity) super.getBukkitEntity();
     }
 
-
     @Override
     public boolean bridge$fauxSleeping() {
         return fauxSleeping;
