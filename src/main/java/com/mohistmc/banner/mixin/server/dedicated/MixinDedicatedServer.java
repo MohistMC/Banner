@@ -55,21 +55,16 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         super(thread, levelStorageAccess, packRepository, worldStem, proxy, dataFixer, services, chunkProgressListenerFactory);
     }
 
-    @Inject(method = "initServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/dedicated/DedicatedServer;usesAuthentication()Z", ordinal = 0))
+    @Inject(method = "initServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/dedicated/DedicatedServer;usesAuthentication()Z", ordinal = 1))
     private void banner$initServer(CallbackInfoReturnable<Boolean> cir) {
         BannerServer.LOGGER.info("Loading Bukkit plugins, please wait...");
         // CraftBukkit start
-        this.setPlayerList(new DedicatedPlayerList((DedicatedServer) (Object) this, this.registries(), this.playerDataStorage));
         this.bridge$server().loadPlugins();
         this.bridge$server().enablePlugins(PluginLoadOrder.STARTUP);
         org.spigotmc.SpigotConfig.init((java.io.File) this.bridge$options().valueOf("spigot-settings"));
         BannerConfig.init((java.io.File) this.bridge$options().valueOf("banner-settings"));
         org.spigotmc.SpigotConfig.registerCommands();
     }
-
-    @Redirect(method = "initServer", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/dedicated/DedicatedServer;setPlayerList(Lnet/minecraft/server/players/PlayerList;)V"))
-    private void banner$moveUpPlayerList(DedicatedServer instance, PlayerList playerList) {}
 
     @Redirect(method = "initServer", at = @At(value = "NEW",target = "(Ljava/lang/Runnable;)Ljava/lang/Thread;", ordinal = 0))
     private Thread banner$newThread(Runnable target) {
