@@ -34,14 +34,11 @@ public class DefaultLibraries {
         Set<File> defaultLibs = new LinkedHashSet<>();
         AtomicLong allSize = new AtomicLong(); // global
         for (File lib : getDefaultLibs().keySet()) {
-            allSize.addAndGet(UpdateUtils.getAllSizeOfUrl(libUrl(lib)));
-            if (lib.exists() && BannerConfigUtil.BLACKLIST_LIB().contains(lib.getName())) {
-                continue;
-            }
             if (lib.exists() && MD5Util.getMd5(lib).equals(libs.get(lib))) {
                 currentSize.addAndGet(lib.length());
                 continue;
             }
+            allSize.addAndGet(UpdateUtils.getAllSizeOfUrl(libUrl(lib)));
             defaultLibs.add(lib);
         }
         for (File lib : defaultLibs) {
@@ -90,4 +87,5 @@ public class DefaultLibraries {
         b.close();
         return temp;
     }
+
 }
