@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(targets = "net.minecraft.world.entity.monster.SpellcasterIllager$SpellcasterUseSpellGoal")
+@Mixin(SpellcasterIllager.SpellcasterUseSpellGoal.class)
 public abstract class MixinSpellcastingIllager_UseSpellGoal {
 
     // @formatter:off
