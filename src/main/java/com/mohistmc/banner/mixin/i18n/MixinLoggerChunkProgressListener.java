@@ -20,7 +20,8 @@ public abstract class MixinLoggerChunkProgressListener {
     @Shadow public abstract int getProgress();
 
     @Redirect(method = "onStatusChange", at = @At(value = "INVOKE",
-            target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V"))
+            target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V",
+            remap = false))
     private void banner$i18nPrepArea(Logger instance, String s) {
         LOGGER.info(BannerMCStart.I18N.get("world.preparingSpawn"), Mth.clamp(this.getProgress(), 0, 100));
     }
