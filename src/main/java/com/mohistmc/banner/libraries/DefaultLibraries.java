@@ -1,10 +1,8 @@
 package com.mohistmc.banner.libraries;
 
 import com.mohistmc.banner.BannerMCStart;
-import com.mohistmc.banner.config.BannerConfigUtil;
 import com.mohistmc.banner.network.download.DownloadSource;
 import com.mohistmc.banner.network.download.UpdateUtils;
-import com.mohistmc.banner.util.JarLoader;
 import com.mohistmc.banner.util.MD5Util;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -48,7 +46,6 @@ public class DefaultLibraries {
             System.out.println(BannerMCStart.I18N.get("libraries.global.percentage") + Math.round((float) (currentSize.get() * 100) / allSize.get()) + "%"); //Global percentage
             try {
                 UpdateUtils.downloadFile(u, lib, libs.get(lib));
-                JarLoader.loadJar(lib.toPath());
                 currentSize.addAndGet(lib.length());
                 fail.remove(u.replace(MAVENURL, ""));
             } catch (Exception e) {
