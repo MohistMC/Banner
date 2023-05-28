@@ -25,3 +25,4 @@ libraries/com/googlecode/json-simple/json-simple/1.1.1/json-simple-1.1.1.jar|5cc
 libraries/com/mysql/mysql-connector-j/8.0.32/mysql-connector-j-8.0.32.jar|25bf3b3cd262065283962078dc82e99c
 libraries/net/md-5/bungeecord-chat/1.16-R0.4/bungeecord-chat-1.16-R0.4.jar|bf6464395a0951675c3bca47d3e1a13a
 libraries/net/md-5/SpecialSource/1.11.0/SpecialSource-1.11.0.jar|815529d90faff79cb61c12f47a4259b5
+libraries/jline/jline/2.14.6/jline-2.14.6.jar|480423551649bc6980b43f09e4717272

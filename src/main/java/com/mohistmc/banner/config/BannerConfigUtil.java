@@ -73,7 +73,12 @@ public class BannerConfigUtil {
     }
 
     public static String lang() {
-        return yml.getString("banner.lang", "xx_XX");
+        String lang = "banner.lang";
+        if (yml.get(lang) == null) {
+            yml.set(lang, "xx_XX");
+            save();
+        }
+        return yml.getString(lang, "xx_XX");
     }
 
     public static boolean showLogo() {

@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.core.server.dedicated;
 
+import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mojang.datafixers.DataFixer;
@@ -49,7 +50,7 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
 
     @Inject(method = "initServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/dedicated/DedicatedServer;usesAuthentication()Z", ordinal = 1))
     private void banner$initServer(CallbackInfoReturnable<Boolean> cir) {
-        BannerServer.LOGGER.info("Loading Bukkit plugins, please wait...");
+        BannerServer.LOGGER.info(BannerMCStart.I18N.get("bukkit.plugin.loading.info"));
         // CraftBukkit start
         this.bridge$server().loadPlugins();
         this.bridge$server().enablePlugins(PluginLoadOrder.STARTUP);
