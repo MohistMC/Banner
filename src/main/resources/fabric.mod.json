@@ -27,8 +27,7 @@
     ]
   },
   "mixins": [
-    "banner.core.mixins.json",
-    "banner.locale.mixins.json"
+    "banner.mixins.json"
   ],
 
   "depends": {
