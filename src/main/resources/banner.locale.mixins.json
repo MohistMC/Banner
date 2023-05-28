@@ -6,7 +6,9 @@
   "mixins": [
     "MixinAdvancementList",
     "MixinDedicatedServer",
+    "MixinLoggerChunkProgressListener",
     "MixinMinecraftServer",
-    "MixinRecipeManager"
+    "MixinRecipeManager",
+    "MixinServerConnectionListener"
   ]
 }

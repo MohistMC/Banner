@@ -9,6 +9,7 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.logging.Level;
 
+import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -222,7 +223,7 @@ public class SpigotConfig
     {
         int count = getInt( "settings.netty-threads", 4 );
         System.setProperty( "io.netty.eventLoopThreads", Integer.toString( count ) );
-        Bukkit.getLogger().log( Level.INFO, "Using {0} threads for Netty based IO", count );
+        Bukkit.getLogger().log( Level.INFO, BannerMCStart.I18N.get("spigotconfig.thread.io"), count );
     }
 
     public static boolean disableStatSaving;
@@ -266,7 +267,7 @@ public class SpigotConfig
     private static void playerSample()
     {
         playerSample = getInt( "settings.sample-count", 12 );
-        System.out.println( "Server Ping Player Sample Count: " + playerSample );
+        System.out.println( BannerMCStart.I18N.get("spigotconfig.ping.sample") + " " + playerSample );
     }
 
     public static int playerShuffle;
@@ -355,10 +356,10 @@ public class SpigotConfig
 
         if ( LogManager.getRootLogger().isTraceEnabled() )
         {
-            Bukkit.getLogger().info( "Debug logging is enabled" );
+            Bukkit.getLogger().info( BannerMCStart.I18N.get("spigotconfig.debug.enabled") );
         } else
         {
-            Bukkit.getLogger().info( "Debug logging is disabled" );
+            Bukkit.getLogger().info(BannerMCStart.I18N.get("spigotconfig.debug.disabled"));
         }
     }
 

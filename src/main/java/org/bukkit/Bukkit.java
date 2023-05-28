@@ -14,6 +14,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
+import com.mohistmc.banner.BannerMCStart;
 import org.bukkit.Warning.WarningState;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.block.data.BlockData;
@@ -90,7 +91,7 @@ public final class Bukkit {
         }
 
         Bukkit.server = server;
-        server.getLogger().info("This server is running " + getName() + " version " + getVersion() + " (Implementing API version " + getBukkitVersion() + ")");
+        server.getLogger().info(BannerMCStart.I18N.get("bukkit.version.servername") + getName() + BannerMCStart.I18N.get("bukkit.version.version") + " " + getVersion() + BannerMCStart.I18N.get("bukkit.version.apiversion") + getBukkitVersion() + ")");
     }
 
     /**
