@@ -1,6 +1,7 @@
 // CHECKSTYLE:OFF
 package org.bukkit.plugin.java;
 
+import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.nms.proxy.DelegateURLClassLoder;
 import net.fabricmc.loader.api.FabricLoader;
@@ -27,7 +28,7 @@ class LibraryLoader {
         if (desc.getLibraries().isEmpty()) {
             return null;
         }
-        BannerServer.LOGGER.info("[{}] Loading {} libraries... please wait", desc.getName(), desc.getLibraries().size());
+        BannerServer.LOGGER.info(BannerMCStart.I18N.get("spigot.lib.loading"), desc.getName(), desc.getLibraries().size());
 
         List<Dependency> dependencies = new ArrayList<>();
         for (String libraries : desc.getLibraries()) {
@@ -49,7 +50,7 @@ class LibraryLoader {
             File file = new File(new File(FabricLoader.getInstance().getGameDir().toFile(), "libraries/spigot-lib"), "%s/%s/%s/%s".formatted(group, dependency.name(), dependency.version(), fileName));
 
             if (file.exists()) {
-                BannerServer.LOGGER.info("[{}] Found libraries {}", desc.getName(), file);
+                BannerServer.LOGGER.info(BannerMCStart.I18N.get("spigot.lib.found"), desc.getName(), file);
                 libraries.add(file);
                 continue;
             }
@@ -76,7 +77,7 @@ class LibraryLoader {
         for (File file : libraries) {
             try {
                 jarFiles.add(file.toURI().toURL());
-                BannerServer.LOGGER.info("[{}] Loaded libraries {}", desc.getName(), file);
+                BannerServer.LOGGER.info(BannerMCStart.I18N.get("spigot.lib.loaded"), desc.getName(), file);
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
