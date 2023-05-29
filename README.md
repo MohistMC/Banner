@@ -15,7 +15,7 @@
 | Version | Support     | Stability | Mod compatibility   | Plugin compatibility |
 |---------|-------------|-----------|---------------------|----------------------|
 | 1.20    | WIP         | Poor      | Zero                | Zero                 |
-| 1.19.4  | WIP         | Poor      | Better than Plugins | Poor                 |
+| 1.19.4  | WIP         | Poor      | Better than plugins | Poor                 |
 
 ## Notice
 - Fabric + Bukkit is more vanilla-like than Forge + Bukkit
@@ -45,14 +45,14 @@ chmod +x ./banner-launcher
 
 ## Usage
 - Just put it in the mods folder.
-- Remember that Banner is still in WIP. Do not use it in a production environment!
+- Also, remember that Banner is still in WIP - do not use it in a production environment!
 
 ## Compatiblity
 - If you want to use Lithium, you should change the "mixin.block.hopper" value in its config to false.
 
 ## Upstream Projects
 - [**Fabric Loader**](https://github.com/FabricMC/fabric-loader.git) - Mod load support.
-- [**Fabric API**](https://github.com/FabricMC/fabric-loader.git) - Mod api support.
+- [**Fabric API**](https://github.com/FabricMC/fabric-loader.git) - Mod API support.
 - [**Bukkit**](https://hub.spigotmc.org/stash/scm/spigot/bukkit.git) - Plugin support.
 - [**CraftBukkit**](https://hub.spigotmc.org/stash/scm/spigot/craftbukkit.git) - Plugin support.
 - [**Spigot**](https://hub.spigotmc.org/stash/scm/spigot/spigot.git) - Plugin support.
