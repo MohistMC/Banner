@@ -14,35 +14,28 @@
 
 | Version | Support     | Stability | Mod compatibility   | Plugin compatibility |
 |---------|-------------|-----------|---------------------|----------------------|
-| 1.20    | WIP         | Poor      | Zero                | Zero                 |   
-| 1.19.4  | WIP         | Poor      | Better than Plugins | Poor                 |   
+| 1.20    | WIP         | Poor      | Zero                | Zero                 |
+| 1.19.4  | WIP         | Poor      | Better than Plugins | Poor                 |
 
-Notice
-------
-* [ ] Fabric + Bukkit is more vanilla like than Forge + Bukkit
-* [ ] Fabric api uses mixins to change minecraft indirectly
-* [ ] there are no a lot of breaking changes
-* [ ] Banner still has a lot of bugs,so do not use it in production environment
-* [ ] Just download for testing, report bugs
+## Notice
+- Fabric + Bukkit is more vanilla-like than Forge + Bukkit
+- Fabric API uses mixins to change minecraft indirectly
+- There's very little breaking changes
+- Banner still has a lot of bugs, so do not use it in production
+- Download for testing only, report bugs
 
-Progress
-------
-
+## Progress
 - [ ] Start patch
-    * [x] Bukkit([**01d577f5**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/commits/01d577f5))
-    * [ ] CraftBukkit([**a7cfc778f**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/commits/a7cfc778f))
-    * [ ] Spigot ([**7d7b241e**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/spigot/commits/d1bd3bd2))
-        * [ ] Bukkit-Patches
-        * [ ] CraftBukkit-Patches (100%) - (029/030/091)
+    - [x] Bukkit ([**01d577f5**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/commits/01d577f5))
+    - [ ] CraftBukkit ([**a7cfc778f**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/commits/a7cfc778f))
+    - [ ] Spigot ([**7d7b241e**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/spigot/commits/d1bd3bd2))
+        - [ ] Bukkit-Patches
+        - [ ] CraftBukkit-Patches (100%) - (029/030/091)
+### Running?
+It could be compilable and running, but the compatibility with plugins is poor.
 
-- [ ] Running ?
-    * [ ] It can be compilable and running
-    * [ ] But the compatibility with plugins is poor
-
-
-install (for Linux)
-------
-- Need `wget` and `curl`
+## Installation (for Linux)
+- You'll need `wget` and `curl`
 ```bash
 cd ./<your-server-folder>
 wget https://github.com/8Mi-Tech/Shell/raw/main/banner-launcher
@@ -50,28 +43,24 @@ chmod +x ./banner-launcher
 ./banner-launcher -i
 ```
 
-Using
-------
-- Please put it in the mods folder
-- Remember that Banner is still in WIP, Do not use it in production environment
-  
-Compatiblity
-------
-- If you use lithium,should write the config value of it, "mixin.block.hopper" to false
+## Usage
+- Just put it in the mods folder.
+- Remember that Banner is still in WIP. Do not use it in a production environment!
 
-Upstream Projects
-------
-* [**FabricLoader**](https://github.com/FabricMC/fabric-loader.git) - mod load support.
-* [**FabricApi**](https://github.com/FabricMC/fabric-loader.git) - mod api support.
-* [**Bukkit**](https://hub.spigotmc.org/stash/scm/spigot/bukkit.git) - plugin support.
-* [**CraftBukkit**](https://hub.spigotmc.org/stash/scm/spigot/craftbukkit.git) - plugin support.
-* [**Spigot**](https://hub.spigotmc.org/stash/scm/spigot/spigot.git) - plugin support.
-* [**Paper**](https://github.com/PaperMC/Paper.git) - plugin support.
-* [**Arclight**](https://github.com/IzzelAliz/Arclight.git) - Some code.
-* [**Mohist**](https://github.com/MohistMC/Mohist.git) - Some code.
+## Compatiblity
+- If you want to use Lithium, you should change the "mixin.block.hopper" value in its config to false.
 
-A Special Thanks To:
--------------
+## Upstream Projects
+- [**FabricLoader**](https://github.com/FabricMC/fabric-loader.git) - Mod load support.
+- [**FabricApi**](https://github.com/FabricMC/fabric-loader.git) - Mod api support.
+- [**Bukkit**](https://hub.spigotmc.org/stash/scm/spigot/bukkit.git) - Plugin support.
+- [**CraftBukkit**](https://hub.spigotmc.org/stash/scm/spigot/craftbukkit.git) - Plugin support.
+- [**Spigot**](https://hub.spigotmc.org/stash/scm/spigot/spigot.git) - Plugin support.
+- [**Paper**](https://github.com/PaperMC/Paper.git) - Plugin support.
+- [**Arclight**](https://github.com/IzzelAliz/Arclight.git) - Some code.
+- [**Mohist**](https://github.com/MohistMC/Mohist.git) - Some code.
+
+## Special Thanks To:
 <a href="https://ci.codemc.io/"><img src="https://i.loli.net/2020/03/11/YNicj3PLkU5BZJT.png" width="172"></a>
 
 <a href="https://www.bisecthosting.com/mohistmc"><img src="https://www.bisecthosting.com/partners/custom-banners/118608b8-6e45-4301-b244-41934cdac6d1.png"></a>
