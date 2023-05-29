@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
-@Mixin(value = DedicatedServer.class, remap = false)
+@Mixin(DedicatedServer.class)
 public class MixinDedicatedServer {
 
     @ModifyConstant(method = "initServer", constant = @Constant(stringValue = "Starting minecraft server version {}"))
