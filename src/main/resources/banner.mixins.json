@@ -25,6 +25,8 @@
     "commands.arguments.blocks.MixinBlockStateParser",
     "commands.arguments.selector.MixinEntitySelector",
     "commands.arguments.selector.MixinEntitySelectorParser",
+    "i18n.MixinDedicatedServer",
+    "i18n.MixinMinecraftServer",
     "interaction.cauldron.MixinCauldronInteraction",
     "interaction.dispenser.MixinAbstractProjectileDispenseBehavior",
     "interaction.dispenser.MixinBoatDispenseItemBehavior",
