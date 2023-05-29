@@ -19,6 +19,7 @@ public class BannerMCStart {
 
     public static void run() throws Exception {
         BannerConfigUtil.copyBannerConfig();
+        BannerConfigUtil.lang();
         BannerConfigUtil.i18n();
         if (BannerConfigUtil.showLogo()) {
             LOGGER.info(" _____       ___   __   _   __   _   _____   _____   ");

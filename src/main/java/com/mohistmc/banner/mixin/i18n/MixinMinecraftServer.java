@@ -10,41 +10,41 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 public class MixinMinecraftServer {
 
     @ModifyConstant(method = "saveAllChunks", constant = @Constant(stringValue = "Saving chunks for level '{}'/{}"))
-    private String localSaveChunk(String constant){
+    private String bosom$localSaveChunk(String constant){
         return BannerMCStart.I18N.get("server.chunk.saving");
     }
 
     @ModifyConstant(method = "initializeKeyPair", constant = @Constant(stringValue = "Generating keypair"))
-    private String localKeyPair(String constant){
+    private String bosom$localKeyPair(String constant){
         return BannerMCStart.I18N.get("server.key.pair");
     }
 
     @ModifyConstant(method = "saveAllChunks", constant = @Constant(stringValue = "ThreadedAnvilChunkStorage ({}): All chunks are saved"))
-    private String localSaveAnvil(String constant){
+    private String bosom$localSaveAnvil(String constant){
         return BannerMCStart.I18N.get("server.chunk.saved");
     }
 
     @ModifyConstant(method = "saveAllChunks", constant = @Constant(stringValue = "ThreadedAnvilChunkStorage: All dimensions are saved"))
-    private String localSaveAnvil0(String constant){
+    private String bosom$localSaveAnvil0(String constant){
         return BannerMCStart.I18N.get("server.dimension.saved");
     }
 
     @ModifyConstant(method = "stopServer", constant = @Constant(stringValue = "Stopping server"))
-    private String localStoppingServer(String constant){
+    private String bosom$localStoppingServer(String constant){
         return BannerMCStart.I18N.get("server.stopping");
     }
 
     @ModifyConstant(method = "stopServer", constant = @Constant(stringValue = "Saving players"))
-    private String localSavePlayer(String constant){
+    private String bosom$localSavePlayer(String constant){
         return BannerMCStart.I18N.get("server.saving.player");
     }
 
     @ModifyConstant(method = "stopServer", constant = @Constant(stringValue = "Saving worlds"))
-    private String localSaveWorld(String constant){
+    private String bosom$localSaveWorld(String constant){
         return BannerMCStart.I18N.get("server.saving.world");
     }
-    @ModifyConstant(method = "stopServer", constant = @Constant(stringValue = "Can't keep up! Is the server overloaded? Running {}ms or {} ticks behind"))
-    private String localCKP(String constant){
+    @ModifyConstant(method = "runServer", constant = @Constant(stringValue = "Can't keep up! Is the server overloaded? Running {}ms or {} ticks behind"))
+    private String banner$localCKP(String constant){
         return BannerMCStart.I18N.get("server.hold.ckp");
     }
 

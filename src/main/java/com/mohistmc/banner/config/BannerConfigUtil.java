@@ -72,6 +72,15 @@ public class BannerConfigUtil {
         BannerMCStart.I18N = new i18n(BannerMCStart.class.getClassLoader(), new Locale(l, c));
     }
 
+    public static String lang() {
+        String lang = "banner.lang";
+        if (yml.get(lang) == null) {
+            yml.set(lang, "xx_XX");
+            save();
+        }
+        return yml.getString(lang, "xx_XX");
+    }
+
     public static boolean showLogo() {
         String key = "banner.show_logo";
         if (yml.get(key) == null) {

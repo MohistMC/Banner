@@ -9,7 +9,6 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.logging.Level;
 
-import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;

@@ -19,6 +19,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
+
+import com.mohistmc.banner.BannerMCStart;
 import org.bukkit.Server;
 import org.bukkit.Warning;
 import org.bukkit.Warning.WarningState;
@@ -320,7 +322,7 @@ public final class JavaPluginLoader implements PluginLoader {
         Preconditions.checkArgument(plugin instanceof JavaPlugin, "Plugin is not associated with this PluginLoader");
 
         if (!plugin.isEnabled()) {
-            plugin.getLogger().info("Enabling " + plugin.getDescription().getFullName());
+            plugin.getLogger().info(BannerMCStart.I18N.get("bukkit.plugin.enabling") + " " + plugin.getDescription().getFullName());
 
             JavaPlugin jPlugin = (JavaPlugin) plugin;
 
@@ -348,7 +350,7 @@ public final class JavaPluginLoader implements PluginLoader {
         Preconditions.checkArgument(plugin instanceof JavaPlugin, "Plugin is not associated with this PluginLoader");
 
         if (plugin.isEnabled()) {
-            String message = String.format("Disabling %s", plugin.getDescription().getFullName());
+            String message = String.format(BannerMCStart.I18N.get("bukkit.plugin.disabling"), plugin.getDescription().getFullName());
             plugin.getLogger().info(message);
 
             server.getPluginManager().callEvent(new PluginDisableEvent(plugin));
