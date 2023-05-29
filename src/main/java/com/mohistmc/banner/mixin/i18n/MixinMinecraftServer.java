@@ -43,8 +43,8 @@ public class MixinMinecraftServer {
     private String bosom$localSaveWorld(String constant){
         return BannerMCStart.I18N.get("server.saving.world");
     }
-    @ModifyConstant(method = "stopServer", constant = @Constant(stringValue = "Can't keep up! Is the server overloaded? Running {}ms or {} ticks behind"))
-    private String bannerlocalCKP(String constant){
+    @ModifyConstant(method = "runServer", constant = @Constant(stringValue = "Can't keep up! Is the server overloaded? Running {}ms or {} ticks behind"))
+    private String banner$localCKP(String constant){
         return BannerMCStart.I18N.get("server.hold.ckp");
     }
 
