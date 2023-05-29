@@ -51,8 +51,8 @@ chmod +x ./banner-launcher
 - If you want to use Lithium, you should change the "mixin.block.hopper" value in its config to false.
 
 ## Upstream Projects
-- [**FabricLoader**](https://github.com/FabricMC/fabric-loader.git) - Mod load support.
-- [**FabricApi**](https://github.com/FabricMC/fabric-loader.git) - Mod api support.
+- [**Fabric Loader**](https://github.com/FabricMC/fabric-loader.git) - Mod load support.
+- [**Fabric API**](https://github.com/FabricMC/fabric-loader.git) - Mod api support.
 - [**Bukkit**](https://hub.spigotmc.org/stash/scm/spigot/bukkit.git) - Plugin support.
 - [**CraftBukkit**](https://hub.spigotmc.org/stash/scm/spigot/craftbukkit.git) - Plugin support.
 - [**Spigot**](https://hub.spigotmc.org/stash/scm/spigot/spigot.git) - Plugin support.
