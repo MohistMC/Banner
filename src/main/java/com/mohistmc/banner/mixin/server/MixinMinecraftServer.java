@@ -35,7 +35,6 @@ import net.minecraft.util.thread.ReentrantBlockableEventLoop;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ForcedChunksSavedData;
 import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -48,7 +47,6 @@ import org.bukkit.craftbukkit.Main;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_19_R3.util.LazyPlayerSet;
-import org.bukkit.craftbukkit.v1_19_R3.util.ServerShutdownThread;
 import org.bukkit.event.player.AsyncPlayerChatPreviewEvent;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.event.world.WorldInitEvent;
@@ -127,7 +125,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         Main.handleParser(parser, options);
         this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
         this.worldLoader = BukkitCaptures.getDataLoadContext();
-        Runtime.getRuntime().addShutdownHook(new ServerShutdownThread(((MinecraftServer) (Object) this)));
+        //Runtime.getRuntime().addShutdownHook(new ServerShutdownThread(((MinecraftServer) (Object) this)));
     }
 
     @Inject(method = "stopServer", at = @At(value = "INVOKE", remap = false, ordinal = 0, shift = At.Shift.AFTER, target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V"))
@@ -159,13 +157,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Inject(method = "runServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;nextTickTime:J", shift = At.Shift.BEFORE))
     private void banner$currentTick(CallbackInfo ci) {
         BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
-    }
-
-    @Inject(method = "runServer",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/MinecraftServer;onServerExit()V"))
-    private void banner$runTimeReturn(CallbackInfo ci) {
-        Runtime.getRuntime().halt(0);
     }
 
     @Inject(method = "getServerModName", at = @At(value = "HEAD"), remap = false, cancellable = true)
@@ -397,15 +388,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             }, chatExecutor);
         };
     }
-
-    @Redirect(method = "saveAllChunks", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/ServerLevelData;setWorldBorder(Lnet/minecraft/world/level/border/WorldBorder$Settings;)V"))
-    private void banner$cancel0(ServerLevelData instance, WorldBorder.Settings settings) {}
-
-    @Redirect(method = "saveAllChunks", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/WorldData;setCustomBossEvents(Lnet/minecraft/nbt/CompoundTag;)V"))
-    private void banner$cancel1(WorldData instance, CompoundTag compoundTag) {}
-
-    @Redirect(method = "saveAllChunks", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;saveDataTag(Lnet/minecraft/core/RegistryAccess;Lnet/minecraft/world/level/storage/WorldData;Lnet/minecraft/nbt/CompoundTag;)V"))
-    private void banner$cancel2(LevelStorageSource.LevelStorageAccess instance, RegistryAccess registries, WorldData serverConfiguration, CompoundTag hostPlayerNBT) {}
 
     // Banner start
     @Override
