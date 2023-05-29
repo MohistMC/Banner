@@ -121,47 +121,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                 this.ticksPerSpawnCategory.put(spawnCategory, this.getCraftServer().getTicksPerSpawns(spawnCategory));
             }
         }
-    }
-
-    @Inject(method = "<init>", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/damagesource/DamageSources;<init>(Lnet/minecraft/core/RegistryAccess;)V",
-            shift = At.Shift.AFTER))
-    private void banner$addWorldBorder(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder holder, Supplier supplier, boolean bl, boolean bl2, long l, int i, CallbackInfo ci) {
         this.getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
-        // CraftBukkit start
-        getWorldBorder().addListener(new BorderChangeListener() {
-            @Override
-            public void onBorderSizeSet(WorldBorder border, double size) {
-                getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderSizePacket(worldBorder), worldBorder.bridge$world());
-            }
-
-            @Override
-            public void onBorderSizeLerping(WorldBorder border, double oldSize, double newSize, long time) {
-                getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderLerpSizePacket(worldBorder), worldBorder.bridge$world());
-            }
-
-            @Override
-            public void onBorderCenterSet(WorldBorder border, double x, double z) {
-                getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderCenterPacket(worldBorder), worldBorder.bridge$world());
-            }
-
-            @Override
-            public void onBorderSetWarningTime(WorldBorder border, int warningTime) {
-                getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderWarningDelayPacket(worldBorder), worldBorder.bridge$world());
-            }
-
-            @Override
-            public void onBorderSetWarningBlocks(WorldBorder border, int warningBlocks) {
-                getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderWarningDistancePacket(worldBorder), worldBorder.bridge$world());
-            }
-
-            @Override
-            public void onBorderSetDamagePerBlock(WorldBorder border, double damagePerBlock) {
-            }
-
-            @Override
-            public void onBorderSetDamageSafeZOne(WorldBorder border, double damageSafeZone) {}
-        });
     }
 
     @Override
