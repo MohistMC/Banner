@@ -9,11 +9,6 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 @Mixin(value = MinecraftServer.class, remap = false)
 public class MixinMinecraftServer {
 
-    @ModifyConstant(method = "prepareLevels", remap = false, constant = @Constant(stringValue = "Preparing start region for dimension {}"))
-    private String bosom$prepRegion(String constant) {
-        return BannerMCStart.I18N.get("server.region.prepare");
-    }
-
     @ModifyConstant(method = "saveAllChunks", constant = @Constant(stringValue = "Saving chunks for level '{}'/{}"))
     private String bosom$localSaveChunk(String constant){
         return BannerMCStart.I18N.get("server.chunk.saving");
