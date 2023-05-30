@@ -91,7 +91,7 @@ public final class Bukkit {
         }
 
         Bukkit.server = server;
-        server.getLogger().info(BannerMCStart.I18N.get("bukkit.version.servername") + getName() + BannerMCStart.I18N.get("bukkit.version.version") + " " + getVersion() + BannerMCStart.I18N.get("bukkit.version.apiversion") + getBukkitVersion() + ")");
+        server.getLogger().info("This server is running " + getName() + " version " + getVersion() + " (Implementing API version " + getBukkitVersion() + ")");
     }
 
     /**
