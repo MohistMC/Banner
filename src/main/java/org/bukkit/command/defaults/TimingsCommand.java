@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class TimingsCommand extends BukkitCommand {
     private static final List<String> TIMINGS_SUBCOMMANDS = ImmutableList.of("merged", "reset", "separate");
+    public static long timingStart = 0; // Spigot
 
     public TimingsCommand(@NotNull String name) {
         super(name);
