@@ -33,7 +33,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.io.IOException;
 import java.net.Proxy;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -57,56 +56,6 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         org.spigotmc.SpigotConfig.init((java.io.File) this.bridge$options().valueOf("spigot-settings"));
         BannerConfig.init((java.io.File) this.bridge$options().valueOf("banner-settings"));
         org.spigotmc.SpigotConfig.registerCommands();
-    }
-
-    @Redirect(method = "initServer", at = @At(value = "NEW",target = "(Ljava/lang/Runnable;)Ljava/lang/Thread;", ordinal = 0))
-    private Thread banner$newThread(Runnable target) {
-        return  new Thread("Server console handler") {
-            public void run() {
-                // CraftBukkit start
-                if (!org.bukkit.craftbukkit.Main.useConsole) {
-                    return;
-                }
-                jline.console.ConsoleReader bufferedreader = bridge$reader();
-
-                // MC-33041, SPIGOT-5538: if System.in is not valid due to javaw, then return
-                try {
-                    System.in.available();
-                } catch (IOException ex) {
-                    return;
-                }
-                // CraftBukkit end
-
-                String s;
-
-                try {
-                    // CraftBukkit start - JLine disabling compatibility
-                    while (!((DedicatedServer) (Object) this).isStopped() && ((DedicatedServer) (Object) this).isRunning()) {
-                        if (org.bukkit.craftbukkit.Main.useJline) {
-                            s = bufferedreader.readLine(">", null);
-                        } else {
-                            s = bufferedreader.readLine();
-                        }
-
-                        // SPIGOT-5220: Throttle if EOF (ctrl^d) or stdin is /dev/null
-                        if (s == null) {
-                            try {
-                                Thread.sleep(50L);
-                            } catch (InterruptedException ex) {
-                                Thread.currentThread().interrupt();
-                            }
-                            continue;
-                        }
-                        if (s.trim().length() > 0) { // Trim to filter lines which are just spaces
-                            ((DedicatedServer) (Object) this).handleConsoleInput(s, ((DedicatedServer) (Object) this).createCommandSourceStack());
-                        }
-                        // CraftBukkit end
-                    }
-                } catch (IOException ioexception) {
-                    LOGGER.error("Exception handling console input", ioexception);
-                }
-            }
-        };
     }
 
     @Inject(method = "initServer",
