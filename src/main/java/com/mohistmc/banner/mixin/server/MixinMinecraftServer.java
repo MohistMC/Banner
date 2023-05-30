@@ -15,8 +15,6 @@ import net.minecraft.Util;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.ChatDecorator;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 import net.minecraft.resources.ResourceKey;
@@ -257,7 +255,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     public final void prepareLevels(ChunkProgressListener listener) {
         ServerLevel serverworld = this.overworld();
         this.forceTicks = true;
-        LOGGER.info(BannerMCStart.I18N.get("server.region.prepare"), serverworld.dimension().location());
+        LOGGER.info("Preparing start region for dimension {}", serverworld.dimension().location());
         BlockPos blockpos = serverworld.getSharedSpawnPos();
         listener.updateSpawnPos(new ChunkPos(blockpos));
         ServerChunkCache serverchunkprovider = serverworld.getChunkSource();
