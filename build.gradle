@@ -122,10 +122,10 @@ dependencies {
 
 	//class modify
 	annotationProcessor "com.github.LlamaLad7:MixinExtras:0.1.1"
-	modImplementation(include("com.github.1798643961:mixin-tools:1.0.1"))
+	modImplementation(include("com.github.wdog5:mixin-tools:1.0.1"))
 	modImplementation(include("com.github.LlamaLad7:MixinExtras:0.1.1"))
 
-	annotationProcessor 'com.github.1798643961:mixin-tools:1.0.1'
+	annotationProcessor 'com.github.wdog5:mixin-tools:1.0.1'
 }
 
 base {
