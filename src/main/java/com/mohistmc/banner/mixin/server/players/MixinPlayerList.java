@@ -118,11 +118,14 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Shadow @Final public PlayerDataStorage playerIo;
     @Shadow @Final private static Logger LOGGER;
-    @Shadow @Final private Map<UUID, PlayerAdvancements> advancements;
 
     @Shadow public abstract ServerPlayer getPlayerForLogin(GameProfile profile);
 
+    @Shadow protected abstract void save(ServerPlayer player);
+
     private CraftServer cserver;
+
+    private static final AtomicReference<String> PROFILE_NAMES = new AtomicReference<>();
 
     @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/server/players/PlayerList;bans:Lnet/minecraft/server/players/UserBanList;"))
     public void banner$init(MinecraftServer minecraftServer, LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess, PlayerDataStorage playerDataStorage, int i, CallbackInfo ci) {
@@ -133,17 +136,29 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         minecraftServer.banner$setConsole(ColouredConsoleSender.getInstance());
     }
 
-    @Inject(method = "placeNewPlayer",
-            at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/dimension/DimensionType;parseLegacy(Lcom/mojang/serialization/Dynamic;)Lcom/mojang/serialization/DataResult;"),
+    @Inject(method = "placeNewPlayer", at = @At (value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerPlayer;setLevel(Lnet/minecraft/server/level/ServerLevel;)V"),
             locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$changeProfile(Connection netManager, ServerPlayer player, CallbackInfo ci, GameProfile gameProfile, GameProfileCache gameProfileCache, Optional optional, String string, CompoundTag compoundTag) {
-        // CraftBukkit start - Better rename detection
-        if (compoundTag.contains("bukkit")) {
+    public void print(Connection netManager, ServerPlayer player, CallbackInfo ci, GameProfile gameProfile,
+                      GameProfileCache gameProfileCache, Optional optional, String string,
+                      CompoundTag compoundTag, ResourceKey resourceKey, ServerLevel serverLevel,
+                      ServerLevel serverLevel2) {
+        if (compoundTag != null && compoundTag.contains("bukkit")) {
             CompoundTag bukkit = compoundTag.getCompound("bukkit");
-            string = bukkit.contains("lastKnownName", 8) ? bukkit.getString("lastKnownName") : string;
+            PROFILE_NAMES.set(bukkit.contains("lastKnownName", 8) ? bukkit.getString("lastKnownName") : string);
         }
-        // CraftBukkit end
+    }
+
+    @ModifyVariable(method = "placeNewPlayer", at = @At (value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerPlayer;setLevel(Lnet/minecraft/server/level/ServerLevel;)V"),
+            index = 6, ordinal = 0)
+    private String banner$renameDetection(String name) {
+        String val = PROFILE_NAMES.get();
+        if (val != null) {
+            PROFILE_NAMES.set(null);
+            return val;
+        }
+        return name;
     }
 
     @Inject(method = "placeNewPlayer",
@@ -287,26 +302,26 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         });
     }
 
-    /**
-     * @author wdog5
-     * @reason bukkit
-     */
-    @Overwrite
-    protected void save(ServerPlayer player) {
+    private final AtomicReference<ServerPlayer> banner$savePlayer = new AtomicReference<>();
+
+    @Inject(method = "save", at = @At("HEAD"), cancellable = true)
+    private void banner$setPlayerSaved(ServerPlayer player, CallbackInfo ci) {
         if (player.getBukkitEntity().isPersistent()) {
-            return;
+            ci.cancel();
         }
-        this.playerIo.save(player);
-        ServerStatsCounter serverStatsCounter = (ServerStatsCounter)player.getStats(); // CraftBukkit
-        if (serverStatsCounter != null) {
-            serverStatsCounter.save();
-        }
+        banner$savePlayer.set(player);
+    }
 
-        PlayerAdvancements playerAdvancements = (PlayerAdvancements)player.getAdvancements(); // CraftBukkit
-        if (playerAdvancements != null) {
-            playerAdvancements.save();
-        }
+    @Redirect(method = "save", at = @At(value = "INVOKE",
+            target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 0))
+    private Object banner$changeMap(Map instance, Object o) {
+        return banner$savePlayer.get().getStats();
+    }
 
+    @Redirect(method = "save", at = @At(value = "INVOKE",
+            target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 1))
+    private Object banner$changeMap0(Map instance, Object o) {
+        return banner$savePlayer.get().getAdvancements();
     }
 
     /**
@@ -394,16 +409,15 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
         ServerPlayer entityplayer;
 
-        for (int i = 0; i < this.players.size(); ++i) {
-            entityplayer = (ServerPlayer) this.players.get(i);
+        for (ServerPlayer value : this.players) {
+            entityplayer = (ServerPlayer) value;
             if (entityplayer.getUUID().equals(uuid)) {
                 list.add(entityplayer);
             }
         }
 
-        Iterator iterator = list.iterator();
-        while (iterator.hasNext()) {
-            entityplayer = (ServerPlayer) iterator.next();
+        for (ServerPlayer serverPlayer : list) {
+            entityplayer = serverPlayer;
             save(entityplayer); // CraftBukkit - Force the player's inventory to be saved
             entityplayer.connection.disconnect(Component.translatable("multiplayer.disconnect.duplicate_login"));
         }
