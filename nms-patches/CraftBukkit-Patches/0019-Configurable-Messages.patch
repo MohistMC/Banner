@@ -1,11 +1,11 @@
-From 601ba598a4bde34bc6135bb018a9e4f2e6474509 Mon Sep 17 00:00:00 2001
+From a8cafbf6616ba58bb9b7c912eda4532cf84e4cc0 Mon Sep 17 00:00:00 2001
 From: md_5 <md_5@live.com.au>
 Date: Fri, 21 Jun 2013 19:21:58 +1000
 Subject: [PATCH] Configurable Messages
 
 
 diff --git a/src/main/java/net/minecraft/server/network/HandshakeListener.java b/src/main/java/net/minecraft/server/network/HandshakeListener.java
-index 753de5b0a..3a9ac2a83 100644
+index 753de5b0a2..3a9ac2a831 100644
 --- a/src/main/java/net/minecraft/server/network/HandshakeListener.java
 +++ b/src/main/java/net/minecraft/server/network/HandshakeListener.java
 @@ -75,9 +75,9 @@ public class HandshakeListener implements PacketHandshakingInListener {
@@ -21,7 +21,7 @@ index 753de5b0a..3a9ac2a83 100644
  
                      this.connection.send(new PacketLoginOutDisconnect(ichatmutablecomponent));
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index ef05008c7..675101972 100644
+index ef05008c71..6751019726 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -603,7 +603,7 @@ public abstract class PlayerList {
@@ -43,10 +43,10 @@ index ef05008c7..675101972 100644
          }
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index b470cbfcd..926b50ed9 100644
+index 7b091fc64a..b2bf396e35 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -823,11 +823,11 @@ public final class CraftServer implements Server {
+@@ -825,11 +825,11 @@ public final class CraftServer implements Server {
              return true;
          }
  
@@ -63,7 +63,7 @@ index b470cbfcd..926b50ed9 100644
          return false;
      }
 diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/spigotmc/SpigotConfig.java
-index fc352ecf1..8ad8b2589 100644
+index fc352ecf10..8ad8b25894 100644
 --- a/src/main/java/org/spigotmc/SpigotConfig.java
 +++ b/src/main/java/org/spigotmc/SpigotConfig.java
 @@ -12,6 +12,7 @@ import java.util.Map;
@@ -104,5 +104,5 @@ index fc352ecf1..8ad8b2589 100644
 +    }
  }
 -- 
-2.40.0
+2.40.1
 

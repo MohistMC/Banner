@@ -1,4 +1,4 @@
-From c51f6b678b58ae4b23b6aa750604f532d02cff2c Mon Sep 17 00:00:00 2001
+From 1fb7032990357e38b77fb19ab578f4dc776b6864 Mon Sep 17 00:00:00 2001
 From: md_5 <git@md-5.net>
 Date: Sat, 13 Dec 2014 03:06:05 +0100
 Subject: [PATCH] BungeeCord Chat API
@@ -37,10 +37,10 @@ index b5a12f0de3..03a73f00f6 100644
      }
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index eba59887fd..84015796aa 100644
+index 6d4488e395..888bda5f21 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -255,6 +255,8 @@ import org.yaml.snakeyaml.Yaml;
+@@ -257,6 +257,8 @@ import org.yaml.snakeyaml.Yaml;
  import org.yaml.snakeyaml.constructor.SafeConstructor;
  import org.yaml.snakeyaml.error.MarkedYAMLException;
  
@@ -49,7 +49,7 @@ index eba59887fd..84015796aa 100644
  public final class CraftServer implements Server {
      private final String serverName = "CraftBukkit";
      private final String serverVersion;
-@@ -2356,6 +2358,20 @@ public final class CraftServer implements Server {
+@@ -2358,6 +2360,20 @@ public final class CraftServer implements Server {
          public void restart() {
              org.spigotmc.RestartCommand.restart();
          }
@@ -145,19 +145,19 @@ index e90064b5e7..9b48d6cb28 100644
  
      public org.bukkit.entity.Entity.Spigot spigot()
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index f67fbec2e6..0e6818699a 100644
+index ea873cd09f..7865054eec 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -163,6 +163,8 @@ import org.bukkit.plugin.messaging.StandardMessenger;
- import org.bukkit.profile.PlayerProfile;
+@@ -165,6 +165,8 @@ import org.bukkit.profile.PlayerProfile;
  import org.bukkit.scoreboard.Scoreboard;
+ import org.jetbrains.annotations.NotNull;
  
 +import net.md_5.bungee.api.chat.BaseComponent; // Spigot
 +
  @DelegateDeserialization(CraftOfflinePlayer.class)
  public class CraftPlayer extends CraftHumanEntity implements Player {
      private long firstPlayed = 0;
-@@ -2157,6 +2159,48 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2164,6 +2166,48 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
              return java.util.Collections.unmodifiableSet( ret );
          }

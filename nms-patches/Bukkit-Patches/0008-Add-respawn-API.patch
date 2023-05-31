@@ -1,14 +1,14 @@
-From 412abfac854e547d76b7df5f13f109d7456b9ab7 Mon Sep 17 00:00:00 2001
+From 2cf4155a039fb8def06180d1b6c1b2665e44bde6 Mon Sep 17 00:00:00 2001
 From: ninja- <xninja@openmailbox.org>
 Date: Tue, 8 Oct 2013 14:35:58 +0200
 Subject: [PATCH] Add respawn API.
 
 
 diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
-index 3fbd5ee9..b976dd1b 100644
+index 91a98c8b..f2408d2d 100644
 --- a/src/main/java/org/bukkit/entity/Player.java
 +++ b/src/main/java/org/bukkit/entity/Player.java
-@@ -1771,6 +1771,13 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
+@@ -1782,6 +1782,13 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
          public void setCollidesWithEntities(boolean collides) {
              throw new UnsupportedOperationException("Not supported yet.");
          }

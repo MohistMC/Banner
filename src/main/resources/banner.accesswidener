@@ -546,6 +546,9 @@ accessible field net/minecraft/world/entity/vehicle/MinecartTNT fuse I
 accessible field net/minecraft/world/entity/animal/allay/Allay duplicationCooldown J
 accessible field net/minecraft/world/entity/animal/allay/Allay jukeboxPos Lnet/minecraft/core/BlockPos;
 accessible field net/minecraft/world/level/NaturalSpawner MAGIC_NUMBER I
+accessible field net/minecraft/server/packs/repository/Pack resources Lnet/minecraft/server/packs/repository/Pack$ResourcesSupplier;
+accessible field net/minecraft/world/flag/FeatureFlag universe Lnet/minecraft/world/flag/FeatureFlagUniverse;
+accessible field net/minecraft/world/flag/FeatureFlagRegistry names Ljava/util/Map;
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;

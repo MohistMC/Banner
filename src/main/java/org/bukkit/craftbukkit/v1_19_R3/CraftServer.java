@@ -151,6 +151,7 @@ import org.bukkit.craftbukkit.v1_19_R3.map.CraftMapView;
 import org.bukkit.craftbukkit.v1_19_R3.metadata.EntityMetadataStore;
 import org.bukkit.craftbukkit.v1_19_R3.metadata.PlayerMetadataStore;
 import org.bukkit.craftbukkit.v1_19_R3.metadata.WorldMetadataStore;
+import org.bukkit.craftbukkit.v1_19_R3.packs.CraftDataPackManager;
 import org.bukkit.craftbukkit.v1_19_R3.potion.CraftPotionBrewer;
 import org.bukkit.craftbukkit.v1_19_R3.profile.CraftPlayerProfile;
 import org.bukkit.craftbukkit.v1_19_R3.scheduler.CraftScheduler;
@@ -188,6 +189,7 @@ import org.bukkit.inventory.*;
 import org.bukkit.loot.LootTable;
 import org.bukkit.map.MapPalette;
 import org.bukkit.map.MapView;
+import org.bukkit.packs.DataPackManager;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
@@ -241,6 +243,7 @@ public final class CraftServer implements Server {
     private WarningState warningState = WarningState.DEFAULT;
     public String minimumAPI;
     public CraftScoreboardManager scoreboardManager;
+    public CraftDataPackManager dataPackManager;
     public boolean playerCommandState;
     private boolean printSaveWarning;
     private CraftIconCache icon;
@@ -267,6 +270,7 @@ public final class CraftServer implements Server {
         this.serverVersion = BannerMCStart.getVersion();
         this.structureManager = new CraftStructureManager(console.getStructureManager());
         this.scoreboardManager = new CraftScoreboardManager(console, new ServerScoreboard(console));
+        this.dataPackManager = new CraftDataPackManager(this.getServer().getPackRepository());
         Bukkit.setServer(this);
 
         // Register all the Enchantments and PotionTypes now so we can stop new registration immediately after
@@ -637,6 +641,21 @@ public final class CraftServer implements Server {
 
     public boolean getQueryPlugins() {
         return this.configuration.getBoolean("settings.query-plugins");
+    }
+
+    @Override
+    public List<String> getInitialEnabledPacks() {
+        return Collections.unmodifiableList(this.getProperties().initialDataPackConfiguration.getEnabled());
+    }
+
+    @Override
+    public List<String> getInitialDisabledPacks() {
+        return Collections.unmodifiableList(this.getProperties().initialDataPackConfiguration.getDisabled());
+    }
+
+    @Override
+    public DataPackManager getDataPackManager() {
+        return this.dataPackManager;
     }
 
     @Override
