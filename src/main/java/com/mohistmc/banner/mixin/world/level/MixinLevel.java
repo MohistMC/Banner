@@ -102,7 +102,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     private org.spigotmc.SpigotWorldConfig spigotConfig; // Spigot
     protected org.bukkit.World.Environment environment;
     protected org.bukkit.generator.BiomeProvider biomeProvider;
-    public final SpigotTimings.WorldTimingsHandler timings = new SpigotTimings.WorldTimingsHandler(((Level) (Object) this)); // Spigot
+    public SpigotTimings.WorldTimingsHandler timings; // Spigot
 
     public void banner$constructor(WritableLevelData worldInfo, ResourceKey<Level> dimension, RegistryAccess registryAccess, final Holder<DimensionType> dimensionType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdate) {
         throw new RuntimeException();
@@ -124,6 +124,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             }
         }
         this.getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
+        this.timings = new SpigotTimings.WorldTimingsHandler(((Level) (Object) this));
     }
 
     @Inject(method = "tickBlockEntities",
