@@ -77,8 +77,8 @@ public class ReflectMethodRemapper extends MethodRemapper {
         registerMethodRemapper(LookupName, "findSetter", MethodHandle.class, new Class[]{Class.class, String.class, Class.class}, ProxyMethodHandlesLookup.class);
         registerMethodRemapper(LookupName, "findStaticGetter", MethodHandle.class, new Class[]{Class.class, String.class, Class.class}, ProxyMethodHandlesLookup.class);
         registerMethodRemapper(LookupName, "findStaticSetter", MethodHandle.class, new Class[]{Class.class, String.class, Class.class}, ProxyMethodHandlesLookup.class);
-        registerMethodRemapper("org/bukkit/configuration/file/YamlConfiguration", "loadConfiguration", YamlConfiguration.class, new Class[]{InputStream.class}, ProxyYamlConfiguration.class);
         registerMethodRemapper(LookupName, "findVarHandle", VarHandle.class, new Class[]{Class.class, String.class, MethodType.class, Class.class}, ProxyMethodHandlesLookup.class);
+        registerMethodRemapper("org/bukkit/configuration/file/YamlConfiguration", "loadConfiguration", YamlConfiguration.class, new Class[]{InputStream.class}, ProxyYamlConfiguration.class);
     }
 
     public ReflectMethodRemapper(MethodVisitor mv, Remapper remapper) {
