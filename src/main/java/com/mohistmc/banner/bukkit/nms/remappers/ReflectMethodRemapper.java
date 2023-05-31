@@ -1,5 +1,7 @@
 package com.mohistmc.banner.bukkit.nms.remappers;
 
+import com.google.common.collect.Maps;
+
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
@@ -12,7 +14,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Maps;
 import com.mohistmc.banner.bukkit.nms.model.MethodRedirectRule;
 import com.mohistmc.banner.bukkit.nms.proxy.ProxyClass;
 import com.mohistmc.banner.bukkit.nms.proxy.ProxyMethodHandlesLookup;
@@ -76,8 +77,8 @@ public class ReflectMethodRemapper extends MethodRemapper {
         registerMethodRemapper(LookupName, "findSetter", MethodHandle.class, new Class[]{Class.class, String.class, Class.class}, ProxyMethodHandlesLookup.class);
         registerMethodRemapper(LookupName, "findStaticGetter", MethodHandle.class, new Class[]{Class.class, String.class, Class.class}, ProxyMethodHandlesLookup.class);
         registerMethodRemapper(LookupName, "findStaticSetter", MethodHandle.class, new Class[]{Class.class, String.class, Class.class}, ProxyMethodHandlesLookup.class);
-        registerMethodRemapper(LookupName, "findVarHandle", VarHandle.class, new Class[]{Class.class, String.class, MethodType.class, Class.class}, ProxyMethodHandlesLookup.class);
         registerMethodRemapper("org/bukkit/configuration/file/YamlConfiguration", "loadConfiguration", YamlConfiguration.class, new Class[]{InputStream.class}, ProxyYamlConfiguration.class);
+        registerMethodRemapper(LookupName, "findVarHandle", VarHandle.class, new Class[]{Class.class, String.class, MethodType.class, Class.class}, ProxyMethodHandlesLookup.class);
     }
 
     public ReflectMethodRemapper(MethodVisitor mv, Remapper remapper) {
@@ -133,7 +134,7 @@ public class ReflectMethodRemapper extends MethodRemapper {
     private void redirectSpecial(int opcode, String owner, String name, String desc, boolean itf) {
         MethodRedirectRule rule = findRule(opcode, owner, name, desc, itf);
         if (rule != null) {
-            owner = rule.getRemapOwner();
+            owner = rule.remapOwner();
         }
         super.visitMethodInsn(opcode, owner, name, desc, itf);
     }
@@ -156,7 +157,7 @@ public class ReflectMethodRemapper extends MethodRemapper {
             Type[] newArgs = new Type[args.length + 1];
             newArgs[0] = Type.getObjectType(owner);
 
-            owner = rule.getRemapOwner();
+            owner = rule.remapOwner();
             System.arraycopy(args, 0, newArgs, 1, args.length);
             desc = Type.getMethodDescriptor(r, newArgs);
         }
@@ -166,7 +167,7 @@ public class ReflectMethodRemapper extends MethodRemapper {
     private void redirectStatic(int opcode, String owner, String name, String desc, boolean itf) {
         MethodRedirectRule rule = findRule(opcode, owner, name, desc, itf);
         if (rule != null) {
-            owner = rule.getRemapOwner();
+            owner = rule.remapOwner();
         }
         super.visitMethodInsn(opcode, owner, name, desc, itf);
     }

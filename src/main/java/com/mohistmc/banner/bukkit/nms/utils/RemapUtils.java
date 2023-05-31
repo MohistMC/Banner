@@ -4,11 +4,19 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.invoke.MethodType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.mohistmc.banner.bukkit.nms.model.ClassMapping;
-import com.mohistmc.banner.bukkit.nms.remappers.*;
+import com.mohistmc.banner.bukkit.nms.remappers.BannerInheritanceMap;
+import com.mohistmc.banner.bukkit.nms.remappers.BannerJarMapping;
+import com.mohistmc.banner.bukkit.nms.remappers.BannerJarRemapper;
+import com.mohistmc.banner.bukkit.nms.remappers.BannerSuperClassRemapper;
+import com.mohistmc.banner.bukkit.nms.remappers.ClassRemapperSupplier;
+import com.mohistmc.banner.bukkit.nms.remappers.ReflectMethodRemapper;
+import com.mohistmc.banner.bukkit.nms.remappers.ReflectRemapper;
+import net.md_5.specialsource.transformer.MavenShade;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
@@ -26,6 +34,7 @@ public class RemapUtils {
     public static BannerJarMapping jarMapping;
     public static BannerJarRemapper jarRemapper;
     private static final List<Remapper> remappers = new ArrayList<>();
+    public static Map<String, String> relocations = new HashMap<>();
 
     public static void init() {
         jarMapping = new BannerJarMapping();
@@ -34,15 +43,13 @@ public class RemapUtils {
         jarMapping.packages.put("org/bukkit/craftbukkit/libs/org/apache/commons/", "org/apache/commons/");
         jarMapping.packages.put("org/bukkit/craftbukkit/libs/org/objectweb/asm/", "org/objectweb/asm/");
         jarMapping.setInheritanceMap(new BannerInheritanceMap());
-        jarMapping.setFallbackInheritanceProvider(new BannerInheritanceProvider());
-
         try {
             jarMapping.loadMappings(
                     new BufferedReader(new InputStreamReader(RemapUtils.class.getClassLoader().getResourceAsStream("mappings/spigot2srg.srg"))),
-                    null,
+                    new MavenShade(relocations),
                     null, false);
         } catch (Exception e) {
-            e.printStackTrace();
+            e.fillInStackTrace();
         }
         jarRemapper = new BannerJarRemapper(jarMapping);
         remappers.add(jarRemapper);
@@ -53,13 +60,13 @@ public class RemapUtils {
         try {
             Class.forName("com.mohistmc.banner.bukkit.nms.proxy.ProxyMethodHandlesLookup");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            e.fillInStackTrace();
         }
     }
 
 
     public static byte[] remapFindClass(byte[] bs) {
-        ClassReader reader = new ClassReader(bs); // Turn from bytes into visitor
+        ClassReader reader = new ClassReader(bs); // Turn from bytes into a visitor
         ClassNode classNode = new ClassNode();
         reader.accept(classNode, ClassReader.EXPAND_FRAMES);
         for (Remapper remapper : remappers) {
@@ -152,10 +159,6 @@ public class RemapUtils {
     public static String inverseMapSimpleName(Class<?> clazz) {
         ClassMapping mapping = jarMapping.byMCPName.get(clazz.getName());
         return mapping == null ? clazz.getSimpleName() : mapping.getNmsSimpleName();
-    }
-
-    public static boolean isNMSClass(String className) {
-        return className.startsWith("net.minecraft.");
     }
 
     public static boolean needRemap(String className){

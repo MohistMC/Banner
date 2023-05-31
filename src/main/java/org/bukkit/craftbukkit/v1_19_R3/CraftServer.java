@@ -373,8 +373,8 @@ public final class CraftServer implements Server {
     }
 
     public void loadPlugins() {
-        RemapUtils.init();
         pluginManager.registerInterface(JavaPluginLoader.class);
+        RemapUtils.init();
 
         File pluginFolder = (File) console.bridge$options().valueOf("plugins");
 

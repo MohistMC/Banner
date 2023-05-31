@@ -47,7 +47,7 @@ public class BannerInheritanceMap extends InheritanceMap {
                 }
 
                 // If there are parents we care about, add to map
-                if (filteredParents.size() > 0) {
+                if (!filteredParents.isEmpty()) {
                     setParents(className, filteredParents);
                 }
             }

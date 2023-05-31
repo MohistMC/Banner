@@ -1,5 +1,6 @@
 package com.mohistmc.banner.bukkit.nms.proxy;
 
+import com.mohistmc.banner.bukkit.nms.model.ClassMapping;
 import com.mohistmc.banner.bukkit.nms.utils.RemapUtils;
 import com.mohistmc.dynamicenum.MohistDynamEnum;
 import java.io.InputStream;
@@ -45,9 +46,13 @@ public class DelegateURLClassLoder extends URLClassLoader {
 
     @Override
     protected Class<?> findClass(final String name) throws ClassNotFoundException {
-        if (RemapUtils.isNMSClass(name)) {
-            String mapName = RemapUtils.map(name.replace('.', '/')).replace('/', '.');
-            return Class.forName(mapName);
+        if (RemapUtils.needRemap(name)) {
+            ClassMapping remappedClassMapping = RemapUtils.jarMapping.byNMSName.get(name);
+            if(remappedClassMapping == null){
+                throw new ClassNotFoundException(name.replace('/','.'));
+            }
+            String remappedClass = remappedClassMapping.getMcpName();
+            return Class.forName(remappedClass);
         }
         Class<?> result = this.classeCache.get(name);
         if (result != null) {
@@ -114,7 +119,7 @@ public class DelegateURLClassLoder extends URLClassLoader {
         int dot = name.lastIndexOf('.');
         if (dot != -1) {
             String pkgName = name.substring(0, dot);
-            Package pkg = getDefinedPackage(pkgName);
+            Package pkg = getPackage(pkgName);
             if (pkg == null) {
                 try {
                     if (manifest != null) {

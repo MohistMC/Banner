@@ -21,7 +21,7 @@ public class BannerSuperClassRemapper {
 
     public static void init(ClassNode node) {
 
-        boolean remapSpClass = false;
+        boolean remapSpClass  = false;
         switch (node.superName) {
             case ASMUtils.urlclassLoaderdesc -> {
                 node.superName = Type.getInternalName(DelegateURLClassLoder.class);
@@ -37,16 +37,17 @@ public class BannerSuperClassRemapper {
         for (MethodNode method : node.methods) { // Taken from SpecialSource
             for (AbstractInsnNode next : method.instructions) {
                 if (next instanceof TypeInsnNode insn && next.getOpcode() == Opcodes.NEW) { // remap new URLClassLoader
-                    switch (insn.desc) {
+                    remapSpClass = switch (insn.desc) {
                         case ASMUtils.urlclassLoaderdesc -> {
                             insn.desc = Type.getInternalName(DelegateURLClassLoder.class);
-                            remapSpClass = true;
+                            yield true;
                         }
                         case ASMUtils.classLoaderdesc -> {
                             insn.desc = Type.getInternalName(DelegateClassLoder.class);
-                            remapSpClass = true;
+                            yield true;
                         }
-                    }
+                        default -> remapSpClass;
+                    };
                 }
 
                 if (next instanceof MethodInsnNode ins) {

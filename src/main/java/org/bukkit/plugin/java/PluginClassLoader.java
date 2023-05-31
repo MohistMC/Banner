@@ -51,6 +51,7 @@ final class PluginClassLoader extends URLClassLoader {
     private JavaPlugin pluginInit;
     private IllegalStateException pluginState;
     private final Set<String> seenIllegalAccess = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    public JavaPlugin getPlugin() { return plugin; } // Spigot
     private final Set<Package> packageCache = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     static {
@@ -153,7 +154,7 @@ final class PluginClassLoader extends URLClassLoader {
             }
         }
 
-        throw new ClassNotFoundException(name);
+        return findClass(name);
     }
 
     @Override
@@ -161,7 +162,7 @@ final class PluginClassLoader extends URLClassLoader {
         ClassLoaderContext.put(this);
         Class<?> result;
         try {
-            if (RemapUtils.needRemap(name.replace('/','.'))) {
+            if (RemapUtils.needRemap(name.replace('/', '.'))) {
                 ClassMapping remappedClassMapping = RemapUtils.jarMapping.byNMSName.get(name);
                 if(remappedClassMapping == null){
                     throw new ClassNotFoundException(name.replace('/','.'));
