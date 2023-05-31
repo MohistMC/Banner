@@ -60,6 +60,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R3.SpigotTimings;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftSign;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
@@ -204,6 +205,16 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         lastYaw = Float.MAX_VALUE;
         justTeleported = false;
         this.chatMessageChain = new FutureChain(server.bridge$chatExecutor());
+    }
+
+    @Inject(method = "tick", at = @At("HEAD"))
+    private void banner$timings(CallbackInfo ci) {
+        SpigotTimings.playerConnectionTimer.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tick", at = @At("TAIL"))
+    private void banner$timings0(CallbackInfo ci) {
+        SpigotTimings.playerConnectionTimer.stopTiming(); // Spigot
     }
 
     /**
@@ -1075,20 +1086,30 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
 
     @Override
     public void handleCommand(String s) {
-        if (SpigotConfig.logCommands) {
+        SpigotTimings.playerCommandTimer.startTiming(); // Spigot
+        if ( org.spigotmc.SpigotConfig.logCommands ) // Spigot
             LOGGER.info(this.player.getScoreboardName() + " issued server command: " + s);
-        }
+
         CraftPlayer player = this.getCraftPlayer();
-        PlayerCommandPreprocessEvent event = new PlayerCommandPreprocessEvent(player, s, new LazyPlayerSet(this.server));
+
+        PlayerCommandPreprocessEvent event = new PlayerCommandPreprocessEvent(player, s, new LazyPlayerSet(server));
         this.cserver.getPluginManager().callEvent(event);
+
         if (event.isCancelled()) {
+            SpigotTimings.playerCommandTimer.stopTiming(); // Spigot
             return;
         }
+
         try {
-            this.cserver.dispatchCommand(event.getPlayer(), event.getMessage().substring(1));
-        } catch (CommandRuntimeException ex) {
-            player.sendMessage(ChatColor.RED + "An internal error occurred while attempting to perform this command");
-            java.util.logging.Logger.getLogger(ServerGamePacketListenerImpl.class.getName()).log(Level.SEVERE, null, ex);
+            if (this.cserver.dispatchCommand(event.getPlayer(), event.getMessage().substring(1))) {
+                return;
+            }
+        } catch (org.bukkit.command.CommandException ex) {
+            player.sendMessage(org.bukkit.ChatColor.RED + "An internal error occurred while attempting to perform this command");
+            java.util.logging.Logger.getLogger(ServerGamePacketListenerImpl.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            return;
+        } finally {
+            SpigotTimings.playerCommandTimer.stopTiming(); // Spigot
         }
     }
 

@@ -19,8 +19,19 @@ public class MixinLevelChunk_BoundTickingBlockEntity<T extends BlockEntity>  {
         BukkitCaptures.captureTickingBlockEntity(this.blockEntity);
     }
 
+    @Inject(method = "tick", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/chunk/LevelChunk;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;"))
+    private void banner$startTimings(CallbackInfo ci) {
+        this.blockEntity.bridge$tickTimer().startTiming(); // Spigot
+    }
+
     @Inject(method = "tick", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/level/block/entity/BlockEntityTicker;tick(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/BlockEntity;)V"))
     private void banner$resetBlockEntity(CallbackInfo ci) {
         BukkitCaptures.resetTickingBlockEntity();
+    }
+
+    @Inject(method = "tick", at = @At("TAIL"))
+    private void banner$stopTimings(CallbackInfo ci) {
+        this.blockEntity.bridge$tickTimer().stopTiming();
     }
 }

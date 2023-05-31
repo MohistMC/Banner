@@ -9,6 +9,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.LevelStem;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R3.SpigotTimings;
 import org.bukkit.craftbukkit.v1_19_R3.block.CapturedBlockState;
 import org.bukkit.entity.SpawnCategory;
 import org.spigotmc.SpigotWorldConfig;
@@ -17,6 +18,10 @@ import java.util.List;
 import java.util.Map;
 
 public interface InjectionLevel {
+
+    default SpigotTimings.WorldTimingsHandler bridge$timings() {
+        return null;
+    }
 
     default boolean bridge$preventPoiUpdated() {
         return false;

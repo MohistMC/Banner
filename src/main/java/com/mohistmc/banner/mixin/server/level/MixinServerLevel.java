@@ -95,6 +95,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 @Mixin(ServerLevel.class)
@@ -224,6 +225,69 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         if (event.isCancelled()) {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "tick",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerLevel;isDebug()Z"))
+    private void banner$timings(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        bridge$timings().doTickPending.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tick",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
+                    ordinal = 3))
+    private void banner$timings0(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        bridge$timings().doTickPending.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "tick",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/level/ServerLevel;runBlockEvents()V"))
+    private void banner$timings1(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        bridge$timings().doSounds.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tick",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/level/ServerLevel;runBlockEvents()V",
+                    shift = At.Shift.AFTER))
+    private void banner$timings2(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        bridge$timings().doSounds.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "tick",
+            at = @At(value = "FIELD",
+                    target = "Lnet/minecraft/server/level/ServerLevel;dragonFight:Lnet/minecraft/world/level/dimension/end/EndDragonFight;",
+                    ordinal = 0))
+    private void banner$timings3(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        bridge$timings().tickEntities.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tick",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/entity/EntityTickList;forEach(Ljava/util/function/Consumer;)V"))
+    private void banner$timings4(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        bridge$timings().entityTick.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tick",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V", ordinal = 3))
+    private void banner$timings5(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        bridge$timings().entityTick.stopTiming(); // Spigot
+        bridge$timings().tickEntities.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "tickNonPassenger", at = @At("HEAD"))
+    private void banner$timings6(Entity entity, CallbackInfo ci) {
+        entity.bridge$tickTimer().startTiming(); // Spigot
+    }
+
+    @Inject(method = "tickNonPassenger", at = @At("TAIL"))
+    private void banner$timings7(Entity entity, CallbackInfo ci) {
+        entity.bridge$tickTimer().stopTiming(); // Spigot
     }
 
     @Override

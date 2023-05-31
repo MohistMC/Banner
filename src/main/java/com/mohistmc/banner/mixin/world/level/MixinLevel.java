@@ -31,6 +31,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R3.SpigotTimings;
 import org.bukkit.craftbukkit.v1_19_R3.block.CapturedBlockState;
 import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_19_R3.generator.CraftWorldInfo;
@@ -101,6 +102,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     private org.spigotmc.SpigotWorldConfig spigotConfig; // Spigot
     protected org.bukkit.World.Environment environment;
     protected org.bukkit.generator.BiomeProvider biomeProvider;
+    public final SpigotTimings.WorldTimingsHandler timings = new SpigotTimings.WorldTimingsHandler(((Level) (Object) this)); // Spigot
 
     public void banner$constructor(WritableLevelData worldInfo, ResourceKey<Level> dimension, RegistryAccess registryAccess, final Holder<DimensionType> dimensionType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdate) {
         throw new RuntimeException();
@@ -122,6 +124,44 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             }
         }
         this.getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
+    }
+
+    @Inject(method = "tickBlockEntities",
+            at = @At(value = "FIELD",
+            target = "Lnet/minecraft/world/level/Level;tickingBlockEntities:Z", ordinal = 0))
+    private void banner$timings(CallbackInfo ci) {
+        timings.tileEntityPending.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tickBlockEntities",
+            at = @At(value = "INVOKE",
+                    target = "Ljava/util/List;iterator()Ljava/util/Iterator;"))
+    private void banner$timings0(CallbackInfo ci) {
+        timings.tileEntityPending.stopTiming(); // Spigot
+        timings.tileEntityTick.startTiming(); // Spigot
+    }
+
+
+    @Inject(method = "tickBlockEntities",
+            at = @At(value = "FIELD",
+                    target = "Lnet/minecraft/world/level/Level;tickingBlockEntities:Z", ordinal = 1))
+    private void banner$timings1(CallbackInfo ci) {
+        timings.tileEntityTick.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "guardEntityTick",
+            at = @At(value = "INVOKE",
+                    target = "Ljava/util/function/Consumer;accept(Ljava/lang/Object;)V"))
+    private void banner$timings2(CallbackInfo ci) {
+        SpigotTimings.tickEntityTimer.startTiming(); // Spigot
+    }
+
+    @Inject(method = "guardEntityTick",
+            at = @At(value = "INVOKE",
+                    target = "Ljava/util/function/Consumer;accept(Ljava/lang/Object;)V",
+                    shift = At.Shift.AFTER))
+    private void banner$timings3(CallbackInfo ci) {
+        SpigotTimings.tickEntityTimer.stopTiming(); // Spigot
     }
 
     @Override
@@ -519,6 +559,11 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     @Override
     public void banner$setPreventPoiUpdated(boolean preventPoiUpdated) {
         this.preventPoiUpdated = preventPoiUpdated;
+    }
+
+    @Override
+    public SpigotTimings.WorldTimingsHandler bridge$timings() {
+        return timings;
     }
 }
 

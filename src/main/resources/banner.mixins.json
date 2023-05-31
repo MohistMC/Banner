@@ -490,6 +490,7 @@
     "world.level.chunk.MixinLevelChunk",
     "world.level.chunk.MixinLevelChunk_BoundTickingBlockEntity",
     "world.level.chunk.MixinLevelChunkSection",
+    "world.level.chunk.storage.MixinChunkSerializer",
     "world.level.chunk.storage.MixinChunkStorage",
     "world.level.chunk.storage.MixinRegionFileStorage",
     "world.level.entity.MixinPersistentEntitySectionManager",

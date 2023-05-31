@@ -84,6 +84,7 @@ public abstract class MixinNaturalSpawner {
     @Overwrite
     public static void spawnForChunk(ServerLevel worldserver, LevelChunk chunk, NaturalSpawner.SpawnState spawnercreature_d, boolean flag, boolean flag1, boolean flag2) {
         worldserver.getProfiler().push("spawner");
+        worldserver.bridge$timings().mobSpawn.startTiming(); // Spigot
         MobCategory[] aenumcreaturetype = SPAWNING_CATEGORIES;
         int i = aenumcreaturetype.length;
 
@@ -114,6 +115,7 @@ public abstract class MixinNaturalSpawner {
             }
         }
 
+        worldserver.bridge$timings().mobSpawn.stopTiming(); // Spigot
         worldserver.getProfiler().pop();
     }
 

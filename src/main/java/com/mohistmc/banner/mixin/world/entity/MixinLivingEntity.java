@@ -47,6 +47,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R3.CraftEquipmentSlot;
+import org.bukkit.craftbukkit.v1_19_R3.SpigotTimings;
 import org.bukkit.craftbukkit.v1_19_R3.attribute.CraftAttributeMap;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
@@ -194,6 +195,70 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setHealth(F)V"))
     private void banner$muteHealth(LivingEntity entity, float health) {
         // do nothing
+    }
+
+    @Inject(method = "tick", at = @At("HEAD"))
+    private void banner$timings(CallbackInfo ci) {
+        SpigotTimings.timerEntityBaseTick.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tick", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/LivingEntity;aiStep()V"))
+    private void banner$timings0(CallbackInfo ci) {
+        SpigotTimings.timerEntityBaseTick.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "tick", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/LivingEntity;aiStep()V",
+            shift = At.Shift.AFTER))
+    private void banner$timings1(CallbackInfo ci) {
+        SpigotTimings.timerEntityTickRest.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tick", at = @At("TAIL"))
+    private void banner$timings2(CallbackInfo ci) {
+        SpigotTimings.timerEntityTickRest.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isImmobile()Z"))
+    private void banner$timings3(CallbackInfo ci) {
+        SpigotTimings.timerEntityAI.startTiming(); // Spigot
+    }
+
+    @Inject(method = "aiStep",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V", ordinal = 1))
+    private void banner$timings4(CallbackInfo ci) {
+        SpigotTimings.timerEntityAI.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "aiStep",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;isAlive()Z"))
+    private void banner$timings5(CallbackInfo ci) {
+        SpigotTimings.timerEntityAIMove.startTiming(); // Spigot
+    }
+
+    @Inject(method = "aiStep",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V", ordinal = 3))
+    private void banner$timings6(CallbackInfo ci) {
+        SpigotTimings.timerEntityAIMove.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "aiStep",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;pushEntities()V"))
+    private void banner$timings7(CallbackInfo ci) {
+        SpigotTimings.timerEntityAICollision.startTiming(); // Spigot
+    }
+
+    @Inject(method = "aiStep",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;pushEntities()V",
+                    shift = At.Shift.AFTER))
+    private void banner$timings8(CallbackInfo ci) {
+        SpigotTimings.timerEntityAICollision.stopTiming(); // Spigot
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
