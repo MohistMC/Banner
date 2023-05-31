@@ -77,7 +77,8 @@ public abstract class MixinServerChunkCache implements InjectionServerChunkCache
     }
 
     @Inject(method = "getChunk", at = @At(value = "INVOKE",
-            target = "Lcom/mojang/datafixers/util/Either;map(Ljava/util/function/Function;Ljava/util/function/Function;)Ljava/lang/Object;"))
+            target = "Lcom/mojang/datafixers/util/Either;map(Ljava/util/function/Function;Ljava/util/function/Function;)Ljava/lang/Object;",
+            remap = false))
     private void banner$timingsStop(int chunkX, int chunkZ, ChunkStatus requiredStatus, boolean load, CallbackInfoReturnable<ChunkAccess> cir) {
         level.bridge$timings().syncChunkLoadTimer.stopTiming(); // Spigot
     }
