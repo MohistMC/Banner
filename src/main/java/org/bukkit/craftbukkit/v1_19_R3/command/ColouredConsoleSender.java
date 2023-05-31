@@ -7,6 +7,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.minecrell.terminalconsole.TerminalConsoleAppender;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
@@ -20,6 +22,7 @@ public class ColouredConsoleSender extends CraftConsoleCommandSender {
     private static final char ANSI_ESC_CHAR = '\u001B';
     private static final String RGB_STRING = String.valueOf(ANSI_ESC_CHAR) + "[38;2;%d;%d;%dm";
     private static final Pattern RBG_TRANSLATE = Pattern.compile(String.valueOf(ChatColor.COLOR_CHAR) + "x(" + String.valueOf(ChatColor.COLOR_CHAR) + "[A-F0-9]){6}", Pattern.CASE_INSENSITIVE);
+    private static final Logger LOGGER = LogManager.getLogger("Console");
 
     protected ColouredConsoleSender() {
         super();
@@ -62,7 +65,7 @@ public class ColouredConsoleSender extends CraftConsoleCommandSender {
                         result = result.replaceAll("(?i)" + color.toString(), "");
                     }
                 }
-                System.out.println(result + Ansi.ansi().reset().toString());
+                LOGGER.info(result + Ansi.ansi().reset().toString());
             }
         } else {
             super.sendMessage(message);
