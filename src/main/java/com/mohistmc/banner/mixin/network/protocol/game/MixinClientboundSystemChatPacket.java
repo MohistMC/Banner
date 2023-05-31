@@ -20,4 +20,5 @@ public class MixinClientboundSystemChatPacket {
     public void banner$constructor(BaseComponent[] content, boolean overlay) {
         banner$constructor(ComponentSerializer.toString(content), overlay);
     }
+
 }

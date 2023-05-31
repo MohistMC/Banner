@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import javax.annotation.Nullable;
 
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -2145,8 +2146,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         @Override
         public void sendMessage(net.md_5.bungee.api.ChatMessageType position, UUID sender, BaseComponent... components) {
             if ( getHandle().connection == null ) return;
-            Component component = Component.literal(net.md_5.bungee.chat.ComponentSerializer.toString(components));
-            getHandle().connection.send(new net.minecraft.network.protocol.game.ClientboundSystemChatPacket(component, position == net.md_5.bungee.api.ChatMessageType.ACTION_BAR));
+            getHandle().connection.send(new
+                    net.minecraft.network.protocol.game.ClientboundSystemChatPacket(
+                    Component.Serializer.fromJson(ComponentSerializer.
+                                    toString(components)),
+                    position == net.md_5.bungee.api.ChatMessageType.ACTION_BAR));
         }
     };
 
