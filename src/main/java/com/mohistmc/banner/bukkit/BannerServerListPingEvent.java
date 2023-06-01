@@ -22,7 +22,7 @@ public class BannerServerListPingEvent extends ServerListPingEvent {
     private final Object[] players;
 
     public BannerServerListPingEvent(Connection networkManager, MinecraftServer server) {
-        super(networkManager.bridge$hostname(), ((InetSocketAddress) networkManager.getRemoteAddress()).getAddress(), server.getMotd(), server.getPlayerList().getMaxPlayers());
+        super(networkManager.bridge$hostname(), ((InetSocketAddress) networkManager.getRemoteAddress()).getAddress(), server.bridge$server().getMotd(), server.getPlayerList().getMaxPlayers());
         this.icon = ((CraftServer) Bukkit.getServer()).getServerIcon();
         this.players = server.getPlayerList().players.toArray();
     }
