@@ -56,6 +56,15 @@ public abstract class MixinItemEntity extends Entity {
         }
     }
 
+    @Redirect(method = "mergeWithNeighbours", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/phys/AABB;inflate(DDD)Lnet/minecraft/world/phys/AABB;"))
+    private AABB banner$resetMerge(AABB instance, double x, double y, double z) {
+        // Spigot start
+        double radius = level.bridge$spigotConfig().itemMerge;
+        return instance.inflate(radius, radius - 0.5D, radius);
+        // Spigot end
+    }
+
     /**
      * @author wdog5
      * @reason
@@ -118,11 +127,5 @@ public abstract class MixinItemEntity extends Entity {
         if (!stack.isEmpty()) {
             itemEntity.setItem(stack);
         }
-    }
-
-    @Redirect(method = "mergeWithNeighbours", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/AABB;inflate(DDD)Lnet/minecraft/world/phys/AABB;"))
-    private AABB banner$mergeRadius(AABB instance, double pX, double pY, double pZ) {
-        double radius = level.bridge$spigotConfig().itemMerge;
-        return instance.inflate(radius);
     }
 }
