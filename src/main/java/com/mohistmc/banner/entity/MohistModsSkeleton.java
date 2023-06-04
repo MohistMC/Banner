@@ -17,7 +17,7 @@ public class MohistModsSkeleton extends CraftAbstractSkeleton {
     }
 
     public @NotNull Skeleton.SkeletonType getSkeletonType() {
-        return Skeleton.SkeletonType.FORGE_MODS;
+        return Skeleton.SkeletonType.MOD;
     }
 
     @NotNull
