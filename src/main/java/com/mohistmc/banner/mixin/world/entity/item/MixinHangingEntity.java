@@ -9,8 +9,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.decoration.HangingEntity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
@@ -23,8 +22,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Collection;
 
 @Mixin(HangingEntity.class)
 public abstract class MixinHangingEntity extends Entity{
@@ -39,9 +36,9 @@ public abstract class MixinHangingEntity extends Entity{
 
     @Inject(method = "tick", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/HangingEntity;discard()V"))
     private void banner$hangingBreak(CallbackInfo ci) {
-        Collection<Property<?>> material = this.level().getBlockState(new BlockPos(this.blockPosition())).getProperties();
+        BlockState material = this.level().getBlockState(new BlockPos(this.blockPosition()));
         HangingBreakEvent.RemoveCause cause;
-        if (!material.equals(BlockBehaviour.Properties.of().air())) {
+        if (!material.isAir()) {
             cause = HangingBreakEvent.RemoveCause.OBSTRUCTION;
         } else {
             cause = HangingBreakEvent.RemoveCause.PHYSICS;

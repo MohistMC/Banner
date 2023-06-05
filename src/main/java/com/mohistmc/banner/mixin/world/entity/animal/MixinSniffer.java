@@ -30,7 +30,9 @@ public abstract class MixinSniffer extends Animal {
     }
 
     @Inject(method = "dropSeed", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/item/ItemEntity;setDefaultPickUpDelay()V"))
-    private void banner$dropSeed(CallbackInfo ci, ServerLevel serverLevel, LootTable lootTable, LootParams lootParams, List list, BlockPos blockPos, Iterator var6, ItemStack itemStack, ItemEntity itemEntity) {
+    private void banner$dropSeed(CallbackInfo ci, ServerLevel serverLevel, LootTable lootTable,
+                                 LootParams lootParams, List list, BlockPos blockPos, Iterator var6,
+                                 ItemStack itemStack, ItemEntity itemEntity) {
         var event = new EntityDropItemEvent(this.getBukkitEntity(), (Item) itemEntity.getBukkitEntity());
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {

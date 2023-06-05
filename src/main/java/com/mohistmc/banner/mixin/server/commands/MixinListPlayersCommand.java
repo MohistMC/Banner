@@ -2,12 +2,14 @@ package com.mohistmc.banner.mixin.server.commands;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.server.commands.ListPlayersCommand;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.List;
 import java.util.function.Function;
@@ -15,21 +17,17 @@ import java.util.function.Function;
 @Mixin(ListPlayersCommand.class)
 public class MixinListPlayersCommand {
 
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    private static int format(CommandSourceStack source, Function<ServerPlayer, Component> nameExtractor) {
-        PlayerList playerList = source.getServer().getPlayerList();
-        List<ServerPlayer> list = playerList.getPlayers();
+    @Inject(method = "format",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/network/chat/ComponentUtils;formatList(Ljava/util/Collection;Ljava/util/function/Function;)Lnet/minecraft/network/chat/Component;",
+                    shift = At.Shift.BEFORE),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private static void banner$format(CommandSourceStack source, Function<ServerPlayer, Component> nameExtractor, CallbackInfoReturnable<Integer> cir, PlayerList playerList, List<ServerPlayer> list) {
         // CraftBukkit start
-        if (source.getBukkitSender() instanceof org.bukkit.entity.Player sender) {
+        if (source.getBukkitSender() instanceof org.bukkit.entity.Player) {
+            org.bukkit.entity.Player sender = (org.bukkit.entity.Player) source.getBukkitSender();
             list = list.stream().filter((ep) -> sender.canSee(ep.getBukkitEntity())).collect(java.util.stream.Collectors.toList());
         }
         // CraftBukkit end
-        Component component = ComponentUtils.formatList(list, nameExtractor);
-        source.sendSuccess(Component.translatable("commands.list.players", new Object[]{list.size(), playerList.getMaxPlayers(), component}), false);
-        return list.size();
     }
 }

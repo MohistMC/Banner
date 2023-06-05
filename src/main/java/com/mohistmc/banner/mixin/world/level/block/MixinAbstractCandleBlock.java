@@ -17,12 +17,12 @@ public class MixinAbstractCandleBlock {
             target = "Lnet/minecraft/world/level/block/AbstractCandleBlock;" +
                     "setLit(Lnet/minecraft/world/level/LevelAccessor;" +
                     "Lnet/minecraft/world/level/block/state/BlockState;" +
-                    "Lnet/minecraft/core/BlockPos;Z)V",
-            shift = At.Shift.BEFORE))
+                    "Lnet/minecraft/core/BlockPos;Z)V"),
+            cancellable = true)
     private void banner$callBlockIgniteEvent(Level level, BlockState state, BlockHitResult hit, Projectile projectile, CallbackInfo ci) {
         // CraftBukkit start
         if (org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callBlockIgniteEvent(level, hit.getBlockPos(), projectile).isCancelled()) {
-            return;
+            ci.cancel();
         }
         // CraftBukkit end
     }

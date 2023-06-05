@@ -21,9 +21,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static net.minecraft.world.level.block.PointedDripstoneBlock.THICKNESS;
-import static net.minecraft.world.level.block.PointedDripstoneBlock.TIP_DIRECTION;
-import static net.minecraft.world.level.block.PointedDripstoneBlock.WATERLOGGED;
+import static net.minecraft.world.level.block.PointedDripstoneBlock.*;
 
 @Mixin(PointedDripstoneBlock.class)
 public class MixinPointedDripstoneBlock {

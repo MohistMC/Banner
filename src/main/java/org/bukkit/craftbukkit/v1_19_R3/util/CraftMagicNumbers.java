@@ -6,7 +6,8 @@ import com.google.common.collect.*;
 import com.google.common.io.Files;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mohistmc.banner.util.ServerUtils;
+import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Dynamic;
 import java.io.File;
@@ -32,6 +33,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.LevelResource;
 import org.bukkit.Bukkit;
+import org.bukkit.FeatureFlag;
 import org.bukkit.Fluid;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -42,6 +44,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_19_R3.CraftEquipmentSlot;
+import org.bukkit.craftbukkit.v1_19_R3.CraftFeatureFlag;
 import org.bukkit.craftbukkit.v1_19_R3.attribute.CraftAttributeInstance;
 import org.bukkit.craftbukkit.v1_19_R3.attribute.CraftAttributeMap;
 import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
@@ -251,7 +254,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
     }
 
     private static File getBukkitDataPackFolder() {
-        return new File(Objects.requireNonNull(ServerUtils.getServer()).getWorldPath(LevelResource.DATAPACK_DIR).toFile(), "bukkit");
+        return new File(Objects.requireNonNull(BukkitExtraConstants.getServer()).getWorldPath(LevelResource.DATAPACK_DIR).toFile(), "bukkit");
     }
 
     @Override
@@ -263,10 +266,9 @@ public final class CraftMagicNumbers implements UnsafeValues {
 
         JsonElement jsonelement = ServerAdvancementManager.GSON.fromJson(advancement, JsonElement.class);
         JsonObject jsonobject = GsonHelper.convertToJsonObject(jsonelement, "advancement");
-        /**
-        net.minecraft.advancements.Advancement.Builder nms = net.minecraft.advancements.Advancement.Builder.fromJson(jsonobject, new DeserializationContext(minecraftkey, ServerUtils.getServer().getPredicateManager()));
+        net.minecraft.advancements.Advancement.Builder nms = net.minecraft.advancements.Advancement.Builder.fromJson(jsonobject, new DeserializationContext(minecraftkey, BukkitExtraConstants.getServer().getLootData()));
         if (nms != null) {
-            ServerUtils.getServer().getAdvancements().advancements.add(Maps.newHashMap(Collections.singletonMap(minecraftkey, nms)));
+            BukkitExtraConstants.getServer().getAdvancements().advancements.add(Maps.newHashMap(Collections.singletonMap(minecraftkey, nms)));
             Advancement bukkit = Bukkit.getAdvancement(key);
 
             if (bukkit != null) {
@@ -279,12 +281,11 @@ public final class CraftMagicNumbers implements UnsafeValues {
                     Bukkit.getLogger().log(Level.SEVERE, "Error saving advancement " + key, ex);
                 }
 
-                ServerUtils.getServer().getPlayerList().reloadResources();
+                BukkitExtraConstants.getServer().getPlayerList().reloadResources();
 
                 return bukkit;
             }
-        }*/
-        // Banner - TODO
+        }
 
         return null;
     }
@@ -299,7 +300,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
 
     @Override
     public void checkSupported(PluginDescriptionFile pdf) throws InvalidPluginException {
-        String minimumVersion = ServerUtils.getServer().bridge$server().minimumAPI;
+        String minimumVersion = BukkitExtraConstants.getServer().bridge$server().minimumAPI;
         int minimumIndex = SUPPORTED_API.indexOf(minimumVersion);
 
         if (pdf.getAPIVersion() != null) {
@@ -377,6 +378,12 @@ public final class CraftMagicNumbers implements UnsafeValues {
     public String getTranslationKey(ItemStack itemStack) {
         net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
         return nmsItemStack.getItem().getDescriptionId(nmsItemStack);
+    }
+
+    @Override
+    public FeatureFlag getFeatureFlag(NamespacedKey namespacedKey) {
+        Preconditions.checkArgument(namespacedKey != null, "NamespaceKey cannot be null");
+        return CraftFeatureFlag.getFromNMS(namespacedKey);
     }
 
     /**

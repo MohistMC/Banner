@@ -36,14 +36,14 @@ public abstract class MixinAbstractMinecartContainer extends AbstractMinecart im
     @Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;)V", at = @At("RETURN"))
     private void banner$init(EntityType<?> type, Level world, CallbackInfo ci) {
         this.itemStacks = NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
-        maxStack = LARGE_MAX_STACK_SIZE;
+        maxStack = MAX_STACK;
         transaction = new ArrayList<>();
     }
 
     @Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;DDDLnet/minecraft/world/level/Level;)V", at = @At("RETURN"))
     private void banner$init(EntityType<?> type, double x, double y, double z, Level world, CallbackInfo ci) {
         this.itemStacks = NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
-        maxStack = LARGE_MAX_STACK_SIZE;
+        maxStack = MAX_STACK;
         transaction = new ArrayList<>();
     }
 

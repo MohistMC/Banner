@@ -43,4 +43,11 @@ public interface InjectionServerGamePacketListenerImpl {
     default boolean checkLimit(long timestamp) {
         return false;
     }
+
+    default boolean bridge$processedDisconnect() {
+        return false;
+    }
+
+    default void setProcessedDisconnect(boolean processedDisconnect) {
+    }
 }

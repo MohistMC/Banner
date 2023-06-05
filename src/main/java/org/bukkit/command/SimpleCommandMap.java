@@ -10,7 +10,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.mohistmc.banner.command.DumpCommand;
+import com.mohistmc.banner.command.GetPluginListCommand;
 import com.mohistmc.banner.command.ModListCommand;
+import com.mohistmc.banner.command.PluginCommand;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.command.defaults.BukkitCommand;
@@ -38,7 +41,10 @@ public class SimpleCommandMap implements CommandMap {
         register("bukkit", new ReloadCommand("reload"));
         register("bukkit", new PluginsCommand("plugins"));
         register("bukkit", new TimingsCommand("timings"));
-        register("bukkit", new ModListCommand("fabricmods"));
+        register("banner", new ModListCommand("fabricmods"));
+        register("banner", new DumpCommand("dump"));
+        register("banner", new PluginCommand("plugin"));
+        register("banner", new GetPluginListCommand("getpluginlist"));
     }
 
     public void setFallbackCommands() {
@@ -147,11 +153,15 @@ public class SimpleCommandMap implements CommandMap {
         }
 
         try {
+            target.timings.startTiming(); // Spigot
             // Note: we don't return the result of target.execute as thats success / failure, we return handled (true) or not handled (false)
             target.execute(sender, sentCommandLabel, Arrays.copyOfRange(args, 1, args.length));
+            target.timings.stopTiming(); // Spigot
         } catch (CommandException ex) {
+            target.timings.stopTiming(); // Spigot
             throw ex;
         } catch (Throwable ex) {
+            target.timings.stopTiming(); // Spigot
             throw new CommandException("Unhandled exception executing '" + commandLine + "' in " + target, ex);
         }
 
@@ -281,4 +291,10 @@ public class SimpleCommandMap implements CommandMap {
             }
         }
     }
+
+    // Banner start - add methods to support plugin manager
+    public Map<String, Command> getKnownCommands() {
+        return knownCommands;
+    }
+    // Banner - end
 }

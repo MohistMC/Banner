@@ -14,7 +14,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.BannerMCStart;
 import org.bukkit.Warning.WarningState;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.block.data.BlockData;
@@ -43,6 +43,7 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.LootTable;
 import org.bukkit.map.MapView;
+import org.bukkit.packs.DataPackManager;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicesManager;
@@ -91,7 +92,7 @@ public final class Bukkit {
         }
 
         Bukkit.server = server;
-        BannerServer.LOGGER.info("This server is running " + getName() + " version " + getVersion() + " (Implementing API version " + getBukkitVersion() + ")");
+        server.getLogger().info("This server is running " + getName() + " version " + getVersion() + " (Implementing API version " + getBukkitVersion() + ")");
     }
 
     /**
@@ -248,6 +249,26 @@ public final class Bukkit {
      */
     public static boolean getAllowNether() {
         return server.getAllowNether();
+    }
+
+    @NotNull
+    public static List<String> getInitialEnabledPacks() {
+        return server.getInitialEnabledPacks();
+    }
+
+    @NotNull
+    public static List<String> getInitialDisabledPacks() {
+        return server.getInitialDisabledPacks();
+    }
+
+    /**
+     * Get the DataPack Manager.
+     *
+     * @return the manager
+     */
+    @NotNull
+    public static DataPackManager getDataPackManager() {
+        return server.getDataPackManager();
     }
 
     /**
@@ -802,6 +823,7 @@ public final class Bukkit {
      */
     public static void reload() {
         server.reload();
+        org.spigotmc.CustomTimingsHandler.reload(); // Spigot
     }
 
     /**

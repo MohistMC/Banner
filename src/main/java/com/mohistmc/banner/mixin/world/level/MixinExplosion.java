@@ -16,6 +16,8 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.boss.EnderDragonPart;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.ProtectionEnchantment;
@@ -42,11 +44,7 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.TNTPrimeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -171,8 +169,25 @@ public abstract class MixinExplosion implements InjectionExplosion {
                         double d14 = Explosion.getSeenPercent(vec3d, entity);
                         double d10 = (1.0D - d12) * d14;
 
+                        if (entity instanceof EnderDragonPart) {
+                            continue;
+                        }
+
                         CraftEventFactory.entityDamage = this.source;
                         entity.banner$setLastDamageCancelled(false);
+
+                        if (entity instanceof EnderDragon) {
+                            for (EnderDragonPart entityComplexPart : ((EnderDragon) entity).subEntities) {
+                                // Calculate damage separately for each EntityComplexPart
+                                double d7part;
+                                if (list.contains(entityComplexPart) && (d7part = Math.sqrt(entityComplexPart.distanceToSqr(vec3d)) / f3) <= 1.0D) {
+                                    double d13part = (1.0D - d7part) * getSeenPercent(vec3d, entityComplexPart);
+                                    entityComplexPart.hurt(this.getDamageSource(), (float) ((int) ((d13part * d13part + d13part) / 2.0D * 7.0D * (double) f3 + 1.0D)));
+                                }
+                            }
+                        } else {
+                            entity.hurt(this.getDamageSource(), (float) ((int) ((d10 * d10 + d10) / 2.0D * 7.0D * (double) f3 + 1.0D)));
+                        }
 
                         CraftEventFactory.entityDamage = null;
                         if (entity.bridge$lastDamageCancelled()) {
@@ -180,8 +195,8 @@ public abstract class MixinExplosion implements InjectionExplosion {
                         }
 
                         double d11;
-                        if (entity instanceof LivingEntity) {
-                            d11 = ProtectionEnchantment.getExplosionKnockbackAfterDampener((LivingEntity) entity, d10);
+                        if (entity instanceof LivingEntity livingEntity) {
+                            d11 = ProtectionEnchantment.getExplosionKnockbackAfterDampener(livingEntity, d10);
                         } else {
                             d11 = d10;
                         }
@@ -257,9 +272,10 @@ public abstract class MixinExplosion implements InjectionExplosion {
                         if (var11 instanceof ServerLevel serverLevel) {
                             BlockEntity blockEntity = blockstate.hasBlockEntity() ? this.level.getBlockEntity(blockpos) : null;
                             LootParams.Builder builder = (new LootParams.Builder(serverLevel)).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockpos)).withParameter(LootContextParams.TOOL, ItemStack.EMPTY).withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity).withOptionalParameter(LootContextParams.THIS_ENTITY, this.source);
-                            if (this.blockInteraction == Explosion.BlockInteraction.DESTROY_WITH_DECAY) {
-                                builder.withParameter(LootContextParams.EXPLOSION_RADIUS, this.radius);
+                            if (yield < 1.0F) { // CraftBukkit - add yield
+                                builder.withParameter(LootContextParams.EXPLOSION_RADIUS, 1.0F / yield); // CraftBukkit - add yield
                             }
+
                             blockstate.spawnAfterBreak(serverLevel, blockpos, ItemStack.EMPTY, flag2);
                             blockstate.getDrops(builder).forEach((itemStack) -> {
                                 addBlockDrops(objectarraylist, itemStack, blockpos1);
@@ -267,6 +283,7 @@ public abstract class MixinExplosion implements InjectionExplosion {
                         }
                     }
 
+                    this.level.setBlock(blockpos, Blocks.AIR.defaultBlockState(), 3);
                     block.wasExploded(this.level, blockpos, ((Explosion) (Object) this));
                     this.level.getProfiler().pop();
                 }

@@ -10,6 +10,7 @@ import com.mohistmc.dynamicenum.MohistDynamEnum;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
@@ -58,6 +59,23 @@ public class FabricInjectBukkit {
         addEnumEntity();
         addEnumVillagerProfession();
         addEnumParticle();
+    }
+
+    public static void addEnumEnvironment() {
+        int i = World.Environment.values().length;
+        var registry = ServerAPI.getNMSServer().registryAccess().registryOrThrow(Registries.LEVEL_STEM);
+        for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry : registry.entrySet()) {
+            ResourceKey<LevelStem> key = entry.getKey();
+            World.Environment environment1 = DIM_MAP.get(key);
+            if (environment1 == null) {
+                String name = normalizeName(key.location().toString());
+                int id = i - 1;
+                environment1 = MohistDynamEnum.addEnum(World.Environment.class, name, new Class[]{Integer.TYPE}, new Object[]{id});
+                DIM_MAP.put(key, environment1);
+                BannerServer.LOGGER.debug("Registered fabric DimensionType as environment {}", environment1);
+                i++;
+            }
+        }
     }
 
     public static void addEnumMaterialInItems() {
@@ -180,7 +198,7 @@ public class FabricInjectBukkit {
                 String name = normalizeName(resourceLocation.toString());
                 Villager.Profession vp = MohistDynamEnum.addEnum0(Villager.Profession.class, name, new Class[0]);
                 profession.put(vp, resourceLocation);
-                BannerServer.LOGGER.debug("Registered forge VillagerProfession as Profession {}", vp.name());
+                BannerServer.LOGGER.debug("Registered fabric VillagerProfession as Profession {}", vp.name());
             }
         }
     }
@@ -193,7 +211,7 @@ public class FabricInjectBukkit {
             if (!isMINECRAFT(resourceLocation)) {
                 Fluid fluid = MohistDynamEnum.addEnum0(Fluid.class, name, new Class[0]);
                 CraftMagicNumbers.FLUIDTYPE_FLUID.put(fluidType, fluid);
-                BannerServer.LOGGER.debug("Registered forge Fluid as Fluid(Bukkit) {}", fluid.name());
+                BannerServer.LOGGER.debug("Registered fabric Fluid as Fluid(Bukkit) {}", fluid.name());
             }
         }
     }

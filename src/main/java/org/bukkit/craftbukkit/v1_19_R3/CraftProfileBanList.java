@@ -1,7 +1,8 @@
 package org.bukkit.craftbukkit.v1_19_R3;
 
 import com.google.common.collect.ImmutableSet;
-import com.mohistmc.banner.util.ServerUtils;
+import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.authlib.GameProfile;
 import java.io.IOException;
 import java.util.Date;
@@ -104,6 +105,6 @@ public class CraftProfileBanList implements org.bukkit.BanList {
         } catch (IllegalArgumentException ex) {
             //
         }
-        return ((uuid != null) ? ServerUtils.getServer().getProfileCache().get(uuid) : ServerUtils.getServer().getProfileCache().get(target)).orElse(null);
+        return ((uuid != null) ? BukkitExtraConstants.getServer().getProfileCache().get(uuid) : BukkitExtraConstants.getServer().getProfileCache().get(target)).orElse(null);
     }
 }

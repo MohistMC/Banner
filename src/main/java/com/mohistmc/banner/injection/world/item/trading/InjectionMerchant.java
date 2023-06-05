@@ -4,7 +4,7 @@ import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftMerchant;
 
 public interface InjectionMerchant {
 
-    default CraftMerchant getCraftMerchant(){
+    default CraftMerchant getCraftMerchant() {
         return null;
     }
 }

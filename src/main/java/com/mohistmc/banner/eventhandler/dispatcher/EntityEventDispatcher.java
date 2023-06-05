@@ -1,16 +1,5 @@
 package com.mohistmc.banner.eventhandler.dispatcher;
 
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.fabricmc.fabric.api.event.player.UseEntityCallback;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.animal.MushroomCow;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ShearsItem;
-import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
-import org.bukkit.event.entity.EntityDropItemEvent;
-
 public class EntityEventDispatcher {
 
     public static void dispatchEntity() {

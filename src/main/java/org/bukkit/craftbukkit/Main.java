@@ -1,8 +1,10 @@
 package org.bukkit.craftbukkit;
 
+import com.mohistmc.banner.BannerMCStart;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.util.PathConverter;
+import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.fusesource.jansi.AnsiConsole;
 
@@ -137,6 +139,13 @@ public class Main extends OptionParser {
                 .defaultsTo(new File("spigot.yml"))
                 .describedAs("Yml file");
 
+        // Banner Start
+        acceptsAll(asList("B", "banner-settings"), "File for banner settings")
+                .withRequiredArg()
+                .ofType(File.class)
+                .defaultsTo(new File("banner-config","banner.yml"))
+                .describedAs("Yml file");
+
         allowsUnrecognizedOptions();
     }
 
@@ -162,48 +171,28 @@ public class Main extends OptionParser {
                 System.err.println("Unsupported Java detected (" + javaVersion + "). This version of Minecraft requires at least Java 17. Check your Java version with the command 'java -version'.");
                 return;
             }
-            if (javaVersion > 63) {
+            if (javaVersion > 64.0) {
                 System.err.println("Unsupported Java detected (" + javaVersion + "). Only up to Java 19 is supported.");
                 return;
             }
 
-            try {
-                // This trick bypasses Maven Shade's clever rewriting of our getProperty call when using String literals
-                String jline_UnsupportedTerminal = new String(new char[]{'j', 'l', 'i', 'n', 'e', '.', 'U', 'n', 's', 'u', 'p', 'p', 'o', 'r', 't', 'e', 'd', 'T', 'e', 'r', 'm', 'i', 'n', 'a', 'l'});
-                String jline_terminal = new String(new char[]{'j', 'l', 'i', 'n', 'e', '.', 't', 'e', 'r', 'm', 'i', 'n', 'a', 'l'});
+            String javaVersionName = System.getProperty("java.version");
+            // J2SE SDK/JRE Version String Naming Convention
+            boolean isPreRelease = javaVersionName.contains("-");
+            if (isPreRelease && javaVersion == 61.0) {
+                System.err.println("Unsupported Java detected (" + javaVersionName + "). You are running an outdated, pre-release version. Only general availability versions of Java are supported. Please update your Java version.");
+                return;
+            }
 
-                Main.useJline = !(jline_UnsupportedTerminal).equals(System.getProperty(jline_terminal));
+            if (options.has("nojline")) {
+                System.setProperty(TerminalConsoleAppender.JLINE_OVERRIDE_PROPERTY, "false");
+                useJline = false;
+            }
 
-                if (options.has("nojline")) {
-                    System.setProperty("user.language", "en");
-                    Main.useJline = false;
-                }
-
-                if (Main.useJline) {
-                    AnsiConsole.systemInstall();
-                } else {
-                    // This ensures the terminal literal will always match the jline implementation
-                    System.setProperty(jline.TerminalFactory.JLINE_TERMINAL, jline.UnsupportedTerminal.class.getName());
-                }
-
-                if (options.has("noconsole")) {
-                    Main.useConsole = false;
-                }
-
-                if (Main.class.getPackage().getImplementationVendor() != null && System.getProperty("IReallyKnowWhatIAmDoingISwear") == null) {
-                    Date buildDate = new Date(Integer.parseInt(Main.class.getPackage().getImplementationVendor()) * 1000L);
-
-                    Calendar deadline = Calendar.getInstance();
-                    deadline.add(Calendar.DAY_OF_YEAR, -28);
-                    if (buildDate.before(deadline.getTime())) {
-                        System.err.println("*** Error, this build is outdated ***");
-                        System.err.println("*** Please download a new build as per instructions from https://www.spigotmc.org/go/outdated-spigot ***");
-                        System.err.println("*** Server will start in 20 seconds ***");
-                        Thread.sleep(TimeUnit.SECONDS.toMillis(20));
-                    }
-                }
-            } catch (Throwable t) {
-                t.printStackTrace();
+            if (options.has("noconsole")) {
+                useConsole = false;
+                useJline = false;
+                System.setProperty(TerminalConsoleAppender.JLINE_OVERRIDE_PROPERTY, "false");
             }
         }
     }

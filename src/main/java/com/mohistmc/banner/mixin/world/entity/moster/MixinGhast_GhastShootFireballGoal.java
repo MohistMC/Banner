@@ -1,14 +1,14 @@
 package com.mohistmc.banner.mixin.world.entity.moster;
 
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.projectile.LargeFireball;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.monster.Ghast;
-import net.minecraft.world.level.Level;
 
 @Mixin(targets = "net.minecraft.world.entity.monster.Ghast$GhastShootFireballGoal")
 public abstract class MixinGhast_GhastShootFireballGoal {

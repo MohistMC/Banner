@@ -5,10 +5,11 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 
 public interface InjectionServerLevelAccessor {
 
-    default void addFreshEntityWithPassengers(Entity entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason reason) {
+    default boolean addAllEntities(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
+        return false;
     }
 
-    default CreatureSpawnEvent.SpawnReason bridge$getAddEntityReason() {
-        return null;
+    default boolean addFreshEntityWithPassengers(Entity entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason reason) {
+        return false;
     }
 }

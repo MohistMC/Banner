@@ -50,7 +50,7 @@ public abstract class MixinLavaFluid {
                                     continue;
                                 }
                             }
-                            // CraftBukkit end*/
+                            // CraftBukkit end
                             level.setBlockAndUpdate(blockPos, BaseFireBlock.getState(level, blockPos));
                             return;
                         }

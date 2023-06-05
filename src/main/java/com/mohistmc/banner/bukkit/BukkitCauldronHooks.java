@@ -38,7 +38,7 @@ public class BukkitCauldronHooks {
         return lastRet;
     }
 
-    public static boolean changeLevel(BlockState old, Level world, BlockPos pos, BlockState state, Entity entity, CauldronLevelChangeEvent.ChangeReason reason) {
+    public static boolean changeLevel(Level world, BlockPos pos, BlockState state, Entity entity, CauldronLevelChangeEvent.ChangeReason reason) {
         CraftBlockState newState = CraftBlockStates.getBlockState(world, pos);
         newState.setData(state);
         CauldronLevelChangeEvent event = new CauldronLevelChangeEvent(

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public interface InjectionLivingEntity {
+public interface InjectionLivingEntity extends InjectionEntity {
 
     default void equipEventAndSound(EquipmentSlot slot, ItemStack oldItem, ItemStack newItem, boolean silent) {
     }

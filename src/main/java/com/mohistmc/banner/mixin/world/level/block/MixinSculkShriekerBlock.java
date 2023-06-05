@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.valueproviders.ConstantInt;
-import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -35,7 +34,10 @@ public abstract class MixinSculkShriekerBlock extends Block {
 
     @Override
     public int getExpDrop(BlockState blockState, ServerLevel world, BlockPos blockPos, ItemStack itemStack, boolean flag) {
-        return this.banner$tryDropExperience(world, blockPos, itemStack, ConstantInt.of(5));
+        if (flag) {
+            return this.banner$tryDropExperience(world, blockPos, itemStack, ConstantInt.of(5));
+        }
+        return 0;
     }
 
 }

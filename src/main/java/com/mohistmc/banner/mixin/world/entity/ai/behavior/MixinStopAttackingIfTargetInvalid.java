@@ -21,12 +21,10 @@ import java.util.function.Predicate;
 public abstract class MixinStopAttackingIfTargetInvalid {
 
     @Shadow
-    protected static boolean isTiredOfTryingToReachTarget(LivingEntity entity, Optional<Long> timeSinceInvalidTarget) {
-        return false;
-    }
+    private static boolean isTiredOfTryingToReachTarget(LivingEntity entity, Optional<Long> timeSinceInvalidTarget) { return false; }
 
     /**
-     * @author wdog5
+     * @author Mgazul
      * @reason
      */
     @Overwrite
@@ -34,8 +32,8 @@ public abstract class MixinStopAttackingIfTargetInvalid {
         return BehaviorBuilder.create((instance) -> {
             return instance.group(instance.present(MemoryModuleType.ATTACK_TARGET), instance.registered(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE)).apply(instance, (memoryAccessor, memoryAccessor2) -> {
                 return (serverLevel, mob, l) -> {
-                    LivingEntity livingEntity = (LivingEntity)instance.get(memoryAccessor);
-                    if (mob.canAttack(livingEntity) && (!canGrowTiredOfTryingToReachTarget || !isTiredOfTryingToReachTarget(mob, instance.tryGet(memoryAccessor2))) && livingEntity.isAlive() && livingEntity.level() == mob.level() && !canStopAttacking.test(livingEntity)) {
+                    LivingEntity livingentity = instance.get(memoryAccessor);
+                    if (mob.canAttack(livingentity) && (!canGrowTiredOfTryingToReachTarget || !isTiredOfTryingToReachTarget(mob, instance.tryGet(memoryAccessor2))) && livingentity.isAlive() && livingentity.level() == mob.level() && !canStopAttacking.test(livingentity)) {
                         return true;
                     } else {
                         // CraftBukkit start
@@ -48,9 +46,9 @@ public abstract class MixinStopAttackingIfTargetInvalid {
                             memoryAccessor.erase();
                             return true;
                         }
-                        livingEntity = ((CraftLivingEntity) event.getTarget()).getHandle();
+                        livingentity = ((CraftLivingEntity) event.getTarget()).getHandle();
                         // CraftBukkit end
-                        onStopAttacking.accept(mob, livingEntity);
+                        onStopAttacking.accept(mob, livingentity);
                         memoryAccessor.erase();
                         return true;
                     }

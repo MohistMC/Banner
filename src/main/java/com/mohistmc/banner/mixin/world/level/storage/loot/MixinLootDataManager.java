@@ -22,7 +22,7 @@ public class MixinLootDataManager implements InjectionLootDataManager {
     @Inject(method = "apply", at = @At("RETURN"))
     private void banner$buildRev(Map<LootDataType<?>, Map<ResourceLocation, ?>> map, CallbackInfo ci) {
         Map<LootTable, ResourceLocation> lootTableToKeyBuilder = new HashMap<>();
-        //this.lootTableToKey.forEach((lootTable, key) -> lootTableToKeyBuilder.put(key, lootTable)); Banner - TODO
+        this.lootTableToKey.forEach((lootTable, key) -> lootTableToKeyBuilder.put(lootTable, key));
         this.lootTableToKey = ImmutableMap.copyOf(lootTableToKeyBuilder);
     }
 

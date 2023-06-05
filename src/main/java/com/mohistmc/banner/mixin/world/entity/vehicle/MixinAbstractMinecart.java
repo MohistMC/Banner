@@ -21,11 +21,7 @@ import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Vehicle;
-import org.bukkit.event.vehicle.VehicleDamageEvent;
-import org.bukkit.event.vehicle.VehicleDestroyEvent;
-import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
-import org.bukkit.event.vehicle.VehicleMoveEvent;
-import org.bukkit.event.vehicle.VehicleUpdateEvent;
+import org.bukkit.event.vehicle.*;
 import org.bukkit.util.Vector;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -146,7 +142,6 @@ public abstract class MixinAbstractMinecart extends Entity {
         if (this.getDamage() > 0.0f) {
             this.setDamage(this.getDamage() - 1.0f);
         }
-
         if (this.level().isClientSide) {
             if (this.lSteps > 0) {
                 double d0 = this.getX() + (this.lx - this.getX()) / this.lSteps;

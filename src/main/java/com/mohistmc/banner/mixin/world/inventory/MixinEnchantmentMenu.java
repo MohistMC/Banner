@@ -40,7 +40,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -77,7 +76,7 @@ public abstract class MixinEnchantmentMenu extends AbstractContainerMenu{
 
     /**
      * @author wdog5
-     * @reason
+     * @reason bukkit
      */
     @Overwrite
     public boolean clickMenuButton(net.minecraft.world.entity.player.Player player, int id) {
@@ -173,7 +172,7 @@ public abstract class MixinEnchantmentMenu extends AbstractContainerMenu{
 
     /**
      * @author wdog5
-     * @reason
+     * @reason bukkit
      */
     @Overwrite
     public void slotsChanged(Container container) {

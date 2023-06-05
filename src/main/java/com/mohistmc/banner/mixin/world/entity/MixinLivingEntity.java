@@ -2,7 +2,6 @@ package com.mohistmc.banner.mixin.world.entity;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mohistmc.banner.bukkit.ProcessableEffect;
 import com.mohistmc.banner.injection.world.entity.InjectionLivingEntity;
 import io.izzel.arclight.mixin.Eject;
@@ -28,7 +27,10 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
@@ -45,6 +47,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R3.CraftEquipmentSlot;
+import org.bukkit.craftbukkit.v1_19_R3.SpigotTimings;
 import org.bukkit.craftbukkit.v1_19_R3.attribute.CraftAttributeMap;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
@@ -52,6 +55,7 @@ import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -165,6 +169,10 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
 
     @Shadow protected abstract boolean doesEmitEquipEvent(EquipmentSlot slot);
 
+    @Shadow @Final private static Logger LOGGER;
+
+    @Shadow public abstract void indicateDamage(double d, double e);
+
     public MixinLivingEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }
@@ -187,6 +195,70 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setHealth(F)V"))
     private void banner$muteHealth(LivingEntity entity, float health) {
         // do nothing
+    }
+
+    @Inject(method = "tick", at = @At("HEAD"))
+    private void banner$timings(CallbackInfo ci) {
+        SpigotTimings.timerEntityBaseTick.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tick", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/LivingEntity;aiStep()V"))
+    private void banner$timings0(CallbackInfo ci) {
+        SpigotTimings.timerEntityBaseTick.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "tick", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/LivingEntity;aiStep()V",
+            shift = At.Shift.AFTER))
+    private void banner$timings1(CallbackInfo ci) {
+        SpigotTimings.timerEntityTickRest.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tick", at = @At("TAIL"))
+    private void banner$timings2(CallbackInfo ci) {
+        SpigotTimings.timerEntityTickRest.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isImmobile()Z"))
+    private void banner$timings3(CallbackInfo ci) {
+        SpigotTimings.timerEntityAI.startTiming(); // Spigot
+    }
+
+    @Inject(method = "aiStep",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V", ordinal = 1))
+    private void banner$timings4(CallbackInfo ci) {
+        SpigotTimings.timerEntityAI.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "aiStep",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;isAlive()Z"))
+    private void banner$timings5(CallbackInfo ci) {
+        SpigotTimings.timerEntityAIMove.startTiming(); // Spigot
+    }
+
+    @Inject(method = "aiStep",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V", ordinal = 3))
+    private void banner$timings6(CallbackInfo ci) {
+        SpigotTimings.timerEntityAIMove.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "aiStep",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;pushEntities()V"))
+    private void banner$timings7(CallbackInfo ci) {
+        SpigotTimings.timerEntityAICollision.startTiming(); // Spigot
+    }
+
+    @Inject(method = "aiStep",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;pushEntities()V",
+                    shift = At.Shift.AFTER))
+    private void banner$timings8(CallbackInfo ci) {
+        SpigotTimings.timerEntityAICollision.stopTiming(); // Spigot
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
@@ -214,9 +286,9 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         }
     }
 
-    @ModifyExpressionValue(method = "onEquipItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isClientSide()Z"))
-    private boolean banner$addSilentCheck(EquipmentSlot equipmentSlot, ItemStack itemStack, ItemStack itemStack2, CallbackInfo ci) {
-        return !this.level().isClientSide() && !banner$silent.get();
+    @Redirect(method = "onEquipItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isClientSide()Z"))
+    private boolean banner$addSilentCheck(Level instance) {
+        return !this.level().isClientSide() && !this.isSilent() && !banner$silent.get();
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("HEAD"))
@@ -241,16 +313,22 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
 
     @Inject(method = "setHealth", cancellable = true, at = @At("HEAD"))
     public void banner$setScaled(float health, CallbackInfo ci) {
+        // CraftBukkit start - Handle scaled health
         if (((LivingEntity) (Object) this) instanceof ServerPlayer && ((ServerPlayer) (Object) this).banner$initialized()) {
             CraftPlayer player = ((ServerPlayer) (Object) this).getBukkitEntity();
 
-            double realHealth = Mth.clamp(health, 0.0F, player.getMaxHealth());
-            player.setRealHealth(realHealth);
-
+            // Squeeze
+            if (health < 0.0F) {
+                player.setRealHealth(0.0D);
+            } else if (health > player.getMaxHealth()) {
+                player.setRealHealth(player.getMaxHealth());
+            } else {
+                player.setRealHealth(health);
+            }
             player.updateScaledHealth(false);
-            player.setRealHealth(realHealth);
             ci.cancel();
         }
+        // CraftBukkit end
     }
 
     /**
@@ -418,55 +496,75 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     @Override
     public boolean damageEntity0(DamageSource damagesource, float f) {
         if (!this.isInvulnerableTo(damagesource)) {
-            final boolean human = (Object) this instanceof net.minecraft.world.entity.player.Player;
+            final boolean human = ((LivingEntity) (Object) this) instanceof Player;
             float originalDamage = f;
-            Function<Double, Double> hardHat = f12 -> {
-                if (damagesource.is(DamageTypeTags.DAMAGES_HELMET) && !this.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
-                    return -(f12 - (f12 * 0.75F));
+            Function<Double, Double> hardHat = new Function<Double, Double>() {
+                @Override
+                public Double apply(Double f) {
+                    if (damagesource.is(DamageTypeTags.DAMAGES_HELMET) && !getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
+                        return -(f - (f * 0.75F));
+
+                    }
+                    return -0.0;
                 }
-                return -0.0;
             };
             float hardHatModifier = hardHat.apply((double) f).floatValue();
             f += hardHatModifier;
 
-            Function<Double, Double> blocking;
-            var shieldTakesDamage = false;
-            if (this.isDamageSourceBlocked(damagesource)) {
-                    blocking = f13 -> 0d;
-            } else {
-                blocking = f13 -> 0d;
-            }
+            Function<Double, Double> blocking = new Function<Double, Double>() {
+                @Override
+                public Double apply(Double f) {
+                    return -((isDamageSourceBlocked(damagesource)) ? f : 0.0);
+                }
+            };
             float blockingModifier = blocking.apply((double) f).floatValue();
             f += blockingModifier;
 
-            Function<Double, Double> armor = f14 -> -(f14 - this.getDamageAfterArmorAbsorb(damagesource, f14.floatValue()));
+            Function<Double, Double> armor = new Function<Double, Double>() {
+                @Override
+                public Double apply(Double f) {
+                    return -(f - getDamageAfterArmorAbsorb(damagesource, f.floatValue()));
+                }
+            };
             float armorModifier = armor.apply((double) f).floatValue();
             f += armorModifier;
 
-            Function<Double, Double> resistance = f15 -> {
-                if (!damagesource.is(DamageTypeTags.BYPASSES_EFFECTS) && this.hasEffect(MobEffects.DAMAGE_RESISTANCE) && !damagesource.is(DamageTypeTags.BYPASSES_RESISTANCE)) {
-                    int i = (this.getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier() + 1) * 5;
-                    int j = 25 - i;
-                    float f1 = f15.floatValue() * (float) j;
-                    return -(f15 - (f1 / 25.0F));
+            Function<Double, Double> resistance = new Function<Double, Double>() {
+                @Override
+                public Double apply(Double f) {
+                    if (!damagesource.is(DamageTypeTags.BYPASSES_EFFECTS) && hasEffect(MobEffects.DAMAGE_RESISTANCE) && !damagesource.is(DamageTypeTags.BYPASSES_RESISTANCE)) {
+                        int i = (getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier() + 1) * 5;
+                        int j = 25 - i;
+                        float f1 = f.floatValue() * (float) j;
+                        return -(f - (f1 / 25.0F));
+                    }
+                    return -0.0;
                 }
-                return -0.0;
             };
             float resistanceModifier = resistance.apply((double) f).floatValue();
             f += resistanceModifier;
 
-            Function<Double, Double> magic = f16 -> -(f16 - this.getDamageAfterMagicAbsorb(damagesource, f16.floatValue()));
+            Function<Double, Double> magic = new Function<Double, Double>() {
+                @Override
+                public Double apply(Double f) {
+                    return -(f - getDamageAfterMagicAbsorb(damagesource, f.floatValue()));
+                }
+            };
             float magicModifier = magic.apply((double) f).floatValue();
             f += magicModifier;
 
-            Function<Double, Double> absorption = f17 -> -(Math.max(f17 - Math.max(f17 - this.getAbsorptionAmount(), 0.0F), 0.0F));
+            Function<Double, Double> absorption = new Function<Double, Double>() {
+                @Override
+                public Double apply(Double f) {
+                    return -(Math.max(f - Math.max(f - getAbsorptionAmount(), 0.0F), 0.0F));
+                }
+            };
             float absorptionModifier = absorption.apply((double) f).floatValue();
 
-            EntityDamageEvent event = CraftEventFactory.handleLivingEntityDamageEvent((LivingEntity) (Object) this, damagesource, originalDamage, hardHatModifier, blockingModifier, armorModifier, resistanceModifier, magicModifier, absorptionModifier, hardHat, blocking, armor, resistance, magic, absorption);
-            if (damagesource.getEntity() instanceof net.minecraft.world.entity.player.Player) {
-                ((net.minecraft.world.entity.player.Player) damagesource.getEntity()).resetAttackStrengthTicker();
+            EntityDamageEvent event = CraftEventFactory.handleLivingEntityDamageEvent(this, damagesource, originalDamage, hardHatModifier, blockingModifier, armorModifier, resistanceModifier, magicModifier, absorptionModifier, hardHat, blocking, armor, resistance, magic, absorption);
+            if (damagesource.getEntity() instanceof Player) {
+                ((Player) damagesource.getEntity()).resetAttackStrengthTicker(); // Moved from EntityHuman in order to make the cooldown reset get called after the damage event is fired
             }
-
             if (event.isCancelled()) {
                 return false;
             }
@@ -477,7 +575,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
             if (event.getDamage(EntityDamageEvent.DamageModifier.RESISTANCE) < 0) {
                 float f3 = (float) -event.getDamage(EntityDamageEvent.DamageModifier.RESISTANCE);
                 if (f3 > 0.0F && f3 < 3.4028235E37F) {
-                    if ((Object) this instanceof ServerPlayer) {
+                    if (((LivingEntity) (Object) this) instanceof ServerPlayer) {
                         ((ServerPlayer) (Object) this).awardStat(Stats.DAMAGE_RESISTED, Math.round(f3 * 10.0F));
                     } else if (damagesource.getEntity() instanceof ServerPlayer) {
                         ((ServerPlayer) damagesource.getEntity()).awardStat(Stats.DAMAGE_DEALT_RESISTED, Math.round(f3 * 10.0F));
@@ -498,14 +596,12 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
 
             // Apply blocking code // PAIL: steal from above
             if (event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0) {
-                this.level().broadcastEntityEvent((Entity) (Object) this, (byte) 29); // SPIGOT-4635 - shield damage sound
-                if (shieldTakesDamage) {
-                    this.hurtCurrentlyUsedShield((float) -event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING));
-                }
+                this.level().broadcastEntityEvent(this, (byte) 29); // SPIGOT-4635 - shield damage sound
+                this.hurtCurrentlyUsedShield((float) -event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING));
                 Entity entity = damagesource.getDirectEntity();
 
                 if (entity instanceof LivingEntity) {
-                    this.blockUsingShield(((LivingEntity) entity));
+                    this.blockUsingShield((LivingEntity) entity);
                 }
             }
 
@@ -513,46 +609,52 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
             this.setAbsorptionAmount(Math.max(this.getAbsorptionAmount() - absorptionModifier, 0.0F));
             float f2 = absorptionModifier;
 
-            if (f2 > 0.0F && f2 < 3.4028235E37F && (Object) this instanceof net.minecraft.world.entity.player.Player) {
-                ((net.minecraft.world.entity.player.Player) (Object) this).awardStat(Stats.DAMAGE_ABSORBED, Math.round(f2 * 10.0F));
+            if (f2 > 0.0F && f2 < 3.4028235E37F && ((LivingEntity) (Object) this) instanceof Player) {
+                ((Player) (Object) this).awardStat(Stats.DAMAGE_ABSORBED, Math.round(f2 * 10.0F));
             }
-            if (f2 > 0.0F && f2 < 3.4028235E37F && damagesource.getEntity() instanceof net.minecraft.world.entity.player.Player) {
-                ((net.minecraft.world.entity.player.Player) damagesource.getEntity()).awardStat(Stats.DAMAGE_DEALT_ABSORBED, Math.round(f2 * 10.0F));
+            if (f2 > 0.0F && f2 < 3.4028235E37F) {
+                Entity entity = damagesource.getEntity();
+
+                if (entity instanceof ServerPlayer) {
+                    ServerPlayer entityplayer = (ServerPlayer) entity;
+
+                    entityplayer.awardStat(Stats.DAMAGE_DEALT_ABSORBED, Math.round(f2 * 10.0F));
+                }
             }
 
-            if (!human) {
+            if (f > 0 || !human) {
                 if (human) {
                     // PAIL: Be sure to drag all this code from the EntityHuman subclass each update.
-                    ((Player) (Object) this).pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.DAMAGED);
-                    ((net.minecraft.world.entity.player.Player) (Object) this).causeFoodExhaustion(damagesource.getFoodExhaustion());
+                    ((Player) (Object) this).causeFoodExhaustion(damagesource.getFoodExhaustion(), org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.DAMAGED); // CraftBukkit - EntityExhaustionEvent
                     if (f < 3.4028235E37F) {
-                        ((net.minecraft.world.entity.player.Player) (Object) this).awardStat(Stats.DAMAGE_TAKEN, Math.round(f * 10.0F));
+                        ((Player) (Object) this).awardStat(Stats.DAMAGE_TAKEN, Math.round(f * 10.0F));
                     }
                 }
                 // CraftBukkit end
                 float f3 = this.getHealth();
 
-                this.getCombatTracker().recordDamage(damagesource, f3, f);
-                this.setHealth(f3 - f); // Forge: moved to fix MC-121048
+                this.getCombatTracker().recordDamage(damagesource, f);
+                this.setHealth(f3 - f);
                 // CraftBukkit start
                 if (!human) {
                     this.setAbsorptionAmount(this.getAbsorptionAmount() - f);
                 }
-                this.gameEvent(GameEvent.ENTITY_DAMAGE, damagesource.getEntity());
+                this.gameEvent(GameEvent.ENTITY_DAMAGE);
 
                 return true;
             } else {
                 // Duplicate triggers if blocking
                 if (event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0) {
-                    if ((Object) this instanceof ServerPlayer) {
-                        CriteriaTriggers.ENTITY_HURT_PLAYER.trigger((ServerPlayer) (Object) this, damagesource, f, originalDamage, true);
-                        f2 = (float) (-event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING));
-                        if (f2 > 0.0f && f2 < 3.4028235E37f) {
-                            ((ServerPlayer) (Object) this).awardStat(Stats.DAMAGE_BLOCKED_BY_SHIELD, Math.round(originalDamage * 10.0f));
+                    if (((LivingEntity) (Object) this)instanceof ServerPlayer) {
+                        CriteriaTriggers.ENTITY_HURT_PLAYER.trigger(((ServerPlayer) (Object) this), damagesource, f, originalDamage, true);
+                        f2 = (float) -event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING);
+                        if (f2 > 0.0F && f2 < 3.4028235E37F) {
+                            ((ServerPlayer) (Object) this).awardStat(Stats.DAMAGE_BLOCKED_BY_SHIELD, Math.round(originalDamage * 10.0F));
                         }
                     }
+
                     if (damagesource.getEntity() instanceof ServerPlayer) {
-                        CriteriaTriggers.PLAYER_HURT_ENTITY.trigger((ServerPlayer) damagesource.getEntity(), (Entity) (Object) this, damagesource, f, originalDamage, true);
+                        CriteriaTriggers.PLAYER_HURT_ENTITY.trigger((ServerPlayer) damagesource.getEntity(), this, damagesource, f, originalDamage, true);
                     }
 
                     return false;
@@ -593,6 +695,14 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     @Inject(method = "heal", at = @At(value = "RETURN"))
     public void banner$resetReason(float healAmount, CallbackInfo ci) {
         banner$regainReason = null;
+    }
+
+    @Redirect(method = "die",
+            at = @At(value = "INVOKE",
+            target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V",
+                    remap = false))
+    private void banner$logNamedDeaths(Logger instance, String s, Object o1, Object o2) {
+        if (org.spigotmc.SpigotConfig.logNamedDeaths) LOGGER.info("Named entity {} died: {}", ((LivingEntity) (Object) this), this.getCombatTracker().getDeathMessage().getString()); // Spigot
     }
 
     @Override

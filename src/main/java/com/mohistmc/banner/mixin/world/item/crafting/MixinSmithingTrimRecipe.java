@@ -26,8 +26,10 @@ public abstract class MixinSmithingTrimRecipe implements SmithingRecipe {
 
     @Shadow @Final private ResourceLocation id;
 
+    // CraftBukkit start
     @Override
     public Recipe toBukkitRecipe() {
         return new CraftSmithingTrimRecipe(CraftNamespacedKey.fromMinecraft(this.id), CraftRecipe.toBukkit(this.template), CraftRecipe.toBukkit(this.base), CraftRecipe.toBukkit(this.addition));
     }
+    // CraftBukkit end
 }

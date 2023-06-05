@@ -22,11 +22,11 @@ public interface InjectionPlayerList {
         return null;
     }
 
-    default String remove(ServerPlayer entityplayer) { // CraftBukkit - return string
+    default String extra$remove(ServerPlayer entityplayer) { // CraftBukkit - return string
         return null;
     }
 
-    default ServerPlayer canPlayerLogin(SocketAddress socketAddress, GameProfile gameProfile, ServerLoginPacketListenerImpl handler) {
+    default ServerPlayer canPlayerLogin(ServerLoginPacketListenerImpl handler, GameProfile gameProfile) {
         return null;
     }
 

@@ -1,9 +1,6 @@
 package com.mohistmc.banner.mixin.world.item;
 
-import com.mohistmc.banner.bukkit.DistValidate;
-import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -11,23 +8,20 @@ import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.BoatItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.jetbrains.annotations.NotNull;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 @Mixin(BoatItem.class)
 public abstract class MixinBoatItem extends Item {
@@ -36,71 +30,48 @@ public abstract class MixinBoatItem extends Item {
         super(properties);
     }
 
-    // @formatter:off
-    @Shadow @Final private static Predicate<Entity> ENTITY_PREDICATE;
-    @Shadow @Final private Boat.Type type;
-    @Shadow protected abstract Boat getBoat(Level p_220017_, HitResult p_220018_);
-    // @formatter:on
-
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level worldIn, Player playerIn, @NotNull InteractionHand handIn) {
-        ItemStack itemstack = playerIn.getItemInHand(handIn);
-        BlockHitResult result = getPlayerPOVHitResult(worldIn, playerIn, ClipContext.Fluid.ANY);
-        if (result.getType() == HitResult.Type.MISS) {
-            return new InteractionResultHolder<>(InteractionResult.PASS, itemstack);
-        } else {
-            Vec3 vec3d = playerIn.getViewVector(1.0F);
-            double d0 = 5.0D;
-            List<Entity> list = worldIn.getEntities(playerIn, playerIn.getBoundingBox().expandTowards(vec3d.scale(5.0D)).inflate(1.0D), ENTITY_PREDICATE);
-            if (!list.isEmpty()) {
-                Vec3 vec3d1 = playerIn.getEyePosition(1.0F);
-
-                for (Entity entity : list) {
-                    AABB axisalignedbb = entity.getBoundingBox().inflate(entity.getPickRadius());
-                    if (axisalignedbb.contains(vec3d1)) {
-                        return new InteractionResultHolder<>(InteractionResult.PASS, itemstack);
-                    }
-                }
-            }
-
-            if (result.getType() == HitResult.Type.BLOCK) {
-                if (DistValidate.isValid(worldIn)) {
-                    PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent(playerIn, Action.RIGHT_CLICK_BLOCK, result.getBlockPos(), result.getDirection(), itemstack, handIn);
-
-                    if (event.isCancelled()) {
-                        return new InteractionResultHolder<>(InteractionResult.PASS, itemstack);
-                    }
-                }
-
-                Boat boatentity = this.getBoat(worldIn, result);
-                boatentity.setVariant(this.type);
-                boatentity.setYRot(playerIn.getYRot());
-                if (!worldIn.noCollision(boatentity, boatentity.getBoundingBox().inflate(-0.1D))) {
-                    return new InteractionResultHolder<>(InteractionResult.FAIL, itemstack);
-                } else {
-                    if (!worldIn.isClientSide) {
-                        if (DistValidate.isValid(worldIn) && CraftEventFactory.callEntityPlaceEvent(worldIn, result.getBlockPos(), result.getDirection(), playerIn, boatentity, handIn).isCancelled()) {
-                            return new InteractionResultHolder<>(InteractionResult.FAIL, itemstack);
-                        }
-                        if (!worldIn.addFreshEntity(boatentity)) {
-                            return new InteractionResultHolder<>(InteractionResult.PASS, itemstack);
-                        }
-
-                        if (!playerIn.getAbilities().instabuild) {
-                            itemstack.shrink(1);
-                        }
-                    }
-
-                    playerIn.awardStat(Stats.ITEM_USED.get(this));
-                    return InteractionResultHolder.sidedSuccess(itemstack, worldIn.isClientSide());
-                }
-            } else {
-                return new InteractionResultHolder<>(InteractionResult.PASS, itemstack);
-            }
+    @Inject(method = "use",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/item/BoatItem;getBoat(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/phys/HitResult;)Lnet/minecraft/world/entity/vehicle/Boat;",
+            shift = At.Shift.BEFORE), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    private void banner$boatEvent(Level level, Player player, InteractionHand usedHand,
+                                  CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir,
+                                  ItemStack itemStack, HitResult hitResult) {
+        // CraftBukkit start - Boat placement
+        PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent(player,
+                org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK, ((BlockHitResult) hitResult).getBlockPos(),
+                ((BlockHitResult) hitResult).getDirection(), itemStack, usedHand);
+        if (event.isCancelled()) {
+            cir.setReturnValue(InteractionResultHolder.pass(itemStack));
         }
+        // CraftBukkit end
+    }
+
+    @Redirect(method = "use",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    private boolean banner$cancelAddEntity(Level instance, Entity entity) {
+        return false;
+    }
+
+    @Inject(method = "use",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/Level;gameEvent(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/level/gameevent/GameEvent;Lnet/minecraft/world/phys/Vec3;)V",
+            shift = At.Shift.BEFORE),
+            locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    private void banner$handleBoatEntityAdd(Level level, Player player, InteractionHand usedHand,
+                                            CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir,
+                                            ItemStack itemStack, HitResult hitResult, Vec3 vec3, double d,
+                                            List<Entity> list, Boat boat) {
+        // CraftBukkit start
+        if (CraftEventFactory.callEntityPlaceEvent(level, ((BlockHitResult) hitResult).getBlockPos(),
+                ((BlockHitResult) hitResult).getDirection(),
+                player, boat, usedHand).isCancelled()) {
+            cir.setReturnValue(InteractionResultHolder.fail(itemStack));
+        }
+        if (!level.addFreshEntity(boat)) {
+            cir.setReturnValue(InteractionResultHolder.pass(itemStack));
+        }
+        // CraftBukkit end
     }
 }

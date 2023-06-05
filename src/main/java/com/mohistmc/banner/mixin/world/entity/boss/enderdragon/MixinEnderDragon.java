@@ -17,7 +17,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.dimension.end.EndDragonFight;
-import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
@@ -26,7 +25,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -40,7 +38,8 @@ import java.util.List;
 @Mixin(EnderDragon.class)
 public abstract class MixinEnderDragon extends Mob {
 
-    @Shadow @Nullable private EndDragonFight dragonFight;
+    @Shadow
+    @Nullable private EndDragonFight dragonFight;
 
     private final Explosion explosionSource = new Explosion(this.level(), (EnderDragon) (Object) this, null, null, Double.NaN, Double.NaN, Double.NaN, Float.NaN, true, Explosion.BlockInteraction.DESTROY);
 
@@ -119,11 +118,10 @@ public abstract class MixinEnderDragon extends Mob {
                 final net.minecraft.world.level.block.Block nmsBlock = craftBlock.getNMS().getBlock();
                 if (nmsBlock.dropFromExplosion(this.explosionSource)) {
                     BlockEntity tileentity = craftBlock.getNMS().hasBlockEntity() ? this.level().getBlockEntity(blockposition2) : null;
-                    // Banner TODO
-                    /**LootParams.Builder loottableinfo_builder = new LootParams.Builder((ServerLevel) this.level()).withDynamicDrop(this.level().random).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockposition2)).withParameter(LootContextParams.TOOL, ItemStack.EMPTY).withParameter(LootContextParams.EXPLOSION_RADIUS, 1.0f / event.getYield()).withOptionalParameter(LootContextParams.BLOCK_ENTITY, tileentity);
+                    LootParams.Builder loottableinfo_builder = new LootParams.Builder((ServerLevel) this.level()).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockposition2)).withParameter(LootContextParams.TOOL, ItemStack.EMPTY).withParameter(LootContextParams.EXPLOSION_RADIUS, 1.0f / event.getYield()).withOptionalParameter(LootContextParams.BLOCK_ENTITY, tileentity);
                     for (ItemStack stack : craftBlock.getNMS().getDrops(loottableinfo_builder)) {
                         Block.popResource(this.level(), blockposition2, stack);
-                    }*/
+                    }
                     craftBlock.getNMS().spawnAfterBreak((ServerLevel) this.level(), blockposition2, ItemStack.EMPTY, false);
                     // net.minecraft.block.Block.spawnDrops(craftBlock.getNMS(), loottableinfo_builder);
                 }

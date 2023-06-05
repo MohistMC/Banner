@@ -5,7 +5,6 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
-import com.mohistmc.banner.util.ServerUtils;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
@@ -62,6 +61,7 @@ import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Difficulty;
 import org.bukkit.Effect;
+import org.bukkit.FeatureFlag;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
@@ -162,11 +162,6 @@ public class CraftWorld extends CraftRegionAccessor implements World {
     }
 
     @Override
-    public int getHighestBlockYAt(int x, int z) {
-        return getHighestBlockYAt(x, z, org.bukkit.HeightMap.MOTION_BLOCKING);
-    }
-
-    @Override
     public Location getSpawnLocation() {
         BlockPos spawn = world.getSharedSpawnPos();
         float yaw = world.getSharedSpawnAngle();
@@ -226,7 +221,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public boolean isChunkLoaded(int x, int z) {
-        return world.getChunkSource().hasChunk(x, z);
+        return world.getChunkSource().isChunkLoaded(x, z);
     }
 
     @Override
@@ -267,7 +262,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
     @Override
     public boolean unloadChunkRequest(int x, int z) {
         if (isChunkLoaded(x, z)) {
-            world.getChunkSource().removeRegionTicket(ServerUtils.PLUGIN, new ChunkPos(x, z), 1, Unit.INSTANCE);
+            world.getChunkSource().removeRegionTicket(BukkitExtraConstants.PLUGIN, new ChunkPos(x, z), 1, Unit.INSTANCE);
         }
 
         return true;
@@ -348,7 +343,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         }
 
         if (chunk instanceof net.minecraft.world.level.chunk.LevelChunk) {
-            world.getChunkSource().addRegionTicket(ServerUtils.PLUGIN, new ChunkPos(x, z), 1, Unit.INSTANCE);
+            world.getChunkSource().addRegionTicket(BukkitExtraConstants.PLUGIN, new ChunkPos(x, z), 1, Unit.INSTANCE);
             return true;
         }
 
@@ -376,7 +371,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
         DistanceManager chunkDistanceManager = this.world.getChunkSource().chunkMap.distanceManager;
 
-        if (chunkDistanceManager.addRegionTicketAtDistance(ServerUtils.PLUGIN_TICKET, new ChunkPos(x, z), 2, plugin)) { // keep in-line with force loading, add at level 31
+        if (chunkDistanceManager.addRegionTicketAtDistance(BukkitExtraConstants.PLUGIN_TICKET, new ChunkPos(x, z), 2, plugin)) { // keep in-line with force loading, add at level 31
             this.getChunkAt(x, z); // ensure loaded
             return true;
         }
@@ -389,7 +384,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         Preconditions.checkNotNull(plugin, "null plugin");
 
         DistanceManager chunkDistanceManager = this.world.getChunkSource().chunkMap.distanceManager;
-        return chunkDistanceManager.removeRegionTicketAtDistance(ServerUtils.PLUGIN_TICKET, new ChunkPos(x, z), 2, plugin); // keep in-line with force loading, remove at level 31
+        return chunkDistanceManager.removeRegionTicketAtDistance(BukkitExtraConstants.PLUGIN_TICKET, new ChunkPos(x, z), 2, plugin); // keep in-line with force loading, remove at level 31
     }
 
     @Override
@@ -397,7 +392,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         Preconditions.checkNotNull(plugin, "null plugin");
 
         DistanceManager chunkDistanceManager = this.world.getChunkSource().chunkMap.distanceManager;
-        chunkDistanceManager.removeAllTicketsFor(ServerUtils.PLUGIN_TICKET, 31, plugin); // keep in-line with force loading, remove at level 31
+        chunkDistanceManager.removeAllTicketsFor(BukkitExtraConstants.PLUGIN_TICKET, 31, plugin); // keep in-line with force loading, remove at level 31
     }
 
     @Override
@@ -411,7 +406,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
         ImmutableList.Builder<Plugin> ret = ImmutableList.builder();
         for (Ticket<?> ticket : tickets) {
-            if (ticket.getType() == ServerUtils.PLUGIN_TICKET) {
+            if (ticket.getType() == BukkitExtraConstants.PLUGIN_TICKET) {
                 ret.add((Plugin) ticket.key);
             }
         }
@@ -430,7 +425,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
             Chunk chunk = null;
             for (Ticket<?> ticket : tickets) {
-                if (ticket.getType() != ServerUtils.PLUGIN_TICKET) {
+                if (ticket.getType() != BukkitExtraConstants.PLUGIN_TICKET) {
                     continue;
                 }
 
@@ -697,11 +692,6 @@ public class CraftWorld extends CraftRegionAccessor implements World {
     }
 
     @Override
-    public int getHighestBlockYAt(Location location) {
-        return getHighestBlockYAt(location.getBlockX(), location.getBlockZ());
-    }
-
-    @Override
     public Chunk getChunkAt(Location location) {
         return getChunkAt(location.getBlockX() >> 4, location.getBlockZ() >> 4);
     }
@@ -729,12 +719,6 @@ public class CraftWorld extends CraftRegionAccessor implements World {
     @Override
     public Block getHighestBlockAt(Location location) {
         return getHighestBlockAt(location.getBlockX(), location.getBlockZ());
-    }
-
-    @Override
-    public int getHighestBlockYAt(int x, int z, org.bukkit.HeightMap heightMap) {
-        // Transient load for this tick
-        return world.getChunk(x >> 4, z >> 4).getHeight(CraftHeightMap.toNMS(heightMap), x, z);
     }
 
     @Override
@@ -1860,6 +1844,18 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         return locateNearestStructure(origin, List.of(structure), radius, findUnexplored);
     }
 
+    // Spigot start
+    @Override
+    public int getViewDistance() {
+        return world.bridge$spigotConfig().viewDistance;
+    }
+
+    @Override
+    public int getSimulationDistance() {
+        return world.bridge$spigotConfig().simulationDistance;
+    }
+    // Spigot end
+
     public StructureSearchResult locateNearestStructure(Location origin, List<Structure> structures, int radius, boolean findUnexplored) {
         BlockPos originPos = BlockPos.containing(origin.getX(), origin.getY(), origin.getZ());
         List<Holder<net.minecraft.world.level.levelgen.structure.Structure>> holders = new ArrayList<>();
@@ -1943,6 +1939,11 @@ public class CraftWorld extends CraftRegionAccessor implements World {
     @Override
     public PersistentDataContainer getPersistentDataContainer() {
         return persistentDataContainer;
+    }
+
+    @Override
+    public Set<FeatureFlag> getFeatureFlags() {
+        return CraftFeatureFlag.getFromNMS(this.getHandle().enabledFeatures()).stream().map(FeatureFlag.class::cast).collect(Collectors.toUnmodifiableSet());
     }
 
     public void storeBukkitValues(CompoundTag c) {

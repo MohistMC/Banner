@@ -7,18 +7,18 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
+import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.api.ServerAPI;
-import com.mohistmc.banner.fabric.FabricInjectBukkit;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.nms.utils.RemapUtils;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.Commands;
 import net.minecraft.world.flag.FeatureFlagSet;
-import net.minecraft.world.inventory.*;
+import net.minecraft.world.inventory.TransientCraftingContainer;
 import org.bukkit.craftbukkit.Main;
-import com.mohistmc.banner.util.ReloadUtils;
-import com.mohistmc.banner.util.ServerUtils;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -62,6 +62,10 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.npc.CatSpawner;
 import net.minecraft.world.entity.npc.WanderingTraderSpawner;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.CraftingMenu;
+import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -142,24 +146,13 @@ import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_19_R3.generator.CraftWorldInfo;
 import org.bukkit.craftbukkit.v1_19_R3.generator.OldCraftChunkData;
 import org.bukkit.craftbukkit.v1_19_R3.help.SimpleHelpMap;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftBlastingRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftCampfireRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftFurnaceRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemFactory;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftMerchantCustom;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftShapedRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftShapelessRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftSmithingRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftSmokingRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftStonecuttingRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.RecipeIterator;
+import org.bukkit.craftbukkit.v1_19_R3.inventory.*;
 import org.bukkit.craftbukkit.v1_19_R3.inventory.util.CraftInventoryCreator;
 import org.bukkit.craftbukkit.v1_19_R3.map.CraftMapView;
 import org.bukkit.craftbukkit.v1_19_R3.metadata.EntityMetadataStore;
 import org.bukkit.craftbukkit.v1_19_R3.metadata.PlayerMetadataStore;
 import org.bukkit.craftbukkit.v1_19_R3.metadata.WorldMetadataStore;
+import org.bukkit.craftbukkit.v1_19_R3.packs.CraftDataPackManager;
 import org.bukkit.craftbukkit.v1_19_R3.potion.CraftPotionBrewer;
 import org.bukkit.craftbukkit.v1_19_R3.profile.CraftPlayerProfile;
 import org.bukkit.craftbukkit.v1_19_R3.scheduler.CraftScheduler;
@@ -185,6 +178,7 @@ import org.bukkit.entity.SpawnCategory;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerChatTabCompleteEvent;
 import org.bukkit.event.server.BroadcastMessageEvent;
+import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.event.server.TabCompleteEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
@@ -196,6 +190,7 @@ import org.bukkit.inventory.*;
 import org.bukkit.loot.LootTable;
 import org.bukkit.map.MapPalette;
 import org.bukkit.map.MapView;
+import org.bukkit.packs.DataPackManager;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
@@ -209,18 +204,20 @@ import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.plugin.messaging.StandardMessenger;
 import org.bukkit.potion.Potion;
 import org.bukkit.profile.PlayerProfile;
+import org.bukkit.scheduler.BukkitWorker;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.structure.StructureManager;
 import org.bukkit.util.StringUtil;
 import org.bukkit.util.permissions.DefaultPermissions;
 import org.jetbrains.annotations.NotNull;
+import org.spigotmc.SpigotConfig;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 
 public final class CraftServer implements Server {
-    private final String serverName = "Mohist Banner";
+    private final String serverName = "Banner";
     public static String serverVersion;
     private final String bukkitVersion = Versioning.getBukkitVersion();
     private final Logger logger = Logger.getLogger("Minecraft");
@@ -247,6 +244,7 @@ public final class CraftServer implements Server {
     private WarningState warningState = WarningState.DEFAULT;
     public String minimumAPI;
     public CraftScoreboardManager scoreboardManager;
+    public CraftDataPackManager dataPackManager;
     public boolean playerCommandState;
     private boolean printSaveWarning;
     private CraftIconCache icon;
@@ -270,13 +268,12 @@ public final class CraftServer implements Server {
                 return player.getBukkitEntity();
             }
         }));
-        vanillaCommandManager = console.getCommands();
-        this.serverVersion = BannerServer.getVersion();
+        this.serverVersion = BannerMCStart.getVersion();
         this.structureManager = new CraftStructureManager(console.getStructureManager());
         this.scoreboardManager = new CraftScoreboardManager(console, new ServerScoreboard(console));
+        this.dataPackManager = new CraftDataPackManager(this.getServer().getPackRepository());
         Bukkit.setServer(this);
 
-        FabricInjectBukkit.init();
         // Register all the Enchantments and PotionTypes now so we can stop new registration immediately after
         Enchantments.SHARPNESS.getClass();
 
@@ -328,9 +325,9 @@ public final class CraftServer implements Server {
         ignoreVanillaPermissions = commandsConfiguration.getBoolean("ignore-vanilla-permissions");
         pluginManager.useTimings(configuration.getBoolean("settings.plugin-profiling"));
         overrideSpawnLimits();
-        ServerUtils.bridge$autosavePeriod = configuration.getInt("ticks-per.autosave");
+        BukkitExtraConstants.bridge$autosavePeriod = configuration.getInt("ticks-per.autosave");
         warningState = WarningState.value(configuration.getString("settings.deprecated-verbose"));
-        ServerUtils.PLUGIN.timeout = configuration.getInt("chunk-gc.period-in-ticks");
+        BukkitExtraConstants.PLUGIN.timeout = configuration.getInt("chunk-gc.period-in-ticks");
         minimumAPI = configuration.getString("settings.minimum-api");
         loadIcon();
 
@@ -378,25 +375,15 @@ public final class CraftServer implements Server {
 
     public void loadPlugins() {
         pluginManager.registerInterface(JavaPluginLoader.class);
+        RemapUtils.init();
 
         File pluginFolder = (File) console.bridge$options().valueOf("plugins");
 
         if (pluginFolder.exists()) {
-            if (pluginFolder.exists()) {
-                for (File f : pluginFolder.listFiles()) {
-                    if (f.getName().endsWith(".jar")) {
-                        try {
-                            com.mohistmc.banner.bukkit.nms.Remapper.remap(f); // Banner: Remap Jar file
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
             Plugin[] plugins = pluginManager.loadPlugins(pluginFolder);
             for (Plugin plugin : plugins) {
                 try {
-                    String message = String.format("Loading %s", plugin.getDescription().getFullName());
+                    String message = String.format(BannerMCStart.I18N.get("bukkit.plugin.loading"), plugin.getDescription().getFullName());
                     plugin.getLogger().info(message);
                     plugin.onLoad();
                 } catch (Throwable ex) {
@@ -441,22 +428,12 @@ public final class CraftServer implements Server {
         pluginManager.disablePlugins();
     }
 
-    public static Commands vanillaCommandManager;
-
     private void setVanillaCommands(boolean first) { // Spigot
-        Commands dispatcher = (vanillaCommandManager = console.getCommands());
+        Commands dispatcher = console.bridge$getVanillaCommands();
+
         // Build a list of all Vanilla commands and create wrappers
         for (CommandNode<CommandSourceStack> cmd : dispatcher.getDispatcher().getRoot().getChildren()) {
-            // Spigot start
-            VanillaCommandWrapper wrapper = new VanillaCommandWrapper(dispatcher, cmd);
-            if (org.spigotmc.SpigotConfig.replaceCommands.contains(wrapper.getName())) {
-                if (first) {
-                    commandMap.register("minecraft", wrapper);
-                }
-            } else if (!first) {
-                commandMap.register("minecraft", wrapper);
-            }
-            // Spigot end
+            commandMap.register("minecraft", new VanillaCommandWrapper(dispatcher, cmd));
         }
     }
 
@@ -668,6 +645,21 @@ public final class CraftServer implements Server {
     }
 
     @Override
+    public List<String> getInitialEnabledPacks() {
+        return Collections.unmodifiableList(this.getProperties().initialDataPackConfiguration.getEnabled());
+    }
+
+    @Override
+    public List<String> getInitialDisabledPacks() {
+        return Collections.unmodifiableList(this.getProperties().initialDataPackConfiguration.getDisabled());
+    }
+
+    @Override
+    public DataPackManager getDataPackManager() {
+        return this.dataPackManager;
+    }
+
+    @Override
     public String getResourcePack() {
         return this.getServer().getServerResourcePack().map(MinecraftServer.ServerResourcePackInfo::url).orElse("");
     }
@@ -847,12 +839,52 @@ public final class CraftServer implements Server {
 
     @Override
     public void reload() {
-        BannerServer.LOGGER.warn("For your server security, Bukkit reloading is not supported by Mohist.");
+        ++this.reloadCount;
+        this.configuration = YamlConfiguration.loadConfiguration(this.getConfigFile());
+        this.commandsConfiguration = YamlConfiguration.loadConfiguration(this.getCommandsConfigFile());
+
+        try {
+            this.playerList.getIpBans().load();
+        } catch (IOException var12) {
+            this.logger.log(Level.WARNING, "Failed to load banned-ips.json, " + var12.getMessage());
+        }
+
+        try {
+            this.playerList.getBans().load();
+        } catch (IOException var11) {
+            this.logger.log(Level.WARNING, "Failed to load banned-players.json, " + var11.getMessage());
+        }
+
+        this.pluginManager.clearPlugins();
+        this.commandMap.clearCommands();
+        this.reloadData();
+        SpigotConfig.registerCommands();
+        this.overrideAllCommandBlockCommands = this.commandsConfiguration.getStringList("command-block-overrides").contains("*");
+        this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");
+
+        for (int pollCount = 0; pollCount < 50 && this.getScheduler().getActiveWorkers().size() > 0; ++pollCount) {
+            try {
+                Thread.sleep(50L);
+            } catch (InterruptedException var10) {
+            }
+        }
+
+        List<BukkitWorker> overdueWorkers = this.getScheduler().getActiveWorkers();
+
+        for (BukkitWorker worker : overdueWorkers) {
+            Plugin plugin = worker.getOwner();
+            this.getLogger().log(Level.SEVERE, String.format("Nag author(s): '%s' of '%s' about the following: %s", plugin.getDescription().getAuthors(), plugin.getDescription().getFullName(), "This plugin is not properly shutting down its async tasks when it is being reloaded.  This may cause conflicts with the newly loaded version of the plugin"));
+        }
+
+        this.loadPlugins();
+        this.enablePlugins(PluginLoadOrder.STARTUP);
+        this.enablePlugins(PluginLoadOrder.POSTWORLD);
+        this.getPluginManager().callEvent(new ServerLoadEvent(ServerLoadEvent.LoadType.RELOAD));
     }
 
     @Override
     public void reloadData() {
-        ReloadUtils.reload(console);
+        BukkitExtraConstants.reload(console);
     }
 
     private void loadIcon() {
@@ -1042,7 +1074,7 @@ public final class CraftServer implements Server {
         }
 
         ServerLevel internal = new ServerLevel(console, console.executor, worldSession, worlddata, worldKey, worlddimension, getServer().progressListenerFactory.create(11),
-                worlddata.isDebugWorld(), j, creator.environment() == Environment.NORMAL ? list : ImmutableList.of(), true);
+                worlddata.isDebugWorld(), j, creator.environment() == Environment.NORMAL ? list : ImmutableList.of(), true, null);
 
         if (!(worlds.containsKey(name.toLowerCase(java.util.Locale.ENGLISH)))) {
             return null;
@@ -1195,9 +1227,9 @@ public final class CraftServer implements Server {
             } else if (recipe instanceof SmithingRecipe) {
                 toAdd = CraftSmithingRecipe.fromBukkitRecipe((SmithingRecipe) recipe);
             } else if (recipe instanceof SmithingTransformRecipe) {
-                toAdd = CraftSmithingRecipe.fromBukkitRecipe((SmithingTransformRecipe) recipe);
+                toAdd = CraftSmithingTransformRecipe.fromBukkitRecipe((SmithingTransformRecipe) recipe);
             } else if (recipe instanceof SmithingTrimRecipe) {
-                toAdd = CraftSmithingRecipe.fromBukkitRecipe((SmithingTrimRecipe) recipe);
+                toAdd = CraftSmithingTrimRecipe.fromBukkitRecipe((SmithingTrimRecipe) recipe);
             } else if (recipe instanceof ComplexRecipe) {
                 throw new UnsupportedOperationException("Cannot add custom complex recipe");
             } else {
@@ -2234,11 +2266,8 @@ public final class CraftServer implements Server {
     public LootTable getLootTable(NamespacedKey key) {
         Validate.notNull(key, "NamespacedKey cannot be null");
 
-        /**
-        net.minecraft.world.level.storage.loot.LootTables registry = getServer().getLootTables();
-        return new CraftLootTable(key, registry.get(CraftNamespacedKey.toMinecraft(key)));*/
-        return null;
-        // Banner - TODO
+        net.minecraft.world.level.storage.loot.LootDataManager registry = getServer().getLootData();
+        return new CraftLootTable(key, registry.getLootTable(CraftNamespacedKey.toMinecraft(key)));
     }
 
     @Override
@@ -2287,20 +2316,20 @@ public final class CraftServer implements Server {
 
         @Override
         public void restart() {
-            throw new UnsupportedOperationException("Mohist Banner Not supported yet, This causes unknown issues with the mod.");
+            org.spigotmc.RestartCommand.restart();
         }
 
         @Override
         public void broadcast(BaseComponent component) {
             for (Player player : getOnlinePlayers()) {
-                //player.spigot().sendMessage(component);
+                player.spigot().sendMessage(component);
             }
         }
 
         @Override
         public void broadcast(BaseComponent... components) {
             for (Player player : getOnlinePlayers()) {
-                //player.spigot().sendMessage(components);
+                player.spigot().sendMessage(components);
             }
         }
     };

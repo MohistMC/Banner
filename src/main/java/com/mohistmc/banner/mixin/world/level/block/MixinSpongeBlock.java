@@ -95,6 +95,7 @@ public abstract class MixinSpongeBlock extends Block {
                 BlockPos blockposition2 = block.getPosition();
                 BlockState iblockdata = level.getBlockState(blockposition2);
                 FluidState fluid = level.getFluidState(blockposition2);
+
                 if (fluid.is(Fluids.WATER)) {
                     if (iblockdata.getBlock() instanceof BucketPickup && !((BucketPickup) iblockdata.getBlock()).pickupBlock(blockList, blockposition2, iblockdata).isEmpty()) {
                         // NOP

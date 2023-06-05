@@ -1,35 +1,27 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
-import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.injection.world.level.block.InjectionBlock;
-import com.mohistmc.banner.bukkit.DistValidate;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import org.spongepowered.asm.mixin.Mixin;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
-import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityExhaustionEvent;
+import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
 import java.util.function.Supplier;
 
 @Mixin(Block.class)
@@ -77,4 +69,10 @@ public abstract class MixinBlock extends BlockBehaviour implements InjectionBloc
         }
         return 0;
     }
+
+    @Inject(method = "playerDestroy", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
+    private void banner$reason(Level level, Player player, BlockPos pos, BlockState state, BlockEntity blockEntity, ItemStack tool, CallbackInfo ci) {
+       player.pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.BLOCK_MINED);
+    }
+
 }

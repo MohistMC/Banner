@@ -1,5 +1,10 @@
 package com.mohistmc.banner.mixin.world.item.crafting;
 
+import net.minecraft.network.protocol.game.ClientboundRecipePacket;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.ServerRecipeBook;
+import net.minecraft.world.item.crafting.Recipe;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -9,11 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Collection;
 import java.util.List;
-import net.minecraft.network.protocol.game.ClientboundRecipePacket;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.stats.ServerRecipeBook;
-import net.minecraft.world.item.crafting.Recipe;
 
 @Mixin(ServerRecipeBook.class)
 public class MixinServerRecipeBook {

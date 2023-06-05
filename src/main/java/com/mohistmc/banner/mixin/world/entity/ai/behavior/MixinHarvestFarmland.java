@@ -1,12 +1,17 @@
 package com.mohistmc.banner.mixin.world.entity.ai.behavior;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.mohistmc.banner.bukkit.BukkitCaptures;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.behavior.Behavior;
+import net.minecraft.world.entity.ai.behavior.HarvestFarmland;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -16,10 +21,10 @@ import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.*;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.ai.behavior.HarvestFarmland;
-import net.minecraft.world.entity.npc.Villager;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -53,7 +58,9 @@ public abstract class MixinHarvestFarmland extends Behavior<Villager> {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"),
             slice = @Slice(to = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;gameEvent(Lnet/minecraft/world/level/gameevent/GameEvent;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/gameevent/GameEvent$Context;)V")),
             locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$getFlag(ServerLevel level, Villager owner, long gameTime, CallbackInfo ci, BlockState blockState, Block block, Block block2, SimpleContainer simpleContainer, int i, ItemStack itemStack, boolean bl, BlockState blockState2) {
+    private void banner$getFlag(ServerLevel level, Villager owner, long gameTime, CallbackInfo ci, BlockState blockState,
+                                Block block, Block block2, SimpleContainer simpleContainer, int i,
+                                ItemStack itemStack, boolean bl, BlockItem blockItem, BlockState blockState2) {
         banner$flag.set(bl);
     }
 
@@ -70,5 +77,11 @@ public abstract class MixinHarvestFarmland extends Behavior<Villager> {
             banner$flag.set(false);
         }
         return banner$flag.get();
+    }
+
+    @Inject(method = "tick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/npc/Villager;J)V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
+    private void banner$captureOn(ServerLevel worldIn, Villager owner, long gameTime, CallbackInfo ci) {
+        BukkitCaptures.captureEntityChangeBlock(owner);
     }
 }

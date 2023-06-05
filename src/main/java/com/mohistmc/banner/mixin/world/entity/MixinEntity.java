@@ -35,6 +35,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R3.SpigotTimings;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
@@ -50,6 +51,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.projectiles.ProjectileSource;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.ActivationRange;
+import org.spigotmc.CustomTimingsHandler;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -68,7 +70,8 @@ import java.util.UUID;
 @Mixin(Entity.class)
 public abstract class MixinEntity implements Nameable, EntityAccess, CommandSource, InjectionEntity {
 
-    @Shadow public Level level;
+    @Shadow
+    private Level level;
     @Shadow @Final public static int TOTAL_AIR_SUPPLY;
     @Shadow private float yRot;
 
@@ -150,10 +153,20 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     public BlockPos lastLavaContact;
     private static transient BlockPos banner$damageEventBlock;
     private static final int CURRENT_LEVEL = 2;
+    public CustomTimingsHandler tickTimer = SpigotTimings.getEntityTimings(((Entity) (Object) this)); // Spigot
 
     @Override
     public void inactiveTick() {
+    }
 
+    @Inject(method = "move", at = @At("HEAD"))
+    private void banner$startTimings(MoverType type, Vec3 pos, CallbackInfo ci) {
+        SpigotTimings.entityMoveTimer.startTiming(); // Spigot
+    }
+
+    @Inject(method = "move", at = @At("HEAD"))
+    private void banner$stopimings(MoverType type, Vec3 pos, CallbackInfo ci) {
+        SpigotTimings.entityMoveTimer.stopTiming(); // Spigot
     }
 
     @Override
@@ -332,7 +345,9 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         banner$damageEventBlock = null;
     }
 
-    @Inject(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity$MovementEmission;emitsAnything()Z"))
+    @Inject(method = "move", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/Entity;getMovementEmission()Lnet/minecraft/world/entity/Entity$MovementEmission;",
+            shift = At.Shift.AFTER))
     private void banner$move$blockCollide(MoverType typeIn, Vec3 pos, CallbackInfo ci) {
         if (horizontalCollision && this.getBukkitEntity() instanceof Vehicle vehicle) {
             org.bukkit.block.Block block = this.level.getWorld().getBlockAt(Mth.floor(this.getX()), Mth.floor(this.getY()), Mth.floor(this.getZ()));
@@ -775,5 +790,10 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Override
     public CommandSender getBukkitSender(CommandSourceStack wrapper) {
         return getBukkitEntity();
+    }
+
+    @Override
+    public CustomTimingsHandler bridge$tickTimer() {
+        return tickTimer;
     }
 }

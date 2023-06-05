@@ -18,7 +18,7 @@ public class CraftAbstractVillager extends CraftAgeable implements AbstractVilla
 
     @Override
     public net.minecraft.world.entity.npc.AbstractVillager getHandle() {
-        return (net.minecraft.world.entity.npc.AbstractVillager) entity;
+        return (net.minecraft.world.entity.npc.AbstractVillager) this.entity;
     }
 
     @Override

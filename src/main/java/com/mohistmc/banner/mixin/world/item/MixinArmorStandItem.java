@@ -1,33 +1,43 @@
 package com.mohistmc.banner.mixin.world.item;
 
-import com.mohistmc.banner.bukkit.DistValidate;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ArmorStandItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.function.Consumer;
 
 @Mixin(ArmorStandItem.class)
 public class MixinArmorStandItem {
 
-    private transient ArmorStand banner$entity;
-
-    @Redirect(method = "useOn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/ArmorStand;moveTo(DDDFF)V"))
-    public void banner$captureEntity(ArmorStand armorStandEntity, double x, double y, double z, float yaw, float pitch) {
-        armorStandEntity.moveTo(x, y, z, yaw, pitch);
-        banner$entity = armorStandEntity;
-    }
-
-    @Inject(method = "useOn", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"))
-    public void banner$entityPlace(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
-        if (DistValidate.isValid(context) && CraftEventFactory.callEntityPlaceEvent(context, banner$entity).isCancelled()) {
+    @Inject(method = "useOn",
+            at= @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V",
+            shift = At.Shift.BEFORE), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    private void banner$callEntityPlaceEvent(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir,
+                                             Direction direction, Level level, BlockPlaceContext blockPlaceContext,
+                                             BlockPos blockPos, ItemStack itemStack, Vec3 vec3, AABB aABB,
+                                             ServerLevel serverLevel, Consumer<ArmorStand> consumer,
+                                             ArmorStand armorStand, float f) {
+        // CraftBukkit start
+        if (CraftEventFactory.callEntityPlaceEvent(context, armorStand).isCancelled()) {
             cir.setReturnValue(InteractionResult.FAIL);
         }
-        banner$entity = null;
+        // CraftBukkit end
     }
+
 }

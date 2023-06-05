@@ -18,7 +18,7 @@ import java.util.List;
 public abstract class MixinResultContainer implements Container {
 
     @Shadow @Final private NonNullList<ItemStack> itemStacks;
-    private int maxStack = LARGE_MAX_STACK_SIZE;
+    private int maxStack = MAX_STACK;
 
     @Override
     public List<ItemStack> getContents() {

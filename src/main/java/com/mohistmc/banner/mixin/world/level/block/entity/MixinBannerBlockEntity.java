@@ -19,11 +19,13 @@ public class MixinBannerBlockEntity {
             target = "Lnet/minecraft/nbt/CompoundTag;getList(Ljava/lang/String;I)Lnet/minecraft/nbt/ListTag;",
             shift = At.Shift.AFTER))
     private void banner$checkPattern(CompoundTag tag, CallbackInfo ci) {
-        // CraftBukkit start
-        while (this.itemPatterns.size() > 20) {
-            this.itemPatterns.remove(20);
+        if (this.itemPatterns != null) {
+            // CraftBukkit start
+            while (this.itemPatterns.size() > 20) {
+                this.itemPatterns.remove(20);
+            }
+            // CraftBukkit end
         }
-        // CraftBukkit end
     }
 
 }

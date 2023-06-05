@@ -1,34 +1,35 @@
 package com.mohistmc.banner.mixin.world.item;
 
-import com.mohistmc.banner.bukkit.DistValidate;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Abilities;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.PlaceOnWaterBlockItem;
 import net.minecraft.world.item.SolidBucketItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlockStates;
 import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
-import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockCanBuildEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -37,64 +38,106 @@ import java.util.concurrent.atomic.AtomicReference;
 @Mixin(BlockItem.class)
 public abstract class MixinBlockItem {
 
-    // @formatter:off
     @Shadow protected abstract boolean mustSurvive();
-    @Shadow
-    public static <T extends Comparable<T>> BlockState updateState(BlockState p_219988_0_, Property<T> p_219988_1_, String p_219988_2_) { return null; }
-    // @formatter:on
 
-    private AtomicReference<org.bukkit.block.BlockState> banner$state = new AtomicReference<>();
+    private AtomicReference<org.bukkit.block.BlockState> banner$stateCB = new AtomicReference<>(null);
+    private static final AtomicReference<BlockPos> banner$pos = new AtomicReference<>();
+    private static final AtomicReference<net.minecraft.world.entity.player.Player> banner$player = new AtomicReference<>();
 
-    @Inject(method = "place", locals = LocalCapture.CAPTURE_FAILHARD,
-            at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/item/BlockItem;getPlacementState(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;"))
-    private void banner$prePlaceLilypad(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir, BlockPlaceContext context1) {
-        if ((Object) this instanceof PlaceOnWaterBlockItem || (Object) this instanceof SolidBucketItem) {
-            this.banner$state.set(CraftBlockStates.getBlockState(context1.getLevel(), context1.getClickedPos()));
+    @Inject(method = "place", at= @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/item/BlockItem;getPlacementState(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;",
+            shift = At.Shift.AFTER),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$postPlace(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir, BlockPlaceContext blockPlaceContext) {
+        // CraftBukkit start - special case for handling block placement with water lilies and snow buckets
+        if (((BlockItem) (Object) this) instanceof PlaceOnWaterBlockItem || ((BlockItem) (Object) this)  instanceof SolidBucketItem) {
+            banner$stateCB.set(CraftBlockStates.getBlockState(blockPlaceContext.getLevel(), blockPlaceContext.getClickedPos()));
         }
+        // CraftBukkit end
     }
 
-    @Inject(method = "place", locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true,
-            at = @At(value = "INVOKE", shift = At.Shift.AFTER,
-                    target = "Lnet/minecraft/world/level/block/Block;setPlacedBy(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V"))
-    private void banner$postPlaceLilypad(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir, BlockPlaceContext blockPlaceContext, BlockState blockState, BlockPos blockPos, Level level, net.minecraft.world.entity.player.Player player, ItemStack itemStack, BlockState blockState2) {
+    @Inject(method = "place",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/block/Block;setPlacedBy(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V",
+            shift = At.Shift.AFTER),
+            locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    private void banner$postPlace0(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir,
+                                   BlockPlaceContext blockPlaceContext, BlockState blockState,
+                                   BlockPos blockPos, Level level, Player player,
+                                   ItemStack itemStack, BlockState blockState2) {
         // CraftBukkit start
-        if (banner$state.get() != null) {
-            org.bukkit.event.block.BlockPlaceEvent placeEvent = CraftEventFactory.callBlockPlaceEvent((ServerLevel) level, player, blockPlaceContext.getHand(), banner$state.get(), blockPos.getX(), blockPos.getY(), blockPos.getZ());
+        if (banner$stateCB.get() != null) {
+            BlockPlaceEvent placeEvent = CraftEventFactory.callBlockPlaceEvent((ServerLevel) level, player, blockPlaceContext.getHand(), banner$stateCB.get(), blockPos.getX(), blockPos.getY(), blockPos.getZ());
             if (placeEvent != null && (placeEvent.isCancelled() || !placeEvent.canBuild())) {
-                banner$state.get().update(true, false);
+                banner$stateCB.get().update(true, false);
+                if (((BlockItem) (Object) this) instanceof SolidBucketItem) {
+                    ((ServerPlayer) player).getBukkitEntity().updateInventory(); // SPIGOT-4541
+                }
+                cir.setReturnValue(InteractionResult.FAIL);
             }
-            if ((Object) this instanceof SolidBucketItem) {
-                ((ServerPlayer) player).getBukkitEntity().updateInventory(); // SPIGOT-4541
-            }
-            cir.setReturnValue(InteractionResult.FAIL);
         }
+        // CraftBukkit end
     }
 
-    private static BlockState getBlockState(BlockState blockState, CompoundTag nbt) {
-        StateDefinition<Block, BlockState> statecontainer = blockState.getBlock().getStateDefinition();
-        for (String s : nbt.getAllKeys()) {
-            Property<?> iproperty = statecontainer.getProperty(s);
-            if (iproperty != null) {
-                String s1 = nbt.get(s).getAsString();
-                blockState = updateState(blockState, iproperty, s1);
-            }
-        }
-        return blockState;
+    @Redirect(method = "place", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;playSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V"))
+    private void banner$cancelPlayerSound(Level instance, Player player,
+                                          BlockPos pos, SoundEvent sound,
+                                          SoundSource source, float volume, float pitch) {}
+
+    private AtomicReference<Player> banner$placePlayer = new AtomicReference<>();
+    private AtomicReference<ItemStack> banner$placeStack = new AtomicReference<>();
+
+    @Inject(method = "place", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/Level;gameEvent(Lnet/minecraft/world/level/gameevent/GameEvent;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/gameevent/GameEvent$Context;)V"),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$setInfo(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir,
+                                BlockPlaceContext blockPlaceContext, BlockState blockState, BlockPos blockPos,
+                                Level level, Player player, ItemStack itemStack, BlockState blockState2,
+                                SoundType soundType) {
+        banner$placePlayer.set(player);
+        banner$placeStack.set(itemStack);
+    }
+
+    @Redirect(method = "place", at = @At(value = "FIELD",
+            target = "Lnet/minecraft/world/entity/player/Abilities;instabuild:Z"))
+    private boolean banner$checkAbilities(Abilities instance) {
+        return !banner$placePlayer.get().getAbilities().instabuild && banner$placeStack.get() != ItemStack.EMPTY;
+    }
+
+    @Inject(method = "updateCustomBlockEntityTag(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;)Z",
+            at = @At("HEAD"))
+    private static void banner$getPos(Level level, net.minecraft.world.entity.player.Player player, BlockPos pos, ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
+        banner$pos.set(pos);
+        banner$player.set(player);
     }
 
     /**
      * @author wdog5
-     * @reason
+     * @reason bukkit event
      */
     @Overwrite
     protected boolean canPlace(BlockPlaceContext context, BlockState state) {
-        net.minecraft.world.entity.player.Player playerentity = context.getPlayer();
-        CollisionContext iselectioncontext = playerentity == null ? CollisionContext.empty() : CollisionContext.of(playerentity);
-        boolean original = (!this.mustSurvive() || state.canSurvive(context.getLevel(), context.getClickedPos())) && context.getLevel().isUnobstructed(state, context.getClickedPos(), iselectioncontext);
-
-        Player player = (context.getPlayer() instanceof ServerPlayer) ? ((ServerPlayer) context.getPlayer()).getBukkitEntity() : null;
-        BlockCanBuildEvent event = new BlockCanBuildEvent(CraftBlock.at(context.getLevel(), context.getClickedPos()), player, CraftBlockData.fromData(state), original);
-        if (DistValidate.isValid(context)) Bukkit.getPluginManager().callEvent(event);
+        Player entityhuman = context.getPlayer();
+        CollisionContext collisionContext = entityhuman == null ? CollisionContext.empty() : CollisionContext.of(entityhuman);
+        // CraftBukkit start - store default return
+        boolean defaultReturn = (!this.mustSurvive() || state.canSurvive(context.getLevel(), context.getClickedPos())) && context.getLevel().isUnobstructed(state, context.getClickedPos(), collisionContext);
+        org.bukkit.entity.Player player = (context.getPlayer() instanceof ServerPlayer) ? (org.bukkit.entity.Player) context.getPlayer().getBukkitEntity() : null;
+        BlockCanBuildEvent event = new BlockCanBuildEvent(CraftBlock.at(context.getLevel(), context.getClickedPos()), player, CraftBlockData.fromData(state), defaultReturn);
+        context.getLevel().getCraftServer().getPluginManager().callEvent(event);
         return event.isBuildable();
+        // CraftBukkit end
+    }
+
+    @Redirect(method = "updateCustomBlockEntityTag(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;)Z",
+            at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
+    private static boolean banner$checkPerm(Level instance) {
+        BlockEntity banner$tileEntity = instance.getBlockEntity(banner$pos.get());
+        return banner$tileEntity != null
+                && !instance.isClientSide
+                && banner$tileEntity.onlyOpCanSetNbt()
+                && (banner$player.get() == null
+                || !banner$player.get().canUseGameMasterBlocks())
+                || (banner$player.get().getAbilities().instabuild
+                && banner$player.get().getBukkitEntity().hasPermission("minecraft.nbt.place"));
     }
 }

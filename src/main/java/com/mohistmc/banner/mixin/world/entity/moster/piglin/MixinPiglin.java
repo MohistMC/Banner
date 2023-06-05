@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.entity.moster.piglin;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mohistmc.banner.injection.world.entity.InjectionPiglin;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -52,9 +51,9 @@ public abstract class MixinPiglin extends AbstractPiglin implements InjectionPig
         this.interestItems = compound.getList("Bukkit.InterestList", 8).stream().map(Tag::getAsString).map(ResourceLocation::tryParse).map(BuiltInRegistries.ITEM::get).collect(Collectors.toCollection(HashSet::new));
     }
 
-    @ModifyExpressionValue(method = "holdInOffHand", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;is(Lnet/minecraft/world/item/Item;)Z"))
+    @Redirect(method = "holdInOffHand", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;is(Lnet/minecraft/world/item/Item;)Z"))
     private boolean banner$customBarter(ItemStack instance, Item item) {
-        return instance.is(PiglinAi.BARTERING_ITEM) || allowedBarterItems.contains(instance.getItem());
+        return instance.is(PiglinAi.BARTERING_ITEM) || allowedBarterItems.contains(item);
     }
 
     @Redirect(method = "canReplaceCurrentItem(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z",

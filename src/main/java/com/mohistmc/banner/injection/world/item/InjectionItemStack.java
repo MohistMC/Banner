@@ -16,7 +16,7 @@ public interface InjectionItemStack {
     }
 
     default InteractionResult useOn(UseOnContext itemactioncontext, InteractionHand enumhand) { // CraftBukkit - add hand
-        return null;
+        return InteractionResult.PASS;
     }
 
     default CompoundTag getTagClone() {

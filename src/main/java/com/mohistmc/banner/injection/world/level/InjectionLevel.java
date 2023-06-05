@@ -2,7 +2,6 @@ package com.mohistmc.banner.injection.world.level;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -10,15 +9,26 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.LevelStem;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R3.SpigotTimings;
 import org.bukkit.craftbukkit.v1_19_R3.block.CapturedBlockState;
 import org.bukkit.entity.SpawnCategory;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.spigotmc.SpigotWorldConfig;
 
 import java.util.List;
 import java.util.Map;
 
 public interface InjectionLevel {
+
+    default SpigotTimings.WorldTimingsHandler bridge$timings() {
+        return null;
+    }
+
+    default boolean bridge$preventPoiUpdated() {
+        return false;
+    }
+
+    default void banner$setPreventPoiUpdated(boolean preventPoiUpdated) {
+    }
 
     default org.bukkit.generator.BiomeProvider bridge$biomeProvider() {
         return null;
@@ -127,9 +137,5 @@ public interface InjectionLevel {
     }
 
     default void banner$setSpigotConfig(SpigotWorldConfig spigotWorldConfig) {
-    }
-
-    default CreatureSpawnEvent.SpawnReason getAddEntityReason() {
-        return null;
     }
 }

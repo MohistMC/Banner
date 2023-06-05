@@ -1,6 +1,9 @@
 package org.bukkit.craftbukkit.v1_19_R3.command;
 
 import java.util.UUID;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.conversations.Conversation;
@@ -15,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 public class CraftConsoleCommandSender extends ServerCommandSender implements ConsoleCommandSender {
 
     protected final ConversationTracker conversationTracker = new ConversationTracker();
+    private static final Logger LOGGER = LogManager.getLogger("Console");
 
     protected CraftConsoleCommandSender() {
         super();
@@ -27,7 +31,7 @@ public class CraftConsoleCommandSender extends ServerCommandSender implements Co
 
     @Override
     public void sendRawMessage(String message) {
-        System.out.println(ChatColor.stripColor(message));
+        LOGGER.info(ChatColor.stripColor(message));
     }
 
     @Override

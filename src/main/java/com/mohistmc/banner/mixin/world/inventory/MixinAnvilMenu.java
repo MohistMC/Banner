@@ -1,7 +1,5 @@
 package com.mohistmc.banner.mixin.world.inventory;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mohistmc.banner.injection.world.inventory.InjectionAnvilMenu;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -14,12 +12,10 @@ import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftInventoryView;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AnvilMenu.class)
 public abstract class MixinAnvilMenu extends ItemCombinerMenu implements InjectionAnvilMenu {
@@ -35,8 +31,12 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu implements Injecti
         super(menuType, i, inventory, containerLevelAccess);
     }
 
-    @ModifyReturnValue(method = "mayPickup", at = @At("RETURN"))
-    private boolean banner$changePickUpValue(Player player, boolean hasStack, CallbackInfoReturnable<Boolean> cir) {
+    /**
+     * @author wdog5
+     * @reason bukkit things
+     */
+    @Overwrite
+    protected boolean mayPickup(Player player, boolean hasStack) {
         return (player.getAbilities().instabuild || player.experienceLevel >= this.cost.get()) && this.cost.get() > DEFAULT_DENIED_COST && hasStack; // CraftBukkit - allow cost 0 like a free item
     }
 
@@ -95,9 +95,9 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu implements Injecti
         sendAllDataToRemote(); // CraftBukkit - SPIGOT-6686: Always send completed inventory to stay in sync with client
     }
 
-    @ModifyExpressionValue(method = "createResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/DataSlot;get()I"))
-    private boolean banner$resetValue() {
-        return this.cost.get() >= maximumRepairCost;
+    @ModifyConstant(method = "createResult", constant = @Constant(intValue = 40))
+    private int banner$maxRepairCost(int constant) {
+        return maximumRepairCost;
     }
 
     @Override

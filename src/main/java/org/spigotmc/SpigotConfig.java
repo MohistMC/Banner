@@ -9,7 +9,7 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.logging.Level;
 
-import com.mohistmc.banner.util.ServerUtils;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -51,7 +51,7 @@ public class SpigotConfig
         config = new YamlConfiguration();
         try
         {
-            config.load( CONFIG_FILE );
+            config.load(CONFIG_FILE);
         } catch ( IOException ex )
         {
         } catch ( InvalidConfigurationException ex )
@@ -74,7 +74,7 @@ public class SpigotConfig
     public static void registerCommands()
     {
         for ( Map.Entry<String, Command> entry : commands.entrySet() ) {
-            Objects.requireNonNull(ServerUtils.getServer()).bridge$server().getCommandMap().register(entry.getKey(), "Spigot", entry.getValue());
+            Objects.requireNonNull(BukkitExtraConstants.getServer()).bridge$server().getCommandMap().register(entry.getKey(), "Spigot", entry.getValue());
         }
     }
 

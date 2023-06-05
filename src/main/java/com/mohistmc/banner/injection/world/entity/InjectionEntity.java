@@ -6,8 +6,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
+import org.spigotmc.CustomTimingsHandler;
 
 public interface InjectionEntity {
+
+    default CustomTimingsHandler bridge$tickTimer() {
+        return null;
+    }
 
     default boolean canCollideWith(Entity entity) {
         return false;

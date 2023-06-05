@@ -358,6 +358,7 @@ public final class SimplePluginManager implements PluginManager {
             }
         }
 
+        org.bukkit.command.defaults.TimingsCommand.timingStart = System.nanoTime(); // Spigot
         return result.toArray(new Plugin[result.size()]);
     }
 
@@ -876,4 +877,18 @@ public final class SimplePluginManager implements PluginManager {
     public void useTimings(boolean use) {
         useTimings = use;
     }
+
+    // Banner start - add methods to support plugin manager
+    public List<Plugin> getPluginList() {
+        return plugins;
+    }
+
+    public Map<String, Plugin> getLookupNames() {
+        return lookupNames;
+    }
+
+    public SimpleCommandMap getCommandMap() {
+        return commandMap;
+    }
+    // Banner end
 }

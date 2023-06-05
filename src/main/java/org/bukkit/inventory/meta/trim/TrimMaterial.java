@@ -59,8 +59,4 @@ public interface TrimMaterial extends Keyed {
      * {@link Material#AMETHYST_SHARD}.
      */
     public static final TrimMaterial AMETHYST = Registry.TRIM_MATERIAL.get(NamespacedKey.minecraft("amethyst"));
-
-    @NotNull
-    @Override
-    public NamespacedKey getKey(); // Satisfies Checkstyle for now
 }

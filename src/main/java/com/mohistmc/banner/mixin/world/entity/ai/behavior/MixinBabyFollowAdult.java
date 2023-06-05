@@ -23,32 +23,32 @@ public class MixinBabyFollowAdult {
 
     /**
      * @author wdog5
-     * @reason
+     * @reason bukkit
      */
     @Overwrite
     public static OneShot<AgeableMob> create(UniformInt uniformInt, Function<LivingEntity, Float> entityFloatFunction) {
         return BehaviorBuilder.create((entity) -> {
-            return entity.group(entity.present(MemoryModuleType.NEAREST_VISIBLE_ADULT), entity.registered(MemoryModuleType.LOOK_TARGET), entity.absent(MemoryModuleType.WALK_TARGET)).apply(entity, (value, p_258318_, p_258319_) -> {
-                return (p_258326_, p_258327_, p_258328_) -> {
-                    if (!p_258327_.isBaby()) {
+            return entity.group(entity.present(MemoryModuleType.NEAREST_VISIBLE_ADULT), entity.registered(MemoryModuleType.LOOK_TARGET), entity.absent(MemoryModuleType.WALK_TARGET)).apply(entity, (memoryAccessor, memoryAccessor1, memoryAccessor2) -> {
+                return (serverLevel, ageableMob, flag) -> {
+                    if (!ageableMob.isBaby()) {
                         return false;
                     } else {
-                        LivingEntity ageablemob = entity.get(value);
-                        if (p_258327_.closerThan(ageablemob, (double) (uniformInt.getMaxValue() + 1)) && !p_258327_.closerThan(ageablemob, (double) uniformInt.getMinValue())) {
+                        LivingEntity ageablemob = entity.get(memoryAccessor);
+                        if (ageableMob.closerThan(ageablemob, (double) (uniformInt.getMaxValue() + 1)) && !ageableMob.closerThan(ageablemob, (double) uniformInt.getMinValue())) {
                             // CraftBukkit start
-                            EntityTargetLivingEntityEvent event = CraftEventFactory.callEntityTargetLivingEvent(p_258327_, ageablemob, EntityTargetEvent.TargetReason.FOLLOW_LEADER);
+                            EntityTargetLivingEntityEvent event = CraftEventFactory.callEntityTargetLivingEvent(ageableMob, ageablemob, EntityTargetEvent.TargetReason.FOLLOW_LEADER);
                             if (event.isCancelled()) {
                                 return false;
                             }
                             if (event.getTarget() == null) {
-                                value.erase();
+                                memoryAccessor.erase();
                                 return true;
                             }
                             ageablemob = ((CraftLivingEntity) event.getTarget()).getHandle();
                             // CraftBukkit end
-                            WalkTarget walktarget = new WalkTarget(new EntityTracker(ageablemob, false), entityFloatFunction.apply(p_258327_), uniformInt.getMinValue() - 1);
-                            p_258318_.set(new EntityTracker(ageablemob, true));
-                            p_258319_.set(walktarget);
+                            WalkTarget walktarget = new WalkTarget(new EntityTracker(ageablemob, false), entityFloatFunction.apply(ageableMob), uniformInt.getMinValue() - 1);
+                            memoryAccessor1.set(new EntityTracker(ageablemob, true));
+                            memoryAccessor2.set(walktarget);
                             return true;
                         } else {
                             return false;
@@ -58,4 +58,5 @@ public class MixinBabyFollowAdult {
             });
         });
     }
+
 }

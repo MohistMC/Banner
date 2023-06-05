@@ -7,13 +7,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.mohistmc.banner.util.BlockUtils;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.CraftCustomContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Items;
@@ -23,6 +25,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.RedStoneWireBlock;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.BlockHitResult;
@@ -308,6 +311,9 @@ public class CraftBlock implements Block {
     }
 
     public static Direction blockFaceToNotch(BlockFace face) {
+        if (face == null) {
+            return null;
+        }
         switch (face) {
             case DOWN:
                 return Direction.DOWN;
@@ -328,7 +334,18 @@ public class CraftBlock implements Block {
 
     @Override
     public org.bukkit.block.BlockState getState() {
-        return CraftBlockStates.getBlockState(this);
+        Material material = getType();
+        // Banner start - handle mod BlockEntities
+        if (material == null) {
+            BlockEntity blockEntity = ((CraftWorld) this.getWorld()).getHandle().getBlockEntity(new BlockPos(this.getX(), this.getY(), this.getZ()));
+            if (blockEntity != null && blockEntity instanceof Container) {
+                // In order to allow plugins to properly grab the container location, we must pass a class that extends CraftBlockState and implements InventoryHolder.
+                // Note: This will be returned when BlockEntity.bridge$getOwner() is called
+                return new CraftCustomContainer(this);
+            }
+        }
+        return CraftBlockStates.getBlockState(this);// Banner - pass default state
+        // Banner end
     }
 
     @Override
@@ -495,12 +512,12 @@ public class CraftBlock implements Block {
 
         // SPIGOT-6895: Call StructureGrowEvent and BlockFertilizeEvent
         world.banner$setCaptureTreeGeneration(true);
-        InteractionResult result = BlockUtils.applyBonemeal(context);
+        InteractionResult result = BukkitExtraConstants.applyBonemeal(context);
         world.banner$setCaptureTreeGeneration(false);
 
         if (world.bridge$capturedBlockStates().size() > 0) {
-            TreeType treeType = BlockUtils.treeType;
-            BlockUtils.treeType = null;
+            TreeType treeType = BukkitExtraConstants.treeType;
+            BukkitExtraConstants.treeType = null;
             List<BlockState> blocks = new ArrayList<>(world.bridge$capturedBlockStates().values());
             world.bridge$capturedBlockStates().clear();
             StructureGrowEvent structureEvent = null;

@@ -1,7 +1,8 @@
 package org.bukkit.craftbukkit.v1_19_R3.command;
 
 import com.google.common.base.Joiner;
-import com.mohistmc.banner.util.ServerUtils;
+import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.tree.CommandNode;
 import java.util.ArrayList;
@@ -9,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.world.entity.vehicle.MinecartCommandBlock;
 import org.apache.commons.lang3.Validate;
@@ -43,7 +43,7 @@ public final class VanillaCommandWrapper extends BukkitCommand {
         if (!testPermission(sender)) return true;
 
         CommandSourceStack icommandlistener = getListener(sender);
-        dispatcher.dispatchServerCommand(icommandlistener, toDispatcher(args, commandLabel));
+        dispatcher.performPrefixedCommand(icommandlistener, toDispatcher(args, commandLabel));// Banner - use vanilla command handle
         return true;
     }
 
@@ -75,7 +75,7 @@ public final class VanillaCommandWrapper extends BukkitCommand {
             return ((MinecartCommandBlock) ((CraftMinecartCommand) sender).getHandle()).getCommandBlock().createCommandSourceStack();
         }
         if (sender instanceof RemoteConsoleCommandSender) {
-            return ((DedicatedServer) ServerUtils.getServer()).rconConsoleSource.createCommandSourceStack();
+            return ((DedicatedServer) BukkitExtraConstants.getServer()).rconConsoleSource.createCommandSourceStack();
         }
         if (sender instanceof ConsoleCommandSender) {
             return ((CraftServer) sender.getServer()).getServer().createCommandSourceStack();

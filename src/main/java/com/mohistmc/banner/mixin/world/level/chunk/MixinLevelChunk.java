@@ -1,7 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.chunk;
 
-import com.mohistmc.banner.injection.world.level.chunk.InjectionLevelChunk;
 import com.mohistmc.banner.bukkit.DistValidate;
+import com.mohistmc.banner.injection.world.level.chunk.InjectionLevelChunk;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -22,10 +22,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R3.CraftChunk;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -33,7 +30,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(LevelChunk.class)
@@ -45,7 +41,7 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
 
     // @formatter:off
     @Shadow @Nullable public abstract BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving);
-    @Shadow @Final public Level level;
+    @Mutable @Shadow @Final public Level level;
     // @formatter:on
 
     @Shadow @org.jetbrains.annotations.Nullable protected abstract BlockEntity promotePendingBlockEntity(BlockPos pos, CompoundTag tag);
@@ -60,6 +56,13 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
     public ServerLevel q; // TODO check on update
     private AtomicReference<Block> banner$block = new AtomicReference<>();
 
+    @Redirect(method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/ChunkPos;Lnet/minecraft/world/level/chunk/UpgradeData;Lnet/minecraft/world/ticks/LevelChunkTicks;Lnet/minecraft/world/ticks/LevelChunkTicks;J[Lnet/minecraft/world/level/chunk/LevelChunkSection;Lnet/minecraft/world/level/chunk/LevelChunk$PostLoadProcessor;Lnet/minecraft/world/level/levelgen/blending/BlendingData;)V",
+            at = @At(value = "FIELD",
+                    target = "Lnet/minecraft/world/level/chunk/LevelChunk;level:Lnet/minecraft/world/level/Level;"))
+    private void banner$setServerLevel(LevelChunk instance, Level level) {
+        this.level = (ServerLevel) level;// CraftBukkit - type
+    }
+
     @Inject(method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/ChunkPos;Lnet/minecraft/world/level/chunk/UpgradeData;Lnet/minecraft/world/ticks/LevelChunkTicks;Lnet/minecraft/world/ticks/LevelChunkTicks;J[Lnet/minecraft/world/level/chunk/LevelChunkSection;Lnet/minecraft/world/level/chunk/LevelChunk$PostLoadProcessor;Lnet/minecraft/world/level/levelgen/blending/BlendingData;)V", at = @At("RETURN"))
     private void banner$init(Level worldIn, ChunkPos p_196855_, UpgradeData p_196856_, LevelChunkTicks<Block> p_196857_, LevelChunkTicks<Fluid> p_196858_, long p_196859_, @Nullable LevelChunkSection[] p_196860_, @Nullable LevelChunk.PostLoadProcessor p_196861_, @Nullable BlendingData p_196862_, CallbackInfo ci) {
         if (DistValidate.isValid(worldIn)) {
@@ -70,7 +73,7 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
     @Inject(method = "<init>(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ProtoChunk;Lnet/minecraft/world/level/chunk/LevelChunk$PostLoadProcessor;)V", at = @At("RETURN"))
     private void banner$init(ServerLevel p_196850_, ProtoChunk protoChunk, @Nullable LevelChunk.PostLoadProcessor p_196852_, CallbackInfo ci) {
         this.needsDecoration = true;
-        this.banner$setPersistentDataContainer(protoChunk.bridge$persistentDataContainer());
+        this.banner$setPersistentDataContainer(protoChunk.bridge$persistentDataContainer()); // SPIGOT-6814: copy PDC to account for 1.17 to 1.18 chunk upgrading.
     }
 
     @Inject(method = "removeBlockEntity", at = @At(value = "INVOKE_ASSIGN", remap = false, target = "Ljava/util/Map;remove(Ljava/lang/Object;)Ljava/lang/Object;"))
@@ -149,7 +152,7 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
 
     @Redirect(method = "setBlockState", at = @At(value = "FIELD", ordinal = 1, target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
     public boolean banner$redirectIsRemote(Level world) {
-        return world.isClientSide && this.banner$doPlace && (!this.level.bridge$captureBlockStates()|| banner$block.get() instanceof BaseEntityBlock);
+        return world.isClientSide && this.banner$doPlace && (!this.level.bridge$captureBlockStates() || banner$block.get() instanceof BaseEntityBlock);
     }
 
     /**
@@ -158,35 +161,39 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
      */
     @Nullable
     @Overwrite
-    public BlockEntity getBlockEntity(BlockPos pos, LevelChunk.EntityCreationType creationType) {
+    public BlockEntity getBlockEntity(BlockPos blockposition, LevelChunk.EntityCreationType creationType) {
         // CraftBukkit start
-        BlockEntity blockEntity = level.bridge$capturedTileEntities().get(pos);
-        if (blockEntity == null) {
-            blockEntity = (BlockEntity) this.blockEntities.get(pos);
+        BlockEntity tileentity = level.bridge$capturedTileEntities().get(blockposition);
+        if (tileentity == null) {
+            tileentity = (BlockEntity) this.blockEntities.get(blockposition);
         }
         // CraftBukkit end
-        if (blockEntity == null) {
-            CompoundTag compoundTag = (CompoundTag)this.pendingBlockEntities.remove(pos);
-            if (compoundTag != null) {
-                BlockEntity blockEntity2 = this.promotePendingBlockEntity(pos, compoundTag);
-                if (blockEntity2 != null) {
-                    return blockEntity2;
+
+        if (tileentity == null) {
+            CompoundTag nbttagcompound = (CompoundTag) this.pendingBlockEntities.remove(blockposition);
+
+            if (nbttagcompound != null) {
+                BlockEntity tileentity1 = this.promotePendingBlockEntity(blockposition, nbttagcompound);
+
+                if (tileentity1 != null) {
+                    return tileentity1;
                 }
             }
         }
 
-        if (blockEntity == null) {
+        if (tileentity == null) {
             if (creationType == LevelChunk.EntityCreationType.IMMEDIATE) {
-                blockEntity = this.createBlockEntity(pos);
-                if (blockEntity != null) {
-                    this.addAndRegisterBlockEntity(blockEntity);
+                tileentity = this.createBlockEntity(blockposition);
+                if (tileentity != null) {
+                    this.addAndRegisterBlockEntity(tileentity);
                 }
             }
-        } else if (blockEntity.isRemoved()) {
-            this.blockEntities.remove(pos);
+        } else if (tileentity.isRemoved()) {
+            this.blockEntities.remove(blockposition);
             return null;
         }
-        return blockEntity;
+
+        return tileentity;
     }
 
     @Inject(method = "setBlockEntity", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)

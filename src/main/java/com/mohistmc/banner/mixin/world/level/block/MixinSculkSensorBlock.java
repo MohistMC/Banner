@@ -29,7 +29,7 @@ public abstract class MixinSculkSensorBlock extends Block {
     }
 
     @Inject(method = "stepOn", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;"))
-    private void banner$stepOn(Level level, BlockPos pos, BlockState p_222134_, Entity entity, CallbackInfo ci) {
+    private void banner$stepOn(Level level, BlockPos pos, BlockState state, Entity entity, CallbackInfo ci) {
         org.bukkit.event.Cancellable cancellable;
         if (entity instanceof Player) {
             cancellable = CraftEventFactory.callPlayerInteractEvent((Player) entity, org.bukkit.event.block.Action.PHYSICAL, pos, null, null, null);
@@ -56,7 +56,8 @@ public abstract class MixinSculkSensorBlock extends Block {
     @Unique private static int newCurrent;
 
     @Inject(method = "activate", cancellable = true, at = @At("HEAD"))
-    private void banner$activate(Entity entity, Level level, BlockPos blockPos, BlockState blockState, int i, int j, CallbackInfo ci) {
+    private void banner$activate(Entity entity, Level level, BlockPos blockPos,
+                                        BlockState blockState, int i, int j, CallbackInfo ci) {
         BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(CraftBlock.at(level, blockPos), blockState.getValue(SculkSensorBlock.POWER), i);
         Bukkit.getPluginManager().callEvent(eventRedstone);
         if (eventRedstone.getNewCurrent() <= 0) {

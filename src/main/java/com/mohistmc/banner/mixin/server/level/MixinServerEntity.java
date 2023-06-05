@@ -1,20 +1,11 @@
 package com.mohistmc.banner.mixin.server.level;
 
 import com.google.common.collect.Lists;
-import com.mohistmc.banner.util.ServerUtils;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.injection.server.level.InjectionServerEntity;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
-import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
-import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
-import net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket;
-import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
-import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
-import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
-import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
-import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket;
-import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
-import net.minecraft.network.protocol.game.VecDeltaCodec;
+import net.minecraft.network.protocol.game.*;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
@@ -37,27 +28,19 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.util.Vector;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 @Mixin(ServerEntity.class)
-public abstract class MixinServerEntity {
+public abstract class MixinServerEntity implements InjectionServerEntity {
 
 
     // @formatter:off
@@ -81,7 +64,10 @@ public abstract class MixinServerEntity {
     @Shadow @Nullable private List<SynchedEntityData.DataValue<?>> trackedDataValues;
     // @formatter:on
 
-    @Shadow protected abstract Stream<Entity> removedPassengers(List<Entity> list, List<Entity> list2);
+    @Shadow
+    protected static Stream<Entity> removedPassengers(List<Entity> list, List<Entity> list2) {
+        return null;
+    }
 
     private Set<ServerPlayerConnection> trackedPlayers;
     @Unique private int lastTick;
@@ -90,16 +76,16 @@ public abstract class MixinServerEntity {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(ServerLevel serverWorld, Entity entity, int updateFrequency, boolean sendVelocityUpdates, Consumer<Packet<?>> packetConsumer, CallbackInfo ci) {
         trackedPlayers = new HashSet<>();
-        lastTick = ServerUtils.currentTick - 1;
+        lastTick = BukkitExtraConstants.currentTick - 1;
         lastUpdate = lastPosUpdate = lastMapUpdate = -1;
     }
 
-    public void ServerUtils$constructor(ServerLevel serverWorld, Entity entity, int updateFrequency, boolean sendVelocityUpdates, Consumer<Packet<?>> packetConsumer) {
+    public void banner$constructor(ServerLevel serverWorld, Entity entity, int updateFrequency, boolean sendVelocityUpdates, Consumer<Packet<?>> packetConsumer) {
         throw new NullPointerException();
     }
 
-    public void ServerUtils$constructor(ServerLevel serverWorld, Entity entity, int updateFrequency, boolean sendVelocityUpdates, Consumer<Packet<?>> packetConsumer, Set<ServerPlayerConnection> set) {
-        ServerUtils$constructor(serverWorld, entity, updateFrequency, sendVelocityUpdates, packetConsumer);
+    public void banner$constructor(ServerLevel serverWorld, Entity entity, int updateFrequency, boolean sendVelocityUpdates, Consumer<Packet<?>> packetConsumer, Set<ServerPlayerConnection> set) {
+        banner$constructor(serverWorld, entity, updateFrequency, sendVelocityUpdates, packetConsumer);
         this.trackedPlayers = set;
     }
 
@@ -112,20 +98,19 @@ public abstract class MixinServerEntity {
         List<Entity> list = this.entity.getPassengers();
         if (!list.equals(this.lastPassengers)) {
             this.lastPassengers = list;
-            this.broadcastAndSend(new ClientboundSetPassengersPacket(this.entity));
-            this.removedPassengers(list, this.lastPassengers).forEach((entity) -> {
-                if (entity instanceof ServerPlayer serverplayer1) {
-                    if (!list.contains(serverplayer1)) {
-                        serverplayer1.connection.teleport(serverplayer1.getX(), serverplayer1.getY(), serverplayer1.getZ(), serverplayer1.getYRot(), serverplayer1.getXRot());
-                    }
+            this.broadcast.accept(new ClientboundSetPassengersPacket(this.entity));
+            removedPassengers(list, this.lastPassengers).forEach((entity) -> {
+                if (entity instanceof ServerPlayer serverPlayer) {
+                    serverPlayer.connection.teleport(serverPlayer.getX(), serverPlayer.getY(), serverPlayer.getZ(), serverPlayer.getYRot(), serverPlayer.getXRot());
                 }
+
             });
         }
-        int elapsedTicks = ServerUtils.currentTick - this.lastTick;
+        int elapsedTicks = BukkitExtraConstants.currentTick - this.lastTick;
         if (elapsedTicks < 0) {
             elapsedTicks = 0;
         }
-        this.lastTick = ServerUtils.currentTick;
+        this.lastTick = BukkitExtraConstants.currentTick;
         if (this.entity instanceof ItemFrame itemFrame) {
             ItemStack itemstack = itemFrame.getItem();
             if (this.tickCount / 10 != this.lastMapUpdate && itemstack.getItem() instanceof MapItem) {
@@ -251,9 +236,9 @@ public abstract class MixinServerEntity {
 
     private transient ServerPlayer banner$player;
 
-    public void a(final Consumer<Packet<?>> consumer, ServerPlayer playerEntity) {
+    public void a(final Consumer<Packet<ClientGamePacketListener>> consumer, ServerPlayer playerEntity) {
         this.banner$player = playerEntity;
-        this.sendPairingData(consumer);
+        this.sendPairingData(playerEntity, consumer);
     }
 
     /**
@@ -261,14 +246,14 @@ public abstract class MixinServerEntity {
      * @reason
      */
     @Overwrite
-    public void sendPairingData(final Consumer<Packet<?>> consumer) {
+    public void sendPairingData(ServerPlayer serverPlayer, Consumer<Packet<ClientGamePacketListener>> consumer) {
         ServerPlayer player = banner$player;
         banner$player = null;
         Mob entityinsentient;
         if (this.entity.isRemoved()) {
             return;
         }
-        Packet<?> packet = this.entity.getAddEntityPacket();
+        Packet<ClientGamePacketListener> packet = this.entity.getAddEntityPacket();
         this.yHeadRotp = Mth.floor(this.entity.getYHeadRot() * 256.0f / 360.0f);
         consumer.accept(packet);
         if (this.trackedDataValues != null) {
@@ -326,5 +311,10 @@ public abstract class MixinServerEntity {
         if (this.entity instanceof ServerPlayer player) {
             player.getBukkitEntity().injectScaledMaxHealth(set, false);
         }
+    }
+
+    @Override
+    public void setTrackedPlayers(Set<ServerPlayerConnection> trackedPlayers) {
+        this.trackedPlayers = trackedPlayers;
     }
 }

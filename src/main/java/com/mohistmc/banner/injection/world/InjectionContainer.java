@@ -9,6 +9,8 @@ import java.util.Collections;
 
 public interface InjectionContainer {
 
+    int MAX_STACK = 64;
+
     default java.util.List<ItemStack> getContents() {
         return Collections.emptyList();
     }

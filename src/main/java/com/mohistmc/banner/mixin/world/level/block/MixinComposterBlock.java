@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
-import com.mohistmc.banner.bukkit.BukkitCaptures;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -34,14 +33,15 @@ public class MixinComposterBlock {
     // @formatter:off
     @Shadow @Final public static IntegerProperty LEVEL;
     @Shadow @Final public static Object2FloatMap<ItemLike> COMPOSTABLES;
-    @Shadow static BlockState empty(@Nullable Entity p_270236_, BlockState p_270873_, LevelAccessor p_270963_, BlockPos p_270211_) { return null; }
+    @Shadow
+    public static BlockState empty(@Nullable Entity p_270236_, BlockState p_270873_, LevelAccessor p_270963_, BlockPos p_270211_) { return null; }
     // @formatter:on
 
     @SuppressWarnings({"InvalidMemberReference", "UnresolvedMixinReference", "MixinAnnotationTarget", "InvalidInjectorMethodSignature"})
     @Redirect(method = "getContainer", at = @At(value = "NEW", target = "()Lnet/minecraft/world/level/block/ComposterBlock$EmptyContainer;"))
     public ComposterBlock.EmptyContainer banner$newEmpty(BlockState blockState, LevelAccessor world, BlockPos blockPos) {
         ComposterBlock.EmptyContainer inventory = new ComposterBlock.EmptyContainer();
-       inventory.setOwner(new CraftBlockInventoryHolder(world, blockPos, inventory));
+        inventory.setOwner(new CraftBlockInventoryHolder(world, blockPos, inventory));
         return inventory;
     }
 
@@ -56,7 +56,7 @@ public class MixinComposterBlock {
             double rand = world.random.nextDouble();
             BlockState state1 = addItem(entity, state, DummyGeneratorAccess.INSTANCE, pos, stack, rand);
 
-            if (state == state1 || CraftEventFactory.callEntityChangeBlockEvent(BukkitCaptures.getEntityChangeBlock(), pos, state1).isCancelled()) {
+            if (state == state1 || CraftEventFactory.callEntityChangeBlockEvent(entity, pos, state1).isCancelled()) {
                 return state;
             }
 

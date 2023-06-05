@@ -6,12 +6,12 @@ import net.minecraft.network.Connection;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
+import java.net.SocketAddress;
+
 @Mixin(Connection.class)
 public class MixinConnection implements InjectionConnection {
 
     @Shadow public Channel channel;
-    public java.util.UUID spoofedUUID;
-    public com.mojang.authlib.properties.Property[] spoofedProfile;
     public String hostname = ""; // CraftBukkit - add field
 
     @Override
@@ -23,4 +23,11 @@ public class MixinConnection implements InjectionConnection {
     public void banner$setHostName(String hostName) {
         hostname = hostName;
     }
+
+    // Spigot Start
+    @Override
+    public SocketAddress getRawAddress() {
+        return this.channel.remoteAddress();
+    }
+    // Spigot End
 }

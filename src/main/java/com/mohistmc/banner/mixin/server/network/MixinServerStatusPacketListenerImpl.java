@@ -1,7 +1,7 @@
 package com.mohistmc.banner.mixin.server.network;
 
 import com.mohistmc.banner.bukkit.BannerServerListPingEvent;
-import com.mohistmc.banner.util.ServerUtils;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.Connection;
@@ -27,7 +27,7 @@ public class MixinServerStatusPacketListenerImpl {
 
     @Redirect(method = "handleStatusRequest", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Connection;send(Lnet/minecraft/network/protocol/Packet;)V"))
     private void banner$handleServerPing(Connection networkManager, Packet<?> packetIn) {
-        MinecraftServer server = ServerUtils.getServer();
+        MinecraftServer server = BukkitExtraConstants.getServer();
         Object[] players = server.getPlayerList().players.toArray();
         BannerServerListPingEvent event = new BannerServerListPingEvent(networkManager, server);
         List<GameProfile> profiles = new ArrayList<>(players.length);

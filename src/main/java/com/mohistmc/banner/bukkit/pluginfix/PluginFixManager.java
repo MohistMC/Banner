@@ -3,13 +3,7 @@ package com.mohistmc.banner.bukkit.pluginfix;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.LdcInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.*;
 
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.IRETURN;
@@ -21,8 +15,14 @@ public class PluginFixManager {
         if (className.endsWith("PaperLib")) {
             return PluginFixManager.removePaper(clazz);
         }
+        if (className.equals("com.earth2me.essentials.utils.VersionUtil")) {
+            return helloWorld(clazz, "net.fabricmc.loader.launch.knot.KnotServer", "hello.World");
+        }
         if (className.equals("com.sk89q.worldedit.bukkit.adapter.Refraction")) {
             return helloWorld(clazz, "net.minecraft.nbt.ListTag", "hello.World");
+        }
+        if (className.equals("net.ess3.nms.refl.providers.ReflServerStateProvider")) {
+            return helloWorld(clazz, "u", "U");
         }
         return clazz;
     }

@@ -4,6 +4,7 @@ import com.mohistmc.banner.injection.world.entity.player.InjectionPlayer;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Unit;
@@ -17,12 +18,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityExhaustionEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
@@ -42,6 +45,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 //TODO fix inject methods
@@ -69,6 +73,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     @Shadow @Final private Inventory inventory;
 
     @Shadow public abstract Either<Player.BedSleepingProblem, net.minecraft.util.Unit> startSleepInBed(BlockPos bedPos);
+    @Shadow public abstract boolean blockActionRestricted(Level level, BlockPos pos, GameType gameMode);
 
     protected MixinPlayer(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
@@ -180,15 +185,18 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
                 return true;
             }
         }
-        if ((Object) this instanceof ServerPlayer) {
+        if (((Player) (Object) this) instanceof ServerPlayer) {
             return !team.hasPlayer(((ServerPlayer) (Object) this).getBukkitEntity());
         }
         return !team.hasPlayer(Bukkit.getOfflinePlayer(this.getScoreboardName()));
     }
 
+    // Banner start
+    public AtomicBoolean spawnEntityFromShoulder = new AtomicBoolean(true);
+
     /**
      * @author wdog5
-     * @reason
+     * @reason bukkit
      */
     @Overwrite
     protected void removeEntitiesOnShoulder() {
@@ -200,6 +208,33 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
                 this.setShoulderEntityRight(new CompoundTag());
             }
         }
+    }
+
+    /**
+     * @author wdog5
+     * @reason bukkit
+     */
+    @Overwrite
+    private void respawnEntityOnShoulder(CompoundTag entityCompound) {
+        if (!this.level().isClientSide && !entityCompound.isEmpty()) {
+            EntityType.create(entityCompound, this.level()).map((entity) -> { // CraftBukkit
+                if (entity instanceof TamableAnimal) {
+                    ((TamableAnimal) entity).setOwnerUUID(this.uuid);
+                }
+
+                entity.setPos(this.getX(), this.getY() + 0.699999988079071D, this.getZ());
+                boolean canAdd =  ((ServerLevel)this.level()).addWithUUID(entity);
+                spawnEntityFromShoulder.set(canAdd);
+                return ((ServerLevel) this.level()).addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY); // CraftBukkit
+            }); // CraftBukkit
+        }
+
+    }
+
+    @Override
+    public boolean spawnEntityFromShoulder(CompoundTag nbttagcompound) {
+        respawnEntityOnShoulder(nbttagcompound);
+        return spawnEntityFromShoulder.getAndSet(true);
     }
 
     private EntityExhaustionEvent.ExhaustionReason banner$exhaustReason;
@@ -236,7 +271,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
         }
     }
 
-    @Inject(method = "actuallyHurt", cancellable = true, at = @At("HEAD"))
+    @Inject(method = "actuallyHurt", at = @At("HEAD"), cancellable = true)
     private void banner$damageEntityCustom(DamageSource damageSrc, float damageAmount, CallbackInfo ci) {
         damageEntity0(damageSrc, damageAmount);
         ci.cancel();
@@ -329,7 +364,6 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     public CraftHumanEntity getBukkitEntity() {
         return (CraftHumanEntity) super.getBukkitEntity();
     }
-
 
     @Override
     public boolean bridge$fauxSleeping() {

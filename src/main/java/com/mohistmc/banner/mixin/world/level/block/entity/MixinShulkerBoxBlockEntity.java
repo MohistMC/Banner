@@ -68,7 +68,7 @@ public abstract class MixinShulkerBoxBlockEntity extends RandomizableContainerBl
 
     @Override
     public int getMaxStackSize() {
-        if (maxStack == 0) maxStack = LARGE_MAX_STACK_SIZE;
+        if (maxStack == 0) maxStack = MAX_STACK;
         return maxStack;
     }
 

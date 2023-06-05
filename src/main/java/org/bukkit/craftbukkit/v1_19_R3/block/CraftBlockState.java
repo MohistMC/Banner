@@ -325,4 +325,11 @@ public class CraftBlockState implements org.bukkit.block.BlockState {
             throw new IllegalStateException("The blockState must be placed to call this method");
         }
     }
+
+    // Banner start
+    @Override
+    public String toString() {
+        return this.data.toString();
+    }
+    // Banner end
 }

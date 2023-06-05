@@ -1,13 +1,11 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.dimension.LevelStem;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
@@ -15,7 +13,6 @@ import org.bukkit.event.entity.EntityCombustByBlockEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BaseFireBlock.class)
 public class MixinBaseFireBlock {

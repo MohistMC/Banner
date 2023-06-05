@@ -19,8 +19,8 @@ public abstract class MixinStonecutterMenu extends AbstractContainerMenu{
 
     // @formatter:off
     @Shadow @Final public Container container;
-    @Shadow @Final private ResultContainer resultContainer;
-    @Shadow @Final private ContainerLevelAccess access;
+    @Shadow @Final
+    ResultContainer resultContainer;
     // @formatter:on
 
     protected MixinStonecutterMenu(@Nullable MenuType<?> menuType, int i) {

@@ -35,10 +35,8 @@ public abstract class MixinInventoryMenu extends RecipeBookMenu<CraftingContaine
     public void banner$init(Inventory playerInventory, boolean localWorld, Player playerIn, CallbackInfo ci) {
         this.playerInventory = playerInventory;
          this.craftSlots.setOwner(playerInventory.player.getBukkitEntity());
-         if (craftSlots instanceof TransientCraftingContainer craftingContainer) {
-             craftingContainer.bridge$setResultInventory(this.resultSlots);
-         }
-         this.setTitle(Component.translatable("container.crafting"));
+         ((TransientCraftingContainer) this.craftSlots).bridge$setResultInventory(this.resultSlots);
+        this.setTitle(Component.translatable("container.crafting"));
     }
 
     @Inject(method = "slotsChanged", at = @At("HEAD"))

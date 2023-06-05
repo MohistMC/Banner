@@ -31,9 +31,9 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements Comman
         super(blockEntityType, blockPos, blockState);
     }
 
-    @Redirect(method = "createCommandSourceStack", at = @At(value = "NEW", target = "net/minecraft/commands/CommandSourceStack"))
+    @Redirect(method = "createCommandSourceStack", at = @At(value = "NEW", target = "(Lnet/minecraft/commands/CommandSource;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/Vec2;Lnet/minecraft/server/level/ServerLevel;ILjava/lang/String;Lnet/minecraft/network/chat/Component;Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/world/entity/Entity;)Lnet/minecraft/commands/CommandSourceStack;"))
     private static CommandSourceStack banner$source(CommandSource source, Vec3 vec3d, Vec2 vec2f, ServerLevel world, int i, String s, Component component, MinecraftServer server, @Nullable Entity entity) {
-        return new CommandSourceStack(source, vec3d, vec2f, world, i, s, component, server, entity);
+        return new CommandSourceStack(CommandSource.NULL, vec3d, vec2f, world, i, s, component, server, entity);// Banner - TODO
     }
 
     @Inject(method = "markUpdated", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;sendBlockUpdated(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;I)V"))

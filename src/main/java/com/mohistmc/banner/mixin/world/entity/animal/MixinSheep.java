@@ -45,8 +45,6 @@ public abstract class MixinSheep extends Animal {
 
     @Inject(method = "makeContainer", locals = LocalCapture.CAPTURE_FAILHARD, at = @At("RETURN"))
     private static void banner$resultInv(DyeColor color, DyeColor color1, CallbackInfoReturnable<CraftingContainer> cir, CraftingContainer craftingInventory) {
-         if (craftingInventory instanceof TransientCraftingContainer craftingContainer) {
-             craftingContainer.bridge$setResultInventory(new ResultContainer());
-         }
+         ((TransientCraftingContainer) craftingInventory).bridge$setResultInventory(new ResultContainer());
     }
 }

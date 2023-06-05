@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.mohistmc.banner.injection.world.level.block.entity.InjectionBeehiveBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;

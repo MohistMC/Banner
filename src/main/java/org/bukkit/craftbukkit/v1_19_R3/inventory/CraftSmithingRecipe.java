@@ -1,6 +1,7 @@
 package org.bukkit.craftbukkit.v1_19_R3.inventory;
 
-import com.mohistmc.banner.util.ServerUtils;
+import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -25,7 +26,6 @@ public class CraftSmithingRecipe extends SmithingRecipe implements CraftRecipe {
     public void addToCraftingManager() {
         ItemStack result = this.getResult();
 
-        // Banner - TODO
-       // ServerUtils.getServer().getRecipeManager().addRecipe(new net.minecraft.world.item.crafting.LegacyUpgradeRecipe(CraftNamespacedKey.toMinecraft(this.getKey()), toNMS(this.getBase(), true), toNMS(this.getAddition(), true), CraftItemStack.asNMSCopy(result)));
+       // BukkitExtraConstants.getServer().getRecipeManager().addRecipe(new net.minecraft.world.item.crafting.LegacyUpgradeRecipe(CraftNamespacedKey.toMinecraft(this.getKey()), toNMS(this.getBase(), true), toNMS(this.getAddition(), true), CraftItemStack.asNMSCopy(result))); // Banner TODO
     }
 }

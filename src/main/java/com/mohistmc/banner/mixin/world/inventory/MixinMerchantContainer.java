@@ -29,7 +29,7 @@ public abstract class MixinMerchantContainer implements Container {
     // @formatter:on
 
     private List<HumanEntity> transactions = new ArrayList<>();
-    private int maxStack = LARGE_MAX_STACK_SIZE;
+    private int maxStack = MAX_STACK;
 
     @Override
     public List<ItemStack> getContents() {
@@ -62,7 +62,7 @@ public abstract class MixinMerchantContainer implements Container {
 
     @Override
     public int getMaxStackSize() {
-        if (maxStack == 0) maxStack = LARGE_MAX_STACK_SIZE;
+        if (maxStack == 0) maxStack = MAX_STACK;
         return this.maxStack;
     }
 

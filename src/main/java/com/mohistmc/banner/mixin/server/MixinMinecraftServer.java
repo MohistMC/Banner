@@ -1,54 +1,49 @@
 package com.mohistmc.banner.mixin.server;
 
 import com.google.common.collect.Maps;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
+import com.mojang.datafixers.DataFixer;
 import it.unimi.dsi.fastutil.longs.LongIterator;
-import net.minecraft.CrashReport;
-import net.minecraft.ReportedException;
+import jline.console.ConsoleReader;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import net.minecraft.Util;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.ChatDecorator;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.*;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.server.level.progress.ChunkProgressListener;
+import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
 import net.minecraft.server.network.ServerConnectionListener;
+import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.Unit;
+import net.minecraft.util.thread.ReentrantBlockableEventLoop;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ForcedChunksSavedData;
 import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldOptions;
+import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WorldData;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.Main;
-import com.mohistmc.banner.util.ServerUtils;
-import com.mojang.datafixers.DataFixer;
-import jline.console.ConsoleReader;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import net.minecraft.server.*;
-import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
-import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.util.thread.ReentrantBlockableEventLoop;
-import net.minecraft.world.level.storage.LevelStorageSource;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.RemoteConsoleCommandSender;
+import org.bukkit.craftbukkit.Main;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R3.SpigotTimings;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_19_R3.util.LazyPlayerSet;
 import org.bukkit.event.player.AsyncPlayerChatPreviewEvent;
@@ -58,11 +53,9 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.PluginLoadOrder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -83,20 +76,21 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow public MinecraftServer.ReloadableResources resources;
 
     @Shadow public Map<ResourceKey<net.minecraft.world.level.Level>, ServerLevel> levels;
-    @Shadow private static void setInitialSpawn(ServerLevel level, ServerLevelData levelData, boolean generateBonusChest, boolean debug) {}
-    @Shadow protected abstract void setupDebugLevel(WorldData worldData);
-    @Shadow public WorldData worldData;
     @Shadow @Final public static org.slf4j.Logger LOGGER;
     @Shadow private long nextTickTime;
-    @Shadow private String localIp;
-    @Shadow private boolean onlineMode;
+    @Shadow public abstract boolean isSpawningMonsters();
+    @Shadow public abstract boolean isSpawningAnimals();
     @Shadow private int tickCount;
     @Shadow public abstract PlayerList getPlayerList();
-    @Shadow private long lastOverloadWarning;
     @Shadow public abstract boolean isStopped();
     // @formatter:on
 
     @Shadow public ServerConnectionListener connection;
+
+    @Shadow public abstract ServerLevel overworld();
+
+    @Shadow protected abstract void updateMobSpawningFlags();
+
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
     public org.bukkit.craftbukkit.v1_19_R3.CraftServer server;
@@ -104,13 +98,14 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     public org.bukkit.command.ConsoleCommandSender console;
     public org.bukkit.command.RemoteConsoleCommandSender remoteConsole;
     public ConsoleReader reader;
-    private static int currentTick = ServerUtils.getCurrentTick();
-    public java.util.Queue<Runnable> processQueue = ServerUtils.bridge$processQueue;
-    public int autosavePeriod = ServerUtils.bridge$autosavePeriod;
+    private static int currentTick = BukkitExtraConstants.currentTick;
+    public java.util.Queue<Runnable> processQueue = BukkitExtraConstants.bridge$processQueue;
+    public int autosavePeriod = BukkitExtraConstants.bridge$autosavePeriod;
     private boolean forceTicks;
     public Commands vanillaCommandDispatcher;
     private boolean hasStopped = false;
     private final Object stopLock = new Object();
+    public final double[] recentTps = new double[3];
     // CraftBukkit end
 
     public MixinMinecraftServer(String string) {
@@ -129,11 +124,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         Main.handleParser(parser, options);
         this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
         this.worldLoader = BukkitCaptures.getDataLoadContext();
-        // Try to see if we're actually running in a terminal, disable jline if not
-        if (System.console() == null && System.getProperty("jline.terminal") == null) {
-            System.setProperty("jline.terminal", "jline.UnsupportedTerminal");
-            org.bukkit.craftbukkit.Main.useJline = false;
-        }
+        //Runtime.getRuntime().addShutdownHook(new ServerShutdownThread(((MinecraftServer) (Object) this)));
     }
 
     @Inject(method = "stopServer", at = @At(value = "INVOKE", remap = false, ordinal = 0, shift = At.Shift.AFTER, target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V"))
@@ -157,16 +148,14 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         try { Thread.sleep(100); } catch (InterruptedException ex) {} // CraftBukkit - SPIGOT-625 - give server at least a chance to send packets
     }
 
-    @ModifyExpressionValue(method = "runServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;lastOverloadWarning:J", ordinal = 0))
-    private boolean banner$resetCKU(MinecraftServer instance) {
-        return this.lastOverloadWarning >= 30000L;
+    @ModifyConstant(method = "runServer", constant = @Constant(longValue = 15000L))
+    private long banner$changeWarningValue(long constant) {
+        return 30000L;
     }
 
-    @WrapWithCondition(method = "runServer",remap = false,
-            at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V"),
-            slice = @Slice(to = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;lastOverloadWarning:J", ordinal = 1)))
-    private boolean banner$addCKUCheck() {
-        return server.getWarnOnOverload();
+    @Inject(method = "runServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;nextTickTime:J", shift = At.Shift.BEFORE))
+    private void banner$currentTick(CallbackInfo ci) {
+        BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
     }
 
     @Inject(method = "getServerModName", at = @At(value = "HEAD"), remap = false, cancellable = true)
@@ -174,16 +163,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         if (this.server != null) {
             cir.setReturnValue(server.getServer().getServerName());
         }
-    }
-
-    @Inject(method = "runServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;nextTickTime:J", shift = At.Shift.BEFORE))
-    private void banner$currentTick(CallbackInfo ci) {
-        ServerUtils.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
-    }
-
-    @Inject(method = "reloadResources", at = @At(value = "RETURN", target = "Ljava/util/concurrent/CompletableFuture;thenAcceptAsync(Ljava/util/function/Consumer;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
-    private void banner$syncCommand(Collection<String> selectedIds, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
-        this.server.syncCommands();
     }
 
     @Override
@@ -242,7 +221,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         cir.setReturnValue(!this.levels.isEmpty());
     }
 
-    /**
     @Inject(method = "setInitialSpawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerChunkCache;getGenerator()Lnet/minecraft/world/level/chunk/ChunkGenerator;", shift = At.Shift.BEFORE), cancellable = true)
     private static void banner$spawnInit(ServerLevel level, ServerLevelData levelData, boolean generateBonusChest, boolean debug, CallbackInfo ci) {
         // CraftBukkit start
@@ -259,62 +237,79 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                 }
             }
         }
-    }*/
-
-    @ModifyExpressionValue(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;tickCount:I", ordinal = 1))
-    private boolean banner$addTaskCheck() {
-        return autosavePeriod > 0 && this.tickCount % autosavePeriod == 0;
     }
 
     @Override
     public void initWorld(ServerLevel serverWorld, ServerLevelData worldInfo, WorldData saveData, WorldOptions worldOptions) {
-        //boolean flag = saveData.isDebugWorld();
         if ((serverWorld.bridge$generator() != null)) {
             serverWorld.getWorld().getPopulators().addAll(
                     serverWorld.bridge$generator().getDefaultPopulators(
                             (serverWorld.getWorld())));
         }
-        /**
-        WorldBorder worldborder = serverWorld.getWorldBorder();
-        worldborder.applySettings(worldInfo.getWorldBorder());
-        if (!worldInfo.isInitialized()) {
-            try {
-                setInitialSpawn(serverWorld, worldInfo, worldOptions.generateBonusChest(), flag);
-                worldInfo.setInitialized(true);
-                if (flag) {
-                    this.setupDebugLevel(this.worldData);
+    }
+
+    /**
+     * @author wdog5
+     * @reason
+     */
+    @Overwrite
+    public final void prepareLevels(ChunkProgressListener listener) {
+        ServerLevel serverworld = this.overworld();
+        this.forceTicks = true;
+        LOGGER.info("Preparing start region for dimension {}", serverworld.dimension().location());
+        BlockPos blockpos = serverworld.getSharedSpawnPos();
+        listener.updateSpawnPos(new ChunkPos(blockpos));
+        ServerChunkCache serverchunkprovider = serverworld.getChunkSource();
+        this.nextTickTime = Util.getMillis();
+        serverchunkprovider.addRegionTicket(TicketType.START, new ChunkPos(blockpos), 11, Unit.INSTANCE);
+
+        while (serverchunkprovider.getTickingGenerated() < 441) {
+            this.executeModerately();
+        }
+
+        this.executeModerately();
+
+        for (ServerLevel serverWorld : this.levels.values()) {
+            if (serverWorld.getWorld().getKeepSpawnInMemory()) {
+                ForcedChunksSavedData forcedchunkssavedata = serverWorld.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
+                if (forcedchunkssavedata != null) {
+                    LongIterator longiterator = forcedchunkssavedata.getChunks().iterator();
+
+                    while (longiterator.hasNext()) {
+                        long i = longiterator.nextLong();
+                        ChunkPos chunkpos = new ChunkPos(i);
+                        serverWorld.getChunkSource().updateChunkForced(chunkpos, true);
+                    }
                 }
-            } catch (Throwable throwable) {
-                CrashReport crashreport = CrashReport.forThrowable(throwable, "Exception initializing level");
-                try {
-                    serverWorld.fillReportDetails(crashreport);
-                } catch (Throwable throwable2) {
-                    // empty catch block
-                }
-                throw new ReportedException(crashreport);
             }
-            worldInfo.setInitialized(true);
-        }*/
+        }
+
+        this.executeModerately();
+        listener.stop();
+        this.updateMobSpawningFlags();
+        this.forceTicks = false;
     }
 
     @Override
     public void prepareLevels(ChunkProgressListener listener, ServerLevel serverWorld) {
-        /**
-        ServerChunkCache serverchunkprovider = serverWorld.getChunkSource();
-        this.forceTicks = true;
-        if (serverWorld.getWorld().getKeepSpawnInMemory()) {
-            LOGGER.info("Preparing start region for dimension {}", serverWorld.dimension().location());
-            BlockPos blockpos = serverWorld.getSharedSpawnPos();
-            listener.updateSpawnPos(new ChunkPos(blockpos));
-            this.nextTickTime = Util.getMillis();
-            serverchunkprovider.addRegionTicket(TicketType.START, new ChunkPos(blockpos), 11, Unit.INSTANCE);
-
-            while (serverchunkprovider.getTickingGenerated() < 441) {
-                this.executeModerately();
-            }
+        if (!serverWorld.getWorld().getKeepSpawnInMemory()) {
+            return;
         }
-        ForcedChunksSavedData forcedchunkssavedata = serverWorld.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
+        this.forceTicks = true;
+        LOGGER.info(BannerMCStart.I18N.get("server.region.prepare"), serverWorld.dimension().location());
+        BlockPos blockpos = serverWorld.getSharedSpawnPos();
+        listener.updateSpawnPos(new ChunkPos(blockpos));
+        ServerChunkCache serverchunkprovider = serverWorld.getChunkSource();
+        this.nextTickTime = Util.getMillis();
+        serverchunkprovider.addRegionTicket(TicketType.START, new ChunkPos(blockpos), 11, Unit.INSTANCE);
 
+        while (serverchunkprovider.getTickingGenerated() < 441) {
+            this.executeModerately();
+        }
+
+        this.executeModerately();
+
+        ForcedChunksSavedData forcedchunkssavedata = serverWorld.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
         if (forcedchunkssavedata != null) {
             LongIterator longiterator = forcedchunkssavedata.getChunks().iterator();
 
@@ -324,15 +319,11 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                 serverWorld.getChunkSource().updateChunkForced(chunkpos, true);
             }
         }
-
         this.executeModerately();
-        if (serverWorld.getWorld().getKeepSpawnInMemory()) {
-            listener.stop();
-        }
-        serverchunkprovider.getLightEngine().setTaskPerBatch(5);
-        //serverWorld.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
+        listener.stop();
+        // this.updateMobSpawningFlags();
+        serverWorld.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
         this.forceTicks = false;
-        */
     }
 
     @Override
@@ -351,14 +342,76 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         server.getScheduler().mainThreadHeartbeat(this.tickCount);
     }
 
+    @Inject(method = "tickServer", at = @At("HEAD"))
+    private void banner$useTimings(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        SpigotTimings.serverTickTimer.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tickServer", at = @At(value = "INVOKE",
+            target = "Lorg/slf4j/Logger;debug(Ljava/lang/String;)V",
+            ordinal = 0,
+            remap = false))
+    private void banner$useTimings0(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        SpigotTimings.worldSaveTimer.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tickServer", at = @At(value = "INVOKE",
+            target = "Lorg/slf4j/Logger;debug(Ljava/lang/String;)V",
+            ordinal = 1,
+            shift = At.Shift.AFTER,
+            remap = false))
+    private void banner$useTimings1(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        SpigotTimings.worldSaveTimer.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "tickServer", at = @At("TAIL"))
+    private void banner$useTimings2(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        SpigotTimings.serverTickTimer.stopTiming(); // Spigot
+        org.spigotmc.CustomTimingsHandler.tick(); // Spigot
+    }
+
+    @Inject(method = "tickChildren", at = @At("HEAD"))
+    private void banner$addTimings(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        SpigotTimings.schedulerTimer.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tickChildren",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
+                    ordinal = 0))
+    private void banner$addTimings0(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        this.server.getScheduler().mainThreadHeartbeat(this.tickCount); // CraftBukkit
+        SpigotTimings.schedulerTimer.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "tickChildren",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/ServerFunctionManager;tick()V"))
+    private void banner$addTimings1(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        this.server.getScheduler().mainThreadHeartbeat(this.tickCount); // CraftBukkit
+        SpigotTimings.commandFunctionsTimer.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tickChildren",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
+                    ordinal = 0))
+    private void banner$addTimings2(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        this.server.getScheduler().mainThreadHeartbeat(this.tickCount); // CraftBukkit
+        SpigotTimings.commandFunctionsTimer.stopTiming(); // Spigot
+    }
+
     @Inject(method = "tickChildren", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getAllLevels()Ljava/lang/Iterable;"))
     private void banner$checkHeart(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
         // CraftBukkit start
         // Run tasks that are waiting on processing
+        SpigotTimings.processQueueTimer.startTiming(); // Spigot
         while (!processQueue.isEmpty()) {
             processQueue.remove().run();
         }
+        SpigotTimings.processQueueTimer.stopTiming(); // Spigot
 
+        SpigotTimings.timeUpdateTimer.startTiming(); // Spigot
         // Send time updates to everyone, it will get the right time from the world the player is in.
         if (this.tickCount % 20 == 0) {
             for (int i = 0; i < this.getPlayerList().players.size(); ++i) {
@@ -366,6 +419,73 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                 entityplayer.connection.send(new ClientboundSetTimePacket(entityplayer.level().getGameTime(), entityplayer.getPlayerTime(), entityplayer.level().getGameRules().getBoolean(GameRules.RULE_DAYLIGHT))); // Add support for per player time
             }
         }
+        SpigotTimings.timeUpdateTimer.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "tickChildren",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/level/ServerLevel;tick(Ljava/util/function/BooleanSupplier;)V"),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$addTimings3(BooleanSupplier hasTimeLeft, CallbackInfo ci,
+                                    Iterator var2, ServerLevel serverLevel) {
+        serverLevel.bridge$timings().doTick.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tickChildren",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/level/ServerLevel;tick(Ljava/util/function/BooleanSupplier;)V",
+                    shift = At.Shift.AFTER),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$addTimings4(BooleanSupplier hasTimeLeft, CallbackInfo ci,
+                                    Iterator var2, ServerLevel serverLevel) {
+        serverLevel.bridge$timings().doTick.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "tickChildren",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/network/ServerConnectionListener;tick()V"))
+    private void banner$addTimings4(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        SpigotTimings.connectionTimer.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tickChildren",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
+                    ordinal = 2))
+    private void banner$addTimings5(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        SpigotTimings.connectionTimer.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "tickChildren",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/players/PlayerList;tick()V"))
+    private void banner$addTimings6(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        SpigotTimings.playerListTimer.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tickChildren",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/players/PlayerList;tick()V",
+                    shift = At.Shift.AFTER))
+    private void banner$addTimings7(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        SpigotTimings.playerListTimer.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "tickChildren",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
+                    shift = At.Shift.AFTER,
+                    ordinal = 3))
+    private void banner$addTimings8(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        SpigotTimings.tickablesTimer.startTiming(); // Spigot
+    }
+
+    @Inject(method = "tickChildren",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V",
+                    ordinal = 3))
+    private void banner$addTimings9(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        SpigotTimings.tickablesTimer.stopTiming(); // Spigot
     }
 
     // CraftBukkit start
@@ -373,7 +493,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             new com.google.common.util.concurrent.ThreadFactoryBuilder().setDaemon(true).setNameFormat("Async Chat Thread - #%d").build());
 
     @ModifyReturnValue(method = "getChatDecorator", at = @At("RETURN"))
-    private ChatDecorator banner$fireChatEvent() {
+    private ChatDecorator banner$fireChatEvent(ChatDecorator decorator) {
         return (entityplayer, ichatbasecomponent) -> {
             // SPIGOT-7127: Console /say and similar
             if (entityplayer == null) {
@@ -392,26 +512,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             }, chatExecutor);
         };
     }
-
-    @Redirect(method = "saveAllChunks", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/ServerLevelData;setWorldBorder(Lnet/minecraft/world/level/border/WorldBorder$Settings;)V"))
-    private void banner$cancel0(ServerLevelData instance, WorldBorder.Settings settings) {}
-
-    @Redirect(method = "saveAllChunks", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/WorldData;setCustomBossEvents(Lnet/minecraft/nbt/CompoundTag;)V"))
-    private void banner$cancel1(WorldData instance, CompoundTag compoundTag) {}
-
-    @Redirect(method = "saveAllChunks", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;saveDataTag(Lnet/minecraft/core/RegistryAccess;Lnet/minecraft/world/level/storage/WorldData;Lnet/minecraft/nbt/CompoundTag;)V"))
-    private void banner$cancel2(LevelStorageSource.LevelStorageAccess instance, RegistryAccess registries, WorldData serverConfiguration, CompoundTag hostPlayerNBT) {}
-
-    // Banner start -- add to support plugins
-    public String u() {
-        return this.localIp;
-    }
-
-    public boolean U() {
-        return this.onlineMode;
-    }
-
-    // Banner end
 
     // Banner start
     @Override

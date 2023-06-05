@@ -18,7 +18,7 @@ public interface MixinInventoryCarrier {
      * @reason
      */
     @Overwrite
-    public static void pickUpItem(Mob mob, InventoryCarrier carrier, ItemEntity itemEntity) {
+    static void pickUpItem(Mob mob, InventoryCarrier carrier, ItemEntity itemEntity) {
         ItemStack itemstack = itemEntity.getItem();
         if (mob.wantsToPickUp(itemstack)) {
             SimpleContainer simplecontainer = carrier.getInventory();

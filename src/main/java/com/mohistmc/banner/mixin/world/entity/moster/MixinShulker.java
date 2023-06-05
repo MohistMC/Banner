@@ -35,7 +35,8 @@ public abstract class MixinShulker extends AbstractGolem {
 
     // @formatter:off
     @Shadow @Nullable protected abstract Direction findAttachableSurface(BlockPos p_149811_);
-    @Shadow protected abstract void setAttachFace(Direction p_149789_);
+    @Shadow
+    public abstract void setAttachFace(Direction p_149789_);
     @Shadow @Final protected static EntityDataAccessor<Byte> DATA_PEEK_ID;
     // @formatter:on
 

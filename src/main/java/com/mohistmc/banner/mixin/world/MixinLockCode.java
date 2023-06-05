@@ -32,5 +32,6 @@ public abstract class MixinLockCode {
             }
         }
         return false;
+        // CraftBukkit end
     }
 }

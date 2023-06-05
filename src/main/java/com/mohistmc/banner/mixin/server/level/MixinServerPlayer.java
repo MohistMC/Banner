@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.level;
 
+import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.injection.server.level.InjectionServerPlayer;
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Either;
@@ -9,6 +10,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
+import net.minecraft.network.protocol.game.ServerboundClientInformationPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.PlayerRespawnLogic;
@@ -18,6 +20,7 @@ import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.CombatTracker;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
@@ -36,7 +39,12 @@ import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorldBorder;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_19_R3.scoreboard.CraftScoreboardManager;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
+import org.bukkit.event.player.PlayerChangedMainHandEvent;
+import org.bukkit.event.player.PlayerLocaleChangeEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -148,7 +156,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         }
     }
 
-    @Redirect(method = "doTick", at = @At(value = "NEW", target = "net/minecraft/network/protocol/game/ClientboundSetHealthPacket"))
+    @Redirect(method = "doTick", at = @At(value = "NEW", args = "class=net/minecraft/network/protocol/game/ClientboundSetHealthPacket"))
     private ClientboundSetHealthPacket banner$useScaledHealth(float healthIn, int foodLevelIn, float saturationLevelIn) {
         return new ClientboundSetHealthPacket(this.getBukkitEntity().getScaledHealth(), foodLevelIn, saturationLevelIn);
     }
@@ -307,6 +315,58 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         this.keepLevel = false;
         this.setDeltaMovement(0, 0, 0);
     }
+
+    @Inject(method = "doCloseContainer", at = @At("HEAD"))
+    private void banner$invClose(CallbackInfo ci) {
+        if (this.containerMenu != this.inventoryMenu) {
+            var old = BukkitCaptures.getContainerOwner();
+            BukkitCaptures.captureContainerOwner((ServerPlayer) (Object) this);
+            CraftEventFactory.handleInventoryCloseEvent((ServerPlayer) (Object) this);
+            BukkitCaptures.captureContainerOwner(old);
+        }
+    }
+
+    @Inject(method = "setPlayerInput", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;setShiftKeyDown(Z)V"))
+    private void banner$toggleSneak(float strafe, float forward, boolean jumping, boolean sneaking, CallbackInfo ci) {
+        if (sneaking != this.isShiftKeyDown()) {
+            PlayerToggleSneakEvent event = new PlayerToggleSneakEvent(this.getBukkitEntity(), sneaking);
+            Bukkit.getPluginManager().callEvent(event);
+
+            if (event.isCancelled()) {
+                ci.cancel();
+            }
+        }
+    }
+
+    @Redirect(method = "awardStat", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/scores/Scoreboard;forAllObjectives(Lnet/minecraft/world/scores/criteria/ObjectiveCriteria;Ljava/lang/String;Ljava/util/function/Consumer;)V"))
+    private void banner$addStats(Scoreboard instance, ObjectiveCriteria criteria, String scoreboardName, Consumer<Score> points) {
+        ((CraftScoreboardManager) Bukkit.getScoreboardManager()).getScoreboardScores(criteria, scoreboardName, points);
+    }
+
+    @Redirect(method = "resetStat", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/scores/Scoreboard;forAllObjectives(Lnet/minecraft/world/scores/criteria/ObjectiveCriteria;Ljava/lang/String;Ljava/util/function/Consumer;)V"))
+    private void banner$takeStats(Scoreboard instance, ObjectiveCriteria criteria, String scoreboardName, Consumer<Score> points) {
+        ((CraftScoreboardManager) Bukkit.getScoreboardManager()).getScoreboardScores(criteria, scoreboardName, points);
+    }
+
+    @Inject(method = "resetSentInfo", at = @At("HEAD"))
+    private void banner$setExpUpdate(CallbackInfo ci) {
+        this.lastSentExp = -1;
+    }
+
+    @Inject(method = "updateOptions", at = @At("HEAD"))
+    private void banner$settingChange(ServerboundClientInformationPacket packetIn, CallbackInfo ci) {
+        if (this.getMainArm() != packetIn.mainHand()) {
+            PlayerChangedMainHandEvent event = new PlayerChangedMainHandEvent(this.getBukkitEntity(), (this.getMainArm() == HumanoidArm.LEFT) ? MainHand.LEFT : MainHand.RIGHT);
+            Bukkit.getPluginManager().callEvent(event);
+        }
+        if (!this.locale.equals(packetIn.language())) {
+            PlayerLocaleChangeEvent event2 = new PlayerLocaleChangeEvent(this.getBukkitEntity(), packetIn.language());
+            Bukkit.getPluginManager().callEvent(event2);
+        }
+        this.locale = packetIn.language();
+        this.clientViewDistance = packetIn.viewDistance();
+    }
+
 
     @Override
     public CraftPlayer getBukkitEntity() {

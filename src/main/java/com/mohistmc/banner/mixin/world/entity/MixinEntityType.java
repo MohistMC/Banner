@@ -40,7 +40,7 @@ public abstract class MixinEntityType<T extends Entity> implements InjectionEnti
     @Inject(method = "spawn(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/MobSpawnType;ZZ)Lnet/minecraft/world/entity/Entity;",
             at = @At(value = "HEAD"))
     private void banner$spawnReason(ServerLevel serverLevel, ItemStack stack, Player player, BlockPos pos, MobSpawnType spawnType, boolean shouldOffsetY, boolean shouldOffsetYMore, CallbackInfoReturnable<T> cir) {
-        CreatureSpawnEvent.SpawnReason spawnReason =  serverLevel.bridge$getAddEntityReason();
+        CreatureSpawnEvent.SpawnReason spawnReason =  serverLevel.getAddEntityReason();
         if (spawnReason == null) {
             serverLevel.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.SPAWNER_EGG);
         }

@@ -101,4 +101,8 @@ public enum TreeType {
     @MinecraftExperimental
     @ApiStatus.Experimental
     CHERRY,
+    /**
+     * Custom
+     */
+    CUSTOM
 }

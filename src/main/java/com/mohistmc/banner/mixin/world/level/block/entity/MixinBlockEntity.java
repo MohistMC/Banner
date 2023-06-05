@@ -3,14 +3,15 @@ package com.mohistmc.banner.mixin.world.level.block.entity;
 import com.mohistmc.banner.injection.world.level.block.entity.InjectionBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.Container;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.bukkit.craftbukkit.v1_19_R3.SpigotTimings;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R3.persistence.CraftPersistentDataContainer;
 import org.bukkit.craftbukkit.v1_19_R3.persistence.CraftPersistentDataTypeRegistry;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.Nullable;
+import org.spigotmc.CustomTimingsHandler;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,6 +27,7 @@ public abstract class MixinBlockEntity implements InjectionBlockEntity {
     @Shadow @Final public BlockPos worldPosition;
     private static final CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new CraftPersistentDataTypeRegistry();
     public CraftPersistentDataContainer persistentDataContainer;
+    public CustomTimingsHandler tickTimer = SpigotTimings.getTileEntityTimings(((BlockEntity) (Object) this)); // Spigot
 
     @Inject(method = "load", at = @At("RETURN"))
     public void banner$loadPersistent(CompoundTag compound, CallbackInfo ci) {
@@ -61,5 +63,10 @@ public abstract class MixinBlockEntity implements InjectionBlockEntity {
     @Override
     public void banner$setPersistentDataContainer(CraftPersistentDataContainer persistentDataContainer) {
         this.persistentDataContainer = persistentDataContainer;
+    }
+
+    @Override
+    public CustomTimingsHandler bridge$tickTimer() {
+        return tickTimer;
     }
 }

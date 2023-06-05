@@ -24,7 +24,7 @@ public abstract class MixinChestBlockEntity extends RandomizableContainerBlockEn
     // @formatter:on
 
     public List<HumanEntity> transaction = new ArrayList<>();
-    private int maxStack = LARGE_MAX_STACK_SIZE;
+    private int maxStack = MAX_STACK;
 
     protected MixinChestBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
@@ -56,7 +56,7 @@ public abstract class MixinChestBlockEntity extends RandomizableContainerBlockEn
 
     @Override
     public int getMaxStackSize() {
-        if (maxStack == 0) maxStack = LARGE_MAX_STACK_SIZE;
+        if (maxStack == 0) maxStack = MAX_STACK;
         return maxStack;
     }
 

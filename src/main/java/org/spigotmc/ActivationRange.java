@@ -1,6 +1,6 @@
 package org.spigotmc;
 
-import com.mohistmc.banner.util.ServerUtils;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LightningBolt;
@@ -118,7 +118,7 @@ public class ActivationRange
 
         for ( Player player : world.players() )
         {
-            player.banner$setActivatedTick(ServerUtils.getCurrentTick());
+            player.banner$setActivatedTick(BukkitExtraConstants.currentTick);
             if ( world.bridge$spigotConfig().ignoreSpectatorActivation && player.isSpectator() )
             {
                 continue;
@@ -140,16 +140,16 @@ public class ActivationRange
      */
     private static void activateEntity(Entity entity)
     {
-        if ( ServerUtils.getCurrentTick() > entity.bridge$activatedTick() )
+        if ( BukkitExtraConstants.currentTick > entity.bridge$activatedTick() )
         {
             if ( entity.bridge$defaultActivationState() )
             {
-                entity.banner$setActivatedTick(ServerUtils.getCurrentTick());
+                entity.banner$setActivatedTick(BukkitExtraConstants.currentTick);
                 return;
             }
             if ( entity.bridge$activationType().boundingBox.intersects( entity.getBoundingBox() ) )
             {
-                entity.banner$setActivatedTick(ServerUtils.getCurrentTick());
+                entity.banner$setActivatedTick(BukkitExtraConstants.currentTick);
             }
         }
     }
@@ -230,17 +230,17 @@ public class ActivationRange
             return true;
         }
 
-        boolean isActive = entity.bridge$activatedTick() >= ServerUtils.getCurrentTick() || entity.bridge$defaultActivationState();
+        boolean isActive = entity.bridge$activatedTick() >= BukkitExtraConstants.currentTick || entity.bridge$defaultActivationState();
         // Should this entity tick?
         if ( !isActive )
         {
-            if ( ( ServerUtils.getCurrentTick() - entity.bridge$activatedTick() - 1 ) % 20 == 0 )
+            if ( ( BukkitExtraConstants.currentTick - entity.bridge$activatedTick() - 1 ) % 20 == 0 )
             {
                 // Check immunities every 20 ticks.
                 if ( checkEntityImmunities( entity ) )
                 {
                     // Triggered some sort of immunity, give 20 full ticks before we check again.
-                    entity.banner$setActivatedTick(ServerUtils.getCurrentTick() + 20);
+                    entity.banner$setActivatedTick(BukkitExtraConstants.currentTick + 20);
                 }
                 isActive = true;
             }

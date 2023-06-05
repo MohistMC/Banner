@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(targets = "net.minecraft.world.entity.animal.horse.TraderLlama$TraderLlamaDefendWanderingTraderGoal")
+@Mixin(net.minecraft.world.entity.animal.horse.TraderLlama.TraderLlamaDefendWanderingTraderGoal.class)
 public abstract class MixinTraderLlama_FollowTraderGoal extends TargetGoal {
 
     public MixinTraderLlama_FollowTraderGoal(Mob mob, boolean bl) {

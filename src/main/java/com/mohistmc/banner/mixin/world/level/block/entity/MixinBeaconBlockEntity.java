@@ -1,14 +1,10 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
 import com.mohistmc.banner.injection.world.level.block.entity.InjectionBeaconBlockEntity;
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.craftbukkit.v1_19_R3.potion.CraftPotionUtil;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.Nullable;

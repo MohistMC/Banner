@@ -100,7 +100,6 @@ public abstract class ServerCommandSender implements CommandSender {
         this.sendMessage(messages); // ServerCommandSenders have no use for senders
     }
 
-    /**
     // Spigot start
     private final Spigot spigot = new Spigot()
     {
@@ -136,5 +135,5 @@ public abstract class ServerCommandSender implements CommandSender {
     {
         return spigot;
     }
-    // Spigot end*/
+    // Spigot end
 }

@@ -11,6 +11,7 @@ accessible class net/minecraft/server/level/ChunkMap$TrackedEntity
 accessible class net/minecraft/world/entity/Interaction$PlayerAction
 accessible class net/minecraft/world/entity/monster/Guardian$GuardianAttackGoal
 accessible class net/minecraft/world/entity/monster/SpellcasterIllager$IllagerSpell
+accessible class net/minecraft/world/entity/monster/SpellcasterIllager$SpellcasterUseSpellGoal
 accessible class net/minecraft/world/entity/projectile/FishingHook$FishHookState
 accessible class net/minecraft/world/item/crafting/Ingredient$ItemValue
 accessible class net/minecraft/world/item/crafting/Ingredient$Value
@@ -25,6 +26,10 @@ accessible class net/minecraft/server/network/ServerLoginPacketListenerImpl$Stat
 accessible method net/minecraft/server/level/Ticket <init> (Lnet/minecraft/server/level/TicketType;ILjava/lang/Object;)V
 accessible class net/minecraft/server/level/DistanceManager$ChunkTicketTracker
 accessible class net/minecraft/world/entity/animal/Bee$BeePollinateGoal
+accessible class net/minecraft/server/commands/LootCommand$Callback
+accessible class net/minecraft/server/commands/SpreadPlayersCommand$Position
+accessible class net/minecraft/server/network/ServerGamePacketListenerImpl$EntityInteraction
+accessible class net/minecraft/world/entity/animal/horse/TraderLlama$TraderLlamaDefendWanderingTraderGoal
 
 # public methods
 accessible method net/minecraft/world/level/block/DispenserBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)V
@@ -186,6 +191,10 @@ accessible method net/minecraft/server/level/ServerChunkCache runDistanceManager
 accessible method net/minecraft/world/entity/animal/Bee$BeePollinateGoal stopPollinating ()V
 accessible method net/minecraft/world/entity/animal/Fox addTrustedUUID (Ljava/util/UUID;)V
 accessible method net/minecraft/world/entity/animal/sniffer/Sniffer calculateDigPosition ()Ljava/util/Optional;
+accessible method net/minecraft/server/network/ServerGamePacketListenerImpl$EntityInteraction run (Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;
+accessible method net/minecraft/world/level/NaturalSpawner$SpawnState canSpawn (Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/chunk/ChunkAccess;)Z
+accessible method net/minecraft/world/level/NaturalSpawner$SpawnState afterSpawn (Lnet/minecraft/world/entity/Mob;Lnet/minecraft/world/level/chunk/ChunkAccess;)V
+accessible method net/minecraft/world/level/NaturalSpawner$SpawnState canSpawnForCategory (Lnet/minecraft/world/entity/MobCategory;Lnet/minecraft/world/level/ChunkPos;)Z
 accessible method net/minecraft/world/entity/Display$TextDisplay getFlags ()B
 accessible method net/minecraft/world/entity/Display$TextDisplay getLineWidth ()I
 accessible method net/minecraft/world/entity/Display$TextDisplay getText ()Lnet/minecraft/network/chat/Component;
@@ -541,6 +550,10 @@ accessible field net/minecraft/world/inventory/StonecutterMenu access Lnet/minec
 accessible field net/minecraft/world/entity/vehicle/MinecartTNT fuse I
 accessible field net/minecraft/world/entity/animal/allay/Allay duplicationCooldown J
 accessible field net/minecraft/world/entity/animal/allay/Allay jukeboxPos Lnet/minecraft/core/BlockPos;
+accessible field net/minecraft/world/level/NaturalSpawner MAGIC_NUMBER I
+accessible field net/minecraft/server/packs/repository/Pack resources Lnet/minecraft/server/packs/repository/Pack$ResourcesSupplier;
+accessible field net/minecraft/world/flag/FeatureFlag universe Lnet/minecraft/world/flag/FeatureFlagUniverse;
+accessible field net/minecraft/world/flag/FeatureFlagRegistry names Ljava/util/Map;
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;

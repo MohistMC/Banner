@@ -16,7 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinTextColor implements InjectionTextColor {
 
     // @formatter:off
-    @Mutable @Shadow @Final @Nullable private String name;
+    @Mutable @Shadow @Final @Nullable
+    private String name;
     @Nullable public ChatFormatting format;
     // @formatter:on
 

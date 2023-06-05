@@ -63,8 +63,4 @@ public interface TrimPattern extends Keyed {
      * {@link Material#SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE}.
      */
     public static final TrimPattern SPIRE = Registry.TRIM_PATTERN.get(NamespacedKey.minecraft("spire"));
-
-    @NotNull
-    @Override
-    public NamespacedKey getKey(); // Satisfies Checkstyle for now
 }

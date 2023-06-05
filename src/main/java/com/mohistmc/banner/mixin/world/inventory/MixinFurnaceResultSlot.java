@@ -2,12 +2,10 @@ package com.mohistmc.banner.mixin.world.inventory;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.FurnaceResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,8 +18,6 @@ public abstract class MixinFurnaceResultSlot extends Slot {
     @Shadow
     private int removeCount;
     // @formatter:on
-
-    @Shadow @Final private Player player;
 
     public MixinFurnaceResultSlot(Container container, int i, int j, int k) {
         super(container, i, j, k);

@@ -6,18 +6,21 @@ import net.minecraft.world.level.block.entity.SignBlockEntity;
 import org.bukkit.DyeColor;
 import org.bukkit.World;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
+import org.bukkit.block.sign.SignSide;
+import org.bukkit.craftbukkit.v1_19_R3.block.sign.CraftSignSide;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class CraftSign<T extends SignBlockEntity> extends CraftBlockEntityState<T> implements Sign {
 
-    // Lazily initialized only if requested:
-    private String[] originalLines = null;
-    private String[] lines = null;
+    private final CraftSignSide front;
 
     public CraftSign(World world, final T tileEntity) {
         super(world, tileEntity);
+        this.front = new CraftSignSide(this.getSnapshot());
     }
 
     public static void openSign(Sign sign, Player player) {
@@ -26,80 +29,68 @@ public class CraftSign<T extends SignBlockEntity> extends CraftBlockEntityState<
         Preconditions.checkArgument(sign.getWorld() == player.getWorld(), "Sign must be in same world as Player");
 
         SignBlockEntity handle = ((CraftSign<?>) sign).getTileEntity();
-        //handle.isEditable = true; Banner - TODO
+        handle.setWaxed(true);
 
         ((CraftPlayer) player).getHandle().openTextEdit(handle, true);
     }
 
     @Override
     public String[] getLines() {
-        if (lines == null) {
-            // Lazy initialization:Banner - TODO
-            SignBlockEntity sign = this.getSnapshot();
-            //lines = new String[sign.messages.length];
-            //System.arraycopy(revertComponents(sign.messages), 0, lines, 0, lines.length); Banner - TODO
-            originalLines = new String[lines.length];
-            System.arraycopy(lines, 0, originalLines, 0, originalLines.length);
-        }
-        return lines;
+        return front.getLines();
     }
 
     @Override
     public String getLine(int index) throws IndexOutOfBoundsException {
-        return getLines()[index];
+        return front.getLine(index);
     }
 
     @Override
     public void setLine(int index, String line) throws IndexOutOfBoundsException {
-        getLines()[index] = line;
+        front.setLine(index, line);
     }
 
     @Override
     public boolean isEditable() {
-        //return getSnapshot().isEditable; Banner - TODO
-        return false;
+        return getSnapshot().isWaxed();
     }
 
     @Override
     public void setEditable(boolean editable) {
-        //getSnapshot().isEditable = editable; Banner - TODO
+        getSnapshot().setWaxed(editable);
     }
 
     @Override
     public boolean isGlowingText() {
-        //return getSnapshot().hasGlowingText();Banner - TODO
-        return false;
+        return front.isGlowingText();
     }
 
     @Override
     public void setGlowingText(boolean glowing) {
-        //getSnapshot().setHasGlowingText(glowing); Banner - TODO
+        front.setGlowingText(glowing);
+    }
+
+    @NotNull
+    @Override
+    public SignSide getSide(Side side) {
+        Preconditions.checkArgument(side != null, "side == null");
+
+        return front;
     }
 
     @Override
     public DyeColor getColor() {
-       // return DyeColor.getByWoolData((byte) getSnapshot().getColor().getId()); Banner - TODO
-        return null;
+        return front.getColor();
     }
 
     @Override
     public void setColor(DyeColor color) {
-       // getSnapshot().setColor(net.minecraft.world.item.DyeColor.byId(color.getWoolData())); Banner - TODO
+        front.setColor(color);
     }
 
     @Override
     public void applyTo(T sign) {
+        front.applyLegacyStringToSignSide();
         super.applyTo(sign);
-
-        if (lines != null) {
-            for (int i = 0; i < lines.length; i++) {
-                String line = (lines[i] == null) ? "" : lines[i];
-                if (line.equals(originalLines[i])) {
-                    continue; // The line contents are still the same, skip.
-                }
-                // sign.setMessage(i, CraftChatMessage.fromString(line)[0]); Banner - TODO
-            }
-        }
     }
 
     public static Component[] sanitizeLines(String[] lines) {

@@ -23,7 +23,7 @@ public abstract class MixinWorldGenRegion implements WorldGenLevel {
     }
 
     @Override
-    public CreatureSpawnEvent.SpawnReason bridge$getAddEntityReason() {
+    public CreatureSpawnEvent.SpawnReason getAddEntityReason() {
         return CreatureSpawnEvent.SpawnReason.DEFAULT;
     }
 

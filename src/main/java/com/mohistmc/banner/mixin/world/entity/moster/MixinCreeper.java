@@ -33,7 +33,8 @@ public abstract class MixinCreeper extends Monster implements PowerableMob {
     @Shadow @Final private static EntityDataAccessor<Boolean> DATA_IS_POWERED;
     @Shadow public int explosionRadius;
     @Shadow protected abstract void spawnLingeringCloud();
-    @Shadow private int swell;
+    @Shadow
+    public int swell;
     @Shadow public abstract boolean isPowered();
     // @formatter:on
 

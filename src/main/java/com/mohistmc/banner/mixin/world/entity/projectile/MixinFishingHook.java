@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.entity.projectile;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mohistmc.banner.injection.world.entity.InjectionFishingHook;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -20,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -37,7 +37,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 @Mixin(FishingHook.class)
@@ -102,14 +101,14 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
         }
     }
 
-    @ModifyExpressionValue(method = "catchingFish", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isRainingAt(Lnet/minecraft/core/BlockPos;)Z"))
+    @Redirect(method = "catchingFish", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isRainingAt(Lnet/minecraft/core/BlockPos;)Z"))
     private boolean addRainCheck(Level instance, BlockPos position) {
         return this.rainInfluenced && this.random.nextFloat() < 0.25F && this.level().isRainingAt(position);
     }
 
-    @ModifyExpressionValue(method = "catchingFish", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;canSeeSky(Lnet/minecraft/core/BlockPos;)Z"))
-    private boolean addSkyCheck(Level instance, BlockPos position) {
-        return this.skyInfluenced && this.random.nextFloat() < 0.25F && this.level().isRainingAt(position);
+    @Redirect(method = "catchingFish", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;canSeeSky(Lnet/minecraft/core/BlockPos;)Z"))
+    private boolean addSkyCheck(Level instance, BlockPos pos) {
+        return this.skyInfluenced && this.random.nextFloat() < 0.25F && this.level().isRainingAt(pos);
     }
 
     /**
@@ -132,10 +131,8 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
                 this.level().broadcastEntityEvent(this, (byte)31);
                 i = this.hookedIn instanceof ItemEntity ? 3 : 5;
             } else if (this.nibble > 0) {
-                // Banner TODO - fixed when spigot updated
-                /**
-                LootContext.Builder builder = (new LootContext.Builder((ServerLevel)this.level())).withParameter(LootContextParams.ORIGIN, this.position()).withParameter(LootContextParams.TOOL, stack).withParameter(LootContextParams.THIS_ENTITY, this).withRandom(this.random).withLuck((float)this.luck + player.getLuck());
-                LootTable lootTable = this.level().getServer().getLootTables().get(BuiltInLootTables.FISHING);
+                LootParams.Builder builder = (new LootParams.Builder((ServerLevel)this.level())).withParameter(LootContextParams.ORIGIN, this.position()).withParameter(LootContextParams.TOOL, stack).withParameter(LootContextParams.THIS_ENTITY, this).withLuck((float)this.luck + player.getLuck());
+                LootTable lootTable = this.level().getServer().getLootData().getLootTable(BuiltInLootTables.FISHING);
                 List<ItemStack> list = lootTable.getRandomItems(builder.create(LootContextParamSets.FISHING));
                 CriteriaTriggers.FISHING_ROD_HOOKED.trigger((ServerPlayer)player, stack, ((FishingHook) (Object) this), list);
 
@@ -153,7 +150,7 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
                     }
                 }
 
-                i = 1;*/
+                i = 1;
             }
 
             if (this.onGround) {

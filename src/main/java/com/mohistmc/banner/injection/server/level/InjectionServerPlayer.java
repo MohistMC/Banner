@@ -1,5 +1,6 @@
 package com.mohistmc.banner.injection.server.level;
 
+import com.mohistmc.banner.injection.world.entity.player.InjectionPlayer;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Unit;
 import net.minecraft.BlockUtil;
@@ -14,6 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.border.WorldBorder;
 import org.bukkit.WeatherType;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.event.player.PlayerSpawnChangeEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -22,7 +24,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.Set;
 
-public interface InjectionServerPlayer {
+public interface InjectionServerPlayer extends InjectionPlayer {
+
+    @Override
+    default CraftPlayer getBukkitEntity() {
+        return null;
+    }
 
     default int nextContainerCounterInt() {
         return 0;
@@ -117,7 +124,7 @@ public interface InjectionServerPlayer {
     }
 
     default Integer bridge$clientViewDistance() {
-        return null;
+        return 0;
     }
 
     default void banner$setClientViewDistance(Integer clientViewDistance) {
@@ -149,7 +156,7 @@ public interface InjectionServerPlayer {
     }
 
     default Optional<BlockUtil.FoundRectangle> getExitPortal(ServerLevel worldserver, BlockPos blockposition, boolean flag, WorldBorder worldborder, int searchRadius, boolean canCreatePortal, int createRadius) { // CraftBukkit
-        return null;
+        return Optional.empty();
     }
 
     default Either<Player.BedSleepingProblem, Unit> getBedResult(BlockPos blockposition, Direction enumdirection) {
@@ -190,9 +197,5 @@ public interface InjectionServerPlayer {
     }
 
     default void reset() {
-    }
-
-    default CraftPlayer getBukkitEntity() {
-        return null;
     }
 }

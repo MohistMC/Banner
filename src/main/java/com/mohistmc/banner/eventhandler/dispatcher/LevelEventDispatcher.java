@@ -1,9 +1,12 @@
 package com.mohistmc.banner.eventhandler.dispatcher;
 
+import com.mohistmc.banner.fabric.FabricHookBukkitEvent;
+import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.scoreboard.CraftScoreboardManager;
+import org.bukkit.event.world.WorldInitEvent;
 
 public class LevelEventDispatcher {
 
@@ -16,6 +19,11 @@ public class LevelEventDispatcher {
                 world.getWorld().getPopulators().addAll(
                         world.bridge$generator().getDefaultPopulators(
                                 world.getWorld()));
+            }
+        });
+        FabricHookBukkitEvent.EVENT.register(bukkitEvent -> {
+            if (bukkitEvent instanceof WorldInitEvent) {
+                FabricInjectBukkit.addEnumEnvironment(); // Banner
             }
         });
     }

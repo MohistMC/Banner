@@ -6,10 +6,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
-import com.mohistmc.banner.util.ServerUtils;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
@@ -45,9 +46,10 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
     public Collection<ItemStack> populateLoot(Random random, LootContext context) {
         Preconditions.checkArgument(context != null, "LootContext cannot be null");
         net.minecraft.world.level.storage.loot.LootContext nmsContext = convertContext(context, random);
-        // Banner - TODO
-        /**
-        List<net.minecraft.world.item.ItemStack> nmsItems = handle.getRandomItems(nmsContext);
+        CraftWorld cbWorld = (CraftWorld) context.getLocation().getWorld();
+        ServerLevel serverLevel = cbWorld.getHandle();
+        LootParams.Builder lootParams = new LootParams.Builder(serverLevel);
+        List<net.minecraft.world.item.ItemStack> nmsItems = handle.getRandomItems(lootParams.create(handle.getParamSet()));
         Collection<ItemStack> bukkit = new ArrayList<>(nmsItems.size());
 
         for (net.minecraft.world.item.ItemStack item : nmsItems) {
@@ -57,8 +59,7 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
             bukkit.add(CraftItemStack.asBukkitCopy(item));
         }
 
-        return bukkit;*/
-        return null;
+        return bukkit;
     }
 
     @Override
@@ -157,8 +158,8 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
             contextBuilder.lootedEntity(info.getParamOrNull(LootContextParams.THIS_ENTITY).getBukkitEntity());
         }
 
-        if (info.hasParam(ServerUtils.LOOTING_MOD)) {
-            contextBuilder.lootingModifier(info.getParamOrNull(ServerUtils.LOOTING_MOD));
+        if (info.hasParam(BukkitExtraConstants.LOOTING_MOD)) {
+            contextBuilder.lootingModifier(info.getParamOrNull(BukkitExtraConstants.LOOTING_MOD));
         }
 
         contextBuilder.luck(info.getLuck());

@@ -1,5 +1,6 @@
 package com.mohistmc.banner.injection.server.level;
 
+import com.mohistmc.banner.injection.world.level.InjectionLevel;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -11,7 +12,11 @@ import org.bukkit.event.weather.LightningStrikeEvent;
 
 import java.util.UUID;
 
-public interface InjectionServerLevel {
+public interface InjectionServerLevel extends InjectionLevel {
+
+    default boolean addEntitySerialized(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
+        return false;
+    }
 
     default  <T extends ParticleOptions> int sendParticles(T type, double posX, double posY, double posZ, int particleCount, double xOffset, double yOffset, double zOffset, double speed, boolean force) {
         return particleCount;

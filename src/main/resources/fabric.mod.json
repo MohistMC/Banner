@@ -87,6 +87,7 @@
       "net/minecraft/class_2826": ["com/mohistmc/banner/injection/world/level/chunk/InjectionLevelChunkSection"],
       "net/minecraft/class_2794": ["com/mohistmc/banner/injection/world/level/chunk/InjectionChunkGenerator"],
       "net/minecraft/class_2867": ["com/mohistmc/banner/injection/world/level/chunk/InjectionRegionFileStorage"],
+      "net/minecraft/class_3485": ["com/mohistmc/banner/injection/world/level/levelgen/structure/templatesystem/InjectionStructureTemplateManager"],
       "net/minecraft/class_3499": ["com/mohistmc/banner/injection/world/level/levelgen/structure/templatesystem/InjectionStructureTemplate"],
       "net/minecraft/class_22": ["com/mohistmc/banner/injection/world/level/saveddata/maps/InjectionMapItemSavedData"],
       "net/minecraft/class_3222": ["com/mohistmc/banner/injection/server/level/InjectionServerPlayer"],
@@ -94,6 +95,7 @@
       "net/minecraft/class_3215": ["com/mohistmc/banner/injection/server/level/InjectionServerChunkCache"],
       "net/minecraft/class_3204": ["com/mohistmc/banner/injection/server/level/InjectionDistanceManager"],
       "net/minecraft/class_3218": ["com/mohistmc/banner/injection/server/level/InjectionServerLevel"],
+      "net/minecraft/class_3225": ["com/mohistmc/banner/injection/server/level/InjectionServerPlayerGameMode"],
       "net/minecraft/class_3350": ["com/mohistmc/banner/injection/server/rcon/InjectionRconConsoleSource"],
       "net/minecraft/class_3244": ["com/mohistmc/banner/injection/server/network/InjectionServerGamePacketListenerImpl"],
       "net/minecraft/class_3242": ["com/mohistmc/banner/injection/server/network/InjectionServerConnectionListener"],
@@ -138,7 +140,9 @@
       "net/minecraft/class_1915": ["com/mohistmc/banner/injection/world/item/trading/InjectionMerchant"],
       "net/minecraft/class_1914": ["com/mohistmc/banner/injection/world/item/trading/InjectionMerchantOffer"],
       "net/minecraft/class_1799": ["com/mohistmc/banner/injection/world/item/InjectionItemStack"],
-      "net/minecraft/class_2637": ["com/mohistmc/banner/injection/network/protocol/game/InjectionClientboundSectionBlocksUpdatePacket"]
+      "net/minecraft/class_2885": ["com/mohistmc/banner/injection/network/protocol/game/InjectionServerboundUseItemOnPacket"],
+      "net/minecraft/class_2637": ["com/mohistmc/banner/injection/network/protocol/game/InjectionClientboundSectionBlocksUpdatePacket"],
+      "net/minecraft/class_2886": ["com/mohistmc/banner/injection/network/protocol/game/InjectionServerboundUseItemPacket"]
     }
   }
 }

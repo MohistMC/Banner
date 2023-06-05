@@ -15,7 +15,9 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -88,6 +90,21 @@ public abstract class MixinFoodData implements InjectionFoodData {
         }
          player.pushHealReason(EntityRegainHealthEvent.RegainReason.SATIATED);
          player.pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.REGEN);
+    }
+
+    @ModifyConstant(method = "tick", constant = @Constant(intValue = 10))
+    private int banner$changeValue(int constant) {
+        return this.saturatedRegenRate; // CraftBukkit
+    }
+
+    @ModifyConstant(method = "tick", constant = @Constant(intValue = 80, ordinal = 0))
+    private int banner$changeValue0(int constant) {
+        return this.unsaturatedRegenRate; // CraftBukkit - add regen rate manipulation
+    }
+
+    @ModifyConstant(method = "tick", constant = @Constant(intValue = 80, ordinal = 1))
+    private int banner$changeValue1(int constant) {
+        return this.starvationRate;  // CraftBukkit - add regen rate manipulation
     }
 
     @Override

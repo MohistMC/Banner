@@ -6,7 +6,8 @@ import java.lang.management.ThreadInfo;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.mohistmc.banner.util.ServerUtils;
+import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import org.bukkit.Bukkit;
 
 public class WatchdogThread extends Thread
@@ -76,7 +77,7 @@ public class WatchdogThread extends Thread
                 log.log( Level.SEVERE, "Spigot version: " + Bukkit.getServer().getVersion() );
                 log.log( Level.SEVERE, "------------------------------" );
                 log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Spigot!):" );
-                dumpThread( ManagementFactory.getThreadMXBean().getThreadInfo( ServerUtils.getServer().serverThread.getId(), Integer.MAX_VALUE ), log );
+                dumpThread( ManagementFactory.getThreadMXBean().getThreadInfo( BukkitExtraConstants.getServer().serverThread.getId(), Integer.MAX_VALUE ), log );
                 log.log( Level.SEVERE, "------------------------------" );
                 //
                 log.log( Level.SEVERE, "Entire Thread Dump:" );

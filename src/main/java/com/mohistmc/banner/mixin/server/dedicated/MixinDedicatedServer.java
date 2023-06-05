@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.server.dedicated;
 
+import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.config.BannerConfig;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -17,6 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_19_R3.SpigotTimings;
 import org.bukkit.craftbukkit.v1_19_R3.command.CraftRemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_19_R3.util.ForwardLogHandler;
 import org.bukkit.event.server.RemoteServerCommandEvent;
@@ -45,12 +48,15 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         super(thread, levelStorageAccess, packRepository, worldStem, proxy, dataFixer, services, chunkProgressListenerFactory);
     }
 
-    @Inject(method = "initServer", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/dedicated/DedicatedServer;setPlayerList(Lnet/minecraft/server/players/PlayerList;)V"))
+    @Inject(method = "initServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/dedicated/DedicatedServer;usesAuthentication()Z", ordinal = 1))
     private void banner$initServer(CallbackInfoReturnable<Boolean> cir) {
-        BannerServer.LOGGER.info("Loading Bukkit plugins, please wait...");
+        BannerServer.LOGGER.info(BannerMCStart.I18N.get("bukkit.plugin.loading.info"));
         // CraftBukkit start
         this.bridge$server().loadPlugins();
         this.bridge$server().enablePlugins(PluginLoadOrder.STARTUP);
+        org.spigotmc.SpigotConfig.init((java.io.File) this.bridge$options().valueOf("spigot-settings"));
+        BannerConfig.init((java.io.File) this.bridge$options().valueOf("banner-settings"));
+        org.spigotmc.SpigotConfig.registerCommands();
     }
 
     @Inject(method = "initServer",
@@ -73,7 +79,7 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         // CraftBukkit end
     }
 
-    @Inject(method = "initServer", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/rcon/thread/RconThread;create(Lnet/minecraft/server/ServerInterface;)Lnet/minecraft/server/rcon/thread/RconThread;"))
+    @Inject(method = "initServer", at = @At(value = "FIELD", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/dedicated/DedicatedServerProperties;enableRcon:Z"))
     public void banner$setRcon(CallbackInfoReturnable<Boolean> cir) {
         this.banner$setRemoteConsole(new CraftRemoteConsoleCommandSender(this.rconConsoleSource));
     }
@@ -102,6 +108,16 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         }
 
         cir.setReturnValue(result.toString());
+    }
+
+    @Inject(method = "handleConsoleInput", at = @At("HEAD"))
+    private void banner$timingsStart(String msg, CommandSourceStack source, CallbackInfo ci) {
+        SpigotTimings.serverCommandTimer.startTiming(); // Spigot
+    }
+
+    @Inject(method = "handleConsoleInput", at = @At("TAIL"))
+    private void banner$timingsStop(String msg, CommandSourceStack source, CallbackInfo ci) {
+        SpigotTimings.serverCommandTimer.stopTiming(); // Spigot
     }
 
     @Redirect(method = "handleConsoleInputs", at = @At(value = "INVOKE", target = "Lnet/minecraft/commands/Commands;performPrefixedCommand(Lnet/minecraft/commands/CommandSourceStack;Ljava/lang/String;)I"))
@@ -134,9 +150,9 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         });
     }
 
-    @Inject(method = "onServerExit", at = @At("RETURN"))
+    @Inject(method = "onServerExit", at = @At("TAIL"))
     public void banner$exitNow(CallbackInfo ci) {
-        System.exit(0);
+        Runtime.getRuntime().halt(0);
     }
 
     @Override
