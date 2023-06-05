@@ -20,6 +20,8 @@ import java.util.List;
 @Mixin(WeightedPressurePlateBlock.class)
 public class MixinWeightedPressurePlateBlock {
 
+    // Banner TODO
+    /*
     @Redirect(method = "getSignalStrength", at = @At(value = "INVOKE", remap = false, target = "Ljava/util/List;size()I"))
     public int banner$entityInteract(List<Entity> list, Level worldIn, BlockPos pos) {
         int i = 0;
@@ -39,5 +41,5 @@ public class MixinWeightedPressurePlateBlock {
             }
         }
         return i;
-    }
+    }*/
 }

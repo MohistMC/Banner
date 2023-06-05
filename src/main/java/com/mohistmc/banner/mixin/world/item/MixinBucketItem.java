@@ -105,7 +105,7 @@ public abstract class MixinBucketItem extends Item {
     }
 
     @Inject(method = "emptyContents", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/block/state/BlockState;getMaterial()Lnet/minecraft/world/level/material/Material;",
+            target = "Lnet/minecraft/world/level/block/state/BlockState;canBeReplaced(Lnet/minecraft/world/level/material/Fluid;)Z",
             shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private void banner$handleEmptyContents(Player player, Level level, BlockPos pos, BlockHitResult result,
                                             CallbackInfoReturnable<Boolean> cir, BlockState blockState, Block block) {
