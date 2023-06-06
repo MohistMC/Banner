@@ -2,7 +2,6 @@ package com.mohistmc.banner.eventhandler.dispatcher;
 
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
-import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.core.BlockPos;
@@ -18,7 +17,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -39,19 +37,6 @@ public class PlayerEventDispatcher {
                 return InteractionResult.PASS;
             }
             return InteractionResult.PASS;
-        });
-        PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, blockEntity) -> {
-            BukkitCaptures.captureNextBlockBreakEventAsPrimaryEvent();
-            return false;
-        });
-        PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, blockEntity) -> {
-            BukkitCaptures.captureNextBlockBreakEventAsPrimaryEvent();
-            BukkitCaptures.BlockBreakEventContext breakEventContext = BukkitCaptures.popSecondaryBlockBreakEvent();
-            while (breakEventContext != null) {
-                Block block = breakEventContext.getEvent().getBlock();
-                handleBlockDrop(breakEventContext, new BlockPos(block.getX(), block.getY(), block.getZ()), world, (ServerPlayer) player);
-                breakEventContext = BukkitCaptures.popSecondaryBlockBreakEvent();
-            }
         });
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
             BukkitCaptures.capturePlaceEventHand(hand);

@@ -99,6 +99,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
     private static Logger LOGGER;
 
     @Shadow public abstract boolean destroyBlock(BlockPos pos);
+    @Shadow public abstract void destroyAndAck(BlockPos pos, int i, String string);
 
     @Inject(method = "changeGameModeForPlayer", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayerGameMode;setGameModeForPlayer(Lnet/minecraft/world/level/GameType;Lnet/minecraft/world/level/GameType;)V"))
     private void banner$gameModeEvent(GameType gameType, CallbackInfoReturnable<Boolean> cir) {
@@ -302,7 +303,6 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
             }
 
             this.level.getCraftServer().getPluginManager().callEvent(event);
-
             if (event.isCancelled()) {
                 if (isSwordNoBreak) {
                     cir.setReturnValue(false);
@@ -324,58 +324,6 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
             }
         }
     }
-
-    /**
-     * @author wdog5
-     * @reason a bad way to handle destroy(use bug to fix bug), bugs help bugs
-     * TODO fix both of bugs
-     */
-    @Overwrite
-    public void destroyAndAck(BlockPos pos, int i, String string) {
-        if (!player.isSpectator() && this.level.mayInteract(player, pos)) {
-            this.destroyBlock(pos);
-            BlockState state = this.level.getBlockState(pos);
-            this.level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-            player.connection.send(new ClientboundBlockUpdatePacket(pos, state)); // Banner - let client know this block has been updated
-            if (!player.isCreative()) {
-                ObjectArrayList<Pair<ItemStack, BlockPos>> objectarraylist = new ObjectArrayList<>();
-                BlockEntity blockEntity = state.hasBlockEntity() ? this.level.getBlockEntity(pos) : null;
-                LootContext.Builder builder = (new LootContext.Builder(level))
-                        .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
-                        .withParameter(LootContextParams.TOOL, ItemStack.EMPTY)
-                        .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity);
-                state.spawnAfterBreak(level, pos, ItemStack.EMPTY, true);
-                state.getDrops(builder).forEach((itemStack) -> {
-                    banner$addBlockDrops(objectarraylist, itemStack, pos);
-                });
-                for (Pair<ItemStack, BlockPos> pair : objectarraylist) {
-                    Block.popResource(this.level, pair.getSecond(), pair.getFirst());
-                }
-                this.level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-                player.connection.send(new ClientboundBlockUpdatePacket(pos, state)); // Banner - let client know this block has been updated
-            }
-        }
-    }
-
-    // Banner start - fool block drops adding
-    private static void banner$addBlockDrops(ObjectArrayList<Pair<ItemStack, BlockPos>> dropPositionArray, ItemStack stack, BlockPos pos) {
-        int i = dropPositionArray.size();
-
-        for(int j = 0; j < i; ++j) {
-            Pair<ItemStack, BlockPos> pair = (Pair)dropPositionArray.get(j);
-            ItemStack itemStack = (ItemStack)pair.getFirst();
-            if (ItemEntity.areMergable(itemStack, stack)) {
-                ItemStack itemStack2 = ItemEntity.merge(itemStack, stack, 16);
-                dropPositionArray.set(j, Pair.of(itemStack2, (BlockPos)pair.getSecond()));
-                if (stack.isEmpty()) {
-                    return;
-                }
-            }
-        }
-
-        dropPositionArray.add(Pair.of(stack, pos));
-    }
-    // Banner end
 
     @Inject(method = "destroyBlock", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/block/Block;playerWillDestroy(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/player/Player;)V",
@@ -401,13 +349,13 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
 
     @Redirect(method = "destroyBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/Item;canAttackBlock(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;)Z"))
     private boolean banner$addFalse(Item instance, BlockState state, Level level, BlockPos pos, Player player) {
-        return false && !this.player.getMainHandItem().getItem().canAttackBlock(state, this.level, pos, this.player);
+        return true && this.player.getMainHandItem().getItem().canAttackBlock(state, this.level, pos, this.player);
     }
 
     @Inject(method = "destroyBlock",
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/server/level/ServerLevel;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;",
-            shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+            shift = At.Shift.BEFORE), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private void banner$resetState(BlockPos pos, CallbackInfoReturnable<Boolean> cir, BlockState blockState) {
         blockState = this.level.getBlockState(pos); // CraftBukkit - update state from plugins
         if (blockState.isAir()) cir.setReturnValue(false); // CraftBukkit - A plugin set block to air without cancelling
