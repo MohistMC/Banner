@@ -19,7 +19,7 @@ public interface InjectionEntity {
     }
 
     default boolean bridge$persist() {
-        return false;
+        return true;
     }
 
     default void banner$setPersist(boolean persist) {

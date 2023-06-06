@@ -304,7 +304,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Inject(method = "save", at = @At("HEAD"), cancellable = true)
     private void banner$setPlayerSaved(ServerPlayer player, CallbackInfo ci) {
-        if (player.getBukkitEntity().isPersistent()) {
+        if (!player.getBukkitEntity().isPersistent() || player.connection == null) {
             ci.cancel();
         }
         banner$savePlayer.set(player);
