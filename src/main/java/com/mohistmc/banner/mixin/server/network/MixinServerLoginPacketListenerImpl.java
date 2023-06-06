@@ -144,6 +144,11 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
     );
     // Paper end
 
+    /**
+     * @author wdog5
+     * @reason bukkit
+     */
+    @Overwrite
     public void handleHello(ServerboundHelloPacket packet) {
         Validate.validState(this.state == ServerLoginPacketListenerImpl.State.HELLO, "Unexpected hello packet", new Object[0]);
         // Validate.validState(isValidUsername(packet.name()), "Invalid characters in username", new Object[0]); // Mohist Chinese and other special characters are allowed
