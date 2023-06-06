@@ -249,7 +249,7 @@ public final class CraftServer implements Server {
     private CraftIconCache icon;
     private boolean overrideAllCommandBlockCommands = false;
     public boolean ignoreVanillaPermissions = false;
-    private final List<CraftPlayer> playerView;
+    private List<CraftPlayer> playerView;
     public int reloadCount;
 
     static {
@@ -504,6 +504,12 @@ public final class CraftServer implements Server {
 
     @Override
     public List<CraftPlayer> getOnlinePlayers() {
+        this.playerView = Collections.unmodifiableList(Lists.transform(playerList.players, new Function<ServerPlayer, CraftPlayer>() {
+            @Override
+            public CraftPlayer apply(ServerPlayer player) {
+                return player.getBukkitEntity();
+            }
+        }));
         return this.playerView;
     }
 

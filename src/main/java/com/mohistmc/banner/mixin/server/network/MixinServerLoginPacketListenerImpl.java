@@ -3,6 +3,7 @@ package com.mohistmc.banner.mixin.server.network;
 import com.mohistmc.banner.injection.server.network.InjectionServerLoginPacketListenerImpl;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.DefaultUncaughtExceptionHandler;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.TickablePacketListener;
@@ -10,11 +11,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientboundDisconnectPacket;
 import net.minecraft.network.protocol.login.ClientboundGameProfilePacket;
+import net.minecraft.network.protocol.login.ClientboundHelloPacket;
 import net.minecraft.network.protocol.login.ClientboundLoginCompressionPacket;
 import net.minecraft.network.protocol.login.ServerLoginPacketListener;
+import net.minecraft.network.protocol.login.ServerboundHelloPacket;
 import net.minecraft.network.protocol.login.ServerboundKeyPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerHandshakePacketListenerImpl;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 import net.minecraft.util.Crypt;
 import net.minecraft.util.CryptException;
@@ -73,6 +77,14 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
         disconnect(Component.literal(s));
     }
 
+    // Spigot start
+    public void initUUID()
+    {
+        UUID uid =  UUIDUtil.createOfflinePlayerUUID( this.gameProfile.getName() );
+        this.gameProfile = new GameProfile( uid, this.gameProfile.getName() );
+    }
+    // Spigot end
+
     /**
      * @author wdog5
      * @reason bukkit
@@ -80,7 +92,7 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
     @Overwrite
     public void handleAcceptedLogin() {
         if (!this.gameProfile.isComplete()) {
-            this.gameProfile = this.createFakeProfile(this.gameProfile);
+           // this.gameProfile = this.createFakeProfile(this.gameProfile);  // Spigot - Moved to initUUID
         }
 
         // CraftBukkit start - fire PlayerLoginEvent
@@ -116,6 +128,50 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
                 this.connection.send(new ClientboundDisconnectPacket(ichatmutablecomponent));
                 this.connection.disconnect(ichatmutablecomponent);
             }
+        }
+    }
+
+    // Paper start - Cache authenticator threads
+    private static final AtomicInteger threadId = new AtomicInteger(0);
+    private static final java.util.concurrent.ExecutorService authenticatorPool = java.util.concurrent.Executors.newCachedThreadPool(
+            r -> {
+                Thread ret = new Thread(r, "User Authenticator #" + threadId.incrementAndGet());
+
+                ret.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(LOGGER));
+
+                return ret;
+            }
+    );
+    // Paper end
+
+    public void handleHello(ServerboundHelloPacket packet) {
+        Validate.validState(this.state == ServerLoginPacketListenerImpl.State.HELLO, "Unexpected hello packet", new Object[0]);
+        // Validate.validState(isValidUsername(packet.name()), "Invalid characters in username", new Object[0]); // Mohist Chinese and other special characters are allowed
+        GameProfile gameProfile = this.server.getSingleplayerProfile();
+        if (gameProfile != null && packet.name().equalsIgnoreCase(gameProfile.getName())) {
+            this.gameProfile = gameProfile;
+            this.state = ServerLoginPacketListenerImpl.State.READY_TO_ACCEPT;
+        } else {
+            this.gameProfile = new GameProfile((UUID)null, packet.name());
+            if (this.server.usesAuthentication() && !this.connection.isMemoryConnection()) {
+                this.state = ServerLoginPacketListenerImpl.State.KEY;
+                this.connection.send(new ClientboundHelloPacket("", this.server.getKeyPair().getPublic().getEncoded(), this.challenge));
+            } else {
+                // Spigot start
+                // Paper start - Cache authenticator threads
+                authenticatorPool.execute(() -> {
+                    try {
+                        this.initUUID();
+                        banner$preLogin();
+                    } catch (Exception ex) {
+                        this.disconnect("Failed to verify username!");
+                        LOGGER.warn("Exception verifying " + this.gameProfile.getName(), ex);
+                    }
+                });
+                // Paper end
+                // Spigot end
+            }
+
         }
     }
 
@@ -204,15 +260,15 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
             if (asyncEvent.getResult() != PlayerPreLoginEvent.Result.ALLOWED) {
                 event.disallow(asyncEvent.getResult(), asyncEvent.getKickMessage());
             }
-            class SyncPreLogin extends Waitable<PlayerPreLoginEvent.Result> {
 
+            Waitable<PlayerPreLoginEvent.Result> waitable = new Waitable<>() {
                 @Override
                 protected PlayerPreLoginEvent.Result evaluate() {
                     craftServer.getPluginManager().callEvent(event);
                     return event.getResult();
                 }
-            }
-            Waitable<PlayerPreLoginEvent.Result> waitable = new SyncPreLogin();
+            };
+
             server.bridge$queuedProcess(waitable);
             if (waitable.get() != PlayerPreLoginEvent.Result.ALLOWED) {
                 disconnect(event.getKickMessage());

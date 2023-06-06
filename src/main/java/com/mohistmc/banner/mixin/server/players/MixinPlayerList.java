@@ -130,8 +130,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/server/players/PlayerList;bans:Lnet/minecraft/server/players/UserBanList;"))
     public void banner$init(MinecraftServer minecraftServer, LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess, PlayerDataStorage playerDataStorage, int i, CallbackInfo ci) {
         this.players = new CopyOnWriteArrayList<>();
-        minecraftServer.banner$setServer(this.cserver =
-                new CraftServer((DedicatedServer) minecraftServer, ((PlayerList) (Object) this)));
+        minecraftServer.banner$setServer(this.cserver = new CraftServer((DedicatedServer) minecraftServer, ((PlayerList) (Object) this)));
         FabricInjectBukkit.init();
         minecraftServer.banner$setConsole(ColouredConsoleSender.getInstance());
     }
@@ -271,35 +270,16 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         player.getEntityData().refresh(player); // CraftBukkit - BungeeCord#2321, send complete data to self on spawn
     }
 
-    private AtomicReference<ServerLevel> banner$level = new AtomicReference<>();
-
-    @WrapWithCondition(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
-    private boolean banner$wrapAddNewPlayer(ServerLevel instance, ServerPlayer player) {
-        banner$level.set(instance);
-        return player.level == instance && !instance.players().contains(player);
-    }
-
-    @WrapWithCondition(method = "placeNewPlayer", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/bossevents/CustomBossEvents;onPlayerConnect(Lnet/minecraft/server/level/ServerPlayer;)V"))
-    private boolean banner$wrapAddNewPlayer0(CustomBossEvents instance, ServerPlayer player) {
-        return player.level == banner$level.get() && !banner$level.get().players().contains(player);
+    @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
+    private void banner$addNewPlayer(ServerLevel instance, ServerPlayer player) {
+        if (player.level == instance && !instance.players().contains(player)) {
+            instance.addNewPlayer(player);
+        }
     }
 
     @ModifyVariable(method = "placeNewPlayer", ordinal = 1, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
     private ServerLevel banner$handleWorldChanges(ServerLevel value, Connection connection, ServerPlayer player) {
         return player.getLevel();// CraftBukkit - Update in case join event changed it
-    }
-
-    @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/EntityType;loadEntityRecursive(Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/world/level/Level;Ljava/util/function/Function;)Lnet/minecraft/world/entity/Entity;"))
-    private Entity banner$loadRecursive(CompoundTag compound, Level level, Function<Entity, Entity> entityFunction) {
-        // CraftBukkit start
-        ServerLevel finalWorldServer = banner$level.get();
-        finalWorldServer = finalWorldServer == null ? ((ServerLevel) level) : finalWorldServer;
-        ServerLevel finalWorldServer1 = finalWorldServer;
-        return EntityType.loadEntityRecursive(compound.getCompound("Entity"), finalWorldServer, (entityx) -> {
-            return !finalWorldServer1.addWithUUID(entityx) ? null : entityx;
-        });
     }
 
     private final AtomicReference<ServerPlayer> banner$savePlayer = new AtomicReference<>();
@@ -392,7 +372,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Override
     public ServerPlayer getPlayerForLogin(GameProfile gameprofile, ServerPlayer player) {
-        return this.getPlayerForLogin(gameprofile);
+        return player;
     }
 
     @Override
@@ -807,9 +787,8 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Override
     public ServerStatsCounter getPlayerStats(UUID uuid, String displayName) {
-        ServerStatsCounter serverstatisticmanager;
         ServerPlayer entityhuman = this.getPlayer(uuid);
-        ServerStatsCounter serverStatisticsManager = serverstatisticmanager = entityhuman == null ? null : entityhuman.getStats();
+        ServerStatsCounter  serverstatisticmanager = entityhuman == null ? null : entityhuman.getStats();
         if (serverstatisticmanager == null) {
             File file2;
             File file = this.server.getWorldPath(LevelResource.PLAYER_STATS_DIR).toFile();
