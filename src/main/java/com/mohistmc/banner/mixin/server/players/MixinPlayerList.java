@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.server.players;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import com.mohistmc.banner.injection.server.players.InjectionPlayerList;
@@ -286,7 +287,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Inject(method = "save", at = @At("HEAD"), cancellable = true)
     private void banner$setPlayerSaved(ServerPlayer player, CallbackInfo ci) {
-        if (player.getBukkitEntity().isPersistent()) {
+        if (!player.getBukkitEntity().isPersistent() || player.connection == null) {
             ci.cancel();
         }
         banner$savePlayer.set(player);
@@ -390,7 +391,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         ServerPlayer entityplayer;
 
         for (ServerPlayer value : this.players) {
-            entityplayer = (ServerPlayer) value;
+            entityplayer = value;
             if (entityplayer.getUUID().equals(uuid)) {
                 list.add(entityplayer);
             }
