@@ -14,6 +14,7 @@ import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -32,6 +33,11 @@ public abstract class MixinBat extends AmbientCreature {
 
     @Shadow @Nullable private BlockPos targetPosition;
 
+    /**
+     * @author wdog5
+     * @reason bukkit event
+     */
+    @Overwrite
     protected void customServerAiStep() {
         super.customServerAiStep();
         BlockPos blockposition = this.blockPosition();
