@@ -1,0 +1,55 @@
+From 9b266cdaa58444157b83fc81301bca6d9f85376e Mon Sep 17 00:00:00 2001
+From: Aikar <aikar@aikar.co>
+Date: Wed, 20 Aug 2014 18:12:32 -0400
+Subject: [PATCH] Limit TNT Detonations per tick
+
+This gives a per-world control on how much TNT will be processed per-tick,
+preventing a massive TNT detonation from lagging out the server.
+
+diff --git a/src/main/java/net/minecraft/world/entity/item/EntityTNTPrimed.java b/src/main/java/net/minecraft/world/entity/item/EntityTNTPrimed.java
+index ee50be388..971696eef 100644
+--- a/src/main/java/net/minecraft/world/entity/item/EntityTNTPrimed.java
++++ b/src/main/java/net/minecraft/world/entity/item/EntityTNTPrimed.java
+@@ -61,6 +61,7 @@ public class EntityTNTPrimed extends Entity implements TraceableEntity {
+ 
+     @Override
+     public void tick() {
++        if (this.level().spigotConfig.maxTntTicksPerTick > 0 && ++this.level().spigotConfig.currentPrimedTnt > this.level().spigotConfig.maxTntTicksPerTick) { return; } // Spigot
+         if (!this.isNoGravity()) {
+             this.setDeltaMovement(this.getDeltaMovement().add(0.0D, -0.04D, 0.0D));
+         }
+diff --git a/src/main/java/net/minecraft/world/level/World.java b/src/main/java/net/minecraft/world/level/World.java
+index c33143811..15e63dbfa 100644
+--- a/src/main/java/net/minecraft/world/level/World.java
++++ b/src/main/java/net/minecraft/world/level/World.java
+@@ -660,6 +660,7 @@ public abstract class World implements GeneratorAccess, AutoCloseable {
+         timings.tileEntityTick.stopTiming(); // Spigot
+         this.tickingBlockEntities = false;
+         gameprofilerfiller.pop();
++        spigotConfig.currentPrimedTnt = 0; // Spigot
+     }
+ 
+     public <T extends Entity> void guardEntityTick(Consumer<T> consumer, T t0) {
+diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
+index 1b5d1e283..8411f9e57 100644
+--- a/src/main/java/org/spigotmc/SpigotWorldConfig.java
++++ b/src/main/java/org/spigotmc/SpigotWorldConfig.java
+@@ -356,4 +356,15 @@ public class SpigotWorldConfig
+         sprintMultiplier = (float) getDouble( "hunger.sprint-multiplier", 0.1 );
+         otherMultiplier = (float) getDouble( "hunger.other-multiplier", 0.0 );
+     }
++
++    public int currentPrimedTnt = 0;
++    public int maxTntTicksPerTick;
++    private void maxTntPerTick() {
++        if ( SpigotConfig.version < 7 )
++        {
++            set( "max-tnt-per-tick", 100 );
++        }
++        maxTntTicksPerTick = getInt( "max-tnt-per-tick", 100 );
++        log( "Max TNT Explosions: " + maxTntTicksPerTick );
++    }
+ }
+-- 
+2.40.1
+

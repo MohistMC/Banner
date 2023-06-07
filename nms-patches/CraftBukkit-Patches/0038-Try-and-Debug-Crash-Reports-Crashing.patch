@@ -1,0 +1,29 @@
+From 996a5f6f0746b6ae2add6c23aafa45a99deb117e Mon Sep 17 00:00:00 2001
+From: md_5 <git@md-5.net>
+Date: Sun, 12 Jan 2014 20:56:41 +1100
+Subject: [PATCH] Try and Debug Crash Reports Crashing
+
+
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 9d4588933..0b322b9fd 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -1270,7 +1270,14 @@ public abstract class MinecraftServer extends IAsyncTaskHandlerReentrant<TickTas
+                 worldserver.tick(booleansupplier);
+                 worldserver.timings.doTick.stopTiming(); // Spigot
+             } catch (Throwable throwable) {
+-                CrashReport crashreport = CrashReport.forThrowable(throwable, "Exception ticking world");
++                // Spigot Start
++                CrashReport crashreport;
++                try {
++                    crashreport = CrashReport.forThrowable(throwable, "Exception ticking world");
++                } catch (Throwable t) {
++                    throw new RuntimeException("Error generating crash report", t);
++                }
++                // Spigot End
+ 
+                 worldserver.fillReportDetails(crashreport);
+                 throw new ReportedException(crashreport);
+-- 
+2.40.1
+

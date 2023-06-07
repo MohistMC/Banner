@@ -1,0 +1,47 @@
+From 0e30614b2140e701cdb280b7d8bbf9f30cd0897e Mon Sep 17 00:00:00 2001
+From: md_5 <git@md-5.net>
+Date: Sat, 27 Feb 2016 10:07:58 +1100
+Subject: [PATCH] Entity Mount and Dismount Events
+
+
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index 84b17c7a1..912cade1c 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -2382,6 +2382,16 @@ public abstract class Entity implements INamableTileEntity, EntityAccess, IComma
+                 }
+             }
+             // CraftBukkit end
++            // Spigot start
++            org.spigotmc.event.entity.EntityMountEvent event = new org.spigotmc.event.entity.EntityMountEvent(entity.getBukkitEntity(), this.getBukkitEntity());
++            // Suppress during worldgen
++            if (this.valid) {
++                Bukkit.getPluginManager().callEvent(event);
++            }
++            if (event.isCancelled()) {
++                return false;
++            }
++            // Spigot end
+             if (this.passengers.isEmpty()) {
+                 this.passengers = ImmutableList.of(entity);
+             } else {
+@@ -2424,6 +2434,16 @@ public abstract class Entity implements INamableTileEntity, EntityAccess, IComma
+                 }
+             }
+             // CraftBukkit end
++            // Spigot start
++            org.spigotmc.event.entity.EntityDismountEvent event = new org.spigotmc.event.entity.EntityDismountEvent(entity.getBukkitEntity(), this.getBukkitEntity());
++            // Suppress during worldgen
++            if (this.valid) {
++                Bukkit.getPluginManager().callEvent(event);
++            }
++            if (event.isCancelled()) {
++                return false;
++            }
++            // Spigot end
+             if (this.passengers.size() == 1 && this.passengers.get(0) == entity) {
+                 this.passengers = ImmutableList.of();
+             } else {
+-- 
+2.40.1
+
