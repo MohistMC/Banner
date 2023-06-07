@@ -40,19 +40,6 @@ public class PlayerEventDispatcher {
             }
             return InteractionResult.PASS;
         });
-        PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, blockEntity) -> {
-            BukkitCaptures.captureNextBlockBreakEventAsPrimaryEvent();
-            return false;
-        });
-        PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, blockEntity) -> {
-            BukkitCaptures.captureNextBlockBreakEventAsPrimaryEvent();
-            BukkitCaptures.BlockBreakEventContext breakEventContext = BukkitCaptures.popSecondaryBlockBreakEvent();
-            while (breakEventContext != null) {
-                Block block = breakEventContext.getEvent().getBlock();
-                handleBlockDrop(breakEventContext, new BlockPos(block.getX(), block.getY(), block.getZ()), world, (ServerPlayer) player);
-                breakEventContext = BukkitCaptures.popSecondaryBlockBreakEvent();
-            }
-        });
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
             BukkitCaptures.capturePlaceEventHand(hand);
             BukkitCaptures.getPlaceEventHand(InteractionHand.MAIN_HAND);
