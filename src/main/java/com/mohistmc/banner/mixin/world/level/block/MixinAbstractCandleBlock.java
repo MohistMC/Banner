@@ -21,7 +21,7 @@ public class MixinAbstractCandleBlock {
             cancellable = true)
     private void banner$callBlockIgniteEvent(Level level, BlockState state, BlockHitResult hit, Projectile projectile, CallbackInfo ci) {
         // CraftBukkit start
-        if (org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callBlockIgniteEvent(level, hit.getBlockPos(), projectile).isCancelled()) {
+        if (org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory.callBlockIgniteEvent(level, hit.getBlockPos(), projectile).isCancelled()) {
             ci.cancel();
         }
         // CraftBukkit end

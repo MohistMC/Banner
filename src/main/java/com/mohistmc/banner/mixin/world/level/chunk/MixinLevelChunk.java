@@ -19,7 +19,7 @@ import net.minecraft.world.level.levelgen.blending.BlendingData;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.ticks.LevelChunkTicks;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_19_R3.CraftChunk;
+import org.bukkit.craftbukkit.v1_20_R1.CraftChunk;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;

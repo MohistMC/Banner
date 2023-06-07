@@ -16,7 +16,9 @@ import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.AnaloguePowerable;
 import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Brushable;
 import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.Hatchable;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.Lightable;
 import org.bukkit.block.data.MultipleFacing;
@@ -36,6 +38,7 @@ import org.bukkit.block.data.type.BigDripleaf;
 import org.bukkit.block.data.type.BrewingStand;
 import org.bukkit.block.data.type.BubbleColumn;
 import org.bukkit.block.data.type.Cake;
+import org.bukkit.block.data.type.CalibratedSculkSensor;
 import org.bukkit.block.data.type.Campfire;
 import org.bukkit.block.data.type.Candle;
 import org.bukkit.block.data.type.CaveVines;
@@ -78,6 +81,7 @@ import org.bukkit.block.data.type.Observer;
 import org.bukkit.block.data.type.PinkPetals;
 import org.bukkit.block.data.type.Piston;
 import org.bukkit.block.data.type.PistonHead;
+import org.bukkit.block.data.type.PitcherCrop;
 import org.bukkit.block.data.type.PointedDripstone;
 import org.bukkit.block.data.type.RedstoneRail;
 import org.bukkit.block.data.type.RedstoneWallTorch;
@@ -97,7 +101,6 @@ import org.bukkit.block.data.type.SmallDripleaf;
 import org.bukkit.block.data.type.Snow;
 import org.bukkit.block.data.type.Stairs;
 import org.bukkit.block.data.type.StructureBlock;
-import org.bukkit.block.data.type.SuspiciousSand;
 import org.bukkit.block.data.type.Switch;
 import org.bukkit.block.data.type.TNT;
 import org.bukkit.block.data.type.TechnicalPiston;
@@ -111,7 +114,6 @@ import org.bukkit.block.data.type.WallSign;
 import org.bukkit.inventory.CreativeCategory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.material.MaterialData;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -157,18 +159,12 @@ public enum Material implements Keyed, Translatable {
     BIRCH_PLANKS(29322),
     JUNGLE_PLANKS(26445),
     ACACIA_PLANKS(31312),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_PLANKS(8354),
     DARK_OAK_PLANKS(20869),
     MANGROVE_PLANKS(7078),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     BAMBOO_PLANKS(8520),
     CRIMSON_PLANKS(18812),
     WARPED_PLANKS(16045),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     BAMBOO_MOSAIC(10715),
     /**
      * BlockData: {@link Sapling}
@@ -193,8 +189,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Sapling}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_SAPLING(25204, Sapling.class),
     /**
      * BlockData: {@link Sapling}
@@ -207,11 +201,13 @@ public enum Material implements Keyed, Translatable {
     BEDROCK(23130),
     SAND(11542),
     /**
-     * BlockData: {@link SuspiciousSand}
+     * BlockData: {@link Brushable}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
-    SUSPICIOUS_SAND(18410, SuspiciousSand.class),
+    SUSPICIOUS_SAND(18410, Brushable.class),
+    /**
+     * BlockData: {@link Brushable}
+     */
+    SUSPICIOUS_GRAVEL(7353, Brushable.class),
     RED_SAND(16279),
     GRAVEL(7804),
     COAL_ORE(30965),
@@ -352,8 +348,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Orientable}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_LOG(20847, Orientable.class),
     /**
      * BlockData: {@link Orientable}
@@ -382,8 +376,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Orientable}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     BAMBOO_BLOCK(20770, Orientable.class),
     /**
      * BlockData: {@link Orientable}
@@ -408,8 +400,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Orientable}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     STRIPPED_CHERRY_LOG(18061, Orientable.class),
     /**
      * BlockData: {@link Orientable}
@@ -450,8 +440,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Orientable}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     STRIPPED_CHERRY_WOOD(19647, Orientable.class),
     /**
      * BlockData: {@link Orientable}
@@ -496,8 +484,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Orientable}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_WOOD(9826, Orientable.class),
     /**
      * BlockData: {@link Orientable}
@@ -538,8 +524,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Leaves}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_LEAVES(20856, Leaves.class),
     /**
      * BlockData: {@link Leaves}
@@ -605,9 +589,11 @@ public enum Material implements Keyed, Translatable {
     CORNFLOWER(15405),
     LILY_OF_THE_VALLEY(7185),
     WITHER_ROSE(8619),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     TORCHFLOWER(4501),
+    /**
+     * BlockData: {@link Bisected}
+     */
+    PITCHER_PLANT(28172, Bisected.class),
     SPORE_BLOSSOM(20627),
     BROWN_MUSHROOM(9665),
     RED_MUSHROOM(19728),
@@ -636,8 +622,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link PinkPetals}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     PINK_PETALS(10420, PinkPetals.class),
     MOSS_BLOCK(9175),
     /**
@@ -679,8 +663,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Slab}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_SLAB(16673, Slab.class),
     /**
      * BlockData: {@link Slab}
@@ -693,14 +675,10 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Slab}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     BAMBOO_SLAB(17798, Slab.class),
     /**
      * BlockData: {@link Slab}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     BAMBOO_MOSAIC_SLAB(22118, Slab.class),
     /**
      * BlockData: {@link Slab}
@@ -787,14 +765,10 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link ChiseledBookshelf}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHISELED_BOOKSHELF(8099, ChiseledBookshelf.class),
     /**
      * BlockData: {@link DecoratedPot}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     DECORATED_POT(8720, 1, DecoratedPot.class),
     MOSSY_COBBLESTONE(21900),
     OBSIDIAN(32723),
@@ -880,8 +854,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Fence}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_FENCE(32047, Fence.class),
     /**
      * BlockData: {@link Fence}
@@ -1062,8 +1034,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Stairs}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_STAIRS(18380, Stairs.class),
     /**
      * BlockData: {@link Stairs}
@@ -1076,14 +1046,10 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Stairs}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     BAMBOO_STAIRS(25674, Stairs.class),
     /**
      * BlockData: {@link Stairs}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     BAMBOO_MOSAIC_STAIRS(20977, Stairs.class),
     /**
      * BlockData: {@link Stairs}
@@ -1565,6 +1531,10 @@ public enum Material implements Keyed, Translatable {
      * BlockData: {@link TurtleEgg}
      */
     TURTLE_EGG(32101, TurtleEgg.class),
+    /**
+     * BlockData: {@link Hatchable}
+     */
+    SNIFFER_EGG(12980, Hatchable.class),
     DEAD_TUBE_CORAL_BLOCK(28350),
     DEAD_BRAIN_CORAL_BLOCK(12979),
     DEAD_BUBBLE_CORAL_BLOCK(28220),
@@ -1869,6 +1839,10 @@ public enum Material implements Keyed, Translatable {
      */
     SCULK_SENSOR(5598, SculkSensor.class),
     /**
+     * BlockData: {@link CalibratedSculkSensor}
+     */
+    CALIBRATED_SCULK_SENSOR(21034, CalibratedSculkSensor.class),
+    /**
      * BlockData: {@link TripwireHook}
      */
     TRIPWIRE_HOOK(8130, TripwireHook.class),
@@ -1919,8 +1893,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Switch}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_BUTTON(9058, Switch.class),
     /**
      * BlockData: {@link Switch}
@@ -1981,8 +1953,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Powerable}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_PRESSURE_PLATE(8651, Powerable.class),
     /**
      * BlockData: {@link Powerable}
@@ -2031,8 +2001,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Door}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_DOOR(12684, Door.class),
     /**
      * BlockData: {@link Door}
@@ -2081,8 +2049,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link TrapDoor}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_TRAPDOOR(6293, TrapDoor.class),
     /**
      * BlockData: {@link TrapDoor}
@@ -2127,8 +2093,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Gate}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_FENCE_GATE(28222, Gate.class),
     /**
      * BlockData: {@link Gate}
@@ -2185,11 +2149,7 @@ public enum Material implements Keyed, Translatable {
     JUNGLE_CHEST_BOAT(20133, 1),
     ACACIA_BOAT(27326, 1),
     ACACIA_CHEST_BOAT(28455, 1),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_BOAT(13628, 1),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_CHEST_BOAT(7165, 1),
     DARK_OAK_BOAT(28618, 1),
     DARK_OAK_CHEST_BOAT(8733, 1),
@@ -2321,8 +2281,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Sign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_SIGN(16520, 16, Sign.class),
     /**
      * BlockData: {@link Sign}
@@ -2347,68 +2305,46 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link HangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     OAK_HANGING_SIGN(20116, 16, HangingSign.class),
     /**
      * BlockData: {@link HangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     SPRUCE_HANGING_SIGN(24371, 16, HangingSign.class),
     /**
      * BlockData: {@link HangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     BIRCH_HANGING_SIGN(17938, 16, HangingSign.class),
     /**
      * BlockData: {@link HangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     JUNGLE_HANGING_SIGN(27671, 16, HangingSign.class),
     /**
      * BlockData: {@link HangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     ACACIA_HANGING_SIGN(30257, 16, HangingSign.class),
     /**
      * BlockData: {@link HangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_HANGING_SIGN(5088, 16, HangingSign.class),
     /**
      * BlockData: {@link HangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     DARK_OAK_HANGING_SIGN(23360, 16, HangingSign.class),
     /**
      * BlockData: {@link HangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     MANGROVE_HANGING_SIGN(25106, 16, HangingSign.class),
     /**
      * BlockData: {@link HangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     BAMBOO_HANGING_SIGN(4726, 16, HangingSign.class),
     /**
      * BlockData: {@link HangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CRIMSON_HANGING_SIGN(20696, 16, HangingSign.class),
     /**
      * BlockData: {@link HangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     WARPED_HANGING_SIGN(8195, 16, HangingSign.class),
     BUCKET(15215, 16),
     WATER_BUCKET(8802, 1),
@@ -2432,8 +2368,6 @@ public enum Material implements Keyed, Translatable {
     EGG(21603, 16),
     COMPASS(24139),
     RECOVERY_COMPASS(12710),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     BUNDLE(16835, 1),
     FISHING_ROD(4167, 1, 64),
     CLOCK(14980),
@@ -2574,8 +2508,6 @@ public enum Material implements Keyed, Translatable {
     BEE_SPAWN_EGG(22924),
     BLAZE_SPAWN_EGG(4759),
     CAT_SPAWN_EGG(29583),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CAMEL_SPAWN_EGG(14760),
     CAVE_SPIDER_SPAWN_EGG(23341),
     CHICKEN_SPAWN_EGG(5462),
@@ -2623,8 +2555,6 @@ public enum Material implements Keyed, Translatable {
     SKELETON_SPAWN_EGG(15261),
     SKELETON_HORSE_SPAWN_EGG(21356),
     SLIME_SPAWN_EGG(17196),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     SNIFFER_SPAWN_EGG(27473),
     SNOW_GOLEM_SPAWN_EGG(24732),
     SPIDER_SPAWN_EGG(14984),
@@ -2689,8 +2619,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Rotatable}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     PIGLIN_HEAD(5512, Rotatable.class),
     NETHER_STAR(12469),
     PUMPKIN_PIE(28725),
@@ -2782,9 +2710,8 @@ public enum Material implements Keyed, Translatable {
     END_CRYSTAL(19090),
     CHORUS_FRUIT(7652),
     POPPED_CHORUS_FRUIT(27844),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     TORCHFLOWER_SEEDS(18153),
+    PITCHER_POD(7977),
     BEETROOT(23305),
     BEETROOT_SEEDS(21282),
     BEETROOT_SOUP(16036, 1),
@@ -2812,6 +2739,7 @@ public enum Material implements Keyed, Translatable {
     MUSIC_DISC_11(27426, 1),
     MUSIC_DISC_WAIT(26499, 1),
     MUSIC_DISC_OTHERSIDE(12974, 1),
+    MUSIC_DISC_RELIC(8200, 1),
     MUSIC_DISC_5(9212, 1),
     MUSIC_DISC_PIGSTEP(21323, 1),
     DISC_FRAGMENT_5(29729),
@@ -3031,57 +2959,44 @@ public enum Material implements Keyed, Translatable {
     PEARLESCENT_FROGLIGHT(21441, Orientable.class),
     FROGSPAWN(8350),
     ECHO_SHARD(12529),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     BRUSH(30569, 1, 64),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     NETHERITE_UPGRADE_SMITHING_TEMPLATE(7615),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE(16124),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     DUNE_ARMOR_TRIM_SMITHING_TEMPLATE(30925),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     COAST_ARMOR_TRIM_SMITHING_TEMPLATE(25501),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     WILD_ARMOR_TRIM_SMITHING_TEMPLATE(5870),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     WARD_ARMOR_TRIM_SMITHING_TEMPLATE(24534),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     EYE_ARMOR_TRIM_SMITHING_TEMPLATE(14663),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     VEX_ARMOR_TRIM_SMITHING_TEMPLATE(25818),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     TIDE_ARMOR_TRIM_SMITHING_TEMPLATE(20420),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE(14386),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     RIB_ARMOR_TRIM_SMITHING_TEMPLATE(6010),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE(29143),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
-    POTTERY_SHARD_ARCHER(26154),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
-    POTTERY_SHARD_PRIZE(31677),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
-    POTTERY_SHARD_ARMS_UP(29222),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
-    POTTERY_SHARD_SKULL(14619),
+    WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE(4957),
+    SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE(20537),
+    SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE(7070),
+    RAISER_ARMOR_TRIM_SMITHING_TEMPLATE(29116),
+    HOST_ARMOR_TRIM_SMITHING_TEMPLATE(12165),
+    ANGLER_POTTERY_SHERD(9952),
+    ARCHER_POTTERY_SHERD(21629),
+    ARMS_UP_POTTERY_SHERD(5484),
+    BLADE_POTTERY_SHERD(25079),
+    BREWER_POTTERY_SHERD(23429),
+    BURN_POTTERY_SHERD(21259),
+    DANGER_POTTERY_SHERD(30506),
+    EXPLORER_POTTERY_SHERD(5124),
+    FRIEND_POTTERY_SHERD(18221),
+    HEART_POTTERY_SHERD(17607),
+    HEARTBREAK_POTTERY_SHERD(21108),
+    HOWL_POTTERY_SHERD(24900),
+    MINER_POTTERY_SHERD(30602),
+    MOURNER_POTTERY_SHERD(23993),
+    PLENTY_POTTERY_SHERD(28236),
+    PRIZE_POTTERY_SHERD(4341),
+    SHEAF_POTTERY_SHERD(23652),
+    SHELTER_POTTERY_SHERD(28390),
+    SKULL_POTTERY_SHERD(16980),
+    SNORT_POTTERY_SHERD(15921),
     /**
      * BlockData: {@link Levelled}
      */
@@ -3134,8 +3049,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link WallSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_WALL_SIGN(20188, 16, WallSign.class),
     /**
      * BlockData: {@link WallSign}
@@ -3156,68 +3069,46 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link WallHangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     OAK_WALL_HANGING_SIGN(15637, WallHangingSign.class),
     /**
      * BlockData: {@link WallHangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     SPRUCE_WALL_HANGING_SIGN(18833, WallHangingSign.class),
     /**
      * BlockData: {@link WallHangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     BIRCH_WALL_HANGING_SIGN(15937, WallHangingSign.class),
     /**
      * BlockData: {@link WallHangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     ACACIA_WALL_HANGING_SIGN(22477, WallHangingSign.class),
     /**
      * BlockData: {@link WallHangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY_WALL_HANGING_SIGN(10953, WallHangingSign.class),
     /**
      * BlockData: {@link WallHangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     JUNGLE_WALL_HANGING_SIGN(16691, WallHangingSign.class),
     /**
      * BlockData: {@link WallHangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     DARK_OAK_WALL_HANGING_SIGN(14296, WallHangingSign.class),
     /**
      * BlockData: {@link WallHangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     MANGROVE_WALL_HANGING_SIGN(16974, WallHangingSign.class),
     /**
      * BlockData: {@link WallHangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CRIMSON_WALL_HANGING_SIGN(28982, WallHangingSign.class),
     /**
      * BlockData: {@link WallHangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     WARPED_WALL_HANGING_SIGN(20605, WallHangingSign.class),
     /**
      * BlockData: {@link WallHangingSign}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     BAMBOO_WALL_HANGING_SIGN(6669, WallHangingSign.class),
     /**
      * BlockData: {@link RedstoneWallTorch}
@@ -3265,16 +3156,12 @@ public enum Material implements Keyed, Translatable {
      * BlockData: {@link Tripwire}
      */
     TRIPWIRE(8810, Tripwire.class),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     POTTED_TORCHFLOWER(21278),
     POTTED_OAK_SAPLING(11905),
     POTTED_SPRUCE_SAPLING(29498),
     POTTED_BIRCH_SAPLING(32484),
     POTTED_JUNGLE_SAPLING(7525),
     POTTED_ACACIA_SAPLING(14096),
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     POTTED_CHERRY_SAPLING(30785),
     POTTED_DARK_OAK_SAPLING(6486),
     POTTED_MANGROVE_PROPAGULE(22003),
@@ -3331,8 +3218,6 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Directional}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     PIGLIN_WALL_HEAD(4446, Directional.class),
     /**
      * BlockData: {@link Directional}
@@ -3401,9 +3286,11 @@ public enum Material implements Keyed, Translatable {
     /**
      * BlockData: {@link Ageable}
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     TORCHFLOWER_CROP(28460, Ageable.class),
+    /**
+     * BlockData: {@link PitcherCrop}
+     */
+    PITCHER_CROP(15420, PitcherCrop.class),
     /**
      * BlockData: {@link Ageable}
      */
@@ -4852,6 +4739,7 @@ public enum Material implements Keyed, Translatable {
             case CACTUS:
             case CAKE:
             case CALCITE:
+            case CALIBRATED_SCULK_SENSOR:
             case CAMPFIRE:
             case CANDLE:
             case CANDLE_CAKE:
@@ -5353,6 +5241,8 @@ public enum Material implements Keyed, Translatable {
             case PINK_WOOL:
             case PISTON:
             case PISTON_HEAD:
+            case PITCHER_CROP:
+            case PITCHER_PLANT:
             case PLAYER_HEAD:
             case PLAYER_WALL_HEAD:
             case PODZOL:
@@ -5529,6 +5419,7 @@ public enum Material implements Keyed, Translatable {
             case SMOOTH_SANDSTONE_STAIRS:
             case SMOOTH_STONE:
             case SMOOTH_STONE_SLAB:
+            case SNIFFER_EGG:
             case SNOW:
             case SNOW_BLOCK:
             case SOUL_CAMPFIRE:
@@ -5594,6 +5485,7 @@ public enum Material implements Keyed, Translatable {
             case STRUCTURE_VOID:
             case SUGAR_CANE:
             case SUNFLOWER:
+            case SUSPICIOUS_GRAVEL:
             case SUSPICIOUS_SAND:
             case SWEET_BERRY_BUSH:
             case TALL_GRASS:
@@ -5900,6 +5792,7 @@ public enum Material implements Keyed, Translatable {
             case MUSIC_DISC_MELLOHI:
             case MUSIC_DISC_OTHERSIDE:
             case MUSIC_DISC_PIGSTEP:
+            case MUSIC_DISC_RELIC:
             case MUSIC_DISC_STAL:
             case MUSIC_DISC_STRAD:
             case MUSIC_DISC_WAIT:
@@ -6042,6 +5935,7 @@ public enum Material implements Keyed, Translatable {
             case CACTUS:
             case CAKE:
             case CALCITE:
+            case CALIBRATED_SCULK_SENSOR:
             case CAMPFIRE:
             case CANDLE_CAKE:
             case CARTOGRAPHY_TABLE:
@@ -6571,6 +6465,7 @@ public enum Material implements Keyed, Translatable {
             case SMOOTH_SANDSTONE_STAIRS:
             case SMOOTH_STONE:
             case SMOOTH_STONE_SLAB:
+            case SNIFFER_EGG:
             case SNOW_BLOCK:
             case SOUL_CAMPFIRE:
             case SOUL_LANTERN:
@@ -6625,6 +6520,7 @@ public enum Material implements Keyed, Translatable {
             case STRIPPED_WARPED_HYPHAE:
             case STRIPPED_WARPED_STEM:
             case STRUCTURE_BLOCK:
+            case SUSPICIOUS_GRAVEL:
             case SUSPICIOUS_SAND:
             case TARGET:
             case TERRACOTTA:
@@ -7183,6 +7079,7 @@ public enum Material implements Keyed, Translatable {
             case BIRCH_SLAB:
             case BIRCH_STAIRS:
             case BIRCH_TRAPDOOR:
+            case BIRCH_WALL_HANGING_SIGN:
             case BIRCH_WALL_SIGN:
             case BIRCH_WOOD:
             case BLACK_BANNER:
@@ -7223,8 +7120,6 @@ public enum Material implements Keyed, Translatable {
             case CHISELED_BOOKSHELF:
             case COMPOSTER:
             case CRAFTING_TABLE:
-            case CRIMSON_HANGING_SIGN:
-            case CRIMSON_WALL_HANGING_SIGN:
             case CYAN_BANNER:
             case CYAN_BED:
             case CYAN_CARPET:
@@ -7347,6 +7242,7 @@ public enum Material implements Keyed, Translatable {
             case PINK_CARPET:
             case PINK_WALL_BANNER:
             case PINK_WOOL:
+            case PITCHER_PLANT:
             case PURPLE_BANNER:
             case PURPLE_BED:
             case PURPLE_CARPET:
@@ -7398,8 +7294,6 @@ public enum Material implements Keyed, Translatable {
             case TNT:
             case TRAPPED_CHEST:
             case VINE:
-            case WARPED_HANGING_SIGN:
-            case WARPED_WALL_HANGING_SIGN:
             case WHITE_BANNER:
             case WHITE_BED:
             case WHITE_CARPET:
@@ -7609,6 +7503,7 @@ public enum Material implements Keyed, Translatable {
             case PINK_PETALS:
             case PINK_TULIP:
             case PINK_WOOL:
+            case PITCHER_PLANT:
             case POPPY:
             case PURPLE_CARPET:
             case PURPLE_WOOL:
@@ -7649,6 +7544,7 @@ public enum Material implements Keyed, Translatable {
             case TALL_GRASS:
             case TARGET:
             case TNT:
+            case TORCHFLOWER:
             case VINE:
             case WHITE_CARPET:
             case WHITE_TULIP:
@@ -8373,6 +8269,7 @@ public enum Material implements Keyed, Translatable {
             case STRIPPED_WARPED_HYPHAE:
             case STRIPPED_WARPED_STEM:
             case STRUCTURE_BLOCK:
+            case SUSPICIOUS_GRAVEL:
             case SUSPICIOUS_SAND:
             case TARGET:
             case TERRACOTTA:
@@ -8642,6 +8539,7 @@ public enum Material implements Keyed, Translatable {
             case PINK_CANDLE_CAKE:
             case PINK_WALL_BANNER:
             case PISTON_HEAD:
+            case PITCHER_CROP:
             case PLAYER_WALL_HEAD:
             case POTATOES:
             case POTTED_ACACIA_SAPLING:
@@ -9219,6 +9117,7 @@ public enum Material implements Keyed, Translatable {
             case YELLOW_BED:
                 return 0.2F;
             case POWDER_SNOW:
+            case SUSPICIOUS_GRAVEL:
             case SUSPICIOUS_SAND:
                 return 0.25F;
             case BEE_NEST:
@@ -9339,6 +9238,7 @@ public enum Material implements Keyed, Translatable {
             case RED_SAND:
             case ROOTED_DIRT:
             case SAND:
+            case SNIFFER_EGG:
             case SOUL_SAND:
             case SOUL_SOIL:
             case SPRUCE_BUTTON:
@@ -9567,6 +9467,7 @@ public enum Material implements Keyed, Translatable {
             case BRAIN_CORAL_BLOCK:
             case BUBBLE_CORAL_BLOCK:
             case BUDDING_AMETHYST:
+            case CALIBRATED_SCULK_SENSOR:
             case CHISELED_BOOKSHELF:
             case CHISELED_POLISHED_BLACKSTONE:
             case CHISELED_STONE_BRICKS:
@@ -10094,6 +9995,7 @@ public enum Material implements Keyed, Translatable {
             case YELLOW_BED:
                 return 0.2F;
             case POWDER_SNOW:
+            case SUSPICIOUS_GRAVEL:
             case SUSPICIOUS_SAND:
                 return 0.25F;
             case BEE_NEST:
@@ -10213,6 +10115,7 @@ public enum Material implements Keyed, Translatable {
             case RED_SAND:
             case ROOTED_DIRT:
             case SAND:
+            case SNIFFER_EGG:
             case SOUL_SAND:
             case SOUL_SOIL:
             case SPRUCE_BUTTON:
@@ -10412,6 +10315,7 @@ public enum Material implements Keyed, Translatable {
             case AMETHYST_CLUSTER:
             case BOOKSHELF:
             case BUDDING_AMETHYST:
+            case CALIBRATED_SCULK_SENSOR:
             case CHISELED_BOOKSHELF:
             case LARGE_AMETHYST_BUD:
             case MEDIUM_AMETHYST_BUD:
@@ -10968,7 +10872,6 @@ public enum Material implements Keyed, Translatable {
             case DRAGON_HEAD:
             case GOLDEN_HELMET:
             case IRON_HELMET:
-            case JACK_O_LANTERN:
             case LEATHER_HELMET:
             case NETHERITE_HELMET:
             case PLAYER_HEAD:
@@ -11084,7 +10987,6 @@ public enum Material implements Keyed, Translatable {
         return Bukkit.getUnsafe().getItemTranslationKey(this);
     }
 
-
     /**
      * Gets if the Material is enabled by the features in a world.
      *
@@ -11123,10 +11025,10 @@ public enum Material implements Keyed, Translatable {
         // Fabric Blocks
         if (isBlock) {
             Material material = BY_NAME.get(materialName);
-            if (material != null){
+            if (material != null) {
                 material.blockID = id;
                 material.isFabricBlock = true;
-            }else {
+            } else {
                 material = (Material) MohistDynamEnum.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE, String.class}, new Object[]{id, true, modName});
             }
             BY_NAME.put(materialName, material);

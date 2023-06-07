@@ -2,7 +2,7 @@ package com.mohistmc.banner.api;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.server.level.ServerPlayer;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.net.SocketAddress;

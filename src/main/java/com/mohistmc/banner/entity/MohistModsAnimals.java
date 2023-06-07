@@ -2,8 +2,8 @@ package com.mohistmc.banner.entity;
 
 import com.mohistmc.banner.api.EntityAPI;
 import net.minecraft.world.entity.animal.Animal;
-import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftAnimals;
+import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftAnimals;
 import org.bukkit.entity.EntityType;
 
 /**

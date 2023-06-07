@@ -3,8 +3,6 @@ package org.bukkit.entity;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Map;
-import java.util.UUID;
-
 import org.bukkit.DyeColor;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
@@ -541,9 +539,32 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
      * of the changed blocks or to handle any side effects caused as a result.
      *
      * @param blocks the block states to send to the player
+     */
+    public void sendBlockChanges(@NotNull Collection<BlockState> blocks);
+
+    /**
+     * Send a multi-block change. This fakes a block change packet for a user
+     * at multiple locations. This will not actually change the world in any
+     * way.
+     * <p>
+     * This method may send multiple packets to the client depending on the
+     * blocks in the collection. A packet must be sent for each chunk section
+     * modified, meaning one packet for each 16x16x16 block area. Even if only
+     * one block is changed in two different chunk sections, two packets will
+     * be sent.
+     * <p>
+     * Additionally, this method cannot guarantee the functionality of changes
+     * being sent to the player in chunks not loaded by the client. It is the
+     * responsibility of the caller to ensure that the client is within range
+     * of the changed blocks or to handle any side effects caused as a result.
+     *
+     * @param blocks the block states to send to the player
      * @param suppressLightUpdates whether or not light updates should be
      * suppressed when updating the blocks on the client
+     * @deprecated suppressLightUpdates is not functional in versions greater
+     * than 1.19.4
      */
+    @Deprecated
     public void sendBlockChanges(@NotNull Collection<BlockState> blocks, boolean suppressLightUpdates);
 
     /**
@@ -719,10 +740,8 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
     /**
      * Forces an update of the player's entire inventory.
      *
-     * @deprecated This method should not be relied upon as it is a temporary
-     *     work-around for a larger, more complicated issue.
      */
-    @Deprecated
+    //@Deprecated // Spigot - undeprecate
     public void updateInventory();
 
     /**
@@ -1750,6 +1769,7 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
 
     // Spigot start
     public class Spigot extends Entity.Spigot {
+
         /**
          * Gets the connection address of this player, regardless of whether it
          * has been spoofed or not.
@@ -1838,7 +1858,7 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
          * @param sender the sender of the message
          * @param component the components to send
          */
-        public void sendMessage(@NotNull net.md_5.bungee.api.ChatMessageType position, @Nullable UUID sender, @NotNull net.md_5.bungee.api.chat.BaseComponent component) {
+        public void sendMessage(@NotNull net.md_5.bungee.api.ChatMessageType position, @Nullable java.util.UUID sender, @NotNull net.md_5.bungee.api.chat.BaseComponent component) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
@@ -1849,7 +1869,7 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
          * @param sender the sender of the message
          * @param components the components to send
          */
-        public void sendMessage(@NotNull net.md_5.bungee.api.ChatMessageType position, @Nullable UUID sender, @NotNull net.md_5.bungee.api.chat.BaseComponent... components) {
+        public void sendMessage(@NotNull net.md_5.bungee.api.ChatMessageType position, @Nullable java.util.UUID sender, @NotNull net.md_5.bungee.api.chat.BaseComponent... components) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     }
@@ -1858,10 +1878,4 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
     @Override
     Spigot spigot();
     // Spigot end
-
-    // Mohist start
-    default boolean isFakePlayer() {
-        return false;
-    }
-    // Mohist end
 }

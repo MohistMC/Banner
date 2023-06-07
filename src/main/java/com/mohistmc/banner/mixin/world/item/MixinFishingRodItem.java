@@ -9,7 +9,7 @@ import net.minecraft.world.item.FishingRodItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.bukkit.craftbukkit.v1_19_R3.CraftEquipmentSlot;
+import org.bukkit.craftbukkit.v1_20_R1.CraftEquipmentSlot;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

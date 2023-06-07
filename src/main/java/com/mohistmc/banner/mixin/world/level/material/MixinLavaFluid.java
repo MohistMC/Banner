@@ -46,7 +46,7 @@ public abstract class MixinLavaFluid {
                         if (this.hasFlammableNeighbours(level, blockPos)) {
                             // CraftBukkit start - Prevent lava putting something on fire
                             if (level.getBlockState(blockPos).getBlock() != Blocks.FIRE) {
-                                if (org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callBlockIgniteEvent(level, blockPos, pos).isCancelled()) {
+                                if (org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory.callBlockIgniteEvent(level, blockPos, pos).isCancelled()) {
                                     continue;
                                 }
                             }
@@ -76,7 +76,7 @@ public abstract class MixinLavaFluid {
 
     @Redirect(method = "spreadTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/LevelAccessor;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
     private boolean banner$spreadTo(LevelAccessor instance, BlockPos pos, BlockState state, int i) {
-        return org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.handleBlockFormEvent(instance.getMinecraftWorld(), pos, Blocks.STONE.defaultBlockState(), 3);
+        return org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory.handleBlockFormEvent(instance.getMinecraftWorld(), pos, Blocks.STONE.defaultBlockState(), 3);
     }
 
 }

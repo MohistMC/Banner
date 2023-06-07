@@ -4,10 +4,10 @@ import com.mohistmc.banner.recipe.BannerModdedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftFurnaceRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftRecipe;
-import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftFurnaceRecipe;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftRecipe;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftNamespacedKey;
 import org.bukkit.inventory.Recipe;
 import org.spongepowered.asm.mixin.Mixin;
 

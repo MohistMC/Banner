@@ -6,7 +6,7 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.Level;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftMerchantRecipe;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftMerchantRecipe;
 import org.bukkit.entity.AbstractVillager;
 import org.bukkit.event.entity.VillagerAcquireTradeEvent;
 import org.spongepowered.asm.mixin.Mixin;

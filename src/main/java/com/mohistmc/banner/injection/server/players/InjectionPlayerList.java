@@ -10,10 +10,9 @@ import net.minecraft.stats.ServerStatsCounter;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
-import java.net.SocketAddress;
 import java.util.UUID;
 
 public interface InjectionPlayerList {

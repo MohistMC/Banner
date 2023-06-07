@@ -1,7 +1,5 @@
 package org.bukkit;
 
-import org.jetbrains.annotations.ApiStatus;
-
 /**
  * Tree and organic structure types.
  */
@@ -98,8 +96,6 @@ public enum TreeType {
     /**
      * Cherry tree
      */
-    @MinecraftExperimental
-    @ApiStatus.Experimental
     CHERRY,
     /**
      * Custom

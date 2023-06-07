@@ -58,7 +58,7 @@ public abstract class MixinShulkerBullet extends Projectile implements Injection
 
     @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
     private void banner$hurt(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.handleNonLivingEntityDamageEvent(this, source, amount, false)) {
+        if (org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory.handleNonLivingEntityDamageEvent(this, source, amount, false)) {
             cir.setReturnValue(false);
         }
     }

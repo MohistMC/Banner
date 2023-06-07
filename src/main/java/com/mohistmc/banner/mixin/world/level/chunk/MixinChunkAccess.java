@@ -9,7 +9,7 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.levelgen.blending.BlendingData;
-import org.bukkit.craftbukkit.v1_19_R3.persistence.DirtyCraftPersistentDataContainer;
+import org.bukkit.craftbukkit.v1_20_R1.persistence.DirtyCraftPersistentDataContainer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,10 +22,10 @@ public abstract class MixinChunkAccess implements InjectionChunkAccess {
 
     @Shadow public abstract int getHeight();
     // CraftBukkit start - SPIGOT-6814: move to IChunkAccess to account for 1.17 to 1.18 chunk upgrading.
-    private static final org.bukkit.craftbukkit.v1_19_R3.persistence.CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY
-            = new org.bukkit.craftbukkit.v1_19_R3.persistence.CraftPersistentDataTypeRegistry();
-    public org.bukkit.craftbukkit.v1_19_R3.persistence.DirtyCraftPersistentDataContainer persistentDataContainer
-            = new org.bukkit.craftbukkit.v1_19_R3.persistence.DirtyCraftPersistentDataContainer(DATA_TYPE_REGISTRY);
+    private static final org.bukkit.craftbukkit.v1_20_R1.persistence.CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY
+            = new org.bukkit.craftbukkit.v1_20_R1.persistence.CraftPersistentDataTypeRegistry();
+    public org.bukkit.craftbukkit.v1_20_R1.persistence.DirtyCraftPersistentDataContainer persistentDataContainer
+            = new org.bukkit.craftbukkit.v1_20_R1.persistence.DirtyCraftPersistentDataContainer(DATA_TYPE_REGISTRY);
     // CraftBukkit end
     public Registry<Biome> biomeRegistry;
 

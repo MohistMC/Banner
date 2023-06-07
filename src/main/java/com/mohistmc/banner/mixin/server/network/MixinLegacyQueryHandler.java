@@ -46,7 +46,7 @@ public abstract class MixinLegacyQueryHandler {
                 MinecraftServer minecraftServer = this.serverConnectionListener.getServer();
                 int i = byteBuf.readableBytes();
                 String string;
-                org.bukkit.event.server.ServerListPingEvent event = org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callServerListPingEvent(minecraftServer.bridge$server(), inetSocketAddress.getAddress(), minecraftServer.getMotd(), minecraftServer.getPlayerCount(), minecraftServer.getMaxPlayers()); // CraftBukkit
+                org.bukkit.event.server.ServerListPingEvent event = org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory.callServerListPingEvent(minecraftServer.bridge$server(), inetSocketAddress.getAddress(), minecraftServer.getMotd(), minecraftServer.getPlayerCount(), minecraftServer.getMaxPlayers()); // CraftBukkit
                 switch (i) {
                     case 0 -> {
                         LOGGER.debug("Ping: (<1.3.x) from {}:{}", inetSocketAddress.getAddress(), inetSocketAddress.getPort());

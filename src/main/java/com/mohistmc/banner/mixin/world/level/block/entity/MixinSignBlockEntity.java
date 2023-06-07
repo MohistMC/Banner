@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_19_R3.command.CraftBlockCommandSender;
+import org.bukkit.craftbukkit.v1_20_R1.command.CraftBlockCommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

@@ -57,7 +57,7 @@ public abstract class MixinPressurePlateBlock extends BasePressurePlateBlock {
                     org.bukkit.event.Cancellable cancellable;
 
                     if (entity instanceof Player) {
-                        cancellable = org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callPlayerInteractEvent((Player) entity, org.bukkit.event.block.Action.PHYSICAL, pos, null, null, null);
+                        cancellable = org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory.callPlayerInteractEvent((Player) entity, org.bukkit.event.block.Action.PHYSICAL, pos, null, null, null);
                     } else {
                         cancellable = new EntityInteractEvent(entity.getBukkitEntity(), bworld.getBlockAt(pos.getX(), pos.getY(), pos.getZ()));
                         manager.callEvent((EntityInteractEvent) cancellable);

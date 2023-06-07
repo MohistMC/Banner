@@ -4,7 +4,7 @@ import com.mohistmc.banner.injection.world.InjectionContainer;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftHumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.spongepowered.asm.mixin.Mixin;

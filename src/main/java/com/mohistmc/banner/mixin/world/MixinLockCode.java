@@ -3,7 +3,7 @@ package com.mohistmc.banner.mixin.world;
 import net.minecraft.world.LockCode;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;

@@ -1,7 +1,7 @@
 package com.mohistmc.banner.injection.world.level.portal;
 
 import net.minecraft.server.level.ServerLevel;
-import org.bukkit.craftbukkit.v1_19_R3.event.CraftPortalEvent;
+import org.bukkit.craftbukkit.v1_20_R1.event.CraftPortalEvent;
 import org.jetbrains.annotations.Nullable;
 
 public interface InjectionPortalInfo {

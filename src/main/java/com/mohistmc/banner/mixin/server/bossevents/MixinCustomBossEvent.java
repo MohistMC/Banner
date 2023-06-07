@@ -3,7 +3,7 @@ package com.mohistmc.banner.mixin.server.bossevents;
 import com.mohistmc.banner.injection.server.bossevents.InjectionCustomBossEvent;
 import net.minecraft.server.bossevents.CustomBossEvent;
 import org.bukkit.boss.KeyedBossBar;
-import org.bukkit.craftbukkit.v1_19_R3.boss.CraftKeyedBossbar;
+import org.bukkit.craftbukkit.v1_20_R1.boss.CraftKeyedBossbar;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(CustomBossEvent.class)

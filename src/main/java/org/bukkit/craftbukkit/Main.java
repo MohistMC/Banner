@@ -1,19 +1,14 @@
 package org.bukkit.craftbukkit;
 
-import com.mohistmc.banner.BannerMCStart;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.util.PathConverter;
 import net.minecrell.terminalconsole.TerminalConsoleAppender;
-import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
-import org.fusesource.jansi.AnsiConsole;
+import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

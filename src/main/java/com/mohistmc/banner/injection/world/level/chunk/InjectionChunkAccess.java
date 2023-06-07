@@ -3,7 +3,7 @@ package com.mohistmc.banner.injection.world.level.chunk;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
-import org.bukkit.craftbukkit.v1_19_R3.persistence.DirtyCraftPersistentDataContainer;
+import org.bukkit.craftbukkit.v1_20_R1.persistence.DirtyCraftPersistentDataContainer;
 
 public interface InjectionChunkAccess {
 

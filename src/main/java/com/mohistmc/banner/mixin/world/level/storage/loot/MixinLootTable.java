@@ -10,9 +10,6 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
-import org.bukkit.event.world.LootGenerateEvent;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -50,32 +47,5 @@ public abstract class MixinLootTable implements InjectionLootTable {
             return event.getLoot().stream().map(CraftItemStack::asNMSCopy).collect(ObjectArrayList.toList());
         }*/
         return list;
-    }
-
-    @Override
-    public void fillInventory(Container inv, LootContext context, boolean plugin) {
-        ObjectArrayList<ItemStack> objectarraylist = this.getRandomItems(context);
-        RandomSource randomsource = context.getRandom();
-        LootGenerateEvent event = CraftEventFactory.callLootGenerateEvent(inv, (LootTable) (Object) this, context, objectarraylist, plugin);
-        if (event.isCancelled()) {
-            return;
-        }
-        objectarraylist = event.getLoot().stream().map(CraftItemStack::asNMSCopy).collect(ObjectArrayList.toList());
-
-        List<Integer> list = this.getAvailableSlots(inv, randomsource);
-        this.shuffleAndSplitItems(objectarraylist, list.size(), randomsource);
-
-        for (ItemStack itemstack : objectarraylist) {
-            if (list.isEmpty()) {
-                LOGGER.warn("Tried to over-fill a container");
-                return;
-            }
-
-            if (itemstack.isEmpty()) {
-                inv.setItem(list.remove(list.size() - 1), ItemStack.EMPTY);
-            } else {
-                inv.setItem(list.remove(list.size() - 1), itemstack);
-            }
-        }
     }
 }

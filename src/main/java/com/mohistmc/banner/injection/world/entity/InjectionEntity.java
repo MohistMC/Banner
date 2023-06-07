@@ -5,7 +5,7 @@ import net.minecraft.core.Position;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
 import org.spigotmc.CustomTimingsHandler;
 
 public interface InjectionEntity {

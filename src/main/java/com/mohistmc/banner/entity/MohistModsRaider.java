@@ -2,8 +2,8 @@ package com.mohistmc.banner.entity;
 
 import com.mohistmc.banner.api.EntityAPI;
 import net.minecraft.world.entity.raid.Raider;
-import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftRaider;
+import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftRaider;
 import org.bukkit.entity.EntityCategory;
 import org.bukkit.entity.EntityType;
 
