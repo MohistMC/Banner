@@ -346,7 +346,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
 
     @Redirect(method = "destroyBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/Item;canAttackBlock(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;)Z"))
     private boolean banner$addFalse(Item instance, BlockState state, Level level, BlockPos pos, Player player) {
-        return true && !this.player.getMainHandItem().getItem().canAttackBlock(state, this.level, pos, this.player);
+        return true && this.player.getMainHandItem().getItem().canAttackBlock(state, this.level, pos, this.player);
     }
 
     @Inject(method = "destroyBlock",
