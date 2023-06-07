@@ -928,7 +928,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         if (isChatMessageIllegal(packet.message())) {
             this.disconnect(Component.translatable("multiplayer.disconnect.illegal_characters"));
         } else {
-            var optional = this.tryHandleChat(packet.message(), packet.timeStamp(), packet.lastSeenMessages());
+            Optional<LastSeenMessages> optional = this.tryHandleChat(packet.message(), packet.timeStamp(), packet.lastSeenMessages());
             if (optional.isPresent()) {
                 PlayerChatMessage playerchatmessage;
 
@@ -988,10 +988,10 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     }
 
     @Inject(method = "tryHandleChat", cancellable = true, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;unpackAndApplyLastSeen(Lnet/minecraft/network/chat/LastSeenMessages$Update;)Ljava/util/Optional;"))
-    private void banner$deadMenTellNoTales(String p_242372_, Instant p_242311_, LastSeenMessages.Update p_242217_, CallbackInfoReturnable<Boolean> cir) {
+    private void banner$deadMenTellNoTales(String p_242372_, Instant p_242311_, LastSeenMessages.Update p_242217_, CallbackInfoReturnable<Optional<LastSeenMessages>> cir) {
         if (this.player.isRemoved()) {
             this.send(new ClientboundSystemChatPacket(Component.translatable("chat.disabled.options").withStyle(ChatFormatting.RED), false));
-            cir.setReturnValue(false);
+            cir.setReturnValue(Optional.empty());
         }
     }
 
