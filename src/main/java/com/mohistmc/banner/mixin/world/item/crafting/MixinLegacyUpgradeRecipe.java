@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.item.crafting;
 
+import com.mohistmc.banner.recipe.BannerModdedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -30,6 +31,9 @@ public abstract class MixinLegacyUpgradeRecipe implements SmithingRecipe {
 
     @Override
     public Recipe toBukkitRecipe() {
+        if (this.result.isEmpty()) {
+            return new BannerModdedRecipe((LegacyUpgradeRecipe) (Object) this);
+        }
         CraftItemStack result = CraftItemStack.asCraftMirror(this.result);
         CraftSmithingRecipe recipe = new CraftSmithingRecipe(CraftNamespacedKey.fromMinecraft(this.id), result, CraftRecipe.toBukkit(this.base), CraftRecipe.toBukkit(this.addition));
         return recipe;

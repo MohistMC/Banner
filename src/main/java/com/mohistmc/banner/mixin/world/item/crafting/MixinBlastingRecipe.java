@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.item.crafting;
 
+import com.mohistmc.banner.recipe.BannerModdedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
@@ -18,6 +19,9 @@ public abstract class MixinBlastingRecipe extends AbstractCookingRecipe {
 
     @Override
     public org.bukkit.inventory.Recipe toBukkitRecipe() {
+        if (this.result.isEmpty()) {
+            return new BannerModdedRecipe((BlastingRecipe) (Object) this);
+        }
         CraftItemStack result = CraftItemStack.asCraftMirror(this.result);
 
         CraftBlastingRecipe recipe = new CraftBlastingRecipe(CraftNamespacedKey.fromMinecraft(this.id), result, CraftRecipe.toBukkit(this.ingredient), this.experience, this.cookingTime);
