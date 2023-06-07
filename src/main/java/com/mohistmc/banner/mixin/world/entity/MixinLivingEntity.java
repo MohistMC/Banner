@@ -68,6 +68,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(LivingEntity.class)
@@ -189,7 +190,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
 
     // Banner - add fields
     private AtomicReference<BlockState> banner$FallState = new AtomicReference<>();
-    private AtomicReference<Boolean> banner$silent = new AtomicReference<>();
+    private AtomicBoolean banner$silent = new AtomicBoolean(false);
     private transient EntityPotionEffectEvent.Cause banner$cause;
 
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setHealth(F)V"))
@@ -288,7 +289,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
 
     @Redirect(method = "onEquipItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isClientSide()Z"))
     private boolean banner$addSilentCheck(Level instance) {
-        return !this.level.isClientSide() && !this.isSilent() && !banner$silent.get();
+        return !this.level.isClientSide() && !this.isSilent() && !banner$silent.getAndSet(false);
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("HEAD"))
