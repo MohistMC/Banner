@@ -8,6 +8,12 @@ import org.spongepowered.asm.mixin.Mixin;
 public interface MixinRecipe extends InjectionRecipe {
 
     @Override
-    org.bukkit.inventory.Recipe toBukkitRecipe();
-
+    default org.bukkit.inventory.Recipe toBukkitRecipe() {
+        return new org.bukkit.inventory.Recipe() {
+            @Override
+            public org.bukkit.inventory.ItemStack getResult() {
+                return new org.bukkit.inventory.ItemStack(org.bukkit.Material.AIR);
+            }
+        };
+    }
 }
