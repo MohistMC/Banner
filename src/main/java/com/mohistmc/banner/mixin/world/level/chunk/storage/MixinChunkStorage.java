@@ -61,7 +61,7 @@ public abstract class MixinChunkStorage {
         stopBelowZero.set(false);
         boolean belowZeroGenerationInExistingChunks = (storage != null) ? ((ServerLevel) storage).bridge$spigotConfig().belowZeroGenerationInExistingChunks : org.spigotmc.SpigotConfig.belowZeroGenerationInExistingChunks;
         if (i <= 2730 && !belowZeroGenerationInExistingChunks) {
-            stopBelowZero.set(ChunkStatus.FULL.toString().equals(chunkData.getCompound("Level").getString("Status")));
+            stopBelowZero.set("full".equals(chunkData.getCompound("Level").getString("Status")));
         }
         // Spigot end
     }
@@ -71,10 +71,9 @@ public abstract class MixinChunkStorage {
             target = "Lnet/minecraft/nbt/CompoundTag;remove(Ljava/lang/String;)V",
             shift = At.Shift.BEFORE))
     private void banner$putChunkTag(ResourceKey<Level> levelKey, Supplier<DimensionDataStorage> storage, CompoundTag chunkData, Optional<ResourceKey<Codec<? extends ChunkGenerator>>> chunkGeneratorKey, CallbackInfoReturnable<CompoundTag> cir) {
-        // Banner TODO
         // Spigot start
         if (stopBelowZero.get()) {
-            chunkData.putString("Status", ChunkStatus.ChunkType.LEVELCHUNK.name());
+            chunkData.putString("Status",  net.minecraft.core.registries.BuiltInRegistries.CHUNK_STATUS.getKey(ChunkStatus.SPAWN).toString());
         }
         // Spigot end
     }
