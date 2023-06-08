@@ -739,9 +739,10 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
 
     /**
      * Forces an update of the player's entire inventory.
-     *
+     * @apiNote It should not be necessary for plugins to use this method. If it
+     * is required for some reason, it is probably a bug.
      */
-    //@Deprecated // Spigot - undeprecate
+    @ApiStatus.Internal
     public void updateInventory();
 
     /**

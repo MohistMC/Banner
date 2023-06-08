@@ -9,6 +9,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.animal.Animal;
@@ -18,16 +19,19 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.entity.EntityEnterLoveModeEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Mixin(Animal.class)
 public abstract class MixinAnimal extends AgeableMob implements InjectionAnimal {
@@ -42,6 +46,8 @@ public abstract class MixinAnimal extends AgeableMob implements InjectionAnimal 
     @Shadow public abstract void resetLove();
     @Shadow @Nullable public abstract ServerPlayer getLoveCause();
     // @formatter:on
+
+    @Shadow public abstract void finalizeSpawnChildFromBreeding(ServerLevel serverLevel, Animal animal, @org.jetbrains.annotations.Nullable AgeableMob ageableMob);
 
     public ItemStack breedItem;
 
@@ -84,38 +90,37 @@ public abstract class MixinAnimal extends AgeableMob implements InjectionAnimal 
          level.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.BREEDING);
     }
 
-    /**
-     * @author wdog5
-     * @reason bukkit event
-     */
-    @Overwrite
-    public void finalizeSpawnChildFromBreeding(ServerLevel worldserver, Animal entityanimal, @Nullable AgeableMob entityageable) {
+    private AtomicInteger banner$exp = new AtomicInteger(this.getRandom().nextInt(7) + 1);
+
+    @Redirect(method = "spawnChildFromBreeding", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/animal/Animal;finalizeSpawnChildFromBreeding(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/animal/Animal;Lnet/minecraft/world/entity/AgeableMob;)V"))
+    private void banner$resetSpawnChild(Animal instance, ServerLevel serverLevel, Animal animal, AgeableMob ageableMob) {
         // CraftBukkit start - call EntityBreedEvent
-        Optional<ServerPlayer> cause = Optional.ofNullable(this.getLoveCause()).or(() -> {
-            return Optional.ofNullable(entityanimal.getLoveCause());
-        });
+        ServerPlayer breeder = Optional.ofNullable(this.getLoveCause()).or(() -> {
+            return Optional.ofNullable(animal.getLoveCause());
+        }).orElse(null);
         int experience = this.getRandom().nextInt(7) + 1;
-        org.bukkit.event.entity.EntityBreedEvent entityBreedEvent = CraftEventFactory.callEntityBreedEvent(entityageable, (Animal) (Object) this, entityanimal, cause.orElse(null), this.breedItem, experience);
+        EntityBreedEvent entityBreedEvent = CraftEventFactory.callEntityBreedEvent(ageableMob, this, animal, breeder, this.breedItem, experience);
         if (entityBreedEvent.isCancelled()) {
             return;
         }
         experience = entityBreedEvent.getExperience();
-        cause.ifPresent((entityplayer) -> {
-            // CraftBukkit end
-            entityplayer.awardStat(Stats.ANIMALS_BRED);
-            CriteriaTriggers.BRED_ANIMALS.trigger(entityplayer, (Animal) (Object) this, entityanimal, entityageable);
-        });
-        this.setAge(6000);
-        entityanimal.setAge(6000);
-        this.resetLove();
-        entityanimal.resetLove();
-        worldserver.broadcastEntityEvent((Animal) (Object) this, (byte) 18);
-        if (worldserver.getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT)) {
-            // CraftBukkit start - use event experience
-            if (experience > 0) {
-                worldserver.addFreshEntity(new ExperienceOrb(worldserver, this.getX(), this.getY(), this.getZ(), experience));
-            }
-            // CraftBukkit end
+        this.finalizeSpawnChildFromBreeding(serverLevel, animal, ageableMob, experience);
+        serverLevel.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.BREEDING);
+        // CraftBukkit end
+    }
+
+    public void finalizeSpawnChildFromBreeding(ServerLevel worldserver, Animal entityanimal, @Nullable AgeableMob entityageable, int experience) {
+        banner$exp.set(experience);
+        this.finalizeSpawnChildFromBreeding(worldserver, entityanimal, entityageable);
+    }
+
+    @Redirect(method = "finalizeSpawnChildFromBreeding", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    private boolean banner$finalizeSpawn(ServerLevel instance, Entity entity) {
+        if (banner$exp.get() > 0) {
+            return instance.addFreshEntity(new ExperienceOrb(instance, this.getX(), this.getY(), this.getZ(), banner$exp.get()));
         }
+        return false;
     }
 }
