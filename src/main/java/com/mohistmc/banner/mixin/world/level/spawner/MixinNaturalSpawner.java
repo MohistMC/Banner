@@ -105,7 +105,7 @@ public abstract class MixinNaturalSpawner {
                 continue;
             }
 
-            if ((flag || !enumcreaturetype.isFriendly()) && (flag1 || enumcreaturetype.isFriendly()) && (flag2 || !enumcreaturetype.isPersistent()) && ((InjectionSpawnState) spawnercreature_d).canSpawnForCategory(enumcreaturetype, chunk.getPos(), limit)) {
+            if ((flag || !enumcreaturetype.isFriendly()) && (flag1 || enumcreaturetype.isFriendly()) && (flag2 || !enumcreaturetype.isPersistent()) &&  ((InjectionSpawnState) spawnercreature_d).canSpawnForCategory(enumcreaturetype, chunk.getPos(), limit)) {
                 // CraftBukkit end
                 Objects.requireNonNull(spawnercreature_d);
                 NaturalSpawner.SpawnPredicate spawnercreature_c = spawnercreature_d::canSpawn;

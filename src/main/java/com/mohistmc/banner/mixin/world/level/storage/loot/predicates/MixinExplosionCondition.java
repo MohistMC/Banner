@@ -12,15 +12,16 @@ public class MixinExplosionCondition {
 
     /**
      * @author wdog5
-     * @reason
+     * @reason bukkit
      */
     @Overwrite
-    public boolean test(LootContext context) {
-        Float f = context.getParamOrNull(LootContextParams.EXPLOSION_RADIUS);
-        if (f != null) {
-            RandomSource random = context.getRandom();
-            float f1 = 1.0F / f;
-            return random.nextFloat() < f1;
+    public boolean test(LootContext lootContext) {
+        Float float_ = (Float)lootContext.getParamOrNull(LootContextParams.EXPLOSION_RADIUS);
+        if (float_ != null) {
+            RandomSource randomSource = lootContext.getRandom();
+            float f = 1.0F / float_;
+            // CraftBukkit - <= to < to allow for plugins to completely disable block drops from explosions
+            return randomSource.nextFloat() < f;
         } else {
             return true;
         }

@@ -17,12 +17,13 @@ public class MixinRandomChanceWithLootingCondition {
 
     @Shadow @Final
     float percent;
+
     @Shadow @Final
     float lootingMultiplier;
 
     /**
      * @author wdog5
-     * @reason
+     * @reason bukkit
      */
     @Overwrite
     public boolean test(LootContext lootContext) {
@@ -39,5 +40,6 @@ public class MixinRandomChanceWithLootingCondition {
 
         return lootContext.getRandom().nextFloat() < this.percent + (float)i * this.lootingMultiplier;
     }
+
 }
 

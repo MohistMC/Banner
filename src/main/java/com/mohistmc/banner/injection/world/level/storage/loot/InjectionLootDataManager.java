@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface InjectionLootDataManager {
 
-    default Map<LootTable, ResourceLocation> bridge$lootTableToKey() {
+    default Map<?, ResourceLocation> bridge$lootTableToKey() {
         return null;
     }
 
