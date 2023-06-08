@@ -59,7 +59,7 @@ public abstract class MixinSculkSensorBlock extends Block {
     private void banner$activate(Entity entity, Level level, BlockPos blockPos,
                                         BlockState blockState, int i, int j, CallbackInfo ci) {
         BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(CraftBlock.at(level, blockPos), blockState.getValue(SculkSensorBlock.POWER), i);
-        Bukkit.getPluginManager().callEvent(eventRedstone);
+        level.getCraftServer().getPluginManager().callEvent(eventRedstone);
         if (eventRedstone.getNewCurrent() <= 0) {
             ci.cancel();
         }

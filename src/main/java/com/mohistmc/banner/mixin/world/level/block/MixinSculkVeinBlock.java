@@ -3,7 +3,6 @@ package com.mohistmc.banner.mixin.world.level.block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -12,7 +11,6 @@ import net.minecraft.world.level.block.SculkVeinBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,19 +24,23 @@ import java.util.concurrent.atomic.AtomicReference;
 @Mixin(SculkVeinBlock.class)
 public abstract class MixinSculkVeinBlock {
 
+
     @Shadow protected abstract boolean attemptPlaceSculk(SculkSpreader spreader, LevelAccessor level, BlockPos pos, RandomSource random);
 
-    /**
-     * @author wdog5
-     * @reason functionally replaced
-     */
-    @Overwrite
-    public int attemptUseCharge(SculkSpreader.ChargeCursor cursor, LevelAccessor level, BlockPos pos, RandomSource random, SculkSpreader spreader, boolean bl) {
-        if (bl && this.attemptPlaceSculk(spreader, level, cursor.getPos(), random, pos)) {
-            return cursor.getCharge() - 1;
-        } else {
-            return random.nextInt(spreader.chargeDecayRate()) == 0 ? Mth.floor((float)cursor.getCharge() * 0.5F) : cursor.getCharge();
-        }
+    private AtomicReference<BlockPos> banner$source = new AtomicReference<>();
+
+    @Inject(method = "attemptUseCharge", at = @At("HEAD"))
+    private void banner$getSource(SculkSpreader.ChargeCursor cursor,
+                                  LevelAccessor level,
+                                  BlockPos pos, RandomSource random, SculkSpreader spreader,
+                                  boolean bl, CallbackInfoReturnable<Integer> cir) {
+        banner$source.set(pos);
+    }
+
+    @Redirect(method = "attemptUseCharge", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/block/SculkVeinBlock;attemptPlaceSculk(Lnet/minecraft/world/level/block/SculkSpreader;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;Lnet/minecraft/util/RandomSource;)Z"))
+    private boolean banner$attemptPlace(SculkVeinBlock instance, SculkSpreader spreader, LevelAccessor level, BlockPos pos, RandomSource random) {
+        return attemptPlaceSculk(spreader, level, pos, random, banner$source.get());
     }
 
     private AtomicReference<BlockPos> banner$pos = new AtomicReference<>();
