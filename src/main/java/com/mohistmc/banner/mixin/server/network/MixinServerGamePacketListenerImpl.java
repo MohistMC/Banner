@@ -78,7 +78,9 @@ import org.slf4j.Logger;
 import org.spigotmc.SpigotConfig;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -164,6 +166,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
 
     @Shadow protected abstract boolean isPlayerCollidingWithAnythingNew(LevelReader levelReader, AABB aABB, double d, double e, double f);
 
+    @Shadow private int chatSpamTickCount;
     private static final int SURVIVAL_PLACE_DISTANCE_SQUARED = 6 * 6;
     private static final int CREATIVE_PLACE_DISTANCE_SQUARED = 7 * 7;
     private CraftServer cserver;
@@ -190,15 +193,12 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(MinecraftServer server, Connection networkManagerIn, ServerPlayer playerIn, CallbackInfo ci) {
         this.cserver = ((CraftServer) Bukkit.getServer());
-        allowedPlayerTicks = 1;
-        dropCount = 0;
-        lastPosX = Double.MAX_VALUE;
-        lastPosY = Double.MAX_VALUE;
-        lastPosZ = Double.MAX_VALUE;
-        lastPitch = Float.MAX_VALUE;
-        lastYaw = Float.MAX_VALUE;
-        justTeleported = false;
         this.chatMessageChain = new FutureChain(server.bridge$chatExecutor());
+    }
+
+    @ModifyConstant(method = "tick", constant = @Constant(longValue = 15000L))
+    private long banner$longValue(long constant) {
+        return 25000L; // CraftBukkit
     }
 
     @Inject(method = "tick", at = @At("HEAD"))
@@ -694,9 +694,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     @Overwrite
     public void handlePlayerAction(ServerboundPlayerActionPacket packetplayinblockdig) {
         PacketUtils.ensureRunningOnSameThread(packetplayinblockdig, (ServerGamePacketListenerImpl) (Object) this, this.player.serverLevel());
-        if (this.player.isImmobile()) {
-            return;
-        }
         BlockPos blockposition = packetplayinblockdig.getPos();
         this.player.resetLastActionTime();
         ServerboundPlayerActionPacket.Action packetplayinblockdig_enumplayerdigtype = packetplayinblockdig.getAction();
@@ -768,9 +765,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
 
     @Inject(method = "handleUseItemOn", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;serverLevel()Lnet/minecraft/server/level/ServerLevel;", ordinal = 1))
     private void banner$frozenUseItem(ServerboundUseItemOnPacket packetIn, CallbackInfo ci) {
-        if (this.player.isImmobile()) {
-            ci.cancel();
-        }
         if (!this.checkLimit(packetIn.bridge$timestamp())) {
             ci.cancel();
         }
@@ -1152,9 +1146,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     @Overwrite
     public void handleInteract(final ServerboundInteractPacket packetIn) {
         PacketUtils.ensureRunningOnSameThread(packetIn, (ServerGamePacketListenerImpl) (Object) this, this.player.serverLevel());
-        if (this.player.isImmobile()) {
-            return;
-        }
         final ServerLevel world = this.player.serverLevel();
         final Entity entity = packetIn.getTarget(world);
         if (entity == player && !player.isSpectator()) {
@@ -1258,10 +1249,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
 
     @Inject(method = "handleContainerClose", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;doCloseContainer()V"))
     private void banner$invClose(ServerboundContainerClosePacket packetIn, CallbackInfo ci) {
-        if (this.player.isImmobile()) {
-            ci.cancel();
-        }
-        // CraftEventFactory.handleInventoryCloseEvent(this.player); Banner - handled in ServerPlayerEntity#closeContainer
+      CraftEventFactory.handleInventoryCloseEvent(this.player);
     }
 
     /**
@@ -1271,9 +1259,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     @Overwrite
     public void handleContainerClick(ServerboundContainerClickPacket packet) {
         PacketUtils.ensureRunningOnSameThread(packet, (ServerGamePacketListenerImpl) (Object) this, this.player.serverLevel());
-        if (this.player.isImmobile()) {
-            return;
-        }
         this.player.resetLastActionTime();
         if (this.player.containerMenu.containerId == packet.getContainerId() && this.player.containerMenu.stillValid(this.player)) { // CraftBukkit
             boolean cancelled = this.player.isSpectator(); // CraftBukkit - see below if

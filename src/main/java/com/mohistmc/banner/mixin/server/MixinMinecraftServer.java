@@ -513,6 +513,13 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         };
     }
 
+    @Inject(method = "method_29440", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/packs/repository/PackRepository;setSelected(Ljava/util/Collection;)V"))
+    private void banner$syncCommands(Collection collection, MinecraftServer.ReloadableResources reloadableResources,
+                                     CallbackInfo ci) {
+        this.server.syncCommands(); // SPIGOT-5884: Lost on reload
+    }
+
     // Banner start
     @Override
     public WorldLoader.DataLoadContext bridge$worldLoader() {

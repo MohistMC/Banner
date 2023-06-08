@@ -11,6 +11,5 @@ public class BannerEventDispatcherRegistry {
         LevelEventDispatcher.dispatchLevel();
         PlayerEventDispatcher.dispatcherPlayer();
         EntityEventDispatcher.dispatchEntity();
-        ReloadEventDispatcher.dispatchReload();
     }
 }
