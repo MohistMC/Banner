@@ -371,7 +371,11 @@ public abstract class MixinItemStack implements InjectionItemStack {
                     // SPIGOT-4678
                     if (this.item instanceof SignItem && BukkitExtraConstants.openSign != null) {
                         try {
-                            player.openTextEdit((SignBlockEntity) world.getBlockEntity(BukkitExtraConstants.openSign), true);
+                            if (world.getBlockEntity(BukkitExtraConstants.openSign) instanceof SignBlockEntity tileentitysign) {
+                                if (world.getBlockState(BukkitExtraConstants.openSign).getBlock() instanceof SignBlock blocksign) {
+                                    blocksign.openTextEdit(player, tileentitysign, true);
+                                }
+                            }
                         } finally {
                             BukkitExtraConstants.openSign = null;
                         }
