@@ -1,0 +1,63 @@
+From 9cc39056d58f09ef0d66e1123c5d571ff79ca77c Mon Sep 17 00:00:00 2001
+From: Jonas Konrad <me@yawk.at>
+Date: Fri, 25 Apr 2014 23:46:46 +0200
+Subject: [PATCH] Fix race condition that could kill connections before they
+ were initiated
+
+Because NetworkManagers are registered before they get their channel in
+channelActive, the ServerConnection would remove them sometimes because
+it thought they were disconnected. This commit fixes this by introducing
+a 'preparing' variable that is true while the NetworkManager is not
+initialized. The ServerConnection does not remove NetworkManagers with
+this flag.
+
+diff --git a/src/main/java/net/minecraft/network/NetworkManager.java b/src/main/java/net/minecraft/network/NetworkManager.java
+index 5d1d8fbcc..916aec222 100644
+--- a/src/main/java/net/minecraft/network/NetworkManager.java
++++ b/src/main/java/net/minecraft/network/NetworkManager.java
+@@ -79,6 +79,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet<?>> {
+     // Spigot Start
+     public java.util.UUID spoofedUUID;
+     public com.mojang.authlib.properties.Property[] spoofedProfile;
++    public boolean preparing = true;
+     // Spigot End
+     private PacketListener packetListener;
+     private IChatBaseComponent disconnectedReason;
+@@ -100,6 +101,9 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet<?>> {
+         super.channelActive(channelhandlercontext);
+         this.channel = channelhandlercontext.channel();
+         this.address = this.channel.remoteAddress();
++        // Spigot Start
++        this.preparing = false;
++        // Spigot End
+ 
+         try {
+             this.setProtocol(EnumProtocol.HANDSHAKING);
+@@ -301,6 +305,9 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet<?>> {
+     }
+ 
+     public void disconnect(IChatBaseComponent ichatbasecomponent) {
++        // Spigot Start
++        this.preparing = false;
++        // Spigot End
+         if (this.channel.isOpen()) {
+             this.channel.close(); // We can't wait as this may be called from an event loop.
+             this.disconnectedReason = ichatbasecomponent;
+diff --git a/src/main/java/net/minecraft/server/network/ServerConnection.java b/src/main/java/net/minecraft/server/network/ServerConnection.java
+index 400f9e0b6..c86091ed1 100644
+--- a/src/main/java/net/minecraft/server/network/ServerConnection.java
++++ b/src/main/java/net/minecraft/server/network/ServerConnection.java
+@@ -187,6 +187,10 @@ public class ServerConnection {
+                             networkmanager.setReadOnly();
+                         }
+                     } else {
++                        // Spigot Start
++                        // Fix a race condition where a NetworkManager could be unregistered just before connection.
++                        if (networkmanager.preparing) continue;
++                        // Spigot End
+                         iterator.remove();
+                         networkmanager.handleDisconnection();
+                     }
+-- 
+2.40.1
+
