@@ -17,7 +17,7 @@
   "icon": "assets/banner/logo.png",
 
   "accessWidener": "banner.accesswidener",
-  "environment": "*",
+  "environment": "server",
   "entrypoints": {
     "server": [
       "com.mohistmc.banner.BannerServer"
@@ -32,9 +32,6 @@
     "fabric-api": "*",
     "minecraft": "1.20",
     "java": ">=17"
-  },
-  "suggests": {
-    "another-mod": "*"
   },
   "custom": {
     "loom:injected_interfaces": {
