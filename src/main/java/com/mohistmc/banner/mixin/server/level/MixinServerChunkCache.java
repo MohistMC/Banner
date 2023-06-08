@@ -29,12 +29,14 @@ public abstract class MixinServerChunkCache implements InjectionServerChunkCache
     @Shadow public abstract void save(boolean flush);
     @Shadow @Final ThreadedLevelLightEngine lightEngine;
     @Shadow @Final public ChunkMap chunkMap;
-    @Shadow @Final public ServerLevel level;
+    @Shadow @Final
+    ServerLevel level;
     @Shadow @Final private DistanceManager distanceManager;
     @Shadow protected abstract void clearCache();
     @Shadow @Nullable protected abstract ChunkHolder getVisibleChunkIfPresent(long chunkPosIn);
 
-    @Shadow abstract boolean runDistanceManagerUpdates();
+    @Shadow
+    public abstract boolean runDistanceManagerUpdates();
 
     @Override
     public boolean isChunkLoaded(final int chunkX, final int chunkZ) {

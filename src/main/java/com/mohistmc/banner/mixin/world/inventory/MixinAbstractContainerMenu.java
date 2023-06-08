@@ -92,6 +92,11 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
 
     @Shadow private ItemStack carried;
 
+    @Shadow
+    public static int getQuickCraftPlaceCount(Set<Slot> set, int i, ItemStack itemStack) {
+        return 0;
+    }
+
     public boolean checkReachable = true;
     private Component title;
 
@@ -171,6 +176,11 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
                     }
 
                     itemstack1 = this.getCarried().copy();
+                    if (itemstack1.isEmpty()) {
+                        this.resetQuickCraft();
+                        return;
+                    }
+
                     l = this.getCarried().getCount();
                     Iterator iterator = this.quickcraftSlots.iterator();
 
@@ -180,19 +190,13 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
                         ItemStack itemstack2 = this.getCarried();
 
                         if (slot1 != null && canItemQuickReplace(slot1, itemstack2, true) && slot1.mayPlace(itemstack2) && (this.quickcraftType == 2 || itemstack2.getCount() >= this.quickcraftSlots.size()) && this.canDragTo(slot1)) {
-                            ItemStack itemstack3 = itemstack1.copy();
                             int j1 = slot1.hasItem() ? slot1.getItem().getCount() : 0;
+                            int k1 = Math.min(itemstack1.getMaxStackSize(), slot1.getMaxStackSize(itemstack1));
+                            int l1 = Math.min(getQuickCraftPlaceCount(this.quickcraftSlots, this.quickcraftType, itemstack1) + j1, k1);
 
-                            //getQuickCraftPlaceCount(this.quickcraftSlots, this.quickcraftType, itemstack3, j1); // Banner TODO
-                            int k1 = Math.min(itemstack3.getMaxStackSize(), slot1.getMaxStackSize(itemstack3));
-
-                            if (itemstack3.getCount() > k1) {
-                                itemstack3.setCount(k1);
-                            }
-
-                            l -= itemstack3.getCount() - j1;
-                            // slot1.setByPlayer(itemstack3);
-                            draggedSlots.put(slot1.index, itemstack3); // CraftBukkit - Put in map instead of setting
+                            l -= l1 - j1;
+                            // slot1.setByPlayer(itemstack1.copyWithCount(l1));
+                            draggedSlots.put(slot1.index, itemstack1.copyWithCount(l1)); // CraftBukkit - Put in map instead of setting
                         }
                     }
 
@@ -242,7 +246,7 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
         } else if (this.quickcraftStatus != 0) {
             this.resetQuickCraft();
         } else {
-            int l1;
+            int i2;
 
             if ((inventoryclicktype == ClickType.PICKUP || inventoryclicktype == ClickType.QUICK_MOVE) && (j == 0 || j == 1)) {
                 ClickAction clickaction = j == 0 ? ClickAction.PRIMARY : ClickAction.SECONDARY;
@@ -279,38 +283,38 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
 
                     slot = (Slot) this.slots.get(i);
                     itemstack = slot.getItem();
-                    ItemStack itemstack4 = this.getCarried();
+                    ItemStack itemstack3 = this.getCarried();
 
-                    entityhuman.updateTutorialInventoryAction(itemstack4, slot.getItem(), clickaction);
-                    if (!this.tryItemClickBehaviourOverride(entityhuman, clickaction, slot, itemstack, itemstack4)) {
+                    entityhuman.updateTutorialInventoryAction(itemstack3, slot.getItem(), clickaction);
+                    if (!this.tryItemClickBehaviourOverride(entityhuman, clickaction, slot, itemstack, itemstack3)) {
                         if (itemstack.isEmpty()) {
-                            if (!itemstack4.isEmpty()) {
-                                l1 = clickaction == ClickAction.PRIMARY ? itemstack4.getCount() : 1;
-                                this.setCarried(slot.safeInsert(itemstack4, l1));
+                            if (!itemstack3.isEmpty()) {
+                                i2 = clickaction == ClickAction.PRIMARY ? itemstack3.getCount() : 1;
+                                this.setCarried(slot.safeInsert(itemstack3, i2));
                             }
                         } else if (slot.mayPickup(entityhuman)) {
-                            if (itemstack4.isEmpty()) {
-                                l1 = clickaction == ClickAction.PRIMARY ? itemstack.getCount() : (itemstack.getCount() + 1) / 2;
-                                Optional<ItemStack> optional = slot.tryRemove(l1, Integer.MAX_VALUE, entityhuman);
+                            if (itemstack3.isEmpty()) {
+                                i2 = clickaction == ClickAction.PRIMARY ? itemstack.getCount() : (itemstack.getCount() + 1) / 2;
+                                Optional<ItemStack> optional = slot.tryRemove(i2, Integer.MAX_VALUE, entityhuman);
 
-                                optional.ifPresent((itemstack5) -> {
-                                    this.setCarried(itemstack5);
-                                    slot.onTake(entityhuman, itemstack5);
+                                optional.ifPresent((itemstack4) -> {
+                                    this.setCarried(itemstack4);
+                                    slot.onTake(entityhuman, itemstack4);
                                 });
-                            } else if (slot.mayPlace(itemstack4)) {
-                                if (ItemStack.isSameItemSameTags(itemstack, itemstack4)) {
-                                    l1 = clickaction == ClickAction.PRIMARY ? itemstack4.getCount() : 1;
-                                    this.setCarried(slot.safeInsert(itemstack4, l1));
-                                } else if (itemstack4.getCount() <= slot.getMaxStackSize(itemstack4)) {
+                            } else if (slot.mayPlace(itemstack3)) {
+                                if (ItemStack.isSameItemSameTags(itemstack, itemstack3)) {
+                                    i2 = clickaction == ClickAction.PRIMARY ? itemstack3.getCount() : 1;
+                                    this.setCarried(slot.safeInsert(itemstack3, i2));
+                                } else if (itemstack3.getCount() <= slot.getMaxStackSize(itemstack3)) {
                                     this.setCarried(itemstack);
-                                    slot.setByPlayer(itemstack4);
+                                    slot.setByPlayer(itemstack3);
                                 }
-                            } else if (ItemStack.isSameItemSameTags(itemstack, itemstack4)) {
-                                Optional<ItemStack> optional1 = slot.tryRemove(itemstack.getCount(), itemstack4.getMaxStackSize() - itemstack4.getCount(), entityhuman);
+                            } else if (ItemStack.isSameItemSameTags(itemstack, itemstack3)) {
+                                Optional<ItemStack> optional1 = slot.tryRemove(itemstack.getCount(), itemstack3.getMaxStackSize() - itemstack3.getCount(), entityhuman);
 
-                                optional1.ifPresent((itemstack5) -> {
-                                    itemstack4.grow(itemstack5.getCount());
-                                    slot.onTake(entityhuman, itemstack5);
+                                optional1.ifPresent((itemstack4) -> {
+                                    itemstack3.grow(itemstack4.getCount());
+                                    slot.onTake(entityhuman, itemstack4);
                                 });
                             }
                         }
@@ -329,7 +333,7 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
                 }
             } else {
                 Slot slot2;
-                int i2;
+                int j2;
 
                 if (inventoryclicktype == ClickType.SWAP) {
                     slot2 = (Slot) this.slots.get(i);
@@ -345,18 +349,18 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
                             }
                         } else if (itemstack.isEmpty()) {
                             if (slot2.mayPlace(itemstack1)) {
-                                i2 = slot2.getMaxStackSize(itemstack1);
-                                if (itemstack1.getCount() > i2) {
-                                    slot2.setByPlayer(itemstack1.split(i2));
+                                j2 = slot2.getMaxStackSize(itemstack1);
+                                if (itemstack1.getCount() > j2) {
+                                    slot2.setByPlayer(itemstack1.split(j2));
                                 } else {
                                     playerinventory.setItem(j, ItemStack.EMPTY);
                                     slot2.setByPlayer(itemstack1);
                                 }
                             }
                         } else if (slot2.mayPickup(entityhuman) && slot2.mayPlace(itemstack1)) {
-                            i2 = slot2.getMaxStackSize(itemstack1);
-                            if (itemstack1.getCount() > i2) {
-                                slot2.setByPlayer(itemstack1.split(i2));
+                            j2 = slot2.getMaxStackSize(itemstack1);
+                            if (itemstack1.getCount() > j2) {
+                                slot2.setByPlayer(itemstack1.split(j2));
                                 slot2.onTake(entityhuman, itemstack);
                                 if (!playerinventory.add(itemstack)) {
                                     entityhuman.drop(itemstack, true);
@@ -371,9 +375,8 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
                 } else if (inventoryclicktype == ClickType.CLONE && entityhuman.getAbilities().instabuild && this.getCarried().isEmpty() && i >= 0) {
                     slot2 = (Slot) this.slots.get(i);
                     if (slot2.hasItem()) {
-                        itemstack1 = slot2.getItem().copy();
-                        itemstack1.setCount(itemstack1.getMaxStackSize());
-                        this.setCarried(itemstack1);
+                        itemstack1 = slot2.getItem();
+                        this.setCarried(itemstack1.copyWithCount(itemstack1.getMaxStackSize()));
                     }
                 } else if (inventoryclicktype == ClickType.THROW && this.getCarried().isEmpty() && i >= 0) {
                     slot2 = (Slot) this.slots.get(i);
@@ -385,19 +388,19 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
                     itemstack1 = this.getCarried();
                     if (!itemstack1.isEmpty() && (!slot2.hasItem() || !slot2.mayPickup(entityhuman))) {
                         l = j == 0 ? 0 : this.slots.size() - 1;
-                        i2 = j == 0 ? 1 : -1;
+                        j2 = j == 0 ? 1 : -1;
 
-                        for (l1 = 0; l1 < 2; ++l1) {
-                            for (int j2 = l; j2 >= 0 && j2 < this.slots.size() && itemstack1.getCount() < itemstack1.getMaxStackSize(); j2 += i2) {
-                                Slot slot3 = (Slot) this.slots.get(j2);
+                        for (i2 = 0; i2 < 2; ++i2) {
+                            for (int k2 = l; k2 >= 0 && k2 < this.slots.size() && itemstack1.getCount() < itemstack1.getMaxStackSize(); k2 += j2) {
+                                Slot slot3 = (Slot) this.slots.get(k2);
 
                                 if (slot3.hasItem() && canItemQuickReplace(slot3, itemstack1, true) && slot3.mayPickup(entityhuman) && this.canTakeItemForPickAll(itemstack1, slot3)) {
-                                    ItemStack itemstack5 = slot3.getItem();
+                                    ItemStack itemstack4 = slot3.getItem();
 
-                                    if (l1 != 0 || itemstack5.getCount() != itemstack5.getMaxStackSize()) {
-                                        ItemStack itemstack6 = slot3.safeTake(itemstack5.getCount(), itemstack1.getMaxStackSize() - itemstack1.getCount(), entityhuman);
+                                    if (i2 != 0 || itemstack4.getCount() != itemstack4.getMaxStackSize()) {
+                                        ItemStack itemstack5 = slot3.safeTake(itemstack4.getCount(), itemstack1.getMaxStackSize() - itemstack1.getCount(), entityhuman);
 
-                                        itemstack1.grow(itemstack6.getCount());
+                                        itemstack1.grow(itemstack5.getCount());
                                     }
                                 }
                             }

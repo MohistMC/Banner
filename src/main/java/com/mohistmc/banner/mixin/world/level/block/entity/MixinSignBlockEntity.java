@@ -1,17 +1,11 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentUtils;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.FilteredText;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -19,8 +13,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
 import org.bukkit.block.sign.Side;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
@@ -48,14 +40,13 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements Comman
 
     @Shadow protected abstract SignText setMessages(Player player, List<FilteredText> list, SignText signText);
 
-    public MixinSignBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
-        super(blockEntityType, blockPos, blockState);
+    @Shadow
+    private static CommandSourceStack createCommandSourceStack(@Nullable Player player, Level level, BlockPos blockPos) {
+        return null;
     }
 
-    @Redirect(method = "loadLine", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/network/chat/ComponentUtils;updateForEntity(Lnet/minecraft/commands/CommandSourceStack;Lnet/minecraft/network/chat/Component;Lnet/minecraft/world/entity/Entity;I)Lnet/minecraft/network/chat/MutableComponent;"))
-    private MutableComponent banner$useUnStatic0(CommandSourceStack commandSourceStack, Component component, Entity entity, int recursionDepth) throws CommandSyntaxException {
-        return ComponentUtils.updateForEntity(banner$createCommandSourceStack((Player)null, ((ServerLevel) this.level), this.worldPosition), component, (Entity)null, 0);
+    public MixinSignBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
+        super(blockEntityType, blockPos, blockState);
     }
 
     private AtomicReference<Player> banner$player = new AtomicReference<>();
@@ -66,18 +57,6 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements Comman
                                 CallbackInfoReturnable<Boolean> cir) {
         banner$player.set(player);
         banner$pos.set(blockPos);
-    }
-
-    @Redirect(method = "executeClickCommandsIfPresent", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/commands/Commands;performPrefixedCommand(Lnet/minecraft/commands/CommandSourceStack;Ljava/lang/String;)I"))
-    private int banner$useUnStatic1(Commands instance, CommandSourceStack source, String command) throws CommandSyntaxException {
-        return instance.performPrefixedCommand(banner$createCommandSourceStack(banner$player.get(), level, banner$pos.get()), command);
-    }
-
-    private CommandSourceStack banner$createCommandSourceStack(@Nullable Player player, Level level, BlockPos blockPos) {
-        String string = player == null ? "Sign" : player.getName().getString();
-        Component component = player == null ? Component.literal("Sign") : player.getDisplayName();
-        return new CommandSourceStack(this, Vec3.atCenterOf(blockPos), Vec2.ZERO, (ServerLevel)level, 2, string, (Component)component, level.getServer(), player);
     }
 
     @Inject(method = "markUpdated", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;sendBlockUpdated(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;I)V"))
@@ -102,6 +81,13 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements Comman
         return setMessages(player, list, signText, banner$bl.get());
     }
 
+    @Redirect(method = "executeClickCommandsIfPresent", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/SignBlockEntity;createCommandSourceStack(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/commands/CommandSourceStack;"))
+    private CommandSourceStack arclight$setSource(Player player, Level level, BlockPos blockPos) {
+        var stack = createCommandSourceStack(player, level, blockPos);
+        stack.banner$setSource(this);
+        return stack;
+    }
+
     @Inject(method = "updateSignText", at = @At(value = "INVOKE",
             target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;)V",
             remap = false,
@@ -116,7 +102,7 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements Comman
     }
 
     @Inject(method = "setMessages", at = @At("RETURN"),
-            locals = LocalCapture.CAPTURE_FAILHARD)
+            locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private void banner$signChangeEvent(Player player, List<FilteredText> list, SignText signText,
                                         CallbackInfoReturnable<SignText> cir) {
         SignText originalText = signText; // CraftBukkit
@@ -138,6 +124,7 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements Comman
         } else {
             signText = originalText;
         }
+        cir.setReturnValue(signText);
         // CraftBukkit end
     }
 

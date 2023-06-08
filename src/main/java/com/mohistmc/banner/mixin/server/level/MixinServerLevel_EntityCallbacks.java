@@ -27,7 +27,7 @@ public class MixinServerLevel_EntityCallbacks {
     @Inject(method = "onTrackingEnd(Lnet/minecraft/world/entity/Entity;)V", at = @At("TAIL"))
     private void banner$entityCleanup(Entity entity, CallbackInfo ci) {
         if (entity instanceof Player player) {
-            for (ServerLevel serverLevel : outerThis.getServer().levels.values()) {
+            for (ServerLevel serverLevel : outerThis.getServer().getAllLevels()) {
                 DimensionDataStorage worldData = serverLevel.getDataStorage();
                 for (Object o : worldData.cache.values()) {
                     if (o instanceof MapItemSavedData map) {

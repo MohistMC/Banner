@@ -169,7 +169,7 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
         if (equipmentslottype.isArmor() && !flag) {
             equipmentslottype = EquipmentSlot.MAINHAND;
             itemstack = this.getItemBySlot(equipmentslottype);
-            flag = this.canReplaceCurrentItem(stack, itemstack);
+            flag = itemstack.isEmpty();
         }
 
         boolean canPickup = flag && this.canHoldItem(stack);

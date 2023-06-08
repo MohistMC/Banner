@@ -14,12 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(MerchantOffer.class)
 public abstract class MixinMerchantOffer implements InjectionMerchantOffer {
 
-    // @formatter:off
     @Shadow public ItemStack baseCostA;
-    // @formatter:on
-
-    @Shadow
-    public int demand;
 
     @Shadow public abstract ItemStack getCostA();
 

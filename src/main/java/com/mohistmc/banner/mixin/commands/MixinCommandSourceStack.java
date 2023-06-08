@@ -13,6 +13,7 @@ import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.command.VanillaCommandWrapper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -27,6 +28,7 @@ public abstract class MixinCommandSourceStack implements InjectionCommandSourceS
 
     @Shadow public abstract ServerLevel getLevel();
 
+    @Mutable
     @Shadow @Final public CommandSource source;
     public volatile CommandNode currentCommand; // CraftBukkit
 
@@ -62,5 +64,10 @@ public abstract class MixinCommandSourceStack implements InjectionCommandSourceS
     @Override
     public void banner$setCurrentCommand(CommandNode<?> node) {
         this.currentCommand = node;
+    }
+
+    @Override
+    public void banner$setSource(CommandSource source) {
+        this.source = source;
     }
 }

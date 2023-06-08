@@ -65,7 +65,7 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
     // @formatter:on
 
     @Shadow
-    protected static Stream<Entity> removedPassengers(List<Entity> list, List<Entity> list2) {
+    private static Stream<Entity> removedPassengers(List<Entity> list, List<Entity> list2) {
         return null;
     }
 
@@ -229,26 +229,12 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
         }
     }
 
-    @Inject(method = "addPairing", at = @At("HEAD"))
-    private void banner$addPlayer(ServerPlayer player, CallbackInfo ci) {
-        this.banner$player = player;
-    }
-
-    private transient ServerPlayer banner$player;
-
-    public void a(final Consumer<Packet<ClientGamePacketListener>> consumer, ServerPlayer playerEntity) {
-        this.banner$player = playerEntity;
-        this.sendPairingData(playerEntity, consumer);
-    }
-
     /**
      * @author wdog5
      * @reason
      */
     @Overwrite
     public void sendPairingData(ServerPlayer serverPlayer, Consumer<Packet<ClientGamePacketListener>> consumer) {
-        ServerPlayer player = banner$player;
-        banner$player = null;
         Mob entityinsentient;
         if (this.entity.isRemoved()) {
             return;
@@ -262,7 +248,7 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
         boolean flag = this.trackDelta;
         if (this.entity instanceof LivingEntity livingEntity) {
             Collection<AttributeInstance> collection = livingEntity.getAttributes().getSyncableAttributes();
-            if (this.entity.getId() == player.getId()) {
+            if (this.entity.getId() == serverPlayer.getId()) {
                 ((ServerPlayer) this.entity).getBukkitEntity().injectScaledMaxHealth(collection, false);
             }
             if (!collection.isEmpty()) {
