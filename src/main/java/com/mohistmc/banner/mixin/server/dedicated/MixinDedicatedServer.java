@@ -159,4 +159,9 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
     public CommandSender getBukkitSender(CommandSourceStack wrapper) {
         return bridge$console();
     }
+
+    @Inject(method = "showGui", at = @At("HEAD"), cancellable = true)
+    public void banner$cancelGui(CallbackInfo ci) {
+        ci.cancel();
+    }
 }
