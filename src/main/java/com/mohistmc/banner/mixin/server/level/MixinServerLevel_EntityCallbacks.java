@@ -24,6 +24,11 @@ public class MixinServerLevel_EntityCallbacks {
          entity.banner$setValid(true);
     }
 
+    @Inject(method = "onTrackingStart(Lnet/minecraft/world/entity/Entity;)V", at = @At("TAIL"))
+    private void banner$entityAdd(Entity entity, CallbackInfo ci) {
+        new com.destroystokyo.paper.event.entity.EntityAddToWorldEvent(entity.getBukkitEntity()).callEvent(); // Paper - fire while valid
+   }
+
     @Inject(method = "onTrackingEnd(Lnet/minecraft/world/entity/Entity;)V", at = @At("TAIL"))
     private void banner$entityCleanup(Entity entity, CallbackInfo ci) {
         if (entity instanceof Player player) {
@@ -42,6 +47,7 @@ public class MixinServerLevel_EntityCallbacks {
                 h.closeInventory();
             }
         }
+        new com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent(entity.getBukkitEntity()).callEvent(); // Paper - fire while valid
     }
 
     @Inject(method = "onTrackingEnd(Lnet/minecraft/world/entity/Entity;)V", at = @At("RETURN"))
