@@ -51,9 +51,6 @@ chmod +x ./banner-launcher
 - Just put it in the mods folder.
 - Also, remember that Banner is still in WIP - do not use it in a production environment!
 
-## Compatiblity
-- If you want to use Lithium, you should change the "mixin.block.hopper" value in its config to false.
-
 ## Upstream Projects
 - [**Fabric Loader**](https://github.com/FabricMC/fabric-loader.git) - Mod load support.
 - [**Fabric API**](https://github.com/FabricMC/fabric-loader.git) - Mod API support.

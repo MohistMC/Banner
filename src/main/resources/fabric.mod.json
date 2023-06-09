@@ -140,6 +140,9 @@
       "net/minecraft/class_2885": ["com/mohistmc/banner/injection/network/protocol/game/InjectionServerboundUseItemOnPacket"],
       "net/minecraft/class_2637": ["com/mohistmc/banner/injection/network/protocol/game/InjectionClientboundSectionBlocksUpdatePacket"],
       "net/minecraft/class_2886": ["com/mohistmc/banner/injection/network/protocol/game/InjectionServerboundUseItemPacket"]
+    },
+    "lithium:options": {
+      "block.hopper": false
     }
   }
 }
