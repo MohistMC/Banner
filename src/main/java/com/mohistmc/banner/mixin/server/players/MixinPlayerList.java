@@ -740,8 +740,8 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Redirect(method = "sendAllPlayerInfo", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;resetSentInfo()V"))
     private void banner$useScaledHealth(ServerPlayer playerEntity) {
-        playerEntity.getBukkitEntity().updateScaledHealth();
-        playerEntity.getEntityData().refresh(playerEntity);
+        playerEntity.getBukkitEntity().updateScaledHealth(); // CraftBukkit - Update scaled health on respawn and worldchange
+        playerEntity.getEntityData().refresh(playerEntity);// CraftBukkkit - SPIGOT-7218: sync metadata
         int i = playerEntity.level().getGameRules().getBoolean(GameRules.RULE_REDUCEDDEBUGINFO) ? 22 : 23;
         playerEntity.connection.send(new ClientboundEntityEventPacket(playerEntity, (byte) i));
         float immediateRespawn = playerEntity.level().getGameRules().getBoolean(GameRules.RULE_DO_IMMEDIATE_RESPAWN) ? 1.0f : 0.0f;

@@ -25,7 +25,6 @@ import java.util.HashMap;
 @Mixin(ServerHandshakePacketListenerImpl.class)
 public class MixinServerHandshakePacketListenerImpl {
 
-    private static final Gson gson = new Gson();
     private static final HashMap<InetAddress, Long> throttleTracker = new HashMap<>();
     private static int throttleCounter = 0;
 

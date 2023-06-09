@@ -93,6 +93,7 @@
     "server.players.MixinBanListEntry",
     "server.players.MixinOldUsersConverter_5",
     "server.players.MixinPlayerList",
+    "server.players.MixinSleepStatus",
     "server.players.MixinStoredUserList",
     "server.rcon.MixinRconConsoleSource",
     "stats.MixinStatsCounter",
