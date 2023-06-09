@@ -46,6 +46,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Material;
@@ -929,7 +930,8 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
 
     @Override
     public BlockData getBlockData(Material material) {
-        return CraftBlockData.fromData(BukkitExtraConstants.getBlockState(CraftMagicNumbers.getBlock(material).defaultBlockState(), blockData));
+        BlockState defaultData = CraftMagicNumbers.getBlock(material).defaultBlockState();
+        return CraftBlockData.fromData((hasBlockData()) ? BukkitExtraConstants.getBlockState(defaultData, blockData) : defaultData);
     }
 
     @Override

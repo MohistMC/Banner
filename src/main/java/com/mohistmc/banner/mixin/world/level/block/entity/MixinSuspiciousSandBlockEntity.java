@@ -1,0 +1,51 @@
+package com.mohistmc.banner.mixin.world.level.block.entity;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.SuspiciousSandBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.Arrays;
+
+@Mixin(SuspiciousSandBlockEntity.class)
+public abstract class MixinSuspiciousSandBlockEntity extends BlockEntity {
+
+    public MixinSuspiciousSandBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
+        super(blockEntityType, blockPos, blockState);
+    }
+
+    @Redirect(method = "dropContent",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    private boolean banner$cancelAddEntity(Level instance, Entity entity) {
+        return false;
+    }
+
+    @Inject(method = "dropContent",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$dropEvent(Player player, CallbackInfo ci, double d, double e, double f,
+                                  Direction direction, BlockPos blockPos,
+                                  double g, double h, double i, ItemEntity itemEntity) {
+        // CraftBukkit start
+        org.bukkit.block.Block bblock = CraftBlock.at(this.level, this.worldPosition);
+        CraftEventFactory.handleBlockDropItemEvent(bblock, bblock.getState(), (ServerPlayer) player, Arrays.asList(itemEntity));
+        // CraftBukkit end
+    }
+}

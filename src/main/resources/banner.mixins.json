@@ -481,6 +481,7 @@
     "world.level.block.entity.MixinSculkCatalystBlockEntity",
     "world.level.block.entity.MixinShulkerBoxBlockEntity",
     "world.level.block.entity.MixinSignBlockEntity",
+    "world.level.block.entity.MixinSuspiciousSandBlockEntity",
     "world.level.block.entity.MixinTheEndGatewayBlockEntity",
     "world.level.block.grower.MixinAbstractMegaTreeGrower",
     "world.level.block.grower.MixinAbstractTreeGrower",
