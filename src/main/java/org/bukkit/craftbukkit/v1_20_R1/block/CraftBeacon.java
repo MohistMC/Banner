@@ -2,6 +2,8 @@ package org.bukkit.craftbukkit.v1_20_R1.block;
 
 import java.util.ArrayList;
 import java.util.Collection;
+
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.world.LockCode;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -28,15 +30,14 @@ public class CraftBeacon extends CraftBlockEntityState<BeaconBlockEntity> implem
         if (tileEntity instanceof BeaconBlockEntity) {
             BeaconBlockEntity beacon = (BeaconBlockEntity) tileEntity;
 
-            /**
-            Collection<net.minecraft.world.entity.player.Player> nms = BeaconBlockEntity.getHumansInRange(beacon.getLevel(), beacon.getBlockPos(), beacon.levels);
+            Collection<net.minecraft.world.entity.player.Player> nms = BukkitExtraConstants.getHumansInRange(beacon.getLevel(), beacon.getBlockPos(), beacon.levels);
             Collection<LivingEntity> bukkit = new ArrayList<LivingEntity>(nms.size());
 
             for (net.minecraft.world.entity.player.Player human : nms) {
                 bukkit.add(human.getBukkitEntity());
             }
 
-            return bukkit;*/
+            return bukkit;
         }
 
         // block is no longer a beacon

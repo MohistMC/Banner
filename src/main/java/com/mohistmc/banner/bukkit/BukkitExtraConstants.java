@@ -18,6 +18,7 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.monster.ZombieVillager;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.context.UseOnContext;
@@ -37,6 +38,7 @@ import org.bukkit.event.entity.EntityTransformEvent;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 
 public class BukkitExtraConstants {
 
@@ -51,6 +53,17 @@ public class BukkitExtraConstants {
             TicketType.create("plugin_ticket", Comparator.comparing(plugin -> plugin.getClass().getName())); // CraftBukkit
     public static final LootContextParam<Integer> LOOTING_MOD = new LootContextParam<>(new ResourceLocation("bukkit:looting_mod")); // CraftBukkit
     public static final TicketType<Unit> PLUGIN = TicketType.create("plugin", (a, b) -> 0); // CraftBukkit
+
+    public static List getHumansInRange(Level world, BlockPos blockposition, int i) {
+        {
+            double d0 = (double) (i * 10 + 10);
+
+            AABB axisalignedbb = (new AABB(blockposition)).inflate(d0).expandTowards(0.0D, (double) world.getHeight(), 0.0D);
+            List<Player> list = world.getEntitiesOfClass(Player.class, axisalignedbb);
+
+            return list;
+        }
+    }
 
     public static ZombieVillager zombifyVillager(ServerLevel level, Villager villager, BlockPos blockPosition, boolean silent, CreatureSpawnEvent.SpawnReason spawnReason) {
         villager.level().pushAddEntityReason(spawnReason);

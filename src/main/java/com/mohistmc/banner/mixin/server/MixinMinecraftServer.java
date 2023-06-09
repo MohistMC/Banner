@@ -91,6 +91,8 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Shadow protected abstract void updateMobSpawningFlags();
 
+    @Shadow @Final private static int TICK_STATS_SPAN;
+    @Shadow private long lastServerStatus;
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
     public org.bukkit.craftbukkit.v1_20_R1.CraftServer server;
@@ -345,6 +347,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Inject(method = "tickServer", at = @At("HEAD"))
     private void banner$useTimings(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
         SpigotTimings.serverTickTimer.startTiming(); // Spigot
+        new com.destroystokyo.paper.event.server.ServerTickStartEvent(this.tickCount+1).callEvent(); // Paper
     }
 
     @Inject(method = "tickServer", at = @At(value = "INVOKE",
@@ -399,6 +402,18 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     private void banner$addTimings2(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
         this.server.getScheduler().mainThreadHeartbeat(this.tickCount); // CraftBukkit
         SpigotTimings.commandFunctionsTimer.stopTiming(); // Spigot
+    }
+
+    @Inject(method = "tickServer",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
+            ordinal = 1))
+    private void banner$tickEndEvent(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        // Paper start
+        long endTime = System.nanoTime();
+        long remaining = (TICK_STATS_SPAN - (endTime - lastServerStatus)) - tickCount;
+        new com.destroystokyo.paper.event.server.ServerTickEndEvent(this.tickCount, ((double)(endTime - lastServerStatus) / 1000000D), remaining).callEvent();
+        // Paper end
     }
 
     @Inject(method = "tickChildren", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getAllLevels()Ljava/lang/Iterable;"))

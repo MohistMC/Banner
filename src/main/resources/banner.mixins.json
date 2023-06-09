@@ -492,6 +492,7 @@
     "world.level.block.grower.MixinAbstractMegaTreeGrower",
     "world.level.block.grower.MixinAbstractTreeGrower",
     "world.level.border.MixinWorldBorder",
+    "world.level.border.MixinWorldBorder_MovingBorderExtent",
     "world.level.chunk.MixinChunkAccess",
     "world.level.chunk.MixinChunkGenerator",
     "world.level.chunk.MixinLevelChunk",

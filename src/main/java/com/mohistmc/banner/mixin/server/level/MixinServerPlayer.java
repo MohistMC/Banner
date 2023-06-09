@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
 import net.minecraft.network.protocol.game.ServerboundClientInformationPacket;
 import net.minecraft.resources.ResourceKey;
@@ -24,6 +25,7 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -54,6 +56,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.List;
 import java.util.Random;
@@ -84,6 +87,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Shadow public abstract ServerLevel serverLevel();
 
+    @Shadow @Nullable private Entity camera;
     // CraftBukkit start
     public String displayName;
     public Component listName;
@@ -367,6 +371,49 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         this.clientViewDistance = packetIn.viewDistance();
     }
 
+    @Inject(method = "trackChunk",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
+            shift = At.Shift.AFTER))
+    private void banner$chunkLoad(ChunkPos chunkPos, Packet<?> packet, CallbackInfo ci) {
+        // Paper start
+        if(io.papermc.paper.event.packet.PlayerChunkLoadEvent.getHandlerList().getRegisteredListeners().length > 0){
+            new io.papermc.paper.event.packet.PlayerChunkLoadEvent(this.getBukkitEntity().getWorld().getChunkAt(chunkPos.x, chunkPos.z), this.getBukkitEntity()).callEvent();
+        }
+        // Paper end
+    }
+
+    @Inject(method = "untrackChunk",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
+            shift = At.Shift.AFTER))
+    private void banner$chunkUnload(ChunkPos chunkPos, CallbackInfo ci) {
+        // Paper start
+        if(io.papermc.paper.event.packet.PlayerChunkUnloadEvent.getHandlerList().getRegisteredListeners().length > 0){
+            new io.papermc.paper.event.packet.PlayerChunkUnloadEvent(this.getBukkitEntity().getWorld().getChunkAt(chunkPos.x, chunkPos.z), this.getBukkitEntity()).callEvent();
+        }
+        // Paper end
+    }
+
+    @Inject(method = "setCamera",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/Entity;level()Lnet/minecraft/world/level/Level;"),
+            locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    private void banner$spectorEvent(Entity entityToSpectate, CallbackInfo ci, Entity entity) {
+        // Paper start - Add PlayerStartSpectatingEntityEvent and PlayerStopSpectatingEntity Event
+        if (this.camera == this) {
+            com.destroystokyo.paper.event.player.PlayerStopSpectatingEntityEvent playerStopSpectatingEntityEvent = new com.destroystokyo.paper.event.player.PlayerStopSpectatingEntityEvent(this.getBukkitEntity(), entity.getBukkitEntity());
+            if (!playerStopSpectatingEntityEvent.callEvent()) {
+                ci.cancel();
+            }
+        } else {
+            com.destroystokyo.paper.event.player.PlayerStartSpectatingEntityEvent playerStartSpectatingEntityEvent = new com.destroystokyo.paper.event.player.PlayerStartSpectatingEntityEvent(this.getBukkitEntity(), entity.getBukkitEntity(), entity.getBukkitEntity());
+            if (!playerStartSpectatingEntityEvent.callEvent()) {
+                ci.cancel();
+            }
+        }
+        // Paper end
+    }
 
     @Override
     public CraftPlayer getBukkitEntity() {

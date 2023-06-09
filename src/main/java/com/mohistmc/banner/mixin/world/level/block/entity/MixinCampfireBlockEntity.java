@@ -45,48 +45,54 @@ public abstract class MixinCampfireBlockEntity extends BlockEntity {
     }
 
     /**
-     * @author IzzelAliz
-     * @reason
+     * @author wdog5
+     * @reason bukkit
      */
     @Overwrite
-    public static void cookTick(Level level, BlockPos pos, BlockState state, CampfireBlockEntity entity) {
+    public static void cookTick(Level world, BlockPos blockposition, BlockState iblockdata, CampfireBlockEntity tileentitycampfire) {
         boolean flag = false;
 
-        for (int i = 0; i < entity.getItems().size(); ++i) {
-            ItemStack itemstack = entity.getItems().get(i);
+        for (int i = 0; i < tileentitycampfire.getItems().size(); ++i) {
+            ItemStack itemstack = (ItemStack) tileentitycampfire.getItems().get(i);
+
             if (!itemstack.isEmpty()) {
                 flag = true;
-                entity.cookingProgress[i]++;
-                if (entity.cookingProgress[i] >= entity.cookingTime[i]) {
-                    Container container = new SimpleContainer(itemstack);
-                    ItemStack itemstack1 = ((MixinCampfireBlockEntity) (Object) entity).quickCheck.getRecipeFor(container, level).map((p_155305_) -> {
-                        return p_155305_.assemble(container, level.registryAccess());
+                int j = tileentitycampfire.cookingProgress[i]++;
+
+                if (tileentitycampfire.cookingProgress[i] >= tileentitycampfire.cookingTime[i]) {
+                    SimpleContainer inventorysubcontainer = new SimpleContainer(new ItemStack[]{itemstack});
+                    Optional<CampfireCookingRecipe> recipe = ((MixinCampfireBlockEntity) (Object) tileentitycampfire).quickCheck.getRecipeFor( inventorysubcontainer, world);
+                    ItemStack itemstack1 = (ItemStack) recipe.map((recipecampfire) -> {
+                        // Paper end
+                        return recipecampfire.assemble(inventorysubcontainer, world.registryAccess());
                     }).orElse(itemstack);
 
-                    if (!itemstack1.isItemEnabled(level.enabledFeatures())) continue;
-                    CraftItemStack source = CraftItemStack.asCraftMirror(itemstack);
-                    org.bukkit.inventory.ItemStack result = CraftItemStack.asBukkitCopy(itemstack1);
+                    if (itemstack1.isItemEnabled(world.enabledFeatures())) {
+                        // CraftBukkit start - fire BlockCookEvent
+                        CraftItemStack source = CraftItemStack.asCraftMirror(itemstack);
+                        org.bukkit.inventory.ItemStack result = CraftItemStack.asBukkitCopy(itemstack1);
 
-                    BlockCookEvent blockCookEvent = new BlockCookEvent(CraftBlock.at(level, pos), source, result);
-                    Bukkit.getPluginManager().callEvent(blockCookEvent);
+                        BlockCookEvent blockCookEvent = new BlockCookEvent(CraftBlock.at(world, blockposition), source, result, (org.bukkit.inventory.CookingRecipe<?>) recipe.map(CampfireCookingRecipe::toBukkitRecipe).orElse(null)); // Paper
+                        world.getCraftServer().getPluginManager().callEvent(blockCookEvent);
 
-                    if (blockCookEvent.isCancelled()) {
-                        return;
+                        if (blockCookEvent.isCancelled()) {
+                            return;
+                        }
+
+                        result = blockCookEvent.getResult();
+                        itemstack1 = CraftItemStack.asNMSCopy(result);
+                        // CraftBukkit end
+                        Containers.dropItemStack(world, (double) blockposition.getX(), (double) blockposition.getY(), (double) blockposition.getZ(), itemstack1);
+                        tileentitycampfire.getItems().set(i, ItemStack.EMPTY);
+                        world.sendBlockUpdated(blockposition, iblockdata, iblockdata, 3);
+                        world.gameEvent(GameEvent.BLOCK_CHANGE, blockposition, GameEvent.Context.of(iblockdata));
                     }
-
-                    result = blockCookEvent.getResult();
-                    itemstack1 = CraftItemStack.asNMSCopy(result);
-
-                    Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), itemstack1);
-                    entity.getItems().set(i, ItemStack.EMPTY);
-                    level.sendBlockUpdated(pos, state, state, 3);
-                    level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(state));
                 }
             }
         }
 
         if (flag) {
-            setChanged(level, pos, state);
+            setChanged(world, blockposition, iblockdata);
         }
 
     }
