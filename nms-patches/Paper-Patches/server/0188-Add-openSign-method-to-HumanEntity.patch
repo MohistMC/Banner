@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mark Vainomaa <mikroskeem@mikroskeem.eu>
+Date: Sun, 1 Apr 2018 02:29:37 +0300
+Subject: [PATCH] Add openSign method to HumanEntity
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/block/CraftSign.java b/src/main/java/org/bukkit/craftbukkit/block/CraftSign.java
+index cc6aab5341365f9b4ec3cb23e2a4f5006aa75cd7..78b57aa3120f8526b4bff2ca90d7735845a87b41 100644
+--- a/src/main/java/org/bukkit/craftbukkit/block/CraftSign.java
++++ b/src/main/java/org/bukkit/craftbukkit/block/CraftSign.java
+@@ -110,7 +110,7 @@ public class CraftSign<T extends SignBlockEntity> extends CraftBlockEntityState<
+         super.applyTo(sign);
+     }
+ 
+-    public static void openSign(Sign sign, Player player, Side side) {
++    public static void openSign(Sign sign, org.bukkit.entity.HumanEntity player, Side side) { // Paper - change move open sign to HumanEntity
+         Preconditions.checkArgument(sign != null, "sign == null");
+         Preconditions.checkArgument(side != null, "side == null");
+         Preconditions.checkArgument(sign.isPlaced(), "Sign must be placed");
+@@ -118,7 +118,8 @@ public class CraftSign<T extends SignBlockEntity> extends CraftBlockEntityState<
+ 
+         SignBlockEntity handle = ((CraftSign<?>) sign).getTileEntity();
+ 
+-        ((CraftPlayer) player).getHandle().openTextEdit(handle, Side.FRONT == side);
++        handle.setAllowedPlayerEditor(player.getUniqueId()); // Paper
++        ((org.bukkit.craftbukkit.entity.CraftHumanEntity) player).getHandle().openTextEdit(handle, Side.FRONT == side); // Paper - change move open sign to HumanEntity
+     }
+ 
+     // Paper start
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftHumanEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftHumanEntity.java
+index c6b2f1b90735ec75492daf64031d9d33226cdac6..4f2a15ff2d4381765c608260c54494f6a11a66cf 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftHumanEntity.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftHumanEntity.java
+@@ -628,6 +628,12 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
+         }
+     }
+ 
++    // Paper start - move open sign method to HumanEntity
++    @Override
++    public void openSign(final org.bukkit.block.Sign sign, final org.bukkit.block.sign.Side side) {
++        org.bukkit.craftbukkit.block.CraftSign.openSign(sign, this, side);
++    }
++    // Paper end
+     @Override
+     public boolean dropItem(boolean dropAll) {
+         if (!(this.getHandle() instanceof ServerPlayer)) return false;
