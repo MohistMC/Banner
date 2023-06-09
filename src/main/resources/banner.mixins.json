@@ -467,6 +467,7 @@
     "world.level.block.entity.MixinBellBlockEntity",
     "world.level.block.entity.MixinBlockEntity",
     "world.level.block.entity.MixinBrewingStandBlockEntity",
+    "world.level.block.entity.MixinBrushableBlockEntity",
     "world.level.block.entity.MixinCampfireBlockEntity",
     "world.level.block.entity.MixinChestBlockEntity",
     "world.level.block.entity.MixinChiseledBookShelfBlockEntity",
