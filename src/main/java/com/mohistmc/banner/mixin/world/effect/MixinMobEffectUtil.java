@@ -22,6 +22,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public class MixinMobEffectUtil {
 
     private static AtomicReference<EntityPotionEffectEvent.Cause> banner$cause = new AtomicReference<>();
+
+    /**
     @Inject(method = "addEffectToPlayersAround", locals = LocalCapture.CAPTURE_FAILHARD,
             at = @At(value = "INVOKE", target = "Ljava/util/List;forEach(Ljava/util/function/Consumer;)V"))
     private static void banner$pushCause(ServerLevel level, Entity source, Vec3 pos, double radius, MobEffectInstance effect, int durate, CallbackInfoReturnable<List<ServerPlayer>> cir, int duration, MobEffect mobEffect, List<ServerPlayer> list) {
@@ -32,5 +34,5 @@ public class MixinMobEffectUtil {
                 player.pushEffectCause(cause);
             }
         }
-    }
+    }*/
 }
