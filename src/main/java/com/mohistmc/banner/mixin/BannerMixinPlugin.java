@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.mohistmc.banner.BannerMCStart;
+import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -128,6 +129,9 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+        if (mixinClassName.equals("com.mohistmc.banner.mixin.world.entity.MixinMob.PaperSpawnAffect")) {
+            return !FabricLoader.getInstance().isModLoaded("vmp");
+        }
         return true;
     }
 

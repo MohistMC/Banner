@@ -119,6 +119,7 @@
     "world.entity.MixinLightningBolt",
     "world.entity.MixinLivingEntity",
     "world.entity.MixinMob",
+    "world.entity.MixinMob$PaperSpawnAffect",
     "world.entity.MixinNeutralMob",
     "world.entity.MixinPathfinderMob",
     "world.entity.ai.behavior.MixinAssignProfessionFromJobSite",

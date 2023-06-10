@@ -72,15 +72,12 @@ public abstract class MixinServerChunkCache implements InjectionServerChunkCache
         return (ticksPer != 0L && gameTime % ticksPer == 0) ? 0 : 1;
     }
 
-    @Inject(method = "getChunk", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/util/profiling/ProfilerFiller;incrementCounter(Ljava/lang/String;)V", ordinal = 1))
+    @Inject(method = "getChunk", at = @At("HEAD"))
     private void banner$timingsStart(int chunkX, int chunkZ, ChunkStatus requiredStatus, boolean load, CallbackInfoReturnable<ChunkAccess> cir) {
         level.bridge$timings().syncChunkLoadTimer.startTiming(); // Spigot
     }
 
-    @Inject(method = "getChunk", at = @At(value = "INVOKE",
-            target = "Lcom/mojang/datafixers/util/Either;map(Ljava/util/function/Function;Ljava/util/function/Function;)Ljava/lang/Object;",
-            remap = false))
+    @Inject(method = "getChunk", at = @At("TAIL"))
     private void banner$timingsStop(int chunkX, int chunkZ, ChunkStatus requiredStatus, boolean load, CallbackInfoReturnable<ChunkAccess> cir) {
         level.bridge$timings().syncChunkLoadTimer.stopTiming(); // Spigot
     }
