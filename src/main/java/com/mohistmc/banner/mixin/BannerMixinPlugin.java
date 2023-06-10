@@ -133,6 +133,9 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
                 || mixinClassName.equals("com.mohistmc.banner.mixin.server.players.MixinPlayerList$LoadRecursive")) {
             return !FabricLoader.getInstance().isModLoaded("vmp");
         }
+        if (mixinClassName.equals("com.mohistmc.banner.mixin.world.level.spawner.MixinNaturalSpawner")) {
+            return !FabricLoader.getInstance().isModLoaded("carpet-tis-addition");
+        }
         return true;
     }
 
