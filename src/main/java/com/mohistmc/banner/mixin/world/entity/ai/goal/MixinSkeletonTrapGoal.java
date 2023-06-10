@@ -5,6 +5,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.animal.horse.SkeletonHorse;
 import net.minecraft.world.entity.animal.horse.SkeletonTrapGoal;
+import net.minecraft.world.level.Level;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
 import org.spongepowered.asm.mixin.Final;
@@ -40,5 +41,12 @@ public class MixinSkeletonTrapGoal {
             slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/horse/SkeletonTrapGoal;createHorse(Lnet/minecraft/world/DifficultyInstance;)Lnet/minecraft/world/entity/animal/horse/AbstractHorse;")))
     private void banner$jockey(CallbackInfo ci) {
          this.horse.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.JOCKEY);
+    }
+
+    @Redirect(method = "canUse",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/Level;hasNearbyAlivePlayer(DDDD)Z"))
+    private boolean banner$affectSpawn(Level instance, double x, double u, double z, double d) {
+        return this.horse.level().hasNearbyAlivePlayerThatAffectsSpawning(this.horse.getX(), this.horse.getY(), this.horse.getZ(), 10.0D); // Paper - Affects Spawning API
     }
 }

@@ -13,6 +13,14 @@ import org.bukkit.event.entity.EntityExhaustionEvent;
 
 public interface InjectionPlayer extends InjectionLivingEntity {
 
+    default boolean bridge$affectsSpawning() {
+        return true;
+    }
+
+    default void banner$setAffectsSpawning(boolean affectsSpawning) {
+
+    }
+
     @Override
     default CraftHumanEntity getBukkitEntity() {
         return null;

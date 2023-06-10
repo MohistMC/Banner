@@ -82,6 +82,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     public boolean fauxSleeping;
     public int oldLevel = -1;
     protected AtomicReference<Boolean> banner$forceSleep = new AtomicReference<>();
+    public boolean affectsSpawning = true;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(CallbackInfo ci) {
@@ -383,5 +384,15 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     @Override
     public void banner$setOldLevel(int oldLevel) {
         this.oldLevel = oldLevel;
+    }
+
+    @Override
+    public boolean bridge$affectsSpawning() {
+        return this.affectsSpawning;
+    }
+
+    @Override
+    public void banner$setAffectsSpawning(boolean affectsSpawning) {
+        this.affectsSpawning = affectsSpawning;
     }
 }

@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.entity;
 
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.injection.world.entity.InjectionMob;
+import com.mohistmc.banner.paper.PaperExtraConstants;
 import io.izzel.arclight.mixin.Eject;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket;
@@ -274,6 +275,13 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
         if (!combustEvent.isCancelled()) {
             entity.setSecondsOnFire(combustEvent.getDuration(), false);
         }
+    }
+
+    @Redirect(method = "checkDespawn",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/Level;getNearestPlayer(Lnet/minecraft/world/entity/Entity;D)Lnet/minecraft/world/entity/player/Player;"))
+    private Player banner$respawnAffect(Level instance, Entity entity, double v) {
+        return this.level().findNearbyPlayer(this, -1.0D, PaperExtraConstants.PLAYER_AFFECTS_SPAWNING); // Paper
     }
 
     @Override

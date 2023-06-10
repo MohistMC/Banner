@@ -2030,6 +2030,18 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         return getHandle().bridge$locale();
     }
 
+    // Paper start
+    @Override
+    public void setAffectsSpawning(boolean affects) {
+        this.getHandle().banner$setAffectsSpawning(affects);
+    }
+
+    @Override
+    public boolean getAffectsSpawning() {
+        return this.getHandle().bridge$affectsSpawning();
+    }
+    // Paper end
+
     @Override
     public void updateCommands() {
         if (getHandle().connection == null) return;

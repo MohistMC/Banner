@@ -1,9 +1,6 @@
 package org.spigotmc;
 
-import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
-
-import java.util.Objects;
 
 public class AsyncCatcher
 {
@@ -12,7 +9,7 @@ public class AsyncCatcher
 
     public static void catchOp(String reason)
     {
-        if ( enabled && Thread.currentThread() != Objects.requireNonNull(BukkitExtraConstants.getServer()).serverThread )
+        if ( (AsyncCatcher.enabled || io.papermc.paper.util.TickThread.STRICT_THREAD_CHECKS) && Thread.currentThread() != BukkitExtraConstants.getServer().serverThread ) // Paper
         {
             throw new IllegalStateException( "Asynchronous " + reason + "!" );
         }

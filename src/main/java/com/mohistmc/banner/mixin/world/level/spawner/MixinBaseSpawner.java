@@ -8,6 +8,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.SimpleWeightedRandomList;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BaseSpawner;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.SpawnData;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -15,6 +16,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -53,5 +55,12 @@ public abstract class MixinBaseSpawner {
         }
         // Spigot End
         serverLevel.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.SPAWNER);
+    }
+
+    @Redirect(method = "isNearPlayer",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/Level;hasNearbyAlivePlayer(DDDD)Z"))
+    private boolean banner$affectSpawn(Level instance, double x, double y, double z, double v) {
+        return instance.hasNearbyAlivePlayerThatAffectsSpawning(x, y, z, v); // Paper - Affects Spawning API
     }
 }

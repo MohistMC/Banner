@@ -96,4 +96,10 @@ public abstract class MixinZombie extends Monster {
         }
         return zombieVillager;
     }
+
+    @Redirect(method = "hurt", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/Level;hasNearbyAlivePlayer(DDDD)Z"))
+    private boolean banner$affectSpawn(Level instance, double x, double y, double z, double d) {
+        return this.level().hasNearbyAlivePlayerThatAffectsSpawning((double) x, (double) y, (double) z, 7.0D);
+    }
 }
