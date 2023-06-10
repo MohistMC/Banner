@@ -205,6 +205,7 @@ accessible method net/minecraft/world/entity/Display$BlockDisplay setBlockState 
 accessible method net/minecraft/world/entity/Display getBillboardConstraints ()Lnet/minecraft/world/entity/Display$BillboardConstraints;
 accessible method net/minecraft/world/entity/Display$ItemDisplay getItemStack ()Lnet/minecraft/world/item/ItemStack;
 accessible method net/minecraft/world/entity/Display$ItemDisplay getItemTransform ()Lnet/minecraft/world/item/ItemDisplayContext;
+accessible method net/minecraft/world/entity/projectile/FishingHook calculateOpenWater (Lnet/minecraft/core/BlockPos;)Z
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C
@@ -556,6 +557,7 @@ accessible field net/minecraft/world/level/NaturalSpawner MAGIC_NUMBER I
 accessible field net/minecraft/server/packs/repository/Pack resources Lnet/minecraft/server/packs/repository/Pack$ResourcesSupplier;
 accessible field net/minecraft/world/flag/FeatureFlag universe Lnet/minecraft/world/flag/FeatureFlagUniverse;
 accessible field net/minecraft/world/flag/FeatureFlagRegistry names Ljava/util/Map;
+accessible field net/minecraft/world/entity/projectile/FishingHook outOfWaterTime I
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;
