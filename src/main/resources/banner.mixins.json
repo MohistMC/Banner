@@ -433,6 +433,7 @@
     "world.level.block.MixinNyliumBlock",
     "world.level.block.MixinObserverBlock",
     "world.level.block.MixinPistonBaseBlock",
+    "world.level.block.MixinPitcherCropBlock",
     "world.level.block.MixinPointedDripstoneBlock",
     "world.level.block.MixinPowderSnowBlock",
     "world.level.block.MixinPoweredRailBlock",
