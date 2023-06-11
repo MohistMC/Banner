@@ -42,7 +42,7 @@ jobs:
       - name: Publish to ModRinth
         uses: Kir-Antipov/mc-publish@v3.2
         with:
-          modrinth-id: 1q2w3e4r
+          modrinth-id: 7ntInrAy
           modrinth-token: "${{env.MODRINTH_TOKEN}}"
           name: "${{env.RELEASE_NAME}}"
           version: "${{env.VERSION}}"
