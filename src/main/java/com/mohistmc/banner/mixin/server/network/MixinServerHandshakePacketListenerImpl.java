@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.server.network;
 
-import com.google.gson.Gson;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.Connection;
 import net.minecraft.network.ConnectionProtocol;

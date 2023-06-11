@@ -1,19 +1,6 @@
 package com.mohistmc.banner.bukkit.nms.remappers;
 
 import com.google.common.collect.Maps;
-
-import java.io.InputStream;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodType;
-import java.lang.invoke.VarHandle;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import com.mohistmc.banner.bukkit.nms.model.MethodRedirectRule;
 import com.mohistmc.banner.bukkit.nms.proxy.ProxyClass;
 import com.mohistmc.banner.bukkit.nms.proxy.ProxyMethodHandlesLookup;
@@ -26,6 +13,18 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.MethodRemapper;
 import org.objectweb.asm.commons.Remapper;
+
+import java.io.InputStream;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodType;
+import java.lang.invoke.VarHandle;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *

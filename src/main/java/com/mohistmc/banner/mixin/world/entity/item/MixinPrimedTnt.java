@@ -2,7 +2,11 @@ package com.mohistmc.banner.mixin.world.entity.item;
 
 import com.mohistmc.banner.injection.world.entity.InjectionPrimedTnt;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.TraceableEntity;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.level.Level;
 import org.bukkit.Bukkit;
