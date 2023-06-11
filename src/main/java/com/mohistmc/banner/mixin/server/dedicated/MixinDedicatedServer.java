@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.server.dedicated;
 
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.Metrics;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.commands.CommandSourceStack;
@@ -34,13 +35,16 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.lang.annotation.Target;
 import java.net.Proxy;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(DedicatedServer.class)
 public abstract class MixinDedicatedServer extends MinecraftServer {
 
-    @Shadow @Final public RconConsoleSource rconConsoleSource;
+    @Shadow
+    @Final
+    public RconConsoleSource rconConsoleSource;
 
     private AtomicReference<String> banner$command = new AtomicReference<>();
 
@@ -61,9 +65,9 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
 
     @Inject(method = "initServer",
             at = @At(value = "INVOKE",
-            target = "Ljava/lang/Thread;setDaemon(Z)V",
-            ordinal = 0,
-            shift = At.Shift.BEFORE))
+                    target = "Ljava/lang/Thread;setDaemon(Z)V",
+                    ordinal = 0,
+                    shift = At.Shift.BEFORE))
     private void banner$addLog4j(CallbackInfoReturnable<Boolean> cir) {
         // CraftBukkit start - TODO: handle command-line logging arguments
         java.util.logging.Logger global = java.util.logging.Logger.getLogger("");
@@ -163,5 +167,13 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
     @Inject(method = "showGui", at = @At("HEAD"), cancellable = true)
     public void banner$cancelGui(CallbackInfo ci) {
         ci.cancel();
+    }
+
+    @Inject(method = "initServer", at = @At(value = "INVOKE",
+            target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V",
+            remap = false,
+            ordinal = 3, shift = At.Shift.AFTER))
+    private void banner$startMetrics(CallbackInfoReturnable<Boolean> cir) {
+        Metrics.BannerMetrics.startMetrics();
     }
 }
