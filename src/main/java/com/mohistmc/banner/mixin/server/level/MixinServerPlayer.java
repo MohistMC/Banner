@@ -295,7 +295,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         }
         this.setHealth(this.getMaxHealth());
         this.stopUsingItem();
-        this.remainingFireTicks = 0;
+        this.setRemainingFireTicks(0);
         this.resetFallDistance();
         this.foodData = new FoodData();
         this.foodData.setEntityhuman((ServerPlayer) (Object) this);

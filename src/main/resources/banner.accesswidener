@@ -280,7 +280,6 @@ accessible field net/minecraft/world/entity/Entity hasVisualFire Z
 accessible field net/minecraft/world/entity/Entity onGround Z
 accessible field net/minecraft/world/entity/Entity passengers Lcom/google/common/collect/ImmutableList;
 accessible field net/minecraft/world/entity/Entity portalCooldown I
-accessible field net/minecraft/world/entity/Entity remainingFireTicks I
 accessible field net/minecraft/world/entity/Entity wasTouchingWater Z
 accessible field net/minecraft/world/entity/AreaEffectCloud durationOnUse I
 accessible field net/minecraft/world/entity/AreaEffectCloud radiusOnUse F

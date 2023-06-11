@@ -712,6 +712,9 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                                 this.player.doCheckFallDamage(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5, packetplayinflying.isOnGround());
                             } else {
                                 // CraftBukkit start - fire PlayerMoveEvent
+                                // Reset to old location first
+                                this.player.absMoveTo(prevX, prevY, prevZ, prevYaw, prevPitch);
+
                                 Player player = this.getCraftPlayer();
                                 Location from = new Location(player.getWorld(), lastPosX, lastPosY, lastPosZ, lastYaw, lastPitch); // Get the Players previous Event location.
                                 Location to = player.getLocation().clone(); // Start off the To location as the Players current location.

@@ -27,7 +27,7 @@
 ## Progress
 - [ ] Start patch
     * [x] Bukkit([**1687ea8**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/commits/1687ea8))
-    * [ ] CraftBukkit([**991639b**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/commits/991639b))
+    * [ ] CraftBukkit([**ce710de**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/commits/ce710de))
     - [ ] Spigot ([**723951c**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/spigot/commits/723951c))
         - [ ] Bukkit-Patches
         - [ ] CraftBukkit-Patches (93%)
