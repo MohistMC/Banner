@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.UUID;
 
@@ -65,57 +66,53 @@ public abstract class MixinItemEntity extends Entity {
         // Spigot end
     }
 
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    public void playerTouch(final Player entity) {
-        if (!this.level.isClientSide) {
-            if (this.pickupDelay > 0) return;
-            ItemStack itemstack = this.getItem();
-            int i = itemstack.getCount();
-            final int canHold =  entity.getInventory().canHold(itemstack);
-            final int remaining = itemstack.getCount() - canHold;
-            if (this.pickupDelay <= 0 && canHold > 0) {
-                itemstack.setCount(canHold);
-                final PlayerPickupItemEvent playerEvent = new PlayerPickupItemEvent(((ServerPlayer) entity).getBukkitEntity(), (Item) this.getBukkitEntity(), remaining);
-                playerEvent.setCancelled(!playerEvent.getPlayer().getCanPickupItems());
-                Bukkit.getPluginManager().callEvent(playerEvent);
-                if (playerEvent.isCancelled()) {
-                    itemstack.setCount(canHold + remaining);
-                    return;
-                }
-                final EntityPickupItemEvent entityEvent = new EntityPickupItemEvent(((ServerPlayer) entity).getBukkitEntity(), (Item) this.getBukkitEntity(), remaining);
-                entityEvent.setCancelled(!entityEvent.getEntity().getCanPickupItems());
-                Bukkit.getPluginManager().callEvent(entityEvent);
-                if (entityEvent.isCancelled()) {
-                    itemstack.setCount(canHold + remaining);
-                    return;
-                }
-                ItemStack current = this.getItem();
-                if (!itemstack.equals(current)) {
-                    itemstack = current;
-                } else {
-                    itemstack.setCount(canHold + remaining);
-                }
-                this.pickupDelay = 0;
-            } else if (this.pickupDelay == 0) {
-                this.pickupDelay = -1;
+    @Inject(method = "playerTouch", at = @At(value = "FIELD",
+            target = "Lnet/minecraft/world/entity/item/ItemEntity;pickupDelay:I"),
+            locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    private void banner$pickUpEvent(Player player, CallbackInfo ci, ItemStack itemStack,
+                                    net.minecraft.world.item.Item item, int i) {
+        // CraftBukkit start - fire PlayerPickupItemEvent
+        int canHold = player.getInventory().canHold(itemStack);
+        int remaining = i - canHold;
+
+        if (this.pickupDelay <= 0 && canHold > 0) {
+            itemStack.setCount(canHold);
+            // Call legacy event
+            PlayerPickupItemEvent playerEvent = new PlayerPickupItemEvent((org.bukkit.entity.Player) player.getBukkitEntity(), (org.bukkit.entity.Item) this.getBukkitEntity(), remaining);
+            playerEvent.setCancelled(!playerEvent.getPlayer().getCanPickupItems());
+            this.level.getCraftServer().getPluginManager().callEvent(playerEvent);
+            if (playerEvent.isCancelled()) {
+                itemStack.setCount(i); // SPIGOT-5294 - restore count
+                ci.cancel();
             }
-            ItemStack copy = itemstack.copy();
-            if (this.pickupDelay == 0 && (this.target == null || this.target.equals(entity.getUUID())) && entity.getInventory().add(itemstack)) {
-                copy.setCount(copy.getCount() - itemstack.getCount());
-                entity.take((ItemEntity) (Object) this, i);
-                if (itemstack.isEmpty()) {
-                    this.discard();
-                    itemstack.setCount(i);
-                }
-                entity.awardStat(Stats.ITEM_PICKED_UP.get(itemstack.getItem()), i);
-                entity.onItemPickup((ItemEntity) (Object) this);
+
+            // Call newer event afterwards
+            EntityPickupItemEvent entityEvent = new EntityPickupItemEvent((org.bukkit.entity.Player) player.getBukkitEntity(), (org.bukkit.entity.Item) this.getBukkitEntity(), remaining);
+            entityEvent.setCancelled(!entityEvent.getEntity().getCanPickupItems());
+            this.level.getCraftServer().getPluginManager().callEvent(entityEvent);
+            if (entityEvent.isCancelled()) {
+                itemStack.setCount(i); // SPIGOT-5294 - restore count
+                ci.cancel();
             }
+
+            // Update the ItemStack if it was changed in the event
+            ItemStack current = this.getItem();
+            if (!itemStack.equals(current)) {
+                itemStack = current;
+            } else {
+                itemStack.setCount(canHold + remaining); // = i
+            }
+
+            // Possibly < 0; fix here so we do not have to modify code below
+            this.pickupDelay = 0;
+        } else if (this.pickupDelay == 0) {
+            // ensure that the code below isn't triggered if canHold says we can't pick the items up
+            this.pickupDelay = -1;
         }
+        // CraftBukkit end
     }
+
+
 
     @Inject(method = "setItem", at = @At("RETURN"))
     private void banner$markDirty(ItemStack stack, CallbackInfo ci) {
