@@ -594,6 +594,13 @@ public final class CraftServer implements Server {
         return playerList.getMaxPlayers();
     }
 
+    @Override
+    public void setMaxPlayers(int maxPlayers) {
+        Preconditions.checkArgument(maxPlayers >= 0, "maxPlayers must be >= 0");
+
+        playerList.maxPlayers = maxPlayers;
+    }
+
     // NOTE: These are dependent on the corresponding call in MinecraftServer
     // so if that changes this will need to as well
     @Override
@@ -1920,6 +1927,10 @@ public final class CraftServer implements Server {
         return console.getMotd();
     }
 
+    @Override
+    public void setMotd(String motd) {
+        console.setMotd(motd);
+    }
     @Override
     public WarningState getWarningState() {
         return warningState;

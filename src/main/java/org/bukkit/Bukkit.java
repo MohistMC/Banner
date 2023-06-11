@@ -166,6 +166,16 @@ public final class Bukkit {
         return server.getMaxPlayers();
     }
 
+
+    /**
+     * Set the maximum amount of players allowed to be logged in at once.
+     *
+     * @param maxPlayers The maximum amount of concurrent players
+     */
+    public static void setMaxPlayers(int maxPlayers) {
+        server.setMaxPlayers(maxPlayers);
+    }
+
     /**
      * Get the game port that the server runs on.
      *
@@ -1535,6 +1545,16 @@ public final class Bukkit {
     @NotNull
     public static String getMotd() {
         return server.getMotd();
+    }
+
+
+    /**
+     * Set the message that is displayed on the server list.
+     *
+     * @param motd The message to be displayed
+     */
+    public static void setMotd(@NotNull String motd) {
+        server.setMotd(motd);
     }
 
     /**
