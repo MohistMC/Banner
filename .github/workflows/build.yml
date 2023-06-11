@@ -1,9 +1,15 @@
 # This workflow will build a Java project with Gradle
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
 
-name: Build Release
+name: Build And Publish to Modrinth
 
 on : [push, pull_request]
+
+env:
+  MINECRAFT_VERSION: 1.20
+  VERSION: 1.1.0+1.20
+  MODRINTH_TOKEN: ${{ secrets.PUBLISH_MODRINTH_TOKEN }}
+  RELEASE_NAME: banner-1.20
 
 jobs:
   build:
@@ -32,3 +38,16 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build
+
+      - name: Publish to ModRinth
+        uses: Kir-Antipov/mc-publish@v3.2
+        with:
+          modrinth-id: 1q2w3e4r
+          modrinth-token: "${{env.MODRINTH_TOKEN}}"
+          name: "${{env.RELEASE_NAME}}"
+          version: "${{env.VERSION}}"
+          version-type: release
+
+          loaders: fabric
+          game-versions: "${{env.MINECRAFT_VERSION}}"
+          java: "17"
