@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.server.dedicated;
 
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.Metrics;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.commands.CommandSourceStack;
@@ -163,5 +164,13 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
     @Inject(method = "showGui", at = @At("HEAD"), cancellable = true)
     public void banner$cancelGui(CallbackInfo ci) {
         ci.cancel();
+    }
+
+    @Inject(method = "initServer", at = @At(value = "INVOKE",
+            target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V",
+            remap = false,
+            ordinal = 3, shift = At.Shift.AFTER))
+    private void banner$startMetrics(CallbackInfoReturnable<Boolean> cir) {
+        Metrics.BannerMetrics.startMetrics();
     }
 }
