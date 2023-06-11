@@ -7,6 +7,7 @@ import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
@@ -30,6 +31,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
@@ -49,6 +51,8 @@ import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.projectiles.ProjectileSource;
+import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.ActivationRange;
 import org.spigotmc.CustomTimingsHandler;
@@ -136,6 +140,8 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
 
     @Shadow public abstract DamageSources damageSources();
 
+    @Shadow protected abstract ListTag newDoubleList(double... numbers);
+
     private CraftEntity bukkitEntity;
     public final org.spigotmc.ActivationRange.ActivationType activationType =
             org.spigotmc.ActivationRange.initializeEntityActivationType((Entity) (Object) this);
@@ -153,6 +159,28 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     private static transient BlockPos banner$damageEventBlock;
     private static final int CURRENT_LEVEL = 2;
     public CustomTimingsHandler tickTimer = SpigotTimings.getEntityTimings(((Entity) (Object) this)); // Spigot
+    @javax.annotation.Nullable
+    private org.bukkit.util.Vector origin;
+    @javax.annotation.Nullable
+    private UUID originWorld;
+
+    @Override
+    public void setOrigin(@NotNull Location location) {
+        this.origin = location.toVector();
+        this.originWorld = location.getWorld().getUID();
+    }
+
+    @Nullable
+    @Override
+    public Vector getOriginVector() {
+        return this.origin != null ? this.origin.clone() : null;
+    }
+
+    @Nullable
+    @Override
+    public UUID getOriginWorld() {
+        return this.originWorld;
+    }
 
     @Override
     public void inactiveTick() {
@@ -417,6 +445,15 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         if (this.bukkitEntity != null) {
             this.bukkitEntity.storeBukkitValues(compound);
         }
+        // Paper start - Save the entity's origin location
+        if (this.origin != null) {
+            UUID originWorld = this.originWorld != null ? this.originWorld : this.level != null ? this.level.getWorld().getUID() : null;
+            if (originWorld != null) {
+                compound.putUUID("Paper.OriginWorld", originWorld);
+            }
+            compound.put("Paper.Origin", this.newDoubleList(origin.getX(), origin.getY(), origin.getZ()));
+        }
+        // Paper end
     }
 
     private static boolean isLevelAtLeast(CompoundTag tag, int level) {
@@ -463,6 +500,19 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
             maxAirTicks = compound.getInt("Bukkit.MaxAirSupply");
         }
         // CraftBukkit end
+        // Paper start - Restore the entity's origin location
+        ListTag originTag = compound.getList("Paper.Origin", 6);
+        if (!originTag.isEmpty()) {
+            UUID originWorld = null;
+            if (compound.contains("Paper.OriginWorld")) {
+                originWorld = compound.getUUID("Paper.OriginWorld");
+            } else if (this.level != null) {
+                originWorld = this.level.getWorld().getUID();
+            }
+            this.originWorld = originWorld;
+            origin = new org.bukkit.util.Vector(originTag.getDouble(0), originTag.getDouble(1), originTag.getDouble(2));
+        }
+        // Paper end
     }
 
     @Inject(method = "setInvisible", cancellable = true, at = @At("HEAD"))

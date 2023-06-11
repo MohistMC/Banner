@@ -5,10 +5,27 @@ import net.minecraft.core.Position;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
 import org.spigotmc.CustomTimingsHandler;
 
+import java.util.UUID;
+
 public interface InjectionEntity {
+
+    default void setOrigin(@javax.annotation.Nonnull Location location) {
+
+    }
+
+    @javax.annotation.Nullable
+    default org.bukkit.util.Vector getOriginVector() {
+        return null;
+    }
+
+    @javax.annotation.Nullable
+    default UUID getOriginWorld() {
+        return null;
+    }
 
     default CustomTimingsHandler bridge$tickTimer() {
         return null;
