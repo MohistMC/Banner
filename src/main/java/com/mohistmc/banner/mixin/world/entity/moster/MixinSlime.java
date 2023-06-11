@@ -1,5 +1,7 @@
 package com.mohistmc.banner.mixin.world.entity.moster;
 
+import com.mohistmc.banner.injection.world.entity.monster.InjectionSlime;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -15,12 +17,15 @@ import org.bukkit.event.entity.SlimeSplitEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(net.minecraft.world.entity.monster.Slime.class)
-public abstract class MixinSlime extends Mob {
+public abstract class MixinSlime extends Mob implements InjectionSlime {
 
     protected MixinSlime(EntityType<? extends Mob> entityType, Level level) {
         super(entityType, level);
@@ -30,10 +35,11 @@ public abstract class MixinSlime extends Mob {
     @Shadow public abstract int getSize();
     @Shadow public abstract EntityType<? extends net.minecraft.world.entity.monster.Slime> getType();
     // @formatter:on
+    private boolean canWander = true;
 
     /**
      * @author wdog5
-     * @reason
+     * @reason bukkit
      */
     @Overwrite(remap = false)
     @Override
@@ -81,5 +87,34 @@ public abstract class MixinSlime extends Mob {
             }
         }
         super.remove(reason);
+    }
+
+    @Inject(method = "addAdditionalSaveData",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/nbt/CompoundTag;putInt(Ljava/lang/String;I)V"))
+    private void banner$putData(CompoundTag compound, CallbackInfo ci) {
+        compound.putBoolean("Paper.canWander", this.canWander); // Paper
+    }
+
+    @Inject(method = "readAdditionalSaveData",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/Mob;readAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V",
+                    shift = At.Shift.AFTER))
+    private void banner$readData(CompoundTag compound, CallbackInfo ci) {
+        // Paper start - check exists before loading or this will be loaded as false
+        if (compound.contains("Paper.canWander")) {
+            this.canWander = compound.getBoolean("Paper.canWander");
+        }
+        // Paper end
+    }
+
+    @Override
+    public boolean canWander() {
+        return canWander;
+    }
+
+    @Override
+    public void setWander(boolean canWander) {
+        this.canWander = canWander;
     }
 }

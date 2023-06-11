@@ -11,16 +11,4 @@ public interface InjectionBeaconBlockEntity {
     default PotionEffect getSecondaryEffect() {
         return null;
     }
-
-    default int getLevel() {
-        return 0;
-    }
-
-    default boolean hasSecondaryEffect() {
-        return false;
-    }
-
-    default byte getAmplification() {
-        return 0;
-    }
 }

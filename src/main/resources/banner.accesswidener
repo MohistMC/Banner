@@ -30,6 +30,8 @@ accessible class net/minecraft/server/commands/LootCommand$Callback
 accessible class net/minecraft/server/commands/SpreadPlayersCommand$Position
 accessible class net/minecraft/server/network/ServerGamePacketListenerImpl$EntityInteraction
 accessible class net/minecraft/world/entity/animal/horse/TraderLlama$TraderLlamaDefendWanderingTraderGoal
+accessible class net/minecraft/world/entity/monster/Slime$SlimeMoveControl
+accessible class net/minecraft/world/level/border/WorldBorder$BorderExtent
 
 # public methods
 accessible method net/minecraft/world/level/block/DispenserBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)V

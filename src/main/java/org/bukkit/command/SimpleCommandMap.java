@@ -159,10 +159,13 @@ public class SimpleCommandMap implements CommandMap {
             target.timings.stopTiming(); // Spigot
         } catch (CommandException ex) {
             target.timings.stopTiming(); // Spigot
+            server.getPluginManager().callEvent(new com.destroystokyo.paper.event.server.ServerExceptionEvent(new com.destroystokyo.paper.exception.ServerCommandException(ex, target, sender, args))); // Paper
             throw ex;
         } catch (Throwable ex) {
             target.timings.stopTiming(); // Spigot
-            throw new CommandException("Unhandled exception executing '" + commandLine + "' in " + target, ex);
+            String msg = "Unhandled exception executing '" + commandLine + "' in " + target;
+            server.getPluginManager().callEvent(new com.destroystokyo.paper.event.server.ServerExceptionEvent(new com.destroystokyo.paper.exception.ServerCommandException(ex, target, sender, args))); // Paper
+            throw new CommandException(msg, ex);
         }
 
         // return true as command was handled
@@ -241,7 +244,9 @@ public class SimpleCommandMap implements CommandMap {
         } catch (CommandException ex) {
             throw ex;
         } catch (Throwable ex) {
-            throw new CommandException("Unhandled exception executing tab-completer for '" + cmdLine + "' in " + target, ex);
+            String msg = "Unhandled exception executing tab-completer for '" + cmdLine + "' in " + target;
+            server.getPluginManager().callEvent(new com.destroystokyo.paper.event.server.ServerExceptionEvent(new com.destroystokyo.paper.exception.ServerTabCompleteException(msg, ex, target, sender, args))); // Paper
+            throw new CommandException(msg, ex);
         }
     }
 

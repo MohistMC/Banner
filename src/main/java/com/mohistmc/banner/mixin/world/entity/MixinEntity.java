@@ -666,6 +666,24 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         return true;
     }
 
+    @Inject(method = "startSeenByPlayer", at = @At("HEAD"))
+    private void banner$trackEvent(ServerPlayer serverPlayer, CallbackInfo ci) {
+        // Paper start
+        if (io.papermc.paper.event.player.PlayerTrackEntityEvent.getHandlerList().getRegisteredListeners().length > 0) {
+            new io.papermc.paper.event.player.PlayerTrackEntityEvent(serverPlayer.getBukkitEntity(), this.getBukkitEntity()).callEvent();
+        }
+        // Paper end
+    }
+
+    @Inject(method = "startSeenByPlayer", at = @At("HEAD"))
+    private void banner$untrackedEvent(ServerPlayer serverPlayer, CallbackInfo ci) {
+        // Paper start
+        if(io.papermc.paper.event.player.PlayerUntrackEntityEvent.getHandlerList().getRegisteredListeners().length > 0) {
+            new io.papermc.paper.event.player.PlayerUntrackEntityEvent(serverPlayer.getBukkitEntity(), this.getBukkitEntity()).callEvent();
+        }
+        // Paper end
+    }
+
     @Override
     public boolean canCollideWith(Entity entity) {
         return this.isPushable();

@@ -1,5 +1,8 @@
 package org.bukkit.craftbukkit.v1_19_R3.scheduler;
 
+import com.destroystokyo.paper.ServerSchedulerReportingWrapper;
+import com.destroystokyo.paper.event.server.ServerExceptionEvent;
+import com.destroystokyo.paper.exception.ServerSchedulerException;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -416,20 +419,23 @@ public class CraftScheduler implements BukkitScheduler {
                 try {
                     task.run();
                 } catch (final Throwable throwable) {
+                    String msg = String.format(
+                            "Task #%s for %s generated an exception",
+                            task.getTaskId(),
+                            task.getOwner().getDescription().getFullName());
                     task.getOwner().getLogger().log(
                             Level.WARNING,
-                            String.format(
-                                "Task #%s for %s generated an exception",
-                                task.getTaskId(),
-                                task.getOwner().getDescription().getFullName()),
+                            msg,
                             throwable);
+                    org.bukkit.Bukkit.getServer().getPluginManager().callEvent(
+                            new ServerExceptionEvent(new ServerSchedulerException(msg, throwable, task)));
                 } finally {
                     currentTask = null;
                 }
                 parsePending();
             } else {
                 debugTail = debugTail.setNext(new CraftAsyncDebugger(currentTick + RECENT_TICKS, task.getOwner(), task.getTaskClass()));
-                executor.execute(task);
+                this.executor.execute(new ServerSchedulerReportingWrapper(task)); // Paper
                 // We don't need to parse pending
                 // (async tasks must live with race-conditions if they attempt to cancel between these few lines of code)
             }

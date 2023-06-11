@@ -33,7 +33,7 @@ public abstract class MixinRegionFileStorage implements InjectionRegionFileStora
     private transient boolean banner$existOnly;
 
     @Inject(method = "getRegionFile", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD,
-            at = @At(value = "NEW", target = "net/minecraft/world/level/chunk/storage/RegionFile"))
+            at = @At(value = "NEW", args = "class=net/minecraft/world/level/chunk/storage/RegionFile"))
     private void banner$retIfSearch(ChunkPos pos, CallbackInfoReturnable<RegionFile> cir, long l, RegionFile rf, Path path) {
         if (banner$existOnly && !Files.exists(path)) cir.setReturnValue(null);
     }
