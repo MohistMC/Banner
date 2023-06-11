@@ -1059,4 +1059,21 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
         return spigot;
     }
     // Spigot end
+
+    // Paper start
+    @Override
+    public Location getOrigin() {
+        Vector originVector = this.getHandle().getOriginVector();
+        if (originVector == null) {
+            return null;
+        }
+        World world = this.getWorld();
+        if (this.getHandle().getOriginWorld() != null) {
+            world = org.bukkit.Bukkit.getWorld(this.getHandle().getOriginWorld());
+        }
+
+        //noinspection ConstantConditions
+        return originVector.toLocation(world);
+    }
+    // Paper end
 }

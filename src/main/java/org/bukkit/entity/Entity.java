@@ -710,4 +710,16 @@ public interface Entity extends Metadatable, CommandSender, Nameable, Persistent
     @Override
     Spigot spigot();
     // Spigot end
+
+    // Paper start
+    /**
+     * Gets the location where this entity originates from.
+     * <p>
+     * This value can be null if the entity hasn't yet been added to the world.
+     *
+     * @return Location where entity originates or null if not yet added
+     */
+    @Nullable
+    Location getOrigin();
+    // Paper end
 }

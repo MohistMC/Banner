@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.entity.item;
 
 import com.mohistmc.banner.injection.world.entity.InjectionPrimedTnt;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -91,6 +92,18 @@ public abstract class MixinPrimedTnt extends Entity implements TraceableEntity, 
         if (!event.isCancelled()) {
             this.level().explode((PrimedTnt) (Object) this, this.getX(), this.getY(0.0625), this.getZ(), event.getRadius(), event.getFire(), Level.ExplosionInteraction.TNT);
         }
+    }
+
+    @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
+    private void banner$addData(CompoundTag compoundTag, CallbackInfo ci) {
+        // Paper start - Try and load origin location from the old NBT tags for backwards compatibility
+        if (compoundTag.contains("SourceLoc_x")) {
+            int srcX = compoundTag.getInt("SourceLoc_x");
+            int srcY = compoundTag.getInt("SourceLoc_y");
+            int srcZ = compoundTag.getInt("SourceLoc_z");
+            this.setOrigin(new org.bukkit.Location(this.level().getWorld(), srcX, srcY, srcZ));
+        }
+        // Paper end
     }
 
     @Override
