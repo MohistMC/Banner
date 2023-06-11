@@ -57,7 +57,9 @@ public interface Sign extends TileState, Colorable {
      * outside of this event is undefined.
      *
      * @return if this sign is currently editable
+     * @deprecated use {@link #isWaxed()}
      */
+    @Deprecated // Paper
     public boolean isEditable();
 
     /**
@@ -68,8 +70,26 @@ public interface Sign extends TileState, Colorable {
      * outside of this event is undefined.
      *
      * @param editable if this sign is currently editable
+     * @deprecated use {@link #setWaxed(boolean)}
      */
+    @Deprecated // Paper
     public void setEditable(boolean editable);
+
+    // Paper start
+    /**
+     * Gets whether the sign has been waxed and therefore prevents editing.
+     *
+     * @return true if waxed
+     */
+    boolean isWaxed();
+
+    /**
+     * Sets whether the sign is waxed.
+     *
+     * @param waxed true to wax and therefore prevent editing
+     */
+    void setWaxed(boolean waxed);
+    // Paper end
 
     /**
      * Gets whether this sign has glowing text. Only affects the {@link Side#FRONT}.

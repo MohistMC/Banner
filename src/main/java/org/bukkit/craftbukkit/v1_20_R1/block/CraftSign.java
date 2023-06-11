@@ -60,6 +60,18 @@ public class CraftSign<T extends SignBlockEntity> extends CraftBlockEntityState<
         getSnapshot().setWaxed(!editable);
     }
 
+    // Paper start
+    @Override
+    public boolean isWaxed() {
+        return this.getSnapshot().isWaxed();
+    }
+
+    @Override
+    public void setWaxed(final boolean waxed) {
+        this.getSnapshot().setWaxed(waxed);
+    }
+    // Paper end
+
     @Override
     public boolean isGlowingText() {
         return front.isGlowingText();
