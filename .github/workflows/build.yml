@@ -49,5 +49,5 @@ jobs:
           version-type: release
 
           loaders: fabric
-          game-versions: "${{env.MINECRAFT_VERSION}}"
+          game-versions: '1.20'
           java: "17"
