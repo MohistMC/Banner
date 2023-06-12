@@ -1016,6 +1016,10 @@ public class CraftEventFactory {
             cause = DamageCause.DRYOUT;
         } else if (source.is(DamageTypes.FREEZE)) {
             cause = DamageCause.FREEZE;
+        } else if (source.is(DamageTypes.GENERIC)) {
+            cause = DamageCause.KILL;
+        } else if (source.is(DamageTypes.OUT_OF_WORLD)) {
+            cause = DamageCause.WORLD_BORDER;
         } else {
             cause = DamageCause.CUSTOM;
         }
