@@ -51,10 +51,6 @@ public abstract class MixinChestBlockEntity extends RandomizableContainerBlockEn
     }
 
     @Override
-    public void setOwner(InventoryHolder owner) {
-    }
-
-    @Override
     public int getMaxStackSize() {
         if (maxStack == 0) maxStack = MAX_STACK;
         return maxStack;
@@ -64,4 +60,11 @@ public abstract class MixinChestBlockEntity extends RandomizableContainerBlockEn
     public void setMaxStackSize(int size) {
         this.maxStack = size;
     }
+
+    // CraftBukkit start
+    @Override
+    public boolean onlyOpCanSetNbt() {
+        return true;
+    }
+    // CraftBukkit end
 }
