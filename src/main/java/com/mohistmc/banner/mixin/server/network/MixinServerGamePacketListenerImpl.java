@@ -588,7 +588,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
 
                             this.player.move(MoverType.PLAYER, new Vec3(d7, d8, d9));
                             this.player.onGround = packetplayinflying.isOnGround(); // CraftBukkit - SPIGOT-5810, SPIGOT-5835, SPIGOT-6828: reset by this.player.move
-                            double d12 = d8;
 
                             d7 = d0 - this.player.getX();
                             d8 = d1 - this.player.getY();
@@ -599,17 +598,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                             d9 = d2 - this.player.getZ();
                             d11 = d7 * d7 + d8 * d8 + d9 * d9;
                             boolean flag2 = false;
-
-                            if (!this.player.isChangingDimension() && d11 > 0.0625D && !this.player.isSleeping() && !this.player.gameMode.isCreative() && this.player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR) {
-                                flag2 = true;
-                                LOGGER.warn("{} moved wrongly!", this.player.getName().getString());
-                            }
-
-                            this.player.absMoveTo(d0, d1, d2, f, f1);
-                            if (!this.player.noPhysics && !this.player.isSleeping() && (flag2 && worldserver.noCollision(this.player, axisalignedbb) || this.isPlayerCollidingWithAnythingNew(worldserver, axisalignedbb))) {
-                                this.internalTeleport(d3, d4, d5, f, f1, Collections.emptySet()); // CraftBukkit - SPIGOT-1807: Don't call teleport event, when the client thinks the player is falling, because the chunks are not loaded on the client yet.
-                                this.player.doCheckFallDamage(this.player.getY() - d6, packetplayinflying.isOnGround());
-                            } else {
+                            if (this.player.noPhysics || this.player.isSleeping() || (!flag2 || !worldserver.noCollision(this.player, axisalignedbb) && !this.isPlayerCollidingWithAnythingNew(worldserver, axisalignedbb))) {
                                 // CraftBukkit start - fire PlayerMoveEvent
                                 // Rest to old location first
                                 this.player.absMoveTo(prevX, prevY, prevZ, prevYaw, prevPitch);
@@ -673,7 +662,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                                 this.player.absMoveTo(d0, d1, d2, f, f1); // Copied from above
                                 // CraftBukkit end
 
-                                this.clientIsFloating = d12 >= -0.03125D && !flag1 && this.player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR && !this.server.isFlightAllowed() && !this.player.getAbilities().mayfly && !this.player.hasEffect(MobEffects.LEVITATION) && !this.player.isFallFlying() && !this.player.isAutoSpinAttack() && this.noBlocksAround(this.player);
+                                this.clientIsFloating = d8 >= -0.03125D && !flag1 && this.player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR && !this.server.isFlightAllowed() && !this.player.getAbilities().mayfly && !this.player.hasEffect(MobEffects.LEVITATION) && !this.player.isFallFlying() && !this.player.isAutoSpinAttack() && this.noBlocksAround(this.player);
                                 this.player.getLevel().getChunkSource().move(this.player);
                                 this.player.doCheckFallDamage(this.player.getY() - d6, packetplayinflying.isOnGround());
                                 this.player.setOnGround(packetplayinflying.isOnGround());
@@ -685,6 +674,9 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                                 this.lastGoodX = this.player.getX();
                                 this.lastGoodY = this.player.getY();
                                 this.lastGoodZ = this.player.getZ();
+                            } else {
+                                this.internalTeleport(d3, d4, d5, f, f1, Collections.emptySet()); // CraftBukkit - SPIGOT-1807: Don't call teleport event, when the client thinks the player is falling, because the chunks are not loaded on the client yet.
+                                this.player.doCheckFallDamage(this.player.getY() - d6, packetplayinflying.isOnGround());
                             }
                         }
                     }
