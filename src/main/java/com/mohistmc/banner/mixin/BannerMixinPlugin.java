@@ -132,6 +132,9 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
         if (mixinClassName.equals("com.mohistmc.banner.mixin.world.level.spawner.MixinNaturalSpawner")) {
             return !FabricLoader.getInstance().isModLoaded("carpet-tis-addition");
         }
+        if (mixinClassName.equals("com.mohistmc.banner.mixin.world.item.MixinChorusFruitItem")) {
+            return !FabricLoader.getInstance().isModLoaded("openpartiesandclaims");
+        }
         return true;
     }
 
