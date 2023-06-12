@@ -106,7 +106,9 @@ public abstract class MixinEnchantmentMenu extends AbstractContainerMenu{
                         }
                         CraftItemStack item = CraftItemStack.asCraftMirror(itemStack3);
 
-                        EnchantItemEvent event = new EnchantItemEvent((org.bukkit.entity.Player) player.getBukkitEntity(), this.getBukkitView(), access.getLocation().getBlock(), item, this.costs[i], enchants, i);
+                        org.bukkit.enchantments.Enchantment hintedEnchantment = org.bukkit.enchantments.Enchantment.getByKey(CraftNamespacedKey.fromMinecraft(BuiltInRegistries.ENCHANTMENT.getKey(Enchantment.byId(enchantClue[i]))));
+                        int hintedEnchantmentLevel = levelClue[i];
+                        EnchantItemEvent event = new EnchantItemEvent((org.bukkit.entity.Player) player.getBukkitEntity(), this.getBukkitView(), access.getLocation().getBlock(), item, this.costs[i], enchants, hintedEnchantment, hintedEnchantmentLevel, i);
                         level.getCraftServer().getPluginManager().callEvent(event);
 
                         int banner$level = event.getExpLevelCost();

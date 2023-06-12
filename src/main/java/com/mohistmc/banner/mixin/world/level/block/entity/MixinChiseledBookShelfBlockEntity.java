@@ -16,6 +16,8 @@ import org.bukkit.inventory.InventoryHolder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,8 @@ import java.util.List;
 public abstract class MixinChiseledBookShelfBlockEntity extends BlockEntity implements Container {
 
     @Shadow @Final private NonNullList<ItemStack> items;
+
+    @Shadow protected abstract void updateState(int i);
 
     public MixinChiseledBookShelfBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
@@ -70,5 +74,13 @@ public abstract class MixinChiseledBookShelfBlockEntity extends BlockEntity impl
     public Location getLocation() {
         if (!DistValidate.isValid(level)) return null;
         return new org.bukkit.Location(level.getWorld(), worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
+    }
+
+    @Redirect(method = "setItem", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/block/entity/ChiseledBookShelfBlockEntity;updateState(I)V"))
+    private void fixShapeUpdate(ChiseledBookShelfBlockEntity instance, int i) {
+        if (this.level != null) {
+            this.updateState(i); // CraftBukkit - SPIGOT-7381: check for null world
+        }
     }
 }
