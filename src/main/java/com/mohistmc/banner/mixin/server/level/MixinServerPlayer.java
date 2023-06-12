@@ -554,7 +554,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         CraftEventFactory.handleInventoryCloseEvent(this); // CraftBukkit
     }
 
-    @Inject(method = "changeDimension", at = @At(value = "HEAD", target = "Lnet/minecraft/server/level/ServerPlayer;changeDimension(Lnet/minecraft/server/level/ServerLevel;)Lnet/minecraft/world/entity/Entity"), cancellable = true)
+    @Inject(method = "changeDimension", at = @At(value = "HEAD"), cancellable = true)
     public void banner$changeDimension(ServerLevel worldserver, CallbackInfoReturnable<Entity> cr) {
         cr.setReturnValue(changeDimension(worldserver, PlayerTeleportEvent.TeleportCause.UNKNOWN));
     }
