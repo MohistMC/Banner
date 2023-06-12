@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftHumanEntity;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.InventoryHolder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -25,8 +24,6 @@ public abstract class MixinChestBlockEntity extends RandomizableContainerBlockEn
 
     public List<HumanEntity> transaction = new ArrayList<>();
     private int maxStack = MAX_STACK;
-
-    public InventoryHolder owner;
 
     protected MixinChestBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
@@ -53,16 +50,6 @@ public abstract class MixinChestBlockEntity extends RandomizableContainerBlockEn
     }
 
     @Override
-    public void setOwner(InventoryHolder owner) {
-        this.owner = owner;
-    }
-
-    @Override
-    public InventoryHolder getOwner() {
-        return owner;
-    }
-
-    @Override
     public int getMaxStackSize() {
         if (maxStack == 0) maxStack = MAX_STACK;
         return maxStack;
@@ -72,4 +59,11 @@ public abstract class MixinChestBlockEntity extends RandomizableContainerBlockEn
     public void setMaxStackSize(int size) {
         this.maxStack = size;
     }
+
+    // CraftBukkit start
+    @Override
+    public boolean onlyOpCanSetNbt() {
+        return true;
+    }
+    // CraftBukkit end
 }
