@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.server.level;
 
 import com.mohistmc.banner.bukkit.BukkitCaptures;
+import com.mohistmc.banner.bukkit.DoubleChestInventory;
 import com.mohistmc.banner.injection.server.level.InjectionServerPlayer;
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Either;
@@ -20,13 +21,19 @@ import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.CombatTracker;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.HorseInventoryMenu;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
@@ -64,7 +71,9 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 @Mixin(ServerPlayer.class)
@@ -134,6 +143,12 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     public boolean relativeTime = true;
     public String locale = "en_us"; // CraftBukkit - add, lowercase
     private boolean banner$initialized = false;
+    @Shadow private int containerCounter;
+    @Shadow public abstract void initMenu(AbstractContainerMenu abstractContainerMenu);
+
+    @Shadow public abstract void nextContainerCounter();
+
+    @Shadow public abstract void initInventoryMenu();
 
     public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
         super(level, blockPos, f, gameProfile);
@@ -246,10 +261,83 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         this.gameMode.setLevel((ServerLevel) world);
     }
 
+    @Override
+    public int nextContainerCounterInt() {
+        this.containerCounter = this.containerCounter % 100 + 1;
+        return containerCounter; // CraftBukkit
+    }
+
+    private AtomicReference<AbstractContainerMenu> banner$containerMenu = new AtomicReference<>();
+
+    @Inject(method = "openMenu", cancellable = true,
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/MenuProvider;createMenu(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/inventory/AbstractContainerMenu;"),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$invOpen(MenuProvider menuProvider, CallbackInfoReturnable<OptionalInt> cir) {
+        AbstractContainerMenu banner$container = menuProvider.createMenu(this.containerCounter, this.getInventory(), this);
+        banner$containerMenu.set(banner$container);
+        if (banner$container != null) {
+            banner$container.setTitle(menuProvider.getDisplayName());
+            boolean cancelled = false;
+            BukkitCaptures.captureContainerOwner((ServerPlayer) (Object) this);
+            banner$container = CraftEventFactory.callInventoryOpenEvent((ServerPlayer) (Object) this, banner$container, cancelled);
+            BukkitCaptures.resetContainerOwner();
+            if (banner$container == null && !cancelled) {
+                if (menuProvider instanceof Container) {
+                    ((Container) menuProvider).stopOpen((ServerPlayer) (Object) this);
+                } else if (menuProvider instanceof DoubleChestInventory) {
+                    ((DoubleChestInventory) menuProvider).inventorylargechest.stopOpen(this);
+                }
+                cir.setReturnValue(OptionalInt.empty());
+            }
+        }
+    }
+
+    @Redirect(method = "openMenu", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/MenuProvider;createMenu(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/inventory/AbstractContainerMenu;"))
+    private AbstractContainerMenu banner$resetMenu(MenuProvider instance, int i, Inventory inventory, Player player) {
+        return banner$containerMenu.get();
+    }
+
+    @Redirect(method = "openMenu", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/MenuProvider;getDisplayName()Lnet/minecraft/network/chat/Component;"))
+    private Component banner$sendData(MenuProvider instance) {
+        return banner$containerMenu.get().getTitle();
+    }
+
+    private AtomicReference<HorseInventoryMenu> banner$horseMenu = new AtomicReference<>();
+
+    @Inject(method = "openHorseInventory", at = @At("HEAD"), cancellable = true)
+    private void banner$menuEvent(AbstractHorse abstractHorse, Container container, CallbackInfo ci) {
+        // CraftBukkit start - Inventory open hook
+        this.nextContainerCounter();
+        AbstractContainerMenu banner$container = new HorseInventoryMenu(this.containerCounter, this.getInventory(), container, abstractHorse);
+        banner$horseMenu.set((HorseInventoryMenu) banner$container);
+        banner$container.setTitle(abstractHorse.getDisplayName());
+        banner$container = CraftEventFactory.callInventoryOpenEvent(((ServerPlayer) (Object) this), banner$container);
+        if (banner$container == null) {
+            container.stopOpen(this);
+            ci.cancel();
+        }
+    }
+
+    @Redirect(method = "openHorseInventory", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;nextContainerCounter()V"))
+    private void banner$cancelNext(ServerPlayer instance) {}
+
+    @Redirect(method = "openHorseInventory", at = @At(value = "NEW", args = "class=net/minecraft/world/inventory/HorseInventoryMenu"))
+    private HorseInventoryMenu banner$resetHorseMenu(int i, Inventory inventory, Container container, AbstractHorse abstractHorse) {
+        return banner$horseMenu.get();
+    }
+
+    @Inject(method = "closeContainer", at = @At("HEAD"))
+    private void banner$closeMenu(CallbackInfo ci) {
+        CraftEventFactory.handleInventoryCloseEvent(this); // CraftBukkit
+    }
+
     @Inject(method = "changeDimension", at = @At(value = "HEAD", target = "Lnet/minecraft/server/level/ServerPlayer;changeDimension(Lnet/minecraft/server/level/ServerLevel;)Lnet/minecraft/world/entity/Entity"), cancellable = true)
     public void banner$changeDimension(ServerLevel worldserver, CallbackInfoReturnable<Entity> cr) {
         cr.setReturnValue(changeDimension(worldserver, PlayerTeleportEvent.TeleportCause.UNKNOWN));
     }
+
     @Override
     public Entity changeDimension(ServerLevel worldserver, PlayerTeleportEvent.TeleportCause cause) {
         if (this.isSleeping()) return this;
