@@ -14,7 +14,7 @@
 
 | Version | Support     | Stability | Mod compatibility   | Plugin compatibility |
 |---------|-------------|-----------|---------------------|----------------------|
-| 1.20    | WIP         | Poor      | Zero                | Zero                 |
+| 1.20.x  | WIP         | Poor      | Better than plugins | Poor                 |
 | 1.19.4  | WIP         | Poor      | Better than plugins | Poor                 |
 
 ## Notice
