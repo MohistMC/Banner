@@ -51,6 +51,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -58,6 +59,8 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 @Mixin(Level.class)
@@ -192,106 +195,86 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         return this.world;
     }
 
-    /**
-     * @author wdog5
-     * @reason functionality replaced
-     * TODO inline this with injects
-     */
-    @Overwrite
-    public boolean setBlock(BlockPos pos, BlockState state, int flags, int recursionLeft) {
+    private AtomicBoolean captured = new AtomicBoolean(false);
+
+    @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z", at = @At("HEAD"), cancellable = true)
+    private void banner$captureTree(BlockPos blockPos, BlockState blockState, int i, CallbackInfoReturnable<Boolean> cir) {
         // CraftBukkit start - tree generation
         if (this.captureTreeGeneration) {
-            CapturedBlockState blockstate = capturedBlockStates.get(pos);
+            CapturedBlockState blockstate = capturedBlockStates.get(blockPos);
             if (blockstate == null) {
-                blockstate = CapturedBlockState.getTreeBlockState(((Level) (Object) this), pos, flags);
-                this.capturedBlockStates.put(pos.immutable(), blockstate);
+                blockstate = CapturedBlockState.getTreeBlockState(((Level) (Object) this), blockPos, i);
+                this.capturedBlockStates.put(blockPos.immutable(), blockstate);
             }
-            blockstate.setData(state);
-            return true;
+            blockstate.setData(blockState);
+            cir.setReturnValue(true);
         }
         // CraftBukkit end
-        if (this.isOutsideBuildHeight(pos)) {
-            return false;
-        } else if (!this.isClientSide && this.isDebug()) {
-            return false;
-        } else {
-            LevelChunk levelChunk = this.getChunkAt(pos);
-            Block block = state.getBlock();
-            // CraftBukkit start - capture blockstates
-            boolean captured = false;
-            if (this.captureBlockStates && !this.capturedBlockStates.containsKey(pos)) {
-                CapturedBlockState blockstate = CapturedBlockState.getBlockState(((Level) (Object) this), pos, flags);
-                this.capturedBlockStates.put(pos.immutable(), blockstate);
-                captured = true;
+    }
+
+    private AtomicReference<BlockState> banner$state = new AtomicReference<>();
+
+    @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/chunk/LevelChunk;setBlockState(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;"),
+            locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    private void banner$captrueBlock(BlockPos blockPos, BlockState blockState, int i, int j,
+                                     CallbackInfoReturnable<Boolean> cir, LevelChunk levelChunk, Block block) {
+        // CraftBukkit start - capture blockstates
+        if (this.captureBlockStates && !this.capturedBlockStates.containsKey(blockPos)) {
+            CapturedBlockState blockstate = CapturedBlockState.getBlockState(((Level) (Object) this), blockPos, i);
+            this.capturedBlockStates.put(blockPos.immutable(), blockstate);
+            captured.set(true);
+        }
+        // CraftBukkit end
+        BlockState banner$blockState2 = levelChunk.setBlockState(blockPos, blockState, (i & 64) != 0, (i & 1024) == 0); // CraftBukkit custom NO_PLACE flag
+        banner$state.set(banner$blockState2);
+        if (banner$blockState2 == null) {
+            // CraftBukkit start - remove blockstate if failed (or the same)
+            if (this.captureBlockStates && captured.get()) {
+                this.capturedBlockStates.remove(blockPos);
             }
             // CraftBukkit end
-            BlockState blockState = levelChunk.setBlockState(pos, state, (flags & 64) != 0, (flags & 1024) == 0); // CraftBukkit custom NO_PLACE flag
-            if (blockState == null) {
-                // CraftBukkit start - remove blockstate if failed (or the same)
-                if (this.captureBlockStates && captured) {
-                    this.capturedBlockStates.remove(pos);
-                }
-                // CraftBukkit end
-                return false;
-            } else {
-                BlockState blockState2 = this.getBlockState(pos);
-                if ((flags & 128) == 0 && blockState2 != blockState && (blockState2.getLightBlock(this, pos) != blockState.getLightBlock(this, pos) || blockState2.getLightEmission() != blockState.getLightEmission() || blockState2.useShapeForLightOcclusion() || blockState.useShapeForLightOcclusion())) {
-                    this.getProfiler().push("queueCheckLight");
-                    this.getChunkSource().getLightEngine().checkBlock(pos);
-                    this.getProfiler().pop();
-                }
-                // CraftBukkit start
-               if (!this.captureBlockStates) { // Don't notify clients or update physics while capturing blockstates
-                    // Modularize client and physic updates
-                   // Banner start - copy method content to this to compat mixins
-                   BlockState iblockdata = state;
-                   BlockState iblockdata1 = blockState;
-                   BlockState iblockdata2 = blockState2;
-                   if (iblockdata2 == iblockdata) {
-                       if (iblockdata1 != iblockdata2) {
-                           this.setBlocksDirty(pos, iblockdata1, iblockdata2);
-                       }
+            cir.setReturnValue(false);
+        }
+    }
 
-                       if ((flags & 2) != 0 && (!this.isClientSide || (flags & 4) == 0) && (this.isClientSide || levelChunk == null || (levelChunk.getFullStatus() != null && levelChunk.getFullStatus().isOrAfter(ChunkHolder.FullChunkStatus.TICKING)))) { // allow chunk to be null here as chunk.isReady() is false when we send our notification during block placement
-                           this.sendBlockUpdated(pos, iblockdata1, iblockdata, flags);
-                       }
+    @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/chunk/LevelChunk;setBlockState(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;"))
+    private BlockState banner$resetState(LevelChunk instance, BlockPos blockPos, BlockState blockState, boolean bl) {
+        return banner$state.get();
+    }
 
-                       if ((flags & 1) != 0) {
-                           this.blockUpdated(pos, iblockdata1.getBlock());
-                           if (!this.isClientSide && iblockdata.hasAnalogOutputSignal()) {
-                               this.updateNeighbourForOutputSignal(pos, state.getBlock());
-                           }
-                       }
+    @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;", shift = At.Shift.AFTER), cancellable = true)
+    private void banner$finalCapture(BlockPos blockPos, BlockState blockState, int i, int j, CallbackInfoReturnable<Boolean> cir) {
+        // CraftBukkit start
+        if (!this.captureBlockStates) { // Don't notify clients or update physics while capturing blockstates
+            cir.setReturnValue(false);
+        }
+    }
 
-                       if ((flags & 16) == 0 && recursionLeft > 0) {
-                           int k = flags & -34;
+    @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/block/state/BlockState;updateNeighbourShapes(Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;II)V"),
+            locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    private void banner$physicEvent(BlockPos blockPos, BlockState blockState, int i, int j, CallbackInfoReturnable<Boolean> cir, LevelChunk levelChunk, Block block, BlockState blockState2, BlockState blockState3, int k) {
+        CraftWorld world = ((ServerLevel) (Object) this).getWorld();
+        if (world != null) {
+            BlockPhysicsEvent event = new BlockPhysicsEvent(world.getBlockAt(blockPos.getX(), blockPos.getY(), blockPos.getZ()), CraftBlockData.fromData(blockState));
+            this.getCraftServer().getPluginManager().callEvent(event);
 
-                           // CraftBukkit start
-                           iblockdata1.updateIndirectNeighbourShapes(((Level) (Object) this), pos, k, recursionLeft - 1); // Don't call an event for the old block to limit event spam
-                           CraftWorld world = ((ServerLevel) (Object) this).getWorld();
-                           if (world != null) {
-                               BlockPhysicsEvent event = new BlockPhysicsEvent(world.getBlockAt(pos.getX(), pos.getY(), pos.getZ()), CraftBlockData.fromData(iblockdata));
-                               this.getCraftServer().getPluginManager().callEvent(event);
-
-                               if (event.isCancelled()) {
-                                   return false;
-                               }
-                           }
-                           // CraftBukkit end
-                           iblockdata.updateNeighbourShapes(((Level) (Object) this), pos, k, recursionLeft - 1);
-                           iblockdata.updateIndirectNeighbourShapes(((Level) (Object) this), pos, k, recursionLeft - 1);
-                       }
-
-                       // CraftBukkit start - SPIGOT-5710
-                       if (!preventPoiUpdated) {
-                           this.onBlockStateChange(pos, iblockdata1, iblockdata2);
-                       }
-                       // CraftBukkit end
-                   }                }
-                // CraftBukkit end
-                return true;
+            if (event.isCancelled()) {
+                cir.setReturnValue(false);
             }
-            // Banner end
+            // CraftBukkit end
+        }
+    }
+
+    @Inject(method = "onBlockStateChange", at = @At("HEAD"), cancellable = true)
+    private void banner$checkIf(BlockPos blockPos, BlockState blockState, BlockState blockState2, CallbackInfo ci) {
+        if (preventPoiUpdated) {
+            ci.cancel();
         }
     }
 
