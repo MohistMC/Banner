@@ -23,10 +23,9 @@ public class MixinEndPortalBlock {
     @Redirect(method = "entityInside", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))
     public ServerLevel banner$enterPortal(MinecraftServer minecraftServer, ResourceKey<Level> dimension, BlockState state, Level worldIn, BlockPos pos, Entity entityIn) {
         ServerLevel world = minecraftServer.getLevel(dimension);
-        EntityPortalEnterEvent event = new EntityPortalEnterEvent(entityIn.getBukkitEntity(), new org.bukkit.Location(world.getWorld(), pos.getX(), pos.getY(), pos.getZ()));
-                new Location(worldIn.getWorld(), pos.getX(), pos.getY(), pos.getZ());
+        EntityPortalEnterEvent event = new EntityPortalEnterEvent(entityIn.getBukkitEntity(), new Location(world.getWorld(), pos.getX(), pos.getY(), pos.getZ()));
         Bukkit.getPluginManager().callEvent(event);
-        if (entityIn instanceof ServerPlayer && world != null) {
+        if (entityIn instanceof ServerPlayer) {
             ((ServerPlayer) entityIn).changeDimension(world, PlayerTeleportEvent.TeleportCause.END_PORTAL);
             return null;
         }
