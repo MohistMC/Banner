@@ -690,7 +690,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
 
                             this.player.move(MoverType.PLAYER, new Vec3(d6, d7, d8));
                             this.player.onGround = packetplayinflying.isOnGround(); // CraftBukkit - SPIGOT-5810, SPIGOT-5835, SPIGOT-6828: reset by this.player.move
-                            double d11 = d7;
 
                             d6 = d0 - this.player.getX();
                             d7 = d1 - this.player.getY();
@@ -707,10 +706,8 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                                 LOGGER.warn("{} moved wrongly!", this.player.getName().getString());
                             }
 
-                            if (!this.player.noPhysics && !this.player.isSleeping() && (flag2 && worldserver.noCollision(this.player, axisalignedbb) || this.isPlayerCollidingWithAnythingNew(worldserver, axisalignedbb, d0, d1, d2))) {
-                                this.internalTeleport(d3, d4, d5, f, f1, Collections.emptySet()); // CraftBukkit - SPIGOT-1807: Don't call teleport event, when the client thinks the player is falling, because the chunks are not loaded on the client yet.
-                                this.player.doCheckFallDamage(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5, packetplayinflying.isOnGround());
-                            } else {
+                            if (this.player.noPhysics || this.player.isSleeping() || (!flag2 || !worldserver.noCollision(this.player, axisalignedbb) && !this.isPlayerCollidingWithAnythingNew(worldserver, axisalignedbb, d0, d1, d2))) {
+
                                 // CraftBukkit start - fire PlayerMoveEvent
                                 // Reset to old location first
                                 this.player.absMoveTo(prevX, prevY, prevZ, prevYaw, prevPitch);
@@ -773,7 +770,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                                 }
                                 // CraftBukkit end
                                 this.player.absMoveTo(d0, d1, d2, f, f1);
-                                this.clientIsFloating = d11 >= -0.03125D && !flag1 && this.player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR && !this.server.isFlightAllowed() && !this.player.getAbilities().mayfly && !this.player.hasEffect(MobEffects.LEVITATION) && !this.player.isFallFlying() && !this.player.isAutoSpinAttack() && this.noBlocksAround(this.player);
+                                this.clientIsFloating = d7 >= -0.03125D && !flag1 && this.player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR && !this.server.isFlightAllowed() && !this.player.getAbilities().mayfly && !this.player.hasEffect(MobEffects.LEVITATION) && !this.player.isFallFlying() && !this.player.isAutoSpinAttack() && this.noBlocksAround(this.player);
                                 this.player.serverLevel().getChunkSource().move(this.player);
                                 this.player.doCheckFallDamage(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5, packetplayinflying.isOnGround());
                                 this.player.setOnGroundWithKnownMovement(packetplayinflying.isOnGround(), new Vec3(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5));
@@ -785,6 +782,9 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                                 this.lastGoodX = this.player.getX();
                                 this.lastGoodY = this.player.getY();
                                 this.lastGoodZ = this.player.getZ();
+                            } else {
+                                this.internalTeleport(d3, d4, d5, f, f1, Collections.emptySet()); // CraftBukkit - SPIGOT-1807: Don't call teleport event, when the client thinks the player is falling, because the chunks are not loaded on the client yet.
+                                this.player.doCheckFallDamage(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5, packetplayinflying.isOnGround());
                             }
                         }
                     }
