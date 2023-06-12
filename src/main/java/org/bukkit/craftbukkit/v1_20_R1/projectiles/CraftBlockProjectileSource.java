@@ -1,5 +1,6 @@
 package org.bukkit.craftbukkit.v1_20_R1.projectiles;
 
+import com.google.common.base.Preconditions;
 import net.minecraft.core.BlockSourceImpl;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -51,7 +52,7 @@ public class CraftBlockProjectileSource implements BlockProjectileSource {
 
     @Override
     public <T extends Projectile> T launchProjectile(Class<? extends T> projectile, Vector velocity) {
-        Validate.isTrue(getBlock().getType() == Material.DISPENSER, "Block is no longer dispenser");
+        Preconditions.checkArgument(getBlock().getType() == Material.DISPENSER, "Block is no longer dispenser");
         // Copied from DispenserBlock.dispense()
         BlockSourceImpl isourceblock = new BlockSourceImpl((ServerLevel) dispenserBlock.getLevel(), dispenserBlock.getBlockPos());
         // Copied from DispenseBehaviorProjectile
@@ -120,7 +121,7 @@ public class CraftBlockProjectileSource implements BlockProjectileSource {
             ((AbstractHurtingProjectile) launch).banner$setProjectileSource(this);
         }
 
-        Validate.notNull(launch, "Projectile not supported");
+        Preconditions.checkArgument(launch != null, "Projectile not supported");
 
         if (launch instanceof net.minecraft.world.entity.projectile.Projectile) {
             if (launch instanceof net.minecraft.world.entity.projectile.ThrowableProjectile) {

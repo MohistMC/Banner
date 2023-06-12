@@ -1,6 +1,7 @@
 package org.bukkit.craftbukkit.v1_20_R1.command;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.tree.CommandNode;
@@ -48,9 +49,9 @@ public final class VanillaCommandWrapper extends BukkitCommand {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args, Location location) throws IllegalArgumentException {
-        Validate.notNull(sender, "Sender cannot be null");
-        Validate.notNull(args, "Arguments cannot be null");
-        Validate.notNull(alias, "Alias cannot be null");
+        Preconditions.checkArgument(sender != null, "Sender cannot be null");
+        Preconditions.checkArgument(args != null, "Arguments cannot be null");
+        Preconditions.checkArgument(alias != null, "Alias cannot be null");
 
         CommandSourceStack icommandlistener = getListener(sender);
         ParseResults<CommandSourceStack> parsed = dispatcher.getDispatcher().parse(toDispatcher(args, getName()), icommandlistener);

@@ -1,5 +1,6 @@
 package org.bukkit.craftbukkit.v1_20_R1;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.authlib.GameProfile;
@@ -25,7 +26,7 @@ public class CraftProfileBanList implements org.bukkit.BanList {
 
     @Override
     public org.bukkit.BanEntry getBanEntry(String target) {
-        Validate.notNull(target, "Target cannot be null");
+        Preconditions.checkArgument(target != null, "Target cannot be null");
 
         GameProfile profile = getProfile(target);
         if (profile == null) {
@@ -42,7 +43,7 @@ public class CraftProfileBanList implements org.bukkit.BanList {
 
     @Override
     public org.bukkit.BanEntry addBan(String target, String reason, Date expires, String source) {
-        Validate.notNull(target, "Ban target cannot be null");
+        Preconditions.checkArgument(target != null, "Ban target cannot be null");
 
         GameProfile profile = getProfile(target);
         if (profile == null) {
@@ -78,7 +79,7 @@ public class CraftProfileBanList implements org.bukkit.BanList {
 
     @Override
     public boolean isBanned(String target) {
-        Validate.notNull(target, "Target cannot be null");
+        Preconditions.checkArgument(target != null, "Target cannot be null");
 
         GameProfile profile = getProfile(target);
         if (profile == null) {
@@ -90,7 +91,7 @@ public class CraftProfileBanList implements org.bukkit.BanList {
 
     @Override
     public void pardon(String target) {
-        Validate.notNull(target, "Target cannot be null");
+        Preconditions.checkArgument(target != null, "Target cannot be null");
 
         GameProfile profile = getProfile(target);
         list.remove(profile);

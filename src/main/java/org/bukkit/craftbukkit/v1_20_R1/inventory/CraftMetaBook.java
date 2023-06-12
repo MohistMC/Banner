@@ -1,5 +1,6 @@
 package org.bukkit.craftbukkit.v1_20_R1.inventory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Lists;
@@ -257,16 +258,14 @@ public class CraftMetaBook extends CraftMetaItem implements BookMeta {
 
     @Override
     public String getPage(final int page) {
-        Validate.isTrue(isValidPage(page), "Invalid page number");
+        Preconditions.checkArgument(isValidPage(page), "Invalid page number (%s)", page);
         // assert: pages != null
         return convertDataToPlainPage(pages.get(page - 1));
     }
 
     @Override
     public void setPage(final int page, final String text) {
-        if (!isValidPage(page)) {
-            throw new IllegalArgumentException("Invalid page number " + page + "/" + getPageCount());
-        }
+        Preconditions.checkArgument(isValidPage(page), "Invalid page number (%s/%s)", page, getPageCount());
         // assert: pages != null
 
         String newText = validatePage(text);
@@ -381,8 +380,7 @@ public class CraftMetaBook extends CraftMetaItem implements BookMeta {
         if (!super.equalsCommon(meta)) {
             return false;
         }
-        if (meta instanceof CraftMetaBook) {
-            CraftMetaBook that = (CraftMetaBook) meta;
+        if (meta instanceof CraftMetaBook that) {
 
             return (hasTitle() ? that.hasTitle() && this.title.equals(that.title) : !that.hasTitle())
                     && (hasAuthor() ? that.hasAuthor() && this.author.equals(that.author) : !that.hasAuthor())

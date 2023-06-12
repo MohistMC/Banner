@@ -2,6 +2,7 @@ package org.bukkit.craftbukkit.v1_20_R1.event;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Either;
 import java.net.InetAddress;
@@ -1584,9 +1585,7 @@ public class CraftEventFactory {
         PotionEffect bukkitOldEffect = (oldEffect == null) ? null : CraftPotionUtil.toBukkit(oldEffect);
         PotionEffect bukkitNewEffect = (newEffect == null) ? null : CraftPotionUtil.toBukkit(newEffect);
 
-        if (bukkitOldEffect == null && bukkitNewEffect == null) {
-            throw new IllegalStateException("Old and new potion effect are both null");
-        }
+        Preconditions.checkState(bukkitOldEffect != null || bukkitNewEffect != null, "Old and new potion effect are both null");
 
         EntityPotionEffectEvent event = new EntityPotionEffectEvent((org.bukkit.entity.LivingEntity) entity.getBukkitEntity(), bukkitOldEffect, bukkitNewEffect, cause, action, willOverride);
         Bukkit.getPluginManager().callEvent(event);

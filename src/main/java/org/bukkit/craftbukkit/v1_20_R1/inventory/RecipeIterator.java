@@ -3,6 +3,7 @@ package org.bukkit.craftbukkit.v1_20_R1.inventory;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.google.common.base.Preconditions;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -42,9 +43,7 @@ public class RecipeIterator implements Iterator<Recipe> {
 
     @Override
     public void remove() {
-        if (current == null) {
-            throw new IllegalStateException("next() not yet called");
-        }
+        Preconditions.checkState(current != null, "next() not yet called");
 
         current.remove();
     }

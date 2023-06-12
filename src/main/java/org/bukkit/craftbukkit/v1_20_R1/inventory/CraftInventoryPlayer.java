@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.HumanEntity;
@@ -174,7 +175,7 @@ public class CraftInventoryPlayer extends CraftInventory implements org.bukkit.i
 
     @Override
     public void setHeldItemSlot(int slot) {
-        Validate.isTrue(slot >= 0 && slot < net.minecraft.world.entity.player.Inventory.getSelectionSize(), "Slot is not between 0 and 8 inclusive");
+        Preconditions.checkArgument(slot >= 0 && slot < Inventory.getSelectionSize(), "Slot (%s) is not between 0 and %s inclusive", slot, Inventory.getSelectionSize() - 1);
         this.getInventory().selected = slot;
         ((CraftPlayer) this.getHolder()).getHandle().connection.send(new ClientboundSetCarriedItemPacket(slot));
     }

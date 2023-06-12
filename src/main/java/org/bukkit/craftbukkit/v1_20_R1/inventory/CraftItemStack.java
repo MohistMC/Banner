@@ -1,5 +1,6 @@
 package org.bukkit.craftbukkit.v1_20_R1.inventory;
 
+import com.google.common.base.Preconditions;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import static org.bukkit.craftbukkit.v1_20_R1.inventory.CraftMetaItem.*;
 import com.google.common.collect.ImmutableMap;
@@ -176,7 +177,7 @@ public final class CraftItemStack extends ItemStack {
 
     @Override
     public void addUnsafeEnchantment(Enchantment ench, int level) {
-        Validate.notNull(ench, "Cannot add null enchantment");
+        Preconditions.checkArgument(ench != null, "Enchantment cannot be null");
 
         if (!makeTag(handle)) {
             return;
@@ -221,7 +222,7 @@ public final class CraftItemStack extends ItemStack {
 
     @Override
     public int getEnchantmentLevel(Enchantment ench) {
-        Validate.notNull(ench, "Cannot find null enchantment");
+        Preconditions.checkArgument(ench != null, "Enchantment cannot be null");
         if (handle == null) {
             return 0;
         }

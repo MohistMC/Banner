@@ -30,7 +30,7 @@ public class CraftStructureBlock extends CraftBlockEntityState<StructureBlockEnt
 
     @Override
     public void setStructureName(String name) {
-        Preconditions.checkArgument(name != null, "Structure Name cannot be null");
+        Preconditions.checkArgument(name != null, "Structure name cannot be null");
         getSnapshot().setStructureName(name);
     }
 
@@ -41,7 +41,8 @@ public class CraftStructureBlock extends CraftBlockEntityState<StructureBlockEnt
 
     @Override
     public void setAuthor(String author) {
-        Preconditions.checkArgument(author != null && !author.isEmpty(), "Author name cannot be null nor empty");
+        Preconditions.checkArgument(author != null, "Author name cannot be null");
+        Preconditions.checkArgument(!author.isEmpty(), "Author name cannot be empty");
         getSnapshot().author = author;
     }
 

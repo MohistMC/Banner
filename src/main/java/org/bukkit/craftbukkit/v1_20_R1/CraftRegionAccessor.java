@@ -555,9 +555,8 @@ public abstract class CraftRegionAccessor implements RegionAccessor {
 
     @SuppressWarnings("unchecked")
     public net.minecraft.world.entity.Entity createEntity(Location location, Class<? extends Entity> clazz, boolean randomizeData) throws IllegalArgumentException {
-        if (location == null || clazz == null) {
-            throw new IllegalArgumentException("Location or entity class cannot be null");
-        }
+        Preconditions.checkArgument(location != null, "Location cannot be null");
+        Preconditions.checkArgument(clazz != null, "Entity class cannot be null");
 
         net.minecraft.world.entity.Entity entity = null;
         net.minecraft.world.level.Level world = getHandle().getMinecraftWorld();
@@ -768,11 +767,8 @@ public abstract class CraftRegionAccessor implements RegionAccessor {
                 entity = net.minecraft.world.entity.EntityType.WITHER.create(world);
             } else if (ComplexLivingEntity.class.isAssignableFrom(clazz)) {
                 if (EnderDragon.class.isAssignableFrom(clazz)) {
-                    if (isNormalWorld()) {
-                        entity = net.minecraft.world.entity.EntityType.ENDER_DRAGON.create(getHandle().getMinecraftWorld());
-                    } else {
-                        throw new IllegalArgumentException("Cannot spawn entity " + clazz.getName() + " during world generation");
-                    }
+                    Preconditions.checkArgument(this.isNormalWorld(), "Cannot spawn entity %s during world generation", clazz.getName());
+                    entity = net.minecraft.world.entity.EntityType.ENDER_DRAGON.create(getHandle().getMinecraftWorld());
                 }
             } else if (Ambient.class.isAssignableFrom(clazz)) {
                 if (Bat.class.isAssignableFrom(clazz)) {

@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Consumer;
+
+import com.google.common.base.Preconditions;
 import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket;
 import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket;
 import net.minecraft.server.MinecraftServer;
@@ -52,7 +54,7 @@ public final class CraftScoreboardManager implements ScoreboardManager {
 
     // CraftBukkit method
     public void setPlayerBoard(CraftPlayer player, org.bukkit.scoreboard.Scoreboard bukkitScoreboard) throws IllegalArgumentException {
-        Validate.isTrue(bukkitScoreboard instanceof CraftScoreboard, "Cannot set player scoreboard to an unregistered Scoreboard");
+        Preconditions.checkArgument(bukkitScoreboard instanceof CraftScoreboard, "Cannot set player scoreboard to an unregistered Scoreboard");
 
         CraftScoreboard scoreboard = (CraftScoreboard) bukkitScoreboard;
         net.minecraft.world.scores.Scoreboard oldboard = getPlayerBoard(player).getHandle();

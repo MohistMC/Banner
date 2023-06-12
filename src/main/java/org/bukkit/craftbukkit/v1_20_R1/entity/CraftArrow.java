@@ -18,7 +18,7 @@ public class CraftArrow extends AbstractProjectile implements AbstractArrow {
 
     @Override
     public void setKnockbackStrength(int knockbackStrength) {
-        Validate.isTrue(knockbackStrength >= 0, "Knockback cannot be negative");
+        Preconditions.checkArgument(knockbackStrength >= 0, "Knockback value (%s) cannot be negative", knockbackStrength);
         getHandle().setKnockback(knockbackStrength);
     }
 
@@ -34,7 +34,7 @@ public class CraftArrow extends AbstractProjectile implements AbstractArrow {
 
     @Override
     public void setDamage(double damage) {
-        Preconditions.checkArgument(damage >= 0, "Damage must be positive");
+        Preconditions.checkArgument(damage >= 0, "Damage value (%s) must be positive", damage);
         getHandle().setBaseDamage(damage);
     }
 
@@ -45,7 +45,7 @@ public class CraftArrow extends AbstractProjectile implements AbstractArrow {
 
     @Override
     public void setPierceLevel(int pierceLevel) {
-        Preconditions.checkArgument(0 <= pierceLevel && pierceLevel <= Byte.MAX_VALUE, "Pierce level out of range, expected 0 < level < 127");
+        Preconditions.checkArgument(0 <= pierceLevel && pierceLevel <= Byte.MAX_VALUE, "Pierce level (%s) out of range, expected 0 < level < 127", pierceLevel);
 
         getHandle().setPierceLevel((byte) pierceLevel);
     }
@@ -97,7 +97,7 @@ public class CraftArrow extends AbstractProjectile implements AbstractArrow {
 
     @Override
     public void setPickupStatus(PickupStatus status) {
-        Preconditions.checkNotNull(status, "status");
+        Preconditions.checkArgument(status != null, "PickupStatus cannot be null");
         getHandle().pickup = net.minecraft.world.entity.projectile.AbstractArrow.Pickup.byOrdinal(status.ordinal());
     }
 
