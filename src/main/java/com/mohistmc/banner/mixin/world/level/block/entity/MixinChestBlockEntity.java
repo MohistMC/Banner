@@ -26,6 +26,8 @@ public abstract class MixinChestBlockEntity extends RandomizableContainerBlockEn
     public List<HumanEntity> transaction = new ArrayList<>();
     private int maxStack = MAX_STACK;
 
+    public InventoryHolder owner;
+
     protected MixinChestBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
     }
@@ -52,6 +54,12 @@ public abstract class MixinChestBlockEntity extends RandomizableContainerBlockEn
 
     @Override
     public void setOwner(InventoryHolder owner) {
+        this.owner = owner;
+    }
+
+    @Override
+    public InventoryHolder getOwner() {
+        return owner;
     }
 
     @Override
