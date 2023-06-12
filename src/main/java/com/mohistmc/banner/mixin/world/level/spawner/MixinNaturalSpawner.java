@@ -139,91 +139,76 @@ public abstract class MixinNaturalSpawner {
         if (!iblockdata.isRedstoneConductor(ichunkaccess, blockposition)) {
             BlockPos.MutableBlockPos blockposition_mutableblockposition = new BlockPos.MutableBlockPos();
             int j = 0;
-            int k = 0;
-
-            while (k < 3) {
+            for(int k = 0; k < 3; ++k) {
                 int l = blockposition.getX();
                 int i1 = blockposition.getZ();
-                boolean flag = true;
+
                 MobSpawnSettings.SpawnerData biomesettingsmobs_c = null;
                 SpawnGroupData groupdataentity = null;
-                int j1 = Mth.ceil(worldserver.random.nextFloat() * 4.0F);
-                int k1 = 0;
+                int k1 = Mth.ceil(worldserver.random.nextFloat() * 4.0F);
                 int l1 = 0;
 
-                while (true) {
-                    if (l1 < j1) {
-                        label53:
-                        {
-                            l += worldserver.random.nextInt(6) - worldserver.random.nextInt(6);
-                            i1 += worldserver.random.nextInt(6) - worldserver.random.nextInt(6);
-                            blockposition_mutableblockposition.set(l, i, i1);
-                            double d0 = (double) l + 0.5D;
-                            double d1 = (double) i1 + 0.5D;
-                            Player entityhuman = worldserver.getNearestPlayer(d0, (double) i, d1, -1.0D, false);
+                for(int i2 = 0; i2 < k1; ++i2) {
+                    l += worldserver.random.nextInt(6) - worldserver.random.nextInt(6);
+                    i1 += worldserver.random.nextInt(6) - worldserver.random.nextInt(6);
+                    blockposition_mutableblockposition.set(l, i, i1);
+                    double d0 = (double) l + 0.5D;
+                    double d1 = (double) i1 + 0.5D;
+                    Player entityhuman = worldserver.getNearestPlayer(d0, (double) i, d1, -1.0D, false);
 
-                            if (entityhuman != null) {
-                                double d2 = entityhuman.distanceToSqr(d0, (double) i, d1);
+                    if (entityhuman != null) {
+                        double d2 = entityhuman.distanceToSqr(d0, (double) i, d1);
 
-                                if (isRightDistanceToPlayerAndSpawnPoint(worldserver, ichunkaccess, blockposition_mutableblockposition, d2)) {
-                                    if (biomesettingsmobs_c == null) {
-                                        Optional<MobSpawnSettings.SpawnerData> optional = getRandomSpawnMobAt(worldserver, structuremanager, chunkgenerator, enumcreaturetype, worldserver.random, blockposition_mutableblockposition);
+                        if (isRightDistanceToPlayerAndSpawnPoint(worldserver, ichunkaccess, blockposition_mutableblockposition, d2)) {
+                            if (biomesettingsmobs_c == null) {
+                                Optional<MobSpawnSettings.SpawnerData> optional = getRandomSpawnMobAt(worldserver, structuremanager, chunkgenerator, enumcreaturetype, worldserver.random, blockposition_mutableblockposition);
 
-                                        if (optional.isEmpty()) {
-                                            break label53;
-                                        }
+                                if (optional.isEmpty()) {
+                                    break;
+                                }
 
-                                        biomesettingsmobs_c = (MobSpawnSettings.SpawnerData) optional.get();
-                                        j1 = biomesettingsmobs_c.minCount + worldserver.random.nextInt(1 + biomesettingsmobs_c.maxCount - biomesettingsmobs_c.minCount);
+                                biomesettingsmobs_c = (MobSpawnSettings.SpawnerData) optional.get();
+                                k1 = biomesettingsmobs_c.minCount + worldserver.random.nextInt(1 + biomesettingsmobs_c.maxCount - biomesettingsmobs_c.minCount);
+                            }
+
+                            if (isValidSpawnPostitionForType(worldserver, enumcreaturetype, structuremanager, chunkgenerator, biomesettingsmobs_c, blockposition_mutableblockposition, d2) && spawnercreature_c.test(biomesettingsmobs_c.type, blockposition_mutableblockposition, ichunkaccess)) {
+                                Mob entityinsentient = getMobForSpawn(worldserver, biomesettingsmobs_c.type);
+
+                                if (entityinsentient == null) {
+                                    return;
+                                }
+
+                                entityinsentient.moveTo(d0, (double) i, d1, worldserver.random.nextFloat() * 360.0F, 0.0F);
+                                if (isValidPositionForMob(worldserver, entityinsentient, d2)) {
+                                    groupdataentity = entityinsentient.finalizeSpawn(worldserver, worldserver.getCurrentDifficultyAt(entityinsentient.blockPosition()), MobSpawnType.NATURAL, groupdataentity, (CompoundTag) null);
+                                    // CraftBukkit start
+                                    // SPIGOT-7045: Give ocelot babies back their special spawn reason. Note: This is the only modification required as ocelots count as monsters which means they only spawn during normal chunk ticking and do not spawn during chunk generation as starter mobs.
+                                    if (entityinsentient instanceof Ocelot && !((org.bukkit.entity.Ageable) entityinsentient.getBukkitEntity()).isAdult()) {
+                                        worldserver.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.OCELOT_BABY);
+                                    } else {
+                                        worldserver.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.NATURAL);
                                     }
 
-                                    if (isValidSpawnPostitionForType(worldserver, enumcreaturetype, structuremanager, chunkgenerator, biomesettingsmobs_c, blockposition_mutableblockposition, d2) && spawnercreature_c.test(biomesettingsmobs_c.type, blockposition_mutableblockposition, ichunkaccess)) {
-                                        Mob entityinsentient = getMobForSpawn(worldserver, biomesettingsmobs_c.type);
+                                    worldserver.addFreshEntityWithPassengers(entityinsentient);
+                                    if (!entityinsentient.isRemoved()) {
+                                        ++j;
+                                        ++k1;
+                                        spawnercreature_a.run(entityinsentient, ichunkaccess);
+                                    }
+                                    // CraftBukkit end
+                                    if (j >= entityinsentient.getMaxSpawnClusterSize()) {
+                                        return;
+                                    }
 
-                                        if (entityinsentient == null) {
-                                            return;
-                                        }
-
-                                        entityinsentient.moveTo(d0, (double) i, d1, worldserver.random.nextFloat() * 360.0F, 0.0F);
-                                        if (isValidPositionForMob(worldserver, entityinsentient, d2)) {
-                                            groupdataentity = entityinsentient.finalizeSpawn(worldserver, worldserver.getCurrentDifficultyAt(entityinsentient.blockPosition()), MobSpawnType.NATURAL, groupdataentity, (CompoundTag) null);
-                                            // CraftBukkit start
-                                            // SPIGOT-7045: Give ocelot babies back their special spawn reason. Note: This is the only modification required as ocelots count as monsters which means they only spawn during normal chunk ticking and do not spawn during chunk generation as starter mobs.
-                                            if (entityinsentient instanceof Ocelot && !((org.bukkit.entity.Ageable) entityinsentient.getBukkitEntity()).isAdult()) {
-                                                worldserver.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.OCELOT_BABY);
-                                            }else {
-                                                worldserver.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.NATURAL);
-                                            }
-
-                                            worldserver.addFreshEntityWithPassengers(entityinsentient);
-                                            if (!entityinsentient.isRemoved()) {
-                                                ++j;
-                                                ++k1;
-                                                spawnercreature_a.run(entityinsentient, ichunkaccess);
-                                            }
-                                            // CraftBukkit end
-                                            if (j >= entityinsentient.getMaxSpawnClusterSize()) {
-                                                return;
-                                            }
-
-                                            if (entityinsentient.isMaxGroupSizeReached(k1)) {
-                                                break label53;
-                                            }
-                                        }
+                                    if (entityinsentient.isMaxGroupSizeReached(k1)) {
+                                        break;
                                     }
                                 }
                             }
-
-                            ++l1;
-                            continue;
                         }
                     }
-
-                    ++k;
-                    break;
                 }
             }
-
         }
     }
 
