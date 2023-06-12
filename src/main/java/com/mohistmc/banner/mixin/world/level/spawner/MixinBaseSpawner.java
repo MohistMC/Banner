@@ -43,8 +43,14 @@ public abstract class MixinBaseSpawner {
                                    int j, double d, double e, double f, BlockPos blockPos,
                                    Entity entity) {
         // Spigot Start
-
-        if (org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory.callSpawnerSpawnEvent(entity, blockPos).isCancelled()) {
+        if (CraftEventFactory.callSpawnerSpawnEvent(entity, blockPos).isCancelled()) {
+            Entity vehicle = entity.getVehicle();
+            if (vehicle != null) {
+                vehicle.discard();
+            }
+            for (Entity passenger : entity.getIndirectPassengers()) {
+                passenger.discard();
+            }
             return;
         }
         // Spigot End
