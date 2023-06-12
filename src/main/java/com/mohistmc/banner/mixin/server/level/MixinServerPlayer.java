@@ -555,8 +555,9 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     }
 
     @Inject(method = "changeDimension", at = @At(value = "HEAD"), cancellable = true)
-    public void banner$changeDimension(ServerLevel worldserver, CallbackInfoReturnable<Entity> cr) {
-        cr.setReturnValue(changeDimension(worldserver, PlayerTeleportEvent.TeleportCause.UNKNOWN));
+    public void banner$changeDimension(ServerLevel worldserver, CallbackInfoReturnable<Entity> cir) {
+        cir.setReturnValue(changeDimension(worldserver, PlayerTeleportEvent.TeleportCause.UNKNOWN));
+        cir.cancel();
     }
 
     @Override
