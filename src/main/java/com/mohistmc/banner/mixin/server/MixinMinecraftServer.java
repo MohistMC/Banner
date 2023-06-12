@@ -222,13 +222,13 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Inject(method = "loadLevel", at = @At("TAIL"))
     private void banner$initPlugins(CallbackInfo ci) {
-        this.server.enablePlugins(PluginLoadOrder.POSTWORLD);
-        this.server.getPluginManager().callEvent(new ServerLoadEvent(ServerLoadEvent.LoadType.STARTUP));
         for (ServerLevel worldserver : ((MinecraftServer)(Object)this).getAllLevels()) {
             worldserver.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API
             this.server.getPluginManager().callEvent(new WorldLoadEvent(worldserver.getWorld()));
-            this.connection.acceptConnections();
         }
+        this.server.enablePlugins(PluginLoadOrder.POSTWORLD);
+        this.server.getPluginManager().callEvent(new ServerLoadEvent(ServerLoadEvent.LoadType.STARTUP));
+        this.connection.acceptConnections();
     }
 
     @Inject(method = "saveAllChunks", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;overworld()Lnet/minecraft/server/level/ServerLevel;"))

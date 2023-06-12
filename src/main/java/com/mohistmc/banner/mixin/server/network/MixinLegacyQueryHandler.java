@@ -93,7 +93,6 @@ public abstract class MixinLegacyQueryHandler {
             bytebuf.release();
             flag = false;
         } catch (RuntimeException runtimeexception) {
-            ;
         } finally {
             if (flag) {
                 bytebuf.resetReaderIndex();

@@ -24,17 +24,17 @@ import java.util.Optional;
 @Mixin(ServerStatusPacketListenerImpl.class)
 public class MixinServerStatusPacketListenerImpl {
 
-    @Shadow @Final private Connection connection;
-
     @Redirect(method = "handleStatusRequest", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Connection;send(Lnet/minecraft/network/protocol/Packet;)V"))
-    private void banner$handleServerPing(Connection networkManager, Packet<?> packetIn) {
+    public void banner$handleServerPing(Connection networkManager, Packet<?> packetIn) {
         // CraftBukkit start
         MinecraftServer server = BukkitExtraConstants.getServer();
-        final Object[] players = server.getPlayerList().players.toArray();
+
         BannerServerListPingEvent event = new BannerServerListPingEvent(networkManager, server);
         server.bridge$server().getPluginManager().callEvent(event);
 
-        java.util.List<GameProfile> profiles = new java.util.ArrayList<GameProfile>(players.length);
+        final Object[] players = event.getPlayers();
+
+        java.util.List<GameProfile> profiles = new java.util.ArrayList<>(players.length);
         for (Object player : players) {
             if (player != null) {
                 ServerPlayer entityPlayer = ((ServerPlayer) player);
@@ -46,6 +46,13 @@ public class MixinServerStatusPacketListenerImpl {
             }
         }
 
+        // Spigot Start
+        if ( !server.hidesOnlinePlayers() && !profiles.isEmpty() ) {
+            java.util.Collections.shuffle(profiles); // This sucks, its inefficient but we have no simple way of doing it differently
+            profiles = profiles.subList(0, Math.min(profiles.size(), org.spigotmc.SpigotConfig.playerSample)); // Cap the sample to n (or less) displayed players, ie: Vanilla behaviour
+        }
+        // Spigot End
+
         ServerStatus.Players playerSample = new ServerStatus.Players(event.getMaxPlayers(), profiles.size(), (server.hidesOnlinePlayers()) ? Collections.emptyList() : profiles);
 
         ServerStatus ping = new ServerStatus(
@@ -55,8 +62,7 @@ public class MixinServerStatusPacketListenerImpl {
                 (event.icon.value != null) ? Optional.of(new ServerStatus.Favicon(event.icon.value)) : Optional.empty(),
                 server.enforceSecureProfile()
         );
-
-        this.connection.send(new ClientboundStatusResponsePacket(ping));
+        networkManager.send(new ClientboundStatusResponsePacket(ping));
         // CraftBukkit end
     }
 }
