@@ -23,6 +23,7 @@
 - There's very little breaking changes
 - Banner still has a lot of bugs, so do not use it in production
 - Download for testing only, report bugs
+- This version of Banner 1.20.x,supports MC version 1.20 to 1.20.1
 
 ## Progress
 - [ ] Start patch
