@@ -29,6 +29,7 @@ public abstract class MixinLevelStorageAccess implements InjectionLevelStorageAc
         this.dimensionType = dimensionType;
     }
 
+    /*
     @Inject(method = "getDimensionPath", cancellable = true, at = @At("HEAD"))
     private void banner$useActualType(ResourceKey<Level> dimensionKey, CallbackInfoReturnable<Path> cir) {
         if (dimensionType == LevelStem.OVERWORLD) {
@@ -39,6 +40,7 @@ public abstract class MixinLevelStorageAccess implements InjectionLevelStorageAc
             cir.setReturnValue(this.levelDirectory.path().resolve("DIM1"));
         }
     }
+    */
 
     @Override
     public ResourceKey<LevelStem> bridge$getTypeKey() {
