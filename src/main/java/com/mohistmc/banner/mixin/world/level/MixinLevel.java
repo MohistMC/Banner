@@ -248,7 +248,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     private void banner$finalCapture(BlockPos blockPos, BlockState blockState, int i, int j, CallbackInfoReturnable<Boolean> cir) {
         // CraftBukkit start
         if (!this.captureBlockStates) { // Don't notify clients or update physics while capturing blockstates
-            cir.setReturnValue(false);
+            cir.setReturnValue(true);
         }
     }
 
