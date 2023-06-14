@@ -249,7 +249,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;", shift = At.Shift.AFTER), cancellable = true)
     private void banner$finalCapture(BlockPos blockPos, BlockState blockState, int i, int j, CallbackInfoReturnable<Boolean> cir) {
         // CraftBukkit start
-        if (!this.captureBlockStates) { // Don't notify clients or update physics while capturing blockstates
+        if (this.captureBlockStates) { // Don't notify clients or update physics while capturing blockstates
             cir.setReturnValue(false);
         }
     }
