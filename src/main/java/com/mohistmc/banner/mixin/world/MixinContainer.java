@@ -1,8 +1,11 @@
 package com.mohistmc.banner.mixin.world;
 
 import com.mohistmc.banner.injection.world.InjectionContainer;
+import com.mohistmc.banner.inventory.InventoryOwner;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftHumanEntity;
 import org.bukkit.inventory.InventoryHolder;
@@ -31,10 +34,19 @@ public interface MixinContainer extends InjectionContainer {
     void onClose(CraftHumanEntity who);
 
     @Override
-    InventoryHolder getOwner();
+    default InventoryHolder getOwner() {
+        return this instanceof BlockEntity blockEntity ? InventoryOwner.get(blockEntity) : null;
+    }
 
     @Override
-    Location getLocation();
+    default Location getLocation() {
+        if (this instanceof BlockEntity entity) {
+            BlockPos blockPos = entity.getBlockPos();
+            return new Location(entity.getLevel().getWorld(), blockPos.getX(), blockPos.getY(), blockPos.getZ());
+        }else {
+            return null;
+        }
+    }
 
     @Override
     InventoryView getBukkitView();
