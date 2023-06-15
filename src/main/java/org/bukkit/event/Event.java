@@ -1,5 +1,7 @@
 package org.bukkit.event;
 
+import com.mohistmc.banner.fabric.FabricHookBukkitEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
@@ -43,6 +45,9 @@ public abstract class Event {
      */
     public boolean callEvent() {
         org.bukkit.Bukkit.getPluginManager().callEvent(this);
+        if (Bukkit.getServer() != null) {
+            FabricHookBukkitEvent.EVENT.invoker().hook(this);
+        }
         if (this instanceof Cancellable) {
             return !((Cancellable) this).isCancelled();
         } else {
