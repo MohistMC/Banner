@@ -33,7 +33,7 @@ public class UpdateUtils {
         System.out.println(BannerMCStart.I18N.get("update.stopcheck"));
 
         try {
-            JsonElement root = JsonParser.parseReader(new InputStreamReader(getInput("https://ci.codemc.io/job/MohistMC/job/Banner/lastSuccessfulBuild/api/json")));
+            JsonElement root = JsonParser.parseReader(new InputStreamReader(getInput("https://ci.codemc.io/job/MohistMC/job/Banner-1.19.4/lastSuccessfulBuild/api/json")));
 
             String jar_sha = BannerMCStart.getVersion();
             String build_number = root.getAsJsonObject().get("number").toString();
