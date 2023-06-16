@@ -1,9 +1,11 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
+import com.destroystokyo.paper.event.block.BeaconEffectEvent;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.injection.world.level.block.entity.InjectionBeaconBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
@@ -13,6 +15,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_20_R1.potion.CraftPotionUtil;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.Nullable;
@@ -127,25 +130,34 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity implements Inje
             int j = getLevel(levels);
             List list = BukkitExtraConstants.getHumansInRange(level, pos, levels);
 
-            applyEffect(list, primary, j, b0);
+            applyEffect(list, primary, j, b0, true, pos); // Paper - BeaconEffectEvent
 
             if (hasSecondaryEffect(levels, primary, secondary)) {
-                applyEffect(list, secondary, j, 0);
+                applyEffect(list, secondary, j, 0, false, pos); // Paper - BeaconEffectEvent
             }
         }
 
     }
     // CraftBukkit end
 
-    private static void applyEffect(List list, MobEffect mobeffectlist, int j, int b0) {
+    private static void applyEffect(List list, MobEffect mobeffectlist, int j, int b0, boolean isPrimary, BlockPos worldPosition) { // Paper - BeaconEffectEvent
         {
-            Iterator iterator = list.iterator();
+            if (!list.isEmpty()) { // Paper - BeaconEffectEvent
+                Iterator iterator = list.iterator();
 
-            Player entityhuman;
+                Player entityhuman;
 
-            while (iterator.hasNext()) {
-                entityhuman = (Player) iterator.next();
-                entityhuman.addEffect(new MobEffectInstance(mobeffectlist, j, b0, true, true), org.bukkit.event.entity.EntityPotionEffectEvent.Cause.BEACON);
+                // Paper start - BeaconEffectEvent
+                org.bukkit.block.Block block = ((Player) list.get(0)).level().getWorld().getBlockAt(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
+                PotionEffect effect = CraftPotionUtil.toBukkit(new MobEffectInstance(mobeffectlist, j, b0, true, true));
+                // Paper end
+                while (iterator.hasNext()) {
+                    // Paper start - BeaconEffectEvent
+                    entityhuman = (ServerPlayer) iterator.next();
+                    BeaconEffectEvent event = new BeaconEffectEvent(block, effect, (org.bukkit.entity.Player) entityhuman.getBukkitEntity(), isPrimary);
+                    if (CraftEventFactory.callEvent(event).isCancelled()) continue;
+                    entityhuman.addEffect(new MobEffectInstance(CraftPotionUtil.fromBukkit(event.getEffect())), org.bukkit.event.entity.EntityPotionEffectEvent.Cause.BEACON);
+                }
             }
         }
     }
