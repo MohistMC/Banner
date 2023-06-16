@@ -20,6 +20,11 @@ import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
+import net.minecraft.network.protocol.game.ClientboundSetBorderCenterPacket;
+import net.minecraft.network.protocol.game.ClientboundSetBorderLerpSizePacket;
+import net.minecraft.network.protocol.game.ClientboundSetBorderSizePacket;
+import net.minecraft.network.protocol.game.ClientboundSetBorderWarningDelayPacket;
+import net.minecraft.network.protocol.game.ClientboundSetBorderWarningDistancePacket;
 import net.minecraft.network.protocol.game.ClientboundSetChunkCacheRadiusPacket;
 import net.minecraft.network.protocol.game.ClientboundSetDefaultSpawnPositionPacket;
 import net.minecraft.network.protocol.game.ClientboundSetExperiencePacket;
@@ -57,6 +62,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.border.BorderChangeListener;
+import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.PlayerDataStorage;
@@ -872,4 +879,44 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         return playerAdvancements;
     }
 
+    /**
+     * @author wdog5
+     * @reason functionally replaced
+     */
+    @Overwrite
+    public void addWorldborderListener(ServerLevel worldserver) {
+        if (playerIo != null) return; // CraftBukkit
+        worldserver.getWorldBorder().addListener(new BorderChangeListener() {
+            @Override
+            public void onBorderSizeSet(WorldBorder worldborder, double d0) {
+                ((PlayerList) (Object) this).broadcastAll(new ClientboundSetBorderSizePacket(worldborder), worldborder.bridge$world()); // CraftBukkit
+            }
+
+            @Override
+            public void onBorderSizeLerping(WorldBorder worldborder, double d0, double d1, long i) {
+                ((PlayerList) (Object) this).broadcastAll(new ClientboundSetBorderLerpSizePacket(worldborder), worldborder.bridge$world()); // CraftBukkit
+            }
+
+            @Override
+            public void onBorderCenterSet(WorldBorder worldborder, double d0, double d1) {
+                ((PlayerList) (Object) this).broadcastAll(new ClientboundSetBorderCenterPacket(worldborder), worldborder.bridge$world()); // CraftBukkit
+            }
+
+            @Override
+            public void onBorderSetWarningTime(WorldBorder worldborder, int i) {
+                ((PlayerList) (Object) this).broadcastAll(new ClientboundSetBorderWarningDelayPacket(worldborder), worldborder.bridge$world()); // CraftBukkit
+            }
+
+            @Override
+            public void onBorderSetWarningBlocks(WorldBorder worldborder, int i) {
+                ((PlayerList) (Object) this).broadcastAll(new ClientboundSetBorderWarningDistancePacket(worldborder), worldborder.bridge$world()); // CraftBukkit
+            }
+
+            @Override
+            public void onBorderSetDamagePerBlock(WorldBorder worldborder, double d0) {}
+
+            @Override
+            public void onBorderSetDamageSafeZOne(WorldBorder worldborder, double d0) {}
+        });
+    }
 }
