@@ -6,6 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+
 @ToString
 @AllArgsConstructor
 public enum DownloadSource {
@@ -19,10 +24,11 @@ public enum DownloadSource {
     final
     String url;
 
-    public static DownloadSource get() {
+    public static DownloadSource get() throws IOException {
         String ds = BannerConfigUtil.defaultSource();
         for (DownloadSource me : DownloadSource.values()) {
             if (me.name().equalsIgnoreCase(ds)) {
+                if (isDown(me.url) != 200) return GITHUB;
                 return me;
             }
         }
@@ -31,5 +37,13 @@ public enum DownloadSource {
 
     public static boolean isCN() {
         return BannerMCStart.I18N.isCN();
+    }
+
+    public static int isDown(String s) throws IOException {
+        URL url = new URL(s);
+        URLConnection rulConnection = url.openConnection();
+        HttpURLConnection httpUrlConnection = (HttpURLConnection) rulConnection;
+        httpUrlConnection.connect();
+        return httpUrlConnection.getResponseCode();
     }
 }
