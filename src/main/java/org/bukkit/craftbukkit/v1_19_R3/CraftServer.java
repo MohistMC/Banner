@@ -437,8 +437,8 @@ public final class CraftServer implements Server {
     }
 
     public void syncCommands() {
-        // Clear existing commands
-        Commands dispatcher = console.resources.managers().commands = new Commands(Commands.CommandSelection.ALL, CommandBuildContext.simple(console.registryAccess(), FeatureFlagSet.of()));
+        // Clear existing commands // Banner - do not clear
+        Commands dispatcher = console.resources.managers().commands;
 
         // Register all commands, vanilla ones will be using the old dispatcher references
         for (Map.Entry<String, Command> entry : commandMap.getKnownCommands().entrySet()) {
