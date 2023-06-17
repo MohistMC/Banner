@@ -1,9 +1,5 @@
 package com.mohistmc.banner.bukkit.nms.remappers;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-
 import com.mohistmc.banner.bukkit.nms.model.ClassMapping;
 import net.md_5.specialsource.CustomRemapper;
 import net.md_5.specialsource.NodeType;
@@ -15,6 +11,9 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 
 import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
 

@@ -1,11 +1,12 @@
 package com.mohistmc.banner.bukkit.nms.remappers;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
 
 import com.mohistmc.banner.bukkit.nms.utils.RemapUtils;
 import net.md_5.specialsource.provider.InheritanceProvider;
 import org.objectweb.asm.tree.ClassNode;
+
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 public class BannerInheritanceProvider implements InheritanceProvider {
 

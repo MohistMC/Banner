@@ -13,7 +13,6 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
-import java.net.SocketAddress;
 import java.util.UUID;
 
 public interface InjectionPlayerList {
