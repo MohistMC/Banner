@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ExperienceOrb;
@@ -36,7 +37,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 @Mixin(FishingHook.class)
@@ -78,13 +78,13 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
 
     @Inject(method = "catchingFish", at = @At(value = "FIELD", shift = At.Shift.AFTER, ordinal = 0, target = "Lnet/minecraft/world/entity/projectile/FishingHook;timeUntilHooked:I"))
     private void banner$attemptFail(BlockPos blockPos, CallbackInfo ci) {
-        PlayerFishEvent event = new PlayerFishEvent(((ServerPlayer) this.getPlayerOwner()).getBukkitEntity(), null, (FishHook) this.getBukkitEntity(), PlayerFishEvent.State.FAILED_ATTEMPT);
+        PlayerFishEvent event = new PlayerFishEvent((org.bukkit.entity.Player) this.getPlayerOwner().getBukkitEntity(), null, (FishHook) this.getBukkitEntity(), PlayerFishEvent.State.FAILED_ATTEMPT);
         Bukkit.getPluginManager().callEvent(event);
     }
 
     @Inject(method = "catchingFish", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/FishingHook;playSound(Lnet/minecraft/sounds/SoundEvent;FF)V"))
     private void banner$fishBite(BlockPos blockPos, CallbackInfo ci) {
-        PlayerFishEvent event = new PlayerFishEvent(((ServerPlayer) this.getPlayerOwner()).getBukkitEntity(), null, (FishHook) this.getBukkitEntity(), PlayerFishEvent.State.BITE);
+        PlayerFishEvent event = new PlayerFishEvent((org.bukkit.entity.Player) this.getPlayerOwner().getBukkitEntity(), null, (FishHook) this.getBukkitEntity(), PlayerFishEvent.State.BITE);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             ci.cancel();
@@ -94,8 +94,6 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
     @Inject(method = "catchingFish", at = @At("RETURN"))
     private void banner$modifyWaitingTime(BlockPos p_37146_, CallbackInfo ci) {
         if (this.nibble <= 0 && this.timeUntilHooked <= 0 && this.timeUntilLured <= 0) {
-            this.fishAngle = Mth.nextFloat(this.random, this.minLureAngle, this.maxLureAngle);
-            this.timeUntilHooked = Mth.nextInt(this.random, this.minLureTime, this.maxLureTime);
             this.timeUntilLured = Mth.nextInt(this.random, this.minWaitTime, this.maxWaitTime);
             this.timeUntilLured -= (this.applyLure) ? this.lureSpeed * 20 * 5 : 0;
         }
@@ -103,13 +101,24 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
 
     @Redirect(method = "catchingFish", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isRainingAt(Lnet/minecraft/core/BlockPos;)Z"))
     private boolean addRainCheck(Level instance, BlockPos position) {
-        return this.rainInfluenced && this.random.nextFloat() < 0.25F && this.level().isRainingAt(position);
+        return this.rainInfluenced && instance.isRainingAt(position);
     }
 
     @Redirect(method = "catchingFish", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;canSeeSky(Lnet/minecraft/core/BlockPos;)Z"))
     private boolean addSkyCheck(Level instance, BlockPos pos) {
-        return this.skyInfluenced && this.random.nextFloat() < 0.25F && this.level().isRainingAt(pos);
+        return this.skyInfluenced  && instance.isRainingAt(pos);
     }
+
+    @Redirect(method = "catchingFish", at = @At(value = "INVOKE", ordinal = 2, target = "Lnet/minecraft/util/Mth;nextFloat(Lnet/minecraft/util/RandomSource;FF)F"))
+    private float arclight$lureAngleParam(RandomSource random, float p_216269_, float p_216270_) {
+        return Mth.nextFloat(random, this.minLureAngle, this.maxLureAngle);
+    }
+
+    @Redirect(method = "catchingFish", at = @At(value = "INVOKE", ordinal = 2, target = "Lnet/minecraft/util/Mth;nextInt(Lnet/minecraft/util/RandomSource;II)I"))
+    private int arclight$lureTimeParam(RandomSource random, int p_216273_, int p_216274_) {
+        return Mth.nextInt(random, this.minLureTime, this.maxLureTime);
+    }
+
 
     /**
      * @author wdog5
@@ -141,10 +150,8 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
                 List<ItemStack> list = loottable.getRandomItems(lootparams);
 
                 CriteriaTriggers.FISHING_ROD_HOOKED.trigger((ServerPlayer) entityhuman, itemstack, ((FishingHook) (Object) this), list);
-                Iterator iterator = list.iterator();
 
-                while (iterator.hasNext()) {
-                    ItemStack itemstack1 = (ItemStack) iterator.next();
+                for (ItemStack itemstack1 : list) {
                     ItemEntity entityitem = new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), itemstack1);
                     // CraftBukkit start
                     PlayerFishEvent playerFishEvent = new PlayerFishEvent((org.bukkit.entity.Player) entityhuman.getBukkitEntity(), entityitem.getBukkitEntity(), (FishHook) this.getBukkitEntity(), PlayerFishEvent.State.CAUGHT_FISH);

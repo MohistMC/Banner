@@ -7,7 +7,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
-import org.bukkit.util.Vector;
 import org.spigotmc.CustomTimingsHandler;
 
 import java.util.UUID;
