@@ -1,13 +1,5 @@
 package com.mohistmc.banner.bukkit.nms.utils;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.lang.invoke.MethodType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.mohistmc.banner.bukkit.nms.model.ClassMapping;
 import com.mohistmc.banner.bukkit.nms.remappers.BannerInheritanceMap;
 import com.mohistmc.banner.bukkit.nms.remappers.BannerJarMapping;
@@ -23,6 +15,14 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.tree.ClassNode;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.lang.invoke.MethodType;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *

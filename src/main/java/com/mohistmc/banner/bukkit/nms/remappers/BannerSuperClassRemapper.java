@@ -1,10 +1,6 @@
 package com.mohistmc.banner.bukkit.nms.remappers;
 
 import com.google.common.collect.Maps;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-
 import com.mohistmc.banner.bukkit.nms.proxy.DelegateClassLoder;
 import com.mohistmc.banner.bukkit.nms.proxy.DelegateURLClassLoder;
 import com.mohistmc.banner.bukkit.nms.utils.ASMUtils;
@@ -15,6 +11,10 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
 
 public class BannerSuperClassRemapper {
     public static Map<String, Class<?>> defineClass = Maps.newHashMap();

@@ -2,7 +2,11 @@ package com.mohistmc.banner.mixin.world.inventory;
 
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.*;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.ResultContainer;
+import net.minecraft.world.inventory.StonecutterMenu;
 import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftInventoryStonecutter;
 import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftInventoryView;
 import org.jetbrains.annotations.Nullable;
