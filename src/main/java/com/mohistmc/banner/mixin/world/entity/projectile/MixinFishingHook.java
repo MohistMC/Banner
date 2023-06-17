@@ -110,12 +110,12 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
     }
 
     @Redirect(method = "catchingFish", at = @At(value = "INVOKE", ordinal = 2, target = "Lnet/minecraft/util/Mth;nextFloat(Lnet/minecraft/util/RandomSource;FF)F"))
-    private float arclight$lureAngleParam(RandomSource random, float p_216269_, float p_216270_) {
+    private float banner$lureAngleParam(RandomSource random, float p_216269_, float p_216270_) {
         return Mth.nextFloat(random, this.minLureAngle, this.maxLureAngle);
     }
 
     @Redirect(method = "catchingFish", at = @At(value = "INVOKE", ordinal = 2, target = "Lnet/minecraft/util/Mth;nextInt(Lnet/minecraft/util/RandomSource;II)I"))
-    private int arclight$lureTimeParam(RandomSource random, int p_216273_, int p_216274_) {
+    private int bannert$lureTimeParam(RandomSource random, int p_216273_, int p_216274_) {
         return Mth.nextInt(random, this.minLureTime, this.maxLureTime);
     }
 
