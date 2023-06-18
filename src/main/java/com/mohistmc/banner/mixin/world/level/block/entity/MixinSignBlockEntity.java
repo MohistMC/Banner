@@ -31,6 +31,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -113,7 +114,7 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements Comman
             lines[j] = CraftChatMessage.fromComponent(signText.getMessage(j, player.isTextFilteringEnabled()));
         }
 
-        SignChangeEvent event = new SignChangeEvent(CraftBlock.at(this.level, this.worldPosition), cbPlayer, lines, (banner$front.get()) ? Side.FRONT : Side.BACK);
+        SignChangeEvent event = new SignChangeEvent(CraftBlock.at(this.level, this.worldPosition), cbPlayer, Arrays.copyOf(lines, lines.length), (banner$front.get()) ? Side.FRONT : Side.BACK);
         player.level().getCraftServer().getPluginManager().callEvent(event);
 
         if (!event.isCancelled()) {
