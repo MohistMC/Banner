@@ -89,7 +89,7 @@ public abstract class MixinSpongeBlock extends Block {
         // CraftBukkit start
         List<CraftBlockState> blocks = blockList.getList(); // Is a clone
         if (!blocks.isEmpty()) {
-            final org.bukkit.block.Block bblock = level.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ());
+            final org.bukkit.block.Block bblock =  level.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ());
             SpongeAbsorbEvent event = new SpongeAbsorbEvent(bblock, (List<org.bukkit.block.BlockState>) (List) blocks);
             level.getCraftServer().getPluginManager().callEvent(event);
 
