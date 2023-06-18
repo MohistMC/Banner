@@ -3,6 +3,7 @@ package com.mohistmc.banner.mixin.world.level.block.entity;
 import com.mohistmc.banner.bukkit.DistValidate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -17,7 +18,10 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,6 +85,30 @@ public abstract class MixinChiseledBookShelfBlockEntity extends BlockEntity impl
     private void fixShapeUpdate(ChiseledBookShelfBlockEntity instance, int i) {
         if (this.level != null) {
             this.updateState(i); // CraftBukkit - SPIGOT-7381: check for null world
+        }
+    }
+
+    @Inject(method = "load", at = @At("HEAD"))
+    private void banner$load(CompoundTag compoundTag, CallbackInfo ci) {
+        super.load(compoundTag); // CraftBukkit - SPIGOT-7393: Load super Bukkit data
+    }
+
+    @Inject(method = "removeItem",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/block/entity/ChiseledBookShelfBlockEntity;updateState(I)V"))
+    private void banner$checkWorld(int i, int j, CallbackInfoReturnable<ItemStack> cir) {
+        if (level == null) {
+            cir.cancel(); // CraftBukkit - SPIGOT-7381: check for null world
+        }
+    }
+
+    @Inject(method = "setItem",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/block/entity/ChiseledBookShelfBlockEntity;updateState(I)V"),
+            cancellable = true)
+    private void banner$checkWorld0(int i, ItemStack itemStack, CallbackInfo ci) {
+        if (level == null) {
+            ci.cancel(); // CraftBukkit - SPIGOT-7381: check for null world
         }
     }
 }

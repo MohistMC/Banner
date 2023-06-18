@@ -45,6 +45,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.saveddata.maps.MapDecoration;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
@@ -69,6 +70,7 @@ import org.bukkit.WorldBorder;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.sign.Side;
 import org.bukkit.configuration.serialization.DelegateDeserialization;
@@ -78,6 +80,7 @@ import org.bukkit.conversations.ManuallyAbandonedConversationCanceller;
 import org.bukkit.craftbukkit.v1_20_R1.*;
 import org.bukkit.craftbukkit.v1_20_R1.advancement.CraftAdvancement;
 import org.bukkit.craftbukkit.v1_20_R1.advancement.CraftAdvancementProgress;
+import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlockEntityState;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlockState;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftSign;
 import org.bukkit.craftbukkit.v1_20_R1.block.data.CraftBlockData;
@@ -614,6 +617,17 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     }
 
     @Override
+    public void sendBlockUpdate(@NotNull Location location, @NotNull TileState tileState) throws IllegalArgumentException {
+        Preconditions.checkArgument(location != null, "Location can not be null");
+        Preconditions.checkArgument(tileState != null, "TileState can not be null");
+
+        if (getHandle().connection == null) return;
+
+        CraftBlockEntityState<?> craftState = ((CraftBlockEntityState<?>) tileState);
+        getHandle().connection.send(craftState.getUpdatePacket(location));
+    }
+
+    @Override
     public void sendEquipmentChange(org.bukkit.entity.LivingEntity entity, EquipmentSlot slot, ItemStack item) {
         this.sendEquipmentChange(entity, Map.of(slot, item));
     }
@@ -656,16 +670,19 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         if (lines == null) {
             lines = new String[4];
         }
-        Preconditions.checkArgument(lines.length < 4, "lines (%s) must be lower than 4", lines.length);
+        Preconditions.checkArgument(lines.length >= 4, "Must have at least 4 lines (%s)", lines.length);
 
         if (getHandle().connection == null) return;
 
         Component[] components = CraftSign.sanitizeLines(lines);
         SignBlockEntity sign = new SignBlockEntity(CraftLocation.toBlockPosition(loc), Blocks.OAK_SIGN.defaultBlockState());
-        //sign.setColor(net.minecraft.world.item.DyeColor.byId(dyeColor.getWoolData()));//Banner TODO
+        SignText text = sign.getFrontText();
+        text = text.setColor(net.minecraft.world.item.DyeColor.byId(dyeColor.getWoolData()));
+        text = text.setHasGlowingText(hasGlowingText);
         for (int i = 0; i < components.length; i++) {
-            //sign.setMessage(i, components[i]); //Banner TODO
+            text = text.setMessage(i, components[i]);
         }
+        sign.setText(text, true);
 
         getHandle().connection.send(sign.getUpdatePacket());
     }
@@ -1746,6 +1763,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     public void setScoreboard(Scoreboard scoreboard) {
         Preconditions.checkArgument(scoreboard != null, "Scoreboard cannot be null");
         Preconditions.checkState(getHandle().connection != null, "Cannot set scoreboard yet (invalid player connection)");
+        Preconditions.checkState(!getHandle().connection.isDisconnected(), "Cannot set scoreboard for invalid CraftPlayer (player is disconnected)");
 
         this.server.getScoreboardManager().setPlayerBoard(this, scoreboard);
     }

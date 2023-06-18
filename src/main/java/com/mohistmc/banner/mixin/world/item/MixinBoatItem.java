@@ -40,7 +40,7 @@ public abstract class MixinBoatItem extends Item {
         // CraftBukkit start - Boat placement
         PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent(player,
                 org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK, ((BlockHitResult) hitResult).getBlockPos(),
-                ((BlockHitResult) hitResult).getDirection(), itemStack, usedHand);
+                ((BlockHitResult) hitResult).getDirection(), itemStack,false,  usedHand, hitResult.getLocation());
         if (event.isCancelled()) {
             cir.setReturnValue(InteractionResultHolder.pass(itemStack));
         }

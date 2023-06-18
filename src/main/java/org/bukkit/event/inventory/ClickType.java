@@ -79,6 +79,16 @@ public enum ClickType {
     }
 
     /**
+     * Gets whether this ClickType represents the pressing of a mouse button
+     *
+     * @return true if this ClickType represents the pressing of a mouse button
+     */
+    public boolean isMouseClick() {
+        return (this == ClickType.DOUBLE_CLICK) || (this == ClickType.LEFT) || (this == ClickType.RIGHT) || (this == ClickType.MIDDLE)
+                || (this == ClickType.WINDOW_BORDER_LEFT) || (this == ClickType.SHIFT_LEFT) || (this == ClickType.SHIFT_RIGHT) || (this == ClickType.WINDOW_BORDER_RIGHT);
+    }
+
+    /**
      * Gets whether this ClickType represents an action that can only be
      * performed by a Player in creative mode.
      *

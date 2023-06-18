@@ -389,7 +389,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
             cancelledBlock = true;
         }
 
-        PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, blockPos, hitResult.getDirection(), stack, cancelledBlock, hand);
+        PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, blockPos, hitResult.getDirection(), stack, cancelledBlock, hand, hitResult.getLocation());
         firedInteract = true;
         interactResult = event.useItemInHand() == Event.Result.DENY;
         interactPosition = blockPos.immutable();

@@ -408,7 +408,7 @@ public abstract class MixinItemStack implements InjectionItemStack {
 
                     // SPIGOT-1288 - play sound stripped from ItemBlock
                     if (this.item instanceof BlockItem) {
-                        SoundType soundeffecttype = ((BlockItem) this.item).getBlock().getSoundType(null);
+                        SoundType soundeffecttype = ((BlockItem) this.item).getBlock().defaultBlockState().getSoundType(); // TODO: not strictly correct, however currently only affects decorated pots
                         world.playSound(player, blockPos, soundeffecttype.getPlaceSound(), SoundSource.BLOCKS, (soundeffecttype.getVolume() + 1.0F) / 2.0F, soundeffecttype.getPitch() * 0.8F);
                     }
                     player.awardStat(Stats.ITEM_USED.get(item));

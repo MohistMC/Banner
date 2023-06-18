@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.level.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -45,5 +46,10 @@ public abstract class MixinBrushableBlockEntity extends BlockEntity {
         org.bukkit.block.Block bblock = CraftBlock.at(this.level, this.worldPosition);
         CraftEventFactory.handleBlockDropItemEvent(bblock, bblock.getState(), (ServerPlayer) player, Arrays.asList(itemEntity));
         // CraftBukkit end
+    }
+
+    @Inject(method = "load", at = @At("HEAD"))
+    private void banner$load(CompoundTag compoundTag, CallbackInfo ci) {
+        super.load(compoundTag); // CraftBukkit - SPIGOT-7393: Load super Bukkit data
     }
 }

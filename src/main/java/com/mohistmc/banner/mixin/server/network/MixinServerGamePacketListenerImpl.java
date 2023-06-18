@@ -944,7 +944,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                 if (player.gameMode.bridge$isFiredInteract() && player.gameMode.bridge$getinteractPosition().equals(((BlockHitResult) movingobjectpositionblock).getBlockPos()) && player.gameMode.bridge$getinteractHand() == enumhand && ItemStack.isSameItemSameTags(player.gameMode.bridge$getinteractItemStack(), itemstack)) {
                     cancelled = player.gameMode.bridge$getInteractResult();
                 } else {
-                    org.bukkit.event.player.PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, ((BlockHitResult) movingobjectpositionblock).getBlockPos(), ((BlockHitResult) movingobjectpositionblock).getDirection(), itemstack, true, enumhand);
+                    org.bukkit.event.player.PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, ((BlockHitResult) movingobjectpositionblock).getBlockPos(), ((BlockHitResult) movingobjectpositionblock).getDirection(), itemstack, true, enumhand, movingobjectpositionblock.getLocation());
                     cancelled = event.useItemInHand() == Event.Result.DENY;
                 }
                 player.gameMode.bridge$setFiredInteract(false);

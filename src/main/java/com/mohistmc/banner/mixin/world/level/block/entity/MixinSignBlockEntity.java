@@ -110,22 +110,16 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements Comman
         // CraftBukkit start
         org.bukkit.entity.Player cbPlayer = ((ServerPlayer) player).getBukkitEntity();
         String[] lines = new String[4];
-        for (int j = 0; j < list.size(); ++j) {
-            lines[j] = CraftChatMessage.fromComponent(signText.getMessage(j, player.isTextFilteringEnabled()));
+        for (int i = 0; i < list.size(); ++i) {
+            lines[i] = CraftChatMessage.fromComponent(signText.getMessage(i, player.isTextFilteringEnabled()));
         }
 
         SignChangeEvent event = new SignChangeEvent(CraftBlock.at(this.level, this.worldPosition), cbPlayer, Arrays.copyOf(lines, lines.length), (banner$front.get()) ? Side.FRONT : Side.BACK);
         player.level().getCraftServer().getPluginManager().callEvent(event);
 
-        if (!event.isCancelled()) {
-            Component[] components = CraftSign.sanitizeLines(event.getLines());
-            for (int j = 0; j < components.length; j++) {
-                signText = signText.setMessage(j, components[j]);
-            }
-        } else {
-            signText = originalText;
+        if (event.isCancelled()) {
+            cir.setReturnValue(originalText);
         }
-        cir.setReturnValue(signText);
         // CraftBukkit end
     }
 
