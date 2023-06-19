@@ -7,6 +7,12 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.nio.file.Path;
+import java.util.logging.Level;
 
 @Mixin(LevelStorageSource.LevelStorageAccess.class)
 public abstract class MixinLevelStorageAccess implements InjectionLevelStorageAccess {
@@ -23,7 +29,7 @@ public abstract class MixinLevelStorageAccess implements InjectionLevelStorageAc
         this.dimensionType = dimensionType;
     }
 
-    /*
+
     @Inject(method = "getDimensionPath", cancellable = true, at = @At("HEAD"))
     private void banner$useActualType(ResourceKey<Level> dimensionKey, CallbackInfoReturnable<Path> cir) {
         if (dimensionType == LevelStem.OVERWORLD) {
@@ -34,7 +40,6 @@ public abstract class MixinLevelStorageAccess implements InjectionLevelStorageAc
             cir.setReturnValue(this.levelDirectory.path().resolve("DIM1"));
         }
     }
-    */
 
     @Override
     public ResourceKey<LevelStem> bridge$getTypeKey() {
