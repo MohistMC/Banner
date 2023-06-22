@@ -1,8 +1,8 @@
 plugins {
 	id 'fabric-loom' version '1.2-SNAPSHOT'
 	id 'maven-publish'
-	id 'org.ajoberstar.grgit' version '3.1.1'
-	id "com.peterabeles.gversion" version "1.8.3"
+	id 'org.ajoberstar.grgit' version '5.2.0'
+	id "com.peterabeles.gversion" version "1.10.2"
 }
 
 project.compileJava.dependsOn(createVersionFile)

@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
-import com.mohistmc.banner.injection.world.level.block.InjectionSaplingBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -20,10 +19,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(SaplingBlock.class)
-public class MixinSaplingBlock implements InjectionSaplingBlock {
+public class MixinSaplingBlock {
 
     @Shadow @Final private AbstractTreeGrower treeGrower;
-    private static TreeType treeType; // CraftBukkit
+    private static TreeType treeType = BukkitExtraConstants.treeType; // CraftBukkit
 
     @Redirect(method = "advanceTree", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/grower/AbstractTreeGrower;growTree(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ChunkGenerator;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/util/RandomSource;)Z"))
     private boolean banner$growTree(AbstractTreeGrower instance, ServerLevel level, ChunkGenerator generator, BlockPos pos, BlockState state, RandomSource random) {
@@ -53,15 +52,5 @@ public class MixinSaplingBlock implements InjectionSaplingBlock {
         }
         // CraftBukkit end
         return true;
-    }
-
-    @Override
-    public TreeType bridge$getTreeType() {
-        return treeType;
-    }
-
-    @Override
-    public void banner$setTreeType(TreeType treeType) {
-        this.treeType = treeType;
     }
 }
