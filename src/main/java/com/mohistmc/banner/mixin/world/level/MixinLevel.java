@@ -250,8 +250,8 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
 
     private AtomicBoolean captured = new AtomicBoolean(false);
 
-    @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z", at = @At("HEAD"), cancellable = true)
-    private void banner$captureTree(BlockPos blockPos, BlockState blockState, int i, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At("HEAD"), cancellable = true)
+    private void banner$captureTree(BlockPos blockPos, BlockState blockState, int i, int j, CallbackInfoReturnable<Boolean> cir) {
         // CraftBukkit start - tree generation
         if (this.captureTreeGeneration) {
             CapturedBlockState blockstate = capturedBlockStates.get(blockPos);
@@ -282,28 +282,41 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         // CraftBukkit end
         BlockState banner$blockState2 = levelChunk.setBlockState(blockPos, blockState, (i & 64) != 0, (i & 1024) == 0); // CraftBukkit custom NO_PLACE flag
         banner$state.set(banner$blockState2);
-        if (banner$blockState2 == null) {
-            // CraftBukkit start - remove blockstate if failed (or the same)
-            if (this.captureBlockStates && captured.get()) {
-                this.capturedBlockStates.remove(blockPos);
-            }
-            // CraftBukkit end
-            cir.setReturnValue(false);
-        }
     }
 
     @Redirect(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z",
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/chunk/LevelChunk;setBlockState(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;"))
-    private BlockState banner$resetState(LevelChunk instance, BlockPos blockPos, BlockState blockState, boolean bl) {
-        return banner$state.get();
+    private BlockState banner$resetState(LevelChunk levelChunk, BlockPos blockPos, BlockState blockState, boolean bl) {
+        BlockState banner$state1 = banner$state.get();
+        banner$state1 = banner$state1 == null ? levelChunk.setBlockState(blockPos, blockState, bl) : banner$state1;
+        BlockState banner$state2 = banner$state1;
+        if (banner$state2 == null && captured.get()) {
+            this.capturedBlockStates.remove(blockPos);
+        }
+        return banner$state2;
     }
 
-    @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/Level;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;", shift = At.Shift.AFTER),
+            cancellable = true)
     private void banner$finalCapture(BlockPos blockPos, BlockState blockState, int i, int j, CallbackInfoReturnable<Boolean> cir) {
         // CraftBukkit start
         if (this.captureBlockStates) { // Don't notify clients or update physics while capturing blockstates
-            cir.setReturnValue(false);
+            cir.setReturnValue(true);
+            cir.cancel();
+        }
+    }
+
+    @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/Level;onBlockStateChange(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;)V"),
+            cancellable = true)
+    private void banner$checkState(BlockPos blockPos, BlockState blockState, int i, int j, CallbackInfoReturnable<Boolean> cir) {
+        if (preventPoiUpdated) {
+            cir.setReturnValue(true);
+            cir.cancel();
         }
     }
 
@@ -321,13 +334,6 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                 cir.setReturnValue(false);
             }
             // CraftBukkit end
-        }
-    }
-
-    @Inject(method = "onBlockStateChange", at = @At("HEAD"), cancellable = true)
-    private void banner$checkIf(BlockPos blockPos, BlockState blockState, BlockState blockState2, CallbackInfo ci) {
-        if (preventPoiUpdated) {
-            ci.cancel();
         }
     }
 
