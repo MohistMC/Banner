@@ -16,6 +16,7 @@ import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.rcon.RconConsoleSource;
 import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.bukkit.Bukkit;
@@ -35,7 +36,10 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.io.IOException;
 import java.net.Proxy;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(DedicatedServer.class)
@@ -153,10 +157,37 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         });
     }
 
-    @Inject(method = "onServerExit", at = @At("TAIL"))
+    @Inject(method = "onServerExit", at = @At("RETURN"))
     public void banner$exitNow(CallbackInfo ci) {
-        Runtime.getRuntime().halt(0);
+        try {
+            TerminalConsoleAppender.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Thread exitThread = new Thread(this::banner$exit, "Exit Thread");
+        exitThread.setDaemon(true);
+        exitThread.start();
     }
+
+    private void banner$exit() {
+        try {
+            Thread.sleep(5000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        List<String> threads = new ArrayList<>();
+        for (Thread thread : Thread.getAllStackTraces().keySet()) {
+            if (!thread.isDaemon() && !thread.getName().equals("DestroyJavaVM")) {
+                threads.add(thread.getName());
+            }
+        }
+        if (!threads.isEmpty()) {
+            BannerServer.LOGGER.debug("Threads {} not shutting down", String.join(", ", threads));
+            BannerServer.LOGGER.info("{} threads not shutting down correctly, force exiting", threads.size());
+        }
+        System.exit(0);
+    }
+
 
     @Override
     public CommandSender getBukkitSender(CommandSourceStack wrapper) {
