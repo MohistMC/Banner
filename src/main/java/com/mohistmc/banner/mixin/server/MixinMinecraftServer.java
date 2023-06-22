@@ -1,8 +1,6 @@
 package com.mohistmc.banner.mixin.server;
 
-import com.google.common.collect.Maps;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
@@ -11,6 +9,8 @@ import it.unimi.dsi.fastutil.longs.LongIterator;
 import jline.console.ConsoleReader;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import net.minecraft.CrashReport;
+import net.minecraft.ReportedException;
 import net.minecraft.Util;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
@@ -37,6 +37,7 @@ import net.minecraft.util.thread.ReentrantBlockableEventLoop;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ForcedChunksSavedData;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -106,6 +107,14 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Shadow @Final private static int TICK_STATS_SPAN;
     @Shadow private long lastServerStatus;
+
+    @Shadow
+    private static void setInitialSpawn(ServerLevel serverLevel, ServerLevelData serverLevelData, boolean bl, boolean bl2) {
+    }
+
+    @Shadow protected abstract void setupDebugLevel(WorldData worldData);
+
+    @Shadow public WorldData worldData;
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
     public org.bukkit.craftbukkit.v1_20_R1.CraftServer server;
@@ -198,18 +207,12 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Override
     public void addLevel(ServerLevel level) {
-        Map<ResourceKey<net.minecraft.world.level.Level>, ServerLevel> oldLevels = this.levels;
-        Map<ResourceKey<net.minecraft.world.level.Level>, ServerLevel> newLevels = Maps.newLinkedHashMap(oldLevels);
-        newLevels.put(level.dimension(), level);
-        this.levels = Collections.unmodifiableMap(newLevels);
+        this.levels.put(level.dimension(), level);
     }
 
     @Override
     public void removeLevel(ServerLevel level) {
-        Map<ResourceKey<net.minecraft.world.level.Level>, ServerLevel> oldLevels = this.levels;
-        Map<ResourceKey<net.minecraft.world.level.Level>, ServerLevel> newLevels = Maps.newLinkedHashMap(oldLevels);
-        newLevels.remove(level.dimension(), level);
-        this.levels = Collections.unmodifiableMap(newLevels);
+        this.levels.remove(level.dimension());
     }
 
     @Inject(method = "createLevels",
@@ -256,16 +259,37 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Override
     public void initWorld(ServerLevel serverWorld, ServerLevelData worldInfo, WorldData saveData, WorldOptions worldOptions) {
+        boolean flag = saveData.isDebugWorld();
         if ((serverWorld.bridge$generator() != null)) {
             serverWorld.getWorld().getPopulators().addAll(
                     serverWorld.bridge$generator().getDefaultPopulators(
                             (serverWorld.getWorld())));
         }
+        WorldBorder worldborder = serverWorld.getWorldBorder();
+        worldborder.applySettings(worldInfo.getWorldBorder());
+        if (!worldInfo.isInitialized()) {
+            try {
+                setInitialSpawn(serverWorld, worldInfo, worldOptions.generateBonusChest(), flag);
+                worldInfo.setInitialized(true);
+                if (flag) {
+                    this.setupDebugLevel(this.worldData);
+                }
+            } catch (Throwable throwable) {
+                CrashReport crashreport = CrashReport.forThrowable(throwable, "Exception initializing level");
+                try {
+                    serverWorld.fillReportDetails(crashreport);
+                } catch (Throwable throwable2) {
+                    // empty catch block
+                }
+                throw new ReportedException(crashreport);
+            }
+            worldInfo.setInitialized(true);
+        }
     }
 
     /**
      * @author wdog5
-     * @reason
+     * @reason bukkit
      */
     @Overwrite
     public final void prepareLevels(ChunkProgressListener listener) {
@@ -311,7 +335,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             return;
         }
         this.forceTicks = true;
-        LOGGER.info(BannerMCStart.I18N.get("server.region.prepare"), serverWorld.dimension().location());
+        LOGGER.info("Preparing start region for dimension {}", serverWorld.dimension().location());
         BlockPos blockpos = serverWorld.getSharedSpawnPos();
         listener.updateSpawnPos(new ChunkPos(blockpos));
         ServerChunkCache serverchunkprovider = serverWorld.getChunkSource();
@@ -336,7 +360,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         }
         this.executeModerately();
         listener.stop();
-        // this.updateMobSpawningFlags();
+        //this.updateMobSpawningFlags();
         serverWorld.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
         this.forceTicks = false;
     }
