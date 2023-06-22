@@ -62,6 +62,7 @@ chmod +x ./banner-launcher
 - [**Paper**](https://github.com/PaperMC/Paper.git) - Plugin support.
 - [**Arclight**](https://github.com/IzzelAliz/Arclight.git) - Some code.
 - [**Mohist**](https://github.com/MohistMC/Mohist.git) - Some code.
+- [**StackDeobfuscator**](https://github.com/booky10/StackDeobfuscator) - auto deobfuscate logger crash
 
 ## Special Thanks To:
 <a href="https://ci.codemc.io/"><img src="https://i.loli.net/2020/03/11/YNicj3PLkU5BZJT.png" width="172"></a>

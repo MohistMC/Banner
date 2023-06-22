@@ -124,6 +124,8 @@ dependencies {
 
 	annotationProcessor 'com.github.wdog5:mixin-tools:1.0.1'
 
+	// mappings remapper
+	implementation(include("net.fabricmc:mapping-io:0.3.0"))
 }
 
 base {
