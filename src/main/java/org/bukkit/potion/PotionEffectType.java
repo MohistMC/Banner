@@ -1,15 +1,15 @@
 package org.bukkit.potion;
 
 import com.google.common.base.Preconditions;
-
-import java.util.*;
-
 import org.bukkit.Color;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Represents a type of potion and its effect on an entity.
@@ -265,7 +265,10 @@ public abstract class PotionEffectType implements Keyed {
             return false;
         }
         final PotionEffectType other = (PotionEffectType) obj;
-        return this.id == other.id;
+        if (this.id != other.id) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -277,7 +280,8 @@ public abstract class PotionEffectType implements Keyed {
     public String toString() {
         return "PotionEffectType[" + id + ", " + getName() + "]";
     }
-    private static final ArrayList<PotionEffectType> byId = new ArrayList<>();
+
+    private static final Map<Integer, PotionEffectType> byId = new HashMap<>();
     private static final Map<String, PotionEffectType> byName = new HashMap<String, PotionEffectType>();
     private static final Map<NamespacedKey, PotionEffectType> byKey = new HashMap<NamespacedKey, PotionEffectType>();
     // will break on updates.
@@ -305,9 +309,6 @@ public abstract class PotionEffectType implements Keyed {
     @Deprecated
     @Nullable
     public static PotionEffectType getById(int id) {
-        if (id >= byId.size() || id < 0) {
-            return null;
-        }
         return byId.get(id);
     }
 
@@ -331,21 +332,15 @@ public abstract class PotionEffectType implements Keyed {
      * @param type PotionType to register
      */
     public static void registerPotionEffectType(@NotNull PotionEffectType type) {
-        if (byId.size() <= type.id) {
-            byId.ensureCapacity(type.id + 1);
-            while (byId.size() <= type.id) {
-                byId.add(null);
-            }
-        }
-
-        if (byId.get(type.id) != null || byName.containsKey(type.getName().toLowerCase(Locale.ENGLISH)) || byKey.containsKey(type.key)) {
+        if (byId.get(type.id) != null || byName.containsKey(type.getName().toLowerCase(java.util.Locale.ENGLISH)) || byKey.containsKey(type.key)) {
             throw new IllegalArgumentException("Cannot set already-set type");
         } else if (!acceptingNew) {
-            throw new IllegalStateException("No longer accepting new potion effect types (can only be done by the server implementation)");
+            throw new IllegalStateException(
+                    "No longer accepting new potion effect types (can only be done by the server implementation)");
         }
 
-        byId.set(type.id, type);
-        byName.put(type.getName().toLowerCase(Locale.ENGLISH), type);
+        byId.put(type.id, type);
+        byName.put(type.getName().toLowerCase(java.util.Locale.ENGLISH), type);
         byKey.put(type.key, type);
     }
 
@@ -364,6 +359,11 @@ public abstract class PotionEffectType implements Keyed {
      */
     @NotNull
     public static PotionEffectType[] values() {
-        return byId.toArray(new PotionEffectType[0]);
+        int maxId = 0;
+        for (int id : byId.keySet()) {
+            maxId = Math.max(maxId, id);
+        }
+        PotionEffectType[] result = new PotionEffectType[maxId + 1];
+        return byId.values().toArray(result);
     }
 }
