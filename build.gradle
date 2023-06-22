@@ -126,6 +126,9 @@ dependencies {
 	modImplementation(include("com.github.LlamaLad7:MixinExtras:0.1.1"))
 
 	annotationProcessor 'com.github.wdog5:mixin-tools:1.0.1'
+
+	// mappings remapper
+	implementation(include("net.fabricmc:mapping-io:0.3.0"))
 }
 
 base {

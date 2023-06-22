@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.mohistmc.banner.BannerMCStart;
+import com.mohistmc.banner.stackdeobf.util.CompatUtil;
 import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -145,6 +146,10 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
         }
         if (mixinClassName.equals("com.mohistmc.banner.mixin.world.item.MixinChorusFruitItem")) {
             return !FabricLoader.getInstance().isModLoaded("openpartiesandclaims");
+        }
+        if (mixinClassName.endsWith("ThreadingDetectorMixin")) {
+            // added in 1.18-pre7
+            return CompatUtil.WORLD_VERSION >= 2854;
         }
         return true;
     }

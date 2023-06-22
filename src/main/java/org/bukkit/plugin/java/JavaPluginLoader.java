@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 import com.mohistmc.banner.BannerMCStart;
+import com.mohistmc.banner.stackdeobf.mappings.RemappingUtil;
 import org.bukkit.Server;
 import org.bukkit.Warning;
 import org.bukkit.Warning.WarningState;
@@ -149,6 +150,7 @@ public final class JavaPluginLoader implements PluginLoader {
         } catch (InvalidPluginException ex) {
             throw ex;
         } catch (Throwable ex) {
+            RemappingUtil.remapStackTraceElements(ex.getStackTrace());
             throw new InvalidPluginException(ex);
         }
 
@@ -312,6 +314,7 @@ public final class JavaPluginLoader implements PluginLoader {
                     } catch (InvocationTargetException ex) {
                         throw new EventException(ex.getCause());
                     } catch (Throwable t) {
+                        RemappingUtil.remapStackTraceElements(t.getStackTrace());
                         throw new EventException(t);
                     }
                 }
@@ -344,6 +347,7 @@ public final class JavaPluginLoader implements PluginLoader {
             try {
                 jPlugin.setEnabled(true);
             } catch (Throwable ex) {
+                RemappingUtil.remapStackTraceElements(ex.getStackTrace());
                 server.getLogger().log(Level.SEVERE, "Error occurred while enabling " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
             }
 
@@ -369,6 +373,7 @@ public final class JavaPluginLoader implements PluginLoader {
             try {
                 jPlugin.setEnabled(false);
             } catch (Throwable ex) {
+                RemappingUtil.remapStackTraceElements(ex.getStackTrace());
                 server.getLogger().log(Level.SEVERE, "Error occurred while disabling " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
             }
 
