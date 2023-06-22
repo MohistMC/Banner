@@ -331,7 +331,8 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             this.getCraftServer().getPluginManager().callEvent(event);
 
             if (event.isCancelled()) {
-                cir.setReturnValue(false);
+                cir.setReturnValue(true);
+                cir.cancel();
             }
             // CraftBukkit end
         }
