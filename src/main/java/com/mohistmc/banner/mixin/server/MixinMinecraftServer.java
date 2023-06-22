@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.server;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
@@ -295,7 +296,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     public final void prepareLevels(ChunkProgressListener listener) {
         ServerLevel serverworld = this.overworld();
         this.forceTicks = true;
-        LOGGER.info("Preparing start region for dimension {}", serverworld.dimension().location());
+        LOGGER.info(BannerMCStart.I18N.get("server.region.prepare"), serverworld.dimension().location());
         BlockPos blockpos = serverworld.getSharedSpawnPos();
         listener.updateSpawnPos(new ChunkPos(blockpos));
         ServerChunkCache serverchunkprovider = serverworld.getChunkSource();
