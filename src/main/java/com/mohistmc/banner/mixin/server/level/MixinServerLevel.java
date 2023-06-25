@@ -81,7 +81,6 @@ import org.bukkit.event.world.WorldSaveEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
-import org.spigotmc.SpigotWorldConfig;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -164,15 +163,12 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         if (gen != null) {
             this.chunkSource.chunkMap.generator = new CustomChunkGenerator((ServerLevel) (Object) this, this.chunkSource.getGenerator(), gen);
         }
-        getWorld();
     }
 
-    @Inject(method = "<init>", at = @At(value = "INVOKE",
-            target = "Lcom/google/common/collect/Lists;newArrayList()Ljava/util/ArrayList;",
-            remap = false,
-            shift = At.Shift.BEFORE))
-    private void banner$preInitWorldServer(MinecraftServer minecraftServer, Executor executor, LevelStorageSource.LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey resourceKey, LevelStem levelStem, ChunkProgressListener chunkProgressListener, boolean bl, long l, List<CustomSpawner> list, boolean bl2, RandomSequences randomSequences, CallbackInfo ci) {
+    @Inject(method = "<init>", at = @At(value = "RETURN"))
+    private void banner$initWorldServer(MinecraftServer minecraftServer, Executor executor, LevelStorageSource.LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey resourceKey, LevelStem levelStem, ChunkProgressListener chunkProgressListener, boolean bl, long l, List list, boolean bl2, RandomSequences randomSequences, CallbackInfo ci) {
         this.banner$setPvpMode(minecraftServer.isPvpAllowed());
+        this.uuid = WorldUUID.getUUID(levelStorageAccess.getDimensionPath(this.dimension()).toFile());
         this.convertable = levelStorageAccess;
         var typeKey = ((InjectionLevelStorageAccess) levelStorageAccess).bridge$getTypeKey();
         if (typeKey != null) {
@@ -191,14 +187,10 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
             this.serverLevelDataCB = (PrimaryLevelData) serverLevelData;
         } else if (serverLevelData instanceof DerivedLevelData) {
             this.serverLevelDataCB = BannerDerivedWorldInfo.create((DerivedLevelData)serverLevelData);
-            serverLevelDataCB.setWorld((ServerLevel) (Object) this);
+            serverLevelDataCB.setWorld(((ServerLevel) (Object) this));
         }
-        this.banner$setSpigotConfig(new SpigotWorldConfig(serverLevelDataCB.getLevelName()));
-    }
-
-    @Inject(method = "<init>", at = @At(value = "RETURN"))
-    private void banner$initWorldServer(MinecraftServer minecraftServer, Executor executor, LevelStorageSource.LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey resourceKey, LevelStem levelStem, ChunkProgressListener chunkProgressListener, boolean bl, long l, List list, boolean bl2, RandomSequences randomSequences, CallbackInfo ci) {
-        this.uuid = WorldUUID.getUUID(levelStorageAccess.getDimensionPath(this.dimension()).toFile());
+        this.getCraftServer().addWorld(this.getWorld()); // CraftBukkit
+        this.getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
         var data = this.getDataStorage().computeIfAbsent(LevelPersistentData::new,
                 () -> new LevelPersistentData(null), "bukkit_pdc");
         this.getWorld().readBukkitValues(data.getTag());

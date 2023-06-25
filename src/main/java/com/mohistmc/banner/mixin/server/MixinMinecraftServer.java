@@ -35,12 +35,15 @@ import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.Unit;
 import net.minecraft.util.thread.ReentrantBlockableEventLoop;
+import net.minecraft.world.RandomSequences;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ForcedChunksSavedData;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldOptions;
+import net.minecraft.world.level.storage.DerivedLevelData;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WorldData;
@@ -69,16 +72,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.Proxy;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -149,6 +153,28 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         Main.handleParser(parser, options);
         this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
         this.worldLoader = BukkitCaptures.getDataLoadContext();
+        // Try to see if we're actually running in a terminal, disable jline if not
+        if (System.console() == null && System.getProperty("jline.terminal") == null) {
+            System.setProperty("jline.terminal", "jline.UnsupportedTerminal");
+            org.bukkit.craftbukkit.Main.useJline = false;
+        }
+
+        try {
+            reader = new ConsoleReader(System.in, System.out);
+            reader.setExpandEvents(false); // Avoid parsing exceptions for uncommonly used event designators
+        } catch (Throwable e) {
+            try {
+                // Try again with jline disabled for Windows users without C++ 2008 Redistributable
+                System.setProperty("jline.terminal", "jline.UnsupportedTerminal");
+                System.setProperty("user.language", "en");
+                org.bukkit.craftbukkit.Main.useJline = false;
+                reader = new ConsoleReader(System.in, System.out);
+                reader.setExpandEvents(false);
+            } catch (IOException ex) {
+                LOGGER.warn((String) null, ex);
+            }
+            // CraftBukkit end
+        }
         //Runtime.getRuntime().addShutdownHook(new ServerShutdownThread(((MinecraftServer) (Object) this)));
     }
 
@@ -159,12 +185,11 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         }
     }
 
-    @Inject(method = "stopServer", at = @At("HEAD"))
+    @Inject(method = "stopServer", at = @At("HEAD"), cancellable = true)
     private void banner$stop(CallbackInfo ci) {
-        synchronized (this.stopLock) {
-            if (this.hasStopped)
-                return;
-            this.hasStopped = true;
+        synchronized(stopLock) {
+            if (hasStopped) ci.cancel();
+            hasStopped = true;
         }
     }
 
@@ -227,6 +252,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Inject(method = "loadLevel", at = @At("TAIL"))
     private void banner$initPlugins(CallbackInfo ci) {
         for (ServerLevel worldserver : ((MinecraftServer)(Object)this).getAllLevels()) {
+            this.prepareLevels(worldserver.getChunkSource().chunkMap.progressListener, worldserver);
             worldserver.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API
             this.server.getPluginManager().callEvent(new WorldLoadEvent(worldserver.getWorld()));
         }
@@ -268,6 +294,8 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         }
         WorldBorder worldborder = serverWorld.getWorldBorder();
         worldborder.applySettings(worldInfo.getWorldBorder());
+        this.server.getPluginManager().callEvent(new org.bukkit.event.world.WorldInitEvent(serverWorld.getWorld())); // CraftBukkit - SPIGOT-5569: Call WorldInitEvent before any chunks are generated
+
         if (!worldInfo.isInitialized()) {
             try {
                 setInitialSpawn(serverWorld, worldInfo, worldOptions.generateBonusChest(), flag);
@@ -288,82 +316,85 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         }
     }
 
+    public AtomicReference<ServerLevel> prepareLevels$serverlevel = new AtomicReference<>();
+
+    @Inject(method = "createLevels",
+            at = @At(value = "INVOKE",
+                    target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 0),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$initWorld(ChunkProgressListener chunkProgressListener, CallbackInfo ci,
+                                  ServerLevelData serverLevelData, boolean bl, Registry registry,
+                                  WorldOptions worldOptions, long l, long m, List list, LevelStem levelStem,
+                                  ServerLevel serverLevel) {
+        initWorld(serverLevel, serverLevelData, this.worldData, worldOptions);
+    }
+
+    @Inject(method = "createLevels",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/border/WorldBorder;addListener(Lnet/minecraft/world/level/border/BorderChangeListener;)V"),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$initWorld0(ChunkProgressListener chunkProgressListener, CallbackInfo ci,
+                                  ServerLevelData serverLevelData, boolean bl, Registry registry,
+                                  WorldOptions worldOptions, long l, long m, List list, LevelStem
+                                              levelStem, ServerLevel serverLevel, DimensionDataStorage
+                                              dimensionDataStorage, WorldBorder worldBorder,
+                                  RandomSequences randomSequences, Iterator var16, Map.Entry entry,
+                                  ResourceKey resourceKey, ResourceKey resourceKey2, DerivedLevelData derivedLevelData,
+                                  ServerLevel serverLevel2) {
+        initWorld(serverLevel2, derivedLevelData, this.worldData, worldOptions);
+    }
+
     /**
      * @author wdog5
      * @reason bukkit
      */
     @Overwrite
-    public final void prepareLevels(ChunkProgressListener listener) {
-        ServerLevel serverworld = this.overworld();
+    public final void prepareLevels(ChunkProgressListener chunkProgressListener) {
         this.forceTicks = true;
-        LOGGER.info(BannerMCStart.I18N.get("server.region.prepare"), serverworld.dimension().location());
-        BlockPos blockpos = serverworld.getSharedSpawnPos();
-        listener.updateSpawnPos(new ChunkPos(blockpos));
-        ServerChunkCache serverchunkprovider = serverworld.getChunkSource();
+        ServerLevel banner$serverLevel = this.prepareLevels$serverlevel.getAndSet(this.overworld());
+        banner$serverLevel = banner$serverLevel == null ? this.overworld() : banner$serverLevel;
+        ServerLevel serverLevel = banner$serverLevel;
+        LOGGER.info(BannerMCStart.I18N.get("server.region.prepare"), serverLevel.dimension().location());
+        BlockPos blockPos = serverLevel.getSharedSpawnPos();
+        chunkProgressListener.updateSpawnPos(new ChunkPos(blockPos));
+        ServerChunkCache serverChunkCache = serverLevel.getChunkSource();
         this.nextTickTime = Util.getMillis();
-        serverchunkprovider.addRegionTicket(TicketType.START, new ChunkPos(blockpos), 11, Unit.INSTANCE);
-
-        while (serverchunkprovider.getTickingGenerated() < 441) {
-            this.executeModerately();
+        if (serverLevel.getWorld().getKeepSpawnInMemory()) {
+            serverChunkCache.addRegionTicket(TicketType.START, new ChunkPos(blockPos), 11, Unit.INSTANCE);
+            while(serverChunkCache.getTickingGenerated() != 441) {
+                this.executeModerately();
+            }
         }
 
         this.executeModerately();
+        for(ServerLevel serverlevel1 : this.levels.values()) {
+            ForcedChunksSavedData forcedchunkssaveddata = serverlevel1.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
+            if (forcedchunkssaveddata != null) {
+                LongIterator longiterator = forcedchunkssaveddata.getChunks().iterator();
 
-        for (ServerLevel serverWorld : this.levels.values()) {
-            if (serverWorld.getWorld().getKeepSpawnInMemory()) {
-                ForcedChunksSavedData forcedchunkssavedata = serverWorld.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
-                if (forcedchunkssavedata != null) {
-                    LongIterator longiterator = forcedchunkssavedata.getChunks().iterator();
-
-                    while (longiterator.hasNext()) {
-                        long i = longiterator.nextLong();
-                        ChunkPos chunkpos = new ChunkPos(i);
-                        serverWorld.getChunkSource().updateChunkForced(chunkpos, true);
-                    }
+                while(longiterator.hasNext()) {
+                    long i = longiterator.nextLong();
+                    ChunkPos chunkpos = new ChunkPos(i);
+                    serverlevel1.getChunkSource().updateChunkForced(chunkpos, true);
                 }
             }
         }
 
+
+        // CraftBukkit start
         this.executeModerately();
-        listener.stop();
-        this.updateMobSpawningFlags();
+        // CraftBukkit end
+        chunkProgressListener.stop();
+        // CraftBukkit start
+        serverLevel.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
         this.forceTicks = false;
+        // CraftBukkit end
     }
 
     @Override
     public void prepareLevels(ChunkProgressListener listener, ServerLevel serverWorld) {
-        if (!serverWorld.getWorld().getKeepSpawnInMemory()) {
-            return;
-        }
-        this.forceTicks = true;
-        LOGGER.info("Preparing start region for dimension {}", serverWorld.dimension().location());
-        BlockPos blockpos = serverWorld.getSharedSpawnPos();
-        listener.updateSpawnPos(new ChunkPos(blockpos));
-        ServerChunkCache serverchunkprovider = serverWorld.getChunkSource();
-        this.nextTickTime = Util.getMillis();
-        serverchunkprovider.addRegionTicket(TicketType.START, new ChunkPos(blockpos), 11, Unit.INSTANCE);
-
-        while (serverchunkprovider.getTickingGenerated() < 441) {
-            this.executeModerately();
-        }
-
-        this.executeModerately();
-
-        ForcedChunksSavedData forcedchunkssavedata = serverWorld.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
-        if (forcedchunkssavedata != null) {
-            LongIterator longiterator = forcedchunkssavedata.getChunks().iterator();
-
-            while (longiterator.hasNext()) {
-                long i = longiterator.nextLong();
-                ChunkPos chunkpos = new ChunkPos(i);
-                serverWorld.getChunkSource().updateChunkForced(chunkpos, true);
-            }
-        }
-        this.executeModerately();
-        listener.stop();
-        //this.updateMobSpawningFlags();
-        serverWorld.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
-        this.forceTicks = false;
+        prepareLevels$serverlevel.set(serverWorld);
+        prepareLevels(listener);
     }
 
     @Override

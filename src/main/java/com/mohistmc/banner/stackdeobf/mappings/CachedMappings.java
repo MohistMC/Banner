@@ -44,6 +44,7 @@ public final class CachedMappings {
                 // executor of the current thread would be shut down
                 .thenRunAsync(() -> {
                     CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.shutting.down"));
+                    CompatUtil.LOGGER.info(BannerMCStart.I18N.get("load.libraries"));
                     cacheExecutor.shutdown();
                 });
     }
