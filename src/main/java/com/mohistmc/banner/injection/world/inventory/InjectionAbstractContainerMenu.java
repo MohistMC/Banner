@@ -17,6 +17,10 @@ public interface InjectionAbstractContainerMenu {
         return null;
     }
 
+    default void setBukkitView(InventoryView view) {
+
+    }
+
     default void transferTo(AbstractContainerMenu other, org.bukkit.craftbukkit.v1_20_R1.entity.CraftHumanEntity player) {
     }
 

@@ -99,6 +99,7 @@ import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.SpigotTimings;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers;
@@ -232,6 +233,9 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     @Shadow protected abstract boolean isPlayerCollidingWithAnythingNew(LevelReader levelReader, AABB aABB, double d, double e, double f);
 
     @Shadow private int chatSpamTickCount;
+
+    @Shadow public abstract ServerPlayer getPlayer();
+
     private static final int SURVIVAL_PLACE_DISTANCE_SQUARED = 6 * 6;
     private static final int CREATIVE_PLACE_DISTANCE_SQUARED = 7 * 7;
     private CraftServer cserver;
@@ -1395,6 +1399,10 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                 BukkitCaptures.captureContainerOwner(this.player);
                 InventoryView inventory = this.player.containerMenu.getBukkitView();
                 BukkitCaptures.resetContainerOwner();
+                if(inventory == null) {
+                    inventory = new CraftInventoryView(this.player.getBukkitEntity(), Bukkit.createInventory(this.player.getBukkitEntity(), InventoryType.CHEST), this.player.containerMenu);
+                    this.player.containerMenu.setBukkitView(inventory);
+                }
                 InventoryType.SlotType type = inventory.getSlotType(packet.getSlotNum());
 
                 InventoryClickEvent event;
