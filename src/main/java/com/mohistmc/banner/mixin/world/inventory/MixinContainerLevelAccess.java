@@ -7,6 +7,7 @@ import net.minecraft.world.level.Level;
 import org.bukkit.Location;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -14,14 +15,16 @@ import java.util.function.BiFunction;
 @Mixin(ContainerLevelAccess.class)
 public interface MixinContainerLevelAccess extends InjectionContainerLevelAccess {
 
+    @Shadow <T> Optional<T> evaluate(BiFunction<Level, BlockPos, T> biFunction);
+
     @Override
     default Level getWorld() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.evaluate((level, blockpos) -> level).orElse(null); // Mohist
     }
 
     @Override
     default BlockPos getPosition() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.evaluate((level, blockpos) -> blockpos).orElse(null); // Mohist
     }
 
     @Override
