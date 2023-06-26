@@ -46,12 +46,13 @@ import java.util.Map;
 
 public class FabricInjectBukkit {
 
-    public static final BiMap<ResourceKey<LevelStem>, World.Environment> DIM_MAP =
+    public static BiMap<ResourceKey<LevelStem>, World.Environment> DIM_MAP =
             HashBiMap.create(ImmutableMap.<ResourceKey<LevelStem>, World.Environment>builder()
                     .put(LevelStem.OVERWORLD, World.Environment.NORMAL)
                     .put(LevelStem.NETHER, World.Environment.NETHER)
                     .put(LevelStem.END, World.Environment.THE_END)
                     .build());
+
     public static Map<Villager.Profession, ResourceLocation> profession = new HashMap<>();
     public static Map<org.bukkit.attribute.Attribute, ResourceLocation> attributemap = new HashMap<>();
     public static Map<StatType<?>, Statistic> statisticMap = new HashMap<>();
