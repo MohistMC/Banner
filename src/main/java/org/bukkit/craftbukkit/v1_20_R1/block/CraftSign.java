@@ -52,12 +52,12 @@ public class CraftSign<T extends SignBlockEntity> extends CraftBlockEntityState<
 
     @Override
     public boolean isEditable() {
-        return !getSnapshot().isWaxed() && getSnapshot().getPlayerWhoMayEdit() != null;
+        return !isWaxed();
     }
 
     @Override
     public void setEditable(boolean editable) {
-        getSnapshot().setWaxed(!editable);
+        this.setWaxed(!editable);
     }
 
     // Paper start
