@@ -13,6 +13,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.stats.StatType;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.npc.VillagerProfession;
@@ -27,6 +28,7 @@ import org.bukkit.Fluid;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
+import org.bukkit.Statistic;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_20_R1.enchantments.CraftEnchantment;
 import org.bukkit.craftbukkit.v1_20_R1.potion.CraftPotionEffectType;
@@ -52,6 +54,7 @@ public class FabricInjectBukkit {
                     .build());
     public static Map<Villager.Profession, ResourceLocation> profession = new HashMap<>();
     public static Map<org.bukkit.attribute.Attribute, ResourceLocation> attributemap = new HashMap<>();
+    public static Map<StatType<?>, Statistic> statisticMap = new HashMap<>();
 
     public static void init() {
         addEnumMaterialInItems();
@@ -63,6 +66,7 @@ public class FabricInjectBukkit {
         addEnumEntity();
         addEnumVillagerProfession();
         addEnumParticle();
+        addStatistic();
     }
 
     public static void addEnumEnvironment() {
@@ -216,6 +220,19 @@ public class FabricInjectBukkit {
                 Fluid fluid = MohistDynamEnum.addEnum0(Fluid.class, name, new Class[0]);
                 CraftMagicNumbers.FLUIDTYPE_FLUID.put(fluidType, fluid);
                 BannerServer.LOGGER.debug("Registered fabric Fluid as Fluid(Bukkit) {}", fluid.name());
+            }
+        }
+    }
+
+    public static void addStatistic() {
+        var registry = BuiltInRegistries.STAT_TYPE;
+        for (StatType<?> statType : registry) {
+            ResourceLocation resourceLocation = registry.getKey(statType);
+            String name = normalizeName(resourceLocation.getPath());
+            if (!isMINECRAFT(resourceLocation)) {
+                Statistic statistic = MohistDynamEnum.addEnum0(Statistic.class, name, new Class[0]);
+                statisticMap.put(statType, statistic);
+                BannerServer.LOGGER.debug("Registered fabric StatType as Statistic(Bukkit) {}", statistic.name());
             }
         }
     }

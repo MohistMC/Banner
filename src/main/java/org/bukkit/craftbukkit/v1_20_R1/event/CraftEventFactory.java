@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import com.mojang.datafixers.util.Either;
 import java.net.InetAddress;
 import java.util.*;
@@ -1450,6 +1451,9 @@ public class CraftEventFactory {
         Event event;
         if (true) {
             org.bukkit.Statistic stat = CraftStatistic.getBukkitStatistic(statistic);
+            if (stat == null) {
+                stat = FabricInjectBukkit.statisticMap.get(statistic.getType());
+            }
             if (stat == null) {
                 System.err.println("Unhandled statistic: " + statistic);
                 return null;
