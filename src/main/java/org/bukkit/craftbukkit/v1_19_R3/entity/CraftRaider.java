@@ -2,8 +2,10 @@ package org.bukkit.craftbukkit.v1_19_R3.entity;
 
 import com.google.common.base.Preconditions;
 import net.minecraft.core.BlockPos;
+import org.bukkit.Raid;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_19_R3.CraftRaid;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftSound;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
@@ -23,6 +25,27 @@ public abstract class CraftRaider extends CraftMonster implements Raider {
     @Override
     public String toString() {
         return "CraftRaider";
+    }
+
+    @Override
+    public void setRaid(Raid raid) {
+        getHandle().setCurrentRaid(raid != null ? ((CraftRaid) raid).getHandle() : null);
+    }
+
+    @Override
+    public Raid getRaid() {
+        return getHandle().getCurrentRaid() == null ? null : new CraftRaid(getHandle().getCurrentRaid());
+    }
+
+    @Override
+    public void setWave(int wave) {
+        Preconditions.checkArgument(wave >= 0, "wave must be >= 0");
+        getHandle().setWave(wave);
+    }
+
+    @Override
+    public int getWave() {
+        return getHandle().getWave();
     }
 
     @Override
@@ -59,6 +82,27 @@ public abstract class CraftRaider extends CraftMonster implements Raider {
     @Override
     public void setCanJoinRaid(boolean join) {
         getHandle().setCanJoinRaid(join);
+    }
+
+    @Override
+    public boolean isCelebrating() {
+        return getHandle().isCelebrating();
+    }
+
+    @Override
+    public void setCelebrating(boolean celebrating) {
+        getHandle().setCelebrating(celebrating);
+    }
+
+    @Override
+    public int getTicksOutsideRaid() {
+        return getHandle().getTicksOutsideRaid();
+    }
+
+    @Override
+    public void setTicksOutsideRaid(int ticks) {
+        Preconditions.checkArgument(ticks >= 0, "ticks must be >= 0");
+        getHandle().setTicksOutsideRaid(ticks);
     }
 
     @Override
