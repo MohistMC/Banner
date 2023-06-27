@@ -38,6 +38,7 @@ import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -47,6 +48,8 @@ import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.levelgen.FlatLevelSource;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
@@ -65,6 +68,7 @@ import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_19_R3.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_19_R3.generator.CustomWorldChunkManager;
 import org.bukkit.craftbukkit.v1_19_R3.util.BlockStateListPopulator;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
 import org.bukkit.craftbukkit.v1_19_R3.util.WorldUUID;
@@ -80,7 +84,6 @@ import org.bukkit.event.world.WorldSaveEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
-import org.spigotmc.SpigotWorldConfig;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -160,18 +163,12 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         this.banner$setGenerator(gen);
         this.banner$setEnvironment(env);
         this.banner$setBiomeProvider(biomeProvider);
-        if (gen != null) {
-            this.chunkSource.chunkMap.generator = new CustomChunkGenerator((ServerLevel) (Object) this, this.chunkSource.getGenerator(), gen);
-        }
-        getWorld();
     }
 
-    @Inject(method = "<init>", at = @At(value = "INVOKE",
-            target = "Lcom/google/common/collect/Lists;newArrayList()Ljava/util/ArrayList;",
-            remap = false,
-            shift = At.Shift.BEFORE))
-    private void banner$preInitWorldServer(MinecraftServer minecraftServer, Executor executor, LevelStorageSource.LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey resourceKey, LevelStem levelStem, ChunkProgressListener chunkProgressListener, boolean bl, long l, List list, boolean bl2, CallbackInfo ci) {
+    @Inject(method = "<init>", at = @At(value = "RETURN"))
+    private void banner$initWorldServer(MinecraftServer minecraftServer, Executor executor, LevelStorageSource.LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey<Level> resourceKey, LevelStem levelStem, ChunkProgressListener chunkProgressListener, boolean bl, long l, List list, boolean bl2, CallbackInfo ci) {
         this.banner$setPvpMode(minecraftServer.isPvpAllowed());
+        this.uuid = WorldUUID.getUUID(levelStorageAccess.getDimensionPath(this.dimension()).toFile());
         this.convertable = levelStorageAccess;
         var typeKey = ((InjectionLevelStorageAccess) levelStorageAccess).bridge$getTypeKey();
         if (typeKey != null) {
@@ -190,14 +187,21 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
             this.serverLevelDataCB = (PrimaryLevelData) serverLevelData;
         } else if (serverLevelData instanceof DerivedLevelData) {
             this.serverLevelDataCB = BannerDerivedWorldInfo.create((DerivedLevelData)serverLevelData);
-            serverLevelDataCB.setWorld((ServerLevel) (Object) this);
         }
-        this.banner$setSpigotConfig(new SpigotWorldConfig(serverLevelDataCB.getLevelName()));
-    }
-
-    @Inject(method = "<init>", at = @At(value = "RETURN"))
-    private void banner$initWorldServer(MinecraftServer minecraftServer, Executor executor, LevelStorageSource.LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey<Level> resourceKey, LevelStem levelStem, ChunkProgressListener chunkProgressListener, boolean bl, long l, List list, boolean bl2, CallbackInfo ci) {
-        this.uuid = WorldUUID.getUUID(levelStorageAccess.getDimensionPath(this.dimension()).toFile());
+        serverLevelDataCB.setWorld((ServerLevel) (Object) this);
+        if (this.bridge$biomeProvider() != null) {
+            BiomeSource worldChunkManager = new CustomWorldChunkManager(getWorld(), this.bridge$biomeProvider(), registryAccess().registryOrThrow(Registries.BIOME));
+            if (this.chunkSource.chunkMap.generator instanceof NoiseBasedChunkGenerator cga) {
+                this.chunkSource.chunkMap.generator = new NoiseBasedChunkGenerator(worldChunkManager, cga.generatorSettings());
+            } else if (this.chunkSource.chunkMap.generator instanceof FlatLevelSource cpf) {
+                this.chunkSource.chunkMap.generator = new FlatLevelSource(cpf.settings());
+            }
+        }
+        if (this.bridge$generator() != null) {
+            this.chunkSource.chunkMap.generator = new CustomChunkGenerator((ServerLevel) (Object) this, this.chunkSource.getGenerator(), this.bridge$generator());
+        }
+        this.getCraftServer().addWorld(this.getWorld()); // CraftBukkit
+        this.getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
         var data = this.getDataStorage().computeIfAbsent(LevelPersistentData::new,
                 () -> new LevelPersistentData(null), "bukkit_pdc");
         this.getWorld().readBukkitValues(data.getTag());

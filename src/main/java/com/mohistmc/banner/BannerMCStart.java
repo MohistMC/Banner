@@ -43,13 +43,12 @@ public class BannerMCStart {
         }
         DefaultLibraries.proposeFabricLibs();
         CustomLibraries.loadCustomLibs();
-        BannerMCStart.LOGGER.info(BannerMCStart.I18N.get("load.libraries"));
+        injectDeobfStack();
         if (!EulaUtil.hasAcceptedEULA()) {
             System.out.println(I18N.get("eula"));
             while (!"true".equals(new Scanner(System.in).next()));
             EulaUtil.writeInfos();
         }
-        injectDeobfStack();
     }
 
     public static String getVersion() {
