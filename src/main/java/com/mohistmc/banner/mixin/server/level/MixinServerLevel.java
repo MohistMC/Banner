@@ -39,6 +39,7 @@ import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -48,6 +49,8 @@ import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.levelgen.FlatLevelSource;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
@@ -66,6 +69,7 @@ import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_20_R1.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_20_R1.generator.CustomWorldChunkManager;
 import org.bukkit.craftbukkit.v1_20_R1.util.BlockStateListPopulator;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftNamespacedKey;
 import org.bukkit.craftbukkit.v1_20_R1.util.WorldUUID;
@@ -187,7 +191,18 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
             this.serverLevelDataCB = (PrimaryLevelData) serverLevelData;
         } else if (serverLevelData instanceof DerivedLevelData) {
             this.serverLevelDataCB = BannerDerivedWorldInfo.create((DerivedLevelData)serverLevelData);
-            serverLevelDataCB.setWorld(((ServerLevel) (Object) this));
+        }
+        serverLevelDataCB.setWorld(((ServerLevel) (Object) this));
+        if (this.bridge$biomeProvider() != null) {
+            BiomeSource worldChunkManager = new CustomWorldChunkManager(getWorld(), this.bridge$biomeProvider(), registryAccess().registryOrThrow(Registries.BIOME));
+            if (this.chunkSource.chunkMap.generator instanceof NoiseBasedChunkGenerator cga) {
+                this.chunkSource.chunkMap.generator = new NoiseBasedChunkGenerator(worldChunkManager, cga.generatorSettings());
+            } else if (this.chunkSource.chunkMap.generator instanceof FlatLevelSource cpf) {
+                this.chunkSource.chunkMap.generator = new FlatLevelSource(cpf.settings());
+            }
+        }
+        if (this.bridge$generator() != null) {
+            this.chunkSource.chunkMap.generator = new CustomChunkGenerator((ServerLevel) (Object) this, this.chunkSource.getGenerator(), this.bridge$generator());
         }
         this.getCraftServer().addWorld(this.getWorld()); // CraftBukkit
         this.getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
