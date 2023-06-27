@@ -1087,7 +1087,12 @@ public final class CraftServer implements Server {
 
         ServerLevel internal = new ServerLevel(console, console.executor, worldSession, worlddata, worldKey, worlddimension, getServer().progressListenerFactory.create(11),
                 worlddata.isDebugWorld(), j, creator.environment() == Environment.NORMAL ? list : ImmutableList.of(), true);
-
+        if (name.contains("/")) {
+            String[] strings = name.split("/");
+            name = strings[strings.length - 1];
+        }
+        internal.banner$setGenerator(generator);
+        internal.banner$setBiomeProvider(biomeProvider);
         if (!(worlds.containsKey(name.toLowerCase(java.util.Locale.ENGLISH)))) {
             return null;
         }
