@@ -466,4 +466,9 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
         }
         // CraftBukkit end
     }
+
+    @Override
+    public void setBukkitView(InventoryView view) {
+        this.bukkitView = view;
+    }
 }

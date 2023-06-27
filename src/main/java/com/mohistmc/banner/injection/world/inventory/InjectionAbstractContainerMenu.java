@@ -29,4 +29,8 @@ public interface InjectionAbstractContainerMenu {
 
     default void broadcastCarriedItem() {
     }
+
+    default void setBukkitView(InventoryView view) {
+
+    }
 }

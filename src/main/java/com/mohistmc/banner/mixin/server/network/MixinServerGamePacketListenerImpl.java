@@ -101,6 +101,7 @@ import org.bukkit.craftbukkit.v1_19_R3.SpigotTimings;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftSign;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers;
@@ -1353,6 +1354,10 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                 BukkitCaptures.captureContainerOwner(this.player);
                 InventoryView inventory = this.player.containerMenu.getBukkitView();
                 BukkitCaptures.resetContainerOwner();
+                if(inventory == null) {
+                    inventory = new CraftInventoryView(this.player.getBukkitEntity(), Bukkit.createInventory(this.player.getBukkitEntity(), InventoryType.CHEST), this.player.containerMenu);
+                    this.player.containerMenu.setBukkitView(inventory);
+                }
                 InventoryType.SlotType type = inventory.getSlotType(packet.getSlotNum());
 
                 InventoryClickEvent event;
