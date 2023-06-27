@@ -22,6 +22,7 @@ public final class WorldUUID {
         if (file1.exists()) {
             DataInputStream dis = null;
             try {
+                baseDir.mkdirs();
                 dis = new DataInputStream(new FileInputStream(file1));
                 return new UUID(dis.readLong(), dis.readLong());
             } catch (IOException ex) {
