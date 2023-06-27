@@ -550,6 +550,7 @@ accessible field net/minecraft/world/level/NaturalSpawner MAGIC_NUMBER I
 accessible field net/minecraft/server/packs/repository/Pack resources Lnet/minecraft/server/packs/repository/Pack$ResourcesSupplier;
 accessible field net/minecraft/world/flag/FeatureFlag universe Lnet/minecraft/world/flag/FeatureFlagUniverse;
 accessible field net/minecraft/world/flag/FeatureFlagRegistry names Ljava/util/Map;
+accessible field net/minecraft/world/entity/item/FallingBlockEntity cancelDrop Z
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;
