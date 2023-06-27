@@ -46,7 +46,7 @@ import java.util.Map;
 
 public class FabricInjectBukkit {
 
-    public static final BiMap<ResourceKey<LevelStem>, World.Environment> DIM_MAP =
+    public static BiMap<ResourceKey<LevelStem>, World.Environment> DIM_MAP =
             HashBiMap.create(ImmutableMap.<ResourceKey<LevelStem>, World.Environment>builder()
                     .put(LevelStem.OVERWORLD, World.Environment.NORMAL)
                     .put(LevelStem.NETHER, World.Environment.NETHER)
