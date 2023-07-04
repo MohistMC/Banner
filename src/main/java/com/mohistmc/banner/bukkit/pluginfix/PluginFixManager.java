@@ -1,5 +1,6 @@
 package com.mohistmc.banner.bukkit.pluginfix;
 
+import com.mohistmc.banner.bukkit.pluginfix.fix.EssentialsXFix;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
@@ -30,6 +31,12 @@ public class PluginFixManager {
         if (className.equals("net.ess3.nms.refl.providers.ReflServerStateProvider")) {
             return helloWorld(clazz, "u", "U");
         }
+        if (className.equals("com.earth2me.essentials.Settings")) {
+            return EssentialsXFix.transferItemDb(clazz);
+        } else if (className.equals("com.earth2me.essentials.metrics.Metrics")) {
+            return EssentialsXFix.fixMetrics(clazz);
+        }
+
         return clazz;
     }
 
