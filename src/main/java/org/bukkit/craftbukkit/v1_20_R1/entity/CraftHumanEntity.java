@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
+
+import com.mohistmc.banner.bukkit.BukkitCaptures;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -265,6 +267,10 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
 
     @Override
     public InventoryView getOpenInventory() {
+        // Banner start - capture player
+        BukkitCaptures.captureContainerOwner(this.getHandle());
+        BukkitCaptures.resetContainerOwner();
+        // Banner end
         return getHandle().containerMenu.getBukkitView();
     }
 
