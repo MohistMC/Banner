@@ -1155,7 +1155,7 @@ public final class CraftServer implements Server {
             getLogger().log(Level.SEVERE, null, ex);
         }
 
-        worlds.remove(world.getName().toLowerCase(java.util.Locale.ENGLISH));
+        worlds.remove(world.getName().toLowerCase(Locale.ROOT)); // Banner - use Root instead of English
         console.removeLevel(handle);
         return true;
     }
@@ -1164,7 +1164,7 @@ public final class CraftServer implements Server {
         if (world == null) {
             return;
         }
-        this.worlds.remove(world.getWorld().getName().toLowerCase(java.util.Locale.ENGLISH));
+        this.worlds.remove(world.getWorld().getName().toLowerCase(Locale.ROOT));// Banner - use Root instead of English
     }
 
     public DedicatedServer getServer() {
