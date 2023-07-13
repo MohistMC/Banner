@@ -149,6 +149,7 @@ public class CraftContainer extends AbstractContainerMenu {
                 return MenuType.GRINDSTONE;
             case STONECUTTER:
                 return MenuType.STONECUTTER;
+            case SMITHING:
             case SMITHING_NEW:
                 return MenuType.SMITHING;
             case CREATIVE:

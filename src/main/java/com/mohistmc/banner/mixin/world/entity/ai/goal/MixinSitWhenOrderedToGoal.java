@@ -16,7 +16,7 @@ public abstract class MixinSitWhenOrderedToGoal extends Goal {
 
     /**
      * @author wdog5
-     * @reason
+     * @reason bukkit
      */
     @Overwrite
     public boolean canUse() {

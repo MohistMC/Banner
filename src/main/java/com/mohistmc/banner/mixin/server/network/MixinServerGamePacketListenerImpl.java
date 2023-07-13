@@ -1595,7 +1595,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                         }
                     }
 
-                    if (packet.getSlotNum() == 2 && top instanceof SmithingInventory) {
+                    if (packet.getSlotNum() == 3 && top instanceof SmithingInventory) {
                         org.bukkit.inventory.ItemStack result = ((SmithingInventory) top).getResult();
                         if (result != null) {
                             if (click == ClickType.NUMBER_KEY) {

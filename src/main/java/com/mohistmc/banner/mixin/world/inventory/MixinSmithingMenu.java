@@ -6,7 +6,7 @@ import net.minecraft.world.inventory.ItemCombinerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.SmithingMenu;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventorySmithingNew;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventorySmithing;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventoryView;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +27,7 @@ public abstract class MixinSmithingMenu extends ItemCombinerMenu {
             return bukkitEntity;
         }
 
-        CraftInventory inventory = new CraftInventorySmithingNew(
+        CraftInventory inventory = new CraftInventorySmithing(
                 access.getLocation(), this.inputSlots, this.resultSlots);
         bukkitEntity = new CraftInventoryView(this.player.getBukkitEntity(), inventory, this);
         return bukkitEntity;

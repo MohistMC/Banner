@@ -1,24 +1,24 @@
-package org.bukkit.craftbukkit.v1_20_R1;
+package org.bukkit.craftbukkit.v1_20_R1.ban;
 
-import com.mojang.authlib.GameProfile;
-import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.time.Instant;
 import java.util.Date;
-import java.util.logging.Level;
-import net.minecraft.server.players.UserBanListEntry;
-import net.minecraft.server.players.UserBanList;
-import org.bukkit.Bukkit;
 
-public final class CraftProfileBanEntry implements org.bukkit.BanEntry {
-    private final UserBanList list;
-    private final GameProfile profile;
+import net.minecraft.server.players.IpBanList;
+import net.minecraft.server.players.IpBanListEntry;
+
+public final class CraftIpBanEntry implements org.bukkit.BanEntry<InetSocketAddress> {
+    private static final Date minorDate = Date.from(Instant.parse("1899-12-31T04:00:00Z"));
+    private final IpBanList list;
+    private final String target;
     private Date created;
     private String source;
     private Date expiration;
     private String reason;
 
-    public CraftProfileBanEntry(GameProfile profile, UserBanListEntry entry, UserBanList list) {
+    public CraftIpBanEntry(String target, IpBanListEntry entry, IpBanList list) {
         this.list = list;
-        this.profile = profile;
+        this.target = target;
         this.created = entry.getCreated() != null ? new Date(entry.getCreated().getTime()) : null;
         this.source = entry.getSource();
         this.expiration = entry.getExpires() != null ? new Date(entry.getExpires().getTime()) : null;
@@ -27,7 +27,12 @@ public final class CraftProfileBanEntry implements org.bukkit.BanEntry {
 
     @Override
     public String getTarget() {
-        return this.profile.getName();
+        return this.target;
+    }
+
+    @Override
+    public InetSocketAddress getBanTarget() {
+        return new InetSocketAddress(this.target, 0);
     }
 
     @Override
@@ -57,7 +62,7 @@ public final class CraftProfileBanEntry implements org.bukkit.BanEntry {
 
     @Override
     public void setExpiration(Date expiration) {
-        if (expiration != null && expiration.getTime() == new Date(0, 0, 0, 0, 0, 0).getTime()) {
+        if (expiration != null && expiration.getTime() == minorDate.getTime()) {
             expiration = null; // Forces "forever"
         }
 
@@ -76,12 +81,12 @@ public final class CraftProfileBanEntry implements org.bukkit.BanEntry {
 
     @Override
     public void save() {
-        UserBanListEntry entry = new UserBanListEntry(profile, this.created, this.source, this.expiration, this.reason);
+        IpBanListEntry entry =  new IpBanListEntry(this.target, this.created, this.source, this.expiration, this.reason);
         this.list.add(entry);
-        try {
-            this.list.save();
-        } catch (IOException ex) {
-            Bukkit.getLogger().log(Level.SEVERE, "Failed to save banned-players.json, {0}", ex.getMessage());
-        }
+    }
+
+    @Override
+    public void remove() {
+        this.list.remove(target);
     }
 }

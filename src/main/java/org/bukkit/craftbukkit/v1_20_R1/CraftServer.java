@@ -13,9 +13,7 @@ import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.bukkit.nms.utils.RemapUtils;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.Commands;
-import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.validation.ContentValidationException;
@@ -35,6 +33,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -102,7 +101,6 @@ import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.WorldData;
 import net.minecraft.world.phys.Vec3;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -134,6 +132,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.conversations.Conversable;
+import org.bukkit.craftbukkit.v1_20_R1.ban.CraftIpBanList;
+import org.bukkit.craftbukkit.v1_20_R1.ban.CraftProfileBanList;
 import org.bukkit.craftbukkit.v1_20_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_20_R1.boss.CraftBossBar;
 import org.bukkit.craftbukkit.v1_20_R1.boss.CraftKeyedBossbar;
@@ -1679,16 +1679,30 @@ public final class CraftServer implements Server {
 
     @Override
     public void banIP(String address) {
-        Preconditions.checkArgument(address != null, "address cannot be null");
+        Preconditions.checkArgument(address != null && !address.isBlank(), "Address cannot be null or blank.");
 
         this.getBanList(org.bukkit.BanList.Type.IP).addBan(address, null, null, null);
     }
 
     @Override
     public void unbanIP(String address) {
-        Preconditions.checkArgument(address != null, "address cannot be null");
+        Preconditions.checkArgument(address != null && !address.isBlank(), "Address cannot be null or blank.");
 
         this.getBanList(org.bukkit.BanList.Type.IP).pardon(address);
+    }
+
+    @Override
+    public void banIP(InetSocketAddress address) {
+        Preconditions.checkArgument(address != null, "Address cannot be null.");
+
+        ((CraftIpBanList) this.getBanList(BanList.Type.IP)).addBan(address, null, null, null);
+    }
+
+    @Override
+    public void unbanIP(InetSocketAddress address) {
+        Preconditions.checkArgument(address != null, "Address cannot be null.");
+
+        ((CraftIpBanList) this.getBanList(BanList.Type.IP)).pardon(address);
     }
 
     @Override
@@ -1703,16 +1717,13 @@ public final class CraftServer implements Server {
     }
 
     @Override
-    public BanList getBanList(BanList.Type type) {
+    public <T extends BanList<?>> T getBanList(BanList.Type type) {
         Preconditions.checkArgument(type != null, "BanList.Type cannot be null");
 
-        switch (type) {
-        case IP:
-            return new CraftIpBanList(playerList.getIpBans());
-        case NAME:
-        default:
-            return new CraftProfileBanList(playerList.getBans());
-        }
+        return switch (type) {
+            case IP -> (T) new CraftIpBanList(this.playerList.getIpBans());
+            case PROFILE, NAME -> (T) new CraftProfileBanList(this.playerList.getBans());
+        };
     }
 
     @Override
