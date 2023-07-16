@@ -62,7 +62,7 @@ allprojects {
 		modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 		// bukkit
-		implementation("org.yaml:snakeyaml:1.33")// Remove
+		implementation("org.yaml:snakeyaml:1.33")
 		// LibraryLoader start
 		implementation "org.apache.maven:maven-resolver-provider:3.8.5"
 		implementation "org.apache.maven.resolver:maven-resolver-connector-basic:1.7.3"
@@ -73,7 +73,7 @@ allprojects {
 		implementation "org.apache.maven:maven-model-builder:3.8.5"
 		implementation "org.apache.maven:maven-repository-metadata:3.8.5"
 		compileOnly "org.jetbrains:annotations:21.0.1"
-		implementation("com.mohistmc:i18n:0.2")// Remove
+		implementation("com.mohistmc:i18n:0.2")
 
 		// craftbukkit
 		implementation "org.fusesource.jansi:jansi:1.18"
@@ -98,7 +98,7 @@ allprojects {
 		implementation "org.slf4j:slf4j-api:2.0.6"
 
 		implementation "org.apache.logging.log4j:log4j-core:2.20.0"
-		implementation("org.apache.logging.log4j:log4j-iostreams:2.20.0")// Remove
+		implementation("org.apache.logging.log4j:log4j-iostreams:2.20.0")
 		implementation "org.apache.logging.log4j:log4j-api:2.20.0"
 		implementation "org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0"
 		implementation "org.apache.commons:commons-lang3:3.12.0"
@@ -122,18 +122,18 @@ allprojects {
 		implementation "io.netty:netty-transport-native-unix-common:4.1.82.Final"
 
 		// jansi support
-		implementation("org.jline:jline-terminal:3.12.1")// Remove
-		implementation("org.jline:jline-terminal-jansi:3.12.1")// Remove
-		implementation("net.minecrell:terminalconsoleappender:1.3.0")// Remove
+		implementation("org.jline:jline-terminal:3.12.1")
+		implementation("org.jline:jline-terminal-jansi:3.12.1")
+		implementation("net.minecrell:terminalconsoleappender:1.3.0")
 
 		//class modify
 		annotationProcessor "com.github.LlamaLad7:MixinExtras:0.1.1"
-		modImplementation("com.github.wdog5:mixin-tools:1.0.1")// Remove
-		modImplementation(include("com.github.LlamaLad7:MixinExtras:0.1.1"))
+		modImplementation("com.github.wdog5:mixin-tools:1.0.1")
+		modImplementation("com.github.LlamaLad7:MixinExtras:0.1.1")
 		annotationProcessor 'com.github.wdog5:mixin-tools:1.0.1'
 
 		// mappings remapper
-		implementation("net.fabricmc:mapping-io:0.3.0")// Remove
+		implementation("net.fabricmc:mapping-io:0.3.0")
 	}
 
 	base {

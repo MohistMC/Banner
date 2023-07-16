@@ -19,7 +19,7 @@ public class BannerLauncher {
 
     public static void main(String[] args) {
         try {
-            //discoverFabricServer();
+            discoverFabricServer();
             setupModFile();
             launchServer(args);
         } catch (Exception e) {
@@ -45,7 +45,9 @@ public class BannerLauncher {
             Manifest manifest = jarFile.getManifest();
             Attributes attributes = manifest.getMainAttributes();
             try (InputStream stream = BannerLauncher.class.getModule().getResourceAsStream("/META-INF/MANIFEST.MF")) {
-
+                Manifest manifest1 = new Manifest(stream);
+                Attributes attributes1 = manifest1.getMainAttributes();
+                attributes1.putValue("Class-Path", attributes.getValue(Attributes.Name.CLASS_PATH));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
