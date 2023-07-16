@@ -30,8 +30,12 @@ public class BannerLauncher {
         try {
             setupModFile();
             readProp();
-            Runtime.getRuntime().exec(javaPath + " -jar " + serverPath + "PAUSE");
+            Runtime.getRuntime().exec(javaPath + " -jar " + serverPath + " PAUSE");
         } catch (Exception e) {
+            File serverJar = new File(serverPath);
+            if (serverJar == null) {
+                LOGGER.info("Please installed Fabric Server first...");
+            }
             throw new RuntimeException(e);
         }
     }
