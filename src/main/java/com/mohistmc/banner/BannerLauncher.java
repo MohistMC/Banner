@@ -3,14 +3,17 @@ package com.mohistmc.banner;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Properties;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -20,14 +23,36 @@ import java.util.stream.Collectors;
 public class BannerLauncher {
 
     private static final Logger LOGGER = Logger.getLogger("BannerLauncher");
+    private static String javaPath;
+    private static String serverPath;
 
     public static void main(String[] args) {
         try {
-            //discoverFabricServer();
             setupModFile();
-            launchServer(args);
+            readProp();
+            Runtime.getRuntime().exec(javaPath + " -jar " + serverPath + "PAUSE");
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static void readProp() {
+        URL propUrl = BannerLauncher.class.getResource("banner-server-launch.properties");
+        if (propUrl != null) {
+            Properties properties = new Properties();
+
+            try (InputStreamReader reader = new InputStreamReader(propUrl.openStream(), StandardCharsets.UTF_8)) {
+                properties.load(reader);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (properties.containsKey("launcher.javaPath")) {
+                javaPath = properties.getProperty("launcher.javaPath");
+            }
+            if (properties.containsKey("launcher.serverPath")) {
+                serverPath = properties.getProperty("launcher.serverPath");
+            }
         }
     }
 
