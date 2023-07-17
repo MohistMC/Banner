@@ -1,6 +1,7 @@
 package com.mohistmc.banner.config;
 
 import com.google.common.base.Throwables;
+import com.mohistmc.banner.network.download.DownloadSource;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -113,5 +114,25 @@ public class BannerConfig {
     {
         config.addDefault( path, def );
         return config.getDouble( path, config.getDouble( path ) );
+    }
+
+    public static int maximumRepairCost;
+    public static boolean enchantment_fix;
+    public static int max_enchantment_level;
+    public static boolean check_update;
+    public static boolean check_libraries;
+    public static String libraries_downloadsource;
+    public static String lang;
+    public static boolean showLogo;
+
+    private static void banner() {
+        check_update = getBoolean("banner.check_update", false);
+        check_libraries = getBoolean("banner.check_libraries", true);
+        libraries_downloadsource = getString("banner.libraries_downloadsource", DownloadSource.defaultSource.name());
+        lang = getString("banner.lang", "xx_XX");
+        showLogo = getBoolean("banner.show_logo", true);
+        maximumRepairCost = getInt("anvilfix.maximumrepaircost", 40);
+        enchantment_fix = getBoolean("anvilfix.enchantment_fix", false);
+        max_enchantment_level = getInt("anvilfix.max_enchantment_level", 32767);
     }
 }

@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.inventory;
 
+import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.injection.world.inventory.InjectionAnvilMenu;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -32,7 +33,7 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu implements Injecti
     @Shadow @Final public DataSlot cost;
     // CraftBukkit start
     private static final int DEFAULT_DENIED_COST = -1;
-    public int maximumRepairCost = 40;
+    public int maximumRepairCost = Math.min(Short.MAX_VALUE, Math.max(41, BannerConfig.maximumRepairCost));
     private CraftInventoryView bukkitEntity;
     // CraftBukkit end
 

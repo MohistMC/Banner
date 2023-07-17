@@ -24,6 +24,8 @@ import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.mohistmc.banner.plugins.BannerPlugin;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -623,6 +625,7 @@ public final class SimplePluginManager implements PluginManager {
                 // Paper end
             }
         }
+        BannerPlugin.registerListener(event);
     }
 
     @Override
