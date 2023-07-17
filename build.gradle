@@ -1,6 +1,7 @@
 plugins {
 	id 'fabric-loom' version '1.3-SNAPSHOT'
 	id 'maven-publish'
+	id 'java'
 	id 'org.ajoberstar.grgit' version '5.2.0'
 	id "com.peterabeles.gversion" version "1.10.2"
 }
@@ -8,160 +9,162 @@ plugins {
 project.compileJava.dependsOn(createVersionFile)
 
 gversion {
-	srcDir = "src/main/java/"
+	srcDir = "banner-common/src/main/java/"
 	classPackage = "com.mohistmc.banner"
 	className = "VersionInfo"
 }
 
-version = ci_version()
-group = project.maven_group
+allprojects {
+	apply plugin: "fabric-loom"
+	apply plugin: "maven-publish"
+	apply plugin: "java"
 
-repositories {
-	maven {
-		name = 'spigot'
-		url = 'https://hub.spigotmc.org/nexus/content/groups/public/'
+	version = ci_version()
+	group = project.maven_group
+
+	repositories {
+		maven {
+			name = 'spigot'
+			url = 'https://hub.spigotmc.org/nexus/content/groups/public/'
+		}
+		maven {
+			name = 'mohist'
+			url = 'https://maven.mohistmc.com/'
+		}
+		maven {
+			name = 'izzel'
+			url = 'https://maven.izzel.io/releases'
+		}
+		maven {
+			name = 'ParchmentMC'
+			url = 'https://maven.parchmentmc.org'
+		}
+		maven {
+			name = 'JitPack'
+			url = 'https://jitpack.io'
+		}
+		maven {
+			name = "Sponge"
+			url = 'https://repo.spongepowered.org/maven'
+		}
+		mavenCentral()
 	}
-	maven {
-		name = 'mohist'
-		url = 'https://maven.mohistmc.com/'
+
+	dependencies {
+		implementation 'org.projectlombok:lombok:1.18.26'
+		annotationProcessor 'org.projectlombok:lombok:1.18.26'
+		minecraft "com.mojang:minecraft:${project.minecraft_version}"
+		mappings loom.layered() {
+			officialMojangMappings()
+			parchment("org.parchmentmc.data:parchment-1.20.1:2023.06.26@zip")
+		}
+		modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+		modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+		// bukkit
+		implementation("org.yaml:snakeyaml:1.33")
+		// LibraryLoader start
+		implementation "org.apache.maven:maven-resolver-provider:3.8.5"
+		implementation "org.apache.maven.resolver:maven-resolver-connector-basic:1.7.3"
+		implementation "org.apache.maven.resolver:maven-resolver-transport-http:1.7.3"
+		implementation "org.apache.maven:maven-artifact:3.8.5"
+		implementation "org.apache.maven:maven-builder-support:3.8.5"
+		implementation "org.apache.maven:maven-model:3.8.5"
+		implementation "org.apache.maven:maven-model-builder:3.8.5"
+		implementation "org.apache.maven:maven-repository-metadata:3.8.5"
+		compileOnly "org.jetbrains:annotations:21.0.1"
+		implementation("com.mohistmc:i18n:0.2")
+
+		// craftbukkit
+		implementation "org.fusesource.jansi:jansi:1.18"
+		implementation "jline:jline:2.14.6"
+		implementation "com.googlecode.json-simple:json-simple:1.1.1"
+		implementation "org.xerial:sqlite-jdbc:3.42.0.0"
+		implementation "com.mysql:mysql-connector-j:8.0.32"
+
+		implementation "net.md-5:SpecialSource:1.11.0"
+
+		// spigot
+		implementation "net.md-5:bungeecord-chat:1.16-R0.4"
+		implementation "io.izzel:tools:1.3.0"
+		implementation "com.mohistmc:dynamicenum:0.1"
+
+		implementation "com.google.guava:failureaccess:1.0.1"
+		implementation "com.google.guava:guava:31.0.1-jre"
+		implementation "com.google.code.gson:gson:2.10"
+		implementation "com.mojang:authlib:3.17.30"
+		implementation "com.mojang:logging:1.1.1"
+		compileOnly "commons-lang:commons-lang:2.6"
+		implementation "org.slf4j:slf4j-api:2.0.6"
+
+		implementation "org.apache.logging.log4j:log4j-core:2.20.0"
+		implementation("org.apache.logging.log4j:log4j-iostreams:2.20.0")
+		implementation "org.apache.logging.log4j:log4j-api:2.20.0"
+		implementation "org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0"
+		implementation "org.apache.commons:commons-lang3:3.12.0"
+		implementation "net.sf.jopt-simple:jopt-simple:5.0.4"
+		implementation "net.java.dev.jna:jna-platform:5.13.0"
+		implementation "net.java.dev.jna:jna:5.13.0"
+		implementation "it.unimi.dsi:fastutil:8.5.12"
+		implementation "commons-io:commons-io:2.11.0"
+		implementation "com.mojang:javabridge:2.0.25"
+		implementation "com.mojang:datafixerupper:6.0.6"
+		implementation "com.mojang:brigadier:1.0.18"
+		implementation "com.github.oshi:oshi-core:6.4.0"
+
+		implementation "io.netty:netty-buffer:4.1.82.Final"
+		implementation "io.netty:netty-codec:4.1.82.Final"
+		implementation "io.netty:netty-common:4.1.82.Final"
+		implementation "io.netty:netty-handler:4.1.82.Final"
+		implementation "io.netty:netty-resolver:4.1.82.Final"
+		implementation "io.netty:netty-transport:4.1.82.Final"
+		implementation "io.netty:netty-transport-classes-epoll:4.1.82.Final"
+		implementation "io.netty:netty-transport-native-unix-common:4.1.82.Final"
+
+		// jansi support
+		implementation("org.jline:jline-terminal:3.12.1")
+		implementation("org.jline:jline-terminal-jansi:3.12.1")
+		implementation("net.minecrell:terminalconsoleappender:1.3.0")
+
+		//class modify
+		annotationProcessor "com.github.LlamaLad7:MixinExtras:0.1.1"
+		modImplementation("com.github.wdog5:mixin-tools:1.0.1")
+		modImplementation("com.github.LlamaLad7:MixinExtras:0.1.1")
+		annotationProcessor 'com.github.wdog5:mixin-tools:1.0.1'
+
+		// mappings remapper
+		implementation("net.fabricmc:mapping-io:0.3.0")
 	}
-	maven {
-		name = 'izzel'
-		url = 'https://maven.izzel.io/releases'
+
+	base {
+		archivesName = project.archives_base_name
 	}
-	maven {
-		name = 'ParchmentMC'
-		url = 'https://maven.parchmentmc.org'
+
+	processResources {
+		inputs.property "version", ci_version()
+
+		filesMatching("fabric.mod.json") {
+			expand "version": ci_version()
+		}
 	}
-	maven {
-		name = 'JitPack'
-		url = 'https://jitpack.io'
+
+	tasks.withType(JavaCompile).configureEach {
+		it.options.release = 17
+		options.encoding = 'UTF-8'
+		options.compilerArgs << '-Xlint:-dep-ann' << '-Xlint:-removal'
 	}
-	maven {
-		name = "Sponge"
-		url = 'https://repo.spongepowered.org/maven'
+
+	java {
+		sourceCompatibility = JavaVersion.VERSION_17
+		targetCompatibility = JavaVersion.VERSION_17
 	}
-	mavenCentral()
-}
-
-dependencies {
-	implementation 'org.projectlombok:lombok:1.18.26'
-	annotationProcessor 'org.projectlombok:lombok:1.18.26'
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.layered() {
-		officialMojangMappings()
-		parchment("org.parchmentmc.data:parchment-1.20.1:2023.06.26@zip")
-	}
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-	// bukkit
-	implementation(include("org.yaml:snakeyaml:1.33"))
-	// LibraryLoader start
-	implementation "org.apache.maven:maven-resolver-provider:3.8.5"
-	implementation "org.apache.maven.resolver:maven-resolver-connector-basic:1.7.3"
-	implementation "org.apache.maven.resolver:maven-resolver-transport-http:1.7.3"
-	implementation "org.apache.maven:maven-artifact:3.8.5"
-	implementation "org.apache.maven:maven-builder-support:3.8.5"
-	implementation "org.apache.maven:maven-model:3.8.5"
-	implementation "org.apache.maven:maven-model-builder:3.8.5"
-	implementation "org.apache.maven:maven-repository-metadata:3.8.5"
-	compileOnly "org.jetbrains:annotations:21.0.1"
-	implementation(include("com.mohistmc:i18n:0.2"))
-
-	// craftbukkit
-	implementation "org.fusesource.jansi:jansi:1.18"
-	implementation "jline:jline:2.14.6"
-	implementation "com.googlecode.json-simple:json-simple:1.1.1"
-	implementation "org.xerial:sqlite-jdbc:3.42.0.0"
-	implementation "com.mysql:mysql-connector-j:8.0.32"
-
-	implementation "net.md-5:SpecialSource:1.11.0"
-
-	// spigot
-	implementation "net.md-5:bungeecord-chat:1.16-R0.4"
-	implementation "io.izzel:tools:1.3.0"
-	implementation "com.mohistmc:dynamicenum:0.1"
-
-	implementation "com.google.guava:failureaccess:1.0.1"
-	implementation "com.google.guava:guava:31.0.1-jre"
-	implementation "com.google.code.gson:gson:2.10"
-	implementation "com.mojang:authlib:3.17.30"
-	implementation "com.mojang:logging:1.1.1"
-	compileOnly "commons-lang:commons-lang:2.6"
-	implementation "org.slf4j:slf4j-api:2.0.6"
-
-	implementation "org.apache.logging.log4j:log4j-core:2.20.0"
-	implementation(include("org.apache.logging.log4j:log4j-iostreams:2.20.0"))
-	implementation "org.apache.logging.log4j:log4j-api:2.20.0"
-	implementation "org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0"
-	implementation "org.apache.commons:commons-lang3:3.12.0"
-	implementation "net.sf.jopt-simple:jopt-simple:5.0.4"
-	implementation "net.java.dev.jna:jna-platform:5.13.0"
-	implementation "net.java.dev.jna:jna:5.13.0"
-	implementation "it.unimi.dsi:fastutil:8.5.12"
-	implementation "commons-io:commons-io:2.11.0"
-	implementation "com.mojang:javabridge:2.0.25"
-	implementation "com.mojang:datafixerupper:6.0.6"
-	implementation "com.mojang:brigadier:1.0.18"
-	implementation "com.github.oshi:oshi-core:6.4.0"
-
-	implementation "io.netty:netty-buffer:4.1.82.Final"
-	implementation "io.netty:netty-codec:4.1.82.Final"
-	implementation "io.netty:netty-common:4.1.82.Final"
-	implementation "io.netty:netty-handler:4.1.82.Final"
-	implementation "io.netty:netty-resolver:4.1.82.Final"
-	implementation "io.netty:netty-transport:4.1.82.Final"
-	implementation "io.netty:netty-transport-classes-epoll:4.1.82.Final"
-	implementation "io.netty:netty-transport-native-unix-common:4.1.82.Final"
-
-	// jansi support
-	implementation(include("org.jline:jline-terminal:3.12.1"))
-	implementation(include("org.jline:jline-terminal-jansi:3.12.1"))
-	implementation(include("net.minecrell:terminalconsoleappender:1.3.0"))
-
-	//class modify
-	annotationProcessor "com.github.LlamaLad7:MixinExtras:0.1.1"
-	modImplementation(include("com.github.wdog5:mixin-tools:1.0.1"))
-	include(implementation(annotationProcessor("com.github.llamalad7.mixinextras:mixinextras-fabric:0.2.0-beta.9")))
-	annotationProcessor 'com.github.wdog5:mixin-tools:1.0.1'
-
-	// mappings remapper
-	implementation(include("net.fabricmc:mapping-io:0.3.0"))
-}
-
-base {
-	archivesName = project.archives_base_name
-}
-
-loom {
-	accessWidenerPath = file("src/main/resources/banner.accesswidener")
-	log4jConfigs.from(file("src/main/resources/log4j2_banner.xml"))
-	serverOnlyMinecraftJar()
-}
-
-processResources {
-	inputs.property "version", project.version
-
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
-	}
-}
-
-tasks.withType(JavaCompile).configureEach {
-	it.options.release = 17
-	options.compilerArgs << '-Xlint:-dep-ann' << '-Xlint:-removal'
-}
-
-java {
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
 }
 
 jar {
 	from("LICENSE")
 	manifest {
 		attributes(
+				'Main-Class'            : 'com.mohistmc.banner.BannerLauncher',
 				'Specification-Title'   : 'Banner',
 				'Specification-Vendor'  : 'MohistMC',
 				'Specification-Version' : ci_version(),
@@ -172,20 +175,69 @@ jar {
 	}
 }
 
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
+def moduleDependencies(Project project, List<String> depNames) {
+	def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: "namedElements") }
+
+	depNames.iterator().forEachRemaining {
+		Project dependProject = findProject(":$it")
+		project.loom {
+			interfaceInjection {
+				interfaceInjectionSourceSets.add(dependProject.sourceSets.main)
+			}
 		}
 	}
-
-	repositories {
-
+	project.dependencies {
+		deps.each {
+			api(include(it))
+		}
 	}
 }
 
-tasks.withType(JavaCompile).configureEach {
-	options.encoding = 'UTF-8'
+def getSubprojectVersion(project) {
+	// Get the version from the gradle.properties file
+	def version = ci_version()
+
+	if (!version) {
+		throw new NullPointerException("Could not find version for " + project.name)
+	}
+
+	return version
+}
+
+dependencies {
+	afterEvaluate {
+		// fat jar depends on and includes all modules
+		for (Project module : subprojects) {
+			api(include(module))
+		}
+	}
+}
+
+sourceSets {
+	allModules {
+		for (Project p : subprojects) {
+			def main = p.sourceSets.main
+			compileClasspath += main.compileClasspath + main.output
+			runtimeClasspath += main.runtimeClasspath + main.output
+		}
+	}
+}
+
+loom {
+	runs {
+		// make default run configs run all modules
+		client {
+			client()
+			name "Minecraft Client"
+			source sourceSets.allModules
+		}
+		server {
+			server()
+			name "Minecraft Server"
+			source sourceSets.allModules
+		}
+	}
+	serverOnlyMinecraftJar()
 }
 
 import groovy.json.JsonSlurper
