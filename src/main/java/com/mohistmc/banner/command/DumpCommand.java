@@ -1,7 +1,9 @@
 package com.mohistmc.banner.command;
 
+import com.mohistmc.banner.api.ServerAPI;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.fabric.FabricInjectBukkit;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -32,13 +34,13 @@ import java.util.Locale;
 import java.util.Objects;
 
 public class DumpCommand extends BukkitCommand {
-    private final List<String> tab_cmd = Arrays.asList("potions", "enchants", "cbcmds", "entitytypes", "biomes", "pattern", "worldtype", "bukkit_material", "vanilla_material", "profession");
+    private final List<String> tab_cmd = Arrays.asList("potions", "enchants", "cbcmds", "entitytypes", "biomes", "pattern", "worldtype", "bukkit_material", "vanilla_material", "profession", "advancements");
     private final List<String> tab_mode = List.of("file");
 
     public DumpCommand(String name) {
         super(name);
         this.description = "Universal Dump, which will print the information you need locally!";
-        this.usageMessage = "/dump <file> [potions|enchants|cbcmds|entitytypes|biomes|pattern|worldtype|bukkit_material|vanilla_material|profession]";
+        this.usageMessage = "/dump <file> [potions|enchants|cbcmds|entitytypes|biomes|pattern|worldtype|bukkit_material|vanilla_material|profession|advancements]";
         this.setPermission("banner.command.dump");
     }
 
@@ -88,6 +90,7 @@ public class DumpCommand extends BukkitCommand {
                 case "bukkit_material" -> dumpBukkitMaterial(sender, mode);
                 case "vanilla_material" -> dumpVanillaMaterial(sender, mode);
                 case "profession" -> dumpVillageProfession(sender, mode);
+                case "advancements" -> dumpAdvancements(sender, mode);
                 default -> {
                     return false;
                 }
@@ -201,6 +204,14 @@ public class DumpCommand extends BukkitCommand {
             }
         }
         dump(sender, "vanilla_material", sb, mode);
+    }
+
+    private void dumpAdvancements(CommandSender sender, String mode) {
+        StringBuilder sb = new StringBuilder();
+        for (Advancement channel : ServerAPI.getNMSServer().getAdvancements().getAllAdvancements()) {
+            sb.append(channel.getId()).append("\n");
+        }
+        dump(sender, "advancements", sb, mode);
     }
 
     private void dumpmsg(CommandSender sender, File file, String type) {
