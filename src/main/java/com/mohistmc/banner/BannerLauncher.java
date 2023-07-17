@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -14,16 +13,13 @@ import java.nio.file.Paths;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class BannerLauncher {
 
-    private static final Logger LOGGER = Logger.getLogger("BannerLauncher");
-
     public static void main(String[] args) {
         try {
-            //discoverFabricServer();
+            discoverFabricServer();
             setupModFile();
             launchServer(args);
         } catch (Exception e) {
@@ -33,7 +29,6 @@ public class BannerLauncher {
 
     private static void launchServer(String[] args) {
         try {
-            System.setProperty("launch.mainClass", "net.fabricmc.loader.impl.launch.knot.KnotServer");
             Class<?> clazz = Class.forName("net.fabricmc.loader.impl.launch.server.FabricServerLauncher");
             Method method = clazz.getDeclaredMethod("main", String[].class);
             URLClassLoader classLoader = new URLClassLoader(new URL[]{}, ClassLoader.getSystemClassLoader());
@@ -49,14 +44,12 @@ public class BannerLauncher {
             JarFile jarFile = new JarFile(serverJar);
             Manifest manifest = jarFile.getManifest();
             Attributes attributes = manifest.getMainAttributes();
-            String classPath = attributes.getValue(Attributes.Name.CLASS_PATH);
-            URL url = new URL(classPath).toURI().toURL();
-            URLClassLoader classLoader = new URLClassLoader(new URL[]{}, ClassLoader.getSystemClassLoader());
-            Method method = classLoader.getClass().getDeclaredMethod("addURL", URL.class);
-            method.invoke(classLoader, url);
-            LOGGER.info("Pass lib " + url.getPath());
-        } catch (IOException | NoSuchMethodException | URISyntaxException | InvocationTargetException |
-                 IllegalAccessException e) {
+            try (InputStream stream = BannerLauncher.class.getModule().getResourceAsStream("/META-INF/MANIFEST.MF")) {
+                Manifest manifest1 = new Manifest(stream);
+                Attributes attributes1 = manifest1.getMainAttributes();
+                attributes1.putValue("Class-Path", attributes.getValue(Attributes.Name.CLASS_PATH));
+            }
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
