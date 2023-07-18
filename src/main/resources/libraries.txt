@@ -21,7 +21,7 @@ libraries/org/jline/jline-reader/3.12.1/jline-reader-3.12.1.jar|a2e7b012cd9802f8
 libraries/org/jline/jline-terminal/3.12.1/jline-terminal-3.12.1.jar|3c52be5ab5e3847be6e62269de924cb0
 libraries/org/checkerframework/checker-qual/2.0.0/checker-qual-2.0.0.jar|94fe1af76c10006fbc5b988180b71bf0
 libraries/org/apache/logging/log4j/log4j-iostreams/2.20.0/log4j-iostreams-2.20.0.jar|d612855f572573a409bb59957c7c24c8
-libraries/net/minecrell/terminalconsoleappender/1.2.0/terminalconsoleappender-1.2.0.jar|679363fa893293791e55a21f81342f87
+libraries/net/minecrell/terminalconsoleappender/1.4.0/terminalconsoleappender-1.4.0.jar|6508e35ad178825278fbd3d1ff82d2cc
 libraries/com/googlecode/json-simple/json-simple/1.1.1/json-simple-1.1.1.jar|5cc2c478d73e8454b4c369cee66c5bc7
 libraries/com/mysql/mysql-connector-j/8.0.32/mysql-connector-j-8.0.32.jar|25bf3b3cd262065283962078dc82e99c
 libraries/net/md-5/bungeecord-chat/1.16-R0.4/bungeecord-chat-1.16-R0.4.jar|bf6464395a0951675c3bca47d3e1a13a
