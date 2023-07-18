@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
 import com.mojang.datafixers.DataFixer;
 import it.unimi.dsi.fastutil.longs.LongIterator;
@@ -37,6 +38,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.util.thread.ReentrantBlockableEventLoop;
 import net.minecraft.world.RandomSequences;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.ForcedChunksSavedData;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.border.WorldBorder;
@@ -72,7 +74,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.Proxy;
 import java.util.Collection;
@@ -303,7 +304,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                                   ServerLevelData serverLevelData, boolean bl, Registry registry,
                                   WorldOptions worldOptions, long l, long m, List list, LevelStem levelStem,
                                   ServerLevel serverLevel) {
-        initWorld(serverLevel, serverLevelData, this.worldData, worldOptions);
+        initWorld(serverLevel, serverLevelData, worldData, worldOptions);
     }
 
     @Inject(method = "createLevels",
@@ -318,7 +319,11 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                                   RandomSequences randomSequences, Iterator var16, Map.Entry entry,
                                   ResourceKey resourceKey, ResourceKey resourceKey2, DerivedLevelData derivedLevelData,
                                   ServerLevel serverLevel2) {
-        initWorld(serverLevel2, derivedLevelData, this.worldData, worldOptions);
+        String name = resourceKey == LevelStem.END ? "DIM1" : "DIM-1";
+        serverLevel2.banner$setGenerator(this.server.getGenerator(name));
+        serverLevel2.banner$setEnvironment(FabricInjectBukkit.DIM_MAP.get(resourceKey));
+        serverLevel2.banner$setBiomeProvider(this.server.getBiomeProvider(name));
+        initWorld(serverLevel2, derivedLevelData, worldData, worldOptions);
     }
 
     /**
