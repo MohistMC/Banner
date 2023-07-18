@@ -11,8 +11,11 @@ import it.unimi.dsi.fastutil.shorts.ShortSet;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1137,6 +1140,16 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     }
 
     @Override
+    public BanEntry<PlayerProfile> ban(String reason, Instant expires, String source) {
+        return ban(reason, expires != null ? Date.from(expires) : null, source);
+    }
+
+    @Override
+    public BanEntry<PlayerProfile> ban(String reason, Duration duration, String source) {
+        return ban(reason, duration != null ? Instant.now().plus(duration) : null, source);
+    }
+
+    @Override
     public BanEntry<PlayerProfile> ban(String reason, Date expires, String source, boolean kickPlayer) {
         BanEntry<PlayerProfile> banEntry = ((ProfileBanList) server.getBanList(BanList.Type.PROFILE)).addBan(getPlayerProfile(), reason, expires, source);
         if (kickPlayer) {
@@ -1146,14 +1159,35 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     }
 
     @Override
-    public BanEntry<InetSocketAddress> banIp(String reason, Date expires, String source, boolean kickPlayer) {
+    public BanEntry<PlayerProfile> ban(String reason, Instant instant, String source, boolean kickPlayer) {
+        return ban(reason, instant != null ? Date.from(instant) : null, source, kickPlayer);
+    }
+
+    @Override
+    public BanEntry<PlayerProfile> ban(String reason, Duration duration, String source, boolean kickPlayer) {
+        return ban(reason, duration != null ? Instant.now().plus(duration) : null, source, kickPlayer);
+    }
+
+    @Override
+    public BanEntry<InetAddress> banIp(String reason, Date expires, String source, boolean kickPlayer) {
         Preconditions.checkArgument(getAddress() != null, "The Address of this Player is null");
-        BanEntry<InetSocketAddress> banEntry = ((IpBanList) server.getBanList(BanList.Type.IP)).addBan(getAddress(), reason, expires, source);
+        BanEntry<InetAddress> banEntry = ((IpBanList) server.getBanList(BanList.Type.IP)).addBan(getAddress().getAddress(), reason, expires, source);
         if (kickPlayer) {
             this.kickPlayer(reason);
         }
         return banEntry;
     }
+
+    @Override
+    public BanEntry<InetAddress> banIp(String reason, Instant instant, String source, boolean kickPlayer) {
+        return banIp(reason, instant != null ? Date.from(instant) : null, source, kickPlayer);
+    }
+
+    @Override
+    public BanEntry<InetAddress> banIp(String reason, Duration duration, String source, boolean kickPlayer) {
+        return banIp(reason, duration != null ? Instant.now().plus(duration) : null, source, kickPlayer);
+    }
+
     @Override
     public boolean isWhitelisted() {
         return server.getHandle().getWhiteList().isWhiteListed(getProfile());

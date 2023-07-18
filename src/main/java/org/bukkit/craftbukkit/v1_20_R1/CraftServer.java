@@ -33,6 +33,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.function.Consumer;
@@ -1692,14 +1693,14 @@ public final class CraftServer implements Server {
     }
 
     @Override
-    public void banIP(InetSocketAddress address) {
+    public void banIP(InetAddress address) {
         Preconditions.checkArgument(address != null, "Address cannot be null.");
 
-        ((CraftIpBanList) this.getBanList(BanList.Type.IP)).addBan(address, null, null, null);
+        ((CraftIpBanList) this.getBanList(BanList.Type.IP)).addBan(address, null, (Date) null, null);
     }
 
     @Override
-    public void unbanIP(InetSocketAddress address) {
+    public void unbanIP(InetAddress address) {
         Preconditions.checkArgument(address != null, "Address cannot be null.");
 
         ((CraftIpBanList) this.getBanList(BanList.Type.IP)).pardon(address);

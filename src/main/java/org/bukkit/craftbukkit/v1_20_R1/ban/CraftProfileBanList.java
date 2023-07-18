@@ -4,6 +4,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.authlib.GameProfile;
+
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
@@ -53,7 +56,30 @@ public class CraftProfileBanList implements ProfileBanList {
     }
 
     @Override
-    public Set<BanEntry<PlayerProfile>> getBanEntries() {
+    public BanEntry<PlayerProfile> addBan(PlayerProfile target, String reason, Instant expires, String source) {
+        Date date = expires != null ? Date.from(expires) : null;
+        return addBan(target, reason, date, source);
+    }
+
+    @Override
+    public BanEntry<PlayerProfile> addBan(PlayerProfile target, String reason, Duration duration, String source) {
+        Instant instant = duration != null ? Instant.now().plus(duration) : null;
+        return addBan(target, reason, instant, source);
+    }
+
+    @Override
+    public Set<BanEntry> getBanEntries() {
+        ImmutableSet.Builder<BanEntry> builder = ImmutableSet.builder();
+        for (UserBanListEntry entry : list.getEntries()) {
+            GameProfile profile = entry.getUser();
+            builder.add(new CraftProfileBanEntry(profile, entry, list));
+        }
+
+        return builder.build();
+    }
+
+    @Override
+    public Set<BanEntry<PlayerProfile>> getEntries() {
         ImmutableSet.Builder<BanEntry<PlayerProfile>> builder = ImmutableSet.builder();
         for (UserBanListEntry entry : list.getEntries()) {
             GameProfile profile = entry.getUser();

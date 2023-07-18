@@ -1,5 +1,7 @@
 package org.bukkit;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
@@ -87,12 +89,52 @@ public interface BanList<T> {
     public BanEntry<T> addBan(@NotNull T target, @Nullable String reason, @Nullable Date expires, @Nullable String source);
 
     /**
+     * Adds a ban to this list. If a previous ban exists, this will
+     * update the previous entry.
+     *
+     * @param target the target of the ban
+     * @param reason reason for the ban, null indicates implementation default
+     * @param expires instant for the ban's expiration (unban), or null to imply
+     *     forever
+     * @param source source of the ban, null indicates implementation default
+     * @return the entry for the newly created ban, or the entry for the
+     *     (updated) previous ban
+     */
+    @Nullable
+    public BanEntry<T> addBan(@NotNull T target, @Nullable String reason, @Nullable Instant expires, @Nullable String source);
+
+    /**
+     * Adds a ban to this list. If a previous ban exists, this will
+     * update the previous entry.
+     *
+     * @param target the target of the ban
+     * @param reason reason for the ban, null indicates implementation default
+     * @param duration the duration of the ban, or null to imply
+     *     forever
+     * @param source source of the ban, null indicates implementation default
+     * @return the entry for the newly created ban, or the entry for the
+     *     (updated) previous ban
+     */
+    @Nullable
+    public BanEntry<T> addBan(@NotNull T target, @Nullable String reason, @Nullable Duration duration, @Nullable String source);
+
+    /**
+     * Gets a set containing every {@link BanEntry} in this list.
+     *
+     * @return an immutable set containing every entry tracked by this list
+     * @deprecated This return a generic class, prefer use {@link #getEntries()}
+     */
+    @Deprecated
+    @NotNull
+    public Set<BanEntry> getBanEntries();
+
+    /**
      * Gets a set containing every {@link BanEntry} in this list.
      *
      * @return an immutable set containing every entry tracked by this list
      */
     @NotNull
-    public Set<BanEntry<T>> getBanEntries();
+    public Set<BanEntry<T>> getEntries();
 
     /**
      * Gets if a {@link BanEntry} exists for the target, indicating an active

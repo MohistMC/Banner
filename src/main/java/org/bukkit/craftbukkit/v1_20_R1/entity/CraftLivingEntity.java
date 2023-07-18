@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import net.minecraft.network.protocol.game.ClientboundHurtAnimationPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
@@ -649,6 +651,20 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
     public void swingOffHand() {
         Preconditions.checkState(!getHandle().bridge$generation(), "Cannot swing hand during world generation");
         getHandle().swing(InteractionHand.OFF_HAND, true);
+    }
+
+    @Override
+    public void playHurtAnimation(float yaw) {
+        if (getHandle().level() instanceof ServerLevel world) {
+            /*
+             * Vanilla degrees state that 0 = left, 90 = front, 180 = right, and 270 = behind.
+             * This makes no sense. We'll add 90 to it so that 0 = front, clockwise from there.
+             */
+            float actualYaw = yaw + 90;
+            ClientboundHurtAnimationPacket packet = new ClientboundHurtAnimationPacket(getEntityId(), actualYaw);
+
+            world.getChunkSource().broadcastAndSend(getHandle(), packet);
+        }
     }
 
     @Override

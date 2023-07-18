@@ -561,6 +561,8 @@ accessible field net/minecraft/world/flag/FeatureFlag universe Lnet/minecraft/wo
 accessible field net/minecraft/world/flag/FeatureFlagRegistry names Ljava/util/Map;
 accessible field net/minecraft/world/entity/projectile/FishingHook outOfWaterTime I
 accessible field net/minecraft/world/entity/item/FallingBlockEntity cancelDrop Z
+accessible field net/minecraft/world/entity/Display$TextDisplay DATA_LINE_WIDTH_ID Lnet/minecraft/network/syncher/EntityDataAccessor;
+accessible field net/minecraft/world/entity/Display$TextDisplay DATA_BACKGROUND_COLOR_ID Lnet/minecraft/network/syncher/EntityDataAccessor;
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;

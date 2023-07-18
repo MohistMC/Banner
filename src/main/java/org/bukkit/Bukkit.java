@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.Serializable;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Collections;
@@ -1211,7 +1212,7 @@ public final class Bukkit {
      *
      * @param address the IP address to ban
      *
-     * @deprecated see {@link #banIP(InetSocketAddress)}
+     * @deprecated see {@link #banIP(InetAddress)}
      */
     @Deprecated
     public static void banIP(@NotNull String address) {
@@ -1223,7 +1224,7 @@ public final class Bukkit {
      *
      * @param address the IP address to unban
      *
-     * @deprecated see {@link #unbanIP(InetSocketAddress)}
+     * @deprecated see {@link #unbanIP(InetAddress)}
      */
     @Deprecated
     public static void unbanIP(@NotNull String address) {
@@ -1236,7 +1237,7 @@ public final class Bukkit {
      *
      * @param address the IP address to ban
      */
-    public static void banIP(@NotNull InetSocketAddress address) {
+    public static void banIP(@NotNull InetAddress address) {
         server.banIP(address);
     }
 
@@ -1245,7 +1246,7 @@ public final class Bukkit {
      *
      * @param address the IP address to unban
      */
-    public static void unbanIP(@NotNull InetSocketAddress address) {
+    public static void unbanIP(@NotNull InetAddress address) {
         server.unbanIP(address);
     }
 
