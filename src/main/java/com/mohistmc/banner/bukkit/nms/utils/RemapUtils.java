@@ -2,6 +2,7 @@ package com.mohistmc.banner.bukkit.nms.utils;
 
 import com.mohistmc.banner.bukkit.nms.model.ClassMapping;
 import com.mohistmc.banner.bukkit.nms.remappers.BannerInheritanceMap;
+import com.mohistmc.banner.bukkit.nms.remappers.BannerInheritanceProvider;
 import com.mohistmc.banner.bukkit.nms.remappers.BannerJarMapping;
 import com.mohistmc.banner.bukkit.nms.remappers.BannerJarRemapper;
 import com.mohistmc.banner.bukkit.nms.remappers.BannerSuperClassRemapper;
@@ -43,6 +44,8 @@ public class RemapUtils {
         jarMapping.packages.put("org/bukkit/craftbukkit/libs/org/apache/commons/", "org/apache/commons/");
         jarMapping.packages.put("org/bukkit/craftbukkit/libs/org/objectweb/asm/", "org/objectweb/asm/");
         jarMapping.setInheritanceMap(new BannerInheritanceMap());
+        jarMapping.setFallbackInheritanceProvider(new BannerInheritanceProvider());
+
         try {
             jarMapping.loadMappings(
                     new BufferedReader(new InputStreamReader(RemapUtils.class.getClassLoader().getResourceAsStream("mappings/spigot2srg.srg"))),
@@ -51,6 +54,7 @@ public class RemapUtils {
         } catch (Exception e) {
             e.fillInStackTrace();
         }
+
         jarRemapper = new BannerJarRemapper(jarMapping);
         remappers.add(jarRemapper);
         remappers.add(new ReflectRemapper());
