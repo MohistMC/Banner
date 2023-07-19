@@ -8,6 +8,7 @@ import com.mohistmc.banner.api.ServerAPI;
 import com.mohistmc.banner.entity.MohistModsEntity;
 import com.mohistmc.dynamicenum.MohistDynamEnum;
 import com.mojang.serialization.Codec;
+import net.fabricmc.mappings.model.CommentEntry;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -16,6 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.stats.StatType;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.alchemy.Potion;
@@ -32,11 +34,15 @@ import org.bukkit.Particle;
 import org.bukkit.Statistic;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_20_R1.enchantments.CraftEnchantment;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftRecipe;
 import org.bukkit.craftbukkit.v1_20_R1.potion.CraftPotionEffectType;
 import org.bukkit.craftbukkit.v1_20_R1.potion.CraftPotionUtil;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftSpawnCategory;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.SpawnCategory;
 import org.bukkit.entity.Villager;
+import org.bukkit.inventory.recipe.CookingBookCategory;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
@@ -76,6 +82,7 @@ public class FabricInjectBukkit {
         addEnumVillagerProfession();
         addEnumParticle();
         addStatistic();
+        addSpawnCategory();
     }
 
     public static void addEnumEnvironment() {
@@ -230,6 +237,15 @@ public class FabricInjectBukkit {
                 CraftMagicNumbers.FLUIDTYPE_FLUID.put(fluidType, fluid);
                 BannerServer.LOGGER.debug("Registered fabric Fluid as Fluid(Bukkit) {}", fluid.name());
             }
+        }
+    }
+
+    private static void addSpawnCategory() {
+        for (var category : MobCategory.values()) {
+            var name = category.name();
+            var spawnCategory = MohistDynamEnum.addEnum0(SpawnCategory.class, name, new Class[0]);
+            CraftSpawnCategory.toBukkit(category);
+            BannerServer.LOGGER.debug("Registered {} as spawn category {}", name, spawnCategory);
         }
     }
 
