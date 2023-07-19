@@ -18,6 +18,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -68,7 +69,7 @@ import org.bukkit.plugin.Plugin;
 
 public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
     private CraftInventoryPlayer inventory;
-    private final CraftInventory enderChest;
+    private CraftInventory enderChest;// Banner - remove final
     protected final PermissibleBase perm = new PermissibleBase(this);
     private boolean op;
     private GameMode mode;
@@ -82,16 +83,31 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
 
     @Override
     public PlayerInventory getInventory() {
+        // Banner start
+        if (inventory == null || inventory.getInventory() != ((Player) entity).getInventory()) {
+            inventory = new CraftInventoryPlayer(((Player)entity).getInventory());
+        }
+        // Banner end
         return inventory;
     }
 
     @Override
     public EntityEquipment getEquipment() {
+        // Banner start
+        if (inventory == null || inventory.getInventory() != ((Player) entity).getInventory()) {
+            inventory = new CraftInventoryPlayer(((Player)entity).getInventory());
+        }
+        // Banner end
         return inventory;
     }
 
     @Override
     public Inventory getEnderChest() {
+        // Banner start
+        if (enderChest == null || enderChest.getInventory() != ((Player) entity).getEnderChestInventory()) {
+            enderChest = new CraftInventory(((Player)entity).getEnderChestInventory());
+        }
+        // Banner end
         return enderChest;
     }
 
