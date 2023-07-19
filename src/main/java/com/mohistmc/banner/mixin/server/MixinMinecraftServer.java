@@ -51,7 +51,6 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WorldData;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.Main;
@@ -323,10 +322,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                                   ServerLevelData serverLevelData, boolean bl, Registry registry,
                                   WorldOptions worldOptions, long l, long m, List list, LevelStem levelStem,
                                   ServerLevel serverLevel) {
-        String levelName = getWorldData().getLevelName();
-        serverLevel.banner$setGenerator(this.server.getGenerator(levelName));
-        serverLevel.banner$setEnvironment(World.Environment.NORMAL);
-        serverLevel.banner$setBiomeProvider(this.server.getBiomeProvider(levelName));
         initWorld(serverLevel, serverLevelData, worldData, worldOptions);
     }
 
