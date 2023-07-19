@@ -231,7 +231,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         this.levels.put(level.dimension(), level);
     }
 
-    @SuppressWarnings("resource")
     @Override
     public void removeLevel(ServerLevel level) {
         this.levels.remove(level.dimension());
