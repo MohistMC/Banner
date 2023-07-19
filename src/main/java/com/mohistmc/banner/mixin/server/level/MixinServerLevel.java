@@ -143,7 +143,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
 
     public LevelStorageSource.LevelStorageAccess convertable;
     public UUID uuid;
-    public PrimaryLevelData serverLevelDataCB;
+    public PrimaryLevelData K;
 
     private transient boolean banner$force;
     private transient LightningStrikeEvent.Cause banner$cause;
@@ -188,11 +188,11 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
             }
         }
         if (serverLevelData instanceof PrimaryLevelData) {
-            this.serverLevelDataCB = (PrimaryLevelData) serverLevelData;
+            this.K = (PrimaryLevelData) serverLevelData;
         } else if (serverLevelData instanceof DerivedLevelData) {
-            this.serverLevelDataCB = BannerDerivedWorldInfo.create((DerivedLevelData)serverLevelData);
+            this.K = BannerDerivedWorldInfo.create((DerivedLevelData)serverLevelData);
         }
-        serverLevelDataCB.setWorld(((ServerLevel) (Object) this));
+        K.setWorld(((ServerLevel) (Object) this));
         if (this.bridge$biomeProvider() != null) {
             BiomeSource worldChunkManager = new CustomWorldChunkManager(getWorld(), this.bridge$biomeProvider(), registryAccess().registryOrThrow(Registries.BIOME));
             if (this.chunkSource.chunkMap.generator instanceof NoiseBasedChunkGenerator cga) {
@@ -686,7 +686,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
 
     @Override
     public PrimaryLevelData bridge$serverLevelDataCB() {
-        return serverLevelDataCB;
+        return K;
     }
 
     @Override

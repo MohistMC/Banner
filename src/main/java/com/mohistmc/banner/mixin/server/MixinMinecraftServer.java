@@ -17,6 +17,7 @@ import net.minecraft.Util;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.ChatDecorator;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 import net.minecraft.resources.ResourceKey;
@@ -25,6 +26,7 @@ import net.minecraft.server.Services;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.WorldLoader;
 import net.minecraft.server.WorldStem;
+import net.minecraft.server.bossevents.CustomBossEvents;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -38,7 +40,6 @@ import net.minecraft.util.Unit;
 import net.minecraft.util.thread.ReentrantBlockableEventLoop;
 import net.minecraft.world.RandomSequences;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.ForcedChunksSavedData;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.border.WorldBorder;
@@ -82,7 +83,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import java.util.logging.Level;
@@ -121,6 +124,20 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow protected abstract void setupDebugLevel(WorldData worldData);
 
     @Shadow public WorldData worldData;
+
+    @Shadow public abstract Set<ResourceKey<net.minecraft.world.level.Level>> levelKeys();
+
+    @Shadow public abstract void executeIfPossible(Runnable task);
+
+    @Shadow @Final public Executor executor;
+    @Shadow public LevelStorageSource.LevelStorageAccess storageSource;
+
+    @Shadow public abstract WorldData getWorldData();
+
+    @Shadow public abstract RegistryAccess.Frozen registryAccess();
+
+    @Shadow public abstract CustomBossEvents getCustomBossEvents();
+
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
     public org.bukkit.craftbukkit.v1_20_R1.CraftServer server;
@@ -377,6 +394,24 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     public void prepareLevels(ChunkProgressListener listener, ServerLevel serverWorld) {
         prepareLevels$serverlevel.set(serverWorld);
         prepareLevels(listener);
+    }
+
+    @Inject(method = "saveAllChunks",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/players/PlayerList;getSingleplayerData()Lnet/minecraft/nbt/CompoundTag;",
+            shift = At.Shift.AFTER))
+    private void banner$saveAllLevel(boolean suppressLog, boolean flush, boolean forced,
+                                     CallbackInfoReturnable<Boolean> cir) {
+        // Banner start - Save level.dat to all plugin world
+        for (ServerLevel banner$level : this.levels.values()) {
+            if (banner$level.bridge$convertable() != this.storageSource) {
+                banner$level.bridge$serverLevelDataCB().setWorldBorder(banner$level.serverLevelData.getWorldBorder());
+                banner$level.bridge$serverLevelDataCB().setCustomBossEvents(this.getCustomBossEvents().save());
+                banner$level.bridge$convertable().saveDataTag(this.registryAccess(), this.worldData,
+                        this.getPlayerList().getSingleplayerData());
+            }
+        }
+        // Banner end
     }
 
     @Override
