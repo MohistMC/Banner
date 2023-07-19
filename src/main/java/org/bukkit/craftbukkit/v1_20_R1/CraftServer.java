@@ -16,6 +16,7 @@ import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.commands.Commands;
 import net.minecraft.world.inventory.TransientCraftingContainer;
+import net.minecraft.world.level.levelgen.PhantomSpawner;
 import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.validation.ContentValidationException;
 import org.bukkit.craftbukkit.Main;
@@ -1058,7 +1059,7 @@ public final class CraftServer implements Server {
         }
 
         long j = BiomeManager.obfuscateSeed(creator.seed());
-        List<CustomSpawner> list = ImmutableList.of(new PatrolSpawner(), new PatrolSpawner(), new CatSpawner(), new VillageSiege(), new WanderingTraderSpawner(worlddata));
+        List<CustomSpawner> list = ImmutableList.of(new PhantomSpawner(), new PatrolSpawner(), new CatSpawner(), new VillageSiege(), new WanderingTraderSpawner(worlddata));
         LevelStem worlddimension = iregistry.get(actualDimension);
 
         WorldInfo worldInfo = new CraftWorldInfo(worlddata, worldSession, creator.environment(), worlddimension.type().value());
@@ -1066,18 +1067,11 @@ public final class CraftServer implements Server {
             biomeProvider = generator.getDefaultBiomeProvider(worldInfo);
         }
 
-        ResourceKey<net.minecraft.world.level.Level> worldKey;
-        String levelName = this.getServer().getProperties().levelName;
-        if (name.equals(levelName + "_nether")) {
-            worldKey = net.minecraft.world.level.Level.NETHER;
-        } else if (name.equals(levelName + "_the_end")) {
-            worldKey = net.minecraft.world.level.Level.END;
-        } else {
-            worldKey = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(name.toLowerCase(java.util.Locale.ENGLISH)));
-        }
+        ResourceKey<net.minecraft.world.level.Level> worldKey = Registries.levelStemToLevel(actualDimension); // Banner
+        boolean isOverworld = creator.environment() == Environment.NORMAL;
 
         ServerLevel internal = new ServerLevel(console, console.executor, worldSession, worlddata, worldKey, worlddimension, getServer().progressListenerFactory.create(11),
-                worlddata.isDebugWorld(), j, creator.environment() == Environment.NORMAL ? list : ImmutableList.of(), true, console.overworld().getRandomSequences());
+                worlddata.isDebugWorld(), j, isOverworld ? list : ImmutableList.of(), isOverworld, isOverworld ? null : console.overworld().getRandomSequences());
         if (name.contains("/")) {
             String[] strings = name.split("/");
             name = strings[strings.length - 1];
