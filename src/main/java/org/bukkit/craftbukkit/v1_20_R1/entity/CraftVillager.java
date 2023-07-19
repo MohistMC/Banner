@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import java.util.Locale;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.monster.ZombieVillager;
@@ -134,6 +135,6 @@ public class CraftVillager extends CraftAbstractVillager implements Villager {
     }
 
     public static VillagerProfession bukkitToNmsProfession(Profession bukkit) {
-        return BuiltInRegistries.VILLAGER_PROFESSION.get(CraftNamespacedKey.toMinecraft(bukkit.getKey()));
+        return !FabricInjectBukkit.profession.containsKey(bukkit) ? BuiltInRegistries.VILLAGER_PROFESSION.get(CraftNamespacedKey.toMinecraft(bukkit.getKey())) : BuiltInRegistries.VILLAGER_PROFESSION.get(FabricInjectBukkit.profession.get(bukkit));
     }
 }
