@@ -27,6 +27,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.players.PlayerList;
+import net.minecraft.stats.RecipeBook;
+import net.minecraft.stats.ServerRecipeBook;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
@@ -388,6 +390,9 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             }
         }
     }
+
+    @Redirect(method = "restoreFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/stats/ServerRecipeBook;copyOverData(Lnet/minecraft/stats/RecipeBook;)V"))
+    private void banner$copyOverData(ServerRecipeBook instance, RecipeBook recipeBook) {}
 
     @Redirect(method = "awardStat", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/scores/Scoreboard;forAllObjectives(Lnet/minecraft/world/scores/criteria/ObjectiveCriteria;Ljava/lang/String;Ljava/util/function/Consumer;)V"))
     private void banner$addStats(Scoreboard instance, ObjectiveCriteria criteria, String scoreboardName, Consumer<Score> points) {
