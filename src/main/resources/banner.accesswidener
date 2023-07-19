@@ -563,6 +563,7 @@ accessible field net/minecraft/world/entity/projectile/FishingHook outOfWaterTim
 accessible field net/minecraft/world/entity/item/FallingBlockEntity cancelDrop Z
 accessible field net/minecraft/world/entity/Display$TextDisplay DATA_LINE_WIDTH_ID Lnet/minecraft/network/syncher/EntityDataAccessor;
 accessible field net/minecraft/world/entity/Display$TextDisplay DATA_BACKGROUND_COLOR_ID Lnet/minecraft/network/syncher/EntityDataAccessor;
+accessible field net/minecraft/world/level/block/entity/DecoratedPotBlockEntity decorations Lnet/minecraft/world/level/block/entity/DecoratedPotBlockEntity$Decorations;
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;
