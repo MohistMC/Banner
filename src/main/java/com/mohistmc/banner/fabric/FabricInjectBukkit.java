@@ -67,6 +67,13 @@ public class FabricInjectBukkit {
                     .put(Level.END, World.Environment.THE_END)
                     .build());
 
+    public static BiMap<World.Environment, ResourceKey<LevelStem>> DIM_MAP0 =
+            HashBiMap.create(ImmutableMap.<World.Environment, ResourceKey<LevelStem>>builder()
+                    .put(World.Environment.NORMAL, LevelStem.OVERWORLD)
+                    .put(World.Environment.NETHER, LevelStem.NETHER)
+                    .put(World.Environment.THE_END, LevelStem.END)
+                    .build());
+
     public static Map<Villager.Profession, ResourceLocation> profession = new HashMap<>();
     public static Map<org.bukkit.attribute.Attribute, ResourceLocation> attributemap = new HashMap<>();
     public static Map<StatType<?>, Statistic> statisticMap = new HashMap<>();
@@ -96,6 +103,7 @@ public class FabricInjectBukkit {
                 int id = i - 1;
                 environment1 = MohistDynamEnum.addEnum(World.Environment.class, name, new Class[]{Integer.TYPE}, new Object[]{id});
                 DIM_MAP.put(key, environment1);
+                DIM_MAP0.put(environment1, key);
                 BannerServer.LOGGER.debug("Registered fabric DimensionType as environment {}", environment1);
                 i++;
             }
