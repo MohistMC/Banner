@@ -70,7 +70,6 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     // @formatter:off
     @Shadow @Final public boolean isClientSide;
     @Shadow @Final public Thread thread;
-    @Shadow @Final private WorldBorder worldBorder;
     @Shadow public abstract WorldBorder getWorldBorder();
     @Shadow public abstract LevelChunk getChunk(int chunkX, int chunkZ);
     @Shadow public abstract LevelData getLevelData();
@@ -79,8 +78,6 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     @Shadow public abstract LevelChunk getChunkAt(BlockPos pos);
     @Shadow public abstract boolean isDebug();
     // @formatter:on
-
-    @Shadow public abstract ProfilerFiller getProfiler();
 
     @Shadow public abstract void setBlocksDirty(BlockPos blockPos, BlockState oldState, BlockState newState);
 

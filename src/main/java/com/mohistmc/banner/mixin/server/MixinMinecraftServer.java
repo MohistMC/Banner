@@ -51,6 +51,7 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WorldData;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.Main;
@@ -256,11 +257,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         this.connection.acceptConnections();
     }
 
-    @Inject(method = "saveAllChunks", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;overworld()Lnet/minecraft/server/level/ServerLevel;"))
-    private void banner$skipSave(boolean suppressLog, boolean flush, boolean forced, CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(!this.levels.isEmpty());
-    }
-
     @Inject(method = "setInitialSpawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerChunkCache;getGenerator()Lnet/minecraft/world/level/chunk/ChunkGenerator;", shift = At.Shift.BEFORE), cancellable = true)
     private static void banner$spawnInit(ServerLevel level, ServerLevelData levelData, boolean generateBonusChest, boolean debug, CallbackInfo ci) {
         // CraftBukkit start
@@ -321,6 +317,10 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                                   ServerLevelData serverLevelData, boolean bl, Registry registry,
                                   WorldOptions worldOptions, long l, long m, List list, LevelStem levelStem,
                                   ServerLevel serverLevel) {
+        String levelName = getWorldData().getLevelName();
+        serverLevel.banner$setGenerator(this.server.getGenerator(levelName));
+        serverLevel.banner$setEnvironment(World.Environment.NORMAL);
+        serverLevel.banner$setBiomeProvider(this.server.getBiomeProvider(levelName));
         initWorld(serverLevel, serverLevelData, worldData, worldOptions);
     }
 
