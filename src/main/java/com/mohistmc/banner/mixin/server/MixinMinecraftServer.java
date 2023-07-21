@@ -13,6 +13,7 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import net.minecraft.CrashReport;
 import net.minecraft.ReportedException;
+import net.minecraft.SystemReport;
 import net.minecraft.Util;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
@@ -20,6 +21,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.ChatDecorator;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
+import net.minecraft.network.protocol.status.ServerStatus;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.Services;
@@ -37,6 +39,8 @@ import net.minecraft.server.network.ServerConnectionListener;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.Unit;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.util.profiling.jfr.JvmProfiler;
 import net.minecraft.util.thread.ReentrantBlockableEventLoop;
 import net.minecraft.world.RandomSequences;
 import net.minecraft.world.level.ChunkPos;
@@ -64,24 +68,28 @@ import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.PluginLoadOrder;
+import org.jetbrains.annotations.Nullable;
+import org.spigotmc.WatchdogThread;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.Proxy;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
@@ -139,6 +147,58 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Shadow public abstract CustomBossEvents getCustomBossEvents();
 
+    @Shadow protected abstract boolean initServer() throws IOException;
+
+    @Shadow @Nullable private ServerStatus.Favicon statusIcon;
+
+    @Shadow protected abstract Optional<ServerStatus.Favicon> loadStatusIcon();
+
+    @Shadow @Nullable private ServerStatus status;
+
+    @Shadow protected abstract ServerStatus buildServerStatus();
+
+    @Shadow private volatile boolean running;
+
+    @Shadow
+    private static CrashReport constructOrExtractCrashReport(Throwable cause) {
+        return null;
+    }
+
+    @Shadow public abstract SystemReport fillSystemReport(SystemReport systemReport);
+
+    @Shadow public abstract File getServerDirectory();
+
+    @Shadow public abstract void onServerCrash(CrashReport report);
+
+    @Shadow private boolean stopped;
+
+    @Shadow public abstract void stopServer();
+
+    @Shadow @Final protected Services services;
+
+    @Shadow public abstract void onServerExit();
+
+    @Shadow private float averageTickTime;
+    @Shadow private volatile boolean isReady;
+
+    @Shadow protected abstract void endMetricsRecordingTick();
+
+    @Shadow private ProfilerFiller profiler;
+
+    @Shadow protected abstract void waitUntilNextTick();
+
+    @Shadow private long delayedTasksMaxNextTickTime;
+    @Shadow private boolean mayHaveDelayedTasks;
+
+    @Shadow public abstract void tickServer(BooleanSupplier hasTimeLeft);
+
+    @Shadow protected abstract boolean haveTime();
+
+    @Shadow protected abstract void startMetricsRecordingTick();
+
+    @Shadow private long lastOverloadWarning;
+    @Shadow private boolean debugCommandProfilerDelayStart;
+    @Shadow @Nullable private MinecraftServer.TimeProfiler debugCommandProfiler;
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
     public org.bukkit.craftbukkit.v1_20_R1.CraftServer server;
@@ -154,6 +214,9 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     private boolean hasStopped = false;
     private final Object stopLock = new Object();
     public final double[] recentTps = new double[3];
+    private static final int TPS = 20;
+    private static final int TICK_TIME = 1000000000 / TPS;
+    private static final int SAMPLE_INTERVAL = 100;
     // CraftBukkit end
 
     public MixinMinecraftServer(String string) {
@@ -161,7 +224,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void banner$initServer(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Proxy proxy, DataFixer dataFixer, Services services, ChunkProgressListenerFactory chunkProgressListenerFactory, CallbackInfo ci) {
+    private void banner$loadOptions(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Proxy proxy, DataFixer dataFixer, Services services, ChunkProgressListenerFactory chunkProgressListenerFactory, CallbackInfo ci) {
         String[] arguments = ManagementFactory.getRuntimeMXBean().getInputArguments().toArray(new String[0]);
         OptionParser parser = new Main();
         try {
@@ -181,6 +244,96 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         }
     }
 
+    /**
+     * @author wdog5
+     * @reason bukkit
+     */
+    @Overwrite
+    protected void runServer() {
+        try {
+            if (!this.initServer()) {
+                throw new IllegalStateException("Failed to initialize server");
+            }
+            this.nextTickTime = Util.getMillis();
+            this.statusIcon = this.loadStatusIcon().orElse(null);
+            this.status = this.buildServerStatus();
+
+            Arrays.fill(recentTps, 20);
+            long curTime, tickSection = Util.getMillis(), tickCount = 1;
+
+            while (this.running) {
+                long i = (curTime = Util.getMillis()) - this.nextTickTime;
+                if (i > 2000L && this.nextTickTime - this.lastOverloadWarning >= 15000L) {
+                    long j = i / 50L;
+
+                    if (server.getWarnOnOverload()) {
+                        LOGGER.warn("Can't keep up! Is the server overloaded? Running {}ms or {} ticks behind", i, j);
+                    }
+
+                    this.nextTickTime += j * 50L;
+                    this.lastOverloadWarning = this.nextTickTime;
+                }
+
+                if (tickCount++ % SAMPLE_INTERVAL == 0) {
+                    double currentTps = 1E3 / (curTime - tickSection) * SAMPLE_INTERVAL;
+                    recentTps[0] = calcTps(recentTps[0], 0.92, currentTps); // 1/exp(5sec/1min)
+                    recentTps[1] = calcTps(recentTps[1], 0.9835, currentTps); // 1/exp(5sec/5min)
+                    recentTps[2] = calcTps(recentTps[2], 0.9945, currentTps); // 1/exp(5sec/15min)
+                    tickSection = curTime;
+                }
+
+                BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50);
+
+                if (this.debugCommandProfilerDelayStart) {
+                    this.debugCommandProfilerDelayStart = false;
+                    this.debugCommandProfiler = new MinecraftServer.TimeProfiler(Util.getNanos(), this.tickCount);
+                }
+
+                this.nextTickTime += 50L;
+                this.startMetricsRecordingTick();
+                this.profiler.push("tick");
+                this.tickServer(this::haveTime);
+                this.profiler.popPush("nextTickWait");
+                this.mayHaveDelayedTasks = true;
+                this.delayedTasksMaxNextTickTime = Math.max(Util.getMillis() + 50L, this.nextTickTime);
+                this.waitUntilNextTick();
+                this.profiler.pop();
+                this.endMetricsRecordingTick();
+                this.isReady = true;
+                JvmProfiler.INSTANCE.onServerTick(this.averageTickTime);
+            }
+        } catch (Throwable throwable1) {
+            LOGGER.error("Encountered an unexpected exception", throwable1);
+            CrashReport crashreport = constructOrExtractCrashReport(throwable1);
+            this.fillSystemReport(crashreport.getSystemReport());
+            File file1 = new File(new File(this.getServerDirectory(), "crash-reports"), "crash-" + Util.getFilenameFormattedDateTime() + "-server.txt");
+            if (crashreport.saveToFile(file1)) {
+                LOGGER.error("This crash report has been saved to: {}", file1.getAbsolutePath());
+            } else {
+                LOGGER.error("We were unable to save this crash report to disk.");
+            }
+
+            this.onServerCrash(crashreport);
+        } finally {
+            try {
+                this.stopped = true;
+                this.stopServer();
+            } catch (Throwable throwable) {
+                LOGGER.error("Exception stopping the server", throwable);
+            } finally {
+                if (this.services.profileCache() != null) {
+                    this.services.profileCache().clearExecutor();
+                }
+                WatchdogThread.doStop();
+                this.onServerExit();
+            }
+        }
+    }
+
+    private static double calcTps(double avg, double exp, double tps) {
+        return (avg * exp) + (tps * (1 - exp));
+    }
+
     @Inject(method = "stopServer", at = @At("HEAD"), cancellable = true)
     private void banner$stop(CallbackInfo ci) {
         synchronized(stopLock) {
@@ -192,16 +345,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Inject(method = "stopServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;removeAll()V"))
     private void banner$stopThread(CallbackInfo ci) {
         try { Thread.sleep(100); } catch (InterruptedException ex) {} // CraftBukkit - SPIGOT-625 - give server at least a chance to send packets
-    }
-
-    @ModifyConstant(method = "runServer", constant = @Constant(longValue = 15000L))
-    private long banner$changeWarningValue(long constant) {
-        return 30000L;
-    }
-
-    @Inject(method = "runServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;nextTickTime:J", shift = At.Shift.BEFORE))
-    private void banner$currentTick(CallbackInfo ci) {
-        BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
     }
 
     @Inject(method = "getServerModName", at = @At(value = "HEAD"), remap = false, cancellable = true)
