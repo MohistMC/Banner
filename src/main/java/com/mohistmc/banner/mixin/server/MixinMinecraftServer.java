@@ -1,12 +1,15 @@
 package com.mohistmc.banner.mixin.server;
 
+import com.google.common.collect.ImmutableList;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
-import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
 import com.mojang.datafixers.DataFixer;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.Lifecycle;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import jline.console.ConsoleReader;
 import joptsimple.OptionParser;
@@ -18,18 +21,27 @@ import net.minecraft.SystemReport;
 import net.minecraft.Util;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.ChatDecorator;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 import net.minecraft.network.protocol.status.ServerStatus;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.Services;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.WorldLoader;
 import net.minecraft.server.WorldStem;
 import net.minecraft.server.bossevents.CustomBossEvents;
+import net.minecraft.server.dedicated.DedicatedServer;
+import net.minecraft.server.dedicated.DedicatedServerProperties;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,24 +51,40 @@ import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
 import net.minecraft.server.network.ServerConnectionListener;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.players.PlayerList;
+import net.minecraft.util.ModCheck;
 import net.minecraft.util.Unit;
+import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.util.profiling.jfr.JvmProfiler;
+import net.minecraft.util.profiling.jfr.callback.ProfiledDuration;
 import net.minecraft.util.thread.ReentrantBlockableEventLoop;
 import net.minecraft.world.RandomSequences;
+import net.minecraft.world.entity.ai.village.VillageSiege;
+import net.minecraft.world.entity.npc.CatSpawner;
+import net.minecraft.world.entity.npc.WanderingTraderSpawner;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.ForcedChunksSavedData;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelSettings;
+import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.levelgen.PatrolSpawner;
+import net.minecraft.world.level.levelgen.PhantomSpawner;
+import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.minecraft.world.level.levelgen.WorldOptions;
-import net.minecraft.world.level.storage.DerivedLevelData;
+import net.minecraft.world.level.levelgen.presets.WorldPresets;
+import net.minecraft.world.level.storage.CommandStorage;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WorldData;
+import net.minecraft.world.level.validation.ContentValidationException;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.Main;
@@ -66,9 +94,6 @@ import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_20_R1.util.LazyPlayerSet;
 import org.bukkit.event.player.AsyncPlayerChatPreviewEvent;
 import org.bukkit.event.server.ServerLoadEvent;
-import org.bukkit.event.world.WorldInitEvent;
-import org.bukkit.event.world.WorldLoadEvent;
-import org.bukkit.plugin.PluginLoadOrder;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.WatchdogThread;
 import org.spongepowered.asm.mixin.Final;
@@ -96,9 +121,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // Banner - TODO fix inject method
@@ -200,6 +223,25 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow private long lastOverloadWarning;
     @Shadow private boolean debugCommandProfilerDelayStart;
     @Shadow @Nullable private MinecraftServer.TimeProfiler debugCommandProfiler;
+
+    @Shadow @Final private LayeredRegistryAccess<RegistryLayer> registries;
+
+    @Shadow public abstract boolean isNetherEnabled();
+
+    @Shadow public abstract boolean isDemo();
+
+    @Shadow @Final public ChunkProgressListenerFactory progressListenerFactory;
+
+    @Shadow public abstract String getServerModName();
+
+    @Shadow public abstract ModCheck getModdedStatus();
+
+    @Shadow protected abstract void readScoreboard(DimensionDataStorage dataStorage);
+
+    @Shadow @Nullable private CommandStorage commandStorage;
+
+    @Shadow protected abstract void forceDifficulty();
+
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
     public org.bukkit.craftbukkit.v1_20_R1.CraftServer server;
@@ -231,7 +273,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         try {
             options = parser.parse(arguments);
         } catch (Exception ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, ex.getLocalizedMessage());
+            Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, ex.getLocalizedMessage());
         }
         Main.handleParser(parser, options);
         this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
@@ -373,24 +415,228 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Override
     public void addLevel(ServerLevel level) {
-        ServerWorldEvents.LOAD.invoker().onWorldLoad(((MinecraftServer) (Object) this), level);
         this.levels.put(level.dimension(), level);
     }
 
     @Override
     public void removeLevel(ServerLevel level) {
-        ServerWorldEvents.UNLOAD.invoker().onWorldUnload(((MinecraftServer) (Object) this), level);
+        ServerWorldEvents.UNLOAD.invoker().onWorldUnload(((MinecraftServer) (Object) this), level);// Banner
         this.levels.remove(level.dimension());
     }
 
-    @Inject(method = "createLevels",
-            at = @At(value = "INVOKE",
-                    target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$callInitEvent(ChunkProgressListener listener, CallbackInfo ci, ServerLevelData serverLevelData, boolean bl, Registry registry, WorldOptions worldOptions, long l, long m, List list, LevelStem levelStem, ServerLevel serverLevel) {
-        this.server.getPluginManager().callEvent(new WorldInitEvent(serverLevel.getWorld()));
+    @Override
+    public void loadLevel(String s) { // CraftBukkit
+        if (!JvmProfiler.INSTANCE.isRunning()) {
+            ;
+        }
+
+        boolean flag = false;
+        ProfiledDuration profiledduration = JvmProfiler.INSTANCE.onWorldLoadedStarted();
+
+        loadWorld0(s); // CraftBukkit
+
+        if (profiledduration != null) {
+            profiledduration.finish();
+        }
+
+        if (flag) {
+            try {
+                JvmProfiler.INSTANCE.stop();
+            } catch (Throwable throwable) {
+                MinecraftServer.LOGGER.warn("Failed to stop JFR profiling", throwable);
+            }
+        }
+
     }
 
+    // CraftBukkit start
+    @Override
+    public void loadWorld0(String s) {
+        LevelStorageSource.LevelStorageAccess worldSession = this.storageSource;
+
+        Registry<LevelStem> dimensions = this.registries.compositeAccess().registryOrThrow(Registries.LEVEL_STEM);
+        for (LevelStem worldDimension : dimensions) {
+            ResourceKey<LevelStem> dimensionKey = dimensions.getResourceKey(worldDimension).get();
+
+            ServerLevel world;
+            int dimension = 0;
+
+            if (dimensionKey == LevelStem.NETHER) {
+                if (isNetherEnabled()) {
+                    dimension = -1;
+                } else {
+                    continue;
+                }
+            } else if (dimensionKey == LevelStem.END) {
+                if (server.getAllowEnd()) {
+                    dimension = 1;
+                } else {
+                    continue;
+                }
+            } else if (dimensionKey != LevelStem.OVERWORLD) {
+                dimension = -999;
+            }
+
+            String worldType = (dimension == -999) ? dimensionKey.location().getNamespace() + "_" + dimensionKey.location().getPath() : org.bukkit.World.Environment.getEnvironment(dimension).toString().toLowerCase();
+            String name = (dimensionKey == LevelStem.OVERWORLD) ? s : s + "_" + worldType;
+            // Banner start - TODO - turn to vanilla mode
+            if (dimension != 0) {
+                ResourceKey<Level> levelType = Registries.levelStemToLevel(dimensionKey);
+                File newWorld = DimensionType.getStorageFolder(levelType, new File(name).toPath()).toFile();
+                File oldWorld = DimensionType.getStorageFolder(levelType, new File(name).toPath()).toFile();
+                File oldLevelDat = new File(new File(s), "level.dat"); // The data folders exist on first run as they are created in the PersistentCollection constructor above, but the level.dat won't
+
+                if (!newWorld.isDirectory() && oldWorld.isDirectory() && oldLevelDat.isFile()) {
+                    MinecraftServer.LOGGER.info("---- Migration of old " + worldType + " folder required ----");
+                    MinecraftServer.LOGGER.info("Unfortunately due to the way that Minecraft implemented multiworld support in 1.6, Bukkit requires that you move your " + worldType + " folder to a new location in order to operate correctly.");
+                    MinecraftServer.LOGGER.info("We will move this folder for you, but it will mean that you need to move it back should you wish to stop using Bukkit in the future.");
+                    MinecraftServer.LOGGER.info("Attempting to move " + oldWorld + " to " + newWorld + "...");
+
+                    if (newWorld.exists()) {
+                        MinecraftServer.LOGGER.warn("A file or folder already exists at " + newWorld + "!");
+                        MinecraftServer.LOGGER.info("---- Migration of old " + worldType + " folder failed ----");
+                    } else if (newWorld.getParentFile().mkdirs()) {
+                        if (oldWorld.renameTo(newWorld)) {
+                            MinecraftServer.LOGGER.info("Success! To restore " + worldType + " in the future, simply move " + newWorld + " to " + oldWorld);
+                            // Migrate world data too.
+                            try {
+                                com.google.common.io.Files.copy(oldLevelDat, new File(new File(name), "level.dat"));
+                                org.apache.commons.io.FileUtils.copyDirectory(new File(new File(s), "data"), new File(new File(name), "data"));
+                            } catch (IOException exception) {
+                                MinecraftServer.LOGGER.warn("Unable to migrate world data.");
+                            }
+                            MinecraftServer.LOGGER.info("---- Migration of old " + worldType + " folder complete ----");
+                        } else {
+                            MinecraftServer.LOGGER.warn("Could not move folder " + oldWorld + " to " + newWorld + "!");
+                            MinecraftServer.LOGGER.info("---- Migration of old " + worldType + " folder failed ----");
+                        }
+                    } else {
+                        MinecraftServer.LOGGER.warn("Could not create path for " + newWorld + "!");
+                        MinecraftServer.LOGGER.info("---- Migration of old " + worldType + " folder failed ----");
+                    }
+                }
+
+                try {
+                    worldSession = LevelStorageSource.createDefault(server.getWorldContainer().toPath()).validateAndCreateAccess(name, dimensionKey);
+                } catch (IOException | ContentValidationException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+            // Banner end
+
+            org.bukkit.generator.ChunkGenerator gen = this.server.getGenerator(name);
+            org.bukkit.generator.BiomeProvider biomeProvider = this.server.getBiomeProvider(name);
+
+            PrimaryLevelData worlddata;
+            WorldLoader.DataLoadContext worldloader_a = this.worldLoader;
+            Registry<LevelStem> iregistry = worldloader_a.datapackDimensions().registryOrThrow(Registries.LEVEL_STEM);
+            DynamicOps<Tag> dynamicops = RegistryOps.create(NbtOps.INSTANCE, (HolderLookup.Provider) worldloader_a.datapackWorldgen());
+            Pair<WorldData, WorldDimensions.Complete> pair = worldSession.getDataTag(dynamicops, worldloader_a.dataConfiguration(), iregistry, worldloader_a.datapackWorldgen().allRegistriesLifecycle());
+
+            if (pair != null) {
+                worlddata = (PrimaryLevelData) pair.getFirst();
+            } else {
+                LevelSettings worldsettings;
+                WorldOptions worldoptions;
+                WorldDimensions worlddimensions;
+
+                if (this.isDemo()) {
+                    worldsettings = MinecraftServer.DEMO_SETTINGS;
+                    worldoptions = WorldOptions.DEMO_OPTIONS;
+                    worlddimensions = WorldPresets.createNormalWorldDimensions(worldloader_a.datapackWorldgen());
+                } else {
+                    DedicatedServerProperties dedicatedserverproperties = ((DedicatedServer) (Object) this).getProperties();
+
+                    worldsettings = new LevelSettings(dedicatedserverproperties.levelName, dedicatedserverproperties.gamemode, dedicatedserverproperties.hardcore, dedicatedserverproperties.difficulty, false, new GameRules(), worldloader_a.dataConfiguration());
+                    worldoptions = options.has("bonusChest") ? dedicatedserverproperties.worldOptions.withBonusChest(true) : dedicatedserverproperties.worldOptions;
+                    worlddimensions = dedicatedserverproperties.createDimensions(worldloader_a.datapackWorldgen());
+                }
+
+                WorldDimensions.Complete worlddimensions_b = worlddimensions.bake(iregistry);
+                Lifecycle lifecycle = worlddimensions_b.lifecycle().add(worldloader_a.datapackWorldgen().allRegistriesLifecycle());
+
+                worlddata = new PrimaryLevelData(worldsettings, worldoptions, worlddimensions_b.specialWorldProperty(), lifecycle);
+            }
+            worlddata.checkName(name); // CraftBukkit - Migration did not rewrite the level.dat; This forces 1.8 to take the last loaded world as respawn (in this case the end)
+            if (options.has("forceUpgrade")) {
+                net.minecraft.server.Main.forceUpgrade(worldSession, DataFixers.getDataFixer(), options.has("eraseCache"), () -> {
+                    return true;
+                }, iregistry);
+            }
+
+            PrimaryLevelData iworlddataserver = worlddata;
+            boolean flag = worlddata.isDebugWorld();
+            WorldOptions worldoptions = worlddata.worldGenOptions();
+            long i = worldoptions.seed();
+            long j = BiomeManager.obfuscateSeed(i);
+            List<CustomSpawner> list = ImmutableList.of(new PhantomSpawner(), new PatrolSpawner(), new CatSpawner(), new VillageSiege(), new WanderingTraderSpawner(iworlddataserver));
+            LevelStem worlddimension = (LevelStem) dimensions.get(dimensionKey);
+
+            org.bukkit.generator.WorldInfo worldInfo = new org.bukkit.craftbukkit.v1_20_R1.generator.CraftWorldInfo(iworlddataserver, worldSession, org.bukkit.World.Environment.getEnvironment(dimension), worlddimension.type().value());
+            if (biomeProvider == null && gen != null) {
+                biomeProvider = gen.getDefaultBiomeProvider(worldInfo);
+            }
+
+            ResourceKey<Level> worldKey = ResourceKey.create(Registries.DIMENSION, dimensionKey.location());
+
+            if (dimensionKey == LevelStem.OVERWORLD) {
+                this.worldData = worlddata;
+                this.worldData.setGameType(((DedicatedServer) (Object) this).getProperties().gamemode); // From DedicatedServer.init
+
+                ChunkProgressListener worldloadlistener = this.progressListenerFactory.create(11);
+
+                world = new ServerLevel(((MinecraftServer) (Object) this), this.executor, worldSession, iworlddataserver, worldKey, worlddimension, worldloadlistener, flag, j, list, true, (RandomSequences) null);
+                world.banner$setEnvironment(org.bukkit.World.Environment.getEnvironment(dimension));
+                world.banner$setGenerator(gen);
+                world.banner$setBiomeProvider(biomeProvider);
+                DimensionDataStorage worldpersistentdata = world.getDataStorage();
+                this.readScoreboard(worldpersistentdata);
+                this.server.scoreboardManager = new org.bukkit.craftbukkit.v1_20_R1.scoreboard.CraftScoreboardManager(((MinecraftServer) (Object) this), world.getScoreboard());
+                this.commandStorage = new CommandStorage(worldpersistentdata);
+            } else {
+                ChunkProgressListener worldloadlistener = this.progressListenerFactory.create(11);
+                world = new ServerLevel(((MinecraftServer) (Object) this), this.executor, worldSession, iworlddataserver, worldKey, worlddimension, worldloadlistener, flag, j, ImmutableList.of(), true, this.overworld().getRandomSequences());
+                world.banner$setEnvironment(org.bukkit.World.Environment.getEnvironment(dimension));
+                world.banner$setGenerator(gen);
+                world.banner$setBiomeProvider(biomeProvider);
+            }
+
+            worlddata.setModdedInfo(this.getServerModName(), this.getModdedStatus().shouldReportAsModified());
+            this.initWorld(world, worlddata, worldData, worldoptions);
+
+            this.addLevel(world);
+            this.getPlayerList().addWorldborderListener(world);
+
+            if (worlddata.getCustomBossEvents() != null) {
+                this.getCustomBossEvents().load(worlddata.getCustomBossEvents());
+            }
+        }
+        this.forceDifficulty();
+        for (ServerLevel worldserver : ((MinecraftServer) (Object) this).getAllLevels()) {
+            this.prepareLevels(worldserver.getChunkSource().chunkMap.progressListener, worldserver);
+            worldserver.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API
+            this.server.getPluginManager().callEvent(new org.bukkit.event.world.WorldLoadEvent(worldserver.getWorld()));
+        }
+
+        this.server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.POSTWORLD);
+        this.server.getPluginManager().callEvent(new ServerLoadEvent(ServerLoadEvent.LoadType.STARTUP));
+        this.connection.acceptConnections();
+    }
+    // CraftBukkit end
+
+    /*
+    @Inject(method = "createLevels",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/storage/ServerLevelData;getWorldBorder()Lnet/minecraft/world/level/border/WorldBorder$Settings;"),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$callInitEvent(ChunkProgressListener listener, CallbackInfo ci, ServerLevelData serverLevelData, boolean bl, Registry registry, WorldOptions worldOptions, long l, long m, List list, LevelStem levelStem, ServerLevel serverLevel) {
+        Collection<ServerLevel> worldz = this.levels.values();
+        for (ServerLevel world : worldz) {
+            this.server.getPluginManager().callEvent(new WorldInitEvent(world.getWorld()));
+        }
+    }*/
+
+    /*
     @Inject(method = "loadLevel", at = @At("TAIL"))
     private void banner$initPlugins(CallbackInfo ci) {
         for (ServerLevel worldserver : ((MinecraftServer)(Object)this).getAllLevels()) {
@@ -398,10 +644,11 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             worldserver.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API
             this.server.getPluginManager().callEvent(new WorldLoadEvent(worldserver.getWorld()));
         }
+
         this.server.enablePlugins(PluginLoadOrder.POSTWORLD);
         this.server.getPluginManager().callEvent(new ServerLoadEvent(ServerLoadEvent.LoadType.STARTUP));
         this.connection.acceptConnections();
-    }
+    }*/
 
     @Inject(method = "setInitialSpawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerChunkCache;getGenerator()Lnet/minecraft/world/level/chunk/ChunkGenerator;", shift = At.Shift.BEFORE), cancellable = true)
     private static void banner$spawnInit(ServerLevel level, ServerLevelData levelData, boolean generateBonusChest, boolean debug, CallbackInfo ci) {
@@ -453,93 +700,42 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         }
     }
 
-    public AtomicReference<ServerLevel> prepareLevels$serverlevel = new AtomicReference<>();
-
-    @Inject(method = "createLevels",
-            at = @At(value = "INVOKE",
-                    target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 0),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$initWorld(ChunkProgressListener chunkProgressListener, CallbackInfo ci,
-                                  ServerLevelData serverLevelData, boolean bl, Registry registry,
-                                  WorldOptions worldOptions, long l, long m, List list, LevelStem levelStem,
-                                  ServerLevel serverLevel) {
-        String levelName = getWorldData().getLevelName();
-        serverLevel.banner$setGenerator(this.server.getGenerator(levelName));
-        serverLevel.banner$setEnvironment(World.Environment.NORMAL);
-        serverLevel.banner$setBiomeProvider(this.server.getBiomeProvider(levelName));
-        initWorld(serverLevel, serverLevelData, worldData, worldOptions);
-    }
-
-    @Inject(method = "createLevels",
-            at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/border/WorldBorder;addListener(Lnet/minecraft/world/level/border/BorderChangeListener;)V"),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$initWorld0(ChunkProgressListener chunkProgressListener, CallbackInfo ci,
-                                  ServerLevelData serverLevelData, boolean bl, Registry registry,
-                                  WorldOptions worldOptions, long l, long m, List list, LevelStem
-                                              levelStem, ServerLevel serverLevel, DimensionDataStorage
-                                              dimensionDataStorage, WorldBorder worldBorder,
-                                  RandomSequences randomSequences, Iterator var16, Map.Entry entry,
-                                  ResourceKey resourceKey, ResourceKey resourceKey2, DerivedLevelData derivedLevelData,
-                                  ServerLevel serverLevel2) {
-        String name = resourceKey == LevelStem.END ? "DIM1" : "DIM-1";
-        serverLevel2.banner$setGenerator(this.server.getGenerator(name));
-        serverLevel2.banner$setEnvironment(FabricInjectBukkit.DIM_MAP.get(resourceKey));
-        serverLevel2.banner$setBiomeProvider(this.server.getBiomeProvider(name));
-        initWorld(serverLevel2, derivedLevelData, worldData, worldOptions);
-    }
-
-    /**
-     * @author wdog5
-     * @reason bukkit
-     */
-    @Overwrite
-    public final void prepareLevels(ChunkProgressListener chunkProgressListener) {
-        this.forceTicks = true;
-        ServerLevel banner$serverLevel = this.prepareLevels$serverlevel.getAndSet(this.overworld());
-        banner$serverLevel = banner$serverLevel == null ? this.overworld() : banner$serverLevel;
-        ServerLevel serverLevel = banner$serverLevel;
-        LOGGER.info(BannerMCStart.I18N.get("server.region.prepare"), serverLevel.dimension().location());
-        BlockPos blockPos = serverLevel.getSharedSpawnPos();
-        chunkProgressListener.updateSpawnPos(new ChunkPos(blockPos));
-        ServerChunkCache serverChunkCache = serverLevel.getChunkSource();
-        this.nextTickTime = Util.getMillis();
-        if (serverLevel.getWorld().getKeepSpawnInMemory()) {
-            serverChunkCache.addRegionTicket(TicketType.START, new ChunkPos(blockPos), 11, Unit.INSTANCE);
-            while(serverChunkCache.getTickingGenerated() != 441) {
-                this.executeModerately();
-            }
-        }
-
-        this.executeModerately();
-        for(ServerLevel serverlevel1 : this.levels.values()) {
-            ForcedChunksSavedData forcedchunkssaveddata = serverlevel1.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
-            if (forcedchunkssaveddata != null) {
-                LongIterator longiterator = forcedchunkssaveddata.getChunks().iterator();
-
-                while(longiterator.hasNext()) {
-                    long i = longiterator.nextLong();
-                    ChunkPos chunkpos = new ChunkPos(i);
-                    serverlevel1.getChunkSource().updateChunkForced(chunkpos, true);
-                }
-            }
-        }
-
-
-        // CraftBukkit start
-        this.executeModerately();
-        // CraftBukkit end
-        chunkProgressListener.stop();
-        // CraftBukkit start
-        serverLevel.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
-        this.forceTicks = false;
-        // CraftBukkit end
-    }
-
+    // bukkit methods
     @Override
     public void prepareLevels(ChunkProgressListener listener, ServerLevel serverWorld) {
-        prepareLevels$serverlevel.set(serverWorld);
-        prepareLevels(listener);
+        ServerWorldEvents.LOAD.invoker().onWorldLoad(((MinecraftServer) (Object) this), serverWorld);// Banner
+        if (!serverWorld.getWorld().getKeepSpawnInMemory()) {
+            return;
+        }
+        this.forceTicks = true;
+        LOGGER.info(BannerMCStart.I18N.get("server.region.prepare"), serverWorld.dimension().location());
+        BlockPos blockpos = serverWorld.getSharedSpawnPos();
+        listener.updateSpawnPos(new ChunkPos(blockpos));
+        ServerChunkCache serverchunkprovider = serverWorld.getChunkSource();
+        this.nextTickTime = Util.getMillis();
+        serverchunkprovider.addRegionTicket(TicketType.START, new ChunkPos(blockpos), 11, Unit.INSTANCE);
+
+        while (serverchunkprovider.getTickingGenerated() < 441) {
+            this.executeModerately();
+        }
+
+        this.executeModerately();
+
+        ForcedChunksSavedData forcedchunkssavedata = serverWorld.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
+        if (forcedchunkssavedata != null) {
+            LongIterator longiterator = forcedchunkssavedata.getChunks().iterator();
+
+            while (longiterator.hasNext()) {
+                long i = longiterator.nextLong();
+                ChunkPos chunkpos = new ChunkPos(i);
+                serverWorld.getChunkSource().updateChunkForced(chunkpos, true);
+            }
+        }
+        this.executeModerately();
+        listener.stop();
+        // this.updateMobSpawningFlags();
+        serverWorld.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
+        this.forceTicks = false;
     }
 
     @Inject(method = "saveAllChunks",
