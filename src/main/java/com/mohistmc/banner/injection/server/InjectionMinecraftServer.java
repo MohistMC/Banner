@@ -15,14 +15,6 @@ import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 
 public interface InjectionMinecraftServer {
 
-    default void loadLevel(String s) {
-
-    }
-
-    default void loadWorld0(String s) {
-
-    }
-
     default Commands bridge$getVanillaCommands() {
         return null;
     }

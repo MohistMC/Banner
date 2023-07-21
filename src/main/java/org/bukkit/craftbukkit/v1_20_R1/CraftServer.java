@@ -1060,8 +1060,9 @@ public final class CraftServer implements Server {
             worlddata = new PrimaryLevelData(worldsettings, worldoptions, worlddimensions_b.specialWorldProperty(), lifecycle);
             iregistry = worlddimensions_b.dimensions();
         }
-        worlddata.banner$setCustomDimensions(iregistry);
-        worlddata.checkName(name);
+        /**
+        worlddata.customDimensions = iregistry;
+        worlddata.checkName(name);*/
         worlddata.setModdedInfo(console.getServerModName(), console.getModdedStatus().shouldReportAsModified());
 
         if (console.bridge$options().has("forceUpgrade")) {
