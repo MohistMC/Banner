@@ -11,6 +11,7 @@ import it.unimi.dsi.fastutil.longs.LongIterator;
 import jline.console.ConsoleReader;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.CrashReport;
 import net.minecraft.ReportedException;
 import net.minecraft.SystemReport;
@@ -372,11 +373,13 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Override
     public void addLevel(ServerLevel level) {
+        ServerWorldEvents.LOAD.invoker().onWorldLoad(((MinecraftServer) (Object) this), level);
         this.levels.put(level.dimension(), level);
     }
 
     @Override
     public void removeLevel(ServerLevel level) {
+        ServerWorldEvents.UNLOAD.invoker().onWorldUnload(((MinecraftServer) (Object) this), level);
         this.levels.remove(level.dimension());
     }
 
