@@ -463,7 +463,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                                   ServerLevelData serverLevelData, boolean bl, Registry registry,
                                   WorldOptions worldOptions, long l, long m, List list, LevelStem levelStem,
                                   ServerLevel serverLevel) {
-        String levelName = getWorldData().getLevelName();
+        String levelName = "overworld";
         serverLevel.banner$setGenerator(this.server.getGenerator(levelName));
         serverLevel.banner$setEnvironment(World.Environment.NORMAL);
         serverLevel.banner$setBiomeProvider(this.server.getBiomeProvider(levelName));
@@ -482,7 +482,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                                   RandomSequences randomSequences, Iterator var16, Map.Entry entry,
                                   ResourceKey resourceKey, ResourceKey resourceKey2, DerivedLevelData derivedLevelData,
                                   ServerLevel serverLevel2) {
-        String name = resourceKey == LevelStem.END ? "DIM1" : "DIM-1";
+        String name = resourceKey == LevelStem.END ? "the_end" : "the_nether";
         serverLevel2.banner$setGenerator(this.server.getGenerator(name));
         serverLevel2.banner$setEnvironment(FabricInjectBukkit.DIM_MAP.get(resourceKey));
         serverLevel2.banner$setBiomeProvider(this.server.getBiomeProvider(name));
