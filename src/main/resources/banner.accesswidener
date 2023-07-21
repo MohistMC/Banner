@@ -209,6 +209,8 @@ accessible method net/minecraft/world/entity/projectile/FishingHook calculateOpe
 accessible method net/minecraft/world/entity/monster/EnderMan teleport ()Z
 accessible method net/minecraft/world/entity/monster/EnderMan teleportTowards (Lnet/minecraft/world/entity/Entity;)Z
 accessible method net/minecraft/world/level/block/ChiseledBookShelfBlock getHitSlot (Lnet/minecraft/world/phys/Vec2;)I
+accessible method net/minecraft/world/entity/animal/Turtle setLayingEgg (Z)V
+accessible method net/minecraft/world/entity/animal/Turtle setHasEgg (Z)V
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C
@@ -564,6 +566,7 @@ accessible field net/minecraft/world/entity/item/FallingBlockEntity cancelDrop Z
 accessible field net/minecraft/world/entity/Display$TextDisplay DATA_LINE_WIDTH_ID Lnet/minecraft/network/syncher/EntityDataAccessor;
 accessible field net/minecraft/world/entity/Display$TextDisplay DATA_BACKGROUND_COLOR_ID Lnet/minecraft/network/syncher/EntityDataAccessor;
 accessible field net/minecraft/world/level/block/entity/DecoratedPotBlockEntity decorations Lnet/minecraft/world/level/block/entity/DecoratedPotBlockEntity$Decorations;
+accessible field net/minecraft/world/entity/animal/Turtle layEggCounter I
 
 # public -f fields
 mutable field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;

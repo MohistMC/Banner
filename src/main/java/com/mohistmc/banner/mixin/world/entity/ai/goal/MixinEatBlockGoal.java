@@ -22,6 +22,6 @@ public abstract class MixinEatBlockGoal extends Goal {
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z"))
     private boolean banner$eatGrassTick(GameRules instance, GameRules.Key<GameRules.BooleanValue> key) {
-        return !CraftEventFactory.callEntityChangeBlockEvent(this.mob, this.mob.blockPosition(), Blocks.AIR.defaultBlockState(), !this.level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)).isCancelled();
+        return CraftEventFactory.callEntityChangeBlockEvent(this.mob, this.mob.blockPosition(), Blocks.AIR.defaultBlockState(), !this.level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING));
     }
 }

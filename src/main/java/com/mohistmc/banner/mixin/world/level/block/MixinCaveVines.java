@@ -40,7 +40,7 @@ public interface MixinCaveVines {
     static InteractionResult use(@Nullable Entity entity, BlockState blockState, Level level, BlockPos blockPos) {
         if ((Boolean)blockState.getValue(BERRIES)) {
             // CraftBukkit start
-            if (CraftEventFactory.callEntityChangeBlockEvent(entity, blockPos, (BlockState) blockState.setValue(CaveVines.BERRIES, false)).isCancelled()) {
+            if (!CraftEventFactory.callEntityChangeBlockEvent(entity, blockPos, (BlockState) blockState.setValue(CaveVines.BERRIES, false))) {
                 return InteractionResult.SUCCESS;
             }
 

@@ -35,7 +35,7 @@ public abstract class MixinAbstractHorse extends Animal implements InjectionAbst
         this.maxDomestication = 100;
     }
 
-    @Redirect(method = "createInventory", at = @At(value = "NEW", target = "net/minecraft/world/SimpleContainer"))
+    @Redirect(method = "createInventory", at = @At(value = "NEW", args = "class=net/minecraft/world/SimpleContainer"))
     private SimpleContainer banner$createInv(int slots) {
         SimpleContainer inventory = new SimpleContainer(slots);
         inventory.setOwner((InventoryHolder) this.getBukkitEntity());
@@ -72,8 +72,7 @@ public abstract class MixinAbstractHorse extends Animal implements InjectionAbst
         } else {
             power = 0.4F + 0.4F * (float) i / 90.0F;
         }
-        HorseJumpEvent event = CraftEventFactory.callHorseJumpEvent((AbstractHorse) (Object) this, power);
-        if (event.isCancelled()) {
+        if (!CraftEventFactory.callHorseJumpEvent((AbstractHorse) (Object) this, power)) {
             ci.cancel();
         }
     }

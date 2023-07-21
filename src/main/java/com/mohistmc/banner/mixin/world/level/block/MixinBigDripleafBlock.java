@@ -29,7 +29,7 @@ public class MixinBigDripleafBlock {
 
     @Inject(method = "onProjectileHit", cancellable = true, at = @At("HEAD"))
     private void banner$projectileHit(Level level, BlockState state, BlockHitResult hitResult, Projectile projectile, CallbackInfo ci) {
-        if (DistValidate.isValid(level) && CraftEventFactory.callEntityChangeBlockEvent(projectile, hitResult.getBlockPos(), state.setValue(TILT, Tilt.FULL)).isCancelled()) {
+        if (DistValidate.isValid(level) && !CraftEventFactory.callEntityChangeBlockEvent(projectile, hitResult.getBlockPos(), state.setValue(TILT, Tilt.FULL))) {
             ci.cancel();
         }
     }
@@ -49,7 +49,7 @@ public class MixinBigDripleafBlock {
             ci.cancel();
             return;
         }
-        if (CraftEventFactory.callEntityChangeBlockEvent(entity, pos, state.setValue(TILT, Tilt.FULL)).isCancelled()) {
+        if (!CraftEventFactory.callEntityChangeBlockEvent(entity, pos, state.setValue(TILT, Tilt.FULL))) {
             ci.cancel();
         }
     }

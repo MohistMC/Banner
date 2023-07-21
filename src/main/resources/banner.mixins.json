@@ -182,6 +182,7 @@
     "world.entity.animal.MixinSniffer",
     "world.entity.animal.MixinSnowGolem",
     "world.entity.animal.MixinTurtle",
+    "world.entity.animal.MixinTurtle_LayEggGoal",
     "world.entity.animal.MixinWolf",
     "world.entity.animal.axolotl.MixinAxolotl",
     "world.entity.animal.frog.MixinTadpole",

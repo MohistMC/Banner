@@ -41,7 +41,7 @@ public abstract class MixinItemEntity extends Entity {
 
     @Inject(method = "merge(Lnet/minecraft/world/entity/item/ItemEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/item/ItemEntity;Lnet/minecraft/world/item/ItemStack;)V", cancellable = true, at = @At("HEAD"))
     private static void banner$itemMerge(ItemEntity from, ItemStack stack1, ItemEntity to, ItemStack stack2, CallbackInfo ci) {
-        if (CraftEventFactory.callItemMergeEvent(to, from).isCancelled()) {
+        if (!CraftEventFactory.callItemMergeEvent(to, from)) {
             ci.cancel();
         }
     }

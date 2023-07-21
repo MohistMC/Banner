@@ -75,7 +75,7 @@ public abstract class MixinRedStoneOreBlock {
 
     @Inject(method = "interact", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
     private static void banner$entityChangeBlock(BlockState blockState, Level world, BlockPos blockPos, CallbackInfo ci) {
-        if (CraftEventFactory.callEntityChangeBlockEvent(banner$entity, blockPos, blockState.setValue(RedStoneOreBlock.LIT, true)).isCancelled()) {
+        if (!CraftEventFactory.callEntityChangeBlockEvent(banner$entity, blockPos, blockState.setValue(RedStoneOreBlock.LIT, true))) {
             ci.cancel();
         }
         banner$entity = null;

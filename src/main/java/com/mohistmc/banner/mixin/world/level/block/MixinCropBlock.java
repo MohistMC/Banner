@@ -42,7 +42,7 @@ public class MixinCropBlock {
 
     @Redirect(method = "entityInside", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z"))
     public boolean banner$entityChangeBlock(GameRules instance, GameRules.Key<GameRules.BooleanValue> key) {
-       return !CraftEventFactory.callEntityChangeBlockEvent(banner$entity.get(), banner$pos.get(), Blocks.AIR.defaultBlockState(), !banner$level.get().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)).isCancelled();
+       return CraftEventFactory.callEntityChangeBlockEvent(banner$entity.get(), banner$pos.get(), Blocks.AIR.defaultBlockState(), !banner$level.get().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING));
     }
 
     @Redirect(method = "randomTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))

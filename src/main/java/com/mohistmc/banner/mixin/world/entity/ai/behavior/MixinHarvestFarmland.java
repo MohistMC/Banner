@@ -46,7 +46,7 @@ public abstract class MixinHarvestFarmland extends Behavior<Villager> {
     @WrapWithCondition(method = "tick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/npc/Villager;J)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;destroyBlock(Lnet/minecraft/core/BlockPos;ZLnet/minecraft/world/entity/Entity;)Z"))
     private boolean banner$callFarmEvent(ServerLevel instance, BlockPos pos, boolean b, Entity entity) {
-        return !CraftEventFactory.callEntityChangeBlockEvent(entity, this.aboveFarmlandPos, Blocks.AIR.defaultBlockState()).isCancelled();
+        return CraftEventFactory.callEntityChangeBlockEvent(entity, this.aboveFarmlandPos, Blocks.AIR.defaultBlockState());
     }
 
     @Inject(method = "tick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/npc/Villager;J)V", at = @At("HEAD"))
@@ -69,7 +69,7 @@ public abstract class MixinHarvestFarmland extends Behavior<Villager> {
     slice = @Slice(to = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;gameEvent(Lnet/minecraft/world/level/gameevent/GameEvent;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/gameevent/GameEvent$Context;)V")))
     private boolean banner$addPlantCheck(ServerLevel instance, BlockPos pos, BlockState state) {
         banner$planted.set(state.getBlock());
-        if (banner$planted.get() != null && !CraftEventFactory.callEntityChangeBlockEvent(banner$villager.get(), this.aboveFarmlandPos, banner$planted.get().defaultBlockState()).isCancelled()) {
+        if (banner$planted.get() != null && CraftEventFactory.callEntityChangeBlockEvent(banner$villager.get(), this.aboveFarmlandPos, banner$planted.get().defaultBlockState())) {
             instance.setBlockAndUpdate(this.aboveFarmlandPos, banner$planted.get().defaultBlockState());
             instance.gameEvent(GameEvent.BLOCK_PLACE, this.aboveFarmlandPos, GameEvent.Context.of(banner$villager.get(), banner$planted.get().defaultBlockState()));
             banner$flag.set(true);

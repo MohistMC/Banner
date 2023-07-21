@@ -704,14 +704,14 @@ public class CraftEventFactory {
     /**
      * ItemMergeEvent
      */
-    public static ItemMergeEvent callItemMergeEvent(ItemEntity merging, ItemEntity mergingWith) {
+    public static boolean callItemMergeEvent(ItemEntity merging, ItemEntity mergingWith) {
         org.bukkit.entity.Item entityMerging = (org.bukkit.entity.Item) merging.getBukkitEntity();
         org.bukkit.entity.Item entityMergingWith = (org.bukkit.entity.Item) mergingWith.getBukkitEntity();
 
         ItemMergeEvent event = new ItemMergeEvent(entityMerging, entityMergingWith);
 
         Bukkit.getPluginManager().callEvent(event);
-        return event;
+        return !event.isCancelled();
     }
 
     /**
@@ -1185,23 +1185,23 @@ public class CraftEventFactory {
         return event;
     }
 
-    public static HorseJumpEvent callHorseJumpEvent(Entity horse, float power) {
+    public static boolean callHorseJumpEvent(Entity horse, float power) {
         HorseJumpEvent event = new HorseJumpEvent((AbstractHorse) horse.getBukkitEntity(), power);
         horse.getBukkitEntity().getServer().getPluginManager().callEvent(event);
-        return event;
+        return !event.isCancelled();
     }
 
-    public static EntityChangeBlockEvent callEntityChangeBlockEvent(Entity entity, BlockPos position, net.minecraft.world.level.block.state.BlockState newBlock) {
+    public static boolean callEntityChangeBlockEvent(Entity entity, BlockPos position, net.minecraft.world.level.block.state.BlockState newBlock) {
         return callEntityChangeBlockEvent(entity, position, newBlock, false);
     }
 
-    public static EntityChangeBlockEvent callEntityChangeBlockEvent(Entity entity, BlockPos position, net.minecraft.world.level.block.state.BlockState newBlock, boolean cancelled) {
+    public static boolean callEntityChangeBlockEvent(Entity entity, BlockPos position, net.minecraft.world.level.block.state.BlockState newBlock, boolean cancelled) {
         Block block = entity.level().getWorld().getBlockAt(position.getX(), position.getY(), position.getZ());
 
         EntityChangeBlockEvent event = new EntityChangeBlockEvent(entity.getBukkitEntity(), block, CraftBlockData.fromData(newBlock));
         event.setCancelled(cancelled);
         event.getEntity().getServer().getPluginManager().callEvent(event);
-        return event;
+        return !event.isCancelled();
     }
 
     public static CreeperPowerEvent callCreeperPowerEvent(Entity creeper, Entity lightning, CreeperPowerEvent.PowerCause cause) {

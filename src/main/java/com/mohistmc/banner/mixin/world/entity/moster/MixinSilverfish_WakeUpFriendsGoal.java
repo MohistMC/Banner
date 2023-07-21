@@ -43,7 +43,7 @@ public abstract class MixinSilverfish_WakeUpFriendsGoal extends Goal {
                         Block block = blockState.getBlock();
                         if (block instanceof InfestedBlock) {
                             // CraftBukkit start
-                            if (CraftEventFactory.callEntityChangeBlockEvent(this.silverfish, blockPos2, Blocks.AIR.defaultBlockState()).isCancelled()) {
+                            if (!CraftEventFactory.callEntityChangeBlockEvent(this.silverfish, blockPos2, Blocks.AIR.defaultBlockState())) {
                                 continue;
                             }
                             if (level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
