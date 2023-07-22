@@ -35,10 +35,10 @@ public abstract class MixinChunkHolder implements InjectionChunkHolder {
     @Shadow public abstract CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> getFutureIfPresentUnchecked(ChunkStatus p_219301_1_);
     @Shadow @Final private ShortSet[] changedBlocksPerSection;
     @Shadow private int ticketLevel;
+    @Shadow @Final ChunkPos pos;
     // @formatter:on
-
-    @Shadow @Final private ChunkPos pos;
     public final BukkitCallbackExecutor callbackExecutor = new BukkitCallbackExecutor();
+
 
     @Override
     public LevelChunk getFullChunkNow() {

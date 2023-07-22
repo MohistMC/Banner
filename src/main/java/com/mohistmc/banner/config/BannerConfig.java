@@ -124,6 +124,7 @@ public class BannerConfig {
     public static String libraries_downloadsource;
     public static String lang;
     public static boolean showLogo;
+    public static boolean isSymlinkWorld;
 
     private static void banner() {
         check_update = getBoolean("banner.check_update", false);
@@ -134,5 +135,6 @@ public class BannerConfig {
         maximumRepairCost = getInt("anvilfix.maximumrepaircost", 40);
         enchantment_fix = getBoolean("anvilfix.enchantment_fix", false);
         max_enchantment_level = getInt("anvilfix.max_enchantment_level", 32767);
+        isSymlinkWorld = getBoolean("compat.symlink_world", false);
     }
 }

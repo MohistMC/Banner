@@ -26,12 +26,13 @@ import org.bukkit.craftbukkit.v1_20_R1.generator.strucutre.CraftStructure;
 import org.bukkit.craftbukkit.v1_20_R1.util.RandomSourceWrapper;
 import org.bukkit.generator.BlockPopulator;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -41,13 +42,14 @@ public abstract class MixinChunkGenerator implements InjectionChunkGenerator {
 
     // @formatter:off
     @Shadow public abstract void applyBiomeDecoration(WorldGenLevel p_187712_, ChunkAccess p_187713_, StructureManager p_187714_);
-    @Shadow
-    @Mutable
-    public BiomeSource biomeSource;
     // @formatter:on
 
     @Shadow
-    private static int fetchReferences(StructureManager structureManager, ChunkAccess chunk, SectionPos sectionPos, Structure structure) {return 0;}
+    private static int fetchReferences(StructureManager structureManager, ChunkAccess chunk, SectionPos sectionPos, Structure structure) {
+        return 0;
+    }
+
+    @Shadow public BiomeSource biomeSource;
 
     @Inject(method = "applyBiomeDecoration", at = @At("RETURN"))
     private void banner$addBukkitDecoration(WorldGenLevel level, ChunkAccess chunkAccess, StructureManager manager, CallbackInfo ci) {

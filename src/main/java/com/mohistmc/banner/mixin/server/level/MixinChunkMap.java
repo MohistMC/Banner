@@ -1,5 +1,7 @@
 package com.mohistmc.banner.mixin.server.level;
 
+import com.mohistmc.banner.bukkit.BukkitCallbackExecutor;
+import com.mohistmc.banner.injection.server.level.InjectionChunkMap;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.Tag;
@@ -38,7 +40,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @Mixin(ChunkMap.class)
-public abstract class MixinChunkMap extends ChunkStorage {
+public abstract class MixinChunkMap extends ChunkStorage implements InjectionChunkMap {
 
     // @formatter:off
     @Shadow protected abstract void tick();
@@ -46,6 +48,8 @@ public abstract class MixinChunkMap extends ChunkStorage {
     @Shadow @Final public ServerLevel level;
     @Shadow @Final @Mutable private RandomState randomState;
     // @formatter:on
+
+    public final BukkitCallbackExecutor callbackExecutor = new BukkitCallbackExecutor();
 
     public MixinChunkMap(Path path, DataFixer dataFixer, boolean bl) {
         super(path, dataFixer, bl);
@@ -92,4 +96,8 @@ public abstract class MixinChunkMap extends ChunkStorage {
         // CraftBukkit end
     }
 
+    @Override
+    public BukkitCallbackExecutor bridge$callbackExecutor() {
+        return callbackExecutor;
+    }
 }

@@ -55,12 +55,12 @@ public abstract class MixinPersistentEntitySectionManager<T extends EntityAccess
         }
     }
 
-
     /**
      * @author wdog5
-     * @reason
+     * @reason bukkit
      */
     @Overwrite
+    @SuppressWarnings("all")
     private boolean storeChunkSections(long l, Consumer<T> consumer) {
         PersistentEntitySectionManager.ChunkLoadStatus chunkLoadStatus = (PersistentEntitySectionManager.ChunkLoadStatus)this.chunkLoadStatuses.get(l);
         if (chunkLoadStatus == PersistentEntitySectionManager.ChunkLoadStatus.PENDING) {
