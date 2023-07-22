@@ -90,6 +90,7 @@
       "net/minecraft/class_3222": ["com/mohistmc/banner/injection/server/level/InjectionServerPlayer"],
       "net/minecraft/class_3193": ["com/mohistmc/banner/injection/server/level/InjectionChunkHolder"],
       "net/minecraft/class_3215": ["com/mohistmc/banner/injection/server/level/InjectionServerChunkCache"],
+      "net/minecraft/class_3898": ["com/mohistmc/banner/injection/server/level/InjectionChunkMap"],
       "net/minecraft/class_3204": ["com/mohistmc/banner/injection/server/level/InjectionDistanceManager"],
       "net/minecraft/class_3218": ["com/mohistmc/banner/injection/server/level/InjectionServerLevel"],
       "net/minecraft/class_3225": ["com/mohistmc/banner/injection/server/level/InjectionServerPlayerGameMode"],
