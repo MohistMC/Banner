@@ -13,10 +13,10 @@
 [![]()](https://bstats.org/plugin/server-implementation/Mohist/6762)
 </div>
 
-| Version | Support | Stability | Mod compatibility   | Plugin compatibility |
-|---------|---------|-----------|---------------------|----------------------|
-| 1.20.x  | Active  | Beta      | Better than plugins | Good                 |
-| 1.19.4  | WIP     | Poor      | Better than plugins | Poor                 |
+| Version | Support     | Stability | Mod compatibility   | Plugin compatibility |
+|---------|-------------|-----------|---------------------|----------------------|
+| 1.20.x  | Active      | Beta      | Better than plugins | Good                 |
+| 1.19.4  | End Of Life | Poor      | Poor                | Poor                 |
 
 ## Notice
 - Fabric + Bukkit is more vanilla-like than Forge + Bukkit
