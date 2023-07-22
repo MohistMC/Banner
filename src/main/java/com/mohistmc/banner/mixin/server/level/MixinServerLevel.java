@@ -384,13 +384,14 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         }
     }
 
-    @Inject(method = "save", at = @At("RETURN"))
-    private void banner$saveLevelDat(ProgressListener progress, boolean flush, boolean skipSave, CallbackInfo ci) {
-        if (this.serverLevelData instanceof PrimaryLevelData worldInfo) {
-            worldInfo.setWorldBorder(this.getWorldBorder().createSettings());
-            worldInfo.setCustomBossEvents(BukkitExtraConstants.getServer().getCustomBossEvents().save());
-            this.convertable.saveDataTag(BukkitExtraConstants.getServer().registryAccess(), worldInfo, BukkitExtraConstants.getServer().getPlayerList().getSingleplayerData());
-        }
+    @Inject(method = "save", at = @At("TAIL"))
+    private void banner$saveAllChunks(ProgressListener progress, boolean flush, boolean skipSave, CallbackInfo ci) {
+        // CraftBukkit start - moved from MinecraftServer.saveAllChunks
+        ServerLevel worldserver1 = ((ServerLevel) (Object) this);
+        K.setWorldBorder(worldserver1.getWorldBorder().createSettings());
+        K.setCustomBossEvents(this.server.getCustomBossEvents().save());
+        convertable.saveDataTag(this.server.registryAccess(), K, this.server.getPlayerList().getSingleplayerData());
+        // CraftBukkit end
     }
 
     @Inject(method = "unload", at = @At("HEAD"))

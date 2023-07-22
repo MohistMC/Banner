@@ -26,6 +26,7 @@ import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.ChatDecorator;
@@ -672,15 +673,17 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     }
 
+
+    /*
     @Inject(method = "saveAllChunks",
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/server/players/PlayerList;getSingleplayerData()Lnet/minecraft/nbt/CompoundTag;",
             shift = At.Shift.AFTER))
     private void banner$saveAllLevel(boolean suppressLog, boolean flush, boolean forced,
                                      CallbackInfoReturnable<Boolean> cir) {
-        // Banner start - Save level.dat to all plugin world
+        // Banner start - Save level.dat to all modded/plugins worlds
         for (ServerLevel banner$level : this.levels.values()) {
-            if (banner$level.bridge$convertable() != this.storageSource) {
+            if (banner$level != overworld()) {
                 banner$level.bridge$serverLevelDataCB().setWorldBorder(banner$level.serverLevelData.getWorldBorder());
                 banner$level.bridge$serverLevelDataCB().setCustomBossEvents(this.getCustomBossEvents().save());
                 banner$level.bridge$convertable().saveDataTag(this.registryAccess(), this.worldData,
@@ -688,7 +691,21 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             }
         }
         // Banner end
-    }
+    }*/
+
+    // Banner start - move world saving
+    @Redirect(method = "saveAllChunks", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/storage/ServerLevelData;setWorldBorder(Lnet/minecraft/world/level/border/WorldBorder$Settings;)V"))
+    private void banner$cancelSaveWorldBorder(ServerLevelData instance, WorldBorder.Settings settings) { }
+
+    @Redirect(method = "saveAllChunks",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/storage/WorldData;setCustomBossEvents(Lnet/minecraft/nbt/CompoundTag;)V"))
+    private void banner$cancelSaveCustomEvents(WorldData instance, CompoundTag compoundTag) { }
+
+    @Redirect(method = "saveAllChunks", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;saveDataTag(Lnet/minecraft/core/RegistryAccess;Lnet/minecraft/world/level/storage/WorldData;Lnet/minecraft/nbt/CompoundTag;)V"))
+    private void banner$cancelSaveDataTag(LevelStorageSource.LevelStorageAccess instance, RegistryAccess registries, WorldData serverConfiguration, CompoundTag hostPlayerNBT) { }
 
     @Override
     public void executeModerately() {
