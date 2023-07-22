@@ -29,7 +29,6 @@ import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.PluginLoadOrder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -92,12 +91,8 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         this.banner$setRemoteConsole(new CraftRemoteConsoleCommandSender(this.rconConsoleSource));
     }
 
-    /**
-     * @author wdog5
-     * @reason bukkit
-     */
-    @Overwrite
-    public String getPluginNames() {
+    @Inject(method = "getPluginNames", at = @At("RETURN"), cancellable = true)
+    private void banner$setPluginNames(CallbackInfoReturnable<String> cir) {
         StringBuilder result = new StringBuilder();
         org.bukkit.plugin.Plugin[] plugins = bridge$server().getPluginManager().getPlugins();
 
@@ -119,7 +114,7 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
             }
         }
 
-        return result.toString();
+        cir.setReturnValue(result.toString());
     }
 
     @Inject(method = "handleConsoleInput", at = @At("HEAD"))

@@ -1,11 +1,13 @@
 package com.mohistmc.banner.fabric;
 
 import com.mojang.serialization.Lifecycle;
+import net.minecraft.CrashReportCategory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.levelgen.WorldOptions;
@@ -20,9 +22,37 @@ public class BannerDerivedWorldInfo extends PrimaryLevelData {
 
     private final DerivedLevelData derivedWorldInfo;
 
-    public BannerDerivedWorldInfo(LevelSettings levelSettings, WorldOptions worldOptions, SpecialWorldProperty specialWorldProperty, Lifecycle lifecycle, DerivedLevelData derivedLevelData) {
+    public BannerDerivedWorldInfo(DerivedLevelData derivedWorldInfo, LevelSettings levelSettings, WorldOptions worldOptions, SpecialWorldProperty specialWorldProperty, Lifecycle lifecycle) {
         super(levelSettings, worldOptions, specialWorldProperty, lifecycle);
-        this.derivedWorldInfo = derivedLevelData;
+        this.derivedWorldInfo = derivedWorldInfo;
+    }
+
+    public static BannerDerivedWorldInfo create(DerivedLevelData worldInfo) {
+        return new BannerDerivedWorldInfo(worldInfo, worldSettings(worldInfo), generatorSettings(worldInfo), null, lifecycle(worldInfo));
+    }
+
+    private static LevelSettings worldSettings(ServerLevelData worldInfo) {
+        if (worldInfo instanceof PrimaryLevelData) {
+            return ((PrimaryLevelData) worldInfo).settings;
+        } else {
+            return worldSettings(((DerivedLevelData) worldInfo).wrapped);
+        }
+    }
+
+    private static WorldOptions generatorSettings(ServerLevelData worldInfo) {
+        if (worldInfo instanceof PrimaryLevelData) {
+            return ((PrimaryLevelData) worldInfo).worldGenOptions();
+        } else {
+            return generatorSettings(((DerivedLevelData) worldInfo).wrapped);
+        }
+    }
+
+    private static Lifecycle lifecycle(ServerLevelData worldInfo) {
+        if (worldInfo instanceof PrimaryLevelData) {
+            return ((PrimaryLevelData) worldInfo).worldGenSettingsLifecycle();
+        } else {
+            return lifecycle(((DerivedLevelData) worldInfo).wrapped);
+        }
     }
 
     @Override
@@ -31,8 +61,18 @@ public class BannerDerivedWorldInfo extends PrimaryLevelData {
     }
 
     @Override
+    public void setXSpawn(int x) {
+        derivedWorldInfo.setXSpawn(x);
+    }
+
+    @Override
     public int getYSpawn() {
         return derivedWorldInfo.getYSpawn();
+    }
+
+    @Override
+    public void setYSpawn(int y) {
+        derivedWorldInfo.setYSpawn(y);
     }
 
     @Override
@@ -41,8 +81,18 @@ public class BannerDerivedWorldInfo extends PrimaryLevelData {
     }
 
     @Override
+    public void setZSpawn(int z) {
+        derivedWorldInfo.setZSpawn(z);
+    }
+
+    @Override
     public float getSpawnAngle() {
         return derivedWorldInfo.getSpawnAngle();
+    }
+
+    @Override
+    public void setSpawnAngle(float angle) {
+        derivedWorldInfo.setSpawnAngle(angle);
     }
 
     @Override
@@ -51,8 +101,18 @@ public class BannerDerivedWorldInfo extends PrimaryLevelData {
     }
 
     @Override
+    public void setGameTime(long time) {
+        derivedWorldInfo.setGameTime(time);
+    }
+
+    @Override
     public long getDayTime() {
         return derivedWorldInfo.getDayTime();
+    }
+
+    @Override
+    public void setDayTime(long time) {
+        derivedWorldInfo.setDayTime(time);
     }
 
     @Override
@@ -76,63 +136,13 @@ public class BannerDerivedWorldInfo extends PrimaryLevelData {
     }
 
     @Override
-    public int getThunderTime() {
-        return derivedWorldInfo.getThunderTime();
-    }
-
-    @Override
-    public boolean isRaining() {
-        return derivedWorldInfo.isRaining();
-    }
-
-    @Override
-    public int getRainTime() {
-        return derivedWorldInfo.getRainTime();
-    }
-
-    @Override
-    public GameType getGameType() {
-        return derivedWorldInfo.getGameType();
-    }
-
-    @Override
-    public void setXSpawn(int x) {
-        derivedWorldInfo.setXSpawn(x);
-    }
-
-    @Override
-    public void setYSpawn(int y) {
-        derivedWorldInfo.setYSpawn(y);
-    }
-
-    @Override
-    public void setZSpawn(int z) {
-        derivedWorldInfo.setZSpawn(z);
-    }
-
-    @Override
-    public void setSpawnAngle(float angle) {
-        derivedWorldInfo.setSpawnAngle(angle);
-    }
-
-    @Override
-    public void setGameTime(long time) {
-        derivedWorldInfo.setGameTime(time);
-    }
-
-    @Override
-    public void setDayTime(long time) {
-        derivedWorldInfo.setDayTime(time);
-    }
-
-    @Override
-    public void setSpawn(BlockPos spawnPoint, float angle) {
-        derivedWorldInfo.setSpawn(spawnPoint, angle);
-    }
-
-    @Override
     public void setThundering(boolean thunderingIn) {
         derivedWorldInfo.setThundering(thunderingIn);
+    }
+
+    @Override
+    public int getThunderTime() {
+        return derivedWorldInfo.getThunderTime();
     }
 
     @Override
@@ -141,8 +151,18 @@ public class BannerDerivedWorldInfo extends PrimaryLevelData {
     }
 
     @Override
+    public boolean isRaining() {
+        return derivedWorldInfo.isRaining();
+    }
+
+    @Override
     public void setRaining(boolean isRaining) {
         derivedWorldInfo.setRaining(isRaining);
+    }
+
+    @Override
+    public int getRainTime() {
+        return derivedWorldInfo.getRainTime();
     }
 
     @Override
@@ -151,8 +171,18 @@ public class BannerDerivedWorldInfo extends PrimaryLevelData {
     }
 
     @Override
+    public GameType getGameType() {
+        return derivedWorldInfo.getGameType();
+    }
+
+    @Override
     public void setGameType(GameType type) {
         derivedWorldInfo.setGameType(type);
+    }
+
+    @Override
+    public void setSpawn(BlockPos spawnPoint, float angle) {
+        derivedWorldInfo.setSpawn(spawnPoint, angle);
     }
 
     @Override
@@ -230,42 +260,8 @@ public class BannerDerivedWorldInfo extends PrimaryLevelData {
         derivedWorldInfo.setWanderingTraderId(id);
     }
 
-    public static BannerDerivedWorldInfo wrap(DerivedLevelData worldInfo) {
-        return new BannerDerivedWorldInfo(worldSettings(worldInfo), generatorSettings(worldInfo), specialWorldProperty(worldInfo), lifecycle(worldInfo), worldInfo);
-    }
-
-    private static LevelSettings worldSettings(ServerLevelData worldInfo) {
-        if (worldInfo instanceof PrimaryLevelData) {
-            return ((PrimaryLevelData) worldInfo).settings;
-        } else {
-            return worldSettings(((DerivedLevelData) worldInfo).wrapped);
-        }
-    }
-
-    private static WorldOptions generatorSettings(ServerLevelData worldInfo) {
-        if (worldInfo instanceof PrimaryLevelData) {
-            return ((PrimaryLevelData) worldInfo).worldGenOptions();
-        } else {
-            return generatorSettings(((DerivedLevelData) worldInfo).wrapped);
-        }
-    }
-
-    private static SpecialWorldProperty specialWorldProperty(ServerLevelData serverLevelData) {
-        if (serverLevelData instanceof PrimaryLevelData) {
-            return ((PrimaryLevelData) serverLevelData).isFlatWorld() ?
-                    SpecialWorldProperty.FLAT : (
-                    ((PrimaryLevelData) serverLevelData).isDebugWorld() ? SpecialWorldProperty.DEBUG : SpecialWorldProperty.NONE
-            );
-        } else {
-            return specialWorldProperty(((DerivedLevelData) serverLevelData).wrapped);
-        }
-    }
-
-    private static Lifecycle lifecycle(ServerLevelData worldInfo) {
-        if (worldInfo instanceof PrimaryLevelData) {
-            return ((PrimaryLevelData) worldInfo).worldGenSettingsLifecycle();
-        } else {
-            return lifecycle(((DerivedLevelData) worldInfo).wrapped);
-        }
+    @Override
+    public void fillCrashReportCategory(CrashReportCategory reportCategory, LevelHeightAccessor heightAccessor) {
+        derivedWorldInfo.fillCrashReportCategory(reportCategory, heightAccessor);
     }
 }
