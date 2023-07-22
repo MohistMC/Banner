@@ -1,15 +1,11 @@
 package com.mohistmc.banner.mixin.server;
 
-import com.google.common.collect.ImmutableList;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
 import com.mojang.datafixers.DataFixer;
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.Lifecycle;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import jline.console.ConsoleReader;
 import joptsimple.OptionParser;
@@ -21,18 +17,12 @@ import net.minecraft.SystemReport;
 import net.minecraft.Util;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.ChatDecorator;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 import net.minecraft.network.protocol.status.ServerStatus;
-import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.RegistryLayer;
@@ -41,8 +31,6 @@ import net.minecraft.server.TickTask;
 import net.minecraft.server.WorldLoader;
 import net.minecraft.server.WorldStem;
 import net.minecraft.server.bossevents.CustomBossEvents;
-import net.minecraft.server.dedicated.DedicatedServer;
-import net.minecraft.server.dedicated.DedicatedServerProperties;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -54,28 +42,15 @@ import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.ModCheck;
 import net.minecraft.util.Unit;
-import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.util.profiling.jfr.JvmProfiler;
 import net.minecraft.util.thread.ReentrantBlockableEventLoop;
-import net.minecraft.world.RandomSequences;
-import net.minecraft.world.entity.ai.village.VillageSiege;
-import net.minecraft.world.entity.npc.CatSpawner;
-import net.minecraft.world.entity.npc.WanderingTraderSpawner;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.ForcedChunksSavedData;
 import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.LevelSettings;
-import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.border.WorldBorder;
-import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.PatrolSpawner;
-import net.minecraft.world.level.levelgen.PhantomSpawner;
-import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.minecraft.world.level.levelgen.WorldOptions;
-import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import net.minecraft.world.level.storage.CommandStorage;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -103,7 +78,6 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -392,10 +366,11 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         try { Thread.sleep(100); } catch (InterruptedException ex) {} // CraftBukkit - SPIGOT-625 - give server at least a chance to send packets
     }
 
-    @Inject(method = "createLevels", at = @At("RETURN"))
-    public void banner$enablePlugins(ChunkProgressListener p_240787_1_, CallbackInfo ci) {
+    @Inject(method = "loadLevel", at = @At("RETURN"))
+    public void banner$enablePlugins(CallbackInfo ci) {
         this.server.enablePlugins(PluginLoadOrder.POSTWORLD);
         this.server.getPluginManager().callEvent(new ServerLoadEvent(ServerLoadEvent.LoadType.STARTUP));
+        this.connection.acceptConnections();
     }
 
     @Inject(method = "createLevels", at = @At(value = "INVOKE", remap = false,

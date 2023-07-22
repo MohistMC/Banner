@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.server.level;
 
-import com.mohistmc.banner.bukkit.BukkitCallbackExecutor;
 import com.mohistmc.banner.injection.server.level.InjectionChunkHolder;
 import com.mojang.datafixers.util.Either;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
@@ -37,8 +36,6 @@ public abstract class MixinChunkHolder implements InjectionChunkHolder {
     @Shadow private int ticketLevel;
     @Shadow @Final ChunkPos pos;
     // @formatter:on
-    public final BukkitCallbackExecutor callbackExecutor = new BukkitCallbackExecutor();
-
 
     @Override
     public LevelChunk getFullChunkNow() {
@@ -73,7 +70,7 @@ public abstract class MixinChunkHolder implements InjectionChunkHolder {
             this.getFutureIfPresentUnchecked(ChunkStatus.FULL).thenAccept((either) -> {
                 LevelChunk chunk = (LevelChunk)either.left().orElse(null);
                 if (chunk != null) {
-                    callbackExecutor.execute(() -> {
+                    chunkMap.bridge$callbackExecutor().execute(() -> {
                         // Minecraft will apply the chunks tick lists to the world once the chunk got loaded, and then store the tick
                         // lists again inside the chunk once the chunk becomes inaccessible and set the chunk's needsSaving flag.
                         // These actions may however happen deferred, so we manually set the needsSaving flag already here.
@@ -88,7 +85,7 @@ public abstract class MixinChunkHolder implements InjectionChunkHolder {
             });
 
             // Run callback right away if the future was already done
-            callbackExecutor.run();
+            chunkMap.bridge$callbackExecutor().run();
         }
         // CraftBukkit end
     }
@@ -101,7 +98,7 @@ public abstract class MixinChunkHolder implements InjectionChunkHolder {
             this.getFutureIfPresentUnchecked(ChunkStatus.FULL).thenAccept((either) -> {
                 LevelChunk chunk = (LevelChunk)either.left().orElse(null);
                 if (chunk != null) {
-                    callbackExecutor.execute(() -> {
+                    chunkMap.bridge$callbackExecutor().execute(() -> {
                         chunk.loadCallback();
                     });
                 }
@@ -112,7 +109,7 @@ public abstract class MixinChunkHolder implements InjectionChunkHolder {
             });
 
             // Run callback right away if the future was already done
-            callbackExecutor.run();
+            chunkMap.bridge$callbackExecutor().run();
         }
         // CraftBukkit end
     }
