@@ -13,6 +13,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.storage.LevelData;
 import org.bukkit.entity.SpawnCategory;
 import org.spongepowered.asm.mixin.Final;
@@ -49,6 +50,15 @@ public abstract class MixinServerChunkCache implements InjectionServerChunkCache
     public boolean isChunkLoaded(final int chunkX, final int chunkZ) {
         ChunkHolder chunk =  this.chunkMap.getUpdatingChunkIfPresent(ChunkPos.asLong(chunkX, chunkZ));
         return chunk != null &&  chunk.getFullChunkNow() != null;
+    }
+
+    @Override
+    public LevelChunk getChunkUnchecked(int chunkX, int chunkZ) {
+        ChunkHolder chunk =  this.chunkMap.getUpdatingChunkIfPresent(ChunkPos.asLong(chunkX, chunkZ));
+        if (chunk == null) {
+            return null;
+        }
+        return chunk.getFullChunkNowUnchecked();
     }
 
     @ModifyVariable(method = "getChunkFutureMainThread", index = 4, at = @At("HEAD"), argsOnly = true)

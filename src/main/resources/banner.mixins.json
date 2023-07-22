@@ -78,6 +78,7 @@
     "server.level.MixinChunkMap_TrackedEntity",
     "server.level.MixinDistanceManager",
     "server.level.MixinServerChunkCache",
+    "server.level.MixinServerChunkCache_MainThreadExecutor",
     "server.level.MixinServerEntity",
     "server.level.MixinServerLevel",
     "server.level.MixinServerLevel_EntityCallbacks",
