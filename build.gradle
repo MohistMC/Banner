@@ -53,7 +53,20 @@ dependencies {
 		parchment("org.parchmentmc.data:parchment-1.20.1:2023.06.26@zip")
 	}
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	// Make a collection of all api modules we wish to use
+	Set<String> apiModules = [
+			"fabric-api-base",
+			"fabric-events-interaction-v0",
+			"fabric-entity-events-v1",
+			"fabric-lifecycle-events-v1",
+			"fabric-transitive-access-wideners-v1"
+	]
+
+	// Add each module as a dependency
+	apiModules.forEach {
+		include(modImplementation(fabricApi.module(it, "${project.fabric_version}")))
+	}
 
 	// bukkit
 	implementation(include("org.yaml:snakeyaml:1.33"))
