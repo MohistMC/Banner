@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.level;
 
-import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import com.mohistmc.banner.fabric.WrappedWorlds;
@@ -63,7 +62,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.CancellationException;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.lang.reflect.Field;
@@ -99,6 +97,8 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     @Shadow public abstract void onBlockStateChange(BlockPos pos, BlockState blockState, BlockState newState);
 
     @Shadow @Nullable public abstract MinecraftServer getServer();
+
+    @Shadow @Final private ResourceKey<Level> dimension;
     private CraftWorld world;
     public boolean pvpMode;
     public boolean keepSpawnInMemory = true;
@@ -206,7 +206,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                         generator.biomeSource = biomeSource;
                     }
                     CustomChunkGenerator gen = new CustomChunkGenerator(serverWorld, generator, this.generator);
-                     serverWorld.getChunkSource().chunkMap.generator = gen;
+                    serverWorld.getChunkSource().chunkMap.generator = gen;
                 }
             }
             this.world = new CraftWorld((ServerLevel) (Object) this, generator, biomeProvider, environment);
@@ -293,19 +293,15 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private void banner$physicEvent(BlockPos blockPos, BlockState blockState, int i, int j, CallbackInfoReturnable<Boolean> cir, LevelChunk levelChunk, Block block, BlockState blockState2, BlockState blockState3, int k) {
         CraftWorld world = ((ServerLevel) (Object) this).getWorld();
-        try {
-            if (world != null) {
-                BlockPhysicsEvent event = new BlockPhysicsEvent(world.getBlockAt(blockPos.getX(), blockPos.getY(), blockPos.getZ()), CraftBlockData.fromData(blockState));
-                this.getCraftServer().getPluginManager().callEvent(event);
+        if (world != null) {
+            BlockPhysicsEvent event = new BlockPhysicsEvent(world.getBlockAt(blockPos.getX(), blockPos.getY(), blockPos.getZ()), CraftBlockData.fromData(blockState));
+            this.getCraftServer().getPluginManager().callEvent(event);
 
-                if (event.isCancelled()) {
-                    cir.setReturnValue(true);
-                    cir.cancel();
-                }
-                // CraftBukkit end
+            if (event.isCancelled()) {
+                cir.setReturnValue(true);
+                cir.cancel();
             }
-        } catch (IllegalStateException | CancellationException e) {
-            throw new RuntimeException(e);
+            // CraftBukkit end
         }
     }
 

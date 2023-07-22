@@ -19,7 +19,6 @@ import net.minecraft.world.level.chunk.LightChunk;
 import net.minecraft.world.level.chunk.StructureAccess;
 import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.levelgen.blending.BlendingData;
-import org.bukkit.craftbukkit.v1_20_R1.persistence.CraftPersistentDataTypeRegistry;
 import org.bukkit.craftbukkit.v1_20_R1.persistence.DirtyCraftPersistentDataContainer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,22 +28,22 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Map;
-
 @Mixin(ChunkAccess.class)
 public abstract class MixinChunkAccess implements BlockGetter, BiomeManager.NoiseBiomeSource, LightChunk, StructureAccess, InjectionChunkAccess {
 
-    // @formatter:off
-    @Shadow public abstract int getMinBuildHeight();
     @Shadow public abstract int getHeight();
+
     @Shadow @Final protected LevelChunkSection[] sections;
-    // @formatter:on
+
+    @Shadow public abstract int getMinBuildHeight();
 
     // CraftBukkit start - SPIGOT-6814: move to IChunkAccess to account for 1.17 to 1.18 chunk upgrading.
-    private static final CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new CraftPersistentDataTypeRegistry();
-    public DirtyCraftPersistentDataContainer persistentDataContainer = new DirtyCraftPersistentDataContainer(DATA_TYPE_REGISTRY);
-    public Registry<Biome> biomeRegistry;
+    private static final org.bukkit.craftbukkit.v1_20_R1.persistence.CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY
+            = new org.bukkit.craftbukkit.v1_20_R1.persistence.CraftPersistentDataTypeRegistry();
+    public org.bukkit.craftbukkit.v1_20_R1.persistence.DirtyCraftPersistentDataContainer persistentDataContainer
+            = new org.bukkit.craftbukkit.v1_20_R1.persistence.DirtyCraftPersistentDataContainer(DATA_TYPE_REGISTRY);
     // CraftBukkit end
+    public Registry<Biome> biomeRegistry;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry<Biome>  registry, long l, LevelChunkSection[] levelChunkSections, BlendingData blendingData, CallbackInfo ci) {
@@ -64,6 +63,12 @@ public abstract class MixinChunkAccess implements BlockGetter, BiomeManager.Nois
     }
 
     @Override
+    public void banner$setPersistentDataContainer(DirtyCraftPersistentDataContainer persistentDataContainer) {
+        this.persistentDataContainer = persistentDataContainer;
+    }
+
+
+    @Override
     public void setBiome(int i, int j, int k, Holder<Biome> biome) {
         try {
             int l = QuartPos.fromBlock(this.getMinBuildHeight());
@@ -81,11 +86,6 @@ public abstract class MixinChunkAccess implements BlockGetter, BiomeManager.Nois
             });
             throw new ReportedException(crashreport);
         }
-    }
-
-    @Override
-    public void banner$setPersistentDataContainer(DirtyCraftPersistentDataContainer persistentDataContainer) {
-        this.persistentDataContainer = persistentDataContainer;
     }
 
     @Override

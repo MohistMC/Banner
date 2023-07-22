@@ -15,10 +15,6 @@ import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 
 public interface InjectionMinecraftServer {
 
-    default void bridge$drainQueuedTasks() {
-
-    }
-
     default Commands bridge$getVanillaCommands() {
         return null;
     }

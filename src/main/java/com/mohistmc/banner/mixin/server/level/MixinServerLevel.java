@@ -11,8 +11,6 @@ import com.mohistmc.banner.fabric.BannerDerivedWorldInfo;
 import com.mohistmc.banner.fabric.WorldSymlink;
 import com.mohistmc.banner.injection.server.level.InjectionServerLevel;
 import com.mohistmc.banner.injection.world.level.storage.InjectionLevelStorageAccess;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
@@ -20,7 +18,6 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -237,7 +234,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
 
     @Inject(method = "tick",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerLevel;isDebug()Z"))
+                    target = "Lnet/minecraft/server/level/ServerLevel;isDebug()Z"))
     private void banner$timings(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
         bridge$timings().doTickPending.startTiming(); // Spigot
     }
@@ -451,8 +448,8 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         if (entity.getSelfAndPassengers().map(Entity::getUUID).anyMatch(this.entityManager::isLoaded)) {
             return false;
         }else {
-           pushAddEntityReason(reason);
-           return this.addAllEntities(entity, reason);
+            pushAddEntityReason(reason);
+            return this.addAllEntities(entity, reason);
         }
     }
 
