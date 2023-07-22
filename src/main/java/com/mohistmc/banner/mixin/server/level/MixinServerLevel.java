@@ -6,11 +6,11 @@ import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.bukkit.DistValidate;
 import com.mohistmc.banner.bukkit.LevelPersistentData;
+import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.fabric.BannerDerivedWorldInfo;
+import com.mohistmc.banner.fabric.WorldSymlink;
 import com.mohistmc.banner.injection.server.level.InjectionServerLevel;
 import com.mohistmc.banner.injection.world.level.storage.InjectionLevelStorageAccess;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
@@ -18,7 +18,6 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -167,12 +166,12 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         if (gen != null) {
             this.chunkSource.chunkMap.generator = new CustomChunkGenerator((ServerLevel) (Object) this, this.chunkSource.getGenerator(), gen);
         }
+        getWorld();
     }
 
     @Inject(method = "<init>", at = @At(value = "RETURN"))
     private void banner$initWorldServer(MinecraftServer minecraftServer, Executor executor, LevelStorageSource.LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey resourceKey, LevelStem levelStem, ChunkProgressListener chunkProgressListener, boolean bl, long l, List list, boolean bl2, RandomSequences randomSequences, CallbackInfo ci) {
         this.banner$setPvpMode(minecraftServer.isPvpAllowed());
-        this.uuid = WorldUUID.getUUID(levelStorageAccess.getDimensionPath(this.dimension()).toFile());
         this.convertable = levelStorageAccess;
         var typeKey = ((InjectionLevelStorageAccess) levelStorageAccess).bridge$getTypeKey();
         if (typeKey != null) {
@@ -190,22 +189,15 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         if (serverLevelData instanceof PrimaryLevelData) {
             this.K = (PrimaryLevelData) serverLevelData;
         } else if (serverLevelData instanceof DerivedLevelData) {
-            this.K = BannerDerivedWorldInfo.create((DerivedLevelData)serverLevelData);
-        }
-        K.setWorld(((ServerLevel) (Object) this));
-        if (this.bridge$biomeProvider() != null) {
-            BiomeSource worldChunkManager = new CustomWorldChunkManager(getWorld(), this.bridge$biomeProvider(), registryAccess().registryOrThrow(Registries.BIOME));
-            if (this.chunkSource.chunkMap.generator instanceof NoiseBasedChunkGenerator cga) {
-                this.chunkSource.chunkMap.generator = new NoiseBasedChunkGenerator(worldChunkManager, cga.generatorSettings());
-            } else if (this.chunkSource.chunkMap.generator instanceof FlatLevelSource cpf) {
-                this.chunkSource.chunkMap.generator = new FlatLevelSource(cpf.settings());
+            this.K = BannerDerivedWorldInfo.wrap(((DerivedLevelData) serverLevelData));
+            ((DerivedLevelData) serverLevelData).setDimType(this.getTypeKey());
+            if (BannerConfig.isSymlinkWorld) {
+                WorldSymlink.create((DerivedLevelData) serverLevelData, levelStorageAccess.getDimensionPath(this.dimension()).toFile());
             }
         }
-        if (this.bridge$generator() != null) {
-            this.chunkSource.chunkMap.generator = new CustomChunkGenerator((ServerLevel) (Object) this, this.chunkSource.getGenerator(), this.bridge$generator());
-        }
-        this.getCraftServer().addWorld(this.getWorld()); // CraftBukkit
+        this.uuid = WorldUUID.getUUID(levelStorageAccess.getDimensionPath(this.dimension()).toFile());
         this.getWorldBorder().banner$setWorld((ServerLevel) (Object) this);
+        this.K.setWorld((ServerLevel) (Object) this);
         var data = this.getDataStorage().computeIfAbsent(LevelPersistentData::new,
                 () -> new LevelPersistentData(null), "bukkit_pdc");
         this.getWorld().readBukkitValues(data.getTag());
@@ -242,7 +234,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
 
     @Inject(method = "tick",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerLevel;isDebug()Z"))
+                    target = "Lnet/minecraft/server/level/ServerLevel;isDebug()Z"))
     private void banner$timings(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
         bridge$timings().doTickPending.startTiming(); // Spigot
     }
@@ -387,10 +379,11 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     @Inject(method = "save", at = @At("TAIL"))
     private void banner$saveAllChunks(ProgressListener progress, boolean flush, boolean skipSave, CallbackInfo ci) {
         // CraftBukkit start - moved from MinecraftServer.saveAllChunks
-        ServerLevel worldserver1 = ((ServerLevel) (Object) this);
-        K.setWorldBorder(worldserver1.getWorldBorder().createSettings());
-        K.setCustomBossEvents(this.server.getCustomBossEvents().save());
-        convertable.saveDataTag(this.server.registryAccess(), K, this.server.getPlayerList().getSingleplayerData());
+        if (this.serverLevelData instanceof PrimaryLevelData worldInfo) {
+            worldInfo.setWorldBorder(this.getWorldBorder().createSettings());
+            worldInfo.setCustomBossEvents(this.getServer().getCustomBossEvents().save());
+            this.convertable.saveDataTag(this.getServer().registryAccess(), worldInfo, this.getServer().getPlayerList().getSingleplayerData());
+        }
         // CraftBukkit end
     }
 
@@ -455,8 +448,8 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         if (entity.getSelfAndPassengers().map(Entity::getUUID).anyMatch(this.entityManager::isLoaded)) {
             return false;
         }else {
-           pushAddEntityReason(reason);
-           return this.addAllEntities(entity, reason);
+            pushAddEntityReason(reason);
+            return this.addAllEntities(entity, reason);
         }
     }
 
@@ -556,93 +549,6 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
             blockList.updateList();
         }
     }
-
-    /**
-     * @author wdog5
-     * @reason bukkit check
-     */
-    @Overwrite
-    public void destroyBlockProgress(int breakerId, BlockPos pos, int progress) {
-        Iterator<ServerPlayer> var4 = this.server.getPlayerList().getPlayers().iterator();
-
-        // CraftBukkit start
-        Player entityhuman = null;
-        Entity entity = this.getEntity(breakerId);
-        if (entity instanceof Player) entityhuman = (Player) entity;
-        // CraftBukkit end
-
-        while(var4.hasNext()) {
-            ServerPlayer serverPlayer = (ServerPlayer)var4.next();
-            if (serverPlayer != null && serverPlayer.level() == ((ServerLevel) (Object) this) && serverPlayer.getId() != breakerId) {
-                double d = (double)pos.getX() - serverPlayer.getX();
-                double e = (double)pos.getY() - serverPlayer.getY();
-                double f = (double)pos.getZ() - serverPlayer.getZ();
-
-                // CraftBukkit start
-                if (entityhuman != null && !serverPlayer.getBukkitEntity().canSee(entityhuman.getBukkitEntity())) {
-                    continue;
-                }
-                // CraftBukkit end
-                if (d * d + e * e + f * f < 1024.0) {
-                    serverPlayer.connection.send(new ClientboundBlockDestructionPacket(breakerId, pos, progress));
-                }
-            }
-        }
-
-    }
-
-    /**
-     * @author wdog5
-     * @reason bukkit things
-     */
-    @Overwrite
-    public void sendBlockUpdated(BlockPos pos, BlockState oldState, BlockState newState, int flags) {
-        if (this.isUpdatingNavigations) {
-            String string = "recursive call to sendBlockUpdated";
-            Util.logAndPauseIfInIde("recursive call to sendBlockUpdated", new IllegalStateException("recursive call to sendBlockUpdated"));
-        }
-
-        this.getChunkSource().blockChanged(pos);
-        VoxelShape voxelShape = oldState.getCollisionShape(this, pos);
-        VoxelShape voxelShape2 = newState.getCollisionShape(this, pos);
-        if (Shapes.joinIsNotEmpty(voxelShape, voxelShape2, BooleanOp.NOT_SAME)) {
-            List<PathNavigation> list = new ObjectArrayList<>();
-            Iterator var8 = this.navigatingMobs.iterator();
-
-            while(var8.hasNext()) {
-                // CraftBukkit start - fix SPIGOT-6362
-                Mob mob;
-                try {
-                    mob = (Mob)var8.next();
-                } catch (java.util.ConcurrentModificationException ex) {
-                    // This can happen because the pathfinder update below may trigger a chunk load, which in turn may cause more navigators to register
-                    // In this case we just run the update again across all the iterators as the chunk will then be loaded
-                    // As this is a relative edge case it is much faster than copying navigators (on either read or write)
-                    sendBlockUpdated(pos, oldState, newState, flags);
-                    return;
-                }
-                // CraftBukkit end
-                PathNavigation pathNavigation = mob.getNavigation();
-                if (pathNavigation.shouldRecomputePath(pos)) {
-                    list.add(pathNavigation);
-                }
-            }
-
-            try {
-                this.isUpdatingNavigations = true;
-                var8 = list.iterator();
-
-                while(var8.hasNext()) {
-                    PathNavigation pathNavigation2 = (PathNavigation)var8.next();
-                    pathNavigation2.recomputePath();
-                }
-            } finally {
-                this.isUpdatingNavigations = false;
-            }
-
-        }
-    }
-
 
     @ModifyVariable(method = "tickChunk", ordinal = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;randomTick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/util/RandomSource;)V"))
     private BlockPos banner$captureRandomTick(BlockPos pos) {

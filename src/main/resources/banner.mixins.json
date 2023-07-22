@@ -529,6 +529,7 @@
     "world.level.spawner.MixinBaseSpawner",
     "world.level.spawner.MixinNaturalSpawner",
     "world.level.spawner.MixinNaturalSpawner_SpawnState",
+    "world.level.storage.MixinDerivedLevelData",
     "world.level.storage.MixinLevelStorageAccess",
     "world.level.storage.MixinLevelStorageSource",
     "world.level.storage.MixinPlayerDataStorage",

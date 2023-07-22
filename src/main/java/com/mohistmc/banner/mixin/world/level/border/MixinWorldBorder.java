@@ -33,11 +33,6 @@ public abstract class MixinWorldBorder implements InjectionWorldBorder {
         return world;
     }
 
-    @Inject(method = "addListener", at = @At("HEAD"), cancellable = true)
-    private void banner$checkBorder(BorderChangeListener listener, CallbackInfo ci) {
-        if (listeners.contains(listener)) ci.cancel(); // CraftBukkit
-    }
-
     @Inject(method = "setCenter", at = @At("HEAD"), cancellable = true)
     private void banner$borderEvent0(double x, double z, CallbackInfo ci) {
         // Paper start
