@@ -362,7 +362,6 @@
     "world.item.trading.MixinMerchant",
     "world.item.trading.MixinMerchantOffer",
     "world.level.MixinClipContext",
-    "world.level.MixinCompoundContainer",
     "world.level.MixinEntityGetter",
     "world.level.MixinExplosion",
     "world.level.MixinLevel",
