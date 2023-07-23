@@ -158,8 +158,4 @@ public interface InjectionLivingEntity extends InjectionEntity {
 
     default void setItemSlot(EquipmentSlot enumitemslot, ItemStack itemstack, boolean silent) {
     }
-
-    default Optional<Boolean> randomTeleport(double d0, double d1, double d2, boolean flag, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause cause) {
-        return Optional.empty();
-    }
 }

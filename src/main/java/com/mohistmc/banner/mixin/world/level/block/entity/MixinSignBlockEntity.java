@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.block.sign.Side;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_20_R1.block.CraftSign;
 import org.bukkit.craftbukkit.v1_20_R1.command.CraftBlockCommandSender;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage;
 import org.bukkit.event.block.SignChangeEvent;

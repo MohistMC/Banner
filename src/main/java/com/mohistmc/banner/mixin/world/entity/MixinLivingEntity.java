@@ -186,6 +186,8 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
 
     @Shadow public abstract void indicateDamage(double d, double e);
 
+    @Shadow public abstract ItemStack eat(Level level, ItemStack food);
+
     public MixinLivingEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }
@@ -856,10 +858,8 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     }
 
     @Eject(method = "randomTeleport", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/world/entity/LivingEntity;teleportTo(DDD)V"))
-    private void banner$entityTeleport(LivingEntity entity, double x, double y, double z, CallbackInfoReturnable<
-            Boolean> cir) {
-        EntityTeleportEvent event = new EntityTeleportEvent(getBukkitEntity(), new Location(this.level().getWorld(), this.getX(), this.getY(), this.getZ()),
-                new Location(this.level().getWorld(), x, y, z));
+    private void banner$entityTeleport(LivingEntity entity, double x, double y, double z, CallbackInfoReturnable<Boolean> cir) {
+        EntityTeleportEvent event = new EntityTeleportEvent(getBukkitEntity(), new Location(this.level().getWorld(), this.getX(), this.getY(), this.getZ()), new Location(this.level().getWorld(), x, y, z));
         Bukkit.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
             this.teleportTo(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());

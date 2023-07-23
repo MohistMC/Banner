@@ -38,7 +38,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -815,8 +814,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
                 return null;
             }
             this.level().getProfiler().push("reposition");
-            var bukkitPos = banner$location.get();
-            banner$location.set(null);
+            var bukkitPos = banner$location.getAndSet(null);
             PortalInfo newpp = new PortalInfo(new Vec3(bukkitPos.x(), bukkitPos.y(), bukkitPos.z()), Vec3.ZERO, this.yRot, this.xRot);
             newpp.banner$setWorld(destination);
             newpp.banner$setPortalEventInfo(null);
