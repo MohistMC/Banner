@@ -1842,6 +1842,11 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     }
 
     @Override
+    public void teleport(Location dest) {
+        this.internalTeleport(dest.getX(), dest.getY(), dest.getZ(), dest.getYaw(), dest.getPitch(), Collections.emptySet());
+    }
+
+    @Override
     public void internalTeleport(double d0, double d1, double d2, float f, float f1, Set<RelativeMovement> set) {
         if (Float.isNaN(f)) {
             f = 0.0f;
@@ -1859,19 +1864,19 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         if (++this.awaitingTeleport == Integer.MAX_VALUE) {
             this.awaitingTeleport = 0;
         }
+
+        // CraftBukkit start - update last location
         this.lastPosX = this.awaitingPositionFromClient.x;
         this.lastPosY = this.awaitingPositionFromClient.y;
         this.lastPosZ = this.awaitingPositionFromClient.z;
         this.lastYaw = f;
         this.lastPitch = f1;
+        // CraftBukkit end
+
         this.awaitingTeleportTime = this.tickCount;
         this.player.absMoveTo(d0, d1, d2, f, f1);
         this.player.connection.send(new ClientboundPlayerPositionPacket(d0 - d3, d1 - d4, d2 - d5, f - f2, f1 - f3, set, this.awaitingTeleport));
-    }
-
-    @Override
-    public void teleport(Location dest) {
-        this.internalTeleport(dest.getX(), dest.getY(), dest.getZ(), dest.getYaw(), dest.getPitch(), Collections.emptySet());
+        this.player.getBukkitEntity().sendMessage("传送成功");
     }
 
     @Override

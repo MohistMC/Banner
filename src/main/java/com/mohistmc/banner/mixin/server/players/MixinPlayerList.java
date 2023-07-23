@@ -432,11 +432,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     }
 
     @Override
-    public ServerPlayer respawn(ServerPlayer entityplayer, boolean flag, PlayerRespawnEvent.RespawnReason reason) {
-        return this.respawn(entityplayer, this.server.getLevel(entityplayer.getRespawnDimension()), flag, null, true, reason);
-    }
-
-    @Override
     public ServerPlayer canPlayerLogin(ServerLoginPacketListenerImpl handler, GameProfile gameProfile) {
         MutableComponent mutablecomponent1 = Component.empty();
         // Moved from processLogin
@@ -500,130 +495,23 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         return entity;
     }
 
+    private transient Location banner$loc;
+    private transient PlayerRespawnEvent.RespawnReason banner$respawnReason;
+    public ServerLevel banner$worldserver;
+
     @Override
     public ServerPlayer respawn(ServerPlayer playerIn, ServerLevel worldIn, boolean flag, Location location, boolean avoidSuffocation, PlayerRespawnEvent.RespawnReason respawnReason) {
-        playerIn.stopRiding();
-        this.players.remove(playerIn);
-        playerIn.serverLevel().removePlayerImmediately(playerIn, Entity.RemovalReason.DISCARDED);
-        BlockPos pos = playerIn.getRespawnPosition();
-        float f = playerIn.getRespawnAngle();
-        boolean flag1 = playerIn.isRespawnForced();
-        ServerPlayer entityplayer1 = playerIn;
-        org.bukkit.World fromWorld = playerIn.getBukkitEntity().getWorld();
-        playerIn.wonGame = false;
-
-        entityplayer1.connection = playerIn.connection;
-        entityplayer1.restoreFrom(playerIn, flag);
-        entityplayer1.setId(playerIn.getId());
-        entityplayer1.setMainArm(playerIn.getMainArm());
-        Iterator iterator = playerIn.getTags().iterator();
-
-        while (iterator.hasNext()) {
-            String s = (String) iterator.next();
-
-            entityplayer1.addTag(s);
-        }
-
-        boolean flag2 = false;
-        if (location == null) {
-            boolean isBedSpawn = false;
-            ServerLevel spawnWorld = this.server.getLevel(playerIn.getRespawnDimension());
-            if (spawnWorld != null) {
-                Optional<Vec3> optional;
-                if (pos != null) {
-                    optional = net.minecraft.world.entity.player.Player.findRespawnPositionAndUseSpawnBlock(spawnWorld, pos, f, flag1, flag);
-                } else {
-                    optional = Optional.empty();
-                }
-                if (optional.isPresent()) {
-                    BlockState iblockdata = spawnWorld.getBlockState(pos);
-                    boolean flag3 = iblockdata.is(Blocks.RESPAWN_ANCHOR);
-                    Vec3 vec3d = optional.get();
-                    float f1;
-                    if (!iblockdata.is(BlockTags.BEDS) && !flag3) {
-                        f1 = f;
-                    } else {
-                        Vec3 vec3d2 = Vec3.atBottomCenterOf(pos).subtract(vec3d).normalize();
-                        f1 = (float) Mth.wrapDegrees(Mth.atan2(vec3d2.z, vec3d2.x) * 57.2957763671875 - 90.0);
-                    }
-                    // playerIn.setLocationAndAngles(vec3d.x, vec3d.y, vec3d.z, f2, 0.0f);
-                    flag2 = (!flag && flag3);
-                    isBedSpawn = true;
-                    location = CraftLocation.toBukkit(vec3d, spawnWorld.getWorld(), f1, 0.0F);
-                } else if (pos != null) {
-                    entityplayer1.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.NO_RESPAWN_BLOCK_AVAILABLE, 0.0f));
-                    entityplayer1.setRespawnPosition(null, null, 0f, false, false, PlayerSpawnChangeEvent.Cause.RESET); // CraftBukkit - SPIGOT-5988: Clear respawn location when obstructed
-                }
-            }
-            if (location == null) {
-                spawnWorld = this.server.getLevel(Level.OVERWORLD);
-                pos =  entityplayer1.getSpawnPoint(spawnWorld);
-                location = CraftLocation.toBukkit(pos, spawnWorld.getWorld()).add(0.5F, 0.1F, 0.5F);
-            }
-            Player respawnPlayer = entityplayer1.getBukkitEntity();
-            PlayerRespawnEvent respawnEvent = new PlayerRespawnEvent(respawnPlayer, location, isBedSpawn && !flag2, flag2, respawnReason);
-            this.cserver.getPluginManager().callEvent(respawnEvent);
-            if (playerIn.connection.isDisconnected()) {
-                return playerIn;
-            }
-            location = respawnEvent.getRespawnLocation();
-            if (!flag) {
-                playerIn.reset();
-            }
-        } else {
-            location.setWorld(worldIn.getWorld());
-        }
-        ServerLevel serverWorld = ((CraftWorld) location.getWorld()).getHandle();
-        entityplayer1.forceSetPositionRotation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
-        // CraftBukkit end
-
-        while (avoidSuffocation && !serverWorld.noCollision(entityplayer1) && entityplayer1.getY() < serverWorld.getMaxBuildHeight()) {
-            entityplayer1.setPos(entityplayer1.getX(), entityplayer1.getY() + 1.0, entityplayer1.getZ());
-        }
-
-        byte b = (byte) (flag ? 1 : 0);
-        LevelData worlddata = serverWorld.getLevelData();
-        entityplayer1.connection.send(new ClientboundRespawnPacket(serverWorld.dimensionTypeId(), serverWorld.dimension(), BiomeManager.obfuscateSeed(serverWorld.getSeed()), entityplayer1.gameMode.getGameModeForPlayer(), entityplayer1.gameMode.getPreviousGameModeForPlayer(), serverWorld.isDebug(), serverWorld.isFlat(), (byte)b, entityplayer1.getLastDeathLocation(), entityplayer1.getPortalCooldown()));
-        entityplayer1.connection.send(new ClientboundSetChunkCacheRadiusPacket((serverWorld.bridge$spigotConfig().viewDistance)));
-        entityplayer1.connection.send(new ClientboundSetSimulationDistancePacket(serverWorld.bridge$spigotConfig().simulationDistance));
-        entityplayer1.spawnIn(serverWorld);
-        entityplayer1.unsetRemoved();
-        entityplayer1.connection.teleport(new Location(serverWorld.getWorld(), entityplayer1.getX(), entityplayer1.getY(), entityplayer1.getZ(), entityplayer1.getYRot(), playerIn.getXRot()));
-        entityplayer1.setShiftKeyDown(false);
-
-        entityplayer1.connection.send(new ClientboundSetDefaultSpawnPositionPacket(serverWorld.getSharedSpawnPos(), serverWorld.getSharedSpawnAngle()));
-        entityplayer1.connection.send(new ClientboundChangeDifficultyPacket(worlddata.getDifficulty(), worlddata.isDifficultyLocked()));
-        entityplayer1.connection.send(new ClientboundSetExperiencePacket(entityplayer1.experienceProgress, entityplayer1.totalExperience, entityplayer1.experienceLevel));
-        this.sendLevelInfo(entityplayer1, serverWorld);
-        this.sendPlayerPermissionLevel(entityplayer1);
-        if (!entityplayer1.connection.isDisconnected()) {
-            serverWorld.addRespawnedPlayer(entityplayer1);
-            this.players.add(entityplayer1);
-            this.playersByUUID.put(entityplayer1.getUUID(), entityplayer1);
-        }
-        entityplayer1.setHealth(entityplayer1.getHealth());
-        if (flag2) {
-            entityplayer1.connection.send(new ClientboundSoundPacket(SoundEvents.RESPAWN_ANCHOR_DEPLETE, SoundSource.BLOCKS, pos.getX(), pos.getY(), pos.getZ(), 1.0f, 1.0f, serverWorld.random.nextLong()));
-        }
-        this.sendAllPlayerInfo(playerIn);
-        playerIn.onUpdateAbilities();
-        for (MobEffectInstance mobEffect : playerIn.getActiveEffects()) {
-            playerIn.connection.send(new ClientboundUpdateMobEffectPacket(playerIn.getId(), mobEffect));
-        }
-        playerIn.triggerDimensionChangeTriggers(((CraftWorld) fromWorld).getHandle());
-        if (fromWorld != location.getWorld()) {
-            PlayerChangedWorldEvent event = new PlayerChangedWorldEvent(playerIn.getBukkitEntity(), fromWorld);
-            Bukkit.getPluginManager().callEvent(event);
-        }
-        if (playerIn.connection.isDisconnected()) {
-            this.save(playerIn);
-        }
-        return entityplayer1;
+        this.banner$loc = location;
+        this.banner$worldserver = worldIn;
+        this.banner$respawnReason = respawnReason;
+        return respawn(playerIn, flag);
     }
 
-    private transient Location banner$loc;
-    private transient Boolean banner$suffo;
-    private transient PlayerRespawnEvent.RespawnReason banner$respawnReason;
+
+    @Override
+    public ServerPlayer respawn(ServerPlayer entityplayer, boolean flag, PlayerRespawnEvent.RespawnReason reason) {
+        return this.respawn(entityplayer, this.server.getLevel(entityplayer.getRespawnDimension()), flag, null, true, reason);
+    }
 
     /**
      * @author wdog5
@@ -631,21 +519,29 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
      */
     @Overwrite
     public ServerPlayer respawn(ServerPlayer playerIn, boolean conqueredEnd) {
-        Location location = banner$loc;
-        banner$loc = null;
-        boolean avoidSuffocation = banner$suffo == null || banner$suffo;
-        banner$suffo = null;
-        var respawnReason = banner$respawnReason == null ? PlayerRespawnEvent.RespawnReason.DEATH : banner$respawnReason;
-        banner$respawnReason = null;
-        playerIn.stopRiding();
+        playerIn.stopRiding(); // CraftBukkit
         this.players.remove(playerIn);
         playerIn.serverLevel().removePlayerImmediately(playerIn, Entity.RemovalReason.DISCARDED);
-        BlockPos pos = playerIn.getRespawnPosition();
+        BlockPos blockposition = playerIn.getRespawnPosition();
         float f = playerIn.getRespawnAngle();
         boolean flag1 = playerIn.isRespawnForced();
+        /* CraftBukkit start
+        WorldServer worldserver = this.server.getLevel(entityplayer.getRespawnDimension());
+        Optional optional;
+
+        if (worldserver != null && blockposition != null) {
+            optional = EntityHuman.findRespawnPositionAndUseSpawnBlock(worldserver, blockposition, f, flag1, flag);
+        } else {
+            optional = Optional.empty();
+        }
+
+        WorldServer worldserver1 = worldserver != null && optional.isPresent() ? worldserver : this.server.overworld();
+        EntityPlayer entityplayer1 = new EntityPlayer(this.server, worldserver1, entityplayer.getGameProfile());
+        // */
         ServerPlayer entityplayer1 = playerIn;
         org.bukkit.World fromWorld = playerIn.getBukkitEntity().getWorld();
         playerIn.wonGame = false;
+        // CraftBukkit end
 
         entityplayer1.connection = playerIn.connection;
         entityplayer1.restoreFrom(playerIn, conqueredEnd);
@@ -659,100 +555,126 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             entityplayer1.addTag(s);
         }
 
-        ServerLevel spawnWorld = this.server.getLevel(playerIn.getRespawnDimension());
         boolean flag2 = false;
-        if (location == null) {
+
+        // CraftBukkit start - fire PlayerRespawnEvent
+        if (banner$loc == null) {
             boolean isBedSpawn = false;
-            if (spawnWorld != null) {
-                Optional<Vec3> optional;
-                if (pos != null) {
-                    optional = net.minecraft.world.entity.player.Player.findRespawnPositionAndUseSpawnBlock(spawnWorld, pos, f, flag1, conqueredEnd);
+            ServerLevel worldserver1 = this.server.getLevel(playerIn.getRespawnDimension());
+            if (worldserver1 != null) {
+                Optional optional;
+
+                if (blockposition != null) {
+                    optional = net.minecraft.world.entity.player.Player.findRespawnPositionAndUseSpawnBlock(worldserver1, blockposition, f, flag1, conqueredEnd);
                 } else {
                     optional = Optional.empty();
                 }
+
                 if (optional.isPresent()) {
-                    BlockState iblockdata = spawnWorld.getBlockState(pos);
+                    BlockState iblockdata = worldserver1.getBlockState(blockposition);
                     boolean flag3 = iblockdata.is(Blocks.RESPAWN_ANCHOR);
-                    Vec3 vec3d = optional.get();
+                    Vec3 vec3d = (Vec3) optional.get();
                     float f1;
+
                     if (!iblockdata.is(BlockTags.BEDS) && !flag3) {
                         f1 = f;
                     } else {
-                        Vec3 vec3d2 = Vec3.atBottomCenterOf(pos).subtract(vec3d).normalize();
-                        f1 = (float) Mth.wrapDegrees(Mth.atan2(vec3d2.z, vec3d2.x) * 57.2957763671875 - 90.0);
+                        Vec3 vec3d1 = Vec3.atBottomCenterOf(blockposition).subtract(vec3d).normalize();
+
+                        f1 = (float) Mth.wrapDegrees(Mth.atan2(vec3d1.z, vec3d1.x) * 57.2957763671875D - 90.0D);
                     }
-                    // playerIn.setLocationAndAngles(vec3d.x, vec3d.y, vec3d.z, f2, 0.0f);
-                    flag2 = (!conqueredEnd && flag3);
+
+                    // entityplayer1.setRespawnPosition(worldserver1.dimension(), blockposition, f, flag1, false); // CraftBukkit - not required, just copies old location into reused entity
+                    flag2 = !conqueredEnd && flag3;
                     isBedSpawn = true;
-                    location = CraftLocation.toBukkit(vec3d, spawnWorld.getWorld(), f1, 0.0F);
-                } else if (pos != null) {
-                    entityplayer1.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.NO_RESPAWN_BLOCK_AVAILABLE, 0.0f));
+                    banner$loc = CraftLocation.toBukkit(vec3d, worldserver1.getWorld(), f1, 0.0F);
+                } else if (blockposition != null) {
+                    entityplayer1.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.NO_RESPAWN_BLOCK_AVAILABLE, 0.0F));
                     entityplayer1.setRespawnPosition(null, null, 0f, false, false, PlayerSpawnChangeEvent.Cause.RESET); // CraftBukkit - SPIGOT-5988: Clear respawn location when obstructed
                 }
             }
-            if (location == null) {
-                spawnWorld = this.server.getLevel(Level.OVERWORLD);
-                pos =  entityplayer1.getSpawnPoint(spawnWorld);
-                location = CraftLocation.toBukkit(pos, spawnWorld.getWorld()).add(0.5F, 0.1F, 0.5F);
+
+            if (banner$loc == null) {
+                worldserver1 = this.server.getLevel(Level.OVERWORLD);
+                blockposition = entityplayer1.getSpawnPoint(worldserver1);
+                banner$loc = CraftLocation.toBukkit(blockposition, worldserver1.getWorld()).add(0.5F, 0.1F, 0.5F);
             }
+
             Player respawnPlayer = entityplayer1.getBukkitEntity();
-            PlayerRespawnEvent respawnEvent = new PlayerRespawnEvent(respawnPlayer, location, isBedSpawn && !flag2, flag2, respawnReason);
-            this.cserver.getPluginManager().callEvent(respawnEvent);
+            PlayerRespawnEvent respawnEvent = new PlayerRespawnEvent(respawnPlayer, banner$loc, isBedSpawn && !flag2, flag2, banner$respawnReason);
+            cserver.getPluginManager().callEvent(respawnEvent);
+            // Spigot Start
             if (playerIn.connection.isDisconnected()) {
                 return playerIn;
             }
-            location = respawnEvent.getRespawnLocation();
-            if (!conqueredEnd) {
-                playerIn.reset();
-            }
+            // Spigot End
+
+            banner$loc = respawnEvent.getRespawnLocation();
+            if (!conqueredEnd) playerIn.reset(); // SPIGOT-4785
         } else {
-            location.setWorld(spawnWorld.getWorld());
+            if (banner$worldserver == null) banner$worldserver = this.server.getLevel(playerIn.getRespawnDimension());
+            banner$loc.setWorld(banner$worldserver.getWorld());
         }
-        ServerLevel serverWorld = ((CraftWorld) location.getWorld()).getHandle();
-        entityplayer1.forceSetPositionRotation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+        ServerLevel worldserver1 = ((CraftWorld) banner$loc.getWorld()).getHandle();
+        entityplayer1.moveTo(banner$loc.getX(), banner$loc.getY(), banner$loc.getZ(), banner$loc.getYaw(), banner$loc.getPitch());
+        entityplayer1.connection.resetPosition();
         // CraftBukkit end
 
-        while (avoidSuffocation && !serverWorld.noCollision(entityplayer1) && entityplayer1.getY() < serverWorld.getMaxBuildHeight()) {
-            entityplayer1.setPos(entityplayer1.getX(), entityplayer1.getY() + 1.0, entityplayer1.getZ());
+        while (!worldserver1.noCollision((Entity) entityplayer1) && entityplayer1.getY() < (double) worldserver1.getMaxBuildHeight()) {
+            entityplayer1.setPos(entityplayer1.getX(), entityplayer1.getY() + 1.0D, entityplayer1.getZ());
         }
 
-        byte b = (byte) (conqueredEnd ? 1 : 0);
-        LevelData worlddata = serverWorld.getLevelData();
-        entityplayer1.connection.send(new ClientboundRespawnPacket(serverWorld.dimensionTypeId(), serverWorld.dimension(), BiomeManager.obfuscateSeed(serverWorld.getSeed()), entityplayer1.gameMode.getGameModeForPlayer(), entityplayer1.gameMode.getPreviousGameModeForPlayer(), serverWorld.isDebug(), serverWorld.isFlat(), (byte)b, entityplayer1.getLastDeathLocation(), entityplayer1.getPortalCooldown()));
-        entityplayer1.connection.send(new ClientboundSetChunkCacheRadiusPacket((serverWorld.bridge$spigotConfig().viewDistance)));
-        entityplayer1.connection.send(new ClientboundSetSimulationDistancePacket(serverWorld.bridge$spigotConfig().simulationDistance));
-        entityplayer1.spawnIn(serverWorld);
+        int i = conqueredEnd ? 1 : 0;
+        // CraftBukkit start
+        LevelData worlddata = worldserver1.getLevelData();
+        entityplayer1.connection.send(new ClientboundRespawnPacket(worldserver1.dimensionTypeId(), worldserver1.dimension(), BiomeManager.obfuscateSeed(worldserver1.getSeed()), entityplayer1.gameMode.getGameModeForPlayer(), entityplayer1.gameMode.getPreviousGameModeForPlayer(), worldserver1.isDebug(), worldserver1.isFlat(), (byte) i, entityplayer1.getLastDeathLocation(), entityplayer1.getPortalCooldown()));
+        entityplayer1.connection.send(new ClientboundSetChunkCacheRadiusPacket((worldserver1.bridge$spigotConfig().viewDistance)));
+        entityplayer1.connection.send(new ClientboundSetSimulationDistancePacket(worldserver1.bridge$spigotConfig().simulationDistance));
+        entityplayer1.spawnIn(worldserver1);
         entityplayer1.unsetRemoved();
-        entityplayer1.connection.teleport(new Location(serverWorld.getWorld(), entityplayer1.getX(), entityplayer1.getY(), entityplayer1.getZ(), entityplayer1.getYRot(), playerIn.getXRot()));
+        entityplayer1.connection.teleport(CraftLocation.toBukkit(entityplayer1.position(), worldserver1.getWorld(), entityplayer1.getYRot(), entityplayer1.getXRot()));
         entityplayer1.setShiftKeyDown(false);
 
-        entityplayer1.connection.send(new ClientboundSetDefaultSpawnPositionPacket(serverWorld.getSharedSpawnPos(), serverWorld.getSharedSpawnAngle()));
+        // entityplayer1.connection.teleport(entityplayer1.getX(), entityplayer1.getY(), entityplayer1.getZ(), entityplayer1.getYRot(), entityplayer1.getXRot());
+        entityplayer1.connection.send(new ClientboundSetDefaultSpawnPositionPacket(worldserver1.getSharedSpawnPos(), worldserver1.getSharedSpawnAngle()));
         entityplayer1.connection.send(new ClientboundChangeDifficultyPacket(worlddata.getDifficulty(), worlddata.isDifficultyLocked()));
         entityplayer1.connection.send(new ClientboundSetExperiencePacket(entityplayer1.experienceProgress, entityplayer1.totalExperience, entityplayer1.experienceLevel));
-        this.sendLevelInfo(entityplayer1, serverWorld);
+        this.sendLevelInfo(entityplayer1, worldserver1);
         this.sendPlayerPermissionLevel(entityplayer1);
-        if (!entityplayer1.connection.isDisconnected()) {
-            serverWorld.addRespawnedPlayer(entityplayer1);
+        if (!playerIn.connection.isDisconnected()) {
+            worldserver1.addRespawnedPlayer(entityplayer1);
             this.players.add(entityplayer1);
             this.playersByUUID.put(entityplayer1.getUUID(), entityplayer1);
         }
+        // entityplayer1.initInventoryMenu();
         entityplayer1.setHealth(entityplayer1.getHealth());
         if (flag2) {
-            entityplayer1.connection.send(new ClientboundSoundPacket(SoundEvents.RESPAWN_ANCHOR_DEPLETE, SoundSource.BLOCKS, pos.getX(), pos.getY(), pos.getZ(), 1.0f, 1.0f, serverWorld.random.nextLong()));
+            entityplayer1.connection.send(new ClientboundSoundPacket(SoundEvents.RESPAWN_ANCHOR_DEPLETE, SoundSource.BLOCKS, (double) blockposition.getX(), (double) blockposition.getY(), (double) blockposition.getZ(), 1.0F, 1.0F, worldserver1.getRandom().nextLong()));
         }
-        this.sendAllPlayerInfo(playerIn);
+        // Added from changeDimension
+        sendAllPlayerInfo(playerIn); // Update health, etc...
         playerIn.onUpdateAbilities();
         for (MobEffectInstance mobEffect : playerIn.getActiveEffects()) {
             playerIn.connection.send(new ClientboundUpdateMobEffectPacket(playerIn.getId(), mobEffect));
         }
+
+        // Fire advancement trigger
         playerIn.triggerDimensionChangeTriggers(((CraftWorld) fromWorld).getHandle());
-        if (fromWorld != location.getWorld()) {
+
+        // Don't fire on respawn
+        if (fromWorld != banner$loc.getWorld()) {
             PlayerChangedWorldEvent event = new PlayerChangedWorldEvent(playerIn.getBukkitEntity(), fromWorld);
             Bukkit.getPluginManager().callEvent(event);
         }
+
+        // Save player file again if they were disconnected
         if (playerIn.connection.isDisconnected()) {
             this.save(playerIn);
         }
+        // CraftBukkit end
+        banner$loc = null;
+        banner$respawnReason = null;
+        banner$worldserver = null;
         return entityplayer1;
     }
 
