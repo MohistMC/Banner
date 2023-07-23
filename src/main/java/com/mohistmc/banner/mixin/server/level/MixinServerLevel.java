@@ -48,8 +48,6 @@ import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.levelgen.FlatLevelSource;
-import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
@@ -58,9 +56,6 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WritableLevelData;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.BooleanOp;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.ticks.LevelTicks;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -68,7 +63,6 @@ import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_20_R1.generator.CustomChunkGenerator;
-import org.bukkit.craftbukkit.v1_20_R1.generator.CustomWorldChunkManager;
 import org.bukkit.craftbukkit.v1_20_R1.util.BlockStateListPopulator;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftNamespacedKey;
 import org.bukkit.craftbukkit.v1_20_R1.util.WorldUUID;
@@ -97,7 +91,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -133,11 +126,6 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     @Shadow public abstract boolean addWithUUID(Entity entity);
 
     @Shadow public abstract DimensionDataStorage getDataStorage();
-
-    @Shadow @Final private MinecraftServer server;
-    @Shadow private volatile boolean isUpdatingNavigations;
-    @Shadow @Final private Set<Mob> navigatingMobs;
-
     @Shadow public abstract ServerChunkCache getChunkSource();
 
     public LevelStorageSource.LevelStorageAccess convertable;
