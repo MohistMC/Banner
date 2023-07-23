@@ -430,10 +430,11 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         this.connection.acceptConnections();
     }
 
+    /*
     @Inject(method = "saveAllChunks", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;overworld()Lnet/minecraft/server/level/ServerLevel;"))
     private void banner$skipSave(boolean suppressLog, boolean flush, boolean forced, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(!this.levels.isEmpty());
-    }
+    }*/
 
     @Inject(method = "createLevels", at = @At(value = "INVOKE", remap = false,
             target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 0),
