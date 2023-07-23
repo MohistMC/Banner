@@ -42,6 +42,7 @@ import net.minecraft.network.protocol.game.ServerboundChatPacket;
 import net.minecraft.network.protocol.game.ServerboundContainerButtonClickPacket;
 import net.minecraft.network.protocol.game.ServerboundContainerClickPacket;
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
+import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ServerboundEditBookPacket;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
@@ -55,6 +56,7 @@ import net.minecraft.network.protocol.game.ServerboundSetCreativeModeSlotPacket;
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -62,6 +64,7 @@ import net.minecraft.server.network.FilteredText;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.FutureChain;
 import net.minecraft.util.Mth;
+import net.minecraft.util.StringUtil;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffects;
@@ -148,6 +151,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1784,6 +1788,54 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                 this.player.getAbilities().flying = packet.isFlying();
             } else {
                 this.player.onUpdateAbilities();
+            }
+        }
+    }
+
+    private static final ResourceLocation CUSTOM_REGISTER = new ResourceLocation("register");
+    private static final ResourceLocation CUSTOM_UNREGISTER = new ResourceLocation("unregister");
+
+    /**
+     * @author Mgazul
+     * @reason
+     */
+    @Overwrite
+    public void handleCustomPayload(ServerboundCustomPayloadPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, (ServerGamePacketListenerImpl) (Object) this, this.player.serverLevel());
+        if (this.connection.isConnected()) {
+            if (packet.identifier.equals(CUSTOM_REGISTER)) {
+                try {
+                    String channels = packet.data.toString(StandardCharsets.UTF_8);
+                    for (String channel : channels.split("\0")) {
+                        if (!StringUtil.isNullOrEmpty(channel)) {
+                            this.getCraftPlayer().addChannel(channel);
+                        }
+                    }
+                } catch (Exception ex) {
+                    LOGGER.error("Couldn't register custom payload", ex);
+                    this.disconnect("Invalid payload REGISTER!");
+                }
+            } else if (packet.identifier.equals(CUSTOM_UNREGISTER)) {
+                try {
+                    final String channels = packet.data.toString(StandardCharsets.UTF_8);
+                    for (String channel : channels.split("\0")) {
+                        if (!StringUtil.isNullOrEmpty(channel)) {
+                            this.getCraftPlayer().removeChannel(channel);
+                        }
+                    }
+                } catch (Exception ex) {
+                    LOGGER.error("Couldn't unregister custom payload", ex);
+                    this.disconnect("Invalid payload UNREGISTER!");
+                }
+            } else {
+                try {
+                    byte[] data = new byte[packet.data.readableBytes()];
+                    packet.data.readBytes(data);
+                    this.cserver.getMessenger().dispatchIncomingMessage(this.player.getBukkitEntity(), packet.identifier.toString(), data);
+                } catch (Exception ex) {
+                    LOGGER.error("Couldn't dispatch custom payload", ex);
+                    this.disconnect("Invalid custom payload!");
+                }
             }
         }
     }
