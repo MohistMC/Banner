@@ -73,7 +73,6 @@ import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.PluginLoadOrder;
 import org.jetbrains.annotations.Nullable;
-import org.spigotmc.WatchdogThread;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -220,6 +219,8 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow public abstract ModCheck getModdedStatus();
 
     @Shadow protected abstract void forceDifficulty();
+
+    @Shadow @Nullable public abstract ServerLevel getLevel(ResourceKey<net.minecraft.world.level.Level> dimension);
 
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
@@ -392,11 +393,34 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     private void banner$loadLevel(CallbackInfo ci) {
         for (ServerLevel worldserver : ((MinecraftServer)(Object)this).getAllLevels()) {
             if (worldserver != overworld()) {
-                this.prepareLevels(worldserver.getChunkSource().chunkMap.progressListener, worldserver);
-                worldserver.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API
-                this.server.getPluginManager().callEvent(new WorldLoadEvent(worldserver.getWorld()));
+                if (banner$isNether(worldserver) && isNetherEnabled()) {
+                    banner$prepareWorld(worldserver);
+                }else if (banner$isEnd(worldserver) && this.server.getAllowEnd()) {
+                    banner$prepareWorld(worldserver);
+                }
+                if (banner$isNotNetherAndEnd(worldserver)) {
+                    banner$prepareWorld(worldserver);
+                }
             }
         }
+    }
+
+    private boolean banner$isNotNetherAndEnd(ServerLevel worldserver) {
+        return !banner$isNether(worldserver) && !banner$isEnd(worldserver);
+    }
+
+    private boolean banner$isNether(ServerLevel worldserver) {
+        return worldserver == this.getLevel(net.minecraft.world.level.Level.NETHER);
+    }
+
+    private boolean banner$isEnd(ServerLevel worldserver) {
+        return worldserver == this.getLevel(net.minecraft.world.level.Level.END);
+    }
+
+    private void banner$prepareWorld(ServerLevel worldserver) {
+        this.prepareLevels(worldserver.getChunkSource().chunkMap.progressListener, worldserver);
+        worldserver.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API
+        this.server.getPluginManager().callEvent(new WorldLoadEvent(worldserver.getWorld()));
     }
 
     @Inject(method = "loadLevel", at = @At("RETURN"))
