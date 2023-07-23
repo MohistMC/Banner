@@ -1795,12 +1795,8 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     private static final ResourceLocation CUSTOM_REGISTER = new ResourceLocation("register");
     private static final ResourceLocation CUSTOM_UNREGISTER = new ResourceLocation("unregister");
 
-    /**
-     * @author Mgazul
-     * @reason
-     */
-    @Overwrite
-    public void handleCustomPayload(ServerboundCustomPayloadPacket packet) {
+    @Inject(method = "handleCustomPayload", at = @At("HEAD"))
+    private void banner$handleCustomPayload(ServerboundCustomPayloadPacket packet, CallbackInfo ci) {
         PacketUtils.ensureRunningOnSameThread(packet, (ServerGamePacketListenerImpl) (Object) this, this.player.serverLevel());
         if (this.connection.isConnected()) {
             if (packet.identifier.equals(CUSTOM_REGISTER)) {
@@ -1839,7 +1835,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
             }
         }
     }
-
 
     @Override
     public void teleport(double d0, double d1, double d2, float f, float f1, PlayerTeleportEvent.TeleportCause cause) {
