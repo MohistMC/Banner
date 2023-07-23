@@ -441,15 +441,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     private void banner$worldInit(ChunkProgressListener listener, CallbackInfo ci, ServerLevelData serverLevelData,
                                     boolean bl, Registry registry, WorldOptions worldOptions, long l, long m,
                                     List list, LevelStem levelStem, ServerLevel serverLevel) {
-        if (((CraftServer) Bukkit.getServer()).scoreboardManager == null) {
-            ((CraftServer) Bukkit.getServer()).scoreboardManager = new CraftScoreboardManager((MinecraftServer) (Object) this, serverLevel.getScoreboard());
-        }
-        if (serverLevel.bridge$generator() != null) {
-            serverLevel.getWorld().getPopulators().addAll(
-                    serverLevel.bridge$generator().getDefaultPopulators(
-                            serverLevel.getWorld()));
-        }
-        Bukkit.getPluginManager().callEvent(new WorldInitEvent(serverLevel.getWorld()));
+        banner$initLevel(serverLevel);
     }
 
     @Redirect(method = "createLevels",
@@ -477,7 +469,8 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                                    RandomSequences randomSequences, Iterator var16, Map.Entry entry,
                                    ResourceKey resourceKey, ResourceKey resourceKey2, DerivedLevelData derivedLevelData,
                                    ServerLevel serverLevel2) {
-        initWorld(serverLevel2, derivedLevelData, worldData, worldOptions);
+        banner$initLevel(serverLevel2);
+        banner$initializedLevel(serverLevel2, derivedLevelData, worldData, worldOptions);
     }
 
     @Inject(method = "getServerModName", at = @At(value = "HEAD"), remap = false, cancellable = true)
@@ -534,15 +527,26 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Override
     public void initWorld(ServerLevel serverWorld, ServerLevelData worldInfo, WorldData saveData, WorldOptions worldOptions) {
-        boolean flag = saveData.isDebugWorld();
-        if ((serverWorld.bridge$generator() != null)) {
-            serverWorld.getWorld().getPopulators().addAll(
-                    serverWorld.bridge$generator().getDefaultPopulators(
-                            (serverWorld.getWorld())));
-        }
+        banner$initLevel(serverWorld);
         WorldBorder worldborder = serverWorld.getWorldBorder();
         worldborder.applySettings(worldInfo.getWorldBorder());
-        this.server.getPluginManager().callEvent(new org.bukkit.event.world.WorldInitEvent(serverWorld.getWorld())); // CraftBukkit - SPIGOT-5569: Call WorldInitEvent before any chunks are generated
+        banner$initializedLevel(serverWorld, worldInfo, saveData, worldOptions);
+    }
+
+    private void banner$initLevel(ServerLevel serverWorld) {
+        if (((CraftServer) Bukkit.getServer()).scoreboardManager == null) {
+            ((CraftServer) Bukkit.getServer()).scoreboardManager = new CraftScoreboardManager((MinecraftServer) (Object) this, serverWorld.getScoreboard());
+        }
+        if (serverWorld.bridge$generator() != null) {
+            serverWorld.getWorld().getPopulators().addAll(
+                    serverWorld.bridge$generator().getDefaultPopulators(
+                            serverWorld.getWorld()));
+        }
+        Bukkit.getPluginManager().callEvent(new WorldInitEvent(serverWorld.getWorld()));
+    }
+
+    private void banner$initializedLevel(ServerLevel serverWorld, ServerLevelData worldInfo, WorldData saveData, WorldOptions worldOptions) {
+        boolean flag = saveData.isDebugWorld();
 
         if (!worldInfo.isInitialized()) {
             try {
