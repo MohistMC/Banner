@@ -45,6 +45,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.util.profiling.jfr.JvmProfiler;
 import net.minecraft.util.thread.ReentrantBlockableEventLoop;
+import net.minecraft.world.RandomSequences;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ForcedChunksSavedData;
 import net.minecraft.world.level.GameRules;
@@ -52,6 +53,7 @@ import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.storage.CommandStorage;
+import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.ServerLevelData;
@@ -78,6 +80,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -273,41 +276,42 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             if (!this.initServer()) {
                 throw new IllegalStateException("Failed to initialize server");
             }
+
             this.nextTickTime = Util.getMillis();
             this.statusIcon = this.loadStatusIcon().orElse(null);
             this.status = this.buildServerStatus();
 
-            Arrays.fill(recentTps, 20);
+            // Spigot start
+            Arrays.fill( recentTps, 20 );
             long curTime, tickSection = Util.getMillis(), tickCount = 1;
-
             while (this.running) {
                 long i = (curTime = Util.getMillis()) - this.nextTickTime;
-                if (i > 2000L && this.nextTickTime - this.lastOverloadWarning >= 15000L) {
+
+                if (i > 5000L && this.nextTickTime - this.lastOverloadWarning >= 30000L) { // CraftBukkit
                     long j = i / 50L;
 
-                    if (server.getWarnOnOverload()) {
-                        LOGGER.warn("Can't keep up! Is the server overloaded? Running {}ms or {} ticks behind", i, j);
-                    }
-
+                    if (server.getWarnOnOverload()) // CraftBukkit
+                        MinecraftServer.LOGGER.warn("Can't keep up! Is the server overloaded? Running {}ms or {} ticks behind", i, j);
                     this.nextTickTime += j * 50L;
                     this.lastOverloadWarning = this.nextTickTime;
                 }
 
-                if (tickCount++ % SAMPLE_INTERVAL == 0) {
-                    double currentTps = 1E3 / (curTime - tickSection) * SAMPLE_INTERVAL;
-                    recentTps[0] = calcTps(recentTps[0], 0.92, currentTps); // 1/exp(5sec/1min)
-                    recentTps[1] = calcTps(recentTps[1], 0.9835, currentTps); // 1/exp(5sec/5min)
-                    recentTps[2] = calcTps(recentTps[2], 0.9945, currentTps); // 1/exp(5sec/15min)
+                if ( tickCount++ % SAMPLE_INTERVAL == 0 )
+                {
+                    double currentTps = 1E3 / ( curTime - tickSection ) * SAMPLE_INTERVAL;
+                    recentTps[0] = calcTps( recentTps[0], 0.92, currentTps ); // 1/exp(5sec/1min)
+                    recentTps[1] = calcTps( recentTps[1], 0.9835, currentTps ); // 1/exp(5sec/5min)
+                    recentTps[2] = calcTps( recentTps[2], 0.9945, currentTps ); // 1/exp(5sec/15min)
                     tickSection = curTime;
                 }
-
-                BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50);
+                // Spigot end
 
                 if (this.debugCommandProfilerDelayStart) {
                     this.debugCommandProfilerDelayStart = false;
                     this.debugCommandProfiler = new MinecraftServer.TimeProfiler(Util.getNanos(), this.tickCount);
                 }
 
+                BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
                 this.nextTickTime += 50L;
                 this.startMetricsRecordingTick();
                 this.profiler.push("tick");
@@ -321,15 +325,23 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                 this.isReady = true;
                 JvmProfiler.INSTANCE.onServerTick(this.averageTickTime);
             }
-        } catch (Throwable throwable1) {
-            LOGGER.error("Encountered an unexpected exception", throwable1);
-            CrashReport crashreport = constructOrExtractCrashReport(throwable1);
+        } catch (Throwable throwable) {
+            MinecraftServer.LOGGER.error("Encountered an unexpected exception", throwable);
+            // Spigot Start
+            if ( throwable.getCause() != null )
+            {
+                MinecraftServer.LOGGER.error( "\tCause of unexpected exception was", throwable.getCause() );
+            }
+            // Spigot End
+            CrashReport crashreport = constructOrExtractCrashReport(throwable);
+
             this.fillSystemReport(crashreport.getSystemReport());
-            File file1 = new File(new File(this.getServerDirectory(), "crash-reports"), "crash-" + Util.getFilenameFormattedDateTime() + "-server.txt");
-            if (crashreport.saveToFile(file1)) {
-                LOGGER.error("This crash report has been saved to: {}", file1.getAbsolutePath());
+            File file = new File(new File(this.getServerDirectory(), "crash-reports"), "crash-" + Util.getFilenameFormattedDateTime() + "-server.txt");
+
+            if (crashreport.saveToFile(file)) {
+                MinecraftServer.LOGGER.error("This crash report has been saved to: {}", file.getAbsolutePath());
             } else {
-                LOGGER.error("We were unable to save this crash report to disk.");
+                MinecraftServer.LOGGER.error("We were unable to save this crash report to disk.");
             }
 
             this.onServerCrash(crashreport);
@@ -337,16 +349,25 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             try {
                 this.stopped = true;
                 this.stopServer();
-            } catch (Throwable throwable) {
-                LOGGER.error("Exception stopping the server", throwable);
+            } catch (Throwable throwable1) {
+                MinecraftServer.LOGGER.error("Exception stopping the server", throwable1);
             } finally {
                 if (this.services.profileCache() != null) {
                     this.services.profileCache().clearExecutor();
                 }
-                WatchdogThread.doStop();
+
+                org.spigotmc.WatchdogThread.doStop(); // Spigot
+                // CraftBukkit start - Restore terminal to original settings
+                try {
+                    reader.getTerminal().restore();
+                } catch (Exception ignored) {
+                }
+                // CraftBukkit end
                 this.onServerExit();
             }
+
         }
+
     }
 
     private static double calcTps(double avg, double exp, double tps) {
@@ -366,6 +387,18 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         try { Thread.sleep(100); } catch (InterruptedException ex) {} // CraftBukkit - SPIGOT-625 - give server at least a chance to send packets
     }
 
+    @Inject(method = "loadLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;prepareLevels(Lnet/minecraft/server/level/progress/ChunkProgressListener;)V",
+            shift = At.Shift.AFTER))
+    private void banner$loadLevel(CallbackInfo ci) {
+        for (ServerLevel worldserver : ((MinecraftServer)(Object)this).getAllLevels()) {
+            if (worldserver != overworld()) {
+                this.prepareLevels(worldserver.getChunkSource().chunkMap.progressListener, worldserver);
+                worldserver.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API
+                this.server.getPluginManager().callEvent(new WorldLoadEvent(worldserver.getWorld()));
+            }
+        }
+    }
+
     @Inject(method = "loadLevel", at = @At("RETURN"))
     public void banner$enablePlugins(CallbackInfo ci) {
         this.server.enablePlugins(PluginLoadOrder.POSTWORLD);
@@ -374,7 +407,8 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     }
 
     @Inject(method = "createLevels", at = @At(value = "INVOKE", remap = false,
-            target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"), locals = LocalCapture.CAPTURE_FAILHARD)
+            target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 0),
+            locals = LocalCapture.CAPTURE_FAILHARD)
     private void banner$worldInit(ChunkProgressListener listener, CallbackInfo ci, ServerLevelData serverLevelData,
                                     boolean bl, Registry registry, WorldOptions worldOptions, long l, long m,
                                     List list, LevelStem levelStem, ServerLevel serverLevel) {
@@ -387,6 +421,34 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                             serverLevel.getWorld()));
         }
         Bukkit.getPluginManager().callEvent(new WorldInitEvent(serverLevel.getWorld()));
+    }
+
+    @Redirect(method = "createLevels",
+            at = @At(value = "NEW", args = "class=net/minecraft/server/level/ServerLevel", ordinal = 1))
+    private ServerLevel banner$resetListener(MinecraftServer server, Executor dispatcher,
+                                             LevelStorageSource.LevelStorageAccess levelStorageAccess,
+                                             ServerLevelData serverLevelData, ResourceKey dimension,
+                                             LevelStem levelStem, ChunkProgressListener progressListener,
+                                             boolean isDebug, long biomeZoomSeed, List customSpawners, boolean tickTime,
+                                             RandomSequences randomSequences) {
+        ChunkProgressListener listener = this.progressListenerFactory.create(11);
+        return new ServerLevel(server, dispatcher, levelStorageAccess, serverLevelData,
+                dimension, levelStem, listener, isDebug, biomeZoomSeed, customSpawners, tickTime, randomSequences);
+    }
+
+    @Inject(method = "createLevels",
+            at = @At(value = "INVOKE",
+                    target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 1),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$initWorld(ChunkProgressListener chunkProgressListener, CallbackInfo ci,
+                                   ServerLevelData serverLevelData, boolean bl, Registry registry,
+                                   WorldOptions worldOptions, long l, long m, List list, LevelStem
+                                           levelStem, ServerLevel serverLevel, DimensionDataStorage
+                                           dimensionDataStorage, WorldBorder worldBorder,
+                                   RandomSequences randomSequences, Iterator var16, Map.Entry entry,
+                                   ResourceKey resourceKey, ResourceKey resourceKey2, DerivedLevelData derivedLevelData,
+                                   ServerLevel serverLevel2) {
+        initWorld(serverLevel2, derivedLevelData, worldData, worldOptions);
     }
 
     @Inject(method = "getServerModName", at = @At(value = "HEAD"), remap = false, cancellable = true)
@@ -479,78 +541,118 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
      */
     @Overwrite
     public final void prepareLevels(ChunkProgressListener listener) {
-        ServerLevel serverworld = this.overworld();
+        ServerLevel worldserver = this.overworld();
         this.forceTicks = true;
-        LOGGER.info(BannerMCStart.I18N.get("server.region.prepare"), serverworld.dimension().location());
-        BlockPos blockpos = serverworld.getSharedSpawnPos();
-        listener.updateSpawnPos(new ChunkPos(blockpos));
-        ServerChunkCache serverchunkprovider = serverworld.getChunkSource();
-        this.nextTickTime = Util.getMillis();
-        serverchunkprovider.addRegionTicket(TicketType.START, new ChunkPos(blockpos), 11, Unit.INSTANCE);
+        // CraftBukkit end
 
-        while (serverchunkprovider.getTickingGenerated() < 441) {
-            this.executeModerately();
+        LOGGER.info(BannerMCStart.I18N.get("server.region.prepare"), worldserver.dimension().location());
+        BlockPos blockposition = worldserver.getSharedSpawnPos();
+
+        listener.updateSpawnPos(new ChunkPos(blockposition));
+        ServerChunkCache chunkproviderserver = worldserver.getChunkSource();
+
+        this.nextTickTime = Util.getMillis();
+        // CraftBukkit start
+        if (worldserver.getWorld().getKeepSpawnInMemory()) {
+            chunkproviderserver.addRegionTicket(TicketType.START, new ChunkPos(blockposition), 11, Unit.INSTANCE);
+
+            while (chunkproviderserver.getTickingGenerated() != 441) {
+                // this.nextTickTime = SystemUtils.getMillis() + 10L;
+                this.executeModerately();
+            }
         }
 
+        // this.nextTickTime = SystemUtils.getMillis() + 10L;
         this.executeModerately();
+        // Iterator iterator = this.levels.values().iterator();
 
-        for (ServerLevel serverWorld : this.levels.values()) {
-            if (serverWorld.getWorld().getKeepSpawnInMemory()) {
-                ForcedChunksSavedData forcedchunkssavedata = serverWorld.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
-                if (forcedchunkssavedata != null) {
-                    LongIterator longiterator = forcedchunkssavedata.getChunks().iterator();
+        if (true) {
+            ServerLevel worldserver1 = worldserver;
+            // CraftBukkit end
+            ForcedChunksSavedData forcedchunk = (ForcedChunksSavedData) worldserver1.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
 
-                    while (longiterator.hasNext()) {
-                        long i = longiterator.nextLong();
-                        ChunkPos chunkpos = new ChunkPos(i);
-                        serverWorld.getChunkSource().updateChunkForced(chunkpos, true);
-                    }
+            if (forcedchunk != null) {
+                LongIterator longiterator = forcedchunk.getChunks().iterator();
+
+                while (longiterator.hasNext()) {
+                    long i = longiterator.nextLong();
+                    ChunkPos chunkcoordintpair = new ChunkPos(i);
+
+                    worldserver1.getChunkSource().updateChunkForced(chunkcoordintpair, true);
                 }
             }
-            Bukkit.getPluginManager().callEvent(new WorldLoadEvent(serverWorld.getWorld()));
+            Bukkit.getPluginManager().callEvent(new WorldLoadEvent(worldserver1.getWorld()));
         }
 
+        // CraftBukkit start
+        // this.nextTickTime = SystemUtils.getMillis() + 10L;
         this.executeModerately();
+        // CraftBukkit end
         listener.stop();
-        this.updateMobSpawningFlags();
+        // CraftBukkit start
+        // this.updateMobSpawningFlags();
+        worldserver.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
+
         this.forceTicks = false;
+        // CraftBukkit end
     }
 
     @Override
-    public void prepareLevels(ChunkProgressListener listener, ServerLevel serverWorld) {
-        ServerWorldEvents.LOAD.invoker().onWorldLoad(((MinecraftServer) (Object) this), serverWorld);// Banner
-        if (!serverWorld.getWorld().getKeepSpawnInMemory()) {
-            return;
-        }
+    public void prepareLevels(ChunkProgressListener listener, ServerLevel worldserver) {
+        ServerWorldEvents.LOAD.invoker().onWorldLoad(((MinecraftServer) (Object) this), worldserver);// Banner
+        // WorldServer worldserver = this.overworld();
         this.forceTicks = true;
-        LOGGER.info(BannerMCStart.I18N.get("server.region.prepare"), serverWorld.dimension().location());
-        BlockPos blockpos = serverWorld.getSharedSpawnPos();
-        listener.updateSpawnPos(new ChunkPos(blockpos));
-        ServerChunkCache serverchunkprovider = serverWorld.getChunkSource();
+        // CraftBukkit end
+
+        LOGGER.info(BannerMCStart.I18N.get("server.region.prepare"), worldserver.dimension().location());
+        BlockPos blockposition = worldserver.getSharedSpawnPos();
+
+        listener.updateSpawnPos(new ChunkPos(blockposition));
+        ServerChunkCache chunkproviderserver = worldserver.getChunkSource();
+
         this.nextTickTime = Util.getMillis();
-        serverchunkprovider.addRegionTicket(TicketType.START, new ChunkPos(blockpos), 11, Unit.INSTANCE);
+        // CraftBukkit start
+        if (worldserver.getWorld().getKeepSpawnInMemory()) {
+            chunkproviderserver.addRegionTicket(TicketType.START, new ChunkPos(blockposition), 11, Unit.INSTANCE);
 
-        while (serverchunkprovider.getTickingGenerated() < 441) {
-            this.executeModerately();
-        }
-
-        this.executeModerately();
-
-        ForcedChunksSavedData forcedchunkssavedata = serverWorld.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
-        if (forcedchunkssavedata != null) {
-            LongIterator longiterator = forcedchunkssavedata.getChunks().iterator();
-
-            while (longiterator.hasNext()) {
-                long i = longiterator.nextLong();
-                ChunkPos chunkpos = new ChunkPos(i);
-                serverWorld.getChunkSource().updateChunkForced(chunkpos, true);
+            while (chunkproviderserver.getTickingGenerated() != 441) {
+                // this.nextTickTime = SystemUtils.getMillis() + 10L;
+                this.executeModerately();
             }
         }
+
+        // this.nextTickTime = SystemUtils.getMillis() + 10L;
         this.executeModerately();
+        // Iterator iterator = this.levels.values().iterator();
+
+        if (true) {
+            ServerLevel worldserver1 = worldserver;
+            // CraftBukkit end
+            ForcedChunksSavedData forcedchunk = (ForcedChunksSavedData) worldserver1.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
+
+            if (forcedchunk != null) {
+                LongIterator longiterator = forcedchunk.getChunks().iterator();
+
+                while (longiterator.hasNext()) {
+                    long i = longiterator.nextLong();
+                    ChunkPos chunkcoordintpair = new ChunkPos(i);
+
+                    worldserver1.getChunkSource().updateChunkForced(chunkcoordintpair, true);
+                }
+            }
+        }
+
+        // CraftBukkit start
+        // this.nextTickTime = SystemUtils.getMillis() + 10L;
+        this.executeModerately();
+        // CraftBukkit end
         listener.stop();
+        // CraftBukkit start
         // this.updateMobSpawningFlags();
-        serverWorld.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
+        worldserver.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
+
         this.forceTicks = false;
+        // CraftBukkit end
     }
 
     @Override
