@@ -2,14 +2,19 @@ package com.mohistmc.banner.mixin.world.entity;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.injection.world.entity.InjectionEntity;
+import net.minecraft.BlockUtil;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.PositionImpl;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.FluidTags;
@@ -18,17 +23,28 @@ import net.minecraft.world.Nameable;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.portal.PortalInfo;
+import net.minecraft.world.level.portal.PortalShape;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -42,6 +58,7 @@ import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_20_R1.event.CraftPortalEvent;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.entity.EntityAirChangeEvent;
@@ -49,8 +66,10 @@ import org.bukkit.event.entity.EntityCombustByBlockEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDropItemEvent;
+import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.entity.EntityPoseChangeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
@@ -63,6 +82,7 @@ import org.spigotmc.ActivationRange;
 import org.spigotmc.CustomTimingsHandler;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -73,7 +93,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 // Banner - TODO fix patches
 @Mixin(Entity.class)
@@ -147,6 +170,29 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Shadow public abstract DamageSources damageSources();
 
     @Shadow protected abstract ListTag newDoubleList(double... ds);
+    @Shadow public abstract boolean teleportTo(ServerLevel level, double x, double y, double z, Set<RelativeMovement> relativeMovements, float yRot, float xRot);
+
+    @Shadow protected BlockPos portalEntrancePos;
+
+    @Shadow public abstract Level level();
+
+    @Shadow protected abstract Vec3 getRelativePortalPosition(Direction.Axis axis, BlockUtil.FoundRectangle portal);
+
+    @Shadow public abstract Vec3 getDeltaMovement();
+
+    @Shadow public abstract boolean isRemoved();
+
+    @Shadow public abstract void unRide();
+
+    @Shadow public abstract EntityType<?> getType();
+
+    @Shadow protected abstract void removeAfterChangingDimensions();
+
+    @Shadow public abstract void setDeltaMovement(Vec3 deltaMovement);
+
+    @Shadow public abstract void moveTo(Vec3 vec);
+
+    @Shadow public abstract void moveTo(double x, double y, double z, float yRot, float xRot);
 
     private CraftEntity bukkitEntity;
     public final org.spigotmc.ActivationRange.ActivationType activationType =
@@ -741,6 +787,185 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         // Paper end
     }
 
+    private AtomicReference<PositionImpl> banner$location = new AtomicReference<>();
+
+    @Nullable
+    @Override
+    public Entity teleportTo(ServerLevel worldserver, PositionImpl location) {
+        banner$location.set(location);
+        return changeDimension(worldserver);
+    }
+
+    @Override
+    public boolean teleportTo(ServerLevel worldserver, double d0, double d1, double d2, Set<RelativeMovement> set, float f, float f1, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause cause) {
+        return this.teleportTo(worldserver, d0, d1, d2, set, f, f1);
+    }
+
+    /**
+     * @author wdog5
+     * @reason bukkit
+     */
+    @Overwrite
+    @Nullable
+    public Entity changeDimension(ServerLevel destination) {
+        if (this.level() instanceof ServerLevel && !this.isRemoved()) {
+            this.level().getProfiler().push("changeDimension");
+            if (destination == null) {
+                return null;
+            }
+            this.unRide();
+            this.level().getProfiler().push("reposition");
+            var bukkitPos = banner$location.get();
+            banner$location.set(null);
+            PortalInfo portalInfo = bukkitPos == null ? this.findDimensionEntryPoint(destination)
+                    : new PortalInfo(new Vec3(bukkitPos.x(), bukkitPos.y(), bukkitPos.z()), Vec3.ZERO, this.yRot, this.xRot);
+            if (portalInfo == null) {
+                return null;
+            } else {
+                ServerLevel world = portalInfo.bridge$getWorld() == null ? destination : portalInfo.bridge$getWorld();
+                if (world == this.level()) {
+                    this.moveTo(portalInfo.pos.x, portalInfo.pos.y, portalInfo.pos.z, portalInfo.yRot, this.getXRot());
+                    this.setDeltaMovement(portalInfo.speed);
+                    return (Entity) (Object) this;
+                }
+                this.unRide();
+
+                this.level().getProfiler().popPush("reloading");
+                Entity entity = this.getType().create(destination);
+
+                if (entity != null) {
+                    entity.restoreFrom(((Entity) (Object) this));
+                    entity.moveTo(portalInfo.pos.x, portalInfo.pos.y, portalInfo.pos.z, portalInfo.yRot, entity.getXRot());
+                    entity.setDeltaMovement(portalInfo.speed);
+                    destination.addDuringTeleport(entity);
+                    if (destination.getTypeKey() == LevelStem.END) { // CraftBukkit
+                        BukkitCaptures.captureEndPortalEntity((Entity) (Object) this, true);
+                        ServerLevel.makeObsidianPlatform(destination); // CraftBukkit
+                    }
+                    // CraftBukkit start - Forward the CraftEntity to the new entity
+                    this.getBukkitEntity().setHandle(entity);
+                    entity.banner$setBukkitEntity(this.getBukkitEntity());
+
+                    if (((Entity) (Object) this) instanceof Mob) {
+                        ((Mob) (Object) this).dropLeash(true, false); // Unleash to prevent duping of leads.
+                    }
+                    // CraftBukkit end
+                }
+
+                this.removeAfterChangingDimensions();
+                this.level().getProfiler().pop();
+                ((ServerLevel)this.level()).resetEmptyTime();
+                destination.resetEmptyTime();
+                this.level().getProfiler().pop();
+                return entity;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    @Inject(method = "restoreFrom", at = @At("HEAD"))
+    private void banner$forwardHandle(Entity entityIn, CallbackInfo ci) {
+         entityIn.getBukkitEntity().setHandle((Entity) (Object) this);
+         this.bukkitEntity =  entityIn.getBukkitEntity();
+        if (entityIn instanceof Mob) {
+            ((Mob) entityIn).dropLeash(true, false);
+        }
+    }
+
+    /**
+     * @author wdog5
+     * @reason bukkit
+     */
+    @Nullable
+    @Overwrite
+    protected PortalInfo findDimensionEntryPoint(ServerLevel worldserver) {
+        // CraftBukkit start
+        if (worldserver == null) {
+            return null;
+        }
+        boolean flag = this.level().getTypeKey() == LevelStem.END && worldserver.getTypeKey() == LevelStem.OVERWORLD; // fromEndToOverworld
+        boolean flag1 = worldserver.getTypeKey() == LevelStem.END; // targetIsEnd
+        // CraftBukkit end
+
+        if (!flag && !flag1) {
+            boolean flag2 = worldserver.getTypeKey() == LevelStem.NETHER; // CraftBukkit
+
+            if (this.level().getTypeKey() != LevelStem.NETHER && !flag2) { // CraftBukkit
+                return null;
+            } else {
+                WorldBorder worldborder = worldserver.getWorldBorder();
+                double d0 = DimensionType.getTeleportationScale(this.level().dimensionType(), worldserver.dimensionType());
+                BlockPos blockposition = worldborder.clampToBounds(this.getX() * d0, this.getY(), this.getZ() * d0);
+                // CraftBukkit start
+                CraftPortalEvent event = callPortalEvent(((Entity) (Object) this), worldserver, new PositionImpl(blockposition.getX(), blockposition.getY(), blockposition.getZ()), PlayerTeleportEvent.TeleportCause.NETHER_PORTAL, flag2 ? 16 : 128, 16);
+                if (event == null) {
+                    return null;
+                }
+                final ServerLevel worldserverFinal = worldserver = ((CraftWorld) event.getTo().getWorld()).getHandle();
+                worldborder = worldserverFinal.getWorldBorder();
+                blockposition = worldborder.clampToBounds(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
+
+                return (PortalInfo) this.getExitPortal(worldserver, blockposition, flag2, worldborder, event.getSearchRadius(), event.getCanCreatePortal(), event.getCreationRadius()).map((blockutil_rectangle) -> {
+                    // CraftBukkit end
+                    BlockState iblockdata = this.level().getBlockState(this.portalEntrancePos);
+                    Direction.Axis enumdirection_enumaxis;
+                    Vec3 vec3d;
+
+                    if (iblockdata.hasProperty(BlockStateProperties.HORIZONTAL_AXIS)) {
+                        enumdirection_enumaxis = (Direction.Axis) iblockdata.getValue(BlockStateProperties.HORIZONTAL_AXIS);
+                        BlockUtil.FoundRectangle blockutil_rectangle1 = BlockUtil.getLargestRectangleAround(this.portalEntrancePos, enumdirection_enumaxis, 21, Direction.Axis.Y, 21, (blockposition1) -> {
+                            return this.level().getBlockState(blockposition1) == iblockdata;
+                        });
+
+                        vec3d = this.getRelativePortalPosition(enumdirection_enumaxis, blockutil_rectangle1);
+                    } else {
+                        enumdirection_enumaxis = Direction.Axis.X;
+                        vec3d = new Vec3(0.5D, 0.0D, 0.0D);
+                    }
+
+                    return PortalShape.createPortalInfo(worldserverFinal, blockutil_rectangle, enumdirection_enumaxis, vec3d, ((Entity) (Object) this), this.getDeltaMovement(), this.getYRot(), this.getXRot()); // CraftBukkit
+                }).orElse(null); // CraftBukkit - decompile error
+            }
+        } else {
+            BlockPos blockposition1;
+
+            if (flag1) {
+                blockposition1 = ServerLevel.END_SPAWN_POINT;
+            } else {
+                blockposition1 = worldserver.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, worldserver.getSharedSpawnPos());
+            }
+            // CraftBukkit start
+            CraftPortalEvent event = callPortalEvent(((Entity) (Object) this), worldserver, new PositionImpl(blockposition1.getX() + 0.5D, blockposition1.getY(), blockposition1.getZ() + 0.5D), PlayerTeleportEvent.TeleportCause.END_PORTAL, 0, 0);
+            if (event == null) {
+                return null;
+            }
+
+            var portalInfo = new PortalInfo(new Vec3(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()), this.getDeltaMovement(), this.getYRot(), this.getXRot());
+            portalInfo.banner$setWorld(((CraftWorld) event.getTo().getWorld()).getHandle());
+            portalInfo.banner$setPortalEventInfo(event);
+            return portalInfo;
+
+            // CraftBukkit end
+        }
+    }
+
+    protected CraftPortalEvent callPortalEvent(Entity entity, ServerLevel exitWorldServer, PositionImpl exitPosition, PlayerTeleportEvent.TeleportCause cause, int searchRadius, int creationRadius) {
+        CraftEntity bukkitEntity =  entity.getBukkitEntity();
+        Location enter = bukkitEntity.getLocation();
+        Location exit = new Location(exitWorldServer.getWorld(), exitPosition.x(), exitPosition.y(), exitPosition.z());
+        EntityPortalEvent event = new EntityPortalEvent(bukkitEntity, enter, exit, searchRadius);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled() || event.getTo() == null || event.getTo().getWorld() == null || !entity.isAlive()) {
+            return null;
+        }
+        return new CraftPortalEvent(event);
+    }
+
+    protected Optional<BlockUtil.FoundRectangle> getExitPortal(ServerLevel serverWorld, BlockPos pos, boolean flag, WorldBorder worldborder, int searchRadius, boolean canCreatePortal, int createRadius) {
+        return  serverWorld.getPortalForcer().findPortalAround(pos, worldborder, searchRadius);
+    }
+
     @Override
     public boolean canCollideWith(Entity entity) {
         return this.isPushable();
@@ -869,5 +1094,10 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Override
     public CustomTimingsHandler bridge$tickTimer() {
         return tickTimer;
+    }
+
+    @Override
+    public void banner$setBukkitEntity(CraftEntity bukkitEntity) {
+        this.bukkitEntity = bukkitEntity;
     }
 }
