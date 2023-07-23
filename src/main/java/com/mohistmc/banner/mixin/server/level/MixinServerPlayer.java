@@ -73,6 +73,7 @@ import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -123,8 +124,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Shadow public abstract void initInventoryMenu();
 
-    @Shadow @Nullable public abstract Entity changeDimension(ServerLevel serverLevel);
-
     @Shadow public boolean isChangingDimension;
     @Shadow public boolean wonGame;
     @Shadow private boolean seenCredits;
@@ -137,6 +136,9 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Shadow private int lastSentFood;
     @Shadow private float lastSentHealth;
     @Shadow @Nullable private Vec3 levitationStartPos;
+
+    @Shadow public abstract boolean canChatInColor();
+
     // CraftBukkit start
     public String displayName;
     public Component listName;
@@ -559,14 +561,38 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         CraftEventFactory.handleInventoryCloseEvent(this); // CraftBukkit
     }
 
-    @Inject(method = "changeDimension", at = @At(value = "HEAD"), cancellable = true)
-    public void banner$changeDimension(ServerLevel worldserver, CallbackInfoReturnable<Entity> cir) {
-        cir.setReturnValue(changeDimension(worldserver, PlayerTeleportEvent.TeleportCause.UNKNOWN));
-        cir.cancel();
+    /**
+     * @author Mgazul
+     * @reason bukkit
+     */
+    @Nullable
+    @Overwrite
+    protected PortalInfo findDimensionEntryPoint(ServerLevel worldserver) {
+        PortalInfo shapedetectorshape = super.findDimensionEntryPoint(worldserver);
+        worldserver = (shapedetectorshape == null) ? worldserver : shapedetectorshape.bridge$getWorld(); // CraftBukkit
+
+        if (shapedetectorshape != null && this.level().dimension() == Level.OVERWORLD && worldserver != null && worldserver.dimension() == Level.END) { // CraftBukkit
+            Vec3 vec3d = shapedetectorshape.pos.add(0.0D, -1.0D, 0.0D);
+            PortalInfo portalInfo = new PortalInfo(vec3d, Vec3.ZERO, 90.0F, 0.0F); // CraftBukkit
+            portalInfo.banner$setWorld(worldserver);
+            portalInfo.banner$setPortalEventInfo(shapedetectorshape.bridge$getPortalEventInfo());
+            return portalInfo;
+        } else {
+            return shapedetectorshape;
+        }
     }
+
+
+    public PlayerTeleportEvent.TeleportCause banner$changeDimensionCause;
 
     @Override
     public Entity changeDimension(ServerLevel worldserver, PlayerTeleportEvent.TeleportCause cause) {
+        banner$changeDimensionCause = cause;
+        return changeDimension(worldserver);
+    }
+
+    @Override
+    public Entity changeDimension(ServerLevel worldserver) {
         if (this.isSleeping()) return this;
         ServerLevel worldserver1 = this.serverLevel();
         ResourceKey<Level> resourcekey = worldserver1.dimension();
@@ -584,7 +610,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         } else {
             PortalInfo shapedetectorshape = this.findDimensionEntryPoint(worldserver);
             if (shapedetectorshape != null) {
-                shapedetectorshape.banner$setWorld(worldserver);
                 worldserver1.getProfiler().push("moving");
                 worldserver = shapedetectorshape.bridge$getWorld();
                 if (worldserver == null) {
@@ -599,7 +624,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             }
             Location enter = this.getBukkitEntity().getLocation();
             Location exit = (worldserver == null) ? null : CraftLocation.toBukkit(shapedetectorshape.pos, worldserver.getWorld(), shapedetectorshape.yRot, shapedetectorshape.xRot);
-            PlayerTeleportEvent tpEvent = new PlayerTeleportEvent(this.getBukkitEntity(), enter, exit, cause);
+            PlayerTeleportEvent tpEvent = new PlayerTeleportEvent(this.getBukkitEntity(), enter, exit, banner$changeDimensionCause == null ? PlayerTeleportEvent.TeleportCause.UNKNOWN : banner$changeDimensionCause);
             Bukkit.getPluginManager().callEvent(tpEvent);
             if (tpEvent.isCancelled() || tpEvent.getTo() == null) {
                 return null;
@@ -619,7 +644,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
                 worldserver1.removePlayerImmediately((ServerPlayer) (Object) this, Entity.RemovalReason.CHANGED_DIMENSION);
                 this.unsetRemoved();
 
-                this.setLevel(worldserver);
+                this.setServerLevel(worldserver);
                 this.connection.teleport(exit);
                 this.connection.resetPosition();
                 worldserver.addDuringPortalTeleport((ServerPlayer) (Object) this);
@@ -644,7 +669,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
                 PlayerChangedWorldEvent changeEvent = new PlayerChangedWorldEvent(this.getBukkitEntity(), worldserver1.getWorld());
                 this.level().getCraftServer().getPluginManager().callEvent(changeEvent);
             }
-
+            banner$changeDimensionCause = null;
             return this;
         }
     }

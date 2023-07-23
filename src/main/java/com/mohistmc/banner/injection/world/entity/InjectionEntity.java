@@ -1,28 +1,35 @@
 package com.mohistmc.banner.injection.world.entity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Position;
+import net.minecraft.core.PositionImpl;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.RelativeMovement;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
+import org.jetbrains.annotations.Nullable;
 import org.spigotmc.CustomTimingsHandler;
 
+import java.util.Set;
 import java.util.UUID;
 
 public interface InjectionEntity {
+
+    default void banner$setBukkitEntity(CraftEntity bukkitEntity) {
+
+    }
 
     default void setOrigin(@javax.annotation.Nonnull Location location) {
 
     }
 
-    @javax.annotation.Nullable
+    @Nullable
     default org.bukkit.util.Vector getOriginVector() {
         return null;
     }
 
-    @javax.annotation.Nullable
+    @Nullable
     default UUID getOriginWorld() {
         return null;
     }
@@ -91,6 +98,10 @@ public interface InjectionEntity {
     default void banner$setLastLavaContact(BlockPos lastLavaContact) {
     }
 
+    default  boolean teleportTo(ServerLevel worldserver, double d0, double d1, double d2, Set<RelativeMovement> set, float f, float f1, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause cause) {
+        return false;
+    }
+
     default CraftEntity getBukkitEntity() {
         return null;
     }
@@ -137,7 +148,7 @@ public interface InjectionEntity {
 
     }
 
-    default Entity teleportTo(ServerLevel worldserver, Position location) {
+    default Entity teleportTo(ServerLevel worldserver, PositionImpl location) {
         return null;
     }
 

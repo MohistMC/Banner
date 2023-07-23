@@ -1876,7 +1876,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         this.awaitingTeleportTime = this.tickCount;
         this.player.absMoveTo(d0, d1, d2, f, f1);
         this.player.connection.send(new ClientboundPlayerPositionPacket(d0 - d3, d1 - d4, d2 - d5, f - f2, f1 - f3, set, this.awaitingTeleport));
-        this.player.getBukkitEntity().sendMessage("传送成功");
     }
 
     @Override
