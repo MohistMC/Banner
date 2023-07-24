@@ -2,16 +2,35 @@ package com.mohistmc.banner.mixin.world.level.block.grower;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.injection.world.level.block.InjectionAbstractTreeGrower;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.features.TreeFeatures;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.grower.AbstractTreeGrower;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import org.bukkit.TreeType;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(AbstractTreeGrower.class)
 public class MixinAbstractTreeGrower implements InjectionAbstractTreeGrower {
+
+    @Inject(method = "growTree", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerLevel;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z",
+            ordinal = 0),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$setTreeType(ServerLevel level, ChunkGenerator generator, BlockPos pos, BlockState state,
+                                    RandomSource random, CallbackInfoReturnable<Boolean> cir, ResourceKey resourceKey,
+                                    Holder<ConfiguredFeature<?, ?>> holder, ConfiguredFeature<?, ?> configuredFeature, BlockState blockState) {
+        this.setTreeType(holder);
+    }
 
     @Override
     public void setTreeType(Holder<ConfiguredFeature<?, ?>> holder) {
@@ -59,7 +78,7 @@ public class MixinAbstractTreeGrower implements InjectionAbstractTreeGrower {
         } else if (worldgentreeabstract == TreeFeatures.CHERRY || worldgentreeabstract == TreeFeatures.CHERRY_BEES_005) {
             BukkitExtraConstants.treeType = TreeType.CHERRY;
         } else {
-           BukkitExtraConstants.treeType = TreeType.CUSTOM;// Banner - add field to handle modded trees
+           BukkitExtraConstants.treeType = TreeType.MODDED;// Banner - add field to handle modded trees
         }
     }
     // CraftBukkit end

@@ -98,7 +98,7 @@ public enum TreeType {
      */
     CHERRY,
     /**
-     * Custom
+     * Modded tree
      */
-    CUSTOM
+    MODDED
 }
