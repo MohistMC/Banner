@@ -32,7 +32,7 @@ public class ServerAPI {
     static {
         for (ModContainer modInfo : FabricLoader.getInstance().getAllMods()) {
             modlists_All.add(modInfo.getMetadata().getId());
-            if (modInfo.getMetadata().getEnvironment() == ModEnvironment.SERVER) {
+            if (modInfo.getMetadata().getEnvironment() == ModEnvironment.CLIENT) {
                 modlists_Client.add(modInfo.getMetadata().getId());
             } else if (modInfo.getMetadata().getEnvironment() == ModEnvironment.SERVER) {
                 modlists_Server.add(modInfo.getMetadata().getId());
