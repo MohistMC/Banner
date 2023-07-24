@@ -98,6 +98,7 @@
     "server.players.MixinPlayerList$LoadRecursive",
     "server.players.MixinSleepStatus",
     "server.players.MixinStoredUserList",
+    "server.players.MixinUserWhiteList",
     "server.rcon.MixinRconConsoleSource",
     "stats.MixinStatsCounter",
     "util.MixinSpawnUtil",
