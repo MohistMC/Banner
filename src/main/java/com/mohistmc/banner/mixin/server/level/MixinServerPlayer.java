@@ -56,12 +56,10 @@ import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.WeatherType;
-import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R1.CraftWorldBorder;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
-import org.bukkit.craftbukkit.v1_20_R1.scoreboard.CraftScoreboardManager;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftLocation;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.player.PlayerChangedMainHandEvent;
@@ -236,12 +234,12 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Redirect(method = "awardKillScore", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/scores/Scoreboard;forAllObjectives(Lnet/minecraft/world/scores/criteria/ObjectiveCriteria;Ljava/lang/String;Ljava/util/function/Consumer;)V"))
     private void banner$useCustomScoreboard(Scoreboard instance, ObjectiveCriteria criteria, String scoreboardName, Consumer<Score> points) {
-        ((CraftServer) Bukkit.getServer()).getScoreboardManager().getScoreboardScores(criteria, scoreboardName, points);
+        this.level().getCraftServer().getScoreboardManager().getScoreboardScores(criteria, scoreboardName, points);
     }
 
     @Redirect(method = "handleTeamKill", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/scores/Scoreboard;forAllObjectives(Lnet/minecraft/world/scores/criteria/ObjectiveCriteria;Ljava/lang/String;Ljava/util/function/Consumer;)V"))
     private void banner$teamKill(Scoreboard instance, ObjectiveCriteria criteria, String scoreboardName, Consumer<Score> points) {
-        ((CraftServer) Bukkit.getServer()).getScoreboardManager().getScoreboardScores(criteria, scoreboardName, points);
+        this.level().getCraftServer().getScoreboardManager().getScoreboardScores(criteria, scoreboardName, points);
     }
 
     @Inject(method = "isPvpAllowed", cancellable = true, at = @At("HEAD"))
@@ -398,12 +396,19 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Redirect(method = "awardStat", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/scores/Scoreboard;forAllObjectives(Lnet/minecraft/world/scores/criteria/ObjectiveCriteria;Ljava/lang/String;Ljava/util/function/Consumer;)V"))
     private void banner$addStats(Scoreboard instance, ObjectiveCriteria criteria, String scoreboardName, Consumer<Score> points) {
-        ((CraftScoreboardManager) Bukkit.getScoreboardManager()).getScoreboardScores(criteria, scoreboardName, points);
+        this.level().getCraftServer().getScoreboardManager().getScoreboardScores(criteria, scoreboardName, points);
     }
 
     @Redirect(method = "resetStat", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/scores/Scoreboard;forAllObjectives(Lnet/minecraft/world/scores/criteria/ObjectiveCriteria;Ljava/lang/String;Ljava/util/function/Consumer;)V"))
     private void banner$takeStats(Scoreboard instance, ObjectiveCriteria criteria, String scoreboardName, Consumer<Score> points) {
-        ((CraftScoreboardManager) Bukkit.getScoreboardManager()).getScoreboardScores(criteria, scoreboardName, points);
+        this.level().getCraftServer().getScoreboardManager().getScoreboardScores(criteria, scoreboardName, points);
+    }
+
+    @Redirect(method = "updateScoreForCriteria", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/scores/Scoreboard;forAllObjectives(Lnet/minecraft/world/scores/criteria/ObjectiveCriteria;Ljava/lang/String;Ljava/util/function/Consumer;)V"))
+    private void banner$updateStats(Scoreboard instance, ObjectiveCriteria criteria, String scoreboardName, Consumer<Score> action) {
+        // CraftBukkit - Use our scores instead
+        this.level().getCraftServer().getScoreboardManager().getScoreboardScores(criteria, this.getScoreboardName(),
+                action);
     }
 
     @Inject(method = "resetSentInfo", at = @At("HEAD"))
