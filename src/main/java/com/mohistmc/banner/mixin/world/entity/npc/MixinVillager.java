@@ -37,6 +37,23 @@ public abstract class MixinVillager extends AbstractVillager {
         super(entityType, level);
     }
 
+    @Redirect(method = "thunderHit", at = @At(value = "INVOKE",
+            target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V",
+            remap = false))
+    private void banner$moveDown(Logger instance, String s, Object o1, Object o2) { }
+
+    @Inject(method = "thunderHit", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/monster/Witch;moveTo(DDDFF)V"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    private void banner$fireZapEvent(ServerLevel level,
+                                     LightningBolt lightning,
+                                     CallbackInfo ci, Witch witch) {
+        // Paper start
+        if (CraftEventFactory.callEntityZapEvent(this, lightning, witch).isCancelled()) {
+            ci.cancel();
+        }
+        if (org.spigotmc.SpigotConfig.logVillagerDeaths) LOGGER.info("Villager {} was struck by lightning {}.", this, lightning); // Move down
+    }
+
     @Inject(method = "customServerAiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;addEffect(Lnet/minecraft/world/effect/MobEffectInstance;)Z"))
     private void banner$reason(CallbackInfo ci) {
         pushEffectCause(EntityPotionEffectEvent.Cause.VILLAGER_TRADE);
