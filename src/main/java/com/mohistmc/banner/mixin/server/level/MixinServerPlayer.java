@@ -157,7 +157,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     public long timeOffset = 0;
     public WeatherType weather = null;
     public boolean relativeTime = true;
-    public String locale = "en_us"; // CraftBukkit - add, lowercase
+    public String locale = null; // CraftBukkit - add, lowercase // Paper - default to null
     private boolean banner$initialized = false;
 
     public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
@@ -417,9 +417,10 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             PlayerChangedMainHandEvent event = new PlayerChangedMainHandEvent(this.getBukkitEntity(), (this.getMainArm() == HumanoidArm.LEFT) ? MainHand.LEFT : MainHand.RIGHT);
             Bukkit.getPluginManager().callEvent(event);
         }
-        if (!this.locale.equals(packetIn.language())) {
+        if (this.locale == null || !this.locale.equals(packetIn.language)) { // Paper - check for null
             PlayerLocaleChangeEvent event2 = new PlayerLocaleChangeEvent(this.getBukkitEntity(), packetIn.language());
             Bukkit.getPluginManager().callEvent(event2);
+            this.server.bridge$server().getPluginManager().callEvent(new com.destroystokyo.paper.event.player.PlayerLocaleChangeEvent(this.getBukkitEntity(), this.locale, packetIn.language)); // Paper
         }
         this.locale = packetIn.language();
         this.clientViewDistance = packetIn.viewDistance();
