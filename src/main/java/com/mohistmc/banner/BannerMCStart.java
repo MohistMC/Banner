@@ -7,6 +7,7 @@ import com.mohistmc.banner.network.download.UpdateUtils;
 import com.mohistmc.banner.stackdeobf.mappings.CachedMappings;
 import com.mohistmc.banner.stackdeobf.mappings.providers.MojangMappingProvider;
 import com.mohistmc.banner.stackdeobf.util.CompatUtil;
+import com.mohistmc.banner.stackdeobf.util.RemappingRewritePolicy;
 import com.mohistmc.banner.util.EulaUtil;
 import com.mohistmc.i18n.i18n;
 import org.apache.logging.log4j.LogManager;
@@ -62,6 +63,8 @@ public class BannerMCStart {
 
     private static void injectDeobfStack() {
         CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.inject.logger"));
+        RemappingRewritePolicy policy = new RemappingRewritePolicy();
+        policy.inject((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger());
         CachedMappings.init(new MojangMappingProvider());
     }
 }
