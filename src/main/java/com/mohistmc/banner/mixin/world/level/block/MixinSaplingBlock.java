@@ -16,7 +16,9 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(SaplingBlock.class)
 public class MixinSaplingBlock {
@@ -24,8 +26,17 @@ public class MixinSaplingBlock {
     @Shadow @Final private AbstractTreeGrower treeGrower;
     private static TreeType treeType = BukkitExtraConstants.treeType; // CraftBukkit
 
-    @Redirect(method = "advanceTree", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/grower/AbstractTreeGrower;growTree(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ChunkGenerator;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/util/RandomSource;)Z"))
-    private boolean banner$growTree(AbstractTreeGrower instance, ServerLevel level, ChunkGenerator generator, BlockPos pos, BlockState state, RandomSource random) {
+    @Redirect(method = "advanceTree", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/block/grower/AbstractTreeGrower;growTree(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ChunkGenerator;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/util/RandomSource;)Z"))
+    private boolean banner$cancelGrowTree(AbstractTreeGrower instance, ServerLevel level, ChunkGenerator generator, BlockPos pos, BlockState state, RandomSource random) {
+        return false;
+    }
+
+    @Inject(method = "advanceTree", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/block/grower/AbstractTreeGrower;growTree(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ChunkGenerator;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/util/RandomSource;)Z"))
+    private void banner$fireStructureGrowEvent(ServerLevel level, BlockPos pos, BlockState state,
+                                               RandomSource random, CallbackInfo ci) {
+        // CraftBukkit start
         if (level.bridge$captureTreeGeneration()) {
             this.treeGrower.growTree(level, level.getChunkSource().getGenerator(), pos, state, random);
         } else {
@@ -51,6 +62,5 @@ public class MixinSaplingBlock {
             }
         }
         // CraftBukkit end
-        return true;
     }
 }
