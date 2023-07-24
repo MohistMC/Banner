@@ -891,6 +891,13 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         }
     }
 
+    @Inject(method = "handleUseItemOn",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerPlayerGameMode;useItemOn(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
+    private void banner$setStopUsing(ServerboundUseItemOnPacket packet, CallbackInfo ci) {
+        this.player.stopUsingItem(); // CraftBukkit - SPIGOT-4706
+    }
+
     private int limitedPackets;
     private long lastLimitedPacket = -1;
 
@@ -909,71 +916,63 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         return true;
     }
 
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    public void handleUseItem(ServerboundUseItemPacket packetplayinblockplace) {
-        PacketUtils.ensureRunningOnSameThread(packetplayinblockplace, ((ServerGamePacketListenerImpl) (Object) this ), this.player.serverLevel());
-        if (this.player.isImmobile()) return; // CraftBukkit
-        this.ackBlockChangesUpTo(packetplayinblockplace.getSequence());
-        ServerLevel worldserver = this.player.serverLevel();
-        InteractionHand enumhand = packetplayinblockplace.getHand();
-        ItemStack itemstack = this.player.getItemInHand(enumhand);
-
-        this.player.resetLastActionTime();
-        if (!itemstack.isEmpty() && itemstack.isItemEnabled(worldserver.enabledFeatures())) {
-            // CraftBukkit start
-            // Raytrace to look for 'rogue armswings'
-            float f1 = this.player.getXRot();
-            float f2 = this.player.getYRot();
-            double d0 = this.player.getX();
-            double d1 = this.player.getY() + (double) this.player.getEyeHeight();
-            double d2 = this.player.getZ();
-            Vec3 vec3d = new Vec3(d0, d1, d2);
-
-            float f3 = Mth.cos(-f2 * 0.017453292F - 3.1415927F);
-            float f4 = Mth.sin(-f2 * 0.017453292F - 3.1415927F);
-            float f5 = -Mth.cos(-f1 * 0.017453292F);
-            float f6 = Mth.sin(-f1 * 0.017453292F);
-            float f7 = f4 * f5;
-            float f8 = f3 * f5;
-            double d3 = player.gameMode.getGameModeForPlayer()== GameType.CREATIVE ? 5.0D : 4.5D;
-            Vec3 vec3d1 = vec3d.add((double) f7 * d3, (double) f6 * d3, (double) f8 * d3);
-            BlockHitResult movingobjectposition = this.player.level().clip(new ClipContext(vec3d, vec3d1, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
-
-            boolean cancelled;
-            if (movingobjectposition == null || movingobjectposition.getType() != HitResult.Type.BLOCK) {
-                org.bukkit.event.player.PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent(this.player, Action.RIGHT_CLICK_AIR, itemstack, enumhand);
-                cancelled = event.useItemInHand() == Event.Result.DENY;
-            } else {
-                HitResult movingobjectpositionblock = (HitResult) movingobjectposition;
-                if (player.gameMode.bridge$isFiredInteract() && player.gameMode.bridge$getinteractPosition().equals(((BlockHitResult) movingobjectpositionblock).getBlockPos()) && player.gameMode.bridge$getinteractHand() == enumhand && ItemStack.isSameItemSameTags(player.gameMode.bridge$getinteractItemStack(), itemstack)) {
-                    cancelled = player.gameMode.bridge$getInteractResult();
-                } else {
-                    org.bukkit.event.player.PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, ((BlockHitResult) movingobjectpositionblock).getBlockPos(), ((BlockHitResult) movingobjectpositionblock).getDirection(), itemstack, true, enumhand, movingobjectpositionblock.getLocation());
-                    cancelled = event.useItemInHand() == Event.Result.DENY;
-                }
-                player.gameMode.bridge$setFiredInteract(false);
-            }
-
-            if (cancelled) {
-                this.player.getBukkitEntity().updateInventory(); // SPIGOT-2524
-                return;
-            }
-            itemstack = this.player.getItemInHand(enumhand); // Update in case it was changed in the event
-            if (itemstack.isEmpty()) {
-                return;
-            }
-            // CraftBukkit end
-            InteractionResult enuminteractionresult = this.player.gameMode.useItem(this.player, worldserver, itemstack, enumhand);
-
-            if (enuminteractionresult.shouldSwing()) {
-                this.player.swing(enumhand, true);
-            }
-
+    @Inject(method = "handleUseItem",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;ackBlockChangesUpTo(I)V"), cancellable = true)
+    private void banner$checkUseItem(ServerboundUseItemPacket packet, CallbackInfo ci) {
+        if (this.player.isImmobile()) {
+            ci.cancel();
         }
+    }
+
+    @Inject(method = "handleUseItem", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerPlayerGameMode;useItem(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$handleInteractEvent(ServerboundUseItemPacket packet, CallbackInfo ci, ServerLevel serverLevel,
+                                            InteractionHand interactionHand, ItemStack itemStack) {
+        // CraftBukkit start
+        // Raytrace to look for 'rogue armswings'
+        float f1 = this.player.getXRot();
+        float f2 = this.player.getYRot();
+        double d0 = this.player.getX();
+        double d1 = this.player.getY() + (double) this.player.getEyeHeight();
+        double d2 = this.player.getZ();
+        Vec3 vec3d = new Vec3(d0, d1, d2);
+
+        float f3 = Mth.cos(-f2 * 0.017453292F - 3.1415927F);
+        float f4 = Mth.sin(-f2 * 0.017453292F - 3.1415927F);
+        float f5 = -Mth.cos(-f1 * 0.017453292F);
+        float f6 = Mth.sin(-f1 * 0.017453292F);
+        float f7 = f4 * f5;
+        float f8 = f3 * f5;
+        double d3 = player.gameMode.getGameModeForPlayer()== GameType.CREATIVE ? 5.0D : 4.5D;
+        Vec3 vec3d1 = vec3d.add((double) f7 * d3, (double) f6 * d3, (double) f8 * d3);
+        BlockHitResult movingobjectposition = this.player.level().clip(new ClipContext(vec3d, vec3d1, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
+
+        boolean cancelled;
+        if (movingobjectposition == null || movingobjectposition.getType() != HitResult.Type.BLOCK) {
+            org.bukkit.event.player.PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent(this.player, Action.RIGHT_CLICK_AIR, itemStack, interactionHand);
+            cancelled = event.useItemInHand() == Event.Result.DENY;
+        } else {
+            BlockHitResult movingobjectpositionblock = movingobjectposition;
+            if (player.gameMode.bridge$isFiredInteract() && player.gameMode.bridge$getinteractPosition().equals(movingobjectpositionblock.getBlockPos()) && player.gameMode.bridge$getinteractHand() == interactionHand && ItemStack.isSameItemSameTags(player.gameMode.bridge$getinteractItemStack(), itemStack)) {
+                cancelled = player.gameMode.bridge$getInteractResult();
+            } else {
+                org.bukkit.event.player.PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, movingobjectpositionblock.getBlockPos(), movingobjectpositionblock.getDirection(), itemStack, true, interactionHand, movingobjectpositionblock.getLocation());
+                cancelled = event.useItemInHand() == Event.Result.DENY;
+            }
+            player.gameMode.bridge$setFiredInteract(false);
+        }
+
+        if (cancelled) {
+            this.player.getBukkitEntity().updateInventory(); // SPIGOT-2524
+            return;
+        }
+        itemStack = this.player.getItemInHand(interactionHand); // Update in case it was changed in the event
+        if (itemStack.isEmpty()) {
+            return;
+        }
+        // CraftBukkit end
     }
 
     @Inject(method = "handleResourcePackResponse", at = @At("RETURN"))
