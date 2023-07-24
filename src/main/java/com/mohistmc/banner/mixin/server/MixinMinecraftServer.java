@@ -5,6 +5,7 @@ import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
+import com.mohistmc.banner.paper.RollingAverage;
 import com.mojang.datafixers.DataFixer;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import jline.console.ConsoleReader;
@@ -239,7 +240,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     public final double[] recentTps = new double[3];
     private static final int TPS = 20;
     private static final int TICK_TIME = 1000000000 / TPS;
-    private static final int SAMPLE_INTERVAL = 100;
+    private static final int SAMPLE_INTERVAL = 20; // Paper
     // CraftBukkit end
 
     public MixinMinecraftServer(String string) {
@@ -267,6 +268,17 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         }
     }
 
+    // Paper start - Further improve server tick loop
+    private static final long SEC_IN_NANO = 1000000000;
+    private static final long MAX_CATCHUP_BUFFER = TICK_TIME * TPS * 60L;
+    private long lastTick = 0;
+    private long catchupTime = 0;
+    public final RollingAverage tps1 = new RollingAverage(60, TPS, SEC_IN_NANO);
+    public final RollingAverage tps5 = new RollingAverage(60 * 5, TPS, SEC_IN_NANO);
+    public final RollingAverage tps15 = new RollingAverage(60 * 15, TPS, SEC_IN_NANO);
+    private static final java.math.BigDecimal TPS_BASE = new java.math.BigDecimal(1E9).multiply(new java.math.BigDecimal(SAMPLE_INTERVAL));
+    // Paper End
+
     /**
      * @author wdog5
      * @reason bukkit
@@ -284,9 +296,10 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
             // Spigot start
             Arrays.fill( recentTps, 20 );
-            long curTime, tickSection = Util.getMillis(), tickCount = 1;
+            long start = System.nanoTime(), curTime, tickSection = start; // Paper - Further improve server tick loop
+            lastTick = start - TICK_TIME; // Paper
             while (this.running) {
-                long i = (curTime = Util.getMillis()) - this.nextTickTime;
+                long i = ((curTime = System.nanoTime()) / (1000L * 1000L)) - this.nextTickTime; // Paper
 
                 if (i > 5000L && this.nextTickTime - this.lastOverloadWarning >= 30000L) { // CraftBukkit
                     long j = i / 50L;
@@ -297,12 +310,18 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                     this.lastOverloadWarning = this.nextTickTime;
                 }
 
-                if ( tickCount++ % SAMPLE_INTERVAL == 0 )
+                if ( ++currentTick % SAMPLE_INTERVAL == 0 )
                 {
-                    double currentTps = 1E3 / ( curTime - tickSection ) * SAMPLE_INTERVAL;
-                    recentTps[0] = calcTps( recentTps[0], 0.92, currentTps ); // 1/exp(5sec/1min)
-                    recentTps[1] = calcTps( recentTps[1], 0.9835, currentTps ); // 1/exp(5sec/5min)
-                    recentTps[2] = calcTps( recentTps[2], 0.9945, currentTps ); // 1/exp(5sec/15min)
+                    final long diff = curTime - tickSection;
+                    java.math.BigDecimal currentTps = TPS_BASE.divide(new java.math.BigDecimal(diff), 30, java.math.RoundingMode.HALF_UP);
+                    tps1.add(currentTps, diff);
+                    tps5.add(currentTps, diff);
+                    tps15.add(currentTps, diff);
+                    // Backwards compat with bad plugins
+                    this.recentTps[0] = tps1.getAverage();
+                    this.recentTps[1] = tps5.getAverage();
+                    this.recentTps[2] = tps15.getAverage();
+                    // Paper end
                     tickSection = curTime;
                 }
                 // Spigot end
@@ -312,7 +331,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                     this.debugCommandProfiler = new MinecraftServer.TimeProfiler(Util.getNanos(), this.tickCount);
                 }
 
-                BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
+                // BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit  // Paper - don't overwrite current tick time
                 this.nextTickTime += 50L;
                 this.startMetricsRecordingTick();
                 this.profiler.push("tick");

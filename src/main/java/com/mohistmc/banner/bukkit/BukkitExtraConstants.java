@@ -47,7 +47,7 @@ public class BukkitExtraConstants {
     public static int bridge$autosavePeriod;
     public static java.util.Queue<Runnable> bridge$processQueue =
             new java.util.concurrent.ConcurrentLinkedQueue<>();
-    public static int currentTick = (int) (System.currentTimeMillis() / 50);
+    public static int currentTick = 0; // Paper - Further improve tick loop
     public static boolean dispenser_eventFired = false; // CraftBukkit
     public static final TicketType<org.bukkit.plugin.Plugin> PLUGIN_TICKET =
             TicketType.create("plugin_ticket", Comparator.comparing(plugin -> plugin.getClass().getName())); // CraftBukkit
