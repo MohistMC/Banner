@@ -1,4 +1,4 @@
-From feb7df98c989257d171e9572743369bac3b2de78 Mon Sep 17 00:00:00 2001
+From 8d25cc388ffea363aec5a9669a173f6a10cf18e6 Mon Sep 17 00:00:00 2001
 From: md_5 <md_5@live.com.au>
 Date: Sun, 1 Dec 2013 18:18:41 +1100
 Subject: [PATCH] BungeeCord Support
@@ -6,7 +6,7 @@ Subject: [PATCH] BungeeCord Support
 Provides support for IP forwarding via BungeeCord.
 
 diff --git a/src/main/java/net/minecraft/network/NetworkManager.java b/src/main/java/net/minecraft/network/NetworkManager.java
-index 1bd30dc70..29428de0b 100644
+index dd0f05b5e..dac406ba7 100644
 --- a/src/main/java/net/minecraft/network/NetworkManager.java
 +++ b/src/main/java/net/minecraft/network/NetworkManager.java
 @@ -76,6 +76,10 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet<?>> {
@@ -113,10 +113,10 @@ index 40f03ce23..ac36c73e1 100644
  
      public void handleAcceptedLogin() {
 diff --git a/src/main/java/net/minecraft/server/network/PlayerConnection.java b/src/main/java/net/minecraft/server/network/PlayerConnection.java
-index 137ae32ab..b4d844780 100644
+index b29159f9b..bae0de2da 100644
 --- a/src/main/java/net/minecraft/server/network/PlayerConnection.java
 +++ b/src/main/java/net/minecraft/server/network/PlayerConnection.java
-@@ -2054,10 +2054,10 @@ public class PlayerConnection implements ServerPlayerConnection, TickablePacketL
+@@ -2057,10 +2057,10 @@ public class PlayerConnection implements ServerPlayerConnection, TickablePacketL
  
                          String message = String.format(queueEvent.getFormat(), queueEvent.getPlayer().getDisplayName(), queueEvent.getMessage());
                          if (((LazyPlayerSet) queueEvent.getRecipients()).isLazy()) {
@@ -129,7 +129,7 @@ index 137ae32ab..b4d844780 100644
                                  PlayerConnection.this.server.getPlayerList().broadcastChatMessage(original, PlayerConnection.this.player, ChatMessageType.bind(ChatMessageType.RAW, (Entity) PlayerConnection.this.player));
                                  return null;
                              }
-@@ -2093,10 +2093,10 @@ public class PlayerConnection implements ServerPlayerConnection, TickablePacketL
+@@ -2096,10 +2096,10 @@ public class PlayerConnection implements ServerPlayerConnection, TickablePacketL
  
                  s = String.format(event.getFormat(), event.getPlayer().getDisplayName(), event.getMessage());
                  if (((LazyPlayerSet) event.getRecipients()).isLazy()) {
@@ -142,7 +142,7 @@ index 137ae32ab..b4d844780 100644
                          PlayerConnection.this.server.getPlayerList().broadcastChatMessage(original, PlayerConnection.this.player, ChatMessageType.bind(ChatMessageType.RAW, (Entity) PlayerConnection.this.player));
                          return;
                      }
-@@ -2350,6 +2350,13 @@ public class PlayerConnection implements ServerPlayerConnection, TickablePacketL
+@@ -2353,6 +2353,13 @@ public class PlayerConnection implements ServerPlayerConnection, TickablePacketL
          return this.connection.getRemoteAddress();
      }
  
@@ -157,7 +157,7 @@ index 137ae32ab..b4d844780 100644
      public void handleInteract(PacketPlayInUseEntity packetplayinuseentity) {
          PlayerConnectionUtils.ensureRunningOnSameThread(packetplayinuseentity, this, this.player.serverLevel());
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index c08461b7f..db7878edc 100644
+index e478c20f9..8d86eb05b 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -596,7 +596,7 @@ public abstract class PlayerList {
@@ -170,10 +170,10 @@ index c08461b7f..db7878edc 100644
          if (getBans().isBanned(gameprofile) && !getBans().get(gameprofile).hasExpired()) {
              GameProfileBanEntry gameprofilebanentry = (GameProfileBanEntry) this.bans.get(gameprofile);
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index e747597b4..fd9653f4e 100644
+index c1d6eef0f..6f0661e66 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -744,7 +744,13 @@ public final class CraftServer implements Server {
+@@ -755,7 +755,13 @@ public final class CraftServer implements Server {
  
      @Override
      public long getConnectionThrottle() {
@@ -189,10 +189,10 @@ index e747597b4..fd9653f4e 100644
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index b6a8418f9..357a0d29f 100644
+index 7d9980b83..e7e5a1e74 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2123,6 +2123,12 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2148,6 +2148,12 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
      private final Player.Spigot spigot = new Player.Spigot()
      {
  
@@ -225,5 +225,5 @@ index 130016282..3bb51f452 100644
 +    }
  }
 -- 
-2.40.1
+2.41.0
 

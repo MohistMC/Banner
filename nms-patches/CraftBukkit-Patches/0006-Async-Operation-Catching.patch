@@ -1,4 +1,4 @@
-From 115b2634ca225f5a8f548c62aaf31e4d1ecdb032 Mon Sep 17 00:00:00 2001
+From 0c354f62c5119533a4686fcbd95a05f679d4111b Mon Sep 17 00:00:00 2001
 From: md_5 <git@md-5.net>
 Date: Tue, 25 Mar 2014 16:10:01 +1100
 Subject: [PATCH] Async Operation Catching
@@ -78,7 +78,7 @@ index 854112e1b..d1498a02d 100644
              if (entity instanceof EntityPlayer) {
                  EntityPlayer entityplayer = (EntityPlayer) entity;
 diff --git a/src/main/java/net/minecraft/world/entity/EntityLiving.java b/src/main/java/net/minecraft/world/entity/EntityLiving.java
-index 005fd6db2..e70bf3394 100644
+index 2f4b559c2..a7110e06c 100644
 --- a/src/main/java/net/minecraft/world/entity/EntityLiving.java
 +++ b/src/main/java/net/minecraft/world/entity/EntityLiving.java
 @@ -1102,6 +1102,7 @@ public abstract class EntityLiving extends Entity implements Attackable {
@@ -122,22 +122,22 @@ index eb4100f53..28a548dee 100644
              world.removeBlockEntity(blockposition);
          }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index cf1800826..79f46d27e 100644
+index 468659f2d..8fe397a1e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -839,6 +839,7 @@ public final class CraftServer implements Server {
+@@ -850,6 +850,7 @@ public final class CraftServer implements Server {
      public boolean dispatchCommand(CommandSender sender, String commandLine) {
-         Validate.notNull(sender, "Sender cannot be null");
-         Validate.notNull(commandLine, "CommandLine cannot be null");
+         Preconditions.checkArgument(sender != null, "sender cannot be null");
+         Preconditions.checkArgument(commandLine != null, "commandLine cannot be null");
 +        org.spigotmc.AsyncCatcher.catchOp("command dispatch"); // Spigot
  
          if (commandMap.dispatch(sender, commandLine)) {
              return true;
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 91ef74595..9da7d68e4 100644
+index 8dc870a5d..8621c949e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-@@ -274,6 +274,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -273,6 +273,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public boolean unloadChunkRequest(int x, int z) {
@@ -145,7 +145,7 @@ index 91ef74595..9da7d68e4 100644
          if (isChunkLoaded(x, z)) {
              world.getChunkSource().removeRegionTicket(TicketType.PLUGIN, new ChunkCoordIntPair(x, z), 1, Unit.INSTANCE);
          }
-@@ -282,6 +283,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -281,6 +282,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
      }
  
      private boolean unloadChunk0(int x, int z, boolean save) {
@@ -153,7 +153,7 @@ index 91ef74595..9da7d68e4 100644
          if (!isChunkLoaded(x, z)) {
              return true;
          }
-@@ -296,6 +298,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -295,6 +297,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public boolean regenerateChunk(int x, int z) {
@@ -161,7 +161,7 @@ index 91ef74595..9da7d68e4 100644
          throw new UnsupportedOperationException("Not supported in this Minecraft version! Unless you can fix it, this is not a bug :)");
          /*
          if (!unloadChunk0(x, z, false)) {
-@@ -348,6 +351,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -347,6 +350,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public boolean loadChunk(int x, int z, boolean generate) {
@@ -169,15 +169,15 @@ index 91ef74595..9da7d68e4 100644
          IChunkAccess chunk = world.getChunkSource().getChunk(x, z, generate ? ChunkStatus.FULL : ChunkStatus.EMPTY, true);
  
          // If generate = false, but the chunk already exists, we will get this back.
-@@ -836,6 +840,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -841,6 +845,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public Collection<Entity> getNearbyEntities(BoundingBox boundingBox, Predicate<Entity> filter) {
 +        org.spigotmc.AsyncCatcher.catchOp("getNearbyEntities"); // Spigot
-         Validate.notNull(boundingBox, "Bounding box is null!");
+         Preconditions.checkArgument(boundingBox != null, "BoundingBox cannot be null");
  
          AxisAlignedBB bb = new AxisAlignedBB(boundingBox.getMinX(), boundingBox.getMinY(), boundingBox.getMinZ(), boundingBox.getMaxX(), boundingBox.getMaxY(), boundingBox.getMaxZ());
-@@ -990,6 +995,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -995,6 +1000,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public void save() {
@@ -186,7 +186,7 @@ index 91ef74595..9da7d68e4 100644
          boolean oldSave = world.noSave;
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-index e57b204b7..47aa4cb9b 100644
+index 613f71d20..0f0366a3e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 @@ -563,6 +563,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
@@ -198,10 +198,10 @@ index e57b204b7..47aa4cb9b 100644
          List<Entity> notchEntityList = entity.level().getEntities(entity, entity.getBoundingBox().inflate(x, y, z), Predicates.alwaysTrue());
          List<org.bukkit.entity.Entity> bukkitEntityList = new java.util.ArrayList<org.bukkit.entity.Entity>(notchEntityList.size());
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 278185c4f..8fd17dfad 100644
+index 2cf505748..67599cbb2 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -375,6 +375,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -386,6 +386,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      @Override
      public void kickPlayer(String message) {
@@ -210,7 +210,7 @@ index 278185c4f..8fd17dfad 100644
  
          getHandle().connection.disconnect(message == null ? "" : message);
 diff --git a/src/main/java/org/bukkit/craftbukkit/scoreboard/CraftScoreboardManager.java b/src/main/java/org/bukkit/craftbukkit/scoreboard/CraftScoreboardManager.java
-index 659c1b272..329b2fbe0 100644
+index 230841a84..950149f1a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/scoreboard/CraftScoreboardManager.java
 +++ b/src/main/java/org/bukkit/craftbukkit/scoreboard/CraftScoreboardManager.java
 @@ -41,6 +41,7 @@ public final class CraftScoreboardManager implements ScoreboardManager {
@@ -257,5 +257,5 @@ index 000000000..aeed76972
 +    }
 +}
 -- 
-2.40.1
+2.41.0
 

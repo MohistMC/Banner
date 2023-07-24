@@ -1,4 +1,4 @@
-From 97f6abd93cca20f1c0c5bdf5474a07be76975209 Mon Sep 17 00:00:00 2001
+From 50108f875e2b600010f3d5563433c951f3e1816c Mon Sep 17 00:00:00 2001
 From: Aikar <aikar@aikar.co>
 Date: Sun, 3 Feb 2013 05:10:21 -0500
 Subject: [PATCH] Entity Activation Range
@@ -35,7 +35,7 @@ index dc84b6954..52957c25e 100644
          entity.setOldPosAndRot();
          GameProfilerFiller gameprofilerfiller = this.getProfiler();
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index a4d0c7e9c..84b17c7a1 100644
+index 774b49e6b..6a5b0dbd6 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -310,6 +310,12 @@ public abstract class Entity implements INamableTileEntity, EntityAccess, IComma
@@ -102,10 +102,10 @@ index bd2e7ba4e..a64ea7677 100644
      public GroupDataEntity finalizeSpawn(WorldAccess worldaccess, DifficultyDamageScaler difficultydamagescaler, EnumMobSpawn enummobspawn, @Nullable GroupDataEntity groupdataentity, @Nullable NBTTagCompound nbttagcompound) {
          if (groupdataentity == null) {
 diff --git a/src/main/java/net/minecraft/world/entity/EntityAreaEffectCloud.java b/src/main/java/net/minecraft/world/entity/EntityAreaEffectCloud.java
-index 1459e28ea..a32d71ac5 100644
+index ea4b295bd..79d87b105 100644
 --- a/src/main/java/net/minecraft/world/entity/EntityAreaEffectCloud.java
 +++ b/src/main/java/net/minecraft/world/entity/EntityAreaEffectCloud.java
-@@ -184,6 +184,18 @@ public class EntityAreaEffectCloud extends Entity implements TraceableEntity {
+@@ -168,6 +168,18 @@ public class EntityAreaEffectCloud extends Entity implements TraceableEntity {
          this.duration = i;
      }
  
@@ -125,7 +125,7 @@ index 1459e28ea..a32d71ac5 100644
      public void tick() {
          super.tick();
 diff --git a/src/main/java/net/minecraft/world/entity/EntityLiving.java b/src/main/java/net/minecraft/world/entity/EntityLiving.java
-index a1a7552ea..1cc26fad9 100644
+index 5f04515ef..3a9f947e4 100644
 --- a/src/main/java/net/minecraft/world/entity/EntityLiving.java
 +++ b/src/main/java/net/minecraft/world/entity/EntityLiving.java
 @@ -267,6 +267,13 @@ public abstract class EntityLiving extends Entity implements Attackable {
@@ -143,10 +143,10 @@ index a1a7552ea..1cc26fad9 100644
      protected EntityLiving(EntityTypes<? extends EntityLiving> entitytypes, World world) {
          super(entitytypes, world);
 diff --git a/src/main/java/net/minecraft/world/entity/item/EntityItem.java b/src/main/java/net/minecraft/world/entity/item/EntityItem.java
-index 50045178c..effde300b 100644
+index 8e26d92c4..fa2c895d2 100644
 --- a/src/main/java/net/minecraft/world/entity/item/EntityItem.java
 +++ b/src/main/java/net/minecraft/world/entity/item/EntityItem.java
-@@ -200,6 +200,28 @@ public class EntityItem extends Entity implements TraceableEntity {
+@@ -202,6 +202,28 @@ public class EntityItem extends Entity implements TraceableEntity {
          }
      }
  
@@ -263,7 +263,7 @@ index aff7b6b43..d3328a695 100644
      public static final HashMap<String, CustomTimingsHandler> pluginTaskTimingMap = new HashMap<String, CustomTimingsHandler>();
 diff --git a/src/main/java/org/spigotmc/ActivationRange.java b/src/main/java/org/spigotmc/ActivationRange.java
 new file mode 100644
-index 000000000..adc48318e
+index 000000000..c5688dd14
 --- /dev/null
 +++ b/src/main/java/org/spigotmc/ActivationRange.java
 @@ -0,0 +1,262 @@
@@ -437,7 +437,7 @@ index 000000000..adc48318e
 +    public static boolean checkEntityImmunities(Entity entity)
 +    {
 +        // quick checks.
-+        if ( entity.wasTouchingWater || entity.remainingFireTicks > 0 )
++        if ( entity.wasTouchingWater || entity.getRemainingFireTicks() > 0 )
 +        {
 +            return true;
 +        }
@@ -556,5 +556,5 @@ index e3682d28c..936279b5f 100644
 +    }
  }
 -- 
-2.40.1
+2.41.0
 

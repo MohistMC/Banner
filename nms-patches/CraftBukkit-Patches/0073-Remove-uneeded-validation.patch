@@ -1,11 +1,11 @@
-From d523541c26d07e4c1e8b7fea01c0f1dade7cea3c Mon Sep 17 00:00:00 2001
+From 509a0d86de80dee5e94b479eff87a5441a7c6871 Mon Sep 17 00:00:00 2001
 From: drXor <mcyoung@mit.edu>
 Date: Fri, 15 Aug 2014 18:11:09 -0400
 Subject: [PATCH] Remove uneeded validation
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
-index 198b0baf3..b19f527c1 100644
+index a866f5308..b48f33dcf 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
 @@ -307,7 +307,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
@@ -29,7 +29,7 @@ index 198b0baf3..b19f527c1 100644
 @@ -828,7 +828,14 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
      @Override
      public boolean removeEnchant(Enchantment ench) {
-         Validate.notNull(ench, "Enchantment cannot be null");
+         Preconditions.checkArgument(ench != null, "Enchantment cannot be null");
 -        return hasEnchants() && enchantments.remove(ench) != null;
 +        // Spigot start
 +        boolean b = hasEnchants() && enchantments.remove( ench ) != null;

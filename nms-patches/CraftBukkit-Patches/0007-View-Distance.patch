@@ -1,4 +1,4 @@
-From 3b6cd27bd9feef3d45636f6e5f7c43ff5bc6119e Mon Sep 17 00:00:00 2001
+From 12431c238ae3348f18c25a31034a7a9015d51659 Mon Sep 17 00:00:00 2001
 From: md_5 <md_5@live.com.au>
 Date: Sat, 23 Mar 2013 09:52:41 +1100
 Subject: [PATCH] View Distance
@@ -21,7 +21,7 @@ index d1498a02d..06d5cfc28 100644
  
          Objects.requireNonNull(this.entityManager);
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 2d56b3a14..958c7f395 100644
+index 7c673e0ea..5b8b8aede 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -245,7 +245,8 @@ public abstract class PlayerList {
@@ -44,10 +44,10 @@ index 2d56b3a14..958c7f395 100644
          entityplayer1.unsetRemoved();
          entityplayer1.connection.teleport(CraftLocation.toBukkit(entityplayer1.position(), worldserver1.getWorld(), entityplayer1.getYRot(), entityplayer1.getXRot()));
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 9da7d68e4..c5dae2ea0 100644
+index 62edfb463..2fc4b138c 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-@@ -1925,6 +1925,18 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -1932,6 +1932,18 @@ public class CraftWorld extends CraftRegionAccessor implements World {
          }
      }
  

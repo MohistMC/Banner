@@ -1,4 +1,4 @@
-From 3efa2da32e00b124adf3678bc8aa55bd3260be09 Mon Sep 17 00:00:00 2001
+From 3be98f93059e5e55b2e80849af751d17641555d1 Mon Sep 17 00:00:00 2001
 From: md_5 <md_5@live.com.au>
 Date: Tue, 5 Aug 2014 17:20:19 +0100
 Subject: [PATCH] Watchdog Thread.
@@ -38,10 +38,10 @@ index 3f3d96894..7208f3b1c 100644
  
                  thread1.setUncaughtExceptionHandler(new ThreadNamedUncaughtExceptionHandler(DedicatedServer.LOGGER));
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index ed2d4939b..e747597b4 100644
+index 092652328..c1d6eef0f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -1950,7 +1950,7 @@ public final class CraftServer implements Server {
+@@ -1973,7 +1973,7 @@ public final class CraftServer implements Server {
  
      @Override
      public boolean isPrimaryThread() {
@@ -50,7 +50,7 @@ index ed2d4939b..e747597b4 100644
      }
  
      @Override
-@@ -2347,6 +2347,11 @@ public final class CraftServer implements Server {
+@@ -2378,6 +2378,11 @@ public final class CraftServer implements Server {
          {
              return org.spigotmc.SpigotConfig.config;
          }
@@ -359,5 +359,5 @@ index 000000000..4734d4ae8
 +    }
 +}
 -- 
-2.40.1
+2.41.0
 

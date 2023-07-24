@@ -1,14 +1,14 @@
-From 305f6610f216ff0d2fb9f18a962a494cf3094ccc Mon Sep 17 00:00:00 2001
+From bc2d5061efb021770ecb59c1fea007d1599eca6c Mon Sep 17 00:00:00 2001
 From: Suddenly <suddenly@suddenly.coffee>
 Date: Tue, 8 Jul 2014 09:44:18 +1000
 Subject: [PATCH] Safer JSON Loading
 
 
 diff --git a/src/main/java/net/minecraft/server/players/JsonList.java b/src/main/java/net/minecraft/server/players/JsonList.java
-index 1220c2e88..86fb74deb 100644
+index f47e588d7..6e55bb4ba 100644
 --- a/src/main/java/net/minecraft/server/players/JsonList.java
 +++ b/src/main/java/net/minecraft/server/players/JsonList.java
-@@ -174,6 +174,14 @@ public abstract class JsonList<K, V extends JsonListEntry<K>> {
+@@ -169,6 +169,14 @@ public abstract class JsonList<K, V extends JsonListEntry<K>> {
                          this.map.put(this.getKeyForUser(jsonlistentry.getUser()), (V) jsonlistentry); // CraftBukkit - decompile error
                      }
                  }
@@ -40,5 +40,5 @@ index 1295a3340..3abeb707c 100644
              UserCache.LOGGER.warn("Failed to load profile cache {}", this.file, ioexception);
          }
 -- 
-2.40.1
+2.41.0
 

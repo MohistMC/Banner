@@ -1,4 +1,4 @@
-From 94c9b86f4de9a8368f2f6923db4295ca882ad2ac Mon Sep 17 00:00:00 2001
+From 3ee81e630296fe74cd039125e0cfb5bfc8201696 Mon Sep 17 00:00:00 2001
 From: Aikar <aikar@aikar.co>
 Date: Thu, 10 Jan 2013 00:18:11 -0500
 Subject: [PATCH] Spigot Timings
@@ -282,7 +282,7 @@ index 06d5cfc28..dc84b6954 100644
      }
  
 diff --git a/src/main/java/net/minecraft/server/network/PlayerConnection.java b/src/main/java/net/minecraft/server/network/PlayerConnection.java
-index ca9f69cbe..d863811db 100644
+index 4dc5350ea..0b1bfe1ef 100644
 --- a/src/main/java/net/minecraft/server/network/PlayerConnection.java
 +++ b/src/main/java/net/minecraft/server/network/PlayerConnection.java
 @@ -340,6 +340,7 @@ public class PlayerConnection implements ServerPlayerConnection, TickablePacketL
@@ -301,7 +301,7 @@ index ca9f69cbe..d863811db 100644
  
      }
  
-@@ -2100,6 +2102,7 @@ public class PlayerConnection implements ServerPlayerConnection, TickablePacketL
+@@ -2103,6 +2105,7 @@ public class PlayerConnection implements ServerPlayerConnection, TickablePacketL
      }
  
      private void handleCommand(String s) {
@@ -309,7 +309,7 @@ index ca9f69cbe..d863811db 100644
          this.LOGGER.info(this.player.getScoreboardName() + " issued server command: " + s);
  
          CraftPlayer player = this.getCraftPlayer();
-@@ -2108,6 +2111,7 @@ public class PlayerConnection implements ServerPlayerConnection, TickablePacketL
+@@ -2111,6 +2114,7 @@ public class PlayerConnection implements ServerPlayerConnection, TickablePacketL
          this.cserver.getPluginManager().callEvent(event);
  
          if (event.isCancelled()) {
@@ -317,7 +317,7 @@ index ca9f69cbe..d863811db 100644
              return;
          }
  
-@@ -2119,6 +2123,8 @@ public class PlayerConnection implements ServerPlayerConnection, TickablePacketL
+@@ -2122,6 +2126,8 @@ public class PlayerConnection implements ServerPlayerConnection, TickablePacketL
              player.sendMessage(org.bukkit.ChatColor.RED + "An internal error occurred while attempting to perform this command");
              java.util.logging.Logger.getLogger(PlayerConnection.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
              return;
@@ -327,7 +327,7 @@ index ca9f69cbe..d863811db 100644
      }
      // CraftBukkit end
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 915f981d1..a4d0c7e9c 100644
+index f23828d40..0a90eff46 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -136,6 +136,7 @@ import org.bukkit.craftbukkit.event.CraftPortalEvent;
@@ -363,7 +363,7 @@ index 915f981d1..a4d0c7e9c 100644
  
      private boolean isStateClimbable(IBlockData iblockdata) {
 diff --git a/src/main/java/net/minecraft/world/entity/EntityLiving.java b/src/main/java/net/minecraft/world/entity/EntityLiving.java
-index e70bf3394..a1a7552ea 100644
+index a7110e06c..5f04515ef 100644
 --- a/src/main/java/net/minecraft/world/entity/EntityLiving.java
 +++ b/src/main/java/net/minecraft/world/entity/EntityLiving.java
 @@ -143,6 +143,8 @@ import org.bukkit.event.entity.EntityTeleportEvent;
@@ -375,7 +375,7 @@ index e70bf3394..a1a7552ea 100644
  public abstract class EntityLiving extends Entity implements Attackable {
  
      private static final Logger LOGGER = LogUtils.getLogger();
-@@ -2836,6 +2838,7 @@ public abstract class EntityLiving extends Entity implements Attackable {
+@@ -2827,6 +2829,7 @@ public abstract class EntityLiving extends Entity implements Attackable {
  
      @Override
      public void tick() {
@@ -383,7 +383,7 @@ index e70bf3394..a1a7552ea 100644
          super.tick();
          this.updatingUsingItem();
          this.updateSwimAmount();
-@@ -2877,7 +2880,9 @@ public abstract class EntityLiving extends Entity implements Attackable {
+@@ -2868,7 +2871,9 @@ public abstract class EntityLiving extends Entity implements Attackable {
          }
  
          if (!this.isRemoved()) {
@@ -393,7 +393,7 @@ index e70bf3394..a1a7552ea 100644
          }
  
          double d0 = this.getX() - this.xo;
-@@ -2960,6 +2965,7 @@ public abstract class EntityLiving extends Entity implements Attackable {
+@@ -2951,6 +2956,7 @@ public abstract class EntityLiving extends Entity implements Attackable {
              this.setXRot(0.0F);
          }
  
@@ -401,7 +401,7 @@ index e70bf3394..a1a7552ea 100644
      }
  
      public void detectEquipmentUpdates() {
-@@ -3137,6 +3143,7 @@ public abstract class EntityLiving extends Entity implements Attackable {
+@@ -3128,6 +3134,7 @@ public abstract class EntityLiving extends Entity implements Attackable {
  
          this.setDeltaMovement(d4, d5, d6);
          this.level().getProfiler().push("ai");
@@ -409,7 +409,7 @@ index e70bf3394..a1a7552ea 100644
          if (this.isImmobile()) {
              this.jumping = false;
              this.xxa = 0.0F;
-@@ -3146,6 +3153,7 @@ public abstract class EntityLiving extends Entity implements Attackable {
+@@ -3137,6 +3144,7 @@ public abstract class EntityLiving extends Entity implements Attackable {
              this.serverAiStep();
              this.level().getProfiler().pop();
          }
@@ -417,7 +417,7 @@ index e70bf3394..a1a7552ea 100644
  
          this.level().getProfiler().pop();
          this.level().getProfiler().push("jump");
-@@ -3185,6 +3193,7 @@ public abstract class EntityLiving extends Entity implements Attackable {
+@@ -3176,6 +3184,7 @@ public abstract class EntityLiving extends Entity implements Attackable {
              this.resetFallDistance();
          }
  
@@ -425,7 +425,7 @@ index e70bf3394..a1a7552ea 100644
          label104:
          {
              EntityLiving entityliving = this.getControllingPassenger();
-@@ -3200,6 +3209,7 @@ public abstract class EntityLiving extends Entity implements Attackable {
+@@ -3191,6 +3200,7 @@ public abstract class EntityLiving extends Entity implements Attackable {
  
              this.travel(vec3d1);
          }
@@ -433,7 +433,7 @@ index e70bf3394..a1a7552ea 100644
  
          this.level().getProfiler().pop();
          this.level().getProfiler().push("freezing");
-@@ -3226,7 +3236,9 @@ public abstract class EntityLiving extends Entity implements Attackable {
+@@ -3217,7 +3227,9 @@ public abstract class EntityLiving extends Entity implements Attackable {
              this.checkAutoSpinAttack(axisalignedbb, this.getBoundingBox());
          }
  
@@ -591,10 +591,10 @@ index 570f62854..c66df1e7a 100644
          };
      }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 79f46d27e..c347fb595 100644
+index 8fe397a1e..583778f31 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -2335,6 +2335,11 @@ public final class CraftServer implements Server {
+@@ -2366,6 +2366,11 @@ public final class CraftServer implements Server {
      private final org.bukkit.Server.Spigot spigot = new org.bukkit.Server.Spigot()
      {
  
@@ -773,7 +773,7 @@ index 000000000..aff7b6b43
 +    }
 +}
 diff --git a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
-index cd43b4551..4f8a30657 100644
+index 1fb9b4582..e90ec26a0 100644
 --- a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
 +++ b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
 @@ -411,7 +411,9 @@ public class CraftScheduler implements BukkitScheduler {
@@ -830,5 +830,5 @@ index c885bc744..70794669f 100644
 +    // Spigot end
  }
 -- 
-2.40.1
+2.41.0
 
