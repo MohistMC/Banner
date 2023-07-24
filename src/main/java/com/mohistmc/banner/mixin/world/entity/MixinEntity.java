@@ -815,15 +815,12 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
             }
             this.level().getProfiler().push("reposition");
             var bukkitPos = banner$location.getAndSet(null);
-            PortalInfo newpp = new PortalInfo(new Vec3(bukkitPos.x(), bukkitPos.y(), bukkitPos.z()), Vec3.ZERO, this.yRot, this.xRot);
-            newpp.banner$setWorld(destination);
-            newpp.banner$setPortalEventInfo(null);
-            PortalInfo portalInfo = bukkitPos == null ? this.findDimensionEntryPoint(destination) : newpp;
+            PortalInfo portalInfo = bukkitPos == null ? this.findDimensionEntryPoint(destination) : new PortalInfo(new Vec3(bukkitPos.x(), bukkitPos.y(), bukkitPos.z()), Vec3.ZERO, this.yRot, this.xRot);
             if (portalInfo == null) {
                 return null;
             } else {
-                ServerLevel world = portalInfo.bridge$getWorld();
-                if (world == this.level()) {
+                portalInfo.banner$setWorld(destination);
+                if (portalInfo.bridge$getWorld() == this.level()) {
                     this.moveTo(portalInfo.pos.x, portalInfo.pos.y, portalInfo.pos.z, portalInfo.yRot, portalInfo.xRot);
                     this.setDeltaMovement(portalInfo.speed);
                     return (Entity) (Object) this;
