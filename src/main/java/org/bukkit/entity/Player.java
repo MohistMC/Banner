@@ -308,6 +308,7 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
      *
      * @return true if player is in sneak mode
      */
+    @Override
     public boolean isSneaking();
 
     /**
@@ -315,6 +316,7 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
      *
      * @param sneak true if player should appear sneaking
      */
+    @Override
     public void setSneaking(boolean sneak);
 
     /**
