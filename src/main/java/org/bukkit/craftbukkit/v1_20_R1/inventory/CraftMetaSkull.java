@@ -2,7 +2,6 @@ package org.bukkit.craftbukkit.v1_20_R1.inventory;
 
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Sets;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.authlib.GameProfile;
 import java.util.Map;
 import java.util.Objects;
@@ -209,13 +208,7 @@ class CraftMetaSkull extends CraftMetaItem implements SkullMeta {
         if (name == null) {
             setProfile(null);
         } else {
-            // Paper start - Use Online Players Skull
-            GameProfile newProfile = null;
-            net.minecraft.server.level.ServerPlayer player = BukkitExtraConstants.getServer().getPlayerList().getPlayerByName(name);
-            if (player != null) newProfile = player.getGameProfile();
-            if (newProfile == null) newProfile = new GameProfile(null, name);
-            this.setProfile(newProfile);
-            // Paper end
+            setProfile(new GameProfile(null, name));
         }
 
         return true;
