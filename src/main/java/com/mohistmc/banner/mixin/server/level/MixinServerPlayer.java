@@ -592,7 +592,11 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         return changeDimension(worldserver);
     }
 
-    @Override
+    /**
+     * @author wdog5
+     * @reason bukkit
+     */
+    @Overwrite
     public Entity changeDimension(ServerLevel worldserver) {
         if (this.isSleeping()) return this;
         ServerLevel worldserver1 = this.serverLevel();
