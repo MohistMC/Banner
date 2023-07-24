@@ -98,4 +98,17 @@ public class BannerConfigUtil {
         TimeZone timeZone = TimeZone.getDefault();
         return "Asia/Shanghai".equals(timeZone.getID());
     }
+
+    public static boolean skipOtherWorldPreparing() {
+        String key = "world.skipOtherWorldPreparing";
+        if (yml.get(key) == null) {
+            yml.set(key, false);
+            save();
+        }
+        return yml.getBoolean(key, false);
+    }
+    public static void initAllNeededConfig() {
+        skipOtherWorldPreparing();
+    }
+
 }

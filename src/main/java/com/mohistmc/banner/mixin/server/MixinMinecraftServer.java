@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
 import com.mohistmc.banner.paper.RollingAverage;
 import com.mojang.datafixers.DataFixer;
@@ -410,15 +411,17 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Inject(method = "loadLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;prepareLevels(Lnet/minecraft/server/level/progress/ChunkProgressListener;)V",
             shift = At.Shift.AFTER))
     private void banner$loadLevel(CallbackInfo ci) {
-        for (ServerLevel worldserver : ((MinecraftServer)(Object)this).getAllLevels()) {
-            if (worldserver != overworld()) {
-                if (banner$isNether(worldserver) && isNetherEnabled()) {
-                    banner$prepareWorld(worldserver);
-                }else if (banner$isEnd(worldserver) && this.server.getAllowEnd()) {
-                    banner$prepareWorld(worldserver);
-                }
-                if (banner$isNotNetherAndEnd(worldserver)) {
-                    banner$prepareWorld(worldserver);
+        if (!BannerConfig.skipOtherWorldPreparing) {
+            for (ServerLevel worldserver : ((MinecraftServer)(Object)this).getAllLevels()) {
+                if (worldserver != overworld()) {
+                    if (banner$isNether(worldserver) && isNetherEnabled()) {
+                        banner$prepareWorld(worldserver);
+                    }else if (banner$isEnd(worldserver) && this.server.getAllowEnd()) {
+                        banner$prepareWorld(worldserver);
+                    }
+                    if (banner$isNotNetherAndEnd(worldserver)) {
+                        banner$prepareWorld(worldserver);
+                    }
                 }
             }
         }

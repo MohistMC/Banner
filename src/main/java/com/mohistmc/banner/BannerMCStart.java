@@ -25,6 +25,7 @@ public class BannerMCStart {
         BannerConfigUtil.copyBannerConfig();
         BannerConfigUtil.lang();
         BannerConfigUtil.i18n();
+        BannerConfigUtil.initAllNeededConfig();
         if (BannerConfigUtil.showLogo()) {
             LOGGER.info(" _____       ___   __   _   __   _   _____   _____   ");
             LOGGER.info("|  _  \\     /   | |  \\ | | |  \\ | | | ____| |  _  \\  ");
