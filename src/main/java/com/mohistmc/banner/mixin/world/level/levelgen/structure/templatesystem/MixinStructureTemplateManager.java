@@ -12,7 +12,7 @@ import java.util.Optional;
 @Mixin(StructureTemplateManager.class)
 public abstract class MixinStructureTemplateManager implements InjectionStructureTemplateManager {
 
-    @Shadow public abstract Optional<StructureTemplate> loadFromResource(ResourceLocation id);
+    @Shadow protected abstract Optional<StructureTemplate> loadFromResource(ResourceLocation id);
 
     // Banner start Fix modernfix mod
     @Override

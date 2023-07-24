@@ -151,7 +151,6 @@ accessible method net/minecraft/world/level/dimension/end/EndDragonFight spawnEx
 accessible method net/minecraft/world/level/entity/PersistentEntitySectionManager ensureChunkQueuedForLoad (J)V
 accessible method net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplateManager createAndValidatePathToStructure (Ljava/nio/file/Path;Lnet/minecraft/resources/ResourceLocation;Ljava/lang/String;)Ljava/nio/file/Path;
 accessible method net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplateManager loadFromGenerated (Lnet/minecraft/resources/ResourceLocation;)Ljava/util/Optional;
-accessible method net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplateManager loadFromResource (Lnet/minecraft/resources/ResourceLocation;)Ljava/util/Optional;
 accessible method net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplateManager readStructure (Ljava/io/InputStream;)Lnet/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplate;
 accessible method net/minecraft/world/level/saveddata/maps/MapItemSavedData setColorsDirty (II)V
 accessible method net/minecraft/world/level/saveddata/maps/MapItemSavedData setDecorationsDirty ()V
