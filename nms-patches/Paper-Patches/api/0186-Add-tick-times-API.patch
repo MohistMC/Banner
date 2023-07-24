@@ -5,10 +5,10 @@ Subject: [PATCH] Add tick times API
 
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index e32094b8e7710158f75450c477c91110d83ba71b..82940fa20f5f958e6473f318ee2c5da3647e0228 100644
+index 93c83d1513745ada3c1ea9b5cc88905f1957d3c4..d715a069a8cfc8704471f254f421bb7baeb498f4 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -1980,6 +1980,25 @@ public final class Bukkit {
+@@ -2035,6 +2035,25 @@ public final class Bukkit {
      public static double[] getTPS() {
          return server.getTPS();
      }
@@ -35,10 +35,10 @@ index e32094b8e7710158f75450c477c91110d83ba71b..82940fa20f5f958e6473f318ee2c5da3
  
      /**
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index fc8a6468c61a84a1fe719505adb274d48e24e8f4..ffd1f47690083b40aa349ed0f92d6fc2fdc56609 100644
+index 3b3cd9994b84770dc9b3c7a0531461bdc3d4b16a..e00d4860ba9ac19014995e85fccea659793f67e7 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
-@@ -1673,6 +1673,21 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+@@ -1718,6 +1718,21 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
       */
      @NotNull
      public double[] getTPS();

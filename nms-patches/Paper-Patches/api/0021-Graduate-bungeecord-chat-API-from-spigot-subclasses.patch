@@ -6,10 +6,10 @@ Subject: [PATCH] Graduate bungeecord chat API from spigot subclasses
 Change Javadoc to be accurate
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index b28d196a810e121d0502e0035b16d2c6ed2efe2d..61734532c341dcbc0565189b63fd05f53b041039 100644
+index b53e94d79862d66165bbcd2a79b82770398a7f3e..9417030074fccdd9113bf75eb8f17f74b9a9118b 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -400,6 +400,30 @@ public final class Bukkit {
+@@ -410,6 +410,30 @@ public final class Bukkit {
          return server.broadcastMessage(message);
      }
  
@@ -41,10 +41,10 @@ index b28d196a810e121d0502e0035b16d2c6ed2efe2d..61734532c341dcbc0565189b63fd05f5
       * Gets the name of the update folder. The update folder is used to safely
       * update plugins at the right moment on a plugin load.
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index b6ff3a80fcb5c0e843caa1cfdb165cf2cadb8bd2..f24bb5b22975bcbdce1bf1e80cf7a1b338ad12a5 100644
+index 124e88e512d24b6ff7ace3cf7d5a6adf4c2bb40d..ccc825a2ea43bb84a5a08dff00c4d8ec27e4e95a 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
-@@ -337,6 +337,30 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+@@ -345,6 +345,30 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
      @Deprecated // Paper
      public int broadcastMessage(@NotNull String message);
  
@@ -76,10 +76,10 @@ index b6ff3a80fcb5c0e843caa1cfdb165cf2cadb8bd2..f24bb5b22975bcbdce1bf1e80cf7a1b3
       * Gets the name of the update folder. The update folder is used to safely
       * update plugins at the right moment on a plugin load.
 diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
-index 7be94e57dc2d665719e7dedfea790f0019a47310..67143a8ab7c18676054f5584dd2fd764a78c7836 100644
+index f128512b17ec0079bea6bfd9d7b726b3db578745..4e68f6bc8ed217712b1d9a8990ee97ddfac18869 100644
 --- a/src/main/java/org/bukkit/entity/Player.java
 +++ b/src/main/java/org/bukkit/entity/Player.java
-@@ -872,6 +872,42 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
+@@ -975,6 +975,42 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
       */
      public void sendMap(@NotNull MapView map);
  
