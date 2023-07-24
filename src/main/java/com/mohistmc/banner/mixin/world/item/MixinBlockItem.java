@@ -101,7 +101,7 @@ public abstract class MixinBlockItem {
     @Redirect(method = "place", at = @At(value = "FIELD",
             target = "Lnet/minecraft/world/entity/player/Abilities;instabuild:Z"))
     private boolean banner$checkAbilities(Abilities instance) {
-        return !banner$placePlayer.get().getAbilities().instabuild && banner$placeStack.get() != ItemStack.EMPTY;
+        return banner$placePlayer.get().getAbilities().instabuild && banner$placeStack.get() == ItemStack.EMPTY;
     }
 
     @Inject(method = "updateCustomBlockEntityTag(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;)Z",
