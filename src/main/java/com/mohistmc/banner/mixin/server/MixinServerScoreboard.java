@@ -1,10 +1,14 @@
 package com.mohistmc.banner.mixin.server;
 
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerScoreboard;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.scores.Scoreboard;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -13,6 +17,8 @@ import java.util.stream.Collectors;
 
 @Mixin(ServerScoreboard.class)
 public class MixinServerScoreboard {
+
+    @Shadow @Final private MinecraftServer server;
 
     @Redirect(method = "startTrackingObjective", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;getPlayers()Ljava/util/List;"))
     private List<ServerPlayer> banner$filterAdd(PlayerList playerList) {
@@ -36,4 +42,14 @@ public class MixinServerScoreboard {
                 .filter(it -> it.getBukkitEntity().getScoreboard().getHandle() == (Object) this)
                 .collect(Collectors.toList());
     }
+
+    // CraftBukkit start - Send to players
+    private void broadcastAll(Packet packet) {
+        for (ServerPlayer entityplayer : (List<ServerPlayer>) this.server.getPlayerList().players) {
+            if (entityplayer.getBukkitEntity().getScoreboard().getHandle() == ((Scoreboard) (Object) this)) {
+                entityplayer.connection.send(packet);
+            }
+        }
+    }
+    // CraftBukkit end
 }
