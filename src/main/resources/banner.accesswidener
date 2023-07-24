@@ -211,6 +211,7 @@ accessible method net/minecraft/world/entity/monster/EnderMan teleportTowards (L
 accessible method net/minecraft/world/level/block/ChiseledBookShelfBlock getHitSlot (Lnet/minecraft/world/phys/Vec2;)I
 accessible method net/minecraft/world/entity/animal/Turtle setLayingEgg (Z)V
 accessible method net/minecraft/world/entity/animal/Turtle setHasEgg (Z)V
+accessible method net/minecraft/world/entity/Entity setRot (FF)V
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C
