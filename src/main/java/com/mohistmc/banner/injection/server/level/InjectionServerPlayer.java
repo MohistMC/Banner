@@ -197,4 +197,16 @@ public interface InjectionServerPlayer extends InjectionPlayer {
 
     default void reset() {
     }
+
+    default void pushChangeDimensionCause(PlayerTeleportEvent.TeleportCause cause) {
+
+    }
+
+    default Optional<PlayerTeleportEvent.TeleportCause> bridge$teleportCause() {
+        return Optional.empty();
+    }
+
+    default void pushChangeSpawnCause(PlayerSpawnChangeEvent.Cause cause) {
+
+    }
 }

@@ -32,8 +32,6 @@ import net.minecraft.network.protocol.game.ClientboundMoveVehiclePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
 import net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket;
 import net.minecraft.network.protocol.game.ClientboundSetDefaultSpawnPositionPacket;
-import net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket;
-import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.network.protocol.game.ServerboundAcceptTeleportationPacket;
@@ -1735,9 +1733,50 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         }
     }
 
+    private transient PlayerTeleportEvent.TeleportCause banner$cause;
+
+    /**
+     * @author wdog5
+     * @reason bukkit
+     */
+    @Overwrite
+    public void teleport(double x, double y, double z, float yaw, float pitch, Set<RelativeMovement> relativeSet) {
+        PlayerTeleportEvent.TeleportCause cause = banner$cause == null ? PlayerTeleportEvent.TeleportCause.UNKNOWN : banner$cause;
+        banner$cause = null;
+        Player player = this.getCraftPlayer();
+        Location from = player.getLocation();
+        Location to = new Location(this.getCraftPlayer().getWorld(), x, y, z, yaw, pitch);
+        if (!from.equals(to)) {
+            PlayerTeleportEvent event = new PlayerTeleportEvent(player, from.clone(), to.clone(), cause);
+            this.cserver.getPluginManager().callEvent(event);
+            if (event.isCancelled() || !to.equals(event.getTo())) {
+                relativeSet.clear();
+                to = (event.isCancelled() ? event.getFrom() : event.getTo());
+                x = to.getX();
+                y = to.getY();
+                z = to.getZ();
+                yaw = to.getYaw();
+                pitch = to.getPitch();
+            }
+        }
+
+        if (Float.isNaN(yaw)) {
+            yaw = 0.0f;
+        }
+        if (Float.isNaN(pitch)) {
+            pitch = 0.0f;
+        }
+        this.internalTeleport(x, y, z, yaw, pitch, relativeSet);
+    }
+
     @Override
     public void teleport(double d0, double d1, double d2, float f, float f1, PlayerTeleportEvent.TeleportCause cause) {
         this.teleport(d0, d1, d2, f, f1, Collections.emptySet(), cause);
+    }
+
+    public void teleport(double d0, double d1, double d2, float f, float f1, Set<RelativeMovement> set, PlayerTeleportEvent.TeleportCause cause) {
+        pushTeleportCause(cause);
+        this.teleport(d0, d1, d2, f, f1, set);
     }
 
     @Override
@@ -1795,5 +1834,10 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     @Override
     public Logger bridge$logger() {
         return LOGGER;
+    }
+
+    @Override
+    public void pushTeleportCause(PlayerTeleportEvent.TeleportCause cause) {
+        banner$cause = cause;
     }
 }

@@ -6,8 +6,10 @@ import com.mohistmc.banner.injection.server.level.InjectionServerPlayer;
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Unit;
+import net.minecraft.BlockUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.PositionImpl;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -36,6 +38,7 @@ import net.minecraft.world.damagesource.CombatTracker;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Inventory;
@@ -47,6 +50,9 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.BiomeManager;
+import net.minecraft.world.level.block.NetherPortalBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.portal.PortalInfo;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -60,13 +66,18 @@ import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R1.CraftWorldBorder;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_20_R1.event.CraftPortalEvent;
+import org.bukkit.craftbukkit.v1_20_R1.util.BlockStateListPopulator;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftLocation;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.player.PlayerChangedMainHandEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerLocaleChangeEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerSpawnChangeEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -82,8 +93,10 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -95,9 +108,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Shadow protected abstract boolean bedInRange(BlockPos pos, Direction direction);
 
     @Shadow protected abstract boolean bedBlocked(BlockPos pos, Direction direction);
-
-    @Shadow public abstract void setRespawnPosition(ResourceKey<Level> dimension, @Nullable BlockPos position, float angle, boolean forced, boolean sendMessage);
-
     @Shadow protected abstract int getCoprime(int i);
 
     @Shadow @Final public MinecraftServer server;
@@ -137,6 +147,13 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Shadow public abstract boolean canChatInColor();
 
+    @Shadow public abstract boolean teleportTo(ServerLevel level, double x, double y, double z, Set<RelativeMovement> relativeMovements, float yRot, float xRot);
+
+    @Shadow public abstract void teleportTo(ServerLevel newLevel, double x, double y, double z, float yaw, float pitch);
+
+    @Shadow @Nullable private BlockPos respawnPosition;
+    @Shadow private float respawnAngle;
+    @Shadow private boolean respawnForced;
     // CraftBukkit start
     public String displayName;
     public Component listName;
@@ -157,6 +174,8 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     public boolean relativeTime = true;
     public String locale = null; // CraftBukkit - add, lowercase // Paper - default to null
     private boolean banner$initialized = false;
+    private float pluginRainPosition;
+    private float pluginRainPositionPrevious;
 
     public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
         super(level, blockPos, f, gameProfile);
@@ -275,6 +294,118 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         this.setPlayerWeather(this.level().getLevelData().isRaining() ? WeatherType.DOWNFALL : WeatherType.CLEAR, false);
     }
 
+    public void updateWeather(float oldRain, float newRain, float oldThunder, float newThunder) {
+        if (this.weather == null) {
+            if (oldRain != newRain) {
+                this.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.RAIN_LEVEL_CHANGE, newRain));
+            }
+        } else if (this.pluginRainPositionPrevious != this.pluginRainPosition) {
+            this.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.RAIN_LEVEL_CHANGE, this.pluginRainPosition));
+        }
+        if (oldThunder != newThunder) {
+            if (this.weather == WeatherType.DOWNFALL || this.weather == null) {
+                this.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.THUNDER_LEVEL_CHANGE, newThunder));
+            } else {
+                this.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.THUNDER_LEVEL_CHANGE, 0.0f));
+            }
+        }
+    }
+
+    public void tickWeather() {
+        if (this.weather == null) {
+            return;
+        }
+        this.pluginRainPositionPrevious = this.pluginRainPosition;
+        if (this.weather == WeatherType.DOWNFALL) {
+            this.pluginRainPosition += (float) 0.01;
+        } else {
+            this.pluginRainPosition -= (float) 0.01;
+        }
+        this.pluginRainPosition = Mth.clamp(this.pluginRainPosition, 0.0f, 1.0f);
+    }
+
+    @Override
+    public void forceSetPositionRotation(double x, double y, double z, float yaw, float pitch) {
+        this.moveTo(x, y, z, yaw, pitch);
+        this.connection.resetPosition();
+    }
+
+    private transient PlayerSpawnChangeEvent.Cause banner$spawnChangeCause;
+
+    @Override
+    public void pushChangeSpawnCause(PlayerSpawnChangeEvent.Cause cause) {
+        this.banner$spawnChangeCause = cause;
+    }
+
+    @Override
+    public void setRespawnPosition(ResourceKey<Level> p_9159_, @Nullable BlockPos p_9160_, float p_9161_, boolean p_9162_, boolean p_9163_, PlayerSpawnChangeEvent.Cause cause) {
+        banner$spawnChangeCause = cause;
+        this.setRespawnPosition(p_9159_, p_9160_, p_9161_, p_9162_, p_9163_);
+    }
+
+    /**
+     * @author wdog5
+     * @reason bukkit
+     */
+    @Overwrite
+    public void setRespawnPosition(ResourceKey<Level> resourceKey, @Nullable BlockPos blockPos, float x, boolean y, boolean z) {
+        var cause = banner$spawnChangeCause == null ? PlayerSpawnChangeEvent.Cause.UNKNOWN : banner$spawnChangeCause;
+        banner$spawnChangeCause = null;
+        var newWorld = this.server.getLevel(resourceKey);
+        Location newSpawn = (blockPos != null) ? new Location(newWorld.getWorld(), blockPos.getX(), blockPos.getY(), blockPos.getZ(), x, 0) : null;
+
+        PlayerSpawnChangeEvent event = new PlayerSpawnChangeEvent(this.getBukkitEntity(), newSpawn, y, cause);
+        Bukkit.getServer().getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return;
+        }
+        newSpawn = event.getNewSpawn();
+        y = event.isForced();
+
+        if (newSpawn != null) {
+            resourceKey = ((CraftWorld) newSpawn.getWorld()).getHandle().dimension();
+            blockPos = BlockPos.containing(newSpawn.getX(), newSpawn.getY(), newSpawn.getZ());
+            x = newSpawn.getYaw();
+        } else {
+            resourceKey = Level.OVERWORLD;
+            blockPos = null;
+            x = 0.0F;
+        }
+
+        if (blockPos != null) {
+            boolean flag = blockPos.equals(this.respawnPosition) && resourceKey.equals(this.respawnDimension);
+            if (z && !flag) {
+                this.sendSystemMessage(Component.translatable("block.minecraft.set_spawn"));
+            }
+
+            this.respawnPosition = blockPos;
+            this.respawnDimension = resourceKey;
+            this.respawnAngle = x;
+            this.respawnForced = y;
+        } else {
+            this.respawnPosition = null;
+            this.respawnDimension = Level.OVERWORLD;
+            this.respawnAngle = 0.0F;
+            this.respawnForced = false;
+        }
+
+    }
+
+    @Override
+    public void setPlayerWeather(WeatherType type, boolean plugin) {
+        if (!plugin && this.weather != null) {
+            return;
+        }
+        if (plugin) {
+            this.weather = type;
+        }
+        if (type == WeatherType.DOWNFALL) {
+            this.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.STOP_RAINING, 0.0f));
+        } else {
+            this.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0.0f));
+        }
+    }
+
     @Override
     public BlockPos getSpawnPoint(ServerLevel worldserver) {
         BlockPos blockposition = worldserver.getSharedSpawnPos();
@@ -333,7 +464,12 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         }
         return Either.left(Player.BedSleepingProblem.OTHER_PROBLEM);
     }
-    
+
+    @Override
+    public Scoreboard getScoreboard() {
+        return this.getBukkitEntity().getScoreboard().getHandle();
+    }
+
     @Override
     public void reset() {
         float exp = 0.0f;
@@ -481,11 +617,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     }
 
     @Override
-    public Scoreboard getScoreboard() {
-        return getBukkitEntity().getScoreboard().getHandle();
-    }
-
-    @Override
     public boolean isImmobile() {
         return super.isImmobile() || !getBukkitEntity().isOnline();
     }
@@ -597,6 +728,50 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         return changeDimension(worldserver);
     }
 
+    @Inject(method = "teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDLjava/util/Set;FF)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;teleport(DDDFFLjava/util/Set;)V"))
+    private void banner$forwardReason(ServerLevel level, double x, double y, double z, Set<RelativeMovement> relativeMovements, float yRot, float xRot, CallbackInfoReturnable<Boolean> cir) {
+        var teleportCause = banner$changeDimensionCause;
+        banner$changeDimensionCause = null;
+        this.connection.pushTeleportCause(teleportCause);
+    }
+
+    @Inject(method = "teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDFF)V", cancellable = true, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/level/ServerPlayer;stopRiding()V"))
+    private void banner$handleBy(ServerLevel world, double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {
+        PlayerTeleportEvent.TeleportCause cause = banner$changeDimensionCause == null ? PlayerTeleportEvent.TeleportCause.UNKNOWN : banner$changeDimensionCause;
+        banner$changeDimensionCause = null;
+        this.getBukkitEntity().teleport(new Location(world.getWorld(), x, y, z, yaw, pitch), cause);
+        ci.cancel();
+    }
+
+    @Override
+    public void teleportTo(ServerLevel worldserver, double d0, double d1, double d2, float f, float f1, PlayerTeleportEvent.TeleportCause cause) {
+        pushChangeDimensionCause(cause);
+        teleportTo(worldserver, d0, d1, d2, f, f1);
+    }
+
+    @Override
+    public void pushChangeDimensionCause(PlayerTeleportEvent.TeleportCause cause) {
+        banner$changeDimensionCause = cause;
+    }
+
+    @Override
+    public Optional<PlayerTeleportEvent.TeleportCause> bridge$teleportCause() {
+        try {
+            return Optional.ofNullable(banner$changeDimensionCause);
+        } finally {
+            banner$changeDimensionCause = null;
+        }
+    }
+
+    @Override
+    public long getPlayerTime() {
+        if (this.relativeTime) {
+            return this.level().getDayTime() + this.timeOffset;
+        }
+        return this.level().getDayTime() - this.level().getDayTime() % 24000L + this.timeOffset;
+    }
+
+
     /**
      * @author wdog5
      * @reason bukkit
@@ -681,6 +856,55 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             }
             banner$changeDimensionCause = null;
             return this;
+        }
+    }
+
+    protected CraftPortalEvent callPortalEvent(Entity entity, ServerLevel exitWorldServer, PositionImpl exitPosition, PlayerTeleportEvent.TeleportCause cause, int searchRadius, int creationRadius) {
+        Location enter = this.getBukkitEntity().getLocation();
+        Location exit = new Location(exitWorldServer.getWorld(), exitPosition.x(), exitPosition.y(), exitPosition.z(), this.getYRot(), this.getXRot());
+        PlayerPortalEvent event = new PlayerPortalEvent(this.getBukkitEntity(), enter, exit, cause, 128, true, creationRadius);
+        Bukkit.getServer().getPluginManager().callEvent(event);
+        if (event.isCancelled() || event.getTo() == null || event.getTo().getWorld() == null) {
+            return null;
+        }
+        return new CraftPortalEvent(event);
+    }
+
+    @Override
+    public Optional<BlockUtil.FoundRectangle> getExitPortal(ServerLevel worldserver, BlockPos blockposition, boolean flag, WorldBorder worldborder, int searchRadius, boolean canCreatePortal, int createRadius) {
+        Optional<BlockUtil.FoundRectangle> optional = super.getExitPortal(worldserver, blockposition, flag, worldborder);
+        if (optional.isPresent() || !canCreatePortal) {
+            return optional;
+        }
+        Direction.Axis enumdirection_enumaxis = this.level().getBlockState(this.portalEntrancePos).getOptionalValue(NetherPortalBlock.AXIS).orElse(Direction.Axis.X);
+        Optional<BlockUtil.FoundRectangle> optional1 =  worldserver.getPortalForcer().createPortal(blockposition, enumdirection_enumaxis, (ServerPlayer) (Object) this, createRadius);
+        if (!optional1.isPresent()) {
+            //  LOGGER.error("Unable to create a portal, likely target out of worldborder");
+        }
+        return optional1;
+    }
+
+    private transient BlockStateListPopulator banner$populator;
+
+
+    @Inject(method = "createEndPlatform", at = @At("HEAD"))
+    private void banner$playerCreatePortalBegin(ServerLevel level, BlockPos pos, CallbackInfo ci) {
+        banner$populator = new BlockStateListPopulator(level);
+    }
+
+    @Redirect(method = "createEndPlatform", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
+    private boolean banner$playerCreatePortal(ServerLevel instance, BlockPos pos, BlockState blockState) {
+        return banner$populator.setBlock(pos, blockState, 3);
+    }
+
+    @Inject(method = "createEndPlatform", at = @At("RETURN"))
+    private void banner$playerCreatePortalEnd(ServerLevel level, BlockPos pos, CallbackInfo ci) {
+        var blockList = banner$populator;
+        banner$populator = null;
+        var portalEvent = new PortalCreateEvent((List<org.bukkit.block.BlockState>) (List) blockList.getList(), level.getWorld(), this.getBukkitEntity(), PortalCreateEvent.CreateReason.END_PLATFORM);
+        Bukkit.getPluginManager().callEvent(portalEvent);
+        if (!portalEvent.isCancelled()) {
+            blockList.updateList();
         }
     }
 
