@@ -10,10 +10,8 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.concurrent.atomic.AtomicReference;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ClipContext.class)
 public class MixinClipContext {
@@ -21,17 +19,10 @@ public class MixinClipContext {
     @Mutable
     @Shadow @Final private CollisionContext collisionContext;
 
-    private AtomicReference<Entity> banner$entity = new AtomicReference<>();
-
-    @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/ClipContext;from:Lnet/minecraft/world/phys/Vec3;",
-            shift = At.Shift.BEFORE))
-    private void banner$setEntity(Vec3 vec3, Vec3 vec32, ClipContext.Block block, ClipContext.Fluid fluid, Entity entity, CallbackInfo ci) {
-        banner$entity.set(entity);
-    }
-
-    @Redirect(method = "<init>", at = @At(value = "FIELD",
-            target = "Lnet/minecraft/world/level/ClipContext;collisionContext:Lnet/minecraft/world/phys/shapes/CollisionContext;"))
-    private void banner$resetRayTrace(ClipContext instance, CollisionContext value) {
-        this.collisionContext = (banner$entity.get() == null) ? CollisionContext.empty() : CollisionContext.of(banner$entity.get()); // CraftBukkit
+    @Inject(method = "<init>", at = @At("RETURN"),
+            locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$resetClipContext(Vec3 from, Vec3 _to, ClipContext.Block block, ClipContext.Fluid fluid,
+                                         Entity entity, CallbackInfo ci) {
+        this.collisionContext = (entity == null) ? CollisionContext.empty() : CollisionContext.of(entity); // CraftBukkit
     }
 }

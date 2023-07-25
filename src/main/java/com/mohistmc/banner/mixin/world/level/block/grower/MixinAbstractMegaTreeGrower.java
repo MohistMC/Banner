@@ -21,12 +21,11 @@ public abstract class MixinAbstractMegaTreeGrower extends AbstractTreeGrower {
 
     @Inject(method = "placeMega",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/block/Block;defaultBlockState()Lnet/minecraft/world/level/block/state/BlockState;"),
+            target = "Lnet/minecraft/core/Holder;value()Ljava/lang/Object;"),
             locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$setTreeType(ServerLevel level, ChunkGenerator generator, BlockPos pos,
-                                    BlockState state, RandomSource random, int branchX,
-                                    int branchY, CallbackInfoReturnable<Boolean> cir,
-                                    ResourceKey resourceKey, Holder holder, ConfiguredFeature configuredFeature) {
+    private void banner$setTreeType(ServerLevel level, ChunkGenerator generator, BlockPos pos, BlockState state,
+                                    RandomSource random, int branchX, int branchY, CallbackInfoReturnable<Boolean> cir,
+                                    ResourceKey resourceKey, Holder holder) {
         setTreeType(holder); // CraftBukkit
     }
 }

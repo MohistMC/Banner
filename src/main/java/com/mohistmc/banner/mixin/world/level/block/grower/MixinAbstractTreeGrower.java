@@ -23,12 +23,11 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public class MixinAbstractTreeGrower implements InjectionAbstractTreeGrower {
 
     @Inject(method = "growTree", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerLevel;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z",
-            ordinal = 0),
+            target = "Lnet/minecraft/core/Holder;value()Ljava/lang/Object;"),
             locals = LocalCapture.CAPTURE_FAILHARD)
     private void banner$setTreeType(ServerLevel level, ChunkGenerator generator, BlockPos pos, BlockState state,
                                     RandomSource random, CallbackInfoReturnable<Boolean> cir, ResourceKey resourceKey,
-                                    Holder<ConfiguredFeature<?, ?>> holder, ConfiguredFeature<?, ?> configuredFeature, BlockState blockState) {
+                                    Holder holder) {
         this.setTreeType(holder);
     }
 
