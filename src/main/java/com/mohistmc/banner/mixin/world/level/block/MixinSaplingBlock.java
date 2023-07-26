@@ -26,6 +26,7 @@ public class MixinSaplingBlock {
     @Shadow @Final private AbstractTreeGrower treeGrower;
     private static TreeType treeType = BukkitExtraConstants.treeType; // CraftBukkit
 
+    /*
     @Redirect(method = "advanceTree", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/block/grower/AbstractTreeGrower;growTree(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ChunkGenerator;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/util/RandomSource;)Z"))
     private boolean banner$cancelGrowTree(AbstractTreeGrower instance, ServerLevel level, ChunkGenerator generator, BlockPos pos, BlockState state, RandomSource random) {
@@ -62,5 +63,5 @@ public class MixinSaplingBlock {
             }
         }
         // CraftBukkit end
-    }
+    }*/
 }
