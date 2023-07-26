@@ -517,7 +517,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     /**
      * @author wdog5
-     * @reason
+     * @reason bukkit
      */
     @Overwrite
     public ServerPlayer respawn(ServerPlayer playerIn, boolean conqueredEnd) {
@@ -527,19 +527,21 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         BlockPos blockposition = playerIn.getRespawnPosition();
         float f = playerIn.getRespawnAngle();
         boolean flag1 = playerIn.isRespawnForced();
-        /* CraftBukkit start
-        WorldServer worldserver = this.server.getLevel(entityplayer.getRespawnDimension());
-        Optional optional;
+        // CraftBukkit start
+        // Banner start - remain original field to compat with carpet
+        ServerLevel worldserver_vanilla = this.server.getLevel(playerIn.getRespawnDimension());
+        Optional optional_vanilla;
 
-        if (worldserver != null && blockposition != null) {
-            optional = EntityHuman.findRespawnPositionAndUseSpawnBlock(worldserver, blockposition, f, flag1, flag);
+        if (worldserver_vanilla != null && blockposition != null) {
+            optional_vanilla = net.minecraft.world.entity.player.Player.findRespawnPositionAndUseSpawnBlock(worldserver_vanilla, blockposition, f, flag1, flag1);
         } else {
-            optional = Optional.empty();
+            optional_vanilla = Optional.empty();
         }
 
-        WorldServer worldserver1 = worldserver != null && optional.isPresent() ? worldserver : this.server.overworld();
-        EntityPlayer entityplayer1 = new EntityPlayer(this.server, worldserver1, entityplayer.getGameProfile());
-        // */
+        ServerLevel worldserver_vanilla_1 = worldserver_vanilla != null && optional_vanilla.isPresent() ? worldserver_vanilla : this.server.overworld();
+        ServerPlayer entityplayer_vanilla = new ServerPlayer(this.server, worldserver_vanilla_1, playerIn.getGameProfile());
+        // Banner end
+
         ServerPlayer entityplayer1 = playerIn;
         org.bukkit.World fromWorld = playerIn.getBukkitEntity().getWorld();
         playerIn.wonGame = false;
