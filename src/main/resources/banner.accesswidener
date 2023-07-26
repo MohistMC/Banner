@@ -51,7 +51,6 @@ accessible method net/minecraft/server/level/ServerBossEvent broadcast (Ljava/ut
 accessible method net/minecraft/server/level/ServerPlayer initMenu (Lnet/minecraft/world/inventory/AbstractContainerMenu;)V
 accessible method net/minecraft/server/level/ServerPlayer nextContainerCounter ()V
 accessible method net/minecraft/server/level/ServerPlayer triggerDimensionChangeTriggers (Lnet/minecraft/server/level/ServerLevel;)V
-accessible method net/minecraft/server/level/ChunkMap save (Lnet/minecraft/world/level/chunk/ChunkAccess;)Z
 accessible method net/minecraft/server/players/PlayerList updateEntireScoreboard (Lnet/minecraft/server/ServerScoreboard;Lnet/minecraft/server/level/ServerPlayer;)V
 accessible method net/minecraft/util/datafix/fixes/BlockStateData register (ILjava/lang/String;[Ljava/lang/String;)V
 accessible method net/minecraft/world/entity/Display$ItemDisplay setItemStack (Lnet/minecraft/world/item/ItemStack;)V
