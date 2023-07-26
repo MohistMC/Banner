@@ -131,6 +131,10 @@ public class BannerConfig {
     public static int server_thread;
 
     public static List<String> nospawnEntity;
+    public static boolean clear_item;
+    public static List<String> clear_item__whitelist;
+    public static String clear_item__msg;
+    public static int clear_item__time;
 
     private static void banner() {
         check_update = getBoolean("banner.check_update", false);
@@ -145,5 +149,9 @@ public class BannerConfig {
         skipOtherWorldPreparing = getBoolean("world.skipOtherWorldPreparing", false);
         server_thread = getInt("threadpriority.server_thread", 8);
         nospawnEntity = getList("entity.nospawn", Collections.emptyList());
+        clear_item = getBoolean("entity.clear.item.enable", false);
+        clear_item__whitelist = getList("entity.clear.item.whitelist", Collections.emptyList());
+        clear_item__msg = getString("entity.clear.item.msg", "[Server] Cleaned up %size% drops");
+        clear_item__time = getInt("entity.clear.item.time", 1800);
     }
 }

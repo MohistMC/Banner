@@ -9,6 +9,10 @@ public class BannerPlugin {
 
     public static Logger LOGGER = LogManager.getLogger("BannerPlugin");
 
+    public static void init() {
+        EntityClear.start();
+    }
+
     public static void registerListener(Event event) {
         if (event instanceof PrepareAnvilEvent prepareAnvilEvent) {
             EnchantmentFix.anvilListener(prepareAnvilEvent);

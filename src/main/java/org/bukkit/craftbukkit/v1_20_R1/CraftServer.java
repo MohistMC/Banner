@@ -11,6 +11,7 @@ import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.api.ServerAPI;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.bukkit.nms.utils.RemapUtils;
+import com.mohistmc.banner.plugins.BannerPlugin;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.commands.Commands;
@@ -412,6 +413,7 @@ public final class CraftServer implements Server {
         }
 
         if (type == PluginLoadOrder.POSTWORLD) {
+            BannerPlugin.init(); // Banner
             // Spigot start - Allow vanilla commands to be forced to be the main command
             setVanillaCommands(true);
             commandMap.setFallbackCommands();
