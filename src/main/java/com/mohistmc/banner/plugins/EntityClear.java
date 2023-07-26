@@ -26,7 +26,7 @@ public class EntityClear {
             if (BukkitExtraConstants.getServer().hasStopped()) {
                 return;
             }
-            run();
+            if (BannerConfig.clear_item) run();
         }, 1000 * 60 * 1, 1000 * BannerConfig.clear_item__time, TimeUnit.MILLISECONDS);
     }
 
