@@ -89,11 +89,12 @@ public class BannerWorldConfig {
 
     public boolean disableChestCatDetection;
     public boolean piglinsGuardChests;
+    public boolean zombiesTargetTurtleEggs;
 
     private void animalBehaviours() {
         disableChestCatDetection = getBoolean("entities.behavior.disableChestCatDetection", false);
         piglinsGuardChests = getBoolean("entities.behavior.piglinsGuardChests", true);
-
+        zombiesTargetTurtleEggs = getBoolean("entities.behavior.zombiesTargetTurtleEggs", true);
     }
 
     public boolean disableTeleportationSuffocationCheck;

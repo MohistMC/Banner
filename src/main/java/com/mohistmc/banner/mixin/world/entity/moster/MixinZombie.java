@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.moster;
 
+import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import io.izzel.arclight.mixin.Eject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -14,6 +15,8 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.ZombieVillager;
 import net.minecraft.world.entity.npc.Villager;
@@ -107,5 +110,13 @@ public abstract class MixinZombie extends Monster {
             target = "Lnet/minecraft/world/level/Level;hasNearbyAlivePlayer(DDDD)Z"))
     private boolean banner$affectSpawn(Level instance, double x, double y, double z, double d) {
         return this.level().hasNearbyAlivePlayerThatAffectsSpawning((double) x, (double) y, (double) z, 7.0D);
+    }
+
+    @WrapWithCondition(method = "registerGoals",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/ai/goal/GoalSelector;addGoal(ILnet/minecraft/world/entity/ai/goal/Goal;)V",
+                    ordinal = 0))
+    private boolean banner$configTurtleEgg(GoalSelector instance, int priority, Goal goal) {
+        return this.level().bridge$bannerConfig().zombiesTargetTurtleEggs;
     }
 }
