@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mixin(ItemEntity.class)
 public abstract class MixinItemEntity extends Entity {
@@ -62,13 +64,32 @@ public abstract class MixinItemEntity extends Entity {
         // Spigot end
     }
 
+    private AtomicBoolean flyAtPlayer = new AtomicBoolean(false);// Paper
+
     @Inject(method = "playerTouch", at = @At(value = "FIELD",
             target = "Lnet/minecraft/world/entity/item/ItemEntity;pickupDelay:I"),
-            locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+            locals = LocalCapture.CAPTURE_FAILHARD,
+            cancellable = true)
     private void banner$pickUpEvent(Player player, CallbackInfo ci, ItemStack itemStack, Item item, int i) {
         // CraftBukkit start - fire PlayerPickupItemEvent
         int canHold = player.getInventory().canHold(itemStack);
         int remaining = i - canHold;
+
+        // Paper start
+        if (this.pickupDelay <= 0) {
+            PlayerAttemptPickupItemEvent attemptEvent = new PlayerAttemptPickupItemEvent((org.bukkit.entity.Player) player.getBukkitEntity(), (org.bukkit.entity.Item) this.getBukkitEntity(), remaining);
+            this.level().getCraftServer().getPluginManager().callEvent(attemptEvent);
+
+            flyAtPlayer.set(attemptEvent.getFlyAtPlayer());
+            if (attemptEvent.isCancelled()) {
+                if (flyAtPlayer.get()) {
+                    player.take(this, i);
+                }
+
+                ci.cancel();
+            }
+        }
+        // Paper end
 
         if (this.pickupDelay <= 0 && canHold > 0) {
             itemStack.setCount(canHold);
@@ -85,8 +106,14 @@ public abstract class MixinItemEntity extends Entity {
             EntityPickupItemEvent entityEvent = new EntityPickupItemEvent((org.bukkit.entity.Player) player.getBukkitEntity(), (org.bukkit.entity.Item) this.getBukkitEntity(), remaining);
             entityEvent.setCancelled(!entityEvent.getEntity().getCanPickupItems());
             this.level().getCraftServer().getPluginManager().callEvent(entityEvent);
+            flyAtPlayer.set(playerEvent.getFlyAtPlayer()); // Paper
             if (entityEvent.isCancelled()) {
                 itemStack.setCount(i); // SPIGOT-5294 - restore count
+                // Paper Start
+                if (flyAtPlayer.get()) {
+                    player.take(this, i);
+                }
+                // Paper End
                 ci.cancel();
             }
 
@@ -107,6 +134,15 @@ public abstract class MixinItemEntity extends Entity {
         // CraftBukkit end
     }
 
+    @Inject(method = "playerTouch",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/player/Player;take(Lnet/minecraft/world/entity/Entity;I)V"),
+            cancellable = true)
+    private void banner$checkIfFly(Player player, CallbackInfo ci) {
+        if (!flyAtPlayer.get()) {
+            ci.cancel();
+        }
+    }
 
     @Inject(method = "setItem", at = @At("RETURN"))
     private void banner$markDirty(ItemStack stack, CallbackInfo ci) {

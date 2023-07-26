@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity;
 
+import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.mohistmc.banner.bukkit.ProcessableEffect;
@@ -878,6 +879,20 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     private void banner$onArrowChange(int count, CallbackInfo ci) {
         if (banner$callArrowCountChange(count, false)) {
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "collectEquipmentChanges", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/LivingEntity;equipmentHasChanged(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z",
+            shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$fireArmorChangeEvent(CallbackInfoReturnable<Map<EquipmentSlot, ItemStack>> cir, Map map,
+                                             EquipmentSlot[] var2, int var3, int var4, EquipmentSlot equipmentSlot,
+                                             ItemStack itemStack, ItemStack itemStack2) {
+        // Paper start - PlayerArmorChangeEvent
+        if (((LivingEntity) (Object) this) instanceof ServerPlayer && equipmentSlot.getType() == EquipmentSlot.Type.ARMOR) {
+            final org.bukkit.inventory.ItemStack oldItem = CraftItemStack.asBukkitCopy(itemStack);
+            final org.bukkit.inventory.ItemStack newItem = CraftItemStack.asBukkitCopy(itemStack2);
+            new PlayerArmorChangeEvent((org.bukkit.entity.Player)this.getBukkitEntity(), PlayerArmorChangeEvent.SlotType.valueOf(equipmentSlot.name()), oldItem, newItem).callEvent();
         }
     }
 

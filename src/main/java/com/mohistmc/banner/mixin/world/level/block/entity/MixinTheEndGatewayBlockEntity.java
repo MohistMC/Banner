@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.entity.TheEndPortalBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_20_R1.block.CraftEndGateway;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,7 +40,7 @@ public abstract class MixinTheEndGatewayBlockEntity extends TheEndPortalBlockEnt
             location.setPitch(player.getLocation().getPitch());
             location.setYaw(player.getLocation().getYaw());
 
-            PlayerTeleportEvent event = new PlayerTeleportEvent(player, player.getLocation(), location, PlayerTeleportEvent.TeleportCause.END_GATEWAY);
+            PlayerTeleportEvent event =  new com.destroystokyo.paper.event.player.PlayerTeleportEndGatewayEvent(player, player.getLocation(), location, new CraftEndGateway(level.getWorld(), blockEntity)); // Paper
             Bukkit.getPluginManager().callEvent(event);
             if (event.isCancelled()) {
                 ci.cancel();

@@ -692,7 +692,34 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                             boolean flag = d7 > 0.0D;
 
                             if (this.player.onGround() && !packetplayinflying.isOnGround() && flag) {
-                                this.player.jumpFromGround();
+                                // Paper start - Add player jump event
+                                Player player = this.getCraftPlayer();
+                                Location from = new Location(player.getWorld(), lastPosX, lastPosY, lastPosZ, lastYaw, lastPitch); // Get the Players previous Event location.
+                                Location to = player.getLocation().clone(); // Start off the To location as the Players current location.
+
+                                // If the packet contains movement information then we update the To location with the correct XYZ.
+                                if (packetplayinflying.hasPos) {
+                                    to.setX(packetplayinflying.x);
+                                    to.setY(packetplayinflying.y);
+                                    to.setZ(packetplayinflying.z);
+                                }
+
+                                // If the packet contains look information then we update the To location with the correct Yaw & Pitch.
+                                if (packetplayinflying.hasRot) {
+                                    to.setYaw(packetplayinflying.yRot);
+                                    to.setPitch(packetplayinflying.xRot);
+                                }
+
+                                com.destroystokyo.paper.event.player.PlayerJumpEvent event = new com.destroystokyo.paper.event.player.PlayerJumpEvent(player, from, to);
+
+                                if (event.callEvent()) {
+                                    this.player.jumpFromGround();
+                                } else {
+                                    from = event.getFrom();
+                                    this.internalTeleport(from.getX(), from.getY(), from.getZ(), from.getYaw(), from.getPitch(), Collections.emptySet());
+                                    return;
+                                }
+                                // Paper end
                             }
 
                             boolean flag1 = this.player.verticalCollisionBelow;

@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -60,5 +61,19 @@ public abstract class MixinPlayerAdvancements {
             at = @At(value = "HEAD"), cancellable = true)
     private void banner$disableAdvancementSaving(Set<Advancement> set, Set<ResourceLocation> set2, Advancement advancement, boolean bl, CallbackInfo ci) {
         if (org.spigotmc.SpigotConfig.disableAdvancementSaving) ci.cancel(); // Spigot
+    }
+
+    @Inject(method = "award", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/PlayerAdvancements;unregisterListeners(Lnet/minecraft/advancements/Advancement;)V"),
+            locals = LocalCapture.CAPTURE_FAILHARD,
+            cancellable = true)
+    private void banner$fireAdvancementEvent(Advancement advancement, String criterionKey, CallbackInfoReturnable<Boolean> cir,
+                                             boolean bl, AdvancementProgress advancementProgress, boolean bl2) {
+        // Paper start
+        if (!new com.destroystokyo.paper.event.player.PlayerAdvancementCriterionGrantEvent(this.player.getBukkitEntity(), advancement.bridge$bukkit(), criterionKey).callEvent()) {
+            advancementProgress.revokeProgress(criterionKey);
+            cir.setReturnValue(false);
+        }
+        // Paper end
     }
 }

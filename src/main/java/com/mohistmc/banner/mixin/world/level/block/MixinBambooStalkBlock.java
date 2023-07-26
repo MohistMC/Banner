@@ -101,4 +101,29 @@ public abstract class MixinBambooStalkBlock extends Block {
     private int banner$corpRate(int constant) {
         return banner$level.get().bridge$spigotConfig().bambooModifier / 100;
     }
+
+    @ModifyConstant(method = "randomTick", constant = @Constant(intValue = 16))
+    private int banner$heightMax0(int constant) {
+        return banner$level.get().bridge$bannerConfig().bambooHeightMax;// Paper - Configurable bamboo growth heights
+    }
+
+    @ModifyConstant(method = "isValidBonemealTarget", constant = @Constant(intValue = 16))
+    private int banner$heightMax1(int constant) {
+        return banner$level.get().bridge$bannerConfig().bambooHeightMax;// Paper - Configurable bamboo growth heights
+    }
+
+    @ModifyConstant(method = "performBonemeal", constant = @Constant(intValue = 16))
+    private int banner$heightMax2(int constant) {
+        return banner$level.get().bridge$bannerConfig().bambooHeightMax;// Paper - Configurable bamboo growth heights
+    }
+
+    @ModifyConstant(method = "getHeightAboveUpToMax", constant = @Constant(intValue = 16))
+    private int banner$heightMax3(int constant) {
+        return banner$level.get().bridge$bannerConfig().bambooHeightMax;// Paper - Configurable bamboo growth heights
+    }
+
+    @ModifyConstant(method = "getHeightBelowUpToMax", constant = @Constant(intValue = 16))
+    private int banner$heightMax4(int constant) {
+        return banner$level.get().bridge$bannerConfig().bambooHeightMax; // Paper - Configurable bamboo growth heights
+    }
 }

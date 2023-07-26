@@ -102,4 +102,14 @@ public class BannerWorldConfig {
     private void environment() {
         disableTeleportationSuffocationCheck = getBoolean("environment.disableTeleportationSuffocationCheck", false);
     }
+
+    public int bambooHeightMax;
+    public int cactusHeight;
+    public int reedHeight;
+
+    public void maxGrowthHeight() {
+        bambooHeightMax = getInt("maxGrowthHeight.bamboo.max", 16);
+        cactusHeight = getInt("maxGrowthHeight.cactus", 3);
+        reedHeight = getInt("maxGrowthHeight.reeds", 3);
+    }
 }
