@@ -650,7 +650,11 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             this.players.add(entityplayer1);
             this.playersByUUID.put(entityplayer1.getUUID(), entityplayer1);
         }
-        // entityplayer1.initInventoryMenu();
+        // Banner start - add for carpet compat
+        if (entityplayer_vanilla == null) {
+            entityplayer1.initInventoryMenu();
+        }
+        // Banner end
         entityplayer1.setHealth(entityplayer1.getHealth());
         if (flag2) {
             entityplayer1.connection.send(new ClientboundSoundPacket(SoundEvents.RESPAWN_ANCHOR_DEPLETE, SoundSource.BLOCKS, (double) blockposition.getX(), (double) blockposition.getY(), (double) blockposition.getZ(), 1.0F, 1.0F, worldserver1.getRandom().nextLong()));
