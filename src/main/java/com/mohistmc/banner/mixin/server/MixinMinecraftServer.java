@@ -560,9 +560,8 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     }
 
     private void banner$initLevel(ServerLevel serverWorld) {
-        if (((CraftServer) Bukkit.getServer()).scoreboardManager == null) {
-            ((CraftServer) Bukkit.getServer()).scoreboardManager = new CraftScoreboardManager((MinecraftServer) (Object) this, serverWorld.getScoreboard());
-        }
+        this.server.scoreboardManager = new CraftScoreboardManager((MinecraftServer) (Object) this, serverWorld.getScoreboard());
+
         if (serverWorld.bridge$generator() != null) {
             serverWorld.getWorld().getPopulators().addAll(
                     serverWorld.bridge$generator().getDefaultPopulators(
