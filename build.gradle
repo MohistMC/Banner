@@ -180,6 +180,7 @@ jar {
 	from("LICENSE")
 	manifest {
 		attributes(
+				'Main-Class': 'com.mohistmc.banner.BannerGUI',
 				'Specification-Title'   : 'Banner',
 				'Specification-Vendor'  : 'MohistMC',
 				'Specification-Version' : ci_version(),
