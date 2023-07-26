@@ -29,6 +29,7 @@ public abstract class MixinLootTable implements InjectionLootTable {
 
     @Override
     public void fillInventory(Container iinventory, LootParams lootparams, long i, boolean plugin) {
+        banner$pluginUsed.set(plugin);
         fill(iinventory, lootparams, i);
     }
 
