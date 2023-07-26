@@ -110,6 +110,7 @@ public abstract class MixinBucketItem extends Item {
     private void banner$handleEmptyContents(Player player, Level level, BlockPos pos, BlockHitResult result,
                                             CallbackInfoReturnable<Boolean> cir, BlockState blockState, Block block) {
         // Banner start - handle NPE
+        assert result != null;
         Direction direction = banner$direction.get();
         direction = direction == null ? result.getDirection() : direction;
         Direction finalDirection = direction;
