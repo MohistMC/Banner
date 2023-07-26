@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.level;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.config.BannerWorldConfig;
 import com.mohistmc.banner.fabric.FabricInjectBukkit;
 import com.mohistmc.banner.fabric.WrappedWorlds;
 import com.mohistmc.banner.injection.world.level.InjectionLevel;
@@ -110,6 +111,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     protected org.bukkit.World.Environment environment;
     protected org.bukkit.generator.BiomeProvider biomeProvider;
     public SpigotTimings.WorldTimingsHandler timings; // Spigot
+    private com.mohistmc.banner.config.BannerWorldConfig bannerConfig;
 
     public void banner$constructor(WritableLevelData worldInfo, ResourceKey<Level> dimension, RegistryAccess registryAccess, final Holder<DimensionType> dimensionType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdate) {
         throw new RuntimeException();
@@ -126,6 +128,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(WritableLevelData info, ResourceKey<Level> dimension, RegistryAccess registryAccess, Holder<DimensionType> dimType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdates, CallbackInfo ci) {
         this.banner$setSpigotConfig(new SpigotWorldConfig(BukkitExtraConstants.getServer().storageSource.getDimensionPath(dimension).getFileName().toFile().getName()));
+        this.banner$setBannerConfig(new BannerWorldConfig(BukkitExtraConstants.getServer().storageSource.getDimensionPath(dimension).getFileName().toFile().getName()));
         for (SpawnCategory spawnCategory : SpawnCategory.values()) {
             if (CraftSpawnCategory.isValidForLimits(spawnCategory)) {
                 this.ticksPerSpawnCategory.put(spawnCategory, this.getCraftServer().getTicksPerSpawns(spawnCategory));
@@ -554,6 +557,16 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     @Override
     public void banner$setSpigotConfig(SpigotWorldConfig spigotWorldConfig) {
         this.spigotConfig = spigotWorldConfig;
+    }
+
+    @Override
+    public BannerWorldConfig bridge$bannerConfig() {
+        return bannerConfig;
+    }
+
+    @Override
+    public void banner$setBannerConfig(BannerWorldConfig bannerWorldConfig) {
+        this.bannerConfig = bannerWorldConfig;
     }
 
     @Override

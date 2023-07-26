@@ -786,6 +786,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             this.unRide();
             this.serverLevel().removePlayerImmediately((ServerPlayer) (Object) this, RemovalReason.CHANGED_DIMENSION);
             if (!this.wonGame) {
+                if (this.level().bridge$bannerConfig().disableEndCredits) this.seenCredits = true; // Paper - Toggle to always disable end credits
                 this.wonGame = true;
                 this.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.WIN_GAME, this.seenCredits ? 0.0F : 1.0F));
                 this.seenCredits = true;

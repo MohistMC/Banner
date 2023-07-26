@@ -1,5 +1,6 @@
 package com.mohistmc.banner.injection.world.level;
 
+import com.mohistmc.banner.config.BannerWorldConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -137,5 +138,12 @@ public interface InjectionLevel {
     }
 
     default void banner$setSpigotConfig(SpigotWorldConfig spigotWorldConfig) {
+    }
+
+    default BannerWorldConfig bridge$bannerConfig() {
+        return null;
+    }
+
+    default void banner$setBannerConfig(BannerWorldConfig bannerWorldConfig) {
     }
 }
