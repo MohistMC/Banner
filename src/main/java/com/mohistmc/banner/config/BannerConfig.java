@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -126,6 +127,10 @@ public class BannerConfig {
     public static boolean showLogo;
     public static boolean isSymlinkWorld;
     public static boolean skipOtherWorldPreparing;
+    // Thread Priority
+    public static int server_thread;
+
+    public static List<String> nospawnEntity;
 
     private static void banner() {
         check_update = getBoolean("banner.check_update", false);
@@ -138,5 +143,7 @@ public class BannerConfig {
         max_enchantment_level = getInt("anvilfix.max_enchantment_level", 32767);
         isSymlinkWorld = getBoolean("compat.symlink_world", false);
         skipOtherWorldPreparing = getBoolean("world.skipOtherWorldPreparing", false);
+        server_thread = getInt("threadpriority.server_thread", 8);
+        nospawnEntity = getList("entity.nospawn", Collections.emptyList());
     }
 }

@@ -569,6 +569,13 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         return entity;
     }
 
+    @Inject(method = "addEntity", at = @At("HEAD"), cancellable = true)
+    private void banner$checkSpawnEntity(Entity entity, CallbackInfoReturnable<Boolean> cir) {
+        if (BannerConfig.nospawnEntity.contains(entity.getBukkitEntity().getType().name())) {
+            cir.setReturnValue(false);
+        }
+    }
+
     @Override
     public boolean addEntitySerialized(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
         return addWithUUID(entity, reason);

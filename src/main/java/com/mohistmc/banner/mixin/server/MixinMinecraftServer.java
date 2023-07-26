@@ -80,7 +80,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -919,6 +921,11 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     private void banner$syncCommands(Collection collection, MinecraftServer.ReloadableResources reloadableResources,
                                      CallbackInfo ci) {
         this.server.syncCommands(); // SPIGOT-5884: Lost on reload
+    }
+
+    @ModifyConstant(method = "spin", constant = @Constant(intValue = 8))
+    private static int banner$configurePriority(int constant) {
+        return BannerConfig.server_thread;
     }
 
     // Banner start
