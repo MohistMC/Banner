@@ -300,6 +300,10 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
             }
             livingEntity.detectEquipmentUpdates();
         }
+        // CraftBukkit start - MC-109346: Fix for nonsensical head yaw
+        if (this.entity instanceof ServerPlayer) {
+            consumer.accept(new ClientboundRotateHeadPacket(this.entity, (byte) Mth.floor(this.entity.getYHeadRot() * 256.0F / 360.0F)));
+        }
         if (!this.entity.getPassengers().isEmpty()) {
             consumer.accept(new ClientboundSetPassengersPacket(this.entity));
         }
