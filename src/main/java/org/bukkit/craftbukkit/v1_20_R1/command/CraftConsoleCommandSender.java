@@ -52,11 +52,6 @@ public class CraftConsoleCommandSender extends ServerCommandSender implements Co
     }
 
     @Override
-    public @NotNull Spigot spigot() {
-        return null;
-    }
-
-    @Override
     public boolean isOp() {
         return true;
     }

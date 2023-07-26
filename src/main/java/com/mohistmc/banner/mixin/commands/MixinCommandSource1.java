@@ -37,11 +37,6 @@ public class MixinCommandSource1 {
             public String getName() {
                 return "NULL";
             }
-
-            @Override
-            public @NotNull Spigot spigot() {
-                return null;
-            }
         };
     }
 }

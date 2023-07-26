@@ -31,11 +31,6 @@ public class CraftRemoteConsoleCommandSender extends ServerCommandSender impleme
     }
 
     @Override
-    public @NotNull Spigot spigot() {
-        return null;
-    }
-
-    @Override
     public boolean isOp() {
         return true;
     }
