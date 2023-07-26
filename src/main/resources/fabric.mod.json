@@ -52,6 +52,7 @@
       "net/minecraft/class_1936": ["com/mohistmc/banner/injection/world/level/InjectionLevelAccessor"],
       "net/minecraft/class_3765": ["com/mohistmc/banner/injection/world/entity/raid/InjectionRaid"],
       "net/minecraft/class_1533": ["com/mohistmc/banner/injection/world/entity/decoration/InjectionItemFrame"],
+      "net/minecraft/class_1531": ["com/mohistmc/banner/injection/world/entity/decoration/InjectionArmorStand"],
       "net/minecraft/class_1657": ["com/mohistmc/banner/injection/world/entity/player/InjectionPlayer"],
       "net/minecraft/class_1661": ["com/mohistmc/banner/injection/world/entity/player/InjectionInventory"],
       "net/minecraft/class_161": ["com/mohistmc/banner/injection/advancements/InjectionAdvancement"],
