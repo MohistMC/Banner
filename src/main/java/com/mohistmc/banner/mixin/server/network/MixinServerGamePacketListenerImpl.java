@@ -53,6 +53,7 @@ import net.minecraft.network.protocol.game.ServerboundSelectTradePacket;
 import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
 import net.minecraft.network.protocol.game.ServerboundSetCreativeModeSlotPacket;
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
+import net.minecraft.network.protocol.game.ServerboundSwingPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -99,6 +100,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.SpigotTimings;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventoryView;
@@ -118,6 +120,8 @@ import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.SmithItemEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
@@ -911,6 +915,12 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         }
     }
 
+    @Inject(method = "handleUseItemOn", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;ackBlockChangesUpTo(I)V"),
+            cancellable = true)
+    private void banner$checkImmobile(ServerboundUseItemOnPacket packet, CallbackInfo ci) {
+        if (this.player.isImmobile()) ci.cancel(); // CraftBukkit
+    }
 
     @Inject(method = "handleUseItemOn", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;serverLevel()Lnet/minecraft/server/level/ServerLevel;", ordinal = 1))
     private void banner$frozenUseItem(ServerboundUseItemOnPacket packetIn, CallbackInfo ci) {
@@ -1026,6 +1036,46 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         if (packetIn instanceof ClientboundSetDefaultSpawnPositionPacket packet6) {
              this.player.banner$setCompassTarget(new Location(this.getCraftPlayer().getWorld(), packet6.pos.getX(), packet6.pos.getY(), packet6.pos.getZ()));
         }
+    }
+
+    @Inject(method = "handleAnimate",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerPlayer;resetLastActionTime()V"),
+            cancellable = true)
+    private void banner$checkAnimate(ServerboundSwingPacket packet, CallbackInfo ci) {
+        if (this.player.isImmobile()) ci.cancel(); // CraftBukkit
+    }
+
+    @Inject(method = "handleAnimate",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerPlayer;swing(Lnet/minecraft/world/InteractionHand;)V"),
+            cancellable = true)
+    private void banner$handleAnimateEvent(ServerboundSwingPacket packet, CallbackInfo ci) {
+        // CraftBukkit start - Raytrace to look for 'rogue armswings'
+        float f1 = this.player.getXRot();
+        float f2 = this.player.getYRot();
+        double d0 = this.player.getX();
+        double d1 = this.player.getY() + (double) this.player.getEyeHeight();
+        double d2 = this.player.getZ();
+        Location origin = new Location(this.player.level().getWorld(), d0, d1, d2, f2, f1);
+
+        double d3 = player.gameMode.getGameModeForPlayer() == GameType.CREATIVE ? 5.0D : 4.5D;
+        // SPIGOT-5607: Only call interact event if no block or entity is being clicked. Use bukkit ray trace method, because it handles blocks and entities at the same time
+        // SPIGOT-7429: Make sure to call PlayerInteractEvent for spectators and non-pickable entities
+        org.bukkit.util.RayTraceResult result = this.player.level().getWorld().rayTrace(origin, origin.getDirection(), d3, org.bukkit.FluidCollisionMode.NEVER, false, 0.1, entity -> {
+            Entity handle = ((CraftEntity) entity).getHandle();
+            return entity != this.player.getBukkitEntity() && this.player.getBukkitEntity().canSee(entity) && !handle.isSpectator() && handle.isPickable() && !handle.isPassengerOfSameVehicle(player);
+        });
+        if (result == null) {
+            CraftEventFactory.callPlayerInteractEvent(this.player, Action.LEFT_CLICK_AIR, this.player.getInventory().getSelected(), InteractionHand.MAIN_HAND);
+        }
+
+        // Arm swing animation
+        PlayerAnimationEvent event = new PlayerAnimationEvent(this.getCraftPlayer(), (packet.getHand() == InteractionHand.MAIN_HAND) ? PlayerAnimationType.ARM_SWING : PlayerAnimationType.OFF_ARM_SWING);
+        this.cserver.getPluginManager().callEvent(event);
+
+        if (event.isCancelled()) ci.cancel();
+        // CraftBukkit end
     }
 
     /**
@@ -1320,8 +1370,10 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         if (this.player.isImmobile()) ci.cancel(); // CraftBukkit
     }
 
-    @Inject(method = "handleContainerClose", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;doCloseContainer()V"))
+    @Inject(method = "handleContainerClose", cancellable = true,
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;doCloseContainer()V"))
     private void banner$invClose(ServerboundContainerClosePacket packetIn, CallbackInfo ci) {
+        if (this.player.isImmobile()) ci.cancel(); // CraftBukkit
       CraftEventFactory.handleInventoryCloseEvent(this.player);
     }
 
