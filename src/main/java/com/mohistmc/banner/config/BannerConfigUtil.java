@@ -107,8 +107,19 @@ public class BannerConfigUtil {
         }
         return yml.getBoolean(key, false);
     }
+
+    public static int serverThread() {
+        String key = "threadpriority.server_thread";
+        if (yml.get(key) == null) {
+            yml.set(key, 8);
+            save();
+        }
+        return yml.getInt(key, 8);
+    }
+
     public static void initAllNeededConfig() {
         skipOtherWorldPreparing();
+        serverThread();
     }
 
 }

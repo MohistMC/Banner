@@ -5,6 +5,7 @@ import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.config.BannerConfig;
+import com.mohistmc.banner.config.BannerConfigUtil;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
 import com.mohistmc.banner.paper.RollingAverage;
 import com.mojang.datafixers.DataFixer;
@@ -925,7 +926,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @ModifyConstant(method = "spin", constant = @Constant(intValue = 8))
     private static int banner$configurePriority(int constant) {
-        return BannerConfig.server_thread;
+        return BannerConfigUtil.serverThread();
     }
 
     // Banner start
