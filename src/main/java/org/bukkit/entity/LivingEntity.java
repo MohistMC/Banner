@@ -364,6 +364,15 @@ public interface LivingEntity extends Attributable, Damageable, ProjectileSource
      */
     public void removePotionEffect(@NotNull PotionEffectType type);
 
+    // Paper start - LivingEntity#clearActivePotionEffects();
+    /**
+     * Removes all active potion effects for this entity.
+     *
+     * @return true if any were removed
+     */
+    boolean clearActivePotionEffects();
+    // Paper end
+
     /**
      * Returns all currently active {@link PotionEffect}s on the living
      * entity.

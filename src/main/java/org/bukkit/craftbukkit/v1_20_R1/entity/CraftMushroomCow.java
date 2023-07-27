@@ -5,7 +5,7 @@ import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.MushroomCow;
 
-public class CraftMushroomCow extends CraftCow implements MushroomCow {
+public class CraftMushroomCow extends CraftCow implements MushroomCow, io.papermc.paper.entity.PaperShearable { // Paper
     public CraftMushroomCow(CraftServer server, net.minecraft.world.entity.animal.MushroomCow entity) {
         super(server, entity);
     }

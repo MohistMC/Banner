@@ -5,7 +5,7 @@ import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Sheep;
 
-public class CraftSheep extends CraftAnimals implements Sheep {
+public class CraftSheep extends CraftAnimals implements Sheep, io.papermc.paper.entity.PaperShearable { // Paper
     public CraftSheep(CraftServer server, net.minecraft.world.entity.animal.Sheep entity) {
         super(server, entity);
     }

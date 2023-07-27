@@ -1,9 +1,11 @@
 package org.bukkit.entity;
 
+import org.bukkit.Sound;
+
 /**
  * Represents a snowman entity
  */
-public interface Snowman extends Golem {
+public interface Snowman extends Golem, io.papermc.paper.entity.Shearable { // Paper
 
     /**
      * Gets whether this snowman is in "derp mode", meaning it is not wearing a
@@ -21,4 +23,11 @@ public interface Snowman extends Golem {
      * @param derpMode True to remove the pumpkin, false to add a pumpkin
      */
     void setDerp(boolean derpMode);
+
+    // Banner start - since we do not use kyori so override it
+    @Override
+    default void shear() {
+        this.shear(Sound.ENTITY_SNOW_GOLEM_SHEAR);
+    }
+    // Banner end
 }
