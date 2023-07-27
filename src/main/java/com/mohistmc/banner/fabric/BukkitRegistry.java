@@ -95,6 +95,7 @@ public class BukkitRegistry {
 
     public static void loadItems() {
         var registry = BuiltInRegistries.ITEM;
+        var newTypes = new ArrayList<Material>();
         for (Item item : registry) {
             ResourceLocation resourceLocation = registry.getKey(item);
             if (!isMINECRAFT(resourceLocation)) {
@@ -102,6 +103,7 @@ public class BukkitRegistry {
                 String materialName = normalizeName(resourceLocation.toString());
                 int id = Item.getId(item);
                 Material material = Material.addMaterial(materialName, id, false, resourceLocation.getNamespace());
+                newTypes.add(material);
 
                 if (material != null) {
                     CraftMagicNumbers.ITEM_MATERIAL.put(item, material);
@@ -110,10 +112,13 @@ public class BukkitRegistry {
                 }
             }
         }
+        BannerServer.LOGGER.info(BannerMCStart.I18N.get("registry.item"), newTypes.size());
     }
 
     public static void loadBlocks() {
         var registry = BuiltInRegistries.BLOCK;
+        var newTypes = new ArrayList<Material>();
+
         for (Block block : registry) {
             ResourceLocation resourceLocation = registry.getKey(block);
             if (!isMINECRAFT(resourceLocation)) {
@@ -121,6 +126,7 @@ public class BukkitRegistry {
                 String materialName = normalizeName(resourceLocation.toString());
                 int id = Item.getId(block.asItem());
                 Material material = Material.addMaterial(materialName, id, true, resourceLocation.getNamespace());
+                newTypes.add(material);
 
                 if (material != null) {
                     CraftMagicNumbers.BLOCK_MATERIAL.put(block, material);
@@ -129,6 +135,7 @@ public class BukkitRegistry {
                 }
             }
         }
+        BannerServer.LOGGER.info(BannerMCStart.I18N.get("registry.block"), newTypes.size());
     }
 
     private static void loadGameEvents() {
