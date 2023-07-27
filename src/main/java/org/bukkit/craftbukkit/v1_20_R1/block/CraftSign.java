@@ -32,6 +32,11 @@ public class CraftSign<T extends SignBlockEntity> extends CraftBlockEntityState<
 
         SignBlockEntity handle = ((CraftSign<?>) sign).getTileEntity();
 
+        // Paper start
+        io.papermc.paper.event.player.PlayerOpenSignEvent event = new io.papermc.paper.event.player.PlayerOpenSignEvent((Player) player, sign, side, io.papermc.paper.event.player.PlayerOpenSignEvent.Cause.PLUGIN);
+        if (!event.callEvent()) return;
+        // Paper end
+
         ((CraftPlayer) player).getHandle().openTextEdit(handle,Side.FRONT == side);
     }
 

@@ -71,6 +71,7 @@
       "net/minecraft/class_2281": ["com/mohistmc/banner/injection/world/level/block/InjectionChestBlock"],
       "net/minecraft/class_2248": ["com/mohistmc/banner/injection/world/level/block/InjectionBlock"],
       "net/minecraft/class_2358": ["com/mohistmc/banner/injection/world/level/block/InjectionFireBlock"],
+      "net/minecraft/class_2478": ["com/mohistmc/banner/injection/world/level/block/InjectionSignBlock"],
       "net/minecraft/class_5454": ["com/mohistmc/banner/injection/world/level/portal/InjectionPortalInfo"],
       "net/minecraft/class_1946": ["com/mohistmc/banner/injection/world/level/portal/InjectionPortalForcer"],
       "net/minecraft/class_2647": ["com/mohistmc/banner/injection/world/level/block/InjectionAbstractTreeGrower"],

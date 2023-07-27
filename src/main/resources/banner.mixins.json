@@ -457,6 +457,7 @@
     "world.level.block.MixinSculkSensorBlock",
     "world.level.block.MixinSculkShriekerBlock",
     "world.level.block.MixinSculkVeinBlock",
+    "world.level.block.MixinSignBlock",
     "world.level.block.MixinSnowLayerBlock",
     "world.level.block.MixinSpawnerBlock",
     "world.level.block.MixinSpongeBlock",

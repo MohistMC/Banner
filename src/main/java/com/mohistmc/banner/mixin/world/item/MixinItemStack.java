@@ -3,6 +3,7 @@ package com.mohistmc.banner.mixin.world.item;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.injection.world.item.InjectionItemStack;
 import com.mojang.serialization.Dynamic;
+import io.papermc.paper.event.player.PlayerOpenSignEvent;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -387,6 +388,7 @@ public abstract class MixinItemStack implements InjectionItemStack {
                         try {
                             if (world.getBlockEntity(BukkitExtraConstants.openSign) instanceof SignBlockEntity tileentitysign) {
                                 if (world.getBlockState(BukkitExtraConstants.openSign).getBlock() instanceof SignBlock blocksign) {
+                                    blocksign.pushOpenSignCause(PlayerOpenSignEvent.Cause.PLACE);
                                     blocksign.openTextEdit(player, tileentitysign, true);
                                 }
                             }
