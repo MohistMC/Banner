@@ -2,7 +2,7 @@ package com.mohistmc.banner.command;
 
 import com.mohistmc.banner.api.ServerAPI;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
-import com.mohistmc.banner.fabric.FabricInjectBukkit;
+import com.mohistmc.banner.fabric.BukkitRegistry;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -192,14 +192,14 @@ public class DumpCommand extends BukkitCommand {
         ResourceLocation resourceLocation;
         for (Item item : vanilla_item) {
             resourceLocation = vanilla_item.getKey(item);
-            if (FabricInjectBukkit.isMINECRAFT(resourceLocation)) {
+            if (BukkitRegistry.isMINECRAFT(resourceLocation)) {
                 sb.append(item).append("\n");
             }
         }
         var vanilla_block = BuiltInRegistries.BLOCK;
         for (Block block : vanilla_block) {
             resourceLocation = vanilla_block.getKey(block);
-            if (FabricInjectBukkit.isMINECRAFT(resourceLocation)) {
+            if (BukkitRegistry.isMINECRAFT(resourceLocation)) {
                 sb.append(block).append("\n");
             }
         }

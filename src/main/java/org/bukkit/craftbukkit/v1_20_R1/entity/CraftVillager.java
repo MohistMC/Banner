@@ -4,14 +4,13 @@ import com.google.common.base.Preconditions;
 import java.util.Locale;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
-import com.mohistmc.banner.fabric.FabricInjectBukkit;
+import com.mohistmc.banner.fabric.BukkitRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.monster.ZombieVillager;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftLocation;
@@ -131,10 +130,10 @@ public class CraftVillager extends CraftAbstractVillager implements Villager {
     }
 
     public static Profession nmsToBukkitProfession(VillagerProfession nms) {
-        return Profession.valueOf(BuiltInRegistries.VILLAGER_PROFESSION.getKey(nms).getPath().toUpperCase(Locale.ROOT));
+        return Profession.valueOf(BukkitRegistry.normalizeName(BuiltInRegistries.VILLAGER_PROFESSION.getKey(nms).toString()));
     }
 
     public static VillagerProfession bukkitToNmsProfession(Profession bukkit) {
-        return !FabricInjectBukkit.profession.containsKey(bukkit) ? BuiltInRegistries.VILLAGER_PROFESSION.get(CraftNamespacedKey.toMinecraft(bukkit.getKey())) : BuiltInRegistries.VILLAGER_PROFESSION.get(FabricInjectBukkit.profession.get(bukkit));
+        return !BukkitRegistry.PROFESSION.containsKey(bukkit) ? BuiltInRegistries.VILLAGER_PROFESSION.get(CraftNamespacedKey.toMinecraft(bukkit.getKey())) : BuiltInRegistries.VILLAGER_PROFESSION.get(BukkitRegistry.PROFESSION.get(bukkit));
     }
 }

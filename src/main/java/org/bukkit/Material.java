@@ -8,7 +8,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import com.mohistmc.dynamicenum.MohistDynamEnum;
+import com.mohistmc.banner.api.DynamicEnumHelper;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
@@ -11010,12 +11010,12 @@ public enum Material implements Keyed, Translatable {
                 material.blockID = id;
                 material.isFabricBlock = true;
             }else {
-                material = (Material) MohistDynamEnum.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE}, new Object[]{id, true});
+                material = (Material) DynamicEnumHelper.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE}, new Object[]{id, true});
             }
             BY_NAME.put(materialName, material);
             return material;
         } else { // Fabric Items
-            Material material = (Material) MohistDynamEnum.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE}, new Object[]{id, false});
+            Material material = (Material) DynamicEnumHelper.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE}, new Object[]{id, false});
             BY_NAME.put(materialName, material);
             return material;
         }
@@ -11029,12 +11029,12 @@ public enum Material implements Keyed, Translatable {
                 material.blockID = id;
                 material.isFabricBlock = true;
             } else {
-                material = (Material) MohistDynamEnum.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE, String.class}, new Object[]{id, true, modName});
+                material = (Material) DynamicEnumHelper.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE, String.class}, new Object[]{id, true, modName});
             }
             BY_NAME.put(materialName, material);
             return material;
         } else { // Fabric Items
-            Material material = (Material) MohistDynamEnum.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE, String.class}, new Object[]{id, false, modName});
+            Material material = (Material) DynamicEnumHelper.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE, String.class}, new Object[]{id, false, modName});
             BY_NAME.put(materialName, material);
             return material;
         }

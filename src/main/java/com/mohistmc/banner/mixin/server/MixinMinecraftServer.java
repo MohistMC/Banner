@@ -6,6 +6,7 @@ import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.config.BannerConfigUtil;
+import com.mohistmc.banner.fabric.BukkitRegistry;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
 import com.mohistmc.banner.paper.RollingAverage;
 import com.mojang.datafixers.DataFixer;
@@ -23,6 +24,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.ChatDecorator;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 import net.minecraft.network.protocol.status.ServerStatus;
@@ -460,6 +462,13 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     private void banner$skipSave(boolean suppressLog, boolean flush, boolean forced, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(!this.levels.isEmpty());
     }*/
+
+    @Inject(method = "createLevels", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerLevel;<init>(Lnet/minecraft/server/MinecraftServer;Ljava/util/concurrent/Executor;Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;Lnet/minecraft/world/level/storage/ServerLevelData;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/level/dimension/LevelStem;Lnet/minecraft/server/level/progress/ChunkProgressListener;ZJLjava/util/List;ZLnet/minecraft/world/RandomSequences;)V",
+            ordinal = 0))
+    private void banner$registerEnv(ChunkProgressListener p_240787_1_, CallbackInfo ci) {
+        BukkitRegistry.registerEnvironments(this.registryAccess().registryOrThrow(Registries.LEVEL_STEM));
+    }
 
     @Inject(method = "createLevels", at = @At(value = "INVOKE", remap = false,
             target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 0),

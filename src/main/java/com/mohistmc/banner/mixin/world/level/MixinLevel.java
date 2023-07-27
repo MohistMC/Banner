@@ -2,7 +2,7 @@ package com.mohistmc.banner.mixin.world.level;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.config.BannerWorldConfig;
-import com.mohistmc.banner.fabric.FabricInjectBukkit;
+import com.mohistmc.banner.fabric.BukkitRegistry;
 import com.mohistmc.banner.fabric.WrappedWorlds;
 import com.mohistmc.banner.injection.world.level.InjectionLevel;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
@@ -187,7 +187,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                 }
             }
             if (environment == null) {
-                environment = FabricInjectBukkit.DIM_MAP.getOrDefault(getTypeKey(), World.Environment.CUSTOM);
+                environment = BukkitRegistry.DIM_MAP.getOrDefault(getTypeKey(), World.Environment.CUSTOM);
             }
             if (generator == null) {
                 generator = getCraftServer().getGenerator(((ServerLevelData) this.getLevelData()).getLevelName());

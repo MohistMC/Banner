@@ -94,7 +94,6 @@ dependencies {
 	// spigot
 	implementation "net.md-5:bungeecord-chat:1.16-R0.4"
 	implementation "io.izzel:tools:1.3.0"
-	implementation "com.mohistmc:dynamicenum:0.1"
 
 	implementation "com.google.guava:failureaccess:1.0.1"
 	implementation "com.google.guava:guava:31.0.1-jre"

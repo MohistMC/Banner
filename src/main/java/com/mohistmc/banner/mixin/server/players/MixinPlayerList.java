@@ -2,7 +2,9 @@ package com.mohistmc.banner.mixin.server.players;
 
 import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
-import com.mohistmc.banner.fabric.FabricInjectBukkit;
+import com.mohistmc.banner.BannerMCStart;
+import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.fabric.BukkitRegistry;
 import com.mohistmc.banner.injection.server.players.InjectionPlayerList;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.ChatFormatting;
@@ -164,7 +166,8 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         this.players = new CopyOnWriteArrayList<>();
         minecraftServer.banner$setServer(this.cserver =
                 new CraftServer((DedicatedServer) minecraftServer, ((PlayerList) (Object) this)));
-        FabricInjectBukkit.init();
+        BannerServer.LOGGER.info(BannerMCStart.I18N.get("registry.begin"));
+        BukkitRegistry.registerAll((DedicatedServer) minecraftServer);
         minecraftServer.banner$setConsole(ColouredConsoleSender.getInstance());
     }
 

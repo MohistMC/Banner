@@ -1,8 +1,8 @@
 package com.mohistmc.banner.bukkit.nms.proxy;
 
+import com.mohistmc.banner.api.DynamicEnumHelper;
 import com.mohistmc.banner.bukkit.nms.model.ClassMapping;
 import com.mohistmc.banner.bukkit.nms.utils.RemapUtils;
-import com.mohistmc.dynamicenum.MohistDynamEnum;
 import net.md_5.specialsource.repo.RuntimeRepo;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -137,15 +137,15 @@ public class DelegateURLClassLoder extends URLClassLoader {
                     if (attributes != null) {
                         try {
                             try {
-                                Object versionInfo = MohistDynamEnum.getField(pkg, Package.class.getDeclaredField("versionInfo"));
+                                Object versionInfo = DynamicEnumHelper.getField(pkg, Package.class.getDeclaredField("versionInfo"));
                                 if (versionInfo != null) {
                                     Class<?> Package$VersionInfo = Class.forName("java.lang.Package$VersionInfo");
-                                    MohistDynamEnum.setField(versionInfo, attributes.getValue(Attributes.Name.IMPLEMENTATION_TITLE), Package$VersionInfo.getDeclaredField("implTitle"));
-                                    MohistDynamEnum.setField(versionInfo, attributes.getValue(Attributes.Name.IMPLEMENTATION_VERSION), Package$VersionInfo.getDeclaredField("implVersion"));
-                                    MohistDynamEnum.setField(versionInfo, attributes.getValue(Attributes.Name.IMPLEMENTATION_VENDOR), Package$VersionInfo.getDeclaredField("implVendor"));
-                                    MohistDynamEnum.setField(versionInfo, attributes.getValue(Attributes.Name.SPECIFICATION_TITLE), Package$VersionInfo.getDeclaredField("specTitle"));
-                                    MohistDynamEnum.setField(versionInfo, attributes.getValue(Attributes.Name.SPECIFICATION_VERSION), Package$VersionInfo.getDeclaredField("specVersion"));
-                                    MohistDynamEnum.setField(versionInfo, attributes.getValue(Attributes.Name.SPECIFICATION_VENDOR), Package$VersionInfo.getDeclaredField("specVendor"));
+                                    DynamicEnumHelper.setField(versionInfo, attributes.getValue(Attributes.Name.IMPLEMENTATION_TITLE), Package$VersionInfo.getDeclaredField("implTitle"));
+                                    DynamicEnumHelper.setField(versionInfo, attributes.getValue(Attributes.Name.IMPLEMENTATION_VERSION), Package$VersionInfo.getDeclaredField("implVersion"));
+                                    DynamicEnumHelper.setField(versionInfo, attributes.getValue(Attributes.Name.IMPLEMENTATION_VENDOR), Package$VersionInfo.getDeclaredField("implVendor"));
+                                    DynamicEnumHelper.setField(versionInfo, attributes.getValue(Attributes.Name.SPECIFICATION_TITLE), Package$VersionInfo.getDeclaredField("specTitle"));
+                                    DynamicEnumHelper.setField(versionInfo, attributes.getValue(Attributes.Name.SPECIFICATION_VERSION), Package$VersionInfo.getDeclaredField("specVersion"));
+                                    DynamicEnumHelper.setField(versionInfo, attributes.getValue(Attributes.Name.SPECIFICATION_VENDOR), Package$VersionInfo.getDeclaredField("specVendor"));
                                 }
                             } catch (Exception ignored) {
                             }
