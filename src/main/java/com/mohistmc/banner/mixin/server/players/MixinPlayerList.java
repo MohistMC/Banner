@@ -614,7 +614,14 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             // Spigot End
 
             banner$loc = respawnEvent.getRespawnLocation();
-            if (!conqueredEnd) playerIn.reset(); // SPIGOT-4785
+            if (!conqueredEnd) { // keep inventory here since inventory dropped at ServerPlayerEntity#onDeath
+                entityplayer1.getInventory().replaceWith(playerIn.getInventory());
+                entityplayer1.experienceLevel = playerIn.experienceLevel;
+                entityplayer1.totalExperience = playerIn.totalExperience;
+                entityplayer1.experienceProgress = playerIn.experienceProgress;
+                entityplayer1.setScore(playerIn.getScore());
+                playerIn.reset(); // SPIGOT-4785
+            }
         } else {
             if (banner$worldserver == null) banner$worldserver = this.server.getLevel(playerIn.getRespawnDimension());
             banner$loc.setWorld(banner$worldserver.getWorld());
