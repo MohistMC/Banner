@@ -43,7 +43,7 @@ so don't worried about the plugin files will be changed to unsafe
 - You'll need `wget` and `curl`
 ```bash
 cd ./<your-server-folder>
-wget https://github.com/8Mi-Tech/Shell/raw/main/banner-launcher
+wget https://github.com/8Mi-Tech/Banner-Shell/raw/main/banner-launcher
 chmod +x ./banner-launcher
 ./banner-launcher -i
 ```
