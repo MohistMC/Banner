@@ -391,6 +391,16 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
     public boolean clearActivePotionEffects() {
         return this.getHandle().removeAllEffects(EntityPotionEffectEvent.Cause.PLUGIN);
     }
+
+    @Override
+    public float getBodyYaw() {
+        return this.getHandle().getVisualRotationYInDegrees();
+    }
+
+    @Override
+    public void setBodyYaw(float bodyYaw) {
+        this.getHandle().setYBodyRot(bodyYaw);
+    }
     // Paper end
 
     @Override

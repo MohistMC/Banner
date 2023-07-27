@@ -822,6 +822,24 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         getHandle().connection.send(packet);
     }
 
+    // Paper start
+    @Override
+    public void showWinScreen() {
+        if (getHandle().connection == null) return;
+        var packet = new ClientboundGameEventPacket(ClientboundGameEventPacket.WIN_GAME, 1);
+        getHandle().connection.send(packet);
+    }
+
+    @Override
+    public boolean hasSeenWinScreen() {
+        return getHandle().seenCredits;
+    }
+
+    @Override
+    public void setHasSeenWinScreen(boolean hasSeenWinScreen) {
+        getHandle().seenCredits = hasSeenWinScreen;
+    }
+    // Paper end
     @Override
     public void setRotation(float yaw, float pitch) {
         throw new UnsupportedOperationException("Cannot set rotation of players. Consider teleporting instead.");

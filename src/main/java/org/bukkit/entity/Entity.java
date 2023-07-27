@@ -710,6 +710,8 @@ public interface Entity extends Metadatable, CommandSender, Nameable, Persistent
      * @param sneak true if the entity should be sneaking
      */
     void setSneaking(boolean sneak);
+
+    // Paper start
     // Paper end
 
     /**

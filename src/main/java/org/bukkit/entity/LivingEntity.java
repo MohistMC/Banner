@@ -371,6 +371,22 @@ public interface LivingEntity extends Attributable, Damageable, ProjectileSource
      * @return true if any were removed
      */
     boolean clearActivePotionEffects();
+
+    /**
+     * Gets entity body yaw
+     *
+     * @return entity body yaw
+     * @see Location#getYaw()
+     */
+    float getBodyYaw();
+
+    /**
+     * Sets entity body yaw
+     *
+     * @param bodyYaw new entity body yaw
+     * @see Location#setYaw(float)
+     */
+    void setBodyYaw(float bodyYaw);
     // Paper end
 
     /**

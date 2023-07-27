@@ -1,6 +1,9 @@
 accessWidener	v1	named
 # Banner
 
+# paper
+accessible field net/minecraft/server/level/ServerPlayer seenCredits Z
+
 # public clazz
 accessible class net/minecraft/server/MinecraftServer$ReloadableResources
 accessible class net/minecraft/server/dedicated/DedicatedServerProperties$WorldDimensionData
