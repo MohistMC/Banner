@@ -50,7 +50,7 @@ chmod +x ./banner-launcher
 
 ## Usage
 - Just put it in the mods folder.
-- Also, remember that Banner is still in WIP - do not use it in a production environment!
+- Because Banner is a mod!!!
 
 ## Upstream Projects
 - [**Fabric Loader**](https://github.com/FabricMC/fabric-loader.git) - Mod load support.
