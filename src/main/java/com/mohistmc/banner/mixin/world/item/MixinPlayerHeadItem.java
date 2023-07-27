@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.item;
 
+import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.Item;
@@ -19,15 +20,23 @@ public abstract class MixinPlayerHeadItem extends Item {
 
     @Inject(method = "verifyTagAfterLoad", at = @At("TAIL"))
     private void banner$verifyTag(CompoundTag compoundTag, CallbackInfo ci) {
-      if (!compoundTag.contains("SkullOwner", 8) && StringUtils.isBlank(compoundTag.getString("SkullOwner"))) {
-          ListTag textures = compoundTag.getCompound("SkullOwner").getCompound("Properties").getList("textures", 10); // Safe due to method contracts
-          for (net.minecraft.nbt.Tag texture : textures) {
-              if (texture instanceof CompoundTag && !((CompoundTag) texture).contains("Signature", 8) && ((CompoundTag) texture).getString("Value").trim().isEmpty()) {
-                  compoundTag.remove("SkullOwner");
-                  break;
-              }
-          }
-          // CraftBukkit end
-      }
+        boolean banner$flag = compoundTag.contains("SkullOwner", 8)
+                && !Util.isBlank(compoundTag.getString("SkullOwner"));
+        // CraftBukkit start
+        if (!banner$flag) {
+            net.minecraft.nbt.ListTag textures =
+                    compoundTag.getCompound("SkullOwner")
+                    .getCompound("Properties")
+                    .getList("textures", 10); // Safe due to method contracts
+            for (int i = 0; i < textures.size(); i++) {
+                if (textures.get(i) instanceof CompoundTag
+                        && !((CompoundTag) textures.get(i)).contains("Signature", 8)
+                        && ((CompoundTag) textures.get(i)).getString("Value").trim().isEmpty()) {
+                    compoundTag.remove("SkullOwner");
+                    break;
+                }
+            }
+            // CraftBukkit end
+        }
     }
 }

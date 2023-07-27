@@ -46,7 +46,8 @@ public abstract class MixinStandingAndWallBlockItem extends BlockItem {
         Direction[] var6 = context.getNearestLookingDirections();
         int var7 = var6.length;
 
-        for (Direction direction : var6) {
+        for(int var8 = 0; var8 < var7; ++var8) {
+            Direction direction = var6[var8];
             if (direction != this.attachmentDirection.getOpposite()) {
                 BlockState blockState3 = direction == this.attachmentDirection ? this.getBlock().getStateForPlacement(context) : blockState;
                 if (blockState3 != null && this.canPlace(levelReader, blockState3, blockPos)) {
@@ -60,7 +61,7 @@ public abstract class MixinStandingAndWallBlockItem extends BlockItem {
         if (blockState2 != null) {
             boolean defaultReturn = levelReader.isUnobstructed(blockState2, blockPos, CollisionContext.empty());
             org.bukkit.entity.Player player = (context.getPlayer() instanceof ServerPlayer) ? (org.bukkit.entity.Player) context.getPlayer().getBukkitEntity() : null;
-            BlockCanBuildEvent event = new BlockCanBuildEvent(CraftBlock.at(context.getLevel(), blockPos), player, CraftBlockData.fromData(blockState), defaultReturn);
+            BlockCanBuildEvent event = new BlockCanBuildEvent(CraftBlock.at(context.getLevel(), blockPos), player, CraftBlockData.fromData(blockState2), defaultReturn);
             context.getLevel().getCraftServer().getPluginManager().callEvent(event);
             return (event.isBuildable()) ? blockState2 : null;
         } else {
