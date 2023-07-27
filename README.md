@@ -21,9 +21,8 @@
 ## Notice
 - Fabric + Bukkit is more vanilla-like than Forge + Bukkit
 - Fabric API uses mixins to change minecraft indirectly
-- There's very little breaking changes
-- Banner still has a lot of bugs, so do not use it in production
-- Download for testing only, report bugs
+- Banner also use mixins to hook Bukkit api as a fabric mod
+- There's a little breaking changes
 - This version of Banner 1.20.x,supports MC version 1.20 to 1.20.1
 
 ## Progress
