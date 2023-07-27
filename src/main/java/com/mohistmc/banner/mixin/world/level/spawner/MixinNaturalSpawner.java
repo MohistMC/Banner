@@ -78,9 +78,7 @@ public abstract class MixinNaturalSpawner {
     }
 
     @Inject(method = "spawnForChunk",
-            at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
-                    shift = At.Shift.AFTER))
+            at = @At("HEAD"))
     private static void banner$timingsStart(ServerLevel level, LevelChunk chunk,
                                           NaturalSpawner.SpawnState spawnState,
                                           boolean spawnFriendlies, boolean spawnMonsters,
