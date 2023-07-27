@@ -5,15 +5,48 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import static org.bukkit.Material.*;
+import static org.bukkit.Material.CARVED_PUMPKIN;
+import static org.bukkit.Material.CHAINMAIL_BOOTS;
+import static org.bukkit.Material.CHAINMAIL_CHESTPLATE;
+import static org.bukkit.Material.CHAINMAIL_HELMET;
+import static org.bukkit.Material.CHAINMAIL_LEGGINGS;
+import static org.bukkit.Material.CREEPER_HEAD;
+import static org.bukkit.Material.DIAMOND_BOOTS;
+import static org.bukkit.Material.DIAMOND_CHESTPLATE;
+import static org.bukkit.Material.DIAMOND_HELMET;
+import static org.bukkit.Material.DIAMOND_LEGGINGS;
+import static org.bukkit.Material.DRAGON_HEAD;
+import static org.bukkit.Material.ELYTRA;
+import static org.bukkit.Material.GOLDEN_BOOTS;
+import static org.bukkit.Material.GOLDEN_CHESTPLATE;
+import static org.bukkit.Material.GOLDEN_HELMET;
+import static org.bukkit.Material.GOLDEN_LEGGINGS;
+import static org.bukkit.Material.IRON_BOOTS;
+import static org.bukkit.Material.IRON_CHESTPLATE;
+import static org.bukkit.Material.IRON_HELMET;
+import static org.bukkit.Material.IRON_LEGGINGS;
+import static org.bukkit.Material.LEATHER_BOOTS;
+import static org.bukkit.Material.LEATHER_CHESTPLATE;
+import static org.bukkit.Material.LEATHER_HELMET;
+import static org.bukkit.Material.LEATHER_LEGGINGS;
+import static org.bukkit.Material.NETHERITE_BOOTS;
+import static org.bukkit.Material.NETHERITE_CHESTPLATE;
+import static org.bukkit.Material.NETHERITE_HELMET;
+import static org.bukkit.Material.NETHERITE_LEGGINGS;
+import static org.bukkit.Material.PIGLIN_HEAD;
+import static org.bukkit.Material.PLAYER_HEAD;
+import static org.bukkit.Material.SKELETON_SKULL;
+import static org.bukkit.Material.TURTLE_HELMET;
+import static org.bukkit.Material.WITHER_SKELETON_SKULL;
+import static org.bukkit.Material.ZOMBIE_HEAD;
 
 /**
  * Called when the player themselves change their armor items

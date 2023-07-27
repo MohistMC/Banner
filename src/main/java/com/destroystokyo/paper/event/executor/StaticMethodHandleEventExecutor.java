@@ -1,19 +1,17 @@
 package com.destroystokyo.paper.event.executor;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-
 import com.destroystokyo.paper.util.SneakyThrow;
 import com.google.common.base.Preconditions;
-
-import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventException;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.jetbrains.annotations.NotNull;
+
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 public class StaticMethodHandleEventExecutor implements EventExecutor {
     private final Class<? extends Event> eventClass;

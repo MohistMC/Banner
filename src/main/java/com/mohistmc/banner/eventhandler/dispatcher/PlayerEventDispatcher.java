@@ -6,22 +6,16 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
-import org.bukkit.event.block.BlockBreakEvent;
-
-import java.util.List;
 
 public class PlayerEventDispatcher {
 
@@ -43,17 +37,6 @@ public class PlayerEventDispatcher {
             BukkitCaptures.getPlaceEventHand(InteractionHand.MAIN_HAND);
             return InteractionResult.PASS;
         });
-    }
-
-    private static void handleBlockDrop(BukkitCaptures.BlockBreakEventContext breakEventContext, BlockPos pos, Level world, ServerPlayer player) {
-        BlockBreakEvent breakEvent = breakEventContext.getEvent();
-        List<ItemEntity> blockDrops = breakEventContext.getBlockDrops();
-        org.bukkit.block.BlockState state = breakEventContext.getBlockBreakPlayerState();
-
-        if (blockDrops != null && (breakEvent == null || breakEvent.isDropItems())) {
-            CraftBlock craftBlock = CraftBlock.at(world, pos);
-            CraftEventFactory.handleBlockDropItemEvent(craftBlock, state, player, blockDrops);
-        }
     }
 
     // CraftBukkit start

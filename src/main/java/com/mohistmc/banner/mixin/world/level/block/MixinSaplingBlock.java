@@ -1,24 +1,12 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.SaplingBlock;
 import net.minecraft.world.level.block.grower.AbstractTreeGrower;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ChunkGenerator;
-import org.bukkit.Location;
 import org.bukkit.TreeType;
-import org.bukkit.craftbukkit.v1_20_R1.util.CraftLocation;
-import org.bukkit.event.world.StructureGrowEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(SaplingBlock.class)
 public class MixinSaplingBlock {

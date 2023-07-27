@@ -1,13 +1,10 @@
 package com.destroystokyo.paper.event.executor.asm;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import com.google.common.base.Preconditions;
-
 import com.google.common.collect.MapMaker;
 import org.jetbrains.annotations.NotNull;
-import org.objectweb.asm.Type;
+
+import java.util.concurrent.ConcurrentMap;
 
 public class SafeClassDefiner implements ClassDefiner {
     /* default */ static final SafeClassDefiner INSTANCE = new SafeClassDefiner();
