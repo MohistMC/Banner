@@ -27,7 +27,7 @@ public class MixinAbstractTreeGrower implements InjectionAbstractTreeGrower {
             locals = LocalCapture.CAPTURE_FAILHARD)
     private void banner$setTreeType(ServerLevel level, ChunkGenerator generator, BlockPos pos, BlockState state,
                                     RandomSource random, CallbackInfoReturnable<Boolean> cir, ResourceKey resourceKey,
-                                    Holder holder) {
+                                    Holder<ConfiguredFeature<?, ?>> holder) {
         this.setTreeType(holder);
     }
 

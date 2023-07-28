@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.grower.AbstractMegaTreeGrower;
 import net.minecraft.world.level.block.grower.AbstractTreeGrower;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,7 +25,7 @@ public abstract class MixinAbstractMegaTreeGrower extends AbstractTreeGrower {
             locals = LocalCapture.CAPTURE_FAILHARD)
     private void banner$setTreeType(ServerLevel level, ChunkGenerator generator, BlockPos pos, BlockState state,
                                     RandomSource random, int branchX, int branchY, CallbackInfoReturnable<Boolean> cir,
-                                    ResourceKey resourceKey, Holder holder) {
+                                    ResourceKey resourceKey, Holder<ConfiguredFeature<?, ?>> holder) {
         setTreeType(holder); // CraftBukkit
     }
 }
