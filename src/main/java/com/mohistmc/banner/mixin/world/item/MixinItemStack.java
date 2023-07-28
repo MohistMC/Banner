@@ -17,7 +17,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.stats.Stat;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.datafix.fixes.References;
@@ -69,7 +68,6 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -211,22 +209,7 @@ public abstract class MixinItemStack implements InjectionItemStack {
         this.item = item;
     }
 
-    private final AtomicReference<InteractionHand> banner$hand = new AtomicReference<>();
-
-
-    @Inject(method = "useOn", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/item/ItemStack;getItem()Lnet/minecraft/world/item/Item;",
-            shift = At.Shift.BEFORE))
-    private void banner$callEvent(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
-        // CraftBukkit start - handle all block place event logic here
-        if (!(this.getItem() instanceof BucketItem || this.getItem() instanceof SolidBucketItem)) { // if not bucket
-            ((ServerLevel) context.getLevel()).banner$setCaptureBlockStates(true);
-            // special case bonemeal
-            if (this.getItem() == Items.BONE_MEAL) {
-                ((ServerLevel) context.getLevel()).banner$setCaptureTreeGeneration(true);
-            }
-        }
-    }
+    private final AtomicReference<InteractionHand> banner$hand = new AtomicReference<>(InteractionHand.MAIN_HAND);
 
     /**
      * @author wdog5
@@ -423,10 +406,6 @@ public abstract class MixinItemStack implements InjectionItemStack {
             return interactionResult;
         }
     }
-
-    @Redirect(method = "useOn", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/player/Player;awardStat(Lnet/minecraft/stats/Stat;)V"))
-    private void banner$cancelStat(Player instance, Stat<?> stat) {}
 
     @Override
     public InteractionResult useOn(UseOnContext itemactioncontext, InteractionHand enumhand) {
