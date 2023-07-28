@@ -35,6 +35,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.CombatTracker;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
@@ -46,7 +47,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.HorseInventoryMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.BiomeManager;
@@ -67,9 +71,12 @@ import org.bukkit.craftbukkit.v1_20_R1.CraftWorldBorder;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftPortalEvent;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R1.util.BlockStateListPopulator;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftLocation;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedMainHandEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerLocaleChangeEvent;
@@ -79,6 +86,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.inventory.MainHand;
+import org.checkerframework.checker.units.qual.A;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -152,6 +160,9 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Shadow @Nullable private BlockPos respawnPosition;
     @Shadow private float respawnAngle;
     @Shadow private boolean respawnForced;
+
+    @Shadow public abstract void setCamera(@Nullable Entity entityToSpectate);
+
     // CraftBukkit start
     public String displayName;
     public Component listName;
@@ -700,6 +711,100 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Inject(method = "closeContainer", at = @At("HEAD"))
     private void banner$closeMenu(CallbackInfo ci) {
         CraftEventFactory.handleInventoryCloseEvent(this); // CraftBukkit
+    }
+
+    private AtomicReference<String> banner$deathString = new AtomicReference<>("null");
+    private AtomicReference<String> banner$deathMsg = new AtomicReference<>("null");
+
+    private AtomicReference<PlayerDeathEvent> banner$deathEvent = new AtomicReference<PlayerDeathEvent>();
+
+    @Inject(method = "die", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z"),
+            cancellable = true)
+    private void banner$deathEvent(DamageSource damageSource, CallbackInfo ci) {
+        // CraftBukkit start - fire PlayerDeathEvent
+        if (this.isRemoved()) {
+            ci.cancel();
+        }
+        java.util.List<org.bukkit.inventory.ItemStack> loot = new java.util.ArrayList<org.bukkit.inventory.ItemStack>(this.getInventory().getContainerSize());
+        boolean keepInventory = this.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) || this.isSpectator();
+
+        if (!keepInventory) {
+            for (ItemStack item : this.getInventory().getContents()) {
+                if (!item.isEmpty() && !EnchantmentHelper.hasVanishingCurse(item)) {
+                    loot.add(CraftItemStack.asCraftMirror(item));
+                }
+            }
+        }
+        // SPIGOT-5071: manually add player loot tables (SPIGOT-5195 - ignores keepInventory rule)
+        this.dropFromLootTable(damageSource, this.lastHurtByPlayerTime > 0);
+        for (org.bukkit.inventory.ItemStack item : this.bridge$drops()) {
+            loot.add(item);
+        }
+        this.bridge$drops().clear(); // SPIGOT-5188: make sure to clear
+
+        Component defaultMessage = this.getCombatTracker().getDeathMessage();
+        String deathmessage = defaultMessage.getString();
+        banner$deathMsg.set(deathmessage);
+        keepLevel = keepInventory; // SPIGOT-2222: pre-set keepLevel
+        org.bukkit.event.entity.PlayerDeathEvent event = CraftEventFactory.callPlayerDeathEvent(((ServerPlayer) (Object) this), loot, deathmessage, keepInventory);
+        banner$deathEvent.set(event);
+
+        // SPIGOT-943 - only call if they have an inventory open
+        if (this.containerMenu != this.inventoryMenu) {
+            this.closeContainer();
+        }
+
+        String deathMessage = event.getDeathMessage();
+        banner$deathString.set(deathMessage);
+    }
+
+    @Inject(method = "die", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/damagesource/CombatTracker;getDeathMessage()Lnet/minecraft/network/chat/Component;"),
+            cancellable = true)
+    private void banner$checkDead(DamageSource damageSource, CallbackInfo ci) {
+        boolean banner$flag = banner$deathString.get() != null && banner$deathString.get().length() > 0;
+        if (!banner$flag) { // TODO: allow plugins to override?
+            ci.cancel();
+        }
+    }
+
+    @Redirect(method = "die", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/damagesource/CombatTracker;getDeathMessage()Lnet/minecraft/network/chat/Component;"))
+    private Component banner$restDeathMsg(CombatTracker instance) {
+        Component banner$component;
+        if (banner$deathString.get().equals(banner$deathMsg.get())) {
+            banner$component = instance.getDeathMessage();
+        } else {
+            banner$component = CraftChatMessage.fromStringOrNull(banner$deathString.get());
+        }
+        return banner$component;
+    }
+
+    @Inject(method = "die", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerPlayer;isSpectator()Z"))
+    private void banner$checkEventDrop(DamageSource damageSource, CallbackInfo ci) {
+        // SPIGOT-5478 must be called manually now
+        this.dropExperience();
+        // we clean the player's inventory after the EntityDeathEvent is called so plugins can get the exact state of the inventory.
+        if (!banner$deathEvent.get().getKeepInventory()) {
+            this.getInventory().clearContent();
+        }
+    }
+
+    @Redirect(method = "die",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerPlayer;dropAllDeathLoot(Lnet/minecraft/world/damagesource/DamageSource;)V"))
+    private void banner$cancelDrop(ServerPlayer instance, DamageSource damageSource) {
+    }
+
+    @Redirect(method = "die", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/scores/Scoreboard;forAllObjectives(Lnet/minecraft/world/scores/criteria/ObjectiveCriteria;Ljava/lang/String;Ljava/util/function/Consumer;)V"))
+    private void banner$useBukkitScore(Scoreboard instance, ObjectiveCriteria criteria, String scoreboardName, Consumer<Score> action) {
+        this.setCamera(((ServerPlayer) (Object) this)); // Remove spectated target
+        // CraftBukkit end
+        // CraftBukkit - Get our scores instead
+        this.level().getCraftServer().getScoreboardManager().getScoreboardScores(ObjectiveCriteria.DEATH_COUNT, this.getScoreboardName(), Score::increment);
     }
 
     /**
