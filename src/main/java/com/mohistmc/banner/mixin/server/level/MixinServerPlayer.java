@@ -10,6 +10,7 @@ import net.minecraft.BlockUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.PositionImpl;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -828,25 +829,26 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     }
 
 
-    public PlayerTeleportEvent.TeleportCause banner$changeDimensionCause;
+    private AtomicReference<PlayerTeleportEvent.TeleportCause> banner$changeDimensionCause =
+            new AtomicReference<>(PlayerTeleportEvent.TeleportCause.UNKNOWN);
 
     @Override
     public Entity changeDimension(ServerLevel worldserver, PlayerTeleportEvent.TeleportCause cause) {
-        banner$changeDimensionCause = cause;
+        banner$changeDimensionCause.set(cause);
         return changeDimension(worldserver);
     }
 
     @Inject(method = "teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDLjava/util/Set;FF)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;teleport(DDDFFLjava/util/Set;)V"))
     private void banner$forwardReason(ServerLevel level, double x, double y, double z, Set<RelativeMovement> relativeMovements, float yRot, float xRot, CallbackInfoReturnable<Boolean> cir) {
-        var teleportCause = banner$changeDimensionCause;
-        banner$changeDimensionCause = null;
+        var teleportCause = banner$changeDimensionCause.get();
+        banner$changeDimensionCause.set(null);
         this.connection.pushTeleportCause(teleportCause);
     }
 
     @Inject(method = "teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDFF)V", cancellable = true, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/level/ServerPlayer;stopRiding()V"))
     private void banner$handleBy(ServerLevel world, double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {
-        PlayerTeleportEvent.TeleportCause cause = banner$changeDimensionCause == null ? PlayerTeleportEvent.TeleportCause.UNKNOWN : banner$changeDimensionCause;
-        banner$changeDimensionCause = null;
+        PlayerTeleportEvent.TeleportCause cause = banner$changeDimensionCause.get() == null ? PlayerTeleportEvent.TeleportCause.UNKNOWN : banner$changeDimensionCause.get();
+        banner$changeDimensionCause.set(null);
         this.getBukkitEntity().teleport(new Location(world.getWorld(), x, y, z, yaw, pitch), cause);
         ci.cancel();
     }
@@ -859,15 +861,15 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Override
     public void pushChangeDimensionCause(PlayerTeleportEvent.TeleportCause cause) {
-        banner$changeDimensionCause = cause;
+        banner$changeDimensionCause.set(cause);
     }
 
     @Override
     public Optional<PlayerTeleportEvent.TeleportCause> bridge$teleportCause() {
         try {
-            return Optional.ofNullable(banner$changeDimensionCause);
+            return Optional.ofNullable(banner$changeDimensionCause.get());
         } finally {
-            banner$changeDimensionCause = null;
+            banner$changeDimensionCause.set(null);;
         }
     }
 
@@ -878,7 +880,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         }
         return this.level().getDayTime() - this.level().getDayTime() % 24000L + this.timeOffset;
     }
-
 
     /**
      * @author wdog5
@@ -918,7 +919,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             }
             Location enter = this.getBukkitEntity().getLocation();
             Location exit = (worldserver == null) ? null : CraftLocation.toBukkit(shapedetectorshape.pos, worldserver.getWorld(), shapedetectorshape.yRot, shapedetectorshape.xRot);
-            PlayerTeleportEvent tpEvent = new PlayerTeleportEvent(this.getBukkitEntity(), enter, exit, banner$changeDimensionCause == null ? PlayerTeleportEvent.TeleportCause.UNKNOWN : banner$changeDimensionCause);
+            PlayerTeleportEvent tpEvent = new PlayerTeleportEvent(this.getBukkitEntity(), enter, exit, banner$changeDimensionCause.get() == null ? PlayerTeleportEvent.TeleportCause.UNKNOWN : banner$changeDimensionCause.get());
             Bukkit.getPluginManager().callEvent(tpEvent);
             if (tpEvent.isCancelled() || tpEvent.getTo() == null) {
                 return null;
@@ -963,12 +964,13 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
                 PlayerChangedWorldEvent changeEvent = new PlayerChangedWorldEvent(this.getBukkitEntity(), worldserver1.getWorld());
                 this.level().getCraftServer().getPluginManager().callEvent(changeEvent);
             }
-            banner$changeDimensionCause = null;
+            banner$changeDimensionCause.set(null);
             return this;
         }
     }
 
-    protected CraftPortalEvent callPortalEvent(Entity entity, ServerLevel exitWorldServer, PositionImpl exitPosition, PlayerTeleportEvent.TeleportCause cause, int searchRadius, int creationRadius) {
+    @Override
+    public CraftPortalEvent callPortalEvent(Entity entity, ServerLevel exitWorldServer, PositionImpl exitPosition, PlayerTeleportEvent.TeleportCause cause, int searchRadius, int creationRadius) {
         Location enter = this.getBukkitEntity().getLocation();
         Location exit = new Location(exitWorldServer.getWorld(), exitPosition.x(), exitPosition.y(), exitPosition.z(), this.getYRot(), this.getXRot());
         PlayerPortalEvent event = new PlayerPortalEvent(this.getBukkitEntity(), enter, exit, cause, 128, true, creationRadius);
