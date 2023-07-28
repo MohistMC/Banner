@@ -127,9 +127,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Shadow public ServerGamePacketListenerImpl connection;
 
     @Shadow public abstract void initMenu(AbstractContainerMenu abstractContainerMenu);
-
-    @Shadow public abstract void nextContainerCounter();
-
     @Shadow public abstract void initInventoryMenu();
 
     @Shadow public boolean isChangingDimension;
@@ -627,7 +624,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     }
 
     @Override
-    public int nextContainerCounterInt() {
+    public int nextContainerCounter() {
         this.containerCounter = this.containerCounter % 100 + 1;
         return containerCounter; // CraftBukkit
     }

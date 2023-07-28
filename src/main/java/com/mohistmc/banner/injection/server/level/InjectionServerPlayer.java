@@ -30,7 +30,7 @@ public interface InjectionServerPlayer extends InjectionPlayer {
         return null;
     }
 
-    default int nextContainerCounterInt() {
+    default int nextContainerCounter() {
         return 0;
     }
 
