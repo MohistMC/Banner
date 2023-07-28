@@ -1,21 +1,20 @@
 package org.bukkit.craftbukkit.v1_20_R1.persistence;
 
+import com.google.common.base.Preconditions;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import org.bukkit.NamespacedKey;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftNBTTagConfigSerializer;
+import org.bukkit.persistence.PersistentDataAdapterContext;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
-
-import com.google.common.base.Preconditions;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import org.apache.commons.lang3.Validate;
-import org.bukkit.NamespacedKey;
-import org.bukkit.craftbukkit.v1_20_R1.util.CraftNBTTagConfigSerializer;
-import org.bukkit.persistence.PersistentDataAdapterContext;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 
 public class CraftPersistentDataContainer implements PersistentDataContainer {
 

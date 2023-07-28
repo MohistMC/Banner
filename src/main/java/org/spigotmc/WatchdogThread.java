@@ -1,14 +1,13 @@
 package org.spigotmc;
 
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import org.bukkit.Bukkit;
+
 import java.lang.management.ManagementFactory;
 import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.mohistmc.banner.BannerServer;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
-import org.bukkit.Bukkit;
 
 public class WatchdogThread extends Thread
 {

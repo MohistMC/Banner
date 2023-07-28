@@ -4,16 +4,18 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-import java.util.Map;
-import java.util.Set;
-import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.CompoundTag;
-import org.apache.commons.lang3.Validate;
+import net.minecraft.nbt.Tag;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.DelegateDeserialization;
-import org.bukkit.craftbukkit.v1_20_R1.block.*;
+import org.bukkit.craftbukkit.v1_20_R1.block.CraftBanner;
+import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlockEntityState;
+import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlockStates;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers;
 import org.bukkit.inventory.meta.BlockStateMeta;
+
+import java.util.Map;
+import java.util.Set;
 
 @DelegateDeserialization(CraftMetaItem.SerializableMeta.class)
 public class CraftMetaBlockState extends CraftMetaItem implements BlockStateMeta {

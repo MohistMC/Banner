@@ -1,14 +1,10 @@
 package org.bukkit.event.entity;
 
-import java.util.Collections;
-
 import com.destroystokyo.paper.event.entity.EntityZapEvent;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.PigZombie;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 /**

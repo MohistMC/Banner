@@ -1,8 +1,8 @@
 package org.bukkit.craftbukkit.v1_20_R1.inventory;
 
 import com.google.common.base.Preconditions;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.CompoundContainer;
+import net.minecraft.world.MenuProvider;
 import org.bukkit.Location;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.inventory.DoubleChestInventory;

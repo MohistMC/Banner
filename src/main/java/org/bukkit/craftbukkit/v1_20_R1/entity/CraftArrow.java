@@ -2,7 +2,6 @@ package org.bukkit.craftbukkit.v1_20_R1.entity;
 
 import com.google.common.base.Preconditions;
 import net.minecraft.core.BlockPos;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.entity.AbstractArrow;

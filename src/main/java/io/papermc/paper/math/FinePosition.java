@@ -1,7 +1,6 @@
 package io.papermc.paper.math;
 
 import org.bukkit.util.NumberConversions;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 

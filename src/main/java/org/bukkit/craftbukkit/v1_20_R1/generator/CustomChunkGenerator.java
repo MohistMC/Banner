@@ -2,10 +2,6 @@ package org.bukkit.craftbukkit.v1_20_R1.generator;
 
 import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
@@ -40,6 +36,11 @@ import org.bukkit.craftbukkit.v1_20_R1.util.RandomSourceWrapper;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.generator.ChunkGenerator.BiomeGrid;
 import org.bukkit.generator.ChunkGenerator.ChunkData;
+
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 public class CustomChunkGenerator extends InternalChunkGenerator {
 

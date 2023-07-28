@@ -4,19 +4,18 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.authlib.GameProfile;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
-import java.util.Set;
-import java.util.UUID;
-
 import net.minecraft.server.players.UserBanList;
 import net.minecraft.server.players.UserBanListEntry;
 import org.bukkit.BanEntry;
 import org.bukkit.ban.ProfileBanList;
 import org.bukkit.craftbukkit.v1_20_R1.profile.CraftPlayerProfile;
 import org.bukkit.profile.PlayerProfile;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
+import java.util.Set;
+import java.util.UUID;
 
 public class CraftProfileBanList implements ProfileBanList {
 

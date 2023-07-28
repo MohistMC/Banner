@@ -5,7 +5,6 @@ import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.world.WorldEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**

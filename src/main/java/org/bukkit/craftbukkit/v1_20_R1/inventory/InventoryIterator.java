@@ -1,10 +1,10 @@
 package org.bukkit.craftbukkit.v1_20_R1.inventory;
 
-import java.util.ListIterator;
-
 import com.google.common.base.Preconditions;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.ListIterator;
 
 public class InventoryIterator implements ListIterator<ItemStack> {
     private final Inventory inventory;

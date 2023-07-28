@@ -1,8 +1,6 @@
 package org.bukkit.craftbukkit.v1_20_R1.block;
 
 import com.google.common.base.Preconditions;
-import java.lang.ref.WeakReference;
-import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,6 +20,8 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
+import java.util.List;
 
 public class CraftBlockState implements org.bukkit.block.BlockState {
     protected final CraftWorld world;

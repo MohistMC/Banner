@@ -1,7 +1,5 @@
 package org.bukkit.craftbukkit.v1_20_R1.metadata;
 
-import java.util.List;
-
 import com.google.common.base.Preconditions;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -9,6 +7,8 @@ import org.bukkit.metadata.MetadataStore;
 import org.bukkit.metadata.MetadataStoreBase;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
+
+import java.util.List;
 
 /**
  * A BlockMetadataStore stores metadata values for {@link Block} objects.

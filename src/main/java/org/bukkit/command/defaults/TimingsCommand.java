@@ -2,18 +2,6 @@ package org.bukkit.command.defaults;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -27,6 +15,17 @@ import org.bukkit.plugin.TimedRegisteredListener;
 import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.spigotmc.CustomTimingsHandler;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
 
 public class TimingsCommand extends BukkitCommand {
     private static final List<String> TIMINGS_SUBCOMMANDS = ImmutableList.of("report", "reset", "on", "off", "paste"); // Spigot

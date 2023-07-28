@@ -1,7 +1,5 @@
 package org.bukkit.craftbukkit.v1_20_R1.inventory;
 
-import java.util.Map;
-
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -10,6 +8,8 @@ import org.bukkit.craftbukkit.v1_20_R1.util.CraftNamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
+
+import java.util.Map;
 
 public class CraftShapedRecipe extends ShapedRecipe implements CraftRecipe {
     // TODO: Could eventually use this to add a matches() method or some such

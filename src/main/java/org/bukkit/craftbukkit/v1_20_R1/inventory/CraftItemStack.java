@@ -1,13 +1,11 @@
 package org.bukkit.craftbukkit.v1_20_R1.inventory;
 
 import com.google.common.base.Preconditions;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import static org.bukkit.craftbukkit.v1_20_R1.inventory.CraftMetaItem.*;
 import com.google.common.collect.ImmutableMap;
-import java.util.Map;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -20,6 +18,12 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
+
+import java.util.Map;
+
+import static org.bukkit.craftbukkit.v1_20_R1.inventory.CraftMetaItem.ENCHANTMENTS;
+import static org.bukkit.craftbukkit.v1_20_R1.inventory.CraftMetaItem.ENCHANTMENTS_ID;
+import static org.bukkit.craftbukkit.v1_20_R1.inventory.CraftMetaItem.ENCHANTMENTS_LVL;
 
 @DelegateDeserialization(ItemStack.class)
 public final class CraftItemStack extends ItemStack {

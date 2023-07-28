@@ -2,10 +2,8 @@ package org.bukkit.craftbukkit.v1_20_R1.entity;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import java.util.Collection;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.alchemy.PotionUtils;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
@@ -14,6 +12,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+
+import java.util.Collection;
 
 public class CraftThrownPotion extends CraftThrowableProjectile implements ThrownPotion {
     public CraftThrownPotion(CraftServer server, net.minecraft.world.entity.projectile.ThrownPotion entity) {

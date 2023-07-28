@@ -1,7 +1,6 @@
 package org.bukkit.craftbukkit.v1_20_R1.inventory.tags;
 
 import com.google.common.base.Preconditions;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.craftbukkit.v1_20_R1.persistence.CraftPersistentDataContainer;
 import org.bukkit.inventory.meta.tags.CustomItemTagContainer;
 import org.bukkit.inventory.meta.tags.ItemTagType;

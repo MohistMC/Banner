@@ -1,15 +1,14 @@
 package org.bukkit.craftbukkit.v1_20_R1.entity;
 
-import java.util.UUID;
-
 import com.google.common.base.Preconditions;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventoryAbstractHorse;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.Horse;
 import org.bukkit.inventory.AbstractHorseInventory;
+
+import java.util.UUID;
 
 public abstract class CraftAbstractHorse extends CraftAnimals implements AbstractHorse {
 

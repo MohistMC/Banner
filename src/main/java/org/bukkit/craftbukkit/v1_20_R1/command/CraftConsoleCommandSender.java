@@ -1,7 +1,5 @@
 package org.bukkit.craftbukkit.v1_20_R1.command;
 
-import java.util.UUID;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.ChatColor;
@@ -10,7 +8,8 @@ import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
 import org.bukkit.conversations.ManuallyAbandonedConversationCanceller;
 import org.bukkit.craftbukkit.v1_20_R1.conversations.ConversationTracker;
-import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 /**
  * Represents CLI input from a console

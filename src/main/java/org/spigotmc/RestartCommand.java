@@ -1,13 +1,12 @@
 package org.spigotmc;
 
-import java.io.File;
-import java.util.List;
-
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+
+import java.io.File;
+import java.util.List;
 
 public class RestartCommand extends Command
 {

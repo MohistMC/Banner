@@ -4,9 +4,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Objects;
 import org.bukkit.Material;
 import org.bukkit.WorldBorder;
 import org.bukkit.entity.Entity;
@@ -14,6 +11,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Stores data for damage events

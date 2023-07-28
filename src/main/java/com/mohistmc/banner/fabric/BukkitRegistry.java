@@ -81,6 +81,7 @@ public class BukkitRegistry {
             Unsafe.getStatic(CraftMagicNumbers.class, "FLUIDTYPE_FLUID");
     public static Map<StatType<?>, Statistic> STATISTIC_MAP = new HashMap<>();
     public static Map<Villager.Profession, ResourceLocation> PROFESSION = new HashMap<>();
+    public static Map<net.minecraft.world.level.biome.Biome, Biome> BIOME_MAP = new HashMap<>();
 
     public static void registerAll(DedicatedServer console) {
         loadItems();

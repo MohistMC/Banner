@@ -1,9 +1,5 @@
 package org.bukkit.craftbukkit.v1_20_R1.inventory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-
 import com.google.common.base.Preconditions;
 import com.mohistmc.banner.bukkit.BannerLecternInventory;
 import net.minecraft.world.Container;
@@ -12,8 +8,17 @@ import net.minecraft.world.inventory.MerchantContainer;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.JukeboxBlock;
-import net.minecraft.world.level.block.entity.*;
-import org.apache.commons.lang3.Validate;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.world.level.block.entity.BarrelBlockEntity;
+import net.minecraft.world.level.block.entity.BlastFurnaceBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
+import net.minecraft.world.level.block.entity.ChiseledBookShelfBlockEntity;
+import net.minecraft.world.level.block.entity.DispenserBlockEntity;
+import net.minecraft.world.level.block.entity.DropperBlockEntity;
+import net.minecraft.world.level.block.entity.LecternBlockEntity;
+import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
+import net.minecraft.world.level.block.entity.SmokerBlockEntity;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftLegacy;
@@ -22,6 +27,10 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
 
 public class CraftInventory implements Inventory {
     protected final Container inventory;
