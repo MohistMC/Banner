@@ -149,6 +149,9 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
             return !FabricLoader.getInstance().isModLoaded("carpet-tis-addition")
                     && !FabricLoader.getInstance().isModLoaded("carpet");
         }
+        if (mixinClassName.equals("com.mohistmc.banner.mixin.network.protocol.MixinPacketUtils")) {
+            return !FabricLoader.getInstance().isModLoaded("cobblemon");
+        }
         if (mixinClassName.equals("com.mohistmc.banner.mixin.world.item.MixinChorusFruitItem")) {
             return !FabricLoader.getInstance().isModLoaded("openpartiesandclaims");
         }
