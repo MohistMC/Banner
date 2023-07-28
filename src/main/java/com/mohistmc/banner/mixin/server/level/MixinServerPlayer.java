@@ -10,7 +10,6 @@ import net.minecraft.BlockUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.PositionImpl;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -162,6 +161,8 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Shadow private boolean respawnForced;
 
     @Shadow public abstract void setCamera(@Nullable Entity entityToSpectate);
+
+    @Shadow @Nullable protected abstract PortalInfo findDimensionEntryPoint(ServerLevel destination);
 
     // CraftBukkit start
     public String displayName;
@@ -620,6 +621,9 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         // Paper end
     }
 
+    public PortalInfo banner$findDimensionEntryPoint(ServerLevel destination) {
+        return findDimensionEntryPoint(destination);
+    }
     @Override
     public CraftPlayer getBukkitEntity() {
         return (CraftPlayer)super.getBukkitEntity();
@@ -807,10 +811,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         this.level().getCraftServer().getScoreboardManager().getScoreboardScores(ObjectiveCriteria.DEATH_COUNT, this.getScoreboardName(), Score::increment);
     }
 
-    /**
-     * @author Mgazul
-     * @reason bukkit
-     */
+    /*
     @Nullable
     @Overwrite
     protected PortalInfo findDimensionEntryPoint(ServerLevel worldserver) {
@@ -826,7 +827,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         } else {
             return shapedetectorshape;
         }
-    }
+    }*/
 
 
     private AtomicReference<PlayerTeleportEvent.TeleportCause> banner$changeDimensionCause =
@@ -865,6 +866,11 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     }
 
     @Override
+    public PlayerTeleportEvent.TeleportCause bridge$changeDimensionCause() {
+        return banner$changeDimensionCause.get();
+    }
+
+    @Override
     public Optional<PlayerTeleportEvent.TeleportCause> bridge$teleportCause() {
         try {
             return Optional.ofNullable(banner$changeDimensionCause.get());
@@ -881,10 +887,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         return this.level().getDayTime() - this.level().getDayTime() % 24000L + this.timeOffset;
     }
 
-    /**
-     * @author wdog5
-     * @reason bukkit
-     */
+    /*
     @Overwrite
     public Entity changeDimension(ServerLevel worldserver) {
         if (this.isSleeping()) return this;
@@ -967,7 +970,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             banner$changeDimensionCause.set(null);
             return this;
         }
-    }
+    }*/
 
     @Override
     public CraftPortalEvent callPortalEvent(Entity entity, ServerLevel exitWorldServer, PositionImpl exitPosition, PlayerTeleportEvent.TeleportCause cause, int searchRadius, int creationRadius) {

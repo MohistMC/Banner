@@ -2,6 +2,7 @@ package com.mohistmc.banner.bukkit;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.PositionImpl;
 import net.minecraft.server.WorldLoader;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -24,6 +25,19 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class BukkitCaptures {
 
+    private static PositionImpl positionImpl;
+
+    public static void capturePositionImpl(PositionImpl position) {
+        positionImpl = position;
+    }
+
+    public static PositionImpl getPositionImpl() {
+        try {
+            return positionImpl;
+        } finally {
+            positionImpl = null;
+        }
+    }
 
     private static Entity entityChangeBlock;
 

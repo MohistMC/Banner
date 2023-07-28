@@ -194,6 +194,10 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
 
     @Shadow public abstract void moveTo(double x, double y, double z, float yRot, float xRot);
 
+    @Shadow public abstract void positionRider(Entity passenger);
+
+    @Shadow @Nullable public abstract Entity changeDimension(ServerLevel destination);
+
     private CraftEntity bukkitEntity;
     public final org.spigotmc.ActivationRange.ActivationType activationType =
             org.spigotmc.ActivationRange.initializeEntityActivationType((Entity) (Object) this);
@@ -801,10 +805,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         return this.teleportTo(worldserver, d0, d1, d2, set, f, f1);
     }
 
-    /**
-     * @author wdog5
-     * @reason bukkit
-     */
+    /*
     @Overwrite
     @Nullable
     public Entity changeDimension(ServerLevel destination) {
@@ -816,11 +817,13 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
             this.level().getProfiler().push("reposition");
             var bukkitPos = banner$location.getAndSet(null);
             PortalInfo portalInfo = bukkitPos == null ? this.findDimensionEntryPoint(destination) : new PortalInfo(new Vec3(bukkitPos.x(), bukkitPos.y(), bukkitPos.z()), Vec3.ZERO, this.yRot, this.xRot);
+            portalInfo.banner$setWorld(destination);
+            portalInfo.banner$setPortalEventInfo(null);
             if (portalInfo == null) {
                 return null;
             } else {
-                portalInfo.banner$setWorld(destination);
-                if (portalInfo.bridge$getWorld() == this.level()) {
+                destination = portalInfo.bridge$getWorld();
+                if (destination == this.level()) {
                     this.moveTo(portalInfo.pos.x, portalInfo.pos.y, portalInfo.pos.z, portalInfo.yRot, portalInfo.xRot);
                     this.setDeltaMovement(portalInfo.speed);
                     return (Entity) (Object) this;
@@ -859,7 +862,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         } else {
             return null;
         }
-    }
+    }*/
 
     @Inject(method = "restoreFrom", at = @At("HEAD"))
     private void banner$forwardHandle(Entity entityIn, CallbackInfo ci) {
@@ -870,10 +873,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         }
     }
 
-    /**
-     * @author wdog5
-     * @reason bukkit
-     */
+    /*
     @Nullable
     @Overwrite
     protected PortalInfo findDimensionEntryPoint(ServerLevel worldserver) {
@@ -921,7 +921,9 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
                         vec3d = new Vec3(0.5D, 0.0D, 0.0D);
                     }
 
-                    return PortalShape.createPortalInfo(worldserverFinal, blockutil_rectangle, enumdirection_enumaxis, vec3d, ((Entity) (Object) this), this.getDeltaMovement(), this.getYRot(), this.getXRot()); // CraftBukkit
+                    var bukkitfiedPortalInfo = PortalShape.createPortalInfo(worldserverFinal, blockutil_rectangle, enumdirection_enumaxis, vec3d, ((Entity) (Object) this), this.getDeltaMovement(), this.getYRot(), this.getXRot()); // CraftBukkit
+                    bukkitfiedPortalInfo.banner$setPortalEventInfo(event);
+                    return bukkitfiedPortalInfo;
                 }).orElse(null); // CraftBukkit - decompile error
             }
         } else {
@@ -938,14 +940,14 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
                 return null;
             }
 
-            var portalInfo = new PortalInfo(new Vec3(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()), this.getDeltaMovement(), this.getYRot(), this.getXRot());
-            portalInfo.banner$setWorld(((CraftWorld) event.getTo().getWorld()).getHandle());
-            portalInfo.banner$setPortalEventInfo(event);
-            return portalInfo;
+            var newPortalInfo = new PortalInfo(new Vec3(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()), this.getDeltaMovement(), this.getYRot(), this.getXRot());
+            newPortalInfo.banner$setWorld(((CraftWorld) event.getTo().getWorld()).getHandle());
+            newPortalInfo.banner$setPortalEventInfo(event);
+            return newPortalInfo;
 
             // CraftBukkit end
         }
-    }
+    }*/
 
     @Override
     public CraftPortalEvent callPortalEvent(Entity entity, ServerLevel exitWorldServer, PositionImpl exitPosition, PlayerTeleportEvent.TeleportCause cause, int searchRadius, int creationRadius) {

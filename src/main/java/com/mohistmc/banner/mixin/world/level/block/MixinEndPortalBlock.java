@@ -26,7 +26,7 @@ public class MixinEndPortalBlock {
         EntityPortalEnterEvent event = new EntityPortalEnterEvent(entityIn.getBukkitEntity(), new org.bukkit.Location(world.getWorld(), pos.getX(), pos.getY(), pos.getZ()));
                 new Location(worldIn.getWorld(), pos.getX(), pos.getY(), pos.getZ());
         Bukkit.getPluginManager().callEvent(event);
-        if (entityIn instanceof ServerPlayer && world != null) {
+        if (entityIn instanceof ServerPlayer) {
             ((ServerPlayer) entityIn).changeDimension(world, PlayerTeleportEvent.TeleportCause.END_PORTAL);
             return null;
         }

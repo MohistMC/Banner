@@ -14,6 +14,7 @@ import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.portal.PortalInfo;
 import org.bukkit.WeatherType;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.event.player.PlayerSpawnChangeEvent;
@@ -212,5 +213,13 @@ public interface InjectionServerPlayer extends InjectionPlayer {
 
     default void pushChangeSpawnCause(PlayerSpawnChangeEvent.Cause cause) {
 
+    }
+
+    default PortalInfo banner$findDimensionEntryPoint(ServerLevel destination) {
+        return null;
+    }
+
+    default PlayerTeleportEvent.TeleportCause bridge$changeDimensionCause() {
+        return null;
     }
 }
