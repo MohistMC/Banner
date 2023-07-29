@@ -13,13 +13,8 @@ import net.minecraft.core.PositionImpl;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundChangeDifficultyPacket;
 import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
-import net.minecraft.network.protocol.game.ClientboundLevelEventPacket;
-import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
-import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
 import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
-import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
 import net.minecraft.network.protocol.game.ServerboundClientInformationPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -28,7 +23,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.server.players.PlayerList;
 import net.minecraft.stats.RecipeBook;
 import net.minecraft.stats.ServerRecipeBook;
 import net.minecraft.util.Mth;
@@ -36,7 +30,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.CombatTracker;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.RelativeMovement;
@@ -53,7 +46,6 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.WorldBorder;
@@ -74,11 +66,9 @@ import org.bukkit.craftbukkit.v1_20_R1.event.CraftPortalEvent;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R1.util.BlockStateListPopulator;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage;
-import org.bukkit.craftbukkit.v1_20_R1.util.CraftLocation;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedMainHandEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerLocaleChangeEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerSpawnChangeEvent;
@@ -98,7 +88,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -886,91 +875,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         }
         return this.level().getDayTime() - this.level().getDayTime() % 24000L + this.timeOffset;
     }
-
-    /*
-    @Overwrite
-    public Entity changeDimension(ServerLevel worldserver) {
-        if (this.isSleeping()) return this;
-        ServerLevel worldserver1 = this.serverLevel();
-        ResourceKey<Level> resourcekey = worldserver1.dimension();
-        if (resourcekey == Level.END && worldserver != null && worldserver.dimension() == Level.OVERWORLD) {
-            this.isChangingDimension = true;
-            this.unRide();
-            this.serverLevel().removePlayerImmediately((ServerPlayer) (Object) this, RemovalReason.CHANGED_DIMENSION);
-            if (!this.wonGame) {
-                if (this.level().bridge$bannerConfig().disableEndCredits) this.seenCredits = true; // Paper - Toggle to always disable end credits
-                this.wonGame = true;
-                this.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.WIN_GAME, this.seenCredits ? 0.0F : 1.0F));
-                this.seenCredits = true;
-            }
-
-            return this;
-        } else {
-            PortalInfo shapedetectorshape = this.findDimensionEntryPoint(worldserver);
-            if (shapedetectorshape != null) {
-                worldserver1.getProfiler().push("moving");
-                worldserver = shapedetectorshape.bridge$getWorld();
-                if (worldserver == null) {
-
-                } else if (resourcekey == Level.OVERWORLD && worldserver.dimension() == Level.NETHER) {
-                    this.enteredNetherPosition = this.position();
-                } else if (worldserver.dimension() == Level.END && shapedetectorshape.bridge$getPortalEventInfo() != null && shapedetectorshape.bridge$getPortalEventInfo().getCanCreatePortal()) {
-                    this.createEndPlatform(worldserver, BlockPos.containing(shapedetectorshape.pos));
-                }
-            } else {
-                return null;
-            }
-            Location enter = this.getBukkitEntity().getLocation();
-            Location exit = (worldserver == null) ? null : CraftLocation.toBukkit(shapedetectorshape.pos, worldserver.getWorld(), shapedetectorshape.yRot, shapedetectorshape.xRot);
-            PlayerTeleportEvent tpEvent = new PlayerTeleportEvent(this.getBukkitEntity(), enter, exit, banner$changeDimensionCause.get() == null ? PlayerTeleportEvent.TeleportCause.UNKNOWN : banner$changeDimensionCause.get());
-            Bukkit.getPluginManager().callEvent(tpEvent);
-            if (tpEvent.isCancelled() || tpEvent.getTo() == null) {
-                return null;
-            }
-            exit = tpEvent.getTo();
-            worldserver = ((CraftWorld) exit.getWorld()).getHandle();
-            worldserver1.getProfiler().pop();
-            worldserver1.getProfiler().push("placing");
-            if (true) {
-                this.isChangingDimension = true; // CraftBukkit - Set teleport invulnerability only if player changing worlds
-
-                this.connection.send(new ClientboundRespawnPacket(this.serverLevel().dimensionTypeId(), this.serverLevel().dimension(), BiomeManager.obfuscateSeed(this.serverLevel().getSeed()), this.gameMode.getGameModeForPlayer(), this.gameMode.getPreviousGameModeForPlayer(), this.serverLevel().isDebug(), this.serverLevel().isFlat(), (byte)3, this.getLastDeathLocation(), this.getPortalCooldown()));
-                this.connection.send(new ClientboundChangeDifficultyPacket(this.level().getDifficulty(), this.level().getLevelData().isDifficultyLocked()));
-                PlayerList playerlist = this.server.getPlayerList();
-
-                playerlist.sendPlayerPermissionLevel((ServerPlayer) (Object) this);
-                worldserver1.removePlayerImmediately((ServerPlayer) (Object) this, Entity.RemovalReason.CHANGED_DIMENSION);
-                this.unsetRemoved();
-
-                this.setServerLevel(worldserver);
-                this.connection.teleport(exit);
-                this.connection.resetPosition();
-                worldserver.addDuringPortalTeleport((ServerPlayer) (Object) this);
-                worldserver1.getProfiler().pop();
-
-                this.triggerDimensionChangeTriggers(worldserver1);
-                this.connection.send(new ClientboundPlayerAbilitiesPacket(this.getAbilities()));
-                playerlist.sendLevelInfo((ServerPlayer) (Object) this, worldserver);
-                playerlist.sendAllPlayerInfo((ServerPlayer) (Object) this);
-                Iterator var7 = this.getActiveEffects().iterator();
-
-                while(var7.hasNext()) {
-                    MobEffectInstance mobEffectInstance = (MobEffectInstance)var7.next();
-                    this.connection.send(new ClientboundUpdateMobEffectPacket(this.getId(), mobEffectInstance));
-                }
-
-                this.connection.send(new ClientboundLevelEventPacket(1032, BlockPos.ZERO, 0, false));
-                this.lastSentExp = -1;
-                this.lastSentHealth = -1.0F;
-                this.lastSentFood = -1;
-
-                PlayerChangedWorldEvent changeEvent = new PlayerChangedWorldEvent(this.getBukkitEntity(), worldserver1.getWorld());
-                this.level().getCraftServer().getPluginManager().callEvent(changeEvent);
-            }
-            banner$changeDimensionCause.set(null);
-            return this;
-        }
-    }*/
 
     @Override
     public CraftPortalEvent callPortalEvent(Entity entity, ServerLevel exitWorldServer, PositionImpl exitPosition, PlayerTeleportEvent.TeleportCause cause, int searchRadius, int creationRadius) {

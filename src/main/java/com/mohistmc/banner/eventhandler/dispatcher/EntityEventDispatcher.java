@@ -30,17 +30,6 @@ public class EntityEventDispatcher {
             }
         });
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> {
-            PortalInfo portalInfo = player.banner$findDimensionEntryPoint(destination);
-            Location enter = player.getBukkitEntity().getLocation();
-            Location exit = (destination == null) ? null :
-                    CraftLocation.toBukkit(portalInfo.pos,
-                    destination.getWorld(),
-                            portalInfo.yRot, portalInfo.xRot);
-            PlayerTeleportEvent tpEvent = new PlayerTeleportEvent(player.getBukkitEntity(), enter, exit, player.bridge$changeDimensionCause());
-            Bukkit.getServer().getPluginManager().callEvent(tpEvent);
-            if (tpEvent.isCancelled() || tpEvent.getTo() == null) {
-                // Banner TODO fix
-            }
             // CraftBukkit start
             PlayerChangedWorldEvent changeEvent = new PlayerChangedWorldEvent(player.getBukkitEntity(), origin.getWorld());
             player.level().getCraftServer().getPluginManager().callEvent(changeEvent);
