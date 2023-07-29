@@ -313,18 +313,20 @@ public class BukkitRegistry {
         var registry = console.registryAccess().registryOrThrow(Registries.BIOME);
         for (net.minecraft.world.level.biome.Biome biome : registry) {
             var location = registry.getKey(biome);
-            String name = normalizeName(location.toString());
-            Biome bukkit;
-            try {
-                bukkit = Biome.valueOf(name);
-            } catch (Throwable t) {
-                bukkit = null;
-            }
-            if (bukkit == null) {
-                bukkit = DynamicEnumHelper.makeEnum(Biome.class, name, i++, ImmutableList.of(), ImmutableList.of());
-                newTypes.add(bukkit);
-                Unsafe.putObject(bukkit, keyOffset, CraftNamespacedKey.fromMinecraft(location));
-                BannerServer.LOGGER.debug("Registered {} as biome {}", location, bukkit);
+            if (!isMINECRAFT(location)) {
+                String name = normalizeName(location.toString());
+                Biome bukkit;
+                try {
+                    bukkit = Biome.valueOf(name);
+                } catch (Throwable t) {
+                    bukkit = null;
+                }
+                if (bukkit == null) {
+                    bukkit = DynamicEnumHelper.makeEnum(Biome.class, name, i++, ImmutableList.of(), ImmutableList.of());
+                    newTypes.add(bukkit);
+                    Unsafe.putObject(bukkit, keyOffset, CraftNamespacedKey.fromMinecraft(location));
+                    BannerServer.LOGGER.debug("Registered {} as biome {}", location, bukkit);
+                }
             }
         }
         DynamicEnumHelper.addEnums(Biome.class, newTypes);
@@ -338,20 +340,22 @@ public class BukkitRegistry {
         long keyOffset = Unsafe.objectFieldOffset(key);
         for (VillagerProfession villagerProfession : BuiltInRegistries.VILLAGER_PROFESSION) {
             var location = BuiltInRegistries.VILLAGER_PROFESSION.getKey(villagerProfession);
-            String name = normalizeName(location.toString());
-            Villager.Profession profession;
-            try {
-                profession = Villager.Profession.valueOf(name);
-            } catch (Throwable t) {
-                profession = null;
+            if (!isMINECRAFT(location)) {
+                String name = normalizeName(location.toString());
+                Villager.Profession profession;
+                try {
+                    profession = Villager.Profession.valueOf(name);
+                } catch (Throwable t) {
+                    profession = null;
+                }
+                if (profession == null) {
+                    profession = DynamicEnumHelper.makeEnum(Villager.Profession.class, name, i++, ImmutableList.of(), ImmutableList.of());
+                    newTypes.add(profession);
+                    Unsafe.putObject(profession, keyOffset, CraftNamespacedKey.fromMinecraft(location));
+                    BannerServer.LOGGER.debug("Registered {} as villager profession {}", location, profession);
+                }
+                PROFESSION.put(profession, location);
             }
-            if (profession == null) {
-                profession = DynamicEnumHelper.makeEnum(Villager.Profession.class, name, i++, ImmutableList.of(), ImmutableList.of());
-                newTypes.add(profession);
-                Unsafe.putObject(profession, keyOffset, CraftNamespacedKey.fromMinecraft(location));
-                BannerServer.LOGGER.debug("Registered {} as villager profession {}", location, profession);
-            }
-            PROFESSION.put(profession, location);
         }
         DynamicEnumHelper.addEnums(Villager.Profession.class, newTypes);
         BannerServer.LOGGER.info(BannerMCStart.I18N.get("registry.villager-profession"), newTypes.size());
@@ -450,15 +454,17 @@ public class BukkitRegistry {
         putStatic(CraftPotionUtil.class, "regular", map);
         for (var potion : BuiltInRegistries.POTION) {
             var location = BuiltInRegistries.POTION.getKey(potion);
-            if (CraftPotionUtil.toBukkit(location.toString()).getType() == PotionType.UNCRAFTABLE && potion != Potions.EMPTY) {
-                String name = normalizeName(location.toString());
-                MobEffectInstance effectInstance = potion.getEffects().isEmpty() ? null : potion.getEffects().get(0);
-                PotionType potionType = DynamicEnumHelper.makeEnum(PotionType.class, name, typeId++,
-                        Arrays.asList(PotionEffectType.class, boolean.class, boolean.class),
-                        Arrays.asList(effectInstance == null ? null : PotionEffectType.getById(MobEffect.getId(effectInstance.getEffect())), false, false));
-                newTypes.add(potionType);
-                map.put(potionType, location.toString());
-                BannerServer.LOGGER.debug("Registered {} as potion type {}", location, potionType);
+            if (!isMINECRAFT(location)) {
+                if (CraftPotionUtil.toBukkit(location.toString()).getType() == PotionType.UNCRAFTABLE && potion != Potions.EMPTY) {
+                    String name = normalizeName(location.toString());
+                    MobEffectInstance effectInstance = potion.getEffects().isEmpty() ? null : potion.getEffects().get(0);
+                    PotionType potionType = DynamicEnumHelper.makeEnum(PotionType.class, name, typeId++,
+                            Arrays.asList(PotionEffectType.class, boolean.class, boolean.class),
+                            Arrays.asList(effectInstance == null ? null : PotionEffectType.getById(MobEffect.getId(effectInstance.getEffect())), false, false));
+                    newTypes.add(potionType);
+                    map.put(potionType, location.toString());
+                    BannerServer.LOGGER.debug("Registered {} as potion type {}", location, potionType);
+                }
             }
         }
         DynamicEnumHelper.addEnums(PotionType.class, newTypes);
