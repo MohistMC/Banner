@@ -10,6 +10,7 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftLocation;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftNamespacedKey;
@@ -130,7 +131,9 @@ public class CraftVillager extends CraftAbstractVillager implements Villager {
     }
 
     public static Profession nmsToBukkitProfession(VillagerProfession nms) {
-        return Profession.valueOf(BukkitRegistry.normalizeName(BuiltInRegistries.VILLAGER_PROFESSION.getKey(nms).toString()));
+        return BuiltInRegistries.VILLAGER_PROFESSION.getKey(nms).getNamespace().equals(NamespacedKey.MINECRAFT)
+                ? Profession.valueOf(BuiltInRegistries.VILLAGER_PROFESSION.getKey(nms).getPath().toUpperCase(Locale.ROOT))
+                : Profession.valueOf(BukkitRegistry.normalizeName(BuiltInRegistries.VILLAGER_PROFESSION.getKey(nms).toString()));
     }
 
     public static VillagerProfession bukkitToNmsProfession(Profession bukkit) {
