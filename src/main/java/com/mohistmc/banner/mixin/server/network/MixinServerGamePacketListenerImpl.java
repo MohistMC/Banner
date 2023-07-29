@@ -1783,10 +1783,15 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     @Inject(method = "handleCustomPayload", at = @At("HEAD"))
     private void banner$handleCustomPayload(ServerboundCustomPayloadPacket packet, CallbackInfo ci) {
         PacketUtils.ensureRunningOnSameThread(packet, (ServerGamePacketListenerImpl) (Object) this, this.player.serverLevel());
+        var readerIndex = packet.data.readerIndex();
+        var buf = new byte[packet.data.readableBytes()];
+        packet.data.readBytes(buf);
+        packet.data.readerIndex(readerIndex);
+
         if (this.connection.isConnected()) {
             if (packet.identifier.equals(CUSTOM_REGISTER)) {
                 try {
-                    String channels = packet.data.toString(StandardCharsets.UTF_8);
+                    String channels = new String(buf, StandardCharsets.UTF_8);
                     for (String channel : channels.split("\0")) {
                         if (!StringUtil.isNullOrEmpty(channel)) {
                             this.getCraftPlayer().addChannel(channel);
@@ -1798,7 +1803,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                 }
             } else if (packet.identifier.equals(CUSTOM_UNREGISTER)) {
                 try {
-                    final String channels = packet.data.toString(StandardCharsets.UTF_8);
+                    String channels = new String(buf, StandardCharsets.UTF_8);
                     for (String channel : channels.split("\0")) {
                         if (!StringUtil.isNullOrEmpty(channel)) {
                             this.getCraftPlayer().removeChannel(channel);
@@ -1810,9 +1815,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                 }
             } else {
                 try {
-                    byte[] data = new byte[packet.data.readableBytes()];
-                    packet.data.readBytes(data);
-                    this.cserver.getMessenger().dispatchIncomingMessage(this.player.getBukkitEntity(), packet.identifier.toString(), data);
+                    this.cserver.getMessenger().dispatchIncomingMessage(this.player.getBukkitEntity(), packet.identifier.toString(), buf);
                 } catch (Exception ex) {
                     LOGGER.error("Couldn't dispatch custom payload", ex);
                     this.disconnect("Invalid custom payload!");
