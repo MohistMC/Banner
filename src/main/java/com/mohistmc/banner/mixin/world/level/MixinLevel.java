@@ -179,16 +179,16 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         this.timings = new SpigotTimings.WorldTimingsHandler(((Level) (Object) this));
     }
 
-    @Redirect(method = "<init>", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/border/WorldBorder;<init>()V"))
-    private void banner$resetBorder(WorldBorder instance) {
-        new WorldBorder() {
+    @Redirect(method = "<init>", at = @At(value = "NEW",
+            args = "class=net/minecraft/world/level/border/WorldBorder"))
+    private WorldBorder banner$resetBorder0() {
+        return new WorldBorder() {
             public double getCenterX() {
-                return super.getCenterX();
-            }// CraftBukkit
+                return super.getCenterX(); // CraftBukkit
+            }
 
             public double getCenterZ() {
-                return super.getCenterZ();// CraftBukkit
+                return super.getCenterZ(); // CraftBukkit
             }
         };
     }
