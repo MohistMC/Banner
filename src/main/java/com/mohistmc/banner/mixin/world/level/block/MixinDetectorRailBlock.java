@@ -7,15 +7,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DetectorRailBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import org.bukkit.event.block.BlockRedstoneEvent;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.List;
 import java.util.function.Predicate;
-
-import static com.mohistmc.banner.mixin.world.level.block.MixinTripWireBlock.POWERED;
 
 @Mixin(DetectorRailBlock.class)
 public abstract class MixinDetectorRailBlock extends Block {
@@ -27,6 +27,8 @@ public abstract class MixinDetectorRailBlock extends Block {
     @Shadow protected abstract <T extends AbstractMinecart> List<T> getInteractingMinecartOfType(Level level, BlockPos pos, Class<T> cartType, Predicate<Entity> filter);
 
     @Shadow protected abstract void updatePowerToConnected(Level level, BlockPos pos, BlockState state, boolean powered);
+
+    @Shadow @Final public static BooleanProperty POWERED;
 
     /**
      * @author wdog5
