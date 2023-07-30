@@ -367,7 +367,6 @@
     "world.level.MixinEntityGetter",
     "world.level.MixinExplosion",
     "world.level.MixinLevel",
-    "world.level.MixinLevel_1",
     "world.level.MixinLevelAccessor",
     "world.level.MixinLevelWriter",
     "world.level.MixinServerLevelAccessor",
