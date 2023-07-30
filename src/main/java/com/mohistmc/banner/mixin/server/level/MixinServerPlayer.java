@@ -712,7 +712,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     private AtomicReference<PlayerDeathEvent> banner$deathEvent = new AtomicReference<PlayerDeathEvent>();
 
     @Inject(method = "die", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z"),
+            target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z", ordinal = 0),
             cancellable = true)
     private void banner$deathEvent(DamageSource damageSource, CallbackInfo ci) {
         // CraftBukkit start - fire PlayerDeathEvent
@@ -799,25 +799,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         // CraftBukkit - Get our scores instead
         this.level().getCraftServer().getScoreboardManager().getScoreboardScores(ObjectiveCriteria.DEATH_COUNT, this.getScoreboardName(), Score::increment);
     }
-
-    /*
-    @Nullable
-    @Overwrite
-    protected PortalInfo findDimensionEntryPoint(ServerLevel worldserver) {
-        PortalInfo shapedetectorshape = super.findDimensionEntryPoint(worldserver);
-        worldserver = (shapedetectorshape == null) ? worldserver : shapedetectorshape.bridge$getWorld(); // CraftBukkit
-
-        if (shapedetectorshape != null && this.level().dimension() == Level.OVERWORLD && worldserver != null && worldserver.dimension() == Level.END) { // CraftBukkit
-            Vec3 vec3d = shapedetectorshape.pos.add(0.0D, -1.0D, 0.0D);
-            PortalInfo portalInfo = new PortalInfo(vec3d, Vec3.ZERO, 90.0F, 0.0F); // CraftBukkit
-            portalInfo.banner$setWorld(worldserver);
-            portalInfo.banner$setPortalEventInfo(shapedetectorshape.bridge$getPortalEventInfo());
-            return portalInfo;
-        } else {
-            return shapedetectorshape;
-        }
-    }*/
-
 
     private AtomicReference<PlayerTeleportEvent.TeleportCause> banner$changeDimensionCause =
             new AtomicReference<>(PlayerTeleportEvent.TeleportCause.UNKNOWN);
