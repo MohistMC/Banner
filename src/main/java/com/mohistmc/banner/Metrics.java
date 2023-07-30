@@ -38,7 +38,8 @@ import java.util.zip.GZIPOutputStream;
  */
 public class Metrics {
 
-    public static final ScheduledExecutorService METRICS = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("Metrics"));
+    public static final ScheduledExecutorService METRICS = new ScheduledThreadPoolExecutor(1,
+            new NamedThreadFactory("Metrics"));
     private final String name;
     private final String serverUUID;
     private final List<CustomChart> charts = new ArrayList<>();
@@ -254,7 +255,7 @@ public class Metrics {
 
     public static class BannerMetrics {
         public static void startMetrics() {
-            File configFile = new File(FabricLoader.getInstance().getGameDir().toFile(), "banner-config/bStats/config.yml");
+            File configFile = new File(new File((File) BukkitExtraConstants.getServer().bridge$options().valueOf("plugins"), "bStats"), "config.yml");
             YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
 
             if (!config.isSet("serverUuid")) {
@@ -278,7 +279,7 @@ public class Metrics {
             String serverUUID = config.getString("serverUuid");
 
             if (config.getBoolean("enabled", true)) {
-                Metrics metrics = new Metrics("Mohist", serverUUID);
+                Metrics metrics = new Metrics("Banner", serverUUID);
 
                 metrics.addCustomChart(new SimplePie("minecraft_version", () -> {
                     String minecraftVersion = Bukkit.getVersion();
@@ -288,7 +289,7 @@ public class Metrics {
 
                 metrics.addCustomChart(new SingleLineChart("players", () -> Bukkit.getOnlinePlayers().size()));
                 metrics.addCustomChart(new SimplePie("online_mode", () -> Bukkit.getOnlineMode() ? "online" : "offline"));
-                metrics.addCustomChart(new SimplePie("mohist_version", () -> "banner-1.20"));
+                metrics.addCustomChart(new SimplePie("banner_version", () -> "1.20.1"));
                 metrics.addCustomChart(new SimplePie("bungeecord", () -> SpigotConfig.bungee ? "true" : "false"));
 
                 metrics.addCustomChart(new DrilldownPie("java_version", () -> {
