@@ -618,11 +618,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
             banner$loc = respawnEvent.getRespawnLocation();
             if (!conqueredEnd) { // keep inventory here since inventory dropped at ServerPlayerEntity#onDeath
-                entityplayer1.getInventory().replaceWith(playerIn.getInventory());
-                entityplayer1.experienceLevel = playerIn.experienceLevel;
-                entityplayer1.totalExperience = playerIn.totalExperience;
-                entityplayer1.experienceProgress = playerIn.experienceProgress;
-                entityplayer1.setScore(playerIn.getScore());
                 playerIn.reset(); // SPIGOT-4785
             }
         } else {
