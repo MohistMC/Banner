@@ -1328,17 +1328,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         return !this.player.bridge$joining() && !this.connection.isConnected();
     }
 
-    @Redirect(method = "handleSetCreativeModeSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"))
-    private boolean banner$permCheck(ItemStack instance) {
-        CompoundTag banner$tag = BlockItem.getBlockEntityData(instance);
-        return !instance.isEmpty()
-                && banner$tag != null
-                && banner$tag.contains("x")
-                && banner$tag.contains("y")
-                && banner$tag.contains("z")
-                && this.player.getBukkitEntity().hasPermission("minecraft.nbt.copy"); // Spigot
-    }
-
     @Inject(method = "handlePlayerCommand", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;resetLastActionTime()V"))
     private void banner$toggleAction(ServerboundPlayerCommandPacket packetIn, CallbackInfo ci) {
         if (this.player.isRemoved()) {
