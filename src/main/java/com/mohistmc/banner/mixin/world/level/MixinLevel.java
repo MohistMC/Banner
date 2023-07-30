@@ -10,6 +10,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.protocol.game.ClientboundSetBorderCenterPacket;
+import net.minecraft.network.protocol.game.ClientboundSetBorderLerpSizePacket;
+import net.minecraft.network.protocol.game.ClientboundSetBorderSizePacket;
+import net.minecraft.network.protocol.game.ClientboundSetBorderWarningDelayPacket;
+import net.minecraft.network.protocol.game.ClientboundSetBorderWarningDistancePacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.FullChunkStatus;
@@ -23,6 +28,7 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -134,6 +140,42 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                 this.ticksPerSpawnCategory.put(spawnCategory, this.getCraftServer().getTicksPerSpawns(spawnCategory));
             }
         }
+        // CraftBukkit start
+        getWorldBorder().banner$setWorld(((ServerLevel) (Object) this));
+        // From PlayerList.setPlayerFileData
+        getWorldBorder().addListener(new BorderChangeListener() {
+            @Override
+            public void onBorderSizeSet(WorldBorder worldborder, double d0) {
+                getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderSizePacket(worldborder), worldborder.bridge$world());
+            }
+
+            @Override
+            public void onBorderSizeLerping(WorldBorder worldborder, double d0, double d1, long i) {
+                getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderLerpSizePacket(worldborder), worldborder.bridge$world());
+            }
+
+            @Override
+            public void onBorderCenterSet(WorldBorder worldborder, double d0, double d1) {
+                getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderCenterPacket(worldborder), worldborder.bridge$world());
+            }
+
+            @Override
+            public void onBorderSetWarningTime(WorldBorder worldborder, int i) {
+                getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderWarningDelayPacket(worldborder), worldborder.bridge$world());
+            }
+
+            @Override
+            public void onBorderSetWarningBlocks(WorldBorder worldborder, int i) {
+                getCraftServer().getHandle().broadcastAll(new ClientboundSetBorderWarningDistancePacket(worldborder), worldborder.bridge$world());
+            }
+
+            @Override
+            public void onBorderSetDamagePerBlock(WorldBorder worldborder, double d0) {}
+
+            @Override
+            public void onBorderSetDamageSafeZOne(WorldBorder worldborder, double d0) {}
+        });
+        // CraftBukkit end
         this.timings = new SpigotTimings.WorldTimingsHandler(((Level) (Object) this));
     }
 
