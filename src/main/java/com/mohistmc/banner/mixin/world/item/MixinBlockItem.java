@@ -15,7 +15,6 @@ import net.minecraft.world.item.SolidBucketItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
@@ -126,18 +125,5 @@ public abstract class MixinBlockItem {
         context.getLevel().getCraftServer().getPluginManager().callEvent(event);
         return event.isBuildable();
         // CraftBukkit end
-    }
-
-    @Redirect(method = "updateCustomBlockEntityTag(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;)Z",
-            at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
-    private static boolean banner$checkPerm(Level instance) {
-        BlockEntity banner$tileEntity = instance.getBlockEntity(banner$pos.get());
-        return banner$tileEntity != null
-                && !instance.isClientSide
-                && banner$tileEntity.onlyOpCanSetNbt()
-                && (banner$player.get() == null
-                || !banner$player.get().canUseGameMasterBlocks())
-                || (banner$player.get().getAbilities().instabuild
-                && banner$player.get().getBukkitEntity().hasPermission("minecraft.nbt.place"));
     }
 }
