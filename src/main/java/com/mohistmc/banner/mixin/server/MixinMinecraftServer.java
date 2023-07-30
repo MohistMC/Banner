@@ -642,6 +642,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                     worldserver1.getChunkSource().updateChunkForced(chunkcoordintpair, true);
                 }
             }
+            worldserver.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API // Banner - tick to sync chunks
             Bukkit.getPluginManager().callEvent(new WorldLoadEvent(worldserver1.getWorld()));
         }
 
