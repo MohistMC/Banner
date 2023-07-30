@@ -25,6 +25,11 @@
 - There's a little breaking changes
 - This version of Banner 1.20.x,supports MC version 1.20 to 1.20.1
 
+## Tips
+- If you want to try a different Fabric + Bukkit hybrid server, you can try CardBoard
+- It is implements bukkit api by itself,and the author is a pioneer to try a new way to implements Fabric + Bukkit
+- Banner is different with Cardboard,you can also try Cardboard as an alternative choice if you want
+
 ## Progress
 - [ ] Start patch
     * [x] Bukkit([**2cc6db9**](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/commits/2cc6db9))
