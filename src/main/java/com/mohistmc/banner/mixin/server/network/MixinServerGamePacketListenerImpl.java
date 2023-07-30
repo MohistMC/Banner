@@ -317,7 +317,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         if (event.isCancelled()) {
             return;
         }
-        BukkitCaptures.captureQuitMessage(event.getLeaveMessage());
+        player.banner$setKickLeaveMessage(event.getLeaveMessage());
         Component textComponent = CraftChatMessage.fromString(event.getReason(), true)[0];
         this.connection.send(new ClientboundDisconnectPacket(textComponent), PacketSendListener.thenRun(() -> this.connection.disconnect(textComponent)));
         this.onDisconnect(textComponent);
