@@ -1050,23 +1050,26 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         float f1 = this.player.getXRot();
         float f2 = this.player.getYRot();
         double d0 = this.player.getX();
-        double d1 = this.player.getY() + (double) this.player.getEyeHeight();
-        double d2 = this.player.getZ();
-        Location origin = new Location(this.player.level().getWorld(), d0, d1, d2, f2, f1);
-
-        double d3 = player.gameMode.getGameModeForPlayer() == GameType.CREATIVE ? 5.0D : 4.5D;
+        double d2 = this.player.getY() + this.player.getEyeHeight();
+        double d3 = this.player.getZ();
+        Vec3 vec3d = new Vec3(d0, d2, d3);
+        float f3 = Mth.cos(-f2 * 0.017453292f - 3.1415927f);
+        float f4 = Mth.sin(-f2 * 0.017453292f - 3.1415927f);
+        float f5 = -Mth.cos(-f1 * 0.017453292f);
+        float f6 = Mth.sin(-f1 * 0.017453292f);
+        float f7 = f4 * f5;
+        float f8 = f3 * f5;
+        double d4 = player.gameMode.getGameModeForPlayer() == GameType.CREATIVE ? 5.0D : 4.5D;
+        Vec3 vec3d2 = vec3d.add(f7 * d4, f6 * d4, f8 * d4);
         // SPIGOT-5607: Only call interact event if no block or entity is being clicked. Use bukkit ray trace method, because it handles blocks and entities at the same time
         // SPIGOT-7429: Make sure to call PlayerInteractEvent for spectators and non-pickable entities
-        org.bukkit.util.RayTraceResult result = this.player.level().getWorld().rayTrace(origin, origin.getDirection(), d3, org.bukkit.FluidCollisionMode.NEVER, false, 0.1, entity -> {
-            Entity handle = ((CraftEntity) entity).getHandle();
-            return entity != this.player.getBukkitEntity() && this.player.getBukkitEntity().canSee(entity) && !handle.isSpectator() && handle.isPickable() && !handle.isPassengerOfSameVehicle(player);
-        });
-        if (result == null) {
+        HitResult result = this.player.level().clip(new ClipContext(vec3d, vec3d2, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, this.player));
+        if (result == null || result.getType() != HitResult.Type.BLOCK) {
             CraftEventFactory.callPlayerInteractEvent(this.player, Action.LEFT_CLICK_AIR, this.player.getInventory().getSelected(), InteractionHand.MAIN_HAND);
         }
 
         // Arm swing animation
-        PlayerAnimationEvent event = new PlayerAnimationEvent(this.getCraftPlayer(), (packet.getHand() == InteractionHand.MAIN_HAND) ? PlayerAnimationType.ARM_SWING : PlayerAnimationType.OFF_ARM_SWING);
+        PlayerAnimationEvent event = new PlayerAnimationEvent(this.getCraftPlayer(), packet.getHand() == InteractionHand.MAIN_HAND ? PlayerAnimationType.ARM_SWING : PlayerAnimationType.OFF_ARM_SWING);
         this.cserver.getPluginManager().callEvent(event);
 
         if (event.isCancelled()) ci.cancel();
