@@ -860,4 +860,45 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             public void onBorderSetDamageSafeZOne(WorldBorder worldborder, double d0) {}
         });
     }
+
+    @Redirect(method = "sendLevelInfo",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
+                    ordinal = 3))
+    private void banner$cancelSendPacket0(ServerGamePacketListenerImpl instance, Packet<?> packet) { }
+
+    @Redirect(method = "sendLevelInfo",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
+                    ordinal = 4))
+    private void banner$cancelSendPacket1(ServerGamePacketListenerImpl instance, Packet<?> packet) { }
+
+    @Redirect(method = "sendLevelInfo",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
+                    ordinal = 5))
+    private void banner$cancelSendPacket2(ServerGamePacketListenerImpl instance, Packet<?> packet) { }
+
+    @Inject(method = "sendLevelInfo",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
+            ordinal = 3))
+    private void banner$setWeatherType(ServerPlayer player, ServerLevel level, CallbackInfo ci) {
+        // CraftBukkit start - handle player weather
+        player.setPlayerWeather(org.bukkit.WeatherType.DOWNFALL, false);
+        player.updateWeather(-level.rainLevel, level.rainLevel, -level.thunderLevel, level.thunderLevel);
+    }
+
+    private AtomicReference<ServerPlayer> banner$worldBorderPlayer = new AtomicReference<>();
+
+    @Inject(method = "sendLevelInfo", at = @At("HEAD"))
+    private void banner$getWorldBorderPlayer(ServerPlayer player, ServerLevel level, CallbackInfo ci) {
+        banner$worldBorderPlayer.set(player);
+    }
+
+    @Redirect(method = "sendLevelInfo", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerLevel;getWorldBorder()Lnet/minecraft/world/level/border/WorldBorder;"))
+    private WorldBorder banner$useBukkitWorldBorder(ServerLevel instance) {
+        return banner$worldBorderPlayer.get().level().getWorldBorder();
+    }
 }
