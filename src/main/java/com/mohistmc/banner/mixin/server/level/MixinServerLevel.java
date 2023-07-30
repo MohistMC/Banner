@@ -339,10 +339,14 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
             banner$cause = null;
         }
         if (DistValidate.isValid((LevelAccessor) this)) {
-            LightningStrikeEvent lightning = CraftEventFactory.callLightningStrikeEvent((LightningStrike) entity.getBukkitEntity(), cause);
-            if (lightning.isCancelled()) {
-                return false;
+            // Banner start - Compat for Modded Weather,ignore modded weather effect
+            if (entity.getBukkitEntity() instanceof org.bukkit.entity.LightningStrike) {
+                LightningStrikeEvent lightning = CraftEventFactory.callLightningStrikeEvent((LightningStrike) entity.getBukkitEntity(), cause);
+                if (lightning.isCancelled()) {
+                    return false;
+                }
             }
+            // Banner end
         }
         return this.addFreshEntity(entity);
     }
