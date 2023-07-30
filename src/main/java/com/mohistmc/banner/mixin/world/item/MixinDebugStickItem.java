@@ -10,10 +10,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class MixinDebugStickItem {
 
     @Redirect(method = "handleInteraction", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;canUseGameMasterBlocks()Z"))
-    private boolean banner$permCheck(Player instance) {
-        return !instance.canUseGameMasterBlocks()
-                && !(instance.getAbilities().instabuild
-                && instance.getBukkitEntity().hasPermission("minecraft.debugstick"))
-                && !instance.getBukkitEntity().hasPermission("minecraft.debugstick.always");
+    private boolean banner$permCheck(Player player) {
+        boolean banner$flag = !player.canUseGameMasterBlocks()
+                && !(player.getAbilities().instabuild
+                && player.getBukkitEntity().hasPermission("minecraft.debugstick"))
+                && !player.getBukkitEntity().hasPermission("minecraft.debugstick.always");
+        return !banner$flag;
     }
 }
