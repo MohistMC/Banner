@@ -59,6 +59,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.FilteredText;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.FutureChain;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringUtil;
@@ -1009,6 +1010,15 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
             ci.cancel();
         } else {
             processedDisconnect = true;
+        }
+    }
+
+    @Redirect(method = "onDisconnect", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V"))
+    private void banner$setQuitMsg(PlayerList instance, Component message, boolean bypassHiddenChat) {
+        String quitMessage = this.server.getPlayerList().bridge$quiltMsg();
+        if ((quitMessage != null) && (quitMessage.length() > 0)) {
+            this.server.getPlayerList().broadcastMessage(CraftChatMessage.fromString(quitMessage));
         }
     }
 

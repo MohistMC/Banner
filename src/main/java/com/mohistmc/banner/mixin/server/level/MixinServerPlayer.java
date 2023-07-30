@@ -712,7 +712,8 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     private AtomicReference<PlayerDeathEvent> banner$deathEvent = new AtomicReference<PlayerDeathEvent>();
 
     @Inject(method = "die", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z", ordinal = 0),
+            target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z",
+            ordinal = 0),
             cancellable = true)
     private void banner$deathEvent(DamageSource damageSource, CallbackInfo ci) {
         // CraftBukkit start - fire PlayerDeathEvent

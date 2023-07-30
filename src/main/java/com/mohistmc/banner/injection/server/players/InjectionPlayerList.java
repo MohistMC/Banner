@@ -57,4 +57,8 @@ public interface InjectionPlayerList {
     default ServerStatsCounter getPlayerStats(UUID uuid, String displayName) {
         return null;
     }
+
+    default String bridge$quiltMsg() {
+        return null;
+    }
 }

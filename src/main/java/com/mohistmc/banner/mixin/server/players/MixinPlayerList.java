@@ -365,6 +365,8 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         return banner$savePlayer.get().getAdvancements();
     }
 
+    public String quitMsg;
+
     /**
      * @author wdog5
      * @reason bukkit
@@ -428,7 +430,13 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         playerIn.getBukkitEntity().disconnect(playerQuitEvent.getQuitMessage());
         playerIn.doTick(); // SPIGOT-924
         // CraftBukkit end
+
+        this.quitMsg = playerQuitEvent.getQuitMessage();
         return playerQuitEvent.getQuitMessage();
+    }
+
+    public String bridge$quiltMsg() {
+        return quitMsg;
     }
 
     @Override
