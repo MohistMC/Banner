@@ -141,6 +141,7 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements Comman
         return false;
     }
 
+    @Override
     public CommandSender getBukkitSender(CommandSourceStack wrapper) {
         return wrapper.getEntity() != null ? wrapper.getEntity().getBukkitSender(wrapper) : new CraftBlockCommandSender(wrapper, (BlockEntity) (Object) this);
     }
