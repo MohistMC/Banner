@@ -188,7 +188,7 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
                     l = this.getCarried().getCount();
                     Iterator iterator = this.quickcraftSlots.iterator();
 
-                    Map<Integer, ItemStack> draggedSlots = new HashMap<Integer, ItemStack>(); // CraftBukkit - Store slots from drag in map (raw slot id -> new stack)
+                    Map<Integer, ItemStack> draggedSlots = new HashMap<>(); // CraftBukkit - Store slots from drag in map (raw slot id -> new stack)
                     while (iterator.hasNext()) {
                         Slot slot1 = (Slot) iterator.next();
                         ItemStack itemstack2 = this.getCarried();
@@ -208,7 +208,7 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
                     InventoryView view = getBukkitView();
                     org.bukkit.inventory.ItemStack newcursor = CraftItemStack.asCraftMirror(itemstack1);
                     newcursor.setAmount(l);
-                    Map<Integer, org.bukkit.inventory.ItemStack> eventmap = new HashMap<Integer, org.bukkit.inventory.ItemStack>();
+                    Map<Integer, org.bukkit.inventory.ItemStack> eventmap = new HashMap<>();
                     for (Map.Entry<Integer, ItemStack> ditem : draggedSlots.entrySet()) {
                         eventmap.put(ditem.getKey(), CraftItemStack.asBukkitCopy(ditem.getValue()));
                     }

@@ -69,8 +69,7 @@ public class MixinTeleportCommand {
                 }
 
                 label23: {
-                    if (entity instanceof LivingEntity) {
-                        LivingEntity livingEntity = (LivingEntity)entity;
+                    if (entity instanceof LivingEntity livingEntity) {
                         if (livingEntity.isFallFlying()) {
                             break label23;
                         }
@@ -80,8 +79,7 @@ public class MixinTeleportCommand {
                     entity.setOnGround(true);
                 }
 
-                if (entity instanceof PathfinderMob) {
-                    PathfinderMob pathfinderMob = (PathfinderMob)entity;
+                if (entity instanceof PathfinderMob pathfinderMob) {
                     pathfinderMob.getNavigation().stop();
                 }
 

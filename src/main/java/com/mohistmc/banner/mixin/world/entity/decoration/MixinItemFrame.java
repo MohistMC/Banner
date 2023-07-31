@@ -70,15 +70,9 @@ public abstract class MixinItemFrame extends HangingEntity implements InjectionI
         double d4 = width;
         Direction.Axis enumdirection_enumaxis = direction.getAxis();
         switch (enumdirection_enumaxis) {
-            case X -> {
-                d2 = 1.0;
-            }
-            case Y -> {
-                d3 = 1.0;
-            }
-            case Z -> {
-                d4 = 1.0;
-            }
+            case X -> d2 = 1.0;
+            case Y -> d3 = 1.0;
+            case Z -> d4 = 1.0;
         }
         d2 /= 32.0;
         d3 /= 32.0;

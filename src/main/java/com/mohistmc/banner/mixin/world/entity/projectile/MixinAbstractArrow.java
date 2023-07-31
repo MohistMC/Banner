@@ -16,15 +16,12 @@ import org.bukkit.craftbukkit.v1_20_R1.entity.CraftItem;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
-import org.bukkit.projectiles.ProjectileSource;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(net.minecraft.world.entity.projectile.AbstractArrow.class)
 public abstract class MixinAbstractArrow extends Projectile {
@@ -76,15 +73,6 @@ public abstract class MixinAbstractArrow extends Projectile {
                 playerEntity.take((net.minecraft.world.entity.projectile.AbstractArrow) (Object) this, 1);
                 this.discard();
             }
-        }
-    }
-
-    @Inject(method = "setOwner", at = @At("HEAD"))
-    private void banner$setShooter(Entity entityIn, CallbackInfo ci) {
-        if (this.bridge$projectileSource() == entityIn || this.bridge$projectileSource() == null) {
-            this.banner$setProjectileSource(entityIn.bridge$projectileSource());
-        }else {
-            this.banner$setProjectileSource((ProjectileSource) entityIn.getBukkitEntity());
         }
     }
 }

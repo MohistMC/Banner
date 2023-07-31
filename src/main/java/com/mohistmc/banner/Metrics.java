@@ -2,7 +2,6 @@ package com.mohistmc.banner;
 
 import com.mohistmc.banner.api.ServerAPI;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.thread.NamedThreadFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;

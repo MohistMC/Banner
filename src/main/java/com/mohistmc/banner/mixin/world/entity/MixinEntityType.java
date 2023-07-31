@@ -30,7 +30,7 @@ public abstract class MixinEntityType<T extends Entity> implements InjectionEnti
 
     @Shadow
     public static Optional<Entity> create(CompoundTag tag, Level level) {
-        return null;
+        return Optional.empty();
     }
 
     @Shadow @Nullable public abstract T create(ServerLevel level, @Nullable CompoundTag nbt, @Nullable Consumer<T> consumer, BlockPos pos, MobSpawnType spawnType, boolean shouldOffsetY, boolean shouldOffsetYMore);

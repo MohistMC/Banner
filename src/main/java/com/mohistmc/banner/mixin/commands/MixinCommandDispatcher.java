@@ -47,8 +47,7 @@ public class MixinCommandDispatcher<S> {
 
         while (contexts != null) {
             final int size = contexts.size();
-            for (int i = 0; i < size; i++) {
-                final CommandContext<S> context = contexts.get(i);
+            for (final CommandContext<S> context : contexts) {
                 final CommandContext<S> child = context.getChild();
                 if (child != null) {
                     forked |= context.isForked();

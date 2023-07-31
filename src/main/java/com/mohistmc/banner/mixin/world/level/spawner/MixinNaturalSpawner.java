@@ -90,8 +90,7 @@ public abstract class MixinNaturalSpawner {
 
         LevelData worlddata = worldserver.getLevelData(); // CraftBukkit - Other mob type spawn tick rate
 
-        for (int j = 0; j < i; ++j) {
-            MobCategory enumcreaturetype = aenumcreaturetype[j];
+        for (MobCategory enumcreaturetype : aenumcreaturetype) {
             // CraftBukkit start - Use per-world spawn limits
             boolean spawnThisTick = true;
             int limit = enumcreaturetype.getMaxInstancesPerChunk();
@@ -105,7 +104,7 @@ public abstract class MixinNaturalSpawner {
                 continue;
             }
 
-            if ((flag || !enumcreaturetype.isFriendly()) && (flag1 || enumcreaturetype.isFriendly()) && (flag2 || !enumcreaturetype.isPersistent()) &&  ((InjectionSpawnState) spawnercreature_d).canSpawnForCategory(enumcreaturetype, chunk.getPos(), limit)) {
+            if ((flag || !enumcreaturetype.isFriendly()) && (flag1 || enumcreaturetype.isFriendly()) && (flag2 || !enumcreaturetype.isPersistent()) && ((InjectionSpawnState) spawnercreature_d).canSpawnForCategory(enumcreaturetype, chunk.getPos(), limit)) {
                 // CraftBukkit end
                 Objects.requireNonNull(spawnercreature_d);
                 NaturalSpawner.SpawnPredicate spawnercreature_c = spawnercreature_d::canSpawn;

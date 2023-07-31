@@ -87,9 +87,9 @@ dependencies {
 	implementation "jline:jline:2.14.6"
 	implementation "com.googlecode.json-simple:json-simple:1.1.1"
 	implementation "org.xerial:sqlite-jdbc:3.42.0.0"
-	implementation "com.mysql:mysql-connector-j:8.0.32"
+	implementation "com.mysql:mysql-connector-j:8.0.33"
 
-	implementation "net.md-5:SpecialSource:1.11.0"
+	implementation "net.md-5:SpecialSource:1.11.2"
 
 	// spigot
 	implementation "net.md-5:bungeecord-chat:1.16-R0.4"
@@ -128,8 +128,8 @@ dependencies {
 	implementation "io.netty:netty-transport-native-unix-common:4.1.82.Final"
 
 	// jansi support
-	implementation(include("org.jline:jline-terminal:3.12.1"))
-	implementation(include("org.jline:jline-terminal-jansi:3.12.1"))
+	implementation(include("org.jline:jline-terminal:3.21.0"))
+	implementation(include("org.jline:jline-terminal-jansi:3.21.0"))
 	implementation(include("net.minecrell:terminalconsoleappender:1.4.0"))
 
 	//class modify

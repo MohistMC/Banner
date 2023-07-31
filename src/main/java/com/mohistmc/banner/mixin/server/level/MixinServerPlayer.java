@@ -709,7 +709,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     private AtomicReference<String> banner$deathString = new AtomicReference<>("null");
     private AtomicReference<String> banner$deathMsg = new AtomicReference<>("null");
 
-    private AtomicReference<PlayerDeathEvent> banner$deathEvent = new AtomicReference<PlayerDeathEvent>();
+    private AtomicReference<PlayerDeathEvent> banner$deathEvent = new AtomicReference<>();
 
     @Inject(method = "die", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z",
@@ -720,7 +720,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         if (this.isRemoved()) {
             ci.cancel();
         }
-        java.util.List<org.bukkit.inventory.ItemStack> loot = new java.util.ArrayList<org.bukkit.inventory.ItemStack>(this.getInventory().getContainerSize());
+        java.util.List<org.bukkit.inventory.ItemStack> loot = new java.util.ArrayList<>(this.getInventory().getContainerSize());
         boolean keepInventory = this.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) || this.isSpectator();
 
         if (!keepInventory) {
@@ -757,7 +757,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             target = "Lnet/minecraft/world/damagesource/CombatTracker;getDeathMessage()Lnet/minecraft/network/chat/Component;"),
             cancellable = true)
     private void banner$checkDead(DamageSource damageSource, CallbackInfo ci) {
-        boolean banner$flag = banner$deathString.get() != null && banner$deathString.get().length() > 0;
+        boolean banner$flag = banner$deathString.get() != null && !banner$deathString.get().isEmpty();
         if (!banner$flag) { // TODO: allow plugins to override?
             ci.cancel();
         }

@@ -58,10 +58,8 @@ public class MixinServerAdvancementManager {
         });
         AdvancementList advancementList = new AdvancementList();
         advancementList.add(map);
-        Iterator var6 = advancementList.getRoots().iterator();
 
-        while(var6.hasNext()) {
-            Advancement advancement = (Advancement)var6.next();
+        for (Advancement advancement : advancementList.getRoots()) {
             if (advancement.getDisplay() != null) {
                 TreeNodePosition.run(advancement);
             }

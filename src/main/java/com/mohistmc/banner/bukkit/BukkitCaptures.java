@@ -79,7 +79,7 @@ public class BukkitCaptures {
     }
 
     public static BlockBreakEventContext popPrimaryBlockBreakEvent() {
-        if (blockBreakEventStack.size() > 0) {
+        if (!blockBreakEventStack.isEmpty()) {
             BlockBreakEventContext eventContext = blockBreakEventStack.pop();
 
             // deal with unhandled secondary events
@@ -90,7 +90,7 @@ public class BukkitCaptures {
                 eventContext = blockBreakEventStack.pop();
             }
 
-            if (unhandledEvents.size() > 0) {
+            if (!unhandledEvents.isEmpty()) {
                 eventContext.mergeAllDrops(unhandledEvents);
             }
 
@@ -101,7 +101,7 @@ public class BukkitCaptures {
     }
 
     public static BlockBreakEventContext popSecondaryBlockBreakEvent() {
-        if (blockBreakEventStack.size() > 0) {
+        if (!blockBreakEventStack.isEmpty()) {
             BlockBreakEventContext eventContext = blockBreakEventStack.peek();
             if (!eventContext.isPrimary()) {
                 return blockBreakEventStack.pop();
@@ -172,7 +172,7 @@ public class BukkitCaptures {
         }
     }
 
-    private static transient AbstractContainerMenu banner$capturedContainer;
+    private static AbstractContainerMenu banner$capturedContainer;
 
     public static void captureWorkbenchContainer(AbstractContainerMenu container) {
         banner$capturedContainer = container;
@@ -186,7 +186,7 @@ public class BukkitCaptures {
         }
     }
 
-    private static transient Entity damageEventEntity;
+    private static Entity damageEventEntity;
 
     public static void captureDamageEventEntity(Entity entity) {
         damageEventEntity = entity;
@@ -200,7 +200,7 @@ public class BukkitCaptures {
         }
     }
 
-    private static transient BlockPos damageEventBlock;
+    private static BlockPos damageEventBlock;
 
     public static void captureDamageEventBlock(BlockPos blockState) {
         damageEventBlock = blockState;
@@ -214,7 +214,7 @@ public class BukkitCaptures {
         }
     }
 
-    private static transient Player containerOwner;
+    private static Player containerOwner;
 
     public static void captureContainerOwner(Player entity) {
         containerOwner = entity;
@@ -228,7 +228,7 @@ public class BukkitCaptures {
         containerOwner = null;
     }
 
-    private static transient CraftPortalEvent craftPortalEvent;
+    private static CraftPortalEvent craftPortalEvent;
 
     public static void captureCraftPortalEvent(CraftPortalEvent event) {
         craftPortalEvent = event;
@@ -242,8 +242,8 @@ public class BukkitCaptures {
         }
     }
 
-    private static transient Entity endPortalEntity;
-    private static transient boolean spawnPortal;
+    private static Entity endPortalEntity;
+    private static boolean spawnPortal;
 
     public static void captureEndPortalEntity(Entity entity, boolean portal) {
         endPortalEntity = entity;
@@ -277,7 +277,7 @@ public class BukkitCaptures {
         }
     }
 
-    private static transient BlockEntity tickingBlockEntity;
+    private static BlockEntity tickingBlockEntity;
 
     public static void captureTickingBlockEntity(BlockEntity entity) {
         tickingBlockEntity = entity;

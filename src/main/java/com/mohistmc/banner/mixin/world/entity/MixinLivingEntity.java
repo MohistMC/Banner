@@ -514,7 +514,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         if (!this.isInvulnerableTo(damagesource)) {
             final boolean human = ((LivingEntity) (Object) this) instanceof Player;
             float originalDamage = f;
-            Function<Double, Double> hardHat = new Function<Double, Double>() {
+            Function<Double, Double> hardHat = new Function<>() {
                 @Override
                 public Double apply(Double f) {
                     if (damagesource.is(DamageTypeTags.DAMAGES_HELMET) && !getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
@@ -527,7 +527,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
             float hardHatModifier = hardHat.apply((double) f).floatValue();
             f += hardHatModifier;
 
-            Function<Double, Double> blocking = new Function<Double, Double>() {
+            Function<Double, Double> blocking = new Function<>() {
                 @Override
                 public Double apply(Double f) {
                     return -((isDamageSourceBlocked(damagesource)) ? f : 0.0);
@@ -536,7 +536,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
             float blockingModifier = blocking.apply((double) f).floatValue();
             f += blockingModifier;
 
-            Function<Double, Double> armor = new Function<Double, Double>() {
+            Function<Double, Double> armor = new Function<>() {
                 @Override
                 public Double apply(Double f) {
                     return -(f - getDamageAfterArmorAbsorb(damagesource, f.floatValue()));
@@ -545,7 +545,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
             float armorModifier = armor.apply((double) f).floatValue();
             f += armorModifier;
 
-            Function<Double, Double> resistance = new Function<Double, Double>() {
+            Function<Double, Double> resistance = new Function<>() {
                 @Override
                 public Double apply(Double f) {
                     if (!damagesource.is(DamageTypeTags.BYPASSES_EFFECTS) && hasEffect(MobEffects.DAMAGE_RESISTANCE) && !damagesource.is(DamageTypeTags.BYPASSES_RESISTANCE)) {
@@ -560,7 +560,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
             float resistanceModifier = resistance.apply((double) f).floatValue();
             f += resistanceModifier;
 
-            Function<Double, Double> magic = new Function<Double, Double>() {
+            Function<Double, Double> magic = new Function<>() {
                 @Override
                 public Double apply(Double f) {
                     return -(f - getDamageAfterMagicAbsorb(damagesource, f.floatValue()));
@@ -569,7 +569,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
             float magicModifier = magic.apply((double) f).floatValue();
             f += magicModifier;
 
-            Function<Double, Double> absorption = new Function<Double, Double>() {
+            Function<Double, Double> absorption = new Function<>() {
                 @Override
                 public Double apply(Double f) {
                     return -(Math.max(f - Math.max(f - getAbsorptionAmount(), 0.0F), 0.0F));
@@ -631,8 +631,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
             if (f2 > 0.0F && f2 < 3.4028235E37F) {
                 Entity entity = damagesource.getEntity();
 
-                if (entity instanceof ServerPlayer) {
-                    ServerPlayer entityplayer = (ServerPlayer) entity;
+                if (entity instanceof ServerPlayer entityplayer) {
 
                     entityplayer.awardStat(Stats.DAMAGE_DEALT_ABSORBED, Math.round(f2 * 10.0F));
                 }

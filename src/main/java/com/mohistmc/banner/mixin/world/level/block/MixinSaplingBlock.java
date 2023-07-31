@@ -45,7 +45,7 @@ public class MixinSaplingBlock {
             level.banner$setCaptureTreeGeneration(true);
             this.treeGrower.growTree(level, level.getChunkSource().getGenerator(), pos, state, random);
             level.banner$setCaptureTreeGeneration(false);
-            if (level.bridge$capturedBlockStates().size() > 0) {
+            if (!level.bridge$capturedBlockStates().isEmpty()) {
                 TreeType treeType = BukkitExtraConstants.treeType;
                 BukkitExtraConstants.treeType = null;
                 Location location = CraftLocation.toBukkit(pos, level.getWorld());

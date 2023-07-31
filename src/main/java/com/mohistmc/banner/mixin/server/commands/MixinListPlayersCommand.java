@@ -24,8 +24,7 @@ public class MixinListPlayersCommand {
             locals = LocalCapture.CAPTURE_FAILHARD)
     private static void banner$format(CommandSourceStack source, Function<ServerPlayer, Component> nameExtractor, CallbackInfoReturnable<Integer> cir, PlayerList playerList, List<ServerPlayer> list) {
         // CraftBukkit start
-        if (source.getBukkitSender() instanceof org.bukkit.entity.Player) {
-            org.bukkit.entity.Player sender = (org.bukkit.entity.Player) source.getBukkitSender();
+        if (source.getBukkitSender() instanceof org.bukkit.entity.Player sender) {
             list = list.stream().filter((ep) -> sender.canSee(ep.getBukkitEntity())).collect(java.util.stream.Collectors.toList());
         }
         // CraftBukkit end

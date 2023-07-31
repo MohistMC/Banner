@@ -241,10 +241,9 @@ public class DynamicEnumHelper {
         Field[] var2 = Class.class.getDeclaredFields();
         int var3 = var2.length;
 
-        for(int var4 = 0; var4 < var3; ++var4) {
-            Field field = var2[var4];
+        for (Field field : var2) {
             if (field.getName().contains(fieldName)) {
-                setFailsafeFieldValue(field, enumClass, (Object)null);
+                setFailsafeFieldValue(field, enumClass, (Object) null);
                 break;
             }
         }

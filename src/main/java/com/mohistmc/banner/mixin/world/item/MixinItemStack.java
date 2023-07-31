@@ -242,7 +242,7 @@ public abstract class MixinItemStack implements InjectionItemStack {
             this.setCount(oldCount);
             this.setTagClone(oldData);
             world.banner$setCaptureBlockStates(false);
-            if (interactionResult.consumesAction() && world.bridge$captureTreeGeneration() && world.bridge$capturedBlockStates().size() > 0) {
+            if (interactionResult.consumesAction() && world.bridge$captureTreeGeneration() && !world.bridge$capturedBlockStates().isEmpty()) {
                 world.banner$setCaptureTreeGeneration(false);
                 Location location = CraftLocation.toBukkit(blockPos, world.getWorld());
                 TreeType treeType = BukkitExtraConstants.treeType;
@@ -332,8 +332,7 @@ public abstract class MixinItemStack implements InjectionItemStack {
                     if (this.item instanceof RecordItem) {
                         BlockEntity tileentity = world.getBlockEntity(blockPos);
 
-                        if (tileentity instanceof JukeboxBlockEntity) {
-                            JukeboxBlockEntity tileentityjukebox = (JukeboxBlockEntity) tileentity;
+                        if (tileentity instanceof JukeboxBlockEntity tileentityjukebox) {
 
                             // There can only be one
                             ItemStack record = this.copy();

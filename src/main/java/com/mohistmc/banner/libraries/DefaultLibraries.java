@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DefaultLibraries {
 
     public static final HashMap<String, String> fail = new HashMap<>();
+    public static final AtomicLong allSize = new AtomicLong(); // global
     public static final String MAVENURL;
 
     static {
@@ -39,20 +40,18 @@ public class DefaultLibraries {
         LinkedHashMap<File, String> libs = getDefaultLibs();
         AtomicLong currentSize = new AtomicLong();
         Set<File> defaultLibs = new LinkedHashSet<>();
-        AtomicLong allSize = new AtomicLong(); // global
         for (File lib : getDefaultLibs().keySet()) {
             if (lib.exists() && MD5Util.getMd5(lib).equals(libs.get(lib))) {
                 currentSize.addAndGet(lib.length());
                 continue;
             }
-            allSize.addAndGet(UpdateUtils.getAllSizeOfUrl(libUrl(lib)));
             defaultLibs.add(lib);
         }
         for (File lib : defaultLibs) {
             lib.getParentFile().mkdirs();
 
             String u = libUrl(lib);
-            System.out.println(BannerMCStart.I18N.get("libraries.global.percentage") + Math.round((float) (currentSize.get() * 100) / allSize.get()) + "%"); //Global percentage
+            System.out.println(BannerMCStart.I18N.get("libraries.global.percentage", Math.round((float) (currentSize.get() * 100) / allSize.get()) + "%")); //Global percentage
             try {
                 UpdateUtils.downloadFile(u, lib, libs.get(lib));
                 currentSize.addAndGet(lib.length());
@@ -89,6 +88,7 @@ public class DefaultLibraries {
         while ((str = b.readLine()) != null) {
             String[] s = str.split("\\|");
             temp.put(new File(FabricLoader.getInstance().getGameDir() + "/" + s[0]), s[1]);
+            allSize.addAndGet(Long.parseLong(s[2]));
         }
         b.close();
         return temp;
