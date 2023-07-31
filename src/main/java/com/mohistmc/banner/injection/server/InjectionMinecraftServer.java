@@ -99,4 +99,8 @@ public interface InjectionMinecraftServer {
 
     default void executeModerately() {
     }
+
+    default double[] getTPS() {
+        return new double[0];
+    }
 }

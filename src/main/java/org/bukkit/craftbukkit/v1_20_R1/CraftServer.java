@@ -2215,7 +2215,7 @@ public final class CraftServer implements Server {
     @Override
     @NotNull
     public double[] getTPS() {
-        return new double[0];
+        return getServer().getTPS();
     }
 
     @Override
