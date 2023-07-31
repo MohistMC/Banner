@@ -146,7 +146,7 @@ public class BannerConfig {
         enchantment_fix = getBoolean("anvilfix.enchantment_fix", false);
         max_enchantment_level = getInt("anvilfix.max_enchantment_level", 32767);
         isSymlinkWorld = getBoolean("compat.symlink_world", true);
-        skipOtherWorldPreparing = getBoolean("world.skipOtherWorldPreparing", false);
+        skipOtherWorldPreparing = getBoolean("compat.skipOtherWorldPreparing", false);
         server_thread = getInt("threadpriority.server_thread", 8);
         nospawnEntity = getList("entity.nospawn", Collections.emptyList());
         clear_item = getBoolean("entity.clear.item.enable", false);
