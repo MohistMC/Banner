@@ -3,7 +3,8 @@ package com.mohistmc.banner.libraries;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.impl.launch.FabricLauncher;
 import net.fabricmc.loader.impl.launch.FabricLauncherBase;
-import net.fabricmc.loader.impl.util.UrlUtil;
+import net.fabricmc.loader.util.UrlConversionException;
+import net.fabricmc.loader.util.UrlUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,7 +23,7 @@ public class KnotLibraryHelper {
                 launcher.setAllowedPrefixes(UrlUtil.asPath(file.toURI().toURL()));
                 launcher.addToClassPath(UrlUtil.asPath(file.toURI().toURL()));
             }
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | UrlConversionException e) {
             e.printStackTrace();
             LOGGER.info("ERROR: Got " + e.getClass().getSimpleName() + " while accessing Fabric Loader.");
         }
