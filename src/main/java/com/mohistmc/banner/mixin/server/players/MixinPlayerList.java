@@ -157,6 +157,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Shadow protected abstract void save(ServerPlayer player);
 
+    @Shadow @Final private Map<UUID, ServerStatsCounter> stats;
     private CraftServer cserver;
 
     private static final AtomicReference<String> PROFILE_NAMES = new AtomicReference<>();
@@ -776,6 +777,11 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
      */
     @Overwrite
     public ServerStatsCounter getPlayerStats(net.minecraft.world.entity.player.Player player) {
+        // Banner start - add a null method to provide a inject point to compat with easy auth
+        if (player == null) {
+            this.stats.put(player.getUUID(), null);
+        }
+        // Banner end
         return getPlayerStats((ServerPlayer) player);
     }
 
