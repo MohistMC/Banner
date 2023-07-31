@@ -3,10 +3,8 @@ package com.mohistmc.banner.eventhandler.dispatcher;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.minecraft.core.PositionImpl;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.portal.PortalInfo;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_20_R1.util.CraftLocation;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
@@ -20,9 +18,11 @@ public class EntityEventDispatcher {
                         PlayerTeleportEvent.TeleportCause.NETHER_PORTAL,
                         16, 16);
             }else if (destination.getTypeKey() == LevelStem.END) {
-                originalEntity.callPortalEvent(originalEntity, destination, new PositionImpl(pos.getX(), pos.getY(), pos.getZ()),
-                        PlayerTeleportEvent.TeleportCause.END_PORTAL,
-                        128, 16);
+                if (Bukkit.getAllowEnd()) {
+                    originalEntity.callPortalEvent(originalEntity, destination, new PositionImpl(pos.getX(), pos.getY(), pos.getZ()),
+                            PlayerTeleportEvent.TeleportCause.END_PORTAL,
+                            128, 16);
+                }
             }else {
                 originalEntity.callPortalEvent(originalEntity, destination, new PositionImpl(pos.getX(), pos.getY(), pos.getZ()),
                         PlayerTeleportEvent.TeleportCause.UNKNOWN,
