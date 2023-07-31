@@ -260,11 +260,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         this.chatMessageChain = new FutureChain(server.bridge$chatExecutor());
     }
 
-    @ModifyConstant(method = "tick", constant = @Constant(longValue = 15000L))
-    private long banner$longValue(long constant) {
-        return 25000L; // CraftBukkit
-    }
-
     @Inject(method = "tick", at = @At("HEAD"))
     private void banner$timings(CallbackInfo ci) {
         SpigotTimings.playerConnectionTimer.startTiming(); // Spigot
