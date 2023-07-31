@@ -1,5 +1,6 @@
 package com.mohistmc.banner.bukkit.pluginfix;
 
+import com.mohistmc.banner.bukkit.pluginfix.patch.WorldEditPatcher;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
@@ -24,12 +25,19 @@ public class PluginFixManager {
         if (className.equals("com.earth2me.essentials.utils.VersionUtil")) {
             return helloWorld(clazz, "net.fabricmc.loader.launch.knot.KnotServer", "hello.World");
         }
-        if (className.equals("com.sk89q.worldedit.bukkit.adapter.Refraction")) {
-            return helloWorld(clazz, "net.minecraft.nbt.ListTag", "hello.World");
-        }
         if (className.equals("net.ess3.nms.refl.providers.ReflServerStateProvider")) {
             return helloWorld(clazz, "u", "U");
         }
+        if (className.equals("com.sk89q.worldedit.bukkit.BukkitAdapter")) {
+            return WorldEditPatcher.handleBukkitAdapter(clazz);
+        }
+        if (className.equals("com.sk89q.worldedit.bukkit.adapter.Refraction")) {
+            return WorldEditPatcher.handlePickName(clazz);
+        }
+        if (className.equals("com.sk89q.worldedit.extension.platform.Watchdog")) {
+            return WorldEditPatcher.handleWatchdog(clazz);
+        }
+        WorldEditPatcher.handleWatchdog(clazz);
         return clazz;
     }
 
