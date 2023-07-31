@@ -836,6 +836,16 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         banner$changeDimensionCause.set(cause);
     }
 
+    /**
+     * @author wdog5
+     * @reason bukkit
+     */
+    @Overwrite
+    @Nullable
+    public Component getTabListDisplayName() {
+        return listName; // CraftBukkit
+    }
+
     @Override
     public PlayerTeleportEvent.TeleportCause bridge$changeDimensionCause() {
         return banner$changeDimensionCause.get();
