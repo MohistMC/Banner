@@ -34,9 +34,6 @@ public class PluginFixManager {
         if (className.equals("com.sk89q.worldedit.bukkit.adapter.Refraction")) {
             return WorldEditPatcher.handlePickName(clazz);
         }
-        if (className.equals("com.sk89q.worldedit.extension.platform.Watchdog")) {
-            return WorldEditPatcher.handleWatchdog(clazz);
-        }
         WorldEditPatcher.handleWatchdog(clazz);
         return clazz;
     }
