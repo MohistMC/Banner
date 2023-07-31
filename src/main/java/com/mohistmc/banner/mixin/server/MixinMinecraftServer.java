@@ -1022,4 +1022,12 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     public boolean isSameThread() {
         return super.isSameThread() || this.isStopped(); // CraftBukkit - MC-142590
     }
+
+    public double[] getTPS() {
+        return new double[] {
+                tps1.getAverage(),
+                tps5.getAverage(),
+                tps15.getAverage()
+        };
+    }
 }
