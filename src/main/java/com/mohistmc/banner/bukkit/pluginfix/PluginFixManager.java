@@ -28,13 +28,7 @@ public class PluginFixManager {
         if (className.equals("net.ess3.nms.refl.providers.ReflServerStateProvider")) {
             return helloWorld(clazz, "u", "U");
         }
-        if (className.equals("com.sk89q.worldedit.bukkit.BukkitAdapter")) {
-            return WorldEditPatcher.handleBukkitAdapter(clazz);
-        }
-        if (className.equals("com.sk89q.worldedit.bukkit.adapter.Refraction")) {
-            return WorldEditPatcher.handlePickName(clazz);
-        }
-        WorldEditPatcher.handleWatchdog(clazz);
+        WorldEditPatcher.patchWorldEdit(className, clazz);
         return clazz;
     }
 

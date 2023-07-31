@@ -16,15 +16,30 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import java.util.Locale;
+import java.util.function.Consumer;
 
 public class WorldEditPatcher {
 
-    public static byte[] handleBukkitAdapter(byte[] clazz) {
-        ClassReader classReader = new ClassReader(clazz);
-        ClassNode classNode = new ClassNode();
-        ClassWriter classWriter = new ClassWriter(0);
-        classReader.accept(classNode, 0);
+    public static byte[] patchWorldEdit(String className, byte[] basicClass) {
+        Consumer<ClassNode> patcher = switch (className) {
+            case "com.sk89q.worldedit.bukkit.BukkitAdapter" -> WorldEditPatcher::handleBukkitAdapter;
+            case "com.sk89q.worldedit.bukkit.adapter.Refraction" -> WorldEditPatcher::handlePickName;
+            case "com.sk89q.worldedit.bukkit.adapter.impl.v1_20_R1.PaperweightAdapter$SpigotWatchdog" -> WorldEditPatcher::handleWatchdog;
+            default -> null;
+        };
+        return patcher == null ? basicClass : modifyPatch(basicClass, patcher);
+    }
 
+    private static byte[] modifyPatch(byte[] basicClass, Consumer<ClassNode> handler) {
+        ClassNode node = new ClassNode();
+        new ClassReader(basicClass).accept(node, 0);
+        handler.accept(node);
+        ClassWriter writer = new ClassWriter(0);
+        node.accept(writer);
+        return writer.toByteArray();
+    }
+
+    private static void handleBukkitAdapter(ClassNode node) {
         MethodNode standardize = new MethodNode(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_SYNTHETIC, "patcher$standardize",
                 Type.getMethodDescriptor(Type.getType(String.class), Type.getType(String.class)), null, null);
         try {
@@ -46,33 +61,12 @@ public class WorldEditPatcher {
         } catch (Throwable t) {
             t.printStackTrace();
         }
-        classNode.methods.add(standardize);
-        for (MethodNode method : classNode.methods) {
+        node.methods.add(standardize);
+        for (MethodNode method : node.methods) {
             if (method.name.equals("adapt")) {
-                handleAdapt(classNode, standardize, method);
+                handleAdapt(node, standardize, method);
             }
         }
-        classNode.accept(classWriter);
-        return classWriter.toByteArray();
-    }
-
-
-    public static byte[] handlePickName(byte[] clazz) {
-        ClassReader classReader = new ClassReader(clazz);
-        ClassNode classNode = new ClassNode();
-        ClassWriter classWriter = new ClassWriter(0);
-        classReader.accept(classNode, 0);
-
-        for (MethodNode method : classNode.methods) {
-            if (method.name.equals("pickName")) {
-                method.instructions.clear();
-                method.instructions.add(new VarInsnNode(Opcodes.ALOAD, 1));
-                method.instructions.add(new InsnNode(Opcodes.ARETURN));
-            }
-        }
-
-        classNode.accept(classWriter);
-        return classWriter.toByteArray();
     }
 
     private static void handleAdapt(ClassNode node, MethodNode standardize, MethodNode method) {
@@ -109,14 +103,21 @@ public class WorldEditPatcher {
         }
     }
 
-    public static byte[] handleWatchdog(byte[] clazz) {
-        ClassReader classReader = new ClassReader(clazz);
-        ClassNode classNode = new ClassNode();
-        ClassWriter classWriter = new ClassWriter(0);
-        classReader.accept(classNode, 0);
-        if (classNode.interfaces.size() == 1 && classNode.interfaces.get(0).equals("com/sk89q/worldedit/extension/platform/Watchdog")
-                && classNode.name.contains("SpigotWatchdog")) {
-            for (MethodNode method : classNode.methods) {
+    private static void handlePickName(ClassNode node) {
+        for (MethodNode method : node.methods) {
+            if (method.name.equals("pickName")) {
+                method.instructions.clear();
+                method.instructions.add(new VarInsnNode(Opcodes.ALOAD, 1));
+                method.instructions.add(new InsnNode(Opcodes.ARETURN));
+                return;
+            }
+        }
+    }
+
+    private static void handleWatchdog(ClassNode node) {
+        if (node.interfaces.size() == 1 && node.interfaces.get(0).equals("com/sk89q/worldedit/extension/platform/Watchdog")
+                && node.name.contains("SpigotWatchdog")) {
+            for (MethodNode method : node.methods) {
                 if (method.name.equals("<init>")) {
                     method.instructions.clear();
                     method.instructions.add(new TypeInsnNode(Opcodes.NEW, "java/lang/ClassNotFoundException"));
@@ -125,11 +126,9 @@ public class WorldEditPatcher {
                     method.instructions.add(new InsnNode(Opcodes.ATHROW));
                     method.tryCatchBlocks.clear();
                     method.localVariables.clear();
+                    return;
                 }
             }
         }
-
-        classNode.accept(classWriter);
-        return classWriter.toByteArray();
     }
 }
