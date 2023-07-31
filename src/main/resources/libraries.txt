@@ -1,4 +1,5 @@
 libraries/commons-lang/commons-lang/2.6-mohist/commons-lang-2.6-mohist.jar|755f5cdb5de00d072215340e8370daff
+libraries/commons-codec/commons-codec/1.16.0/commons-codec-1.16.0.jar|6e26920fa7228891980890cce06b718c|360738
 libraries/org/apache/maven/maven-artifact/3.8.5/maven-artifact-3.8.5.jar|ce473b0d9fbfd10fe147f03fe8707d67
 libraries/org/apache/maven/maven-builder-support/3.8.5/maven-builder-support-3.8.5.jar|fe19c6661c964ce89508900565c8524c
 libraries/org/apache/maven/maven-model/3.8.5/maven-model-3.8.5.jar|3be24835bb2379d50201f4d5958d643c
