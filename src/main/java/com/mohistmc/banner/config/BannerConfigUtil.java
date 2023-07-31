@@ -100,7 +100,7 @@ public class BannerConfigUtil {
     }
 
     public static boolean skipOtherWorldPreparing() {
-        String key = "world.skipOtherWorldPreparing";
+        String key = "compat.skipOtherWorldPreparing";
         if (yml.get(key) == null) {
             yml.set(key, false);
             save();
