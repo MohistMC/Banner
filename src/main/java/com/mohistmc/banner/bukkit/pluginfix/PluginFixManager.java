@@ -1,6 +1,5 @@
 package com.mohistmc.banner.bukkit.pluginfix;
 
-import com.mohistmc.banner.bukkit.pluginfix.patch.WorldEditPatcher;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
@@ -27,13 +26,6 @@ public class PluginFixManager {
         }
         if (className.equals("net.ess3.nms.refl.providers.ReflServerStateProvider")) {
             return helloWorld(clazz, "u", "U");
-        }
-        if (className.equals("com.sk89q.worldedit.bukkit.WorldEditPlugin")) {
-            System.setProperty("worldedit.bukkit.adapter", "com.sk89q.worldedit.bukkit.adapter.impl.v1_20_R1.PaperweightAdapter");
-        } else if (className.equals("com.sk89q.worldedit.bukkit.BukkitAdapter")) {
-            return WorldEditPatcher.handleBukkitAdapter(clazz);
-        } else if (className.equals("com.sk89q.worldedit.bukkit.adapter.impl.v1_20_R1.PaperweightAdapter")) {
-            return WorldEditPatcher.handlePaperweightAdapter(clazz);
         }
         return clazz;
     }
