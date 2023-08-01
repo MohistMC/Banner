@@ -513,6 +513,14 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     private transient PlayerRespawnEvent.RespawnReason banner$respawnReason;
     public ServerLevel banner$worldserver;
 
+    // Banner start - Fix mixin by apoli
+    public org.bukkit.World fromWorld;
+    public PlayerRespawnEvent respawnEvent;
+    public ServerLevel worldserver1;
+    public LevelData worlddata;
+    public ServerPlayer entityplayer_vanilla;
+    // Banner end
+
     @Override
     public ServerPlayer respawn(ServerPlayer playerIn, ServerLevel worldIn, boolean flag, Location location, boolean avoidSuffocation, PlayerRespawnEvent.RespawnReason respawnReason) {
         this.banner$loc = location;
@@ -551,11 +559,11 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         }
 
         ServerLevel worldserver_vanilla_1 = worldserver_vanilla != null && optional_vanilla.isPresent() ? worldserver_vanilla : this.server.overworld();
-        ServerPlayer entityplayer_vanilla = new ServerPlayer(this.server, worldserver_vanilla_1, playerIn.getGameProfile());
+        entityplayer_vanilla = new ServerPlayer(this.server, worldserver_vanilla_1, playerIn.getGameProfile());
         // Banner end
 
         ServerPlayer entityplayer1 = playerIn;
-        org.bukkit.World fromWorld = playerIn.getBukkitEntity().getWorld();
+        fromWorld = playerIn.getBukkitEntity().getWorld();
         playerIn.wonGame = false;
         // CraftBukkit end
 
@@ -603,7 +611,8 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
                     banner$loc = CraftLocation.toBukkit(vec3d, worldserver1.getWorld(), f1, 0.0F);
                 } else if (blockposition != null) {
                     entityplayer1.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.NO_RESPAWN_BLOCK_AVAILABLE, 0.0F));
-                    entityplayer1.setRespawnPosition(null, null, 0f, false, false, PlayerSpawnChangeEvent.Cause.RESET); // CraftBukkit - SPIGOT-5988: Clear respawn location when obstructed
+                    entityplayer1.pushChangeSpawnCause(PlayerSpawnChangeEvent.Cause.RESET);
+                    entityplayer1.setRespawnPosition(null, null, 0f, false, false);
                 }
             }
 
@@ -614,7 +623,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             }
 
             Player respawnPlayer = entityplayer1.getBukkitEntity();
-            PlayerRespawnEvent respawnEvent = new PlayerRespawnEvent(respawnPlayer, banner$loc, isBedSpawn && !flag2, flag2, banner$respawnReason);
+            respawnEvent = new PlayerRespawnEvent(respawnPlayer, banner$loc, isBedSpawn && !flag2, flag2, banner$respawnReason);
             cserver.getPluginManager().callEvent(respawnEvent);
             // Spigot Start
             if (playerIn.connection.isDisconnected()) {
@@ -630,7 +639,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             if (banner$worldserver == null) banner$worldserver = this.server.getLevel(playerIn.getRespawnDimension());
             banner$loc.setWorld(banner$worldserver.getWorld());
         }
-        ServerLevel worldserver1 = ((CraftWorld) banner$loc.getWorld()).getHandle();
+        worldserver1 = ((CraftWorld) banner$loc.getWorld()).getHandle();
         entityplayer1.moveTo(banner$loc.getX(), banner$loc.getY(), banner$loc.getZ(), banner$loc.getYaw(), banner$loc.getPitch());
         entityplayer1.connection.resetPosition();
         // CraftBukkit end
@@ -639,10 +648,9 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             entityplayer1.setPos(entityplayer1.getX(), entityplayer1.getY() + 1.0D, entityplayer1.getZ());
         }
 
-        int i = conqueredEnd ? 1 : 0;
         // CraftBukkit start
-        LevelData worlddata = worldserver1.getLevelData();
-        entityplayer1.connection.send(new ClientboundRespawnPacket(worldserver1.dimensionTypeId(), worldserver1.dimension(), BiomeManager.obfuscateSeed(worldserver1.getSeed()), entityplayer1.gameMode.getGameModeForPlayer(), entityplayer1.gameMode.getPreviousGameModeForPlayer(), worldserver1.isDebug(), worldserver1.isFlat(), (byte) i, entityplayer1.getLastDeathLocation(), entityplayer1.getPortalCooldown()));
+        worlddata = worldserver1.getLevelData();
+        entityplayer1.connection.send(new ClientboundRespawnPacket(worldserver1.dimensionTypeId(), worldserver1.dimension(), BiomeManager.obfuscateSeed(worldserver1.getSeed()), entityplayer1.gameMode.getGameModeForPlayer(), entityplayer1.gameMode.getPreviousGameModeForPlayer(), worldserver1.isDebug(), worldserver1.isFlat(), (byte) (conqueredEnd ? 1 : 0), entityplayer1.getLastDeathLocation(), entityplayer1.getPortalCooldown()));
         entityplayer1.connection.send(new ClientboundSetChunkCacheRadiusPacket((worldserver1.bridge$spigotConfig().viewDistance)));
         entityplayer1.connection.send(new ClientboundSetSimulationDistancePacket(worldserver1.bridge$spigotConfig().simulationDistance));
         entityplayer1.spawnIn(worldserver1);

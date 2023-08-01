@@ -25,6 +25,16 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class BukkitCaptures {
 
+    private static boolean banner$stopGlide = false;
+
+    public static void capturebanner$stopGlide(boolean f) {
+        banner$stopGlide = f;
+    }
+
+    public static boolean banner$stopGlide() {
+        return banner$stopGlide;
+    }
+
     private static PositionImpl positionImpl;
 
     public static void capturePositionImpl(PositionImpl position) {

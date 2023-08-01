@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.entity;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.injection.world.entity.InjectionEntity;
 import net.minecraft.BlockUtil;
 import net.minecraft.commands.CommandSource;
@@ -189,6 +190,8 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Shadow public abstract void positionRider(Entity passenger);
 
     @Shadow @Nullable public abstract Entity changeDimension(ServerLevel destination);
+
+    @Shadow public abstract boolean getSharedFlag(int p_20292_);
 
     private CraftEntity bukkitEntity;
     public final org.spigotmc.ActivationRange.ActivationType activationType =
@@ -862,6 +865,17 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
          this.bukkitEntity =  entityIn.getBukkitEntity();
         if (entityIn instanceof Mob) {
             ((Mob) entityIn).dropLeash(true, false);
+        }
+    }
+
+    @Inject(method = "setSharedFlag", at = @At("HEAD"))
+    private void banner$forwardHandle(int p_20116_, boolean p_20117_, CallbackInfo ci) {
+        if (BukkitCaptures.banner$stopGlide()) {
+            if (!(getSharedFlag(p_20116_) && !CraftEventFactory.callToggleGlideEvent((LivingEntity) (Object)this, false).isCancelled())) {
+                ci.cancel();
+                BukkitCaptures.capturebanner$stopGlide(false);
+                return;
+            }
         }
     }
 

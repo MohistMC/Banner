@@ -3,6 +3,7 @@ package com.mohistmc.banner.mixin.world.entity;
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.ProcessableEffect;
 import com.mohistmc.banner.injection.world.entity.InjectionLivingEntity;
 import io.izzel.arclight.mixin.Eject;
@@ -45,6 +46,7 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R1.CraftEquipmentSlot;
@@ -801,11 +803,9 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         return CraftEventFactory.handleBlockFormEvent(instance, pPos, pNewState, 3, (Entity) (Object) this);
     }
 
-    @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setSharedFlag(IZ)V"))
-    public void banner$stopGlide(LivingEntity livingEntity, int flag, boolean set) {
-        if (set != livingEntity.getSharedFlag(flag) && !CraftEventFactory.callToggleGlideEvent(livingEntity, set).isCancelled()) {
-            livingEntity.setSharedFlag(flag, set);
-        }
+    @Inject(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setSharedFlag(IZ)V"))
+    public void banner$stopGlide(Vec3 travelVector, CallbackInfo ci) {
+        BukkitCaptures.capturebanner$stopGlide(true);
     }
 
     @Redirect(method = "updateFallFlying", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setSharedFlag(IZ)V"))
