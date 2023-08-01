@@ -32,6 +32,8 @@ public class WatchdogThread extends Thread
 
     public static void doStart(int timeoutTime, boolean restart)
     {
+        // Banner Start - disabled watchdog
+        /*
         if ( instance == null )
         {
             instance = new WatchdogThread( timeoutTime * 1000L, restart );
@@ -40,12 +42,13 @@ public class WatchdogThread extends Thread
         {
             instance.timeoutTime = timeoutTime * 1000L;
             instance.restart = restart;
-        }
+        }*/
+        // Banner end
     }
 
     public static void tick()
     {
-        instance.lastTick = monotonicMillis();
+        //instance.lastTick = monotonicMillis(); // Banner - disabled
     }
 
     public static void doStop()
