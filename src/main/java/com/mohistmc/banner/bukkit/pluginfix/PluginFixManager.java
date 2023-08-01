@@ -28,7 +28,13 @@ public class PluginFixManager {
         if (className.equals("net.ess3.nms.refl.providers.ReflServerStateProvider")) {
             return helloWorld(clazz, "u", "U");
         }
-        WorldEditPatcher.patchWorldEdit(className, clazz);
+        if (className.equals("com.sk89q.worldedit.bukkit.WorldEditPlugin")) {
+            System.setProperty("worldedit.bukkit.adapter", "com.sk89q.worldedit.bukkit.adapter.impl.v1_18_R2.PaperweightAdapter");
+        } else if (className.equals("com.sk89q.worldedit.bukkit.BukkitAdapter")) {
+            return WorldEditPatcher.handleBukkitAdapter(clazz);
+        } else if (className.equals("com.sk89q.worldedit.bukkit.adapter.impl.v1_18_R2.PaperweightAdapter")) {
+            return WorldEditPatcher.handlePaperweightAdapter(clazz);
+        }
         return clazz;
     }
 
