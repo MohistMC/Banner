@@ -29,10 +29,10 @@ public class PluginFixManager {
             return helloWorld(clazz, "u", "U");
         }
         if (className.equals("com.sk89q.worldedit.bukkit.WorldEditPlugin")) {
-            System.setProperty("worldedit.bukkit.adapter", "com.sk89q.worldedit.bukkit.adapter.impl.v1_18_R2.PaperweightAdapter");
+            System.setProperty("worldedit.bukkit.adapter", "com.sk89q.worldedit.bukkit.adapter.impl.v1_20_R1.PaperweightAdapter");
         } else if (className.equals("com.sk89q.worldedit.bukkit.BukkitAdapter")) {
             return WorldEditPatcher.handleBukkitAdapter(clazz);
-        } else if (className.equals("com.sk89q.worldedit.bukkit.adapter.impl.v1_18_R2.PaperweightAdapter")) {
+        } else if (className.equals("com.sk89q.worldedit.bukkit.adapter.impl.v1_20_R1.PaperweightAdapter")) {
             return WorldEditPatcher.handlePaperweightAdapter(clazz);
         }
         return clazz;
