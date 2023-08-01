@@ -328,6 +328,9 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
     }
 
     CraftMetaItem(CompoundTag tag) {
+        if (tag == null) {
+            tag = new CompoundTag();
+        }
         if (tag.contains(DISPLAY.NBT)) {
             CompoundTag display = tag.getCompound(DISPLAY.NBT);
 
@@ -382,11 +385,9 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
 
         Set<String> keys = tag.getAllKeys();
         for (String key : keys) {
-            // Mohist start - handle modded tags
-            if (handleModdedTags(key)) {
+            if (!getHandledTags().contains(key)) {
                 unhandledTags.put(key, tag.get(key).copy());
             }
-            //Mohist end
         }
     }
 
@@ -527,7 +528,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
                 deserializeInternal(internalTag, map);
                 Set<String> keys = internalTag.getAllKeys();
                 for (String key : keys) {
-                    if (!getHandledTags().contains(key)) {
+                    if (!forceDeserializeInternalTags(getHandledTags(), key)) {
                         unhandledTags.put(key, internalTag.get(key));
                     }
                 }
@@ -543,13 +544,10 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
     }
 
     // Banner start - handle modded Tags
-    private boolean handleModdedTags(String key) {
-        if (this instanceof CraftMetaItem) {
-            return true;
-        } else {
-            return !getHandledTags().contains(key);
-        }
+    private boolean forceDeserializeInternalTags(Set<String> handledTags, Object key) {
+        return !(this instanceof CraftMetaItem) && handledTags.contains((String) key);
     }
+
 
     void deserializeInternal(CompoundTag tag, Object context) {
         // SPIGOT-4576: Need to migrate from internal to proper data
