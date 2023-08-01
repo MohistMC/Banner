@@ -802,6 +802,16 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         }
     }
 
+    @Redirect(method = "handlePlayerAction",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerPlayer;setItemInHand(Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/item/ItemStack;)V", ordinal = 0))
+    private void banner$cancelHeldItem0(ServerPlayer instance, InteractionHand hand, ItemStack stack) { }
+
+    @Redirect(method = "handlePlayerAction",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/level/ServerPlayer;setItemInHand(Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/item/ItemStack;)V", ordinal = 1))
+    private void banner$cancelHeldItem1(ServerPlayer instance, InteractionHand hand, ItemStack stack) { }
+
     @Inject(method = "handlePlayerAction",
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/server/level/ServerPlayer;stopUsingItem()V"),
