@@ -46,8 +46,7 @@ public abstract class MixinStandingAndWallBlockItem extends BlockItem {
         Direction[] var6 = context.getNearestLookingDirections();
         int var7 = var6.length;
 
-        for(int var8 = 0; var8 < var7; ++var8) {
-            Direction direction = var6[var8];
+        for (Direction direction : var6) {
             if (direction != this.attachmentDirection.getOpposite()) {
                 BlockState blockState3 = direction == this.attachmentDirection ? this.getBlock().getStateForPlacement(context) : blockState;
                 if (blockState3 != null && this.canPlace(levelReader, blockState3, blockPos)) {

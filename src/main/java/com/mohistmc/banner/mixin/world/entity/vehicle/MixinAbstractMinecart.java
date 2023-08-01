@@ -248,8 +248,8 @@ public abstract class MixinAbstractMinecart extends Entity {
                 List<Entity> list = this.level().getEntities((Entity) this, this.getBoundingBox().inflate(0.20000000298023224D, 0.0D, 0.20000000298023224D), EntitySelector.pushableBy(this));
 
                 if (!list.isEmpty()) {
-                    for (int l = 0; l < list.size(); ++l) {
-                        Entity entity = (Entity) list.get(l);
+                    for (Entity value : list) {
+                        Entity entity = (Entity) value;
 
                         if (!(entity instanceof Player) && !(entity instanceof IronGolem) && !(entity instanceof AbstractMinecart) && !this.isVehicle() && !entity.isPassenger()) {
                             // CraftBukkit start
@@ -277,11 +277,8 @@ public abstract class MixinAbstractMinecart extends Entity {
                     }
                 }
             } else {
-                Iterator iterator = this.level().getEntities(this, this.getBoundingBox().inflate(0.20000000298023224D, 0.0D, 0.20000000298023224D)).iterator();
 
-                while (iterator.hasNext()) {
-                    Entity entity1 = (Entity) iterator.next();
-
+                for (Entity entity1 : this.level().getEntities(this, this.getBoundingBox().inflate(0.20000000298023224D, 0.0D, 0.20000000298023224D))) {
                     if (!this.hasPassenger(entity1) && entity1.isPushable() && entity1 instanceof AbstractMinecart) {
                         // CraftBukkit start
                         VehicleEntityCollisionEvent collisionEvent = new VehicleEntityCollisionEvent(vehicle, entity1.getBukkitEntity());

@@ -4,7 +4,6 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.minecraft.core.PositionImpl;
 import net.minecraft.world.level.dimension.LevelStem;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 

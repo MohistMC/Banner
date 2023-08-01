@@ -91,7 +91,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.SpigotTimings;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventoryView;
@@ -135,11 +134,8 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -388,8 +384,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                 d8 = d5 - this.vehicleLastGoodZ;
                 boolean flag1 = entity.verticalCollisionBelow;
 
-                if (entity instanceof LivingEntity) {
-                    LivingEntity entityliving = (LivingEntity) entity;
+                if (entity instanceof LivingEntity entityliving) {
 
                     if (entityliving.onClimbable()) {
                         entityliving.resetFallDistance();
@@ -951,7 +946,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
             target = "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V"))
     private void banner$setQuitMsg(PlayerList instance, Component message, boolean bypassHiddenChat) {
         String quitMessage = this.server.getPlayerList().bridge$quiltMsg();
-        if ((quitMessage != null) && (quitMessage.length() > 0)) {
+        if ((quitMessage != null) && (!quitMessage.isEmpty())) {
             this.server.getPlayerList().broadcastMessage(CraftChatMessage.fromString(quitMessage));
         }
     }

@@ -279,7 +279,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         }
 
         banner$joinMsg.set(playerJoinEvent.getJoinMessage());
-        if (banner$joinMsg.get() != null && banner$joinMsg.get().length() > 0) {
+        if (banner$joinMsg.get() != null && !banner$joinMsg.get().isEmpty()) {
             for (Component line : CraftChatMessage.fromString(banner$joinMsg.get())) {
                 server.getPlayerList().broadcastSystemMessage(line, false);
             }
@@ -289,8 +289,8 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         // CraftBukkit start - sendAll above replaced with this loop
         ClientboundPlayerInfoUpdatePacket packet = ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(player));
 
-        for (int i = 0; i < this.players.size(); ++i) {
-            ServerPlayer entityplayer1 = (ServerPlayer) this.players.get(i);
+        for (ServerPlayer serverPlayer : this.players) {
+            ServerPlayer entityplayer1 = (ServerPlayer) serverPlayer;
 
             if (entityplayer1.getBukkitEntity().canSee(bukkitPlayer)) {
                 entityplayer1.connection.send(packet);
@@ -403,8 +403,8 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         }
         // CraftBukkit start
         ClientboundPlayerInfoRemovePacket packet = new ClientboundPlayerInfoRemovePacket(List.of(serverPlayer.getUUID()));
-        for (int i = 0; i < players.size(); i++) {
-            ServerPlayer entityplayer2 = (ServerPlayer) this.players.get(i);
+        for (ServerPlayer value : players) {
+            ServerPlayer entityplayer2 = (ServerPlayer) value;
 
             if (entityplayer2.getBukkitEntity().canSee(player.getBukkitEntity())) {
                 entityplayer2.connection.send(packet);
@@ -563,11 +563,8 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         entityplayer1.restoreFrom(playerIn, conqueredEnd);
         entityplayer1.setId(playerIn.getId());
         entityplayer1.setMainArm(playerIn.getMainArm());
-        Iterator iterator = playerIn.getTags().iterator();
 
-        while (iterator.hasNext()) {
-            String s = (String) iterator.next();
-
+        for (String s : playerIn.getTags()) {
             entityplayer1.addTag(s);
         }
 
@@ -761,7 +758,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         for (int i = 0; i < this.players.size(); ++i) {
             final ServerPlayer target = (ServerPlayer) this.players.get(i);
 
-            target.connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LATENCY), this.players.stream().filter(new Predicate<ServerPlayer>() {
+            target.connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LATENCY), this.players.stream().filter(new Predicate<>() {
                 @Override
                 public boolean test(ServerPlayer input) {
                     return target.getBukkitEntity().canSee(input.getBukkitEntity());

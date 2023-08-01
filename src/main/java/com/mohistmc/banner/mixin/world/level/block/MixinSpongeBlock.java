@@ -42,9 +42,7 @@ public abstract class MixinSpongeBlock extends Block {
             Direction[] aenumdirection = ALL_DIRECTIONS;
             int i = aenumdirection.length;
 
-            for (int j = 0; j < i; ++j) {
-                Direction enumdirection = aenumdirection[j];
-
+            for (Direction enumdirection : aenumdirection) {
                 consumer.accept(blockposition1.relative(enumdirection));
             }
 
@@ -62,8 +60,7 @@ public abstract class MixinSpongeBlock extends Block {
                 } else {
                     Block block = iblockdata.getBlock();
 
-                    if (block instanceof BucketPickup) {
-                        BucketPickup ifluidsource = (BucketPickup) block;
+                    if (block instanceof BucketPickup ifluidsource) {
 
                         if (!ifluidsource.pickupBlock(blockList, blockposition1, iblockdata).isEmpty()) { // CraftBukkit
                             return true;

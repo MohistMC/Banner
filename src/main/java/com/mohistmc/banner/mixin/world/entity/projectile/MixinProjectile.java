@@ -28,12 +28,7 @@ public abstract class MixinProjectile extends Entity implements InjectionProject
 
     @Inject(method = "setOwner", at = @At("RETURN"))
     private void banner$updateSource(Entity entityIn, CallbackInfo ci) {
-        if (entityIn != null) {
-            CraftEntity entity =  entityIn.getBukkitEntity();
-            if (entity instanceof ProjectileSource) {
-                this.banner$setProjectileSource(((ProjectileSource) entity));
-            }
-        }
+        this.banner$setProjectileSource((entityIn != null && entityIn.getBukkitEntity() instanceof ProjectileSource) ? (ProjectileSource) entityIn.getBukkitEntity() : null);
     }
 
     @Inject(method = "onHitBlock", cancellable = true, at = @At("HEAD"))

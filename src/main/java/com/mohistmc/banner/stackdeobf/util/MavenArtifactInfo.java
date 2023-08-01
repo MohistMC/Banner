@@ -7,12 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import java.net.URI;
 import java.util.Objects;
 
-public class MavenArtifactInfo {
-
-    private final String repoUrl;
-    private final String groupId;
-    private final String artifactId;
-    private final String classifier;
+public record MavenArtifactInfo(String repoUrl, String groupId, String artifactId, String classifier) {
 
     public MavenArtifactInfo(String repoUrl, String groupId, String artifactId, @Nullable String classifier) {
         this.repoUrl = repoUrl.endsWith("/") ? repoUrl : repoUrl + "/";
@@ -43,19 +38,8 @@ public class MavenArtifactInfo {
                 "/" + this.artifactId + "/" + version + "/" + fileName);
     }
 
-    public String getRepoUrl() {
-        return this.repoUrl;
-    }
-
-    public String getGroupId() {
-        return this.groupId;
-    }
-
-    public String getArtifactId() {
-        return this.artifactId;
-    }
-
-    public @Nullable String getClassifier() {
+    @Override
+    public @Nullable String classifier() {
         return this.classifier;
     }
 
@@ -67,15 +51,6 @@ public class MavenArtifactInfo {
         if (!this.groupId.equals(that.groupId)) return false;
         if (!this.artifactId.equals(that.artifactId)) return false;
         return Objects.equals(this.classifier, that.classifier);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = this.repoUrl.hashCode();
-        result = 31 * result + this.groupId.hashCode();
-        result = 31 * result + this.artifactId.hashCode();
-        result = 31 * result + (this.classifier != null ? this.classifier.hashCode() : 0);
-        return result;
     }
 
     @Override
