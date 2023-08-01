@@ -57,11 +57,19 @@ public abstract class MixinChunkMap extends ChunkStorage implements InjectionChu
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$updateRandom(ServerLevel serverLevel, LevelStorageSource.LevelStorageAccess levelStorageAccess, DataFixer dataFixer, StructureTemplateManager structureTemplateManager, Executor executor, BlockableEventLoop blockableEventLoop, LightChunkGetter lightChunkGetter, ChunkGenerator chunkGenerator, ChunkProgressListener chunkProgressListener, ChunkStatusUpdateListener chunkStatusUpdateListener, Supplier supplier, int i, boolean bl, CallbackInfo ci) {
-        // CraftBukkit start - SPIGOT-7051: It's a rigged game! Use delegate for random state creation, otherwise it is not so random.
-        if (chunkGenerator instanceof CustomChunkGenerator) {
-            chunkGenerator = ((CustomChunkGenerator) chunkGenerator).getDelegate();
+        this.setChunkGenerator(this.generator);
+    }
+
+    public void setChunkGenerator(ChunkGenerator generator) {
+        this.generator = generator;
+        if (generator instanceof CustomChunkGenerator custom) {
+            generator = custom.getDelegate();
         }
-        // CraftBukkit end
+        if (generator instanceof NoiseBasedChunkGenerator noisebasedchunkgenerator) {
+            this.randomState = RandomState.create(noisebasedchunkgenerator.generatorSettings().value(), this.level.registryAccess().lookupOrThrow(Registries.NOISE), this.level.getSeed());
+        } else {
+            this.randomState = RandomState.create(NoiseGeneratorSettings.dummy(), this.level.registryAccess().lookupOrThrow(Registries.NOISE), this.level.getSeed());
+        }
     }
 
     @Redirect(method = "upgradeChunkTag", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;dimension()Lnet/minecraft/resources/ResourceKey;"))
