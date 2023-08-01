@@ -868,12 +868,13 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         }
     }
 
-    @Inject(method = "setSharedFlag", at = @At("HEAD"))
-    private void banner$forwardHandle(int p_20116_, boolean p_20117_, CallbackInfo ci) {
+    @Inject(method = "setSharedFlag", at = @At("HEAD"),
+            cancellable = true)
+    private void banner$forwardHandle(int flag, boolean set, CallbackInfo ci) {
         if (BukkitCaptures.banner$stopGlide()) {
-            if (!(getSharedFlag(p_20116_) && !CraftEventFactory.callToggleGlideEvent((LivingEntity) (Object)this, false).isCancelled())) {
-                ci.cancel();
+            if (!(getSharedFlag(flag) && !CraftEventFactory.callToggleGlideEvent((LivingEntity) (Object)this, false).isCancelled())) {
                 BukkitCaptures.capturebanner$stopGlide(false);
+                ci.cancel();
                 return;
             }
         }
