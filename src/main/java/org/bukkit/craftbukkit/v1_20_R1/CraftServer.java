@@ -1007,11 +1007,6 @@ public final class CraftServer implements Server {
         return "CraftServer{" + "serverName=" + serverName + ",serverVersion=" + serverVersion + ",minecraftVersion=" + console.getServerVersion() + '}';
     }
 
-    // Banner start - add for F3 display
-    public String getBannerServerName() {
-        return serverName + "-" + serverVersion + " running on " + console.getServerVersion() + " for " + console.getServerName();
-    }
-
     public World createWorld(String name, World.Environment environment) {
         return WorldCreator.name(name).environment(environment).createWorld();
     }

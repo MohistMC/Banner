@@ -505,7 +505,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Inject(method = "getServerModName", at = @At(value = "HEAD"), remap = false, cancellable = true)
     private void banner$setServerModName(CallbackInfoReturnable<String> cir) {
         if (this.server != null) {
-            cir.setReturnValue(server.getBannerServerName());
+            cir.setReturnValue(server.getName());
         }
     }
 
