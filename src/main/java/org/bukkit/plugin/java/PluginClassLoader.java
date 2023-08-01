@@ -6,7 +6,6 @@ import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.bukkit.nms.ClassLoaderContext;
 import com.mohistmc.banner.bukkit.nms.model.ClassMapping;
 import com.mohistmc.banner.bukkit.nms.utils.RemapUtils;
-import com.mohistmc.banner.bukkit.pluginfix.IPluginFixer;
 import com.mohistmc.banner.bukkit.pluginfix.PluginFixManager;
 import net.md_5.specialsource.repo.RuntimeRepo;
 import org.bukkit.plugin.InvalidPluginException;
@@ -54,7 +53,6 @@ final class PluginClassLoader extends URLClassLoader {
     private final Set<String> seenIllegalAccess = Collections.newSetFromMap(new ConcurrentHashMap<>());
     public JavaPlugin getPlugin() { return plugin; } // Spigot
     private final Set<Package> packageCache = Collections.newSetFromMap(new ConcurrentHashMap<>());
-    private IPluginFixer pluginFixer; // Banner - add field
 
     static {
         ClassLoader.registerAsParallelCapable();
@@ -72,7 +70,6 @@ final class PluginClassLoader extends URLClassLoader {
         this.manifest = jar.getManifest();
         this.url = file.toURI().toURL();
         this.libraryLoader = libraryLoader;
-        this.pluginFixer = PluginFixManager.getPluginToFix(description.getName());
 
         try {
             Class<?> jarClass;
@@ -221,7 +218,8 @@ final class PluginClassLoader extends URLClassLoader {
                     bytecode = RemapUtils.remapFindClass(bytecode);
 
                     bytecode = modifyByteCode(name, bytecode); // Mohist: add entry point for asm or mixin
-                    if (this.pluginFixer != null) bytecode = this.pluginFixer.injectPluginFix(name, bytecode);// Banner - inject plugin fixers
+
+                    bytecode = PluginFixManager.injectPluginFix(name, bytecode); // Mohist - Inject plugin fix
 
                     JarURLConnection jarURLConnection = (JarURLConnection) url.openConnection();
                     URL jarURL = jarURLConnection.getJarFileURL();
