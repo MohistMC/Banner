@@ -1,12 +1,5 @@
 package com.mohistmc.banner.bukkit.nms.proxy;
 
-import com.mohistmc.banner.api.DynamicEnumHelper;
-import com.mohistmc.banner.bukkit.nms.model.ClassMapping;
-import com.mohistmc.banner.bukkit.nms.utils.RemapUtils;
-import net.md_5.specialsource.repo.RuntimeRepo;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
-
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
@@ -21,6 +14,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+
+import com.mohistmc.banner.api.DynamicEnumHelper;
+import com.mohistmc.banner.bukkit.nms.utils.RemapUtils;
+import net.md_5.specialsource.repo.RuntimeRepo;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 
 /**
  *
@@ -47,13 +46,9 @@ public class DelegateURLClassLoder extends URLClassLoader {
 
     @Override
     protected Class<?> findClass(final String name) throws ClassNotFoundException {
-        if (RemapUtils.needRemap(name)) {
-            ClassMapping remappedClassMapping = RemapUtils.jarMapping.byNMSName.get(name);
-            if(remappedClassMapping == null){
-                throw new ClassNotFoundException(name.replace('/','.'));
-            }
-            String remappedClass = remappedClassMapping.getMcpName();
-            return Class.forName(remappedClass);
+        if (RemapUtils.isNMSClass(name)) {
+            String mapName = RemapUtils.map(name.replace('.', '/')).replace('/', '.');
+            return Class.forName(mapName);
         }
         Class<?> result = this.classeCache.get(name);
         if (result != null) {

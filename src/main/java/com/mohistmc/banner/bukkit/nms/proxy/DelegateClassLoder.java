@@ -1,9 +1,9 @@
 package com.mohistmc.banner.bukkit.nms.proxy;
 
+import java.security.ProtectionDomain;
+
 import com.mohistmc.banner.bukkit.nms.utils.RemapUtils;
 import net.md_5.specialsource.repo.RuntimeRepo;
-
-import java.security.ProtectionDomain;
 
 public class DelegateClassLoder extends ClassLoader{
 

@@ -1,15 +1,14 @@
 package com.mohistmc.banner.bukkit.nms.remappers;
 
-import com.mohistmc.banner.bukkit.nms.utils.RemapUtils;
-import net.md_5.specialsource.provider.InheritanceProvider;
-import org.objectweb.asm.tree.ClassNode;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class BannerInheritanceProvider implements InheritanceProvider {
+import com.mohistmc.banner.bukkit.nms.utils.RemapUtils;
+import net.md_5.specialsource.provider.InheritanceProvider;
+import org.objectweb.asm.tree.ClassNode;
 
+public class BannerInheritanceProvider implements InheritanceProvider {
     @Override
     public Set<String> getParents(String className) {
         if (className.startsWith("org/springframework/")) {

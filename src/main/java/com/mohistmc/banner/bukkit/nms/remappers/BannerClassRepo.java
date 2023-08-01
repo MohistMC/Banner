@@ -1,12 +1,12 @@
 package com.mohistmc.banner.bukkit.nms.remappers;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import com.mohistmc.banner.bukkit.nms.ClassLoaderContext;
 import net.md_5.specialsource.repo.CachingRepo;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  *
