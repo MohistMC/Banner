@@ -37,8 +37,14 @@ public class RecipeIterator implements Iterator<Recipe> {
             current = recipes.next().getValue().values().iterator();
             return next();
         }
-
-        return current.next().toBukkitRecipe();
+        // Banner start - get more info about recipe
+        net.minecraft.world.item.crafting.Recipe<?> recipe = current.next();
+        try {
+            return  recipe.toBukkitRecipe();
+        } catch (Throwable e) {
+            throw new RuntimeException("Error converting recipe " + recipe.getId(), e);
+        }
+        // Banner end
     }
 
     @Override
