@@ -8,6 +8,7 @@ import com.mohistmc.banner.bukkit.nms.remappers.BannerSuperClassRemapper;
 import com.mohistmc.banner.bukkit.nms.remappers.ClassRemapperSupplier;
 import com.mohistmc.banner.bukkit.nms.remappers.ReflectMethodRemapper;
 import com.mohistmc.banner.bukkit.nms.remappers.ReflectRemapper;
+import net.md_5.specialsource.InheritanceMap;
 import net.md_5.specialsource.provider.JointProvider;
 import net.md_5.specialsource.transformer.MavenShade;
 import org.objectweb.asm.ClassReader;
@@ -55,6 +56,7 @@ public class RemapUtils {
 
         JointProvider provider = new JointProvider();
         provider.add(new BannerInheritanceProvider());
+        jarMapping.setInheritanceMap(new InheritanceMap());
         jarMapping.setFallbackInheritanceProvider(provider);
         jarRemapper = new BannerJarRemapper(jarMapping);
         remappers.add(jarRemapper);
