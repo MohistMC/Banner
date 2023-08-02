@@ -210,7 +210,7 @@ public class SpigotConfig
         restartOnCrash = getBoolean( "settings.restart-on-crash", restartOnCrash );
         restartScript = getString( "settings.restart-script", restartScript );
         restartMessage = transform( getString( "messages.restart", "Server is restarting" ) );
-        WatchdogThread.doStart( timeoutTime, restartOnCrash );
+        // WatchdogThread.doStart( timeoutTime, restartOnCrash ); // Banner - disabled
     }
 
     public static boolean bungee;

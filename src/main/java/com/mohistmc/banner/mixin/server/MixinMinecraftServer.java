@@ -382,7 +382,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                     this.services.profileCache().clearExecutor();
                 }
 
-                org.spigotmc.WatchdogThread.doStop(); // Spigot
+                //org.spigotmc.WatchdogThread.doStop(); // Spigot // Banner - disabled
                 // CraftBukkit start - Restore terminal to original settings
                 try {
                     reader.getTerminal().restore();
