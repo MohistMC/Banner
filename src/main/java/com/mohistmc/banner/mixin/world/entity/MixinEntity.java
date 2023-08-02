@@ -32,6 +32,7 @@ import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.ProtectionEnchantment;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.border.WorldBorder;
@@ -193,6 +194,8 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
 
     @Shadow public abstract boolean getSharedFlag(int p_20292_);
 
+    @Shadow public abstract void setRemainingFireTicks(int remainingFireTicks);
+
     private CraftEntity bukkitEntity;
     public final org.spigotmc.ActivationRange.ActivationType activationType =
             org.spigotmc.ActivationRange.initializeEntityActivationType((Entity) (Object) this);
@@ -297,6 +300,26 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Inject(method = "setSecondsOnFire", at = @At("HEAD"))
     private void banner$setSecondsOnFire(int seconds, CallbackInfo ci) {
         setSecondsOnFire(seconds, true);
+    }
+
+    @Override
+    public void banner$setSecondsOnFire(int i, boolean callEvent) {
+        if (callEvent) {
+            EntityCombustEvent event = new EntityCombustEvent(this.getBukkitEntity(), i);
+            this.level.getCraftServer().getPluginManager().callEvent(event);
+
+            if (event.isCancelled()) {
+                return;
+            }
+            i = event.getDuration();
+        }
+        int secs = i * 20;
+        if (((Entity) (Object) this) instanceof LivingEntity) {
+            secs = ProtectionEnchantment.getFireAfterDampener((LivingEntity) (Object) this, secs);
+        }
+        if (this.remainingFireTicks < secs) {
+            this.setRemainingFireTicks(secs);
+        }
     }
 
     @Override

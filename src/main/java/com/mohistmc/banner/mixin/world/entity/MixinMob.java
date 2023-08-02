@@ -282,7 +282,7 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
         EntityCombustByEntityEvent combustEvent = new EntityCombustByEntityEvent(this.getBukkitEntity(), entity.getBukkitEntity(), seconds);
         org.bukkit.Bukkit.getPluginManager().callEvent(combustEvent);
         if (!combustEvent.isCancelled()) {
-            entity.setSecondsOnFire(combustEvent.getDuration(), false);
+            entity.banner$setSecondsOnFire(combustEvent.getDuration(), false);
         }
     }
 

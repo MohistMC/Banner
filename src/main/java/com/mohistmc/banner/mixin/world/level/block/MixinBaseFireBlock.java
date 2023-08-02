@@ -23,7 +23,7 @@ public class MixinBaseFireBlock {
         Bukkit.getPluginManager().callEvent(event);
 
         if (!event.isCancelled()) {
-            instance.setSecondsOnFire(event.getDuration(), false);
+            instance.banner$setSecondsOnFire(event.getDuration(), false);
         }
     }
 
@@ -37,10 +37,10 @@ public class MixinBaseFireBlock {
 
     // Banner - no need
     /**
-    @ModifyExpressionValue(method = "inPortalDimension", at = @At("RETURN"))
-    private static boolean banner$inPortalDimension(Level level, CallbackInfoReturnable<Boolean> cir) {
-        var typeKey = level.getTypeKey();
-        return typeKey == LevelStem.NETHER || typeKey == LevelStem.OVERWORLD;
-    }*/
+     @ModifyExpressionValue(method = "inPortalDimension", at = @At("RETURN"))
+     private static boolean banner$inPortalDimension(Level level, CallbackInfoReturnable<Boolean> cir) {
+     var typeKey = level.getTypeKey();
+     return typeKey == LevelStem.NETHER || typeKey == LevelStem.OVERWORLD;
+     }*/
 
 }

@@ -69,7 +69,7 @@ public abstract class MixinZombie extends Monster {
         EntityCombustByEntityEvent event = new EntityCombustByEntityEvent(this.getBukkitEntity(),  entity.getBukkitEntity(), seconds);
         Bukkit.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-             entity.setSecondsOnFire(event.getDuration(), false);
+             entity.banner$setSecondsOnFire(event.getDuration(), false);
         }
     }
 
