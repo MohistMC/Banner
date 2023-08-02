@@ -29,8 +29,8 @@ public class MixinDyeItem {
 
     @Inject(method = "interactLivingEntity",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/item/ItemStack;shrink(I)V",
-            shift = At.Shift.BEFORE), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+            target = "Lnet/minecraft/world/item/ItemStack;shrink(I)V"),
+            locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private void banner$handleDyeEvent(ItemStack stack, Player player, LivingEntity interactionTarget,
                                        InteractionHand usedHand, CallbackInfoReturnable<InteractionResult> cir,
                                        Sheep sheep) {
