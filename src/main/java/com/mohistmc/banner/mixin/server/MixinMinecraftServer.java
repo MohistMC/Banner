@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.server;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mohistmc.banner.BannerMCStart;
+import com.mohistmc.banner.api.color.ColorsAPI;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.config.BannerConfig;
@@ -414,7 +415,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
      */
     @Overwrite
     public String getMotd() {
-        return BannerConfigUtil.motd();
+        return ColorsAPI.of(BannerConfigUtil.motd());
     }
 
     @Inject(method = "stopServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;removeAll()V"))
