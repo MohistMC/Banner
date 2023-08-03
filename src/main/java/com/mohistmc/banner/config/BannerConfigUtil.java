@@ -117,9 +117,19 @@ public class BannerConfigUtil {
         return yml.getInt(key, 8);
     }
 
+    public static String motd() {
+        String key = "motd";
+        if (yml.get(key) == null) {
+            yml.set(key, "<RAINBOW1>A Minecraft Server</RAINBOW>");
+            save();
+        }
+        return yml.getString(key);
+
+    }
     public static void initAllNeededConfig() {
         skipOtherWorldPreparing();
         serverThread();
+        motd();
     }
 
 }
