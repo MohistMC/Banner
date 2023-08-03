@@ -33,6 +33,8 @@ import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.levelgen.FlatLevelSource;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WritableLevelData;
@@ -256,10 +258,16 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                     var generator = serverWorld.getChunkSource().getGenerator();
                     if (biomeProvider != null) {
                         BiomeSource biomeSource = new CustomWorldChunkManager(worldInfo, biomeProvider, serverWorld.registryAccess().registryOrThrow(Registries.BIOME));
-                        generator.biomeSource = biomeSource;
+                        if (generator instanceof NoiseBasedChunkGenerator cga) {
+                            generator = new NoiseBasedChunkGenerator(biomeSource, cga.settings);
+                        } else if (generator instanceof FlatLevelSource cpf) {
+                            var flatLevelSource = new FlatLevelSource(cpf.settings());
+                            flatLevelSource.banner$setBiomeSource(biomeSource);
+                            generator = flatLevelSource;
+                        }
                     }
-                    CustomChunkGenerator gen = new CustomChunkGenerator(serverWorld, generator, this.generator);
-                    serverWorld.getChunkSource().chunkMap.generator = gen;
+                    serverWorld.getChunkSource().chunkMap.generator =
+                            new CustomChunkGenerator(serverWorld, generator, this.generator);
                 }
             }
             this.world = new CraftWorld((ServerLevel) (Object) this, generator, biomeProvider, environment);
