@@ -132,6 +132,7 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
             .add("net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket")
             .add("net.minecraft.server.players.BanListEntry")
             .add("net.minecraft.core.dispenser.DefaultDispenseItemBehavior")
+            .add("net.minecraft.world.level.levelgen.FlatLevelSource")
             .build();
 
     @Override
