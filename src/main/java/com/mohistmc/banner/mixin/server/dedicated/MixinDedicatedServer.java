@@ -21,7 +21,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_20_R1.SpigotTimings;
 import org.bukkit.craftbukkit.v1_20_R1.command.CraftRemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_20_R1.util.ForwardLogHandler;
 import org.bukkit.event.server.RemoteServerCommandEvent;
@@ -115,16 +114,6 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         }
 
         cir.setReturnValue(result.toString());
-    }
-
-    @Inject(method = "handleConsoleInput", at = @At("HEAD"))
-    private void banner$timingsStart(String msg, CommandSourceStack source, CallbackInfo ci) {
-        SpigotTimings.serverCommandTimer.startTiming(); // Spigot
-    }
-
-    @Inject(method = "handleConsoleInput", at = @At("TAIL"))
-    private void banner$timingsStop(String msg, CommandSourceStack source, CallbackInfo ci) {
-        SpigotTimings.serverCommandTimer.stopTiming(); // Spigot
     }
 
     @Redirect(method = "handleConsoleInputs", at = @At(value = "INVOKE", target = "Lnet/minecraft/commands/Commands;performPrefixedCommand(Lnet/minecraft/commands/CommandSourceStack;Ljava/lang/String;)I"))

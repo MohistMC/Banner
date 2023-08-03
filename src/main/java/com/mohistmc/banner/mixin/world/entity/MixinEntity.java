@@ -47,7 +47,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_20_R1.SpigotTimings;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
@@ -74,7 +73,6 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.ActivationRange;
-import org.spigotmc.CustomTimingsHandler;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -212,7 +210,6 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     public BlockPos lastLavaContact;
     private static transient BlockPos banner$damageEventBlock;
     private static final int CURRENT_LEVEL = 2;
-    public CustomTimingsHandler tickTimer = SpigotTimings.getEntityTimings(((Entity) (Object) this)); // Spigot
     @javax.annotation.Nullable
     private org.bukkit.util.Vector origin;
     @javax.annotation.Nullable
@@ -239,16 +236,6 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Override
     public void inactiveTick() {
 
-    }
-
-    @Inject(method = "move", at = @At("HEAD"))
-    private void banner$startTimings(MoverType type, Vec3 pos, CallbackInfo ci) {
-        SpigotTimings.entityMoveTimer.startTiming(); // Spigot
-    }
-
-    @Inject(method = "move", at = @At("HEAD"))
-    private void banner$stopimings(MoverType type, Vec3 pos, CallbackInfo ci) {
-        SpigotTimings.entityMoveTimer.stopTiming(); // Spigot
     }
 
     @Override
@@ -1119,11 +1106,6 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Override
     public CommandSender getBukkitSender(CommandSourceStack wrapper) {
         return getBukkitEntity();
-    }
-
-    @Override
-    public CustomTimingsHandler bridge$tickTimer() {
-        return tickTimer;
     }
 
     @Override

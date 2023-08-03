@@ -90,7 +90,6 @@ import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_20_R1.SpigotTimings;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventoryView;
@@ -254,16 +253,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     private void banner$init(MinecraftServer server, Connection networkManagerIn, ServerPlayer playerIn, CallbackInfo ci) {
         this.cserver = ((CraftServer) Bukkit.getServer());
         this.chatMessageChain = new FutureChain(server.bridge$chatExecutor());
-    }
-
-    @Inject(method = "tick", at = @At("HEAD"))
-    private void banner$timings(CallbackInfo ci) {
-        SpigotTimings.playerConnectionTimer.startTiming(); // Spigot
-    }
-
-    @Inject(method = "tick", at = @At("TAIL"))
-    private void banner$timings0(CallbackInfo ci) {
-        SpigotTimings.playerConnectionTimer.stopTiming(); // Spigot
     }
 
     /**
@@ -1214,7 +1203,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
 
     @Override
     public void handleCommand(String s) {
-        SpigotTimings.playerCommandTimer.startTiming(); // Spigot
         if ( org.spigotmc.SpigotConfig.logCommands ) // Spigot
             LOGGER.info(this.player.getScoreboardName() + " issued server command: " + s);
 
@@ -1224,7 +1212,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         this.cserver.getPluginManager().callEvent(event);
 
         if (event.isCancelled()) {
-            SpigotTimings.playerCommandTimer.stopTiming(); // Spigot
             return;
         }
 
@@ -1237,7 +1224,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
             java.util.logging.Logger.getLogger(ServerGamePacketListenerImpl.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
             return;
         } finally {
-            SpigotTimings.playerCommandTimer.stopTiming(); // Spigot
         }
     }
 

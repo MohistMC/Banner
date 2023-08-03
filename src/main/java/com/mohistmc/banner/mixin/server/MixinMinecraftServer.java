@@ -69,7 +69,6 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.Main;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_20_R1.SpigotTimings;
 import org.bukkit.craftbukkit.v1_20_R1.scoreboard.CraftScoreboardManager;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_20_R1.util.LazyPlayerSet;
@@ -747,63 +746,31 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     }
 
     @Inject(method = "tickServer", at = @At("HEAD"))
-    private void banner$useTimings(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-        SpigotTimings.serverTickTimer.startTiming(); // Spigot
+    private void banner$serverTickStartEvent(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
         new com.destroystokyo.paper.event.server.ServerTickStartEvent(this.tickCount+1).callEvent(); // Paper
-    }
-
-    @Inject(method = "tickServer", at = @At(value = "INVOKE",
-            target = "Lorg/slf4j/Logger;debug(Ljava/lang/String;)V",
-            ordinal = 0,
-            remap = false))
-    private void banner$useTimings0(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-        SpigotTimings.worldSaveTimer.startTiming(); // Spigot
-    }
-
-    @Inject(method = "tickServer", at = @At(value = "INVOKE",
-            target = "Lorg/slf4j/Logger;debug(Ljava/lang/String;)V",
-            ordinal = 1,
-            shift = At.Shift.AFTER,
-            remap = false))
-    private void banner$useTimings1(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-        SpigotTimings.worldSaveTimer.stopTiming(); // Spigot
-    }
-
-    @Inject(method = "tickServer", at = @At("TAIL"))
-    private void banner$useTimings2(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-        SpigotTimings.serverTickTimer.stopTiming(); // Spigot
-        org.spigotmc.CustomTimingsHandler.tick(); // Spigot
-    }
-
-    @Inject(method = "tickChildren", at = @At("HEAD"))
-    private void banner$addTimings(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-        SpigotTimings.schedulerTimer.startTiming(); // Spigot
     }
 
     @Inject(method = "tickChildren",
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
                     ordinal = 0))
-    private void banner$addTimings0(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+    private void banner$mainThreadHeartbeat0(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
         this.server.getScheduler().mainThreadHeartbeat(this.tickCount); // CraftBukkit
-        SpigotTimings.schedulerTimer.stopTiming(); // Spigot
     }
 
     @Inject(method = "tickChildren",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/server/ServerFunctionManager;tick()V"))
-    private void banner$addTimings1(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+    private void banner$mainThreadHeartbeat1(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
         this.server.getScheduler().mainThreadHeartbeat(this.tickCount); // CraftBukkit
-        SpigotTimings.commandFunctionsTimer.startTiming(); // Spigot
     }
 
     @Inject(method = "tickChildren",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
                     ordinal = 0))
-    private void banner$addTimings2(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+    private void banner$mainThreadHeartbeat2(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
         this.server.getScheduler().mainThreadHeartbeat(this.tickCount); // CraftBukkit
-        SpigotTimings.commandFunctionsTimer.stopTiming(); // Spigot
     }
 
     @Inject(method = "tickServer",
@@ -822,13 +789,10 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     private void banner$checkHeart(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
         // CraftBukkit start
         // Run tasks that are waiting on processing
-        SpigotTimings.processQueueTimer.startTiming(); // Spigot
         while (!processQueue.isEmpty()) {
             processQueue.remove().run();
         }
-        SpigotTimings.processQueueTimer.stopTiming(); // Spigot
 
-        SpigotTimings.timeUpdateTimer.startTiming(); // Spigot
         // Send time updates to everyone, it will get the right time from the world the player is in.
         if (this.tickCount % 20 == 0) {
             for (int i = 0; i < this.getPlayerList().players.size(); ++i) {
@@ -836,73 +800,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                 entityplayer.connection.send(new ClientboundSetTimePacket(entityplayer.level().getGameTime(), entityplayer.getPlayerTime(), entityplayer.level().getGameRules().getBoolean(GameRules.RULE_DAYLIGHT))); // Add support for per player time
             }
         }
-        SpigotTimings.timeUpdateTimer.stopTiming(); // Spigot
-    }
-
-    @Inject(method = "tickChildren",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/level/ServerLevel;tick(Ljava/util/function/BooleanSupplier;)V"),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$addTimings3(BooleanSupplier hasTimeLeft, CallbackInfo ci,
-                                    Iterator var2, ServerLevel serverLevel) {
-        serverLevel.bridge$timings().doTick.startTiming(); // Spigot
-    }
-
-    @Inject(method = "tickChildren",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/level/ServerLevel;tick(Ljava/util/function/BooleanSupplier;)V",
-                    shift = At.Shift.AFTER),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$addTimings4(BooleanSupplier hasTimeLeft, CallbackInfo ci,
-                                    Iterator var2, ServerLevel serverLevel) {
-        serverLevel.bridge$timings().doTick.stopTiming(); // Spigot
-    }
-
-    @Inject(method = "tickChildren",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/network/ServerConnectionListener;tick()V"))
-    private void banner$addTimings4(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-        SpigotTimings.connectionTimer.startTiming(); // Spigot
-    }
-
-    @Inject(method = "tickChildren",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
-                    ordinal = 2))
-    private void banner$addTimings5(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-        SpigotTimings.connectionTimer.stopTiming(); // Spigot
-    }
-
-    @Inject(method = "tickChildren",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/players/PlayerList;tick()V"))
-    private void banner$addTimings6(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-        SpigotTimings.playerListTimer.startTiming(); // Spigot
-    }
-
-    @Inject(method = "tickChildren",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/players/PlayerList;tick()V",
-                    shift = At.Shift.AFTER))
-    private void banner$addTimings7(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-        SpigotTimings.playerListTimer.stopTiming(); // Spigot
-    }
-
-    @Inject(method = "tickChildren",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
-                    shift = At.Shift.AFTER,
-                    ordinal = 3))
-    private void banner$addTimings8(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-        SpigotTimings.tickablesTimer.startTiming(); // Spigot
-    }
-
-    @Inject(method = "tickChildren",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V",
-                    ordinal = 3))
-    private void banner$addTimings9(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-        SpigotTimings.tickablesTimer.stopTiming(); // Spigot
     }
 
     // CraftBukkit start

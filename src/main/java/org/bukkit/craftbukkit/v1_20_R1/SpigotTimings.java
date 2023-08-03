@@ -37,7 +37,7 @@ public class SpigotTimings {
     public static final CustomTimingsHandler timerEntityTickRest = new CustomTimingsHandler("** livingEntityTickRest");
 
     public static final CustomTimingsHandler processQueueTimer = new CustomTimingsHandler("processQueue");
-    public static final CustomTimingsHandler schedulerSyncTimer = new CustomTimingsHandler("** Scheduler - Sync Tasks", JavaPluginLoader.pluginParentTimer);
+    //public static final CustomTimingsHandler schedulerSyncTimer = new CustomTimingsHandler("** Scheduler - Sync Tasks", JavaPluginLoader.pluginParentTimer);
 
     public static final CustomTimingsHandler playerCommandTimer = new CustomTimingsHandler("** playerCommand");
 
@@ -76,7 +76,7 @@ public class SpigotTimings {
         }
         CustomTimingsHandler result = pluginTaskTimingMap.get(name);
         if (result == null) {
-            result = new CustomTimingsHandler(name, SpigotTimings.schedulerSyncTimer);
+           // result = new CustomTimingsHandler(name, SpigotTimings.schedulerSyncTimer);
             pluginTaskTimingMap.put(name, result);
         }
         return result;

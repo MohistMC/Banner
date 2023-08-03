@@ -11,7 +11,6 @@ import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.jetbrains.annotations.Nullable;
-import org.spigotmc.CustomTimingsHandler;
 
 import java.util.Set;
 import java.util.UUID;
@@ -33,10 +32,6 @@ public interface InjectionEntity {
 
     @Nullable
     default UUID getOriginWorld() {
-        return null;
-    }
-
-    default CustomTimingsHandler bridge$tickTimer() {
         return null;
     }
 
