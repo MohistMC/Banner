@@ -297,7 +297,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     }
 
     @Inject(method = "checkMovementStatistics", at = @At(value = "INVOKE", ordinal = 4, target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
-    private void banner$exhauseCause5() {
+    private void banner$exhauseCause5(double distanceX, double distanceY, double distanceZ, CallbackInfo ci) {
         pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.CROUCH);
     }
 
