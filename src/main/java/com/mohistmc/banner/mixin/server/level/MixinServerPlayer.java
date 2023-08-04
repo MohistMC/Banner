@@ -293,6 +293,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         this.setPlayerWeather(this.level().getLevelData().isRaining() ? WeatherType.DOWNFALL : WeatherType.CLEAR, false);
     }
 
+    @Override
     public void updateWeather(float oldRain, float newRain, float oldThunder, float newThunder) {
         if (this.weather == null) {
             if (oldRain != newRain) {
@@ -310,6 +311,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         }
     }
 
+    @Override
     public void tickWeather() {
         if (this.weather == null) {
             return;

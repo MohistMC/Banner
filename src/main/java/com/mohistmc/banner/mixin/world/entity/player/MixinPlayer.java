@@ -277,32 +277,32 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     }
 
     @Inject(method = "checkMovementStatistics", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
-    private void banner$exhauseCause1(double p_36379_, double p_36380_, double p_36381_, CallbackInfo ci) {
+    private void banner$exhauseCause1(double distanceX, double distanceY, double distanceZ, CallbackInfo ci) {
         pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.SWIM);
     }
 
     @Inject(method = "checkMovementStatistics", at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
-    private void banner$exhauseCause2(double p_36379_, double p_36380_, double p_36381_, CallbackInfo ci) {
+    private void banner$exhauseCause2(double distanceX, double distanceY, double distanceZ, CallbackInfo ci) {
         pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.WALK_UNDERWATER);
     }
 
     @Inject(method = "checkMovementStatistics", at = @At(value = "INVOKE", ordinal = 2, target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
-    private void banner$exhauseCause3(double p_36379_, double p_36380_, double p_36381_, CallbackInfo ci) {
+    private void banner$exhauseCause3(double distanceX, double distanceY, double distanceZ, CallbackInfo ci) {
         pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.WALK_ON_WATER);
     }
 
     @Inject(method = "checkMovementStatistics", at = @At(value = "INVOKE", ordinal = 3, target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
-    private void banner$exhauseCause4(double p_36379_, double p_36380_, double p_36381_, CallbackInfo ci) {
+    private void banner$exhauseCause4(double distanceX, double distanceY, double distanceZ, CallbackInfo ci) {
         pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.SPRINT);
     }
 
     @Inject(method = "checkMovementStatistics", at = @At(value = "INVOKE", ordinal = 4, target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
-    private void banner$exhauseCause5(double p_36379_, double p_36380_, double p_36381_, CallbackInfo ci) {
+    private void banner$exhauseCause5() {
         pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.CROUCH);
     }
 
     @Inject(method = "checkMovementStatistics", at = @At(value = "INVOKE", ordinal = 5, target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
-    private void banner$exhauseCause6(double p_36379_, double p_36380_, double p_36381_, CallbackInfo ci) {
+    private void banner$exhauseCause6(double distanceX, double distanceY, double distanceZ, CallbackInfo ci) {
         pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.WALK);
     }
 

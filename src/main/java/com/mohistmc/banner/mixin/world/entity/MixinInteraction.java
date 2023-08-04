@@ -26,6 +26,8 @@ public class MixinInteraction {
             EntityDamageEvent event = CraftEventFactory.callNonLivingEntityDamageEvent(((Interaction) (Object) this), source, 1.0F, false);
             if (event.isCancelled()) {
                 cir.setReturnValue(true);
+            } else {
+                banner$finalDamage = event.getFinalDamage();
             }
         }
     }
