@@ -414,7 +414,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
      */
     @Overwrite
     public String getMotd() {
-        return ColorsAPI.of(BannerConfigUtil.motd());
+        return ColorsAPI.of(BannerConfigUtil.motdFirstLine() + "\n" + BannerConfigUtil.motdSecondLine());
     }
 
     @Inject(method = "stopServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;removeAll()V"))

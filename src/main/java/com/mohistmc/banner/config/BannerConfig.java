@@ -136,7 +136,8 @@ public class BannerConfig {
     public static List<String> clear_item__whitelist;
     public static String clear_item__msg;
     public static int clear_item__time;
-    public static String motd;
+    public static String motdFirstLine;
+    public static String motdSecondLine;
 
     private static void banner() {
         check_update = getBoolean("banner.check_update", false);
@@ -155,6 +156,7 @@ public class BannerConfig {
         clear_item__whitelist = getList("entity.clear.item.whitelist", Collections.emptyList());
         clear_item__msg = getString("entity.clear.item.msg", "[Server] Cleaned up %size% drops");
         clear_item__time = getInt("entity.clear.item.time", 1800);
-        motd = ColorsAPI.of(getString("motd", "<RAINBOW1>A Minecraft Server</RAINBOW>"));
+        motdFirstLine = ColorsAPI.of(getString("motd.firstline", "<RAINBOW1>A Minecraft Server</RAINBOW>"));
+        motdFirstLine = ColorsAPI.of(getString("motd.secondline", ""));
     }
 }
