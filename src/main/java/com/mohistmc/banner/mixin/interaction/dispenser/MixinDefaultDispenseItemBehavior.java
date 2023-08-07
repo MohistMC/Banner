@@ -38,9 +38,10 @@ public class MixinDefaultDispenseItemBehavior {
      * @author wdog5
      * @reason
      */
+    /*
     @Overwrite
     public static void spawnItem(Level level, ItemStack stack, int speed, Direction facing, Position position) {
-        position = DispenserBlock.getDispensePosition(banner$isourceblock);
+       position = DispenserBlock.getDispensePosition(banner$isourceblock);
         double d = position.x();
         double e = position.y();
         double f = position.z();
@@ -54,9 +55,9 @@ public class MixinDefaultDispenseItemBehavior {
         banner$itemEntity = itemEntity;
         double g = level.random.nextDouble() * 0.1 + 0.2;
         itemEntity.setDeltaMovement(level.random.triangle((double)facing.getStepX() * g, 0.0172275 * (double)speed), level.random.triangle(0.2, 0.0172275 * (double)speed), level.random.triangle((double)facing.getStepZ() * g, 0.0172275 * (double)speed));
-        spawnItem(level, stack, speed, facing, banner$isourceblock, banner$dropper);
+        //spawnItem(level, stack, speed, facing, banner$isourceblock, banner$dropper);
         level.addFreshEntity(itemEntity);
-    }
+    }*/
 
     private static boolean spawnItem(Level level, ItemStack stack, int speed, Direction facing, BlockSource isourceblock, boolean dropper) {
         banner$dropper = dropper;
