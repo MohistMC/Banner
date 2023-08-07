@@ -3,7 +3,6 @@ package com.mohistmc.banner.mixin.world.entity;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.injection.world.entity.InjectionMob;
 import com.mohistmc.banner.paper.PaperExtraConstants;
-import io.izzel.arclight.mixin.Eject;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -37,6 +36,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 // Banner - TODO fix patches
 @Mixin(Mob.class)
@@ -259,15 +260,27 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
         Bukkit.getPluginManager().callEvent(new EntityUnleashEvent(this.getBukkitEntity(), EntityUnleashEvent.UnleashReason.UNKNOWN));
     }
 
-    @Eject(method = "convertTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
-    private boolean banner$copySpawn(net.minecraft.world.level.Level world, Entity entityIn, CallbackInfoReturnable<Mob> cir) {
+    private AtomicReference<EntityTransformEvent> banner$transformerEvent = new AtomicReference<>();
+
+    @Redirect(method = "convertTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    private boolean banner$copySpawn(Level world, Entity entityIn) {
         EntityTransformEvent.TransformReason transformReason = banner$transform == null ? EntityTransformEvent.TransformReason.UNKNOWN : banner$transform;
         banner$transform = null;
-        if (CraftEventFactory.callEntityTransformEvent((Mob) (Object) this, (LivingEntity) entityIn, transformReason).isCancelled()) {
-            cir.setReturnValue(null);
+        EntityTransformEvent event = CraftEventFactory.callEntityTransformEvent((Mob) (Object) this, (LivingEntity) entityIn, transformReason);
+        banner$transformerEvent.set(event);
+        if (event.isCancelled()) {
             return false;
         } else {
             return world.addFreshEntity(entityIn);
+        }
+    }
+
+    @Inject(method = "convertTo", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/Mob;isPassenger()Z"),
+            cancellable = true)
+    private <T extends Entity> void banner$cancelIfNotTransformer(EntityType<T> entityType, boolean transferInventory, CallbackInfoReturnable<T> cir) {
+        if (banner$transformerEvent.get().isCancelled()) {
+            cir.setReturnValue(null);
         }
     }
 

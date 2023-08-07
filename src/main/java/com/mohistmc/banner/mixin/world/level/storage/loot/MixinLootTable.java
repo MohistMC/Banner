@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.storage.loot;
 
 import com.mohistmc.banner.injection.world.level.storage.loot.InjectionLootTable;
-import io.izzel.arclight.mixin.Eject;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -20,9 +19,12 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(LootTable.class)
 public abstract class MixinLootTable implements InjectionLootTable {
@@ -37,18 +39,28 @@ public abstract class MixinLootTable implements InjectionLootTable {
 
     @Shadow protected abstract ObjectArrayList<ItemStack> getRandomItems(LootContext context);
 
-    @Eject(method = "fill", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/loot/LootTable;getRandomItems(Lnet/minecraft/world/level/storage/loot/LootContext;)Lit/unimi/dsi/fastutil/objects/ObjectArrayList;"))
-    private ObjectArrayList<ItemStack> banner$nonPluginEvent(LootTable lootTable, LootContext context, CallbackInfo ci, Container inv) {
+    private AtomicReference<LootGenerateEvent> banner$event = new AtomicReference<>();
+
+    @Redirect(method = "fill", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/loot/LootTable;getRandomItems(Lnet/minecraft/world/level/storage/loot/LootContext;)Lit/unimi/dsi/fastutil/objects/ObjectArrayList;"))
+    private ObjectArrayList<ItemStack> banner$nonPluginEvent(LootTable instance, LootContext context, Container inv) {
         ObjectArrayList<ItemStack> list = this.getRandomItems(context);
         if (!context.hasParam(LootContextParams.ORIGIN) && !context.hasParam(LootContextParams.THIS_ENTITY)) {
             return list;
         }
         LootGenerateEvent event = CraftEventFactory.callLootGenerateEvent(inv, (LootTable) (Object) this, context, list, false);
+        banner$event.set(event);
         if (event.isCancelled()) {
-            ci.cancel();
             return null;
         } else {
             return event.getLoot().stream().map(CraftItemStack::asNMSCopy).collect(ObjectArrayList.toList());
+        }
+    }
+
+    @Inject(method = "fill", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/storage/loot/LootContext;getRandom()Lnet/minecraft/util/RandomSource;"), cancellable = true)
+    private void banner$cancelIfNot(Container container, LootParams params, long seed, CallbackInfo ci) {
+        if (banner$event.get().isCancelled()) {
+            ci.cancel();
         }
     }
 
