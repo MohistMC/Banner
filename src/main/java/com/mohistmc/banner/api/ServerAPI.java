@@ -7,6 +7,7 @@ import net.fabricmc.loader.api.metadata.ModEnvironment;
 import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
@@ -28,6 +29,7 @@ public class ServerAPI {
     public static Map<String, String> fabriccmdper = new ConcurrentHashMap<>();
     public static List<Command> fabriccmd = new ArrayList<>();
     public static Map<net.minecraft.world.entity.EntityType<?>, String> entityTypeMap = new ConcurrentHashMap<>();
+    public static Map<Integer, EnderDragon.Phase> phasetypeMap = new ConcurrentHashMap<>();
 
     static {
         for (ModContainer modInfo : FabricLoader.getInstance().getAllMods()) {

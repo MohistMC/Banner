@@ -159,6 +159,10 @@ public class DynamicEnumHelper {
         }
     }
 
+    public static <T extends Enum<?>> T addEnum0(Class<T> enumType, String enumName, Class<?>[] paramTypes, Object... paramValues) {
+        return addEnum(enumType, enumName, paramTypes, paramValues);
+    }
+
     private static final long[] ENUM_CACHE_OFFSETS;
 
     static {

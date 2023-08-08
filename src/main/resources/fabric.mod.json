@@ -45,6 +45,7 @@
       "net/minecraft/class_1541": ["com/mohistmc/banner/injection/world/entity/InjectionPrimedTnt"],
       "net/minecraft/class_1577": ["com/mohistmc/banner/injection/world/entity/InjectionGuardian"],
       "net/minecraft/class_1308": ["com/mohistmc/banner/injection/world/entity/InjectionMob"],
+      "net/minecraft/class_1527": ["com/mohistmc/banner/injection/world/entity/boss/enderdragon/phases/InjectionEnderDragonPhase"],
       "net/minecraft/class_1536": ["com/mohistmc/banner/injection/world/entity/InjectionFishingHook"],
       "net/minecraft/class_1496": ["com/mohistmc/banner/injection/world/entity/InjectionAbstractHorse"],
       "net/minecraft/class_1937": ["com/mohistmc/banner/injection/world/level/InjectionLevel"],

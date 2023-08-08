@@ -195,6 +195,7 @@
     "world.entity.animal.horse.MixinTraderLlama_FollowTraderGoal",
     "world.entity.boss.enderdragon.MixinEnderCrystal",
     "world.entity.boss.enderdragon.MixinEnderDragon",
+    "world.entity.boss.enderdragon.phases.MixinEnderDragonPhase",
     "world.entity.boss.enderdragon.phases.MixinEnderDragonPhaseManager",
     "world.entity.boss.wither.MixinWitherBoss",
     "world.entity.decoration.MixinArmorStand",
