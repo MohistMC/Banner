@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
-import io.izzel.arclight.mixin.Eject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
@@ -23,7 +22,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,20 +58,30 @@ public abstract class MixinBrewingStandBlockEntity extends BaseContainerBlockEnt
         }
     }
 
-    @Eject(method = "serverTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;shrink(I)V"))
-    private static void banner$brewFuel(ItemStack stack, int count, CallbackInfo ci, Level level, BlockPos pos, BlockState state, BrewingStandBlockEntity entity) {
-        BrewingStandFuelEvent event = new BrewingStandFuelEvent(CraftBlock.at(level, pos), CraftItemStack.asCraftMirror(stack), 20);
-        Bukkit.getServer().getPluginManager().callEvent(event);
+    @Inject(method = "serverTick",
+            at = @At (value = "CONSTANT",
+                    args = "intValue=20"),
+            locals = LocalCapture.CAPTURE_FAILHARD,
+            cancellable = true)
+    private static void banner$brewEvent(Level level, BlockPos pos, BlockState state, BrewingStandBlockEntity blockEntity, CallbackInfo ci, ItemStack itemStack) {
+        BrewingStandFuelEvent event = new BrewingStandFuelEvent(CraftBlock.at(level, pos), CraftItemStack.asCraftMirror(itemStack), 20);
+        level.getCraftServer().getPluginManager().callEvent(event);
 
         if (event.isCancelled()) {
             ci.cancel();
-        } else {
-            entity.fuel = event.getFuelPower();
-            if (entity.fuel > 0 && event.isConsuming()) {
-                stack.shrink(count);
-            }
+            return;
+        }
+
+        blockEntity.fuel = event.getFuelPower();
+        if (blockEntity.fuel > 0 && event.isConsuming()) {
+            itemStack.shrink(1);
         }
     }
+
+    @Redirect(method = "serverTick",
+            at = @At (value = "INVOKE",
+                    target = "Lnet/minecraft/world/item/ItemStack;shrink(I)V"))
+    private static void banner$isConsuming(ItemStack stack, int amount) {}
 
     @Inject(method = "serverTick", at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/world/level/block/entity/BrewingStandBlockEntity;ingredient:Lnet/minecraft/world/item/Item;"))
     private static void banner$brewBegin(Level level, BlockPos pos, BlockState p_155288_, BrewingStandBlockEntity entity, CallbackInfo ci) {
