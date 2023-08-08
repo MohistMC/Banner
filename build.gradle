@@ -41,6 +41,10 @@ repositories {
 		name = "Sponge"
 		url = 'https://repo.spongepowered.org/maven'
 	}
+	maven {
+		name = "Adventure"
+		url = 'https://jd.advntr.dev/'
+	}
 	mavenCentral()
 }
 
@@ -139,6 +143,14 @@ dependencies {
 
 	// mappings remapper
 	implementation(include("net.fabricmc:mapping-io:0.3.0"))
+
+	// Kyori
+	implementation(include("net.kyori:adventure-api:4.14.0"))
+	implementation(include("net.kyori:adventure-text-minimessage:4.14.0"))
+	implementation(include("net.kyori:adventure-text-serializer-gson:4.14.0"))
+	implementation(include("net.kyori:adventure-text-serializer-legacy:4.14.0"))
+	implementation(include("net.kyori:adventure-text-serializer-plain:4.14.0"))
+	implementation(include("net.kyori:adventure-text-logger-slf4j:4.14.0"))
 }
 
 base {
