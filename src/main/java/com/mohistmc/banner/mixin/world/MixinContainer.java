@@ -28,10 +28,14 @@ public interface MixinContainer extends InjectionContainer {
     }
 
     @Override
-    void onOpen(CraftHumanEntity who);
+    default void onOpen(CraftHumanEntity who) {
+
+    }
 
     @Override
-    void onClose(CraftHumanEntity who);
+    default void onClose(CraftHumanEntity who) {
+
+    }
 
     @Override
     default InventoryHolder getOwner() {
