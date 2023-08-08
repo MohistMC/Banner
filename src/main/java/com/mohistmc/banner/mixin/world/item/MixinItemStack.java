@@ -224,24 +224,28 @@ public abstract class MixinItemStack implements InjectionItemStack {
         if (player != null && !player.getAbilities().mayBuild && !this.hasAdventureModePlaceTagForBlock(context.getLevel().registryAccess().registryOrThrow(Registries.BLOCK), blockInWorld)) {
             return InteractionResult.PASS;
         } else {
+            Item item = this.getItem();
             // CraftBukkit start - handle all block place event logic here
             CompoundTag oldData = this.getTagClone();
             int oldCount = this.getCount();
             ServerLevel world = (ServerLevel) context.getLevel();
-            if (!(this.getItem() instanceof BucketItem || this.getItem() instanceof SolidBucketItem)) { // if not bucket
+            if (!(item instanceof BucketItem || item instanceof SolidBucketItem)) { // if not bucket
                 world.banner$setCaptureBlockStates(true);
                 // special case bonemeal
-                if (this.getItem() == Items.BONE_MEAL) {
+                if (item == Items.BONE_MEAL) {
                     world.banner$setCaptureTreeGeneration(true);
                 }
             }
-            Item item = this.getItem();
-            InteractionResult interactionResult = item.useOn(context);
+            InteractionResult interactionResult;
+            try {
+                interactionResult = item.useOn(context);
+            } finally {
+                world.banner$setCaptureBlockStates(false);
+            }
             CompoundTag newData = this.getTagClone();
             int newCount = this.getCount();
             this.setCount(oldCount);
             this.setTagClone(oldData);
-            world.banner$setCaptureBlockStates(false);
             if (interactionResult.consumesAction() && world.bridge$captureTreeGeneration() && !world.bridge$capturedBlockStates().isEmpty()) {
                 world.banner$setCaptureTreeGeneration(false);
                 Location location = CraftLocation.toBukkit(blockPos, world.getWorld());

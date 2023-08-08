@@ -832,6 +832,13 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         teleportTo(worldserver, d0, d1, d2, f, f1);
     }
 
+    @Inject(method = "stopSleepInBed",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;teleport(DDDFF)V"))
+    private void banner$tpCauseExitBed(boolean wakeImmediately, boolean updateLevelForSleepingPlayers, CallbackInfo ci) {
+        this.connection.pushTeleportCause(PlayerTeleportEvent.TeleportCause.EXIT_BED);
+    }
+
     @Override
     public void pushChangeDimensionCause(PlayerTeleportEvent.TeleportCause cause) {
         banner$changeDimensionCause.set(cause);

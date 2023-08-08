@@ -42,6 +42,7 @@ import net.minecraft.network.protocol.game.ServerboundEditBookPacket;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.network.protocol.game.ServerboundMoveVehiclePacket;
+import net.minecraft.network.protocol.game.ServerboundPlaceRecipePacket;
 import net.minecraft.network.protocol.game.ServerboundPlayerAbilitiesPacket;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
@@ -63,6 +64,7 @@ import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.FutureChain;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringUtil;
+import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -72,11 +74,13 @@ import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.entity.player.ChatVisiblity;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MerchantMenu;
+import net.minecraft.world.inventory.RecipeBookMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
@@ -96,6 +100,7 @@ import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftNamespacedKey;
 import org.bukkit.craftbukkit.v1_20_R1.util.LazyPlayerSet;
 import org.bukkit.craftbukkit.v1_20_R1.util.Waitable;
 import org.bukkit.entity.Player;
@@ -116,6 +121,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerRecipeBookClickEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -148,6 +154,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
 
 @Mixin(ServerGamePacketListenerImpl.class)
@@ -1143,9 +1150,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                             if (!org.spigotmc.SpigotConfig.bungee && originalFormat.equals(queueEvent.getFormat()) && originalMessage.equals(queueEvent.getMessage()) && queueEvent.getPlayer().getName().equalsIgnoreCase(queueEvent.getPlayer().getDisplayName())) { // Spigot
                                 server.getPlayerList().broadcastChatMessage(original, player, ChatType.bind(ChatType.CHAT, player));
                                 return null;
-                            } else if (!org.spigotmc.SpigotConfig.bungee && CraftChatMessage.fromComponent(original.decoratedContent()).equals(message)) { // Spigot
-                                // TODO server.getPlayerList().broadcastChatMessage(original, player, ChatType.bind(ChatType.RAW, player));
-                                return null;
                             }
                             for (ServerPlayer recipient : server.getPlayerList().players) {
                                  recipient.getBukkitEntity().sendMessage(player.getUUID(), message);
@@ -1183,9 +1187,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
             if (((LazyPlayerSet) event.getRecipients()).isLazy()) {
                 if (!org.spigotmc.SpigotConfig.bungee && originalFormat.equals(event.getFormat()) && originalMessage.equals(event.getMessage()) && event.getPlayer().getName().equalsIgnoreCase(event.getPlayer().getDisplayName())) { // Spigot
                     server.getPlayerList().broadcastChatMessage(original, player, ChatType.bind(ChatType.CHAT, player));
-                    return;
-                } else if (!org.spigotmc.SpigotConfig.bungee && CraftChatMessage.fromComponent(original.decoratedContent()).equals(s)) { // Spigot
-                    // TODO server.getPlayerList().broadcastChatMessage(original, player, ChatType.bind(ChatType.RAW, player));
                     return;
                 }
 
@@ -1685,6 +1686,31 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                 this.player.drop(itemstack, true);
             }
         }
+    }
+
+    private AtomicReference<PlayerRecipeBookClickEvent> banner$recipeClickEvent = new AtomicReference<>();
+
+    @Inject(method = "handlePlaceRecipe",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/MinecraftServer;getRecipeManager()Lnet/minecraft/world/item/crafting/RecipeManager;"),
+            cancellable = true)
+    private void banner$recipeClickEvent(ServerboundPlaceRecipePacket packet, CallbackInfo ci) {
+        // CraftBukkit start - implement PlayerRecipeBookClickEvent
+        org.bukkit.inventory.Recipe recipe = this.cserver.getRecipe(CraftNamespacedKey.fromMinecraft(packet.getRecipe()));
+        if (recipe == null) {
+            ci.cancel();
+        }
+        PlayerRecipeBookClickEvent event =
+                CraftEventFactory.callRecipeBookClickEvent(this.player, recipe, packet.isShiftDown());
+        banner$recipeClickEvent.set(event);
+        // Cast to keyed should be safe as the recipe will never be a MerchantRecipe.
+    }
+
+    @Redirect(method = "method_17820",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/inventory/RecipeBookMenu;handlePlacement(ZLnet/minecraft/world/item/crafting/Recipe;Lnet/minecraft/server/level/ServerPlayer;)V"))
+    private <C extends Container> void banner$recipeClickEvent0(RecipeBookMenu<C> instance, boolean placeAll, Recipe<?> recipe, ServerPlayer player) {
+      ((RecipeBookMenu<?>) this.player.containerMenu).handlePlacement(banner$recipeClickEvent.get().isShiftClick(), recipe, this.player);
     }
 
     @Inject(method = "updateSignText", cancellable = true, at = @At("HEAD"))
