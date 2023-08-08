@@ -655,7 +655,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             boolean cancelled = false;
             BukkitCaptures.captureContainerOwner((ServerPlayer) (Object) this);
             banner$container = CraftEventFactory.callInventoryOpenEvent((ServerPlayer) (Object) this, banner$container, cancelled);
-            BukkitCaptures.resetContainerOwner();
             if (banner$container == null && !cancelled) {
                 if (menuProvider instanceof Container) {
                     ((Container) menuProvider).stopOpen((ServerPlayer) (Object) this);

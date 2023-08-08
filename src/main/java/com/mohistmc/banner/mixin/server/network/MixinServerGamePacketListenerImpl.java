@@ -1320,7 +1320,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
 
                     BukkitCaptures.captureContainerOwner(this.player);
                     InventoryView inventory = this.player.containerMenu.getBukkitView();
-                    BukkitCaptures.resetContainerOwner();
                     if(inventory == null) {
                         inventory = new CraftInventoryView(this.player.getBukkitEntity(), Bukkit.createInventory(this.player.getBukkitEntity(), InventoryType.CHEST), this.player.containerMenu);
                         this.player.containerMenu.setBukkitView(inventory);

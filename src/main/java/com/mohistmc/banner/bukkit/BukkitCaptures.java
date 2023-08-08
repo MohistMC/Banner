@@ -231,11 +231,11 @@ public class BukkitCaptures {
     }
 
     public static Player getContainerOwner() {
-        return containerOwner;
-    }
-
-    public static void resetContainerOwner() {
-        containerOwner = null;
+        try {
+            return containerOwner;
+        } finally {
+            containerOwner = null;
+        }
     }
 
     private static CraftPortalEvent craftPortalEvent;

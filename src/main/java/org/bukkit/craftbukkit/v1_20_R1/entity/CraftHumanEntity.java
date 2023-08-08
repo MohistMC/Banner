@@ -285,7 +285,6 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
     public InventoryView getOpenInventory() {
         // Banner start - capture player
         BukkitCaptures.captureContainerOwner(this.getHandle());
-        BukkitCaptures.resetContainerOwner();
         // Banner end
         return getHandle().containerMenu.getBukkitView();
     }
