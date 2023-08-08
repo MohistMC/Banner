@@ -781,7 +781,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         if (((LivingEntity)(Object) this) instanceof ServerPlayer) {
             final org.bukkit.inventory.ItemStack craftItem = CraftItemStack.asBukkitCopy(itemStack);
             final PlayerItemConsumeEvent event = new PlayerItemConsumeEvent((org.bukkit.entity.Player)this.getBukkitEntity(), craftItem, CraftEquipmentSlot.getHand(this.getUsedItemHand()));
-            banner$consumeEvent.set(event);
+            banner$consumeEvent.getAndSet(event);
             Bukkit.getPluginManager().callEvent(event);
             if (event.isCancelled()) {
                 ((ServerPlayer) (Object) this).getBukkitEntity().updateInventory();
@@ -800,7 +800,8 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
             ordinal = 4),
             cancellable = true)
     private void banner$cancelIfNotComplete(CallbackInfo ci) {
-        if (banner$consumeEvent.get().isCancelled()) {
+        if (banner$consumeEvent.get() != null
+         && banner$consumeEvent.get().isCancelled()) {
             ci.cancel();
         }
     }
