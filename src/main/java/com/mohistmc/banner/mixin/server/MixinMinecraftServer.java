@@ -221,7 +221,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Shadow @Nullable private CommandStorage commandStorage;
 
-    @Shadow public abstract String getServerModName();
+    @Shadow(remap = false) public abstract String getServerModName();
 
     @Shadow public abstract ModCheck getModdedStatus();
 

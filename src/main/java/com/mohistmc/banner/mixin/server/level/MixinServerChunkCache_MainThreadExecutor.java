@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(targets = "net.minecraft.server.level.ServerChunkCache$MainThreadExecutor")
+@Mixin(ServerChunkCache.MainThreadExecutor.class)
 public abstract class MixinServerChunkCache_MainThreadExecutor extends BlockableEventLoop<Runnable> {
 
     // @formatter:off

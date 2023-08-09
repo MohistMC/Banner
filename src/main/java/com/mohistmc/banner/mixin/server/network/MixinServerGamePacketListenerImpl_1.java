@@ -26,6 +26,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -36,44 +37,45 @@ import java.util.stream.Collectors;
 @Mixin(targets = "net.minecraft.server.network.ServerGamePacketListenerImpl$1")
 public abstract class MixinServerGamePacketListenerImpl_1 {
 
-    @Shadow(aliases = {"field_28963"}, remap = false)
-    ServerGamePacketListenerImpl outerThis;
+    @Shadow @Final
+    ServerGamePacketListenerImpl field_28963;
 
-    @Shadow(aliases = {"field_28962"}, remap = false)
-    Entity outerEntity;
-    @Shadow(aliases = {"field_39991"}, remap = false)
-    ServerLevel outerLevel;
+    @Shadow @Final
+    Entity val$target;
+
+    @Shadow @Final
+    ServerLevel val$level;
 
     private void performInteraction(InteractionHand enumhand, ServerGamePacketListenerImpl.EntityInteraction playerconnection_a, PlayerInteractEntityEvent event) { // CraftBukkit
-        ItemStack itemstack = outerThis.player.getItemInHand(enumhand);
+        ItemStack itemstack = field_28963.player.getItemInHand(enumhand);
 
-        if (itemstack.isItemEnabled(outerLevel.enabledFeatures())) {
+        if (itemstack.isItemEnabled(val$level.enabledFeatures())) {
             ItemStack itemstack1 = itemstack.copy();
             // CraftBukkit start
-            ItemStack itemInHand = outerThis.player.getItemInHand(enumhand);
-            boolean triggerLeashUpdate = itemInHand != null && itemInHand.getItem() == Items.LEAD && outerEntity instanceof Mob;
-            Item origItem = outerThis.player.getInventory().getSelected() == null ? null : outerThis.player.getInventory().getSelected().getItem();
+            ItemStack itemInHand = field_28963.player.getItemInHand(enumhand);
+            boolean triggerLeashUpdate = itemInHand != null && itemInHand.getItem() == Items.LEAD && val$target instanceof Mob;
+            Item origItem = field_28963.player.getInventory().getSelected() == null ? null : field_28963.player.getInventory().getSelected().getItem();
 
-            outerThis.bridge$craftServer().getPluginManager().callEvent(event);
+            field_28963.bridge$craftServer().getPluginManager().callEvent(event);
 
             // Entity in bucket - SPIGOT-4048 and SPIGOT-6859a
-            if ((outerEntity instanceof Bucketable && outerEntity instanceof LivingEntity && origItem != null && origItem.asItem() == Items.WATER_BUCKET) && (event.isCancelled() || outerThis.player.getInventory().getSelected() == null || outerThis.player.getInventory().getSelected().getItem() != origItem)) {
-                outerThis.send(new ClientboundAddEntityPacket(outerEntity));
-                outerThis.player.containerMenu.sendAllDataToRemote();
+            if ((val$target instanceof Bucketable && val$target instanceof LivingEntity && origItem != null && origItem.asItem() == Items.WATER_BUCKET) && (event.isCancelled() || field_28963.player.getInventory().getSelected() == null || field_28963.player.getInventory().getSelected().getItem() != origItem)) {
+                field_28963.send(new ClientboundAddEntityPacket(val$target));
+                field_28963.player.containerMenu.sendAllDataToRemote();
             }
 
-            if (triggerLeashUpdate && (event.isCancelled() || outerThis.player.getInventory().getSelected() == null || outerThis.player.getInventory().getSelected().getItem() != origItem)) {
+            if (triggerLeashUpdate && (event.isCancelled() || field_28963.player.getInventory().getSelected() == null || field_28963.player.getInventory().getSelected().getItem() != origItem)) {
                 // Refresh the current leash state
-                outerThis.send(new ClientboundSetEntityLinkPacket(outerEntity, ((Mob) outerEntity).getLeashHolder()));
+                field_28963.send(new ClientboundSetEntityLinkPacket(val$target, ((Mob) val$target).getLeashHolder()));
             }
 
-            if (event.isCancelled() || outerThis.player.getInventory().getSelected() == null || outerThis.player.getInventory().getSelected().getItem() != origItem) {
+            if (event.isCancelled() || field_28963.player.getInventory().getSelected() == null || field_28963.player.getInventory().getSelected().getItem() != origItem) {
                 // Refresh the current entity metadata
-                outerEntity.getEntityData().refresh(outerThis.player);
+                val$target.getEntityData().refresh(field_28963.player);
                 // SPIGOT-7136 - Allays
-                if (outerEntity instanceof Allay) {
-                    outerThis.send(new ClientboundSetEquipmentPacket(outerEntity.getId(), Arrays.stream(EquipmentSlot.values()).map((slot) -> Pair.of(slot, ((LivingEntity) outerEntity).getItemBySlot(slot).copy())).collect(Collectors.toList())));
-                    outerThis.player.containerMenu.sendAllDataToRemote();
+                if (val$target instanceof Allay) {
+                    field_28963.send(new ClientboundSetEquipmentPacket(val$target.getId(), Arrays.stream(EquipmentSlot.values()).map((slot) -> Pair.of(slot, ((LivingEntity) val$target).getItemBySlot(slot).copy())).collect(Collectors.toList())));
+                    field_28963.player.containerMenu.sendAllDataToRemote();
                 }
             }
 
@@ -81,18 +83,18 @@ public abstract class MixinServerGamePacketListenerImpl_1 {
                 return;
             }
             // CraftBukkit end
-            InteractionResult enuminteractionresult = playerconnection_a.run(outerThis.player, outerEntity, enumhand);
+            InteractionResult enuminteractionresult = playerconnection_a.run(field_28963.player, val$target, enumhand);
 
             // CraftBukkit start
             if (!itemInHand.isEmpty() && itemInHand.getCount() <= -1) {
-                outerThis.player.containerMenu.sendAllDataToRemote();
+                field_28963.player.containerMenu.sendAllDataToRemote();
             }
             // CraftBukkit end
 
             if (enuminteractionresult.consumesAction()) {
-                CriteriaTriggers.PLAYER_INTERACTED_WITH_ENTITY.trigger(outerThis.player, itemstack1, outerEntity);
+                CriteriaTriggers.PLAYER_INTERACTED_WITH_ENTITY.trigger(field_28963.player, itemstack1, val$target);
                 if (enuminteractionresult.shouldSwing()) {
-                    outerThis.player.swing(enumhand, true);
+                    field_28963.player.swing(enumhand, true);
                 }
             }
 
@@ -105,7 +107,7 @@ public abstract class MixinServerGamePacketListenerImpl_1 {
      */
     @Overwrite
     public void onInteraction(InteractionHand enumhand) {
-        this.performInteraction(enumhand, Player::interactOn, new PlayerInteractEntityEvent(outerThis.getCraftPlayer(), outerEntity.getBukkitEntity(), (enumhand == InteractionHand.OFF_HAND) ? org.bukkit.inventory.EquipmentSlot.OFF_HAND : org.bukkit.inventory.EquipmentSlot.HAND)); // CraftBukkit
+        this.performInteraction(enumhand, Player::interactOn, new PlayerInteractEntityEvent(field_28963.getCraftPlayer(), val$target.getBukkitEntity(), (enumhand == InteractionHand.OFF_HAND) ? org.bukkit.inventory.EquipmentSlot.OFF_HAND : org.bukkit.inventory.EquipmentSlot.HAND)); // CraftBukkit
     }
 
     /**
@@ -116,7 +118,7 @@ public abstract class MixinServerGamePacketListenerImpl_1 {
     public void onInteraction(InteractionHand enumhand, Vec3 vec3d) {
         this.performInteraction(enumhand, (serverPlayer, entityx, interactionHand) -> {
             return entityx.interactAt(serverPlayer, vec3d, interactionHand);
-        }, new PlayerInteractAtEntityEvent(outerThis.getCraftPlayer(), outerEntity.getBukkitEntity(), new org.bukkit.util.Vector(vec3d.x, vec3d.y, vec3d.z), (enumhand == InteractionHand.OFF_HAND) ? org.bukkit.inventory.EquipmentSlot.OFF_HAND : org.bukkit.inventory.EquipmentSlot.HAND)); // CraftBukkit
+        }, new PlayerInteractAtEntityEvent(field_28963.getCraftPlayer(), val$target.getBukkitEntity(), new org.bukkit.util.Vector(vec3d.x, vec3d.y, vec3d.z), (enumhand == InteractionHand.OFF_HAND) ? org.bukkit.inventory.EquipmentSlot.OFF_HAND : org.bukkit.inventory.EquipmentSlot.HAND)); // CraftBukkit
     }
 
     /**
@@ -126,20 +128,20 @@ public abstract class MixinServerGamePacketListenerImpl_1 {
     @Overwrite
     public void onAttack() {
         // CraftBukkit
-        if (!(outerEntity instanceof ItemEntity) && !(outerEntity instanceof ExperienceOrb) && !(outerEntity instanceof AbstractArrow) && (outerEntity != outerThis.player || outerThis.player.isSpectator())) {
-            ItemStack itemstack = outerThis.player.getItemInHand(InteractionHand.MAIN_HAND);
+        if (!(val$target instanceof ItemEntity) && !(val$target instanceof ExperienceOrb) && !(val$target instanceof AbstractArrow) && (val$target != field_28963.player || field_28963.player.isSpectator())) {
+            ItemStack itemstack = field_28963.player.getItemInHand(InteractionHand.MAIN_HAND);
 
-            if (itemstack.isItemEnabled(outerLevel.enabledFeatures())) {
-                outerThis.player.attack(outerEntity);
+            if (itemstack.isItemEnabled(val$level.enabledFeatures())) {
+                field_28963.player.attack(val$target);
                 // CraftBukkit start
                 if (!itemstack.isEmpty() && itemstack.getCount() <= -1) {
-                    outerThis.player.containerMenu.sendAllDataToRemote();
+                    field_28963.player.containerMenu.sendAllDataToRemote();
                 }
                 // CraftBukkit end
             }
         } else {
-            outerThis.disconnect(Component.translatable("multiplayer.disconnect.invalid_entity_attacked"));
-            outerThis.bridge$logger().warn("Player {} tried to attack an invalid entity", outerThis.player.getName().getString());
+            field_28963.disconnect(Component.translatable("multiplayer.disconnect.invalid_entity_attacked"));
+            field_28963.bridge$logger().warn("Player {} tried to attack an invalid entity", field_28963.player.getName().getString());
         }
     }
 }
