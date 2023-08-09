@@ -495,8 +495,10 @@ public class BukkitRegistry {
     }
 
     public static String normalizeName(String name) {
-        return name.toUpperCase(java.util.Locale.ENGLISH).replaceAll("(:|\\s)", "_")
-                .replaceAll("\\W", "");
+        return name.replace(':', '_')
+                .replaceAll("\\s+", "_")
+                .replaceAll("\\W", "")
+                .toUpperCase(Locale.ENGLISH);
     }
 
     public static boolean isMINECRAFT(ResourceLocation resourceLocation) {
