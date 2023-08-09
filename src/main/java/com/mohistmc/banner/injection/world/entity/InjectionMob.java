@@ -10,7 +10,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
 
-public interface InjectionMob {
+public interface InjectionMob extends InjectionNeutralMob {
 
     default boolean getBanner$targetSuccess() {
         return false;
@@ -26,6 +26,7 @@ public interface InjectionMob {
     default void setPersistenceRequired(boolean persistenceRequired) {
     }
 
+    @Override
     default boolean setTarget(LivingEntity entityliving, EntityTargetEvent.TargetReason reason, boolean fireEvent) {
         return false;
     }
