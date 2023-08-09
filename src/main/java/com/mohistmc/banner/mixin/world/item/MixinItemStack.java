@@ -68,6 +68,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -106,6 +107,15 @@ public abstract class MixinItemStack implements InjectionItemStack {
     @Shadow public abstract ItemStack copy();
 
     @Shadow public abstract void shrink(int decrement);
+
+    @Redirect(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/nbt/CompoundTag;getCompound(Ljava/lang/String;)Lnet/minecraft/nbt/CompoundTag;"))
+    private CompoundTag banner$markAsCopy(CompoundTag instance, String key) {
+        // CraftBukkit start - make defensive copy as this data may be coming from the save thread
+        return instance.getCompound(key).copy();
+        // CraftBukkit end
+    }
 
     @Override
     public void convertStack(int version) {
@@ -160,25 +170,19 @@ public abstract class MixinItemStack implements InjectionItemStack {
     }
 
     @Override
-    public void load(CompoundTag nbttagcompound) {
-        this.loadNbt(nbttagcompound);
-    }
-
-    @SuppressWarnings("all")
-    private CompoundTag loadNbt(CompoundTag compound) {
-        Item rawItem = this.item = BuiltInRegistries.ITEM.get(new ResourceLocation(compound.getString("id")));
-        this.count = compound.getByte("Count");
-        if (compound.contains("tag", 10)) {
+    public void load(CompoundTag compoundTag) {
+        this.item = BuiltInRegistries.ITEM.get(new ResourceLocation(compoundTag.getString("id")));
+        this.count = compoundTag.getByte("Count");
+        if (compoundTag.contains("tag", 10)) {
             // CraftBukkit start - make defensive copy as this data may be coming from the save thread
-            this.tag = compound.getCompound("tag").copy();
-            this.getItem().verifyTagAfterLoad(this.tag);
+            this.tag = compoundTag.getCompound("tag").copy();
             // CraftBukkit end
+            this.getItem().verifyTagAfterLoad(this.tag);
         }
 
         if (this.getItem().canBeDepleted()) {
             this.setDamageValue(this.getDamageValue());
         }
-        return compound;
     }
 
     @Override
