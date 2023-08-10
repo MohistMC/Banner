@@ -552,6 +552,14 @@ public final class CraftServer implements Server {
 
     @Override
     public List<CraftPlayer> getOnlinePlayers() {
+        // Banner start - refresh online players
+        this.playerView = Collections.unmodifiableList(Lists.transform(playerList.players, new Function<ServerPlayer, CraftPlayer>() {
+            @Override
+            public CraftPlayer apply(ServerPlayer player) {
+                return player.getBukkitEntity();
+            }
+        }));
+        // Banner end
         return this.playerView;
     }
 
