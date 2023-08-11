@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.ProcessableEffect;
 import com.mohistmc.banner.injection.world.entity.InjectionLivingEntity;
+import io.izzel.arclight.mixin.Eject;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -188,8 +189,6 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     @Shadow public abstract void indicateDamage(double d, double e);
 
     @Shadow public abstract ItemStack eat(Level level, ItemStack food);
-
-    @Shadow public abstract boolean equipmentHasChanged(ItemStack oldItem, ItemStack newItem);
 
     public MixinLivingEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -774,18 +773,17 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         return this.isPushable() && this.collides != this.collidableExemptions.contains(entity.getUUID());
     }
 
-    private AtomicReference<PlayerItemConsumeEvent> banner$consumeEvent = new AtomicReference<>();
-
-    @Redirect(method = "completeUsingItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;finishUsingItem(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/item/ItemStack;"))
-    private ItemStack banner$itemConsume(ItemStack itemStack, Level worldIn, LivingEntity entityLiving) {
+    @Eject(method = "completeUsingItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;finishUsingItem(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/item/ItemStack;"))
+    private ItemStack banner$itemConsume(ItemStack itemStack, Level worldIn, LivingEntity
+            entityLiving, CallbackInfo ci) {
         if (((LivingEntity)(Object) this) instanceof ServerPlayer) {
             final org.bukkit.inventory.ItemStack craftItem = CraftItemStack.asBukkitCopy(itemStack);
             final PlayerItemConsumeEvent event = new PlayerItemConsumeEvent((org.bukkit.entity.Player)this.getBukkitEntity(), craftItem, CraftEquipmentSlot.getHand(this.getUsedItemHand()));
-            banner$consumeEvent.getAndSet(event);
             Bukkit.getPluginManager().callEvent(event);
             if (event.isCancelled()) {
                 ((ServerPlayer) (Object) this).getBukkitEntity().updateInventory();
                 ((ServerPlayer) (Object) this).getBukkitEntity().updateScaledHealth();
+                ci.cancel();
                 return null;
             } else if (!craftItem.equals(event.getItem())) {
                 return CraftItemStack.asNMSCopy(event.getItem()).finishUsingItem(worldIn, entityLiving);
@@ -794,38 +792,14 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         return itemStack.finishUsingItem(worldIn, entityLiving);
     }
 
-    @Inject(method = "completeUsingItem",
-            at = @At(value = "FIELD",
-            target = "Lnet/minecraft/world/entity/LivingEntity;useItem:Lnet/minecraft/world/item/ItemStack;",
-            ordinal = 4),
-            cancellable = true)
-    private void banner$cancelIfNotComplete(CallbackInfo ci) {
-        if (banner$consumeEvent.get() != null
-         && banner$consumeEvent.get().isCancelled()) {
-            ci.cancel();
-        }
-    }
-
-    private AtomicReference<EntityTeleportEvent> banner$tpEvent = new AtomicReference<>();
-
-    @Redirect(method = "randomTeleport", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/world/entity/LivingEntity;teleportTo(DDD)V"))
-    private void banner$entityTeleport(LivingEntity instance, double x, double y, double z) {
+    @Eject(method = "randomTeleport", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/world/entity/LivingEntity;teleportTo(DDD)V"))
+    private void banner$entityTeleport(LivingEntity entity, double x, double y, double z, CallbackInfoReturnable<Boolean> cir) {
         EntityTeleportEvent event = new EntityTeleportEvent(getBukkitEntity(), new Location(this.level().getWorld(), this.getX(), this.getY(), this.getZ()), new Location(this.level().getWorld(), x, y, z));
-        banner$tpEvent.set(event);
         Bukkit.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
             this.teleportTo(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
         } else {
             this.teleportTo(this.getX(), this.getY(), this.getZ());
-        }
-    }
-
-    @Inject(method = "randomTeleport",
-            at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/Level;noCollision(Lnet/minecraft/world/entity/Entity;)Z"),
-            cancellable = true)
-    private void banner$cancelIfNotTp(double x, double y, double z, boolean broadcastTeleport, CallbackInfoReturnable<Boolean> cir) {
-        if (banner$tpEvent.get().isCancelled()) {
             cir.setReturnValue(false);
         }
     }

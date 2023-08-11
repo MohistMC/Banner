@@ -10,8 +10,10 @@ import com.mohistmc.banner.stackdeobf.util.CompatUtil;
 import com.mohistmc.banner.stackdeobf.util.RemappingRewritePolicy;
 import com.mohistmc.banner.util.EulaUtil;
 import com.mohistmc.i18n.i18n;
+import io.izzel.arclight.mixin.injector.EjectorInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.spongepowered.asm.mixin.injection.struct.InjectionInfo;
 
 import java.util.Scanner;
 
@@ -22,6 +24,7 @@ public class BannerMCStart {
     public static final float javaVersion = Float.parseFloat(System.getProperty("java.class.version"));
 
     public static void run() throws Exception {
+        InjectionInfo.register(EjectorInfo.class);
         BannerConfigUtil.copyBannerConfig();
         BannerConfigUtil.lang();
         BannerConfigUtil.i18n();
