@@ -35,6 +35,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.ProtectionEnchantment;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -348,32 +350,28 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     public void banner$infCheck(float yaw, float pitch, CallbackInfo ci) {
         // CraftBukkit start - yaw was sometimes set to NaN, so we need to set it back to 0
         if (Float.isNaN(yaw)) {
-            this.yRot = 0;
-            ci.cancel();
+            yaw = 0;
         }
 
         if (yaw == Float.POSITIVE_INFINITY || yaw == Float.NEGATIVE_INFINITY) {
             if (((Object) this) instanceof Player) {
-                Bukkit.getLogger().warning(this.getScoreboardName() + " was caught trying to crash the server with an invalid yaw");
-                ((CraftPlayer) this.getBukkitEntity()).kickPlayer("Infinite yaw (Are you hacking?)");
+                this.level.getCraftServer().getLogger().warning(this.getScoreboardName() + " was caught trying to crash the server with an invalid yaw");
+                ((CraftPlayer) this.getBukkitEntity()).kickPlayer("Infinite yaw (Hacking?)");
             }
-            this.yRot = 0;
-            ci.cancel();
+            yaw = 0;
         }
 
         // pitch was sometimes set to NaN, so we need to set it back to 0
         if (Float.isNaN(pitch)) {
-            this.xRot = 0;
-            ci.cancel();
+            pitch = 0;
         }
 
         if (pitch == Float.POSITIVE_INFINITY || pitch == Float.NEGATIVE_INFINITY) {
             if (((Object) this) instanceof Player) {
-                Bukkit.getLogger().warning(this.getScoreboardName() + " was caught trying to crash the server with an invalid pitch");
-                ((CraftPlayer) this.getBukkitEntity()).kickPlayer("Infinite pitch (Are you hacking?)");
+                this.level.getCraftServer().getLogger().warning(this.getScoreboardName() + " was caught trying to crash the server with an invalid pitch");
+                ((CraftPlayer) this.getBukkitEntity()).kickPlayer("Infinite pitch (Hacking?)");
             }
-            this.xRot = 0;
-            ci.cancel();
+            pitch = 0;
         }
         // CraftBukkit end
     }
@@ -435,33 +433,32 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     }
 
     @Inject(method = "move", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/Entity;getMovementEmission()Lnet/minecraft/world/entity/Entity$MovementEmission;",
-            shift = At.Shift.AFTER))
-    private void banner$move$blockCollide(MoverType typeIn, Vec3 pos, CallbackInfo ci) {
-        if (horizontalCollision && this.getBukkitEntity() instanceof Vehicle vehicle) {
-            org.bukkit.block.Block block = this.level.getWorld().getBlockAt(Mth.floor(this.getX()), Mth.floor(this.getY()), Mth.floor(this.getZ()));
-            Vec3 vec3d = this.collide(pos);
-            if (pos.x > vec3d.x) {
-                block = block.getRelative(BlockFace.EAST);
-            } else if (vec3d.x < vec3d.x) {
-                block = block.getRelative(BlockFace.WEST);
-            } else if (pos.z > vec3d.z) {
-                block = block.getRelative(BlockFace.SOUTH);
-            } else if (pos.z < vec3d.z) {
-                block = block.getRelative(BlockFace.NORTH);
+            target = "Lnet/minecraft/world/entity/Entity;onGround()Z",
+            ordinal = 1), locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$move$blockCollide(MoverType type, Vec3 pos, CallbackInfo ci, Vec3 vec3,
+                                          double d, boolean bl, boolean bl2, BlockPos blockPos,
+                                          BlockState blockState, Block block) {
+        // CraftBukkit start
+        if (horizontalCollision && getBukkitEntity() instanceof Vehicle) {
+            Vehicle vehicle = (Vehicle) this.getBukkitEntity();
+            org.bukkit.block.Block cbBlock = this.level.getWorld().getBlockAt(Mth.floor(this.getX()), Mth.floor(this.getY()), Mth.floor(this.getZ()));
+
+            if (pos.x > vec3.x) {
+                cbBlock = cbBlock.getRelative(BlockFace.EAST);
+            } else if (pos.x < vec3.x) {
+                cbBlock = cbBlock.getRelative(BlockFace.WEST);
+            } else if (pos.z > vec3.z) {
+                cbBlock = cbBlock.getRelative(BlockFace.SOUTH);
+            } else if (pos.z < vec3.z) {
+                cbBlock = cbBlock.getRelative(BlockFace.NORTH);
             }
 
-            if (block.getType() != org.bukkit.Material.AIR) {
-                VehicleBlockCollisionEvent event = new VehicleBlockCollisionEvent(vehicle, block);
-                Bukkit.getPluginManager().callEvent(event);
+            if (!cbBlock.getType().isAir()) {
+                VehicleBlockCollisionEvent event = new VehicleBlockCollisionEvent(vehicle, cbBlock);
+                level.getCraftServer().getPluginManager().callEvent(event);
             }
         }
-    }
-
-    @Inject(method = "absMoveTo(DDDFF)V", at = @At("RETURN"))
-    private void banner$loadChunk(double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {
-        if (this.valid)
-            this.level.getChunk((int) Math.floor(this.getX()) >> 4, (int) Math.floor(this.getZ()) >> 4);
+        // CraftBukkit end
     }
 
     @Inject(method = "saveAsPassenger", cancellable = true, at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/entity/Entity;getEncodeId()Ljava/lang/String;"))
