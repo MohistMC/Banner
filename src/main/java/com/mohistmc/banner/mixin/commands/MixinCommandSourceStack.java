@@ -6,7 +6,6 @@ import com.mojang.brigadier.tree.CommandNode;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -42,13 +41,8 @@ public abstract class MixinCommandSourceStack implements InjectionCommandSourceS
     }
 
     @Redirect(method = "broadcastToAdmins", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;isOp(Lcom/mojang/authlib/GameProfile;)Z"))
-    private boolean banner$hasPerm(PlayerList instance, GameProfile profile) {
-        return profile == null;
-    }
-
-    @Redirect(method = "broadcastToAdmins", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;getGameProfile()Lcom/mojang/authlib/GameProfile;"))
-    private GameProfile banner$hasPermission(ServerPlayer player) {
-        return player.getBukkitEntity().hasPermission("minecraft.admin.command_feedback") ? null : player.getGameProfile();
+    private boolean banner$feedbackPermission(PlayerList instance, GameProfile profile) {
+        return instance.getPlayer(profile.getId()).getBukkitEntity().hasPermission("minecraft.admin.command_feedback");
     }
 
     @Override
