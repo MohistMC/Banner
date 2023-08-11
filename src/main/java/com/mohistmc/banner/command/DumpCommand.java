@@ -171,8 +171,10 @@ public class DumpCommand extends BukkitCommand {
     private void dumpBukkitMaterial(CommandSender sender, String mode) {
         StringBuilder sb = new StringBuilder();
         for (Material material : Material.values()) {
-            String key = material.name();
-            sb.append(material).append("-").append(key).append("\n");
+            if (!material.isLegacy()) {
+                String key = material.getKey().toString();
+                sb.append(material).append("-").append(key).append("\n");
+            }
         }
         dump(sender, "bukkit_material", sb, mode);
     }

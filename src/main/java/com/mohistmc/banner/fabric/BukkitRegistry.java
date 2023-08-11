@@ -26,6 +26,7 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.CookingBookCategory;
 import net.minecraft.world.level.block.Block;
@@ -119,14 +120,12 @@ public class BukkitRegistry {
                 // inject item materials into Bukkit for Fabric
                 String materialName = normalizeName(resourceLocation.toString());
                 int id = Item.getId(item);
-                Material material = Material.addMaterial(materialName, id, false, resourceLocation.getNamespace());
+                Material material = Material.addMaterial(materialName, id, item.getMaxStackSize(), false, resourceLocation);
                 newTypes.add(material);
 
-                if (material != null) {
-                    CraftMagicNumbers.ITEM_MATERIAL.put(item, material);
-                    CraftMagicNumbers.MATERIAL_ITEM.put(material, item);
-                    BannerServer.LOGGER.debug("Registered {} as item {}" + material.name() + " - " + materialName);
-                }
+                CraftMagicNumbers.ITEM_MATERIAL.put(item, material);
+                CraftMagicNumbers.MATERIAL_ITEM.put(material, item);
+                BannerServer.LOGGER.debug("Save-ITEM: " + material.name() + " - " + material.key);
             }
         }
         BannerServer.LOGGER.info(BannerMCStart.I18N.get("registry.item"), newTypes.size());
@@ -142,13 +141,14 @@ public class BukkitRegistry {
                 // inject block materials into Bukkit for Fabric
                 String materialName = normalizeName(resourceLocation.toString());
                 int id = Item.getId(block.asItem());
-                Material material = Material.addMaterial(materialName, id, true, resourceLocation.getNamespace());
+                Item item = Item.byId(id);
+                Material material = Material.addMaterial(materialName, id, item.getMaxStackSize(), true, resourceLocation);
                 newTypes.add(material);
 
                 if (material != null) {
                     CraftMagicNumbers.BLOCK_MATERIAL.put(block, material);
                     CraftMagicNumbers.MATERIAL_BLOCK.put(material, block);
-                    BannerServer.LOGGER.debug("Registered {} as block {}" + material.name() + " - " + materialName);
+                    BannerServer.LOGGER.debug("Registered {} as block {}" + material.name() + " - " + material.key);
                 }
             }
         }

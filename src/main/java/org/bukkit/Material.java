@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.mohistmc.banner.api.DynamicEnumHelper;
+import net.minecraft.resources.ResourceLocation;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
@@ -106,6 +107,7 @@ import org.bukkit.block.data.type.TurtleEgg;
 import org.bukkit.block.data.type.Wall;
 import org.bukkit.block.data.type.WallHangingSign;
 import org.bukkit.block.data.type.WallSign;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftNamespacedKey;
 import org.bukkit.inventory.CreativeCategory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.material.MaterialData;
@@ -113,6 +115,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -4388,37 +4391,27 @@ public enum Material implements Keyed, Translatable {
     public static final String LEGACY_PREFIX = "LEGACY_";
 
     private final int id;
+    private int blockID;
     private final Constructor<? extends MaterialData> ctor;
     private static final Map<String, Material> BY_NAME = Maps.newHashMap();
     private final int maxStack;
     private final short durability;
     public final Class<?> data;
     private final boolean legacy;
-    private final NamespacedKey key;
-    private int blockID;
+    public NamespacedKey key;
     public boolean isFabricBlock = false;
-    private NamespacedKey keyFabric;
-    private String modName;
-
-    // Banner start - constructor used to set if the Material is a block or not
-    private Material(final int id, boolean flag) {
-        this(id, 64);
-        this.isFabricBlock = flag;
-    }
-    // Banner end
-
-    // Banner start - constructor used to set if block is modded
-    private Material(final int id, boolean flag, String modName) {
-        this(id, 64);
-        this.isFabricBlock = flag;
-        this.modName = modName;
-        this.keyFabric = new NamespacedKey(modName, this.name().toLowerCase(Locale.ROOT).substring(modName.length() + 1));
-    }
-    // Banner end
+    public boolean isFabricItem = false;
 
     private Material(final int id) {
         this(id, 64);
     }
+
+    // Banner start - constructor used to set if the Material is a block or not
+    private Material(final int id, final int stack, boolean isFabricBlock) {
+        this(id, stack);
+        this.isFabricBlock = isFabricBlock;
+    }
+    // Banner end
 
     private Material(final int id, final int stack) {
         this(id, stack, MaterialData.class);
@@ -5591,7 +5584,7 @@ public enum Material implements Keyed, Translatable {
             case YELLOW_WOOL:
             case ZOMBIE_HEAD:
             case ZOMBIE_WALL_HEAD:
-            //</editor-fold>
+                //</editor-fold>
                 return true;
             default:
                 return 0 <= id && id < 256;
@@ -5646,7 +5639,7 @@ public enum Material implements Keyed, Translatable {
             case SUSPICIOUS_STEW:
             case SWEET_BERRIES:
             case TROPICAL_FISH:
-            // ----- Legacy Separator -----
+                // ----- Legacy Separator -----
             case LEGACY_BREAD:
             case LEGACY_CARROT_ITEM:
             case LEGACY_BAKED_POTATO:
@@ -5677,7 +5670,7 @@ public enum Material implements Keyed, Translatable {
             case LEGACY_BEETROOT:
             case LEGACY_CHORUS_FRUIT:
             case LEGACY_BEETROOT_SOUP:
-            //</editor-fold>
+                //</editor-fold>
                 return true;
             default:
                 return false;
@@ -5797,7 +5790,7 @@ public enum Material implements Keyed, Translatable {
             case MUSIC_DISC_STRAD:
             case MUSIC_DISC_WAIT:
             case MUSIC_DISC_WARD:
-            //</editor-fold>
+                //</editor-fold>
                 return true;
             default:
                 return id >= LEGACY_GOLD_RECORD.id && id <= LEGACY_RECORD_12.id;
@@ -6593,7 +6586,7 @@ public enum Material implements Keyed, Translatable {
             case YELLOW_TERRACOTTA:
             case YELLOW_WALL_BANNER:
             case YELLOW_WOOL:
-            // ----- Legacy Separator -----
+                // ----- Legacy Separator -----
             case LEGACY_STONE:
             case LEGACY_GRASS:
             case LEGACY_DIRT:
@@ -6793,7 +6786,7 @@ public enum Material implements Keyed, Translatable {
             case LEGACY_BLACK_GLAZED_TERRACOTTA:
             case LEGACY_CONCRETE:
             case LEGACY_CONCRETE_POWDER:
-            //</editor-fold>
+                //</editor-fold>
                 return true;
             default:
                 return false;
@@ -6811,7 +6804,7 @@ public enum Material implements Keyed, Translatable {
             case AIR:
             case CAVE_AIR:
             case VOID_AIR:
-            // ----- Legacy Separator -----
+                // ----- Legacy Separator -----
             case LEGACY_AIR:
                 //</editor-fold>
                 return true;
@@ -6961,7 +6954,7 @@ public enum Material implements Keyed, Translatable {
             case YELLOW_CARPET:
             case ZOMBIE_HEAD:
             case ZOMBIE_WALL_HEAD:
-            // ----- Legacy Separator -----
+                // ----- Legacy Separator -----
             case LEGACY_AIR:
             case LEGACY_SAPLING:
             case LEGACY_POWERED_RAIL:
@@ -7012,7 +7005,7 @@ public enum Material implements Keyed, Translatable {
             case LEGACY_BEETROOT_BLOCK:
             case LEGACY_END_GATEWAY:
             case LEGACY_STRUCTURE_VOID:
-            //</editor-fold>
+                //</editor-fold>
                 return true;
             default:
                 return false;
@@ -7304,7 +7297,7 @@ public enum Material implements Keyed, Translatable {
             case YELLOW_CARPET:
             case YELLOW_WALL_BANNER:
             case YELLOW_WOOL:
-            // ----- Legacy Separator -----
+                // ----- Legacy Separator -----
             case LEGACY_WOOD:
             case LEGACY_LOG:
             case LEGACY_LEAVES:
@@ -7360,7 +7353,7 @@ public enum Material implements Keyed, Translatable {
             case LEGACY_JUNGLE_DOOR:
             case LEGACY_ACACIA_DOOR:
             case LEGACY_DARK_OAK_DOOR:
-            //</editor-fold>
+                //</editor-fold>
                 return true;
             default:
                 return false;
@@ -7552,7 +7545,7 @@ public enum Material implements Keyed, Translatable {
             case WITHER_ROSE:
             case YELLOW_CARPET:
             case YELLOW_WOOL:
-            // ----- Legacy Separator -----
+                // ----- Legacy Separator -----
             case LEGACY_WOOD:
             case LEGACY_LOG:
             case LEGACY_LEAVES:
@@ -7590,7 +7583,7 @@ public enum Material implements Keyed, Translatable {
             case LEGACY_ACACIA_FENCE:
             case LEGACY_ACACIA_STAIRS:
             case LEGACY_DARK_OAK_STAIRS:
-            //</editor-fold>
+                //</editor-fold>
                 return true;
             default:
                 return false;
@@ -7853,7 +7846,7 @@ public enum Material implements Keyed, Translatable {
             case YELLOW_BANNER:
             case YELLOW_CARPET:
             case YELLOW_WOOL:
-            // ----- Legacy Separator -----
+                // ----- Legacy Separator -----
             case LEGACY_LAVA_BUCKET:
             case LEGACY_COAL_BLOCK:
             case LEGACY_BLAZE_ROD:
@@ -7917,7 +7910,7 @@ public enum Material implements Keyed, Translatable {
             case LEGACY_WOOL:
             case LEGACY_CARPET:
             case LEGACY_BOWL:
-            //</editor-fold>
+                //</editor-fold>
                 return true;
             default:
                 return false;
@@ -8304,7 +8297,7 @@ public enum Material implements Keyed, Translatable {
             case YELLOW_SHULKER_BOX:
             case YELLOW_TERRACOTTA:
             case YELLOW_WOOL:
-            // ----- Legacy Separator -----
+                // ----- Legacy Separator -----
             case LEGACY_STONE:
             case LEGACY_GRASS:
             case LEGACY_DIRT:
@@ -8403,7 +8396,7 @@ public enum Material implements Keyed, Translatable {
             case LEGACY_BLACK_GLAZED_TERRACOTTA:
             case LEGACY_CONCRETE:
             case LEGACY_CONCRETE_POWDER:
-            //</editor-fold>
+                //</editor-fold>
                 return true;
             default:
                 return false;
@@ -8442,12 +8435,12 @@ public enum Material implements Keyed, Translatable {
             case SAND:
             case WHITE_CONCRETE_POWDER:
             case YELLOW_CONCRETE_POWDER:
-            // ----- Legacy Separator -----
+                // ----- Legacy Separator -----
             case LEGACY_SAND:
             case LEGACY_GRAVEL:
             case LEGACY_ANVIL:
             case LEGACY_CONCRETE_POWDER:
-            //</editor-fold>
+                //</editor-fold>
                 return true;
             default:
                 return false;
@@ -8460,6 +8453,9 @@ public enum Material implements Keyed, Translatable {
      * @return true if this material is an item
      */
     public boolean isItem() {
+        if (isFabricItem && !isFabricBlock) {
+            return true;
+        }
         switch (this) {
             //<editor-fold defaultstate="collapsed" desc="isItem">
             case ACACIA_WALL_HANGING_SIGN:
@@ -8609,7 +8605,7 @@ public enum Material implements Keyed, Translatable {
             case YELLOW_CANDLE_CAKE:
             case YELLOW_WALL_BANNER:
             case ZOMBIE_WALL_HEAD:
-            // ----- Legacy Separator -----
+                // ----- Legacy Separator -----
             case LEGACY_ACACIA_DOOR:
             case LEGACY_BED_BLOCK:
             case LEGACY_BEETROOT_BLOCK:
@@ -8662,7 +8658,7 @@ public enum Material implements Keyed, Translatable {
             case LEGACY_WATER:
             case LEGACY_WOODEN_DOOR:
             case LEGACY_WOOD_DOUBLE_STEP:
-            //</editor-fold>
+                //</editor-fold>
                 return false;
             default:
                 return true;
@@ -10997,45 +10993,22 @@ public enum Material implements Keyed, Translatable {
         return Bukkit.getDataPackManager().isEnabledByFeature(this, world);
     }
 
-    // use a normalize() function to ensure it is accessible after a round-trip
-    public static String normalizeName(String name) {
-        return name.toUpperCase(java.util.Locale.ENGLISH).replaceAll("(:|\\s)", "_").replaceAll("\\W", "");
-    }
-
-    public static Material addMaterial(String materialName, int id, boolean isBlock) {
-        // Fabric Blocks
+    public static Material addMaterial(String materialName, int id, int stack, boolean isBlock, ResourceLocation resourceLocation) {
         if (isBlock) {
             Material material = BY_NAME.get(materialName);
             if (material != null){
                 material.blockID = id;
                 material.isFabricBlock = true;
             }else {
-                material = (Material) DynamicEnumHelper.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE}, new Object[]{id, true});
+                material = DynamicEnumHelper.addEnum(Material.class, materialName, List.of(Integer.TYPE, Integer.TYPE, Boolean.TYPE), List.of(id, stack, isBlock));
             }
             BY_NAME.put(materialName, material);
+            material.key = CraftNamespacedKey.fromMinecraft(resourceLocation);
             return material;
         } else { // Fabric Items
-            Material material = (Material) DynamicEnumHelper.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE}, new Object[]{id, false});
+            Material material = DynamicEnumHelper.addEnum(Material.class, materialName, List.of(Integer.TYPE, Integer.TYPE, Boolean.TYPE), List.of(id, stack, isBlock));
             BY_NAME.put(materialName, material);
-            return material;
-        }
-    }
-
-    public static Material addMaterial(String materialName, int id, boolean isBlock, String modName) {
-        // Fabric Blocks
-        if (isBlock) {
-            Material material = BY_NAME.get(materialName);
-            if (material != null) {
-                material.blockID = id;
-                material.isFabricBlock = true;
-            } else {
-                material = (Material) DynamicEnumHelper.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE, String.class}, new Object[]{id, true, modName});
-            }
-            BY_NAME.put(materialName, material);
-            return material;
-        } else { // Fabric Items
-            Material material = (Material) DynamicEnumHelper.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE, String.class}, new Object[]{id, false, modName});
-            BY_NAME.put(materialName, material);
+            material.key = CraftNamespacedKey.fromMinecraft(resourceLocation);
             return material;
         }
     }
