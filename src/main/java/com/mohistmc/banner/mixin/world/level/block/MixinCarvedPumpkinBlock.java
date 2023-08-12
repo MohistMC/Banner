@@ -7,7 +7,6 @@ import net.minecraft.world.level.block.CarvedPumpkinBlock;
 import net.minecraft.world.level.block.state.pattern.BlockPattern;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -15,10 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(CarvedPumpkinBlock.class)
 public abstract class MixinCarvedPumpkinBlock {
-
-    @Shadow
-    public static void clearPatternBlocks(Level level, BlockPattern.BlockPatternMatch patternMatch) {
-    }
 
     @Redirect(method = "spawnGolemInWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/CarvedPumpkinBlock;clearPatternBlocks(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/state/pattern/BlockPattern$BlockPatternMatch;)V"))
     private static void banner$cancelClear(Level level, BlockPattern.BlockPatternMatch patternMatch) {

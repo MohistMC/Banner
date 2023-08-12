@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_20_R1.potion.CraftPotionUtil;
@@ -122,19 +123,40 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity implements Inje
      * @reason bukkit
      */
     @Overwrite
-    private static void applyEffects(Level level, BlockPos pos, int levels, @Nullable MobEffect primary, @Nullable MobEffect secondary) {
-        if (!level.isClientSide && primary != null) {
-            double d0 = (double) (levels * 10 + 10);
-            byte b0 = getAmplification(levels, primary, secondary);
-
-            int j = getLevel(levels);
-            List list = BukkitExtraConstants.getHumansInRange(level, pos, levels);
-
-            applyEffect(list, primary, j, b0, true, pos); // Paper - BeaconEffectEvent
-
-            if (hasSecondaryEffect(levels, primary, secondary)) {
-                applyEffect(list, secondary, j, 0, false, pos); // Paper - BeaconEffectEvent
+    private static void applyEffects(Level pLevel, BlockPos pPos, int pLevels, @Nullable MobEffect pPrimary, @Nullable MobEffect pSecondary) {
+        if (!pLevel.isClientSide && pPrimary != null) {
+            double d0 = (double)(pLevels * 10 + 10);
+            int i = 0;
+            if (pLevels >= 4 && pPrimary == pSecondary) {
+                i = 1;
             }
+
+            int j = (9 + pLevels * 2) * 20;
+            AABB aabb = (new AABB(pPos)).inflate(d0).expandTowards(0.0D, (double)pLevel.getHeight(), 0.0D);
+            List<Player> list = pLevel.getEntitiesOfClass(Player.class, aabb);
+            if (list.isEmpty()) return;
+            for(Player player : list) {
+                // Paper start - BeaconEffectEvent
+                org.bukkit.block.Block block = player.level().getWorld().getBlockAt(pPos.getX(), pPos.getY(), pPos.getZ());
+                PotionEffect effect = CraftPotionUtil.toBukkit(new MobEffectInstance(pPrimary, j, i, true, true));
+                BeaconEffectEvent event = new BeaconEffectEvent(block, effect, (org.bukkit.entity.Player) player.getBukkitEntity(), true);
+                if (CraftEventFactory.callEvent(event).isCancelled()) continue;
+                // Paper end
+                player.addEffect(new MobEffectInstance(CraftPotionUtil.fromBukkit(event.getEffect())), org.bukkit.event.entity.EntityPotionEffectEvent.Cause.BEACON);
+            }
+
+            if (pLevels >= 4 && pPrimary != pSecondary && pSecondary != null) {
+                for(Player player1 : list) {
+                    // Paper start - BeaconEffectEvent
+                    org.bukkit.block.Block block = player1.level().getWorld().getBlockAt(pPos.getX(), pPos.getY(), pPos.getZ());
+                    PotionEffect effect = CraftPotionUtil.toBukkit(new MobEffectInstance(pSecondary, j, 0, true, true));
+                    BeaconEffectEvent event = new BeaconEffectEvent(block, effect, (org.bukkit.entity.Player) player1.getBukkitEntity(), false);
+                    if (CraftEventFactory.callEvent(event).isCancelled()) continue;
+                    // Paper end
+                    player1.addEffect(new MobEffectInstance(CraftPotionUtil.fromBukkit(event.getEffect())), org.bukkit.event.entity.EntityPotionEffectEvent.Cause.BEACON);
+                }
+            }
+
         }
 
     }
