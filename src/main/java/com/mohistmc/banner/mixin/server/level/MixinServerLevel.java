@@ -31,10 +31,12 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.Container;
 import net.minecraft.world.RandomSequences;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -56,6 +58,8 @@ import net.minecraft.world.ticks.LevelTicks;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlockState;
+import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlockStates;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_20_R1.generator.CustomChunkGenerator;
@@ -64,6 +68,7 @@ import org.bukkit.craftbukkit.v1_20_R1.util.CraftNamespacedKey;
 import org.bukkit.craftbukkit.v1_20_R1.util.WorldUUID;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LightningStrike;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.server.MapInitializeEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
@@ -86,12 +91,12 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 @Mixin(ServerLevel.class)
@@ -288,9 +293,46 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         return this.addFreshEntity(entity);
     }
 
-    @Redirect(method = "tickChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
-    public boolean banner$snowForm(ServerLevel serverWorld, BlockPos pos, BlockState state) {
-        return CraftEventFactory.handleBlockFormEvent(serverWorld, pos, state, null);
+    @Inject(method = "tickChunk", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", ordinal = 0, shift = At.Shift.BEFORE, target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
+    public void banner$snowForm0(LevelChunk chunk, int randomTickSpeed, CallbackInfo ci, ChunkPos chunkPos, boolean bl, int i, int j, ProfilerFiller profilerFiller, BlockPos blockPos, BlockPos blockPos2, Biome biome) {
+
+        CraftBlockState craftBlockState = CraftBlockStates.getBlockState((ServerLevel) (Object) this, blockPos2, 3);
+        craftBlockState.setData(Blocks.ICE.defaultBlockState());
+
+        BlockFormEvent event = new BlockFormEvent(craftBlockState.getBlock(), craftBlockState);
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.isCancelled()) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "tickChunk", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", ordinal = 1, shift = At.Shift.BEFORE, target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
+    public void banner$snowForm1(LevelChunk chunk, int randomTickSpeed, CallbackInfo ci, ChunkPos chunkPos, boolean bl, int i, int j, ProfilerFiller profilerFiller, BlockPos blockPos, BlockPos blockPos2, Biome biome, int k, BlockState blockState, int l, BlockState blockState2) {
+
+        CraftBlockState craftBlockState = CraftBlockStates.getBlockState((ServerLevel) (Object) this, blockPos, 3);
+        craftBlockState.setData(blockState2);
+
+        BlockFormEvent event = new BlockFormEvent(craftBlockState.getBlock(), craftBlockState);
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.isCancelled()) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "tickChunk", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", ordinal = 2, shift = At.Shift.BEFORE, target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
+    public void banner$snowForm2(LevelChunk chunk, int randomTickSpeed, CallbackInfo ci, ChunkPos chunkPos, boolean bl, int i, int j, ProfilerFiller profilerFiller, BlockPos blockPos, BlockPos blockPos2, Biome biome) {
+
+        CraftBlockState craftBlockState = CraftBlockStates.getBlockState((ServerLevel) (Object) this, blockPos, 3);
+        craftBlockState.setData(Blocks.SNOW.defaultBlockState());
+
+        BlockFormEvent event = new BlockFormEvent(craftBlockState.getBlock(), craftBlockState);
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.isCancelled()) {
+            ci.cancel();
+        }
     }
 
     @Inject(method = "save", at = @At(value = "JUMP", ordinal = 0, opcode = Opcodes.IFNULL))
