@@ -34,6 +34,8 @@ public abstract class MixinBowItem extends ProjectileWeaponItem {
         super(properties);
     }
 
+    EntityShootBowEvent event;
+
     /**
      * @author wdog5
      * @reason bukkit
@@ -75,18 +77,18 @@ public abstract class MixinBowItem extends ProjectileWeaponItem {
                         }
 
                         // CraftBukkit start
-                        EntityShootBowEvent event = CraftEventFactory.callEntityShootBowEvent(player, stack, itemStack,
+                        event = CraftEventFactory.callEntityShootBowEvent(player, stack, itemStack,
                                 abstractArrow, player.getUsedItemHand(), f, !bl2);
                         if (event.isCancelled()) {
                             event.getProjectile().remove();
                             return;
                         }
-                        bl2 = !event.shouldConsumeItem();
                         // CraftBukkit end
 
                         stack.hurtAndBreak(1, player, (player2) -> {
                             player2.broadcastBreakEvent(player.getUsedItemHand());
                         });
+                        bl2 = !event.shouldConsumeItem(); // Banner
                         if (bl2 || player.getAbilities().instabuild && (itemStack.is(Items.SPECTRAL_ARROW) || itemStack.is(Items.TIPPED_ARROW))) {
                             abstractArrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                         }

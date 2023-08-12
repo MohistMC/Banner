@@ -62,20 +62,9 @@ public abstract class MixinWitch extends Raider {
         // Paper end
     }
 
-    @Redirect(method = "performRangedAttack", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/item/alchemy/PotionUtils;setPotion(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/alchemy/Potion;)Lnet/minecraft/world/item/ItemStack;"))
+    @Redirect(method = "performRangedAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/alchemy/PotionUtils;setPotion(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/alchemy/Potion;)Lnet/minecraft/world/item/ItemStack;"))
     private ItemStack banner$resetPotionStack(ItemStack stack, Potion potion) {
         return paperPotion.get();
-    }
-
-    @Redirect(method = "aiStep", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/item/alchemy/PotionUtils;setPotion(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/alchemy/Potion;)Lnet/minecraft/world/item/ItemStack;"))
-    private ItemStack banner$useBukkitStack(ItemStack stack, Potion potion) {
-        // Paper start
-        org.bukkit.inventory.ItemStack bukkitStack =
-                com.destroystokyo.paper.event.entity.WitchReadyPotionEvent.process((org.bukkit.entity.Witch) this.getBukkitEntity(), CraftItemStack.asCraftMirror(stack));
-        return CraftItemStack.asNMSCopy(bukkitStack);
-        // Paper end
     }
 
 }
