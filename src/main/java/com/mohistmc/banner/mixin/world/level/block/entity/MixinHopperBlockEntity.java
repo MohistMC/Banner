@@ -127,10 +127,9 @@ public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockE
             target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"),
             cancellable = true)
     private static void banner$cancelIfNotEject(Level level, BlockPos pos, BlockState state, Container sourceContainer, CallbackInfoReturnable<Boolean> cir) {
-        if (banner$moveEvent.get().isCancelled()) {
+        if (banner$moveEvent.get() != null && banner$moveEvent.getAndSet(null).isCancelled()) {
             cir.setReturnValue(false);
         }
-        banner$moveEvent.set(null);
     }
 
     @Redirect(method = "tryTakeInItemFromSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;addItem(Lnet/minecraft/world/Container;Lnet/minecraft/world/Container;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/core/Direction;)Lnet/minecraft/world/item/ItemStack;"))
