@@ -1,7 +1,7 @@
 package com.mohistmc.banner.api.color;
 
-import java.util.regex.Matcher;
 import java.awt.Color;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**

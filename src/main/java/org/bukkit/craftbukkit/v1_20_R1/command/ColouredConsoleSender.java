@@ -9,7 +9,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.Ansi.Attribute;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.regex.Matcher;
