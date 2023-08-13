@@ -554,7 +554,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
             this.updateBookPages(list, (s) -> {
                 return Component.Serializer.toJson(Component.literal(s));
             }, itemstack1); // CraftBukkit
-            this.player.getInventory().setItem(i, itemstack); // CraftBukkit - event factory updates the hand book
+            this.player.getInventory().setItem(i, CraftEventFactory.handleEditBookEvent(this.player, i, itemstack, itemstack1)); // CraftBukkit - event factory updates the hand book
         }
     }
 
