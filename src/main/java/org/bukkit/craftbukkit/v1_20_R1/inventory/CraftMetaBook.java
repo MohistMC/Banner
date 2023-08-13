@@ -10,6 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.DelegateDeserialization;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftMetaItem.SerializableMeta;
@@ -18,6 +19,7 @@ import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers;
 import org.bukkit.inventory.meta.BookMeta;
 import org.spigotmc.ValidateUtils;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -450,8 +452,6 @@ public class CraftMetaBook extends CraftMetaItem implements BookMeta {
                 return CraftChatMessage.fromJSONComponent(ComponentSerializer.toString(components));
             }
         }
-
-        /**
         @Override
         public BaseComponent[] getPage(final int page) {
             Validate.isTrue(isValidPage(page), "Invalid page number");
@@ -475,7 +475,7 @@ public class CraftMetaBook extends CraftMetaItem implements BookMeta {
                 if (page == null) {
                     page = new BaseComponent[0];
                 }
-                CraftMetaBook.this.pages.add(componentsToPage(page));
+                CraftMetaBook.this.internalAddPage(componentsToPage(page));
             }
         }
         @Override
@@ -506,7 +506,7 @@ public class CraftMetaBook extends CraftMetaItem implements BookMeta {
             for (BaseComponent[] page : pages) {
                 addPage(page);
             }
-        }*/
+        }
     };
 
     @Override
