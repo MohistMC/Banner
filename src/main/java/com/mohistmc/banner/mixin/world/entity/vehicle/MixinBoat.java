@@ -7,6 +7,7 @@ import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.level.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftLocation;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
@@ -84,9 +85,9 @@ public abstract class MixinBoat extends Entity {
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/Boat;tickBubbleColumn()V"))
     private void banner$updateVehicle(CallbackInfo ci) {
-        final org.bukkit.World bworld = this.level().getWorld();
-        final Location to = new Location(bworld, this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
-        final Vehicle vehicle = (Vehicle) this.getBukkitEntity();
+        org.bukkit.World bworld = this.level().getWorld();
+        Location to = CraftLocation.toBukkit(this.position(), bworld, this.getYRot(), this.getXRot());
+        Vehicle vehicle = (Vehicle) this.getBukkitEntity();
         Bukkit.getPluginManager().callEvent(new VehicleUpdateEvent(vehicle));
         if (this.lastLocation != null && !this.lastLocation.equals(to)) {
             final VehicleMoveEvent event = new VehicleMoveEvent(vehicle, this.lastLocation, to);

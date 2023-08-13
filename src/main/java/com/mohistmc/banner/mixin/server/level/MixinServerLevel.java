@@ -528,30 +528,6 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         return pos;
     }
 
-    @ModifyVariable(method = "tickNonPassenger", argsOnly = true, ordinal = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V"))
-    private Entity banner$captureTickingEntity(Entity entity) {
-        BukkitCaptures.captureTickingEntity(entity);
-        return entity;
-    }
-
-    @ModifyVariable(method = "tickNonPassenger", argsOnly = true, ordinal = 0, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/Entity;tick()V"))
-    private Entity banner$resetTickingEntity(Entity entity) {
-        BukkitCaptures.resetTickingEntity();
-        return entity;
-    }
-
-    @ModifyVariable(method = "tickPassenger", argsOnly = true, ordinal = 1, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;rideTick()V"))
-    private Entity banner$captureTickingPassenger(Entity entity) {
-        BukkitCaptures.captureTickingEntity(entity);
-        return entity;
-    }
-
-    @ModifyVariable(method = "tickPassenger", argsOnly = true, ordinal = 1, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/Entity;rideTick()V"))
-    private Entity banner$resetTickingPassenger(Entity entity) {
-        BukkitCaptures.resetTickingEntity();
-        return entity;
-    }
-
     @Inject(method = "addEntity", at = @At("HEAD"), cancellable = true)
     private void banner$checkSpawnEntity(Entity entity, CallbackInfoReturnable<Boolean> cir) {
         if (BannerConfig.nospawnEntity.contains(entity.getBukkitEntity().getType().name())) {

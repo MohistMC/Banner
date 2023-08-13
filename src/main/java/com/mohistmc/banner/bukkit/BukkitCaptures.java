@@ -323,20 +323,6 @@ public class BukkitCaptures {
         tickingPosition = null;
     }
 
-    private static Entity tickingEntity;
-
-    public static void captureTickingEntity(Entity entity) {
-        tickingEntity = entity;
-    }
-
-    public static Entity getTickingEntity() {
-        return tickingEntity;
-    }
-
-    public static void resetTickingEntity() {
-        tickingEntity = null;
-    }
-
     private static EntityPotionEffectEvent.Cause effectCause;
 
     public static void captureEffectCause(EntityPotionEffectEvent.Cause cause) {

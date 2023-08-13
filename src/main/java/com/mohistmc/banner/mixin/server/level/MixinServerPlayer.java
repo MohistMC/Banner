@@ -153,6 +153,10 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Shadow @Nullable protected abstract PortalInfo findDimensionEntryPoint(ServerLevel destination);
 
+    @Shadow public abstract void resetFallDistance();
+
+    @Shadow public abstract boolean canHarmPlayer(Player other);
+
     // CraftBukkit start
     public String displayName;
     public Component listName;
@@ -813,23 +817,29 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Inject(method = "teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDLjava/util/Set;FF)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;teleport(DDDFFLjava/util/Set;)V"))
     private void banner$forwardReason(ServerLevel level, double x, double y, double z, Set<RelativeMovement> relativeMovements, float yRot, float xRot, CallbackInfoReturnable<Boolean> cir) {
-        var teleportCause = banner$changeDimensionCause.get();
-        banner$changeDimensionCause.set(null);
+        var teleportCause = banner$changeDimensionCause.getAndSet(null);
         this.connection.pushTeleportCause(teleportCause);
     }
 
     @Inject(method = "teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDFF)V", cancellable = true, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/level/ServerPlayer;stopRiding()V"))
     private void banner$handleBy(ServerLevel world, double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {
-        PlayerTeleportEvent.TeleportCause cause = banner$changeDimensionCause.get() == null ? PlayerTeleportEvent.TeleportCause.UNKNOWN : banner$changeDimensionCause.get();
-        banner$changeDimensionCause.set(null);
-        this.getBukkitEntity().teleport(new Location(world.getWorld(), x, y, z, yaw, pitch), cause);
-        ci.cancel();
+        PlayerTeleportEvent.TeleportCause cause = banner$changeDimensionCause.get() == null ? PlayerTeleportEvent.TeleportCause.UNKNOWN : banner$changeDimensionCause.getAndSet(null);
+        if (cause != PlayerTeleportEvent.TeleportCause.UNKNOWN) {
+            this.getBukkitEntity().teleport(new Location(world.getWorld(), x, y, z, yaw, pitch), cause);
+            ci.cancel();
+        }
     }
 
     @Override
     public void teleportTo(ServerLevel worldserver, double d0, double d1, double d2, float f, float f1, PlayerTeleportEvent.TeleportCause cause) {
         pushChangeDimensionCause(cause);
         teleportTo(worldserver, d0, d1, d2, f, f1);
+    }
+
+    @Override
+    public boolean teleportTo(ServerLevel worldserver, double d0, double d1, double d2, Set<RelativeMovement> pRelativeMovements, float f, float f1, PlayerTeleportEvent.TeleportCause cause) {
+        pushChangeDimensionCause(cause);
+        return teleportTo(worldserver, d0, d1, d2, pRelativeMovements, f, f1);
     }
 
     @Inject(method = "stopSleepInBed",

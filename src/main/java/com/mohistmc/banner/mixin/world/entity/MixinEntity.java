@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.injection.world.entity.InjectionEntity;
 import net.minecraft.BlockUtil;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
@@ -78,6 +79,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spigotmc.ActivationRange;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -594,73 +596,37 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         }
     }
 
-    @Redirect(method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;addPassenger(Lnet/minecraft/world/entity/Entity;)V"))
-    private void banner$startRiding(Entity entity, Entity pPassenger) {
-        if (!(entity).banner$addPassenger(pPassenger)) {
-            this.vehicle = null;
-        }
-    }
-
-    @Redirect(method = "removeVehicle", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;removePassenger(Lnet/minecraft/world/entity/Entity;)V"))
-    private void banner$stopRiding(Entity entity, Entity passenger) {
-        if (!(entity).banner$removePassenger(passenger)) {
-            this.vehicle = entity;
-        }
-    }
-
-    @Override
-    public boolean banner$addPassenger(Entity entity) {
-        if (entity.getVehicle() != (Object) this) {
-            throw new IllegalStateException("Use x.startRiding(y), not y.addPassenger(x)");
-        } else {
-            // CraftBukkit start
-            com.google.common.base.Preconditions.checkState(!(entity).getPassengers().contains(((Entity) (Object) this)), "Circular entity riding! %s %s", this, entity);
-
-            CraftEntity craft = (CraftEntity) (entity.getBukkitEntity().getVehicle());
-            Entity orig = craft == null ? null : craft.getHandle();
-            if (getBukkitEntity() instanceof Vehicle && (entity).getBukkitEntity() instanceof org.bukkit.entity.LivingEntity) {
-                VehicleEnterEvent event = new VehicleEnterEvent(
-                        (Vehicle) getBukkitEntity(),
-                        (entity.getBukkitEntity()
-                ));
-                // Suppress during worldgen
-                if (this.valid) {
-                    Bukkit.getPluginManager().callEvent(event);
-                }
-                CraftEntity craftn = (CraftEntity) entity.getBukkitEntity().getVehicle();
-                Entity n = craftn == null ? null : craftn.getHandle();
-                if (event.isCancelled() || n != orig) {
-                    return false;
-                }
-            }
-            // CraftBukkit end
-            // Spigot start
-            org.spigotmc.event.entity.EntityMountEvent event = new org.spigotmc.event.entity.EntityMountEvent((entity).getBukkitEntity(), this.getBukkitEntity());
+    @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", shift = At.Shift.BEFORE, target = "Lnet/minecraft/world/entity/Entity;setPose(Lnet/minecraft/world/entity/Pose;)V"))
+    public void banner$startRiding(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> cir) {
+        // CraftBukkit start
+        if (vehicle.getBukkitEntity() instanceof Vehicle && this.getBukkitEntity() instanceof org.bukkit.entity.LivingEntity) {
+            VehicleEnterEvent event = new VehicleEnterEvent((Vehicle) vehicle.getBukkitEntity(), this.getBukkitEntity());
             // Suppress during worldgen
             if (this.valid) {
                 Bukkit.getPluginManager().callEvent(event);
             }
             if (event.isCancelled()) {
-                return false;
+                cir.setReturnValue(false);
             }
-            // Spigot end
-            if (this.passengers.isEmpty()) {
-                this.passengers = ImmutableList.of(entity);
-            } else {
-                List<Entity> list = Lists.newArrayList(this.passengers);
-
-                if (!this.level.isClientSide && entity instanceof Player && !(this.getFirstPassenger() instanceof Player)) {
-                    list.add(0, entity);
-                } else {
-                    list.add(entity);
-                }
-
-                this.passengers = ImmutableList.copyOf(list);
-            }
-
-            this.gameEvent(GameEvent.ENTITY_MOUNT, entity);
         }
-        return true; // CraftBukkit
+        // CraftBukkit end
+        // Spigot start
+        org.spigotmc.event.entity.EntityMountEvent event = new org.spigotmc.event.entity.EntityMountEvent(this.getBukkitEntity(), vehicle.getBukkitEntity());
+        // Suppress during worldgen
+        if (this.valid) {
+            Bukkit.getPluginManager().callEvent(event);
+        }
+        if (event.isCancelled()) {
+            cir.setReturnValue(false);
+        }
+        // Spigot end
+    }
+
+    @Redirect(method = "removeVehicle", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;removePassenger(Lnet/minecraft/world/entity/Entity;)V"))
+    private void banner$stopRiding(Entity entity, Entity passenger) {
+        if (!entity.banner$removePassenger(passenger)) {
+            this.vehicle = entity;
+        }
     }
 
     @Override
