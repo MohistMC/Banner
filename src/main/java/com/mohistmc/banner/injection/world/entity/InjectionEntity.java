@@ -35,10 +35,6 @@ public interface InjectionEntity {
         return null;
     }
 
-    default boolean canCollideWith(Entity entity) {
-        return false;
-    }
-
     default boolean bridge$persist() {
         return true;
     }

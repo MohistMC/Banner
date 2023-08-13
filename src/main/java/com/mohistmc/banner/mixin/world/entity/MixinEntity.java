@@ -874,11 +874,6 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     }
 
     @Override
-    public boolean canCollideWith(Entity entity) {
-        return this.isPushable();
-    }
-
-    @Override
     public ActivationRange.ActivationType bridge$activationType() {
         return activationType;
     }
