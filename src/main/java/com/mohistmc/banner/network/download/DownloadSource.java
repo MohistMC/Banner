@@ -18,13 +18,13 @@ public enum DownloadSource {
 
     MOHIST("https://maven.mohistmc.com/"),
     CHINA("http://s1.devicloud.cn:25119/"),
-    GITHUB("https://mavenmirror.mohistmc.com/");
+    GITHUB("https://mohistmc.github.io/maven/");
 
     public static final DownloadSource defaultSource = isCN() ? CHINA : MOHIST;
     final
     String url;
 
-    public static DownloadSource get() throws IOException {
+    public static DownloadSource get() {
         String ds = BannerConfigUtil.defaultSource();
         for (DownloadSource me : DownloadSource.values()) {
             if (me.name().equalsIgnoreCase(ds)) {
@@ -39,11 +39,15 @@ public enum DownloadSource {
         return BannerMCStart.I18N.isCN();
     }
 
-    public static int isDown(String s) throws IOException {
-        URL url = new URL(s);
-        URLConnection rulConnection = url.openConnection();
-        HttpURLConnection httpUrlConnection = (HttpURLConnection) rulConnection;
-        httpUrlConnection.connect();
-        return httpUrlConnection.getResponseCode();
+    public static int isDown(String s) {
+        try {
+            URL url = new URL(s);
+            URLConnection rulConnection = url.openConnection();
+            HttpURLConnection httpUrlConnection = (HttpURLConnection) rulConnection;
+            httpUrlConnection.connect();
+            return httpUrlConnection.getResponseCode();
+        } catch (Exception e) {
+            return 0;
+        }
     }
 }
