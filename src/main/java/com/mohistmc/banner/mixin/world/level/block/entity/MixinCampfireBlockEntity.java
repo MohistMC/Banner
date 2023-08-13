@@ -44,6 +44,13 @@ public abstract class MixinCampfireBlockEntity extends BlockEntity {
         super(blockEntityType, blockPos, blockState);
     }
 
+
+    // Banner - fix mixin(locals = LocalCapture.CAPTURE_FAILSOFT)
+    private static Optional<CampfireCookingRecipe> recipe;
+    private static CraftItemStack source;
+    private static  org.bukkit.inventory.ItemStack result;
+    private static BlockCookEvent blockCookEvent;
+
     /**
      * @author wdog5
      * @reason bukkit
@@ -53,26 +60,25 @@ public abstract class MixinCampfireBlockEntity extends BlockEntity {
         boolean flag = false;
 
         for (int i = 0; i < tileentitycampfire.getItems().size(); ++i) {
-            ItemStack itemstack = (ItemStack) tileentitycampfire.getItems().get(i);
+            ItemStack itemstack = tileentitycampfire.getItems().get(i);
 
             if (!itemstack.isEmpty()) {
                 flag = true;
-                int j = tileentitycampfire.cookingProgress[i]++;
 
                 if (tileentitycampfire.cookingProgress[i] >= tileentitycampfire.cookingTime[i]) {
-                    SimpleContainer inventorysubcontainer = new SimpleContainer(new ItemStack[]{itemstack});
-                    Optional<CampfireCookingRecipe> recipe = ((MixinCampfireBlockEntity) (Object) tileentitycampfire).quickCheck.getRecipeFor( inventorysubcontainer, world);
-                    ItemStack itemstack1 = (ItemStack) recipe.map((recipecampfire) -> {
+                    Container inventorysubcontainer = new SimpleContainer(itemstack);
+                    recipe = ((MixinCampfireBlockEntity) (Object) tileentitycampfire).quickCheck.getRecipeFor( inventorysubcontainer, world);
+                    ItemStack itemStack2 = recipe.map((recipecampfire) -> {
                         // Paper end
                         return recipecampfire.assemble(inventorysubcontainer, world.registryAccess());
                     }).orElse(itemstack);
 
-                    if (itemstack1.isItemEnabled(world.enabledFeatures())) {
+                    if (itemStack2.isItemEnabled(world.enabledFeatures())) {
                         // CraftBukkit start - fire BlockCookEvent
-                        CraftItemStack source = CraftItemStack.asCraftMirror(itemstack);
-                        org.bukkit.inventory.ItemStack result = CraftItemStack.asBukkitCopy(itemstack1);
+                        source = CraftItemStack.asCraftMirror(itemstack);
+                        result = CraftItemStack.asBukkitCopy(itemStack2);
 
-                        BlockCookEvent blockCookEvent = new BlockCookEvent(CraftBlock.at(world, blockposition), source, result, (org.bukkit.inventory.CookingRecipe<?>) recipe.map(CampfireCookingRecipe::toBukkitRecipe).orElse(null)); // Paper
+                        blockCookEvent = new BlockCookEvent(CraftBlock.at(world, blockposition), source, result, (org.bukkit.inventory.CookingRecipe<?>) recipe.map(CampfireCookingRecipe::toBukkitRecipe).orElse(null)); // Paper
                         world.getCraftServer().getPluginManager().callEvent(blockCookEvent);
 
                         if (blockCookEvent.isCancelled()) {
@@ -80,9 +86,9 @@ public abstract class MixinCampfireBlockEntity extends BlockEntity {
                         }
 
                         result = blockCookEvent.getResult();
-                        itemstack1 = CraftItemStack.asNMSCopy(result);
+                        itemStack2 = CraftItemStack.asNMSCopy(result);
                         // CraftBukkit end
-                        Containers.dropItemStack(world, (double) blockposition.getX(), (double) blockposition.getY(), (double) blockposition.getZ(), itemstack1);
+                        Containers.dropItemStack(world, (double) blockposition.getX(), (double) blockposition.getY(), (double) blockposition.getZ(), itemStack2);
                         tileentitycampfire.getItems().set(i, ItemStack.EMPTY);
                         world.sendBlockUpdated(blockposition, iblockdata, iblockdata, 3);
                         world.gameEvent(GameEvent.BLOCK_CHANGE, blockposition, GameEvent.Context.of(iblockdata));
