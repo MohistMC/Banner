@@ -57,11 +57,13 @@ public abstract class MixinLootTable implements InjectionLootTable {
         LootContext context = (new LootContext.Builder(lootparams)).withOptionalRandomSeed(seed).create(this.randomSequence);
         ObjectArrayList<ItemStack> objectArrayList = this.getRandomItems(context);
         RandomSource randomsource = context.getRandom();
-        LootGenerateEvent event = CraftEventFactory.callLootGenerateEvent(inv, (LootTable) (Object) this, context, objectArrayList, plugin);
-        if (event.isCancelled()) {
-            return;
+        if (context.hasParam(LootContextParams.ORIGIN) && !context.hasParam(LootContextParams.THIS_ENTITY)) {
+            LootGenerateEvent event = CraftEventFactory.callLootGenerateEvent(inv, (LootTable) (Object) this, context, objectArrayList, plugin);
+            if (event.isCancelled()) {
+                return;
+            }
+            objectArrayList = event.getLoot().stream().map(CraftItemStack::asNMSCopy).collect(ObjectArrayList.toList());
         }
-        objectArrayList = event.getLoot().stream().map(CraftItemStack::asNMSCopy).collect(ObjectArrayList.toList());
 
         List<Integer> list = this.getAvailableSlots(inv, randomsource);
         this.shuffleAndSplitItems(objectArrayList, list.size(), randomsource);
