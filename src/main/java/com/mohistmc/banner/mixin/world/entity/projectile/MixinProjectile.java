@@ -50,9 +50,7 @@ public abstract class MixinProjectile extends Entity implements InjectionProject
 
     @Override
     public void preOnHit(HitResult movingobjectposition) {
-        org.bukkit.event.entity.ProjectileHitEvent event =
-                org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory.callProjectileHitEvent(((Projectile) (Object) this),
-                        movingobjectposition);
+        org.bukkit.event.entity.ProjectileHitEvent event = org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory.callProjectileHitEvent(((Projectile) (Object) this), movingobjectposition);
         this.hitCancelled = event != null && event.isCancelled();
         if (movingobjectposition.getType() == HitResult.Type.BLOCK || !this.hitCancelled) {
             this.onHit(movingobjectposition);

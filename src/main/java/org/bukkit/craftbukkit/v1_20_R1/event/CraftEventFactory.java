@@ -1367,6 +1367,11 @@ public class CraftEventFactory {
             hitEntity = ((EntityHitResult) position).getEntity().getBukkitEntity();
         }
 
+        // Mohist start - Fix ClassCastException MohistModsEntity -> org.bukkit.entity.Projectile
+        if (!(entity.getBukkitEntity() instanceof Projectile))
+            return null;
+        // Mohist end
+
         // Paper start - legacy event
         boolean cancelled = false;
         if (hitEntity != null && position instanceof EntityHitResult entityHitResult) {
