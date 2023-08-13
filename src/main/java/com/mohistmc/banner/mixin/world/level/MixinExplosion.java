@@ -246,12 +246,49 @@ public abstract class MixinExplosion implements InjectionExplosion {
             boolean flag2 = this.getIndirectSourceEntity() instanceof Player;
             Util.shuffle(this.toBlow, this.level.random);
 
-            float yield = this.callBlockExplodeEvent();
+            // CraftBukkit start
+            org.bukkit.World bworld = this.level.getWorld();
+            org.bukkit.entity.Entity explode = this.source == null ? null : this.source.getBukkitEntity();
+            Location location = new Location(bworld, this.x, this.y, this.z);
 
-            if (Float.isNaN(yield)) {
+            List<org.bukkit.block.Block> blockList = new ObjectArrayList<>();
+            for (int i1 = this.toBlow.size() - 1; i1 >= 0; i1--) {
+                BlockPos cpos = this.toBlow.get(i1);
+                org.bukkit.block.Block bblock = bworld.getBlockAt(cpos.getX(), cpos.getY(), cpos.getZ());
+                if (!bblock.getType().isAir()) {
+                    blockList.add(bblock);
+                }
+            }
+
+            boolean cancelled;
+            List<org.bukkit.block.Block> bukkitBlocks;
+            float yield;
+
+            if (explode != null) {
+                EntityExplodeEvent event = new EntityExplodeEvent(explode, location, blockList, this.blockInteraction == Explosion.BlockInteraction.DESTROY_WITH_DECAY ? 1.0F / this.radius : 1.0F);
+                this.level.getCraftServer().getPluginManager().callEvent(event);
+                cancelled = event.isCancelled();
+                bukkitBlocks = event.blockList();
+                yield = event.getYield();
+            } else {
+                BlockExplodeEvent event = new BlockExplodeEvent(location.getBlock(), blockList, this.blockInteraction == Explosion.BlockInteraction.DESTROY_WITH_DECAY ? 1.0F / this.radius : 1.0F);
+                this.level.getCraftServer().getPluginManager().callEvent(event);
+                cancelled = event.isCancelled();
+                bukkitBlocks = event.blockList();
+                yield = event.getYield();
+            }
+
+            this.toBlow.clear();
+            for (org.bukkit.block.Block bblock : bukkitBlocks) {
+                BlockPos coords = new BlockPos(bblock.getX(), bblock.getY(), bblock.getZ());
+                toBlow.add(coords);
+            }
+
+            if (cancelled) {
                 this.wasCanceled = true;
                 return;
             }
+            // CraftBukkit end
 
             for (BlockPos blockpos : this.toBlow) {
                 BlockState blockstate = this.level.getBlockState(blockpos);
@@ -270,23 +307,20 @@ public abstract class MixinExplosion implements InjectionExplosion {
                 if (!blockstate.isAir()) {
                     BlockPos blockpos1 = blockpos.immutable();
                     this.level.getProfiler().push("explosion_blocks");
-                    if (block.dropFromExplosion(((Explosion) (Object) this))) {
-                        Level var11 = this.level;
-                        if (var11 instanceof ServerLevel serverLevel) {
-                            BlockEntity blockEntity = blockstate.hasBlockEntity() ? this.level.getBlockEntity(blockpos) : null;
-                            LootParams.Builder builder = (new LootParams.Builder(serverLevel)).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockpos)).withParameter(LootContextParams.TOOL, ItemStack.EMPTY).withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity).withOptionalParameter(LootContextParams.THIS_ENTITY, this.source);
-                            if (yield < 1.0F) { // CraftBukkit - add yield
-                                builder.withParameter(LootContextParams.EXPLOSION_RADIUS, 1.0F / yield); // CraftBukkit - add yield
-                            }
-
-                            blockstate.spawnAfterBreak(serverLevel, blockpos, ItemStack.EMPTY, flag2);
-                            blockstate.getDrops(builder).forEach((itemStack) -> {
-                                addBlockDrops(objectarraylist, itemStack, blockpos1);
-                            });
+                    if (block.dropFromExplosion(((Explosion) (Object) this))&& this.level instanceof ServerLevel serverLevel) {
+                        BlockEntity blockEntity = blockstate.hasBlockEntity() ? this.level.getBlockEntity(blockpos) : null;
+                        LootParams.Builder builder = (new LootParams.Builder(serverLevel)).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockpos)).withParameter(LootContextParams.TOOL, ItemStack.EMPTY).withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity).withOptionalParameter(LootContextParams.THIS_ENTITY, this.source);
+                        if (yield < 1.0F) { // CraftBukkit - add yield
+                            builder.withParameter(LootContextParams.EXPLOSION_RADIUS, 1.0F / yield); // CraftBukkit - add yield
                         }
+
+                        blockstate.spawnAfterBreak(serverLevel, blockpos, ItemStack.EMPTY, flag2);
+                        blockstate.getDrops(builder).forEach((itemStack) -> {
+                            addBlockDrops(objectarraylist, itemStack, blockpos1);
+                        });
+
                     }
 
-                    this.level.setBlock(blockpos, Blocks.AIR.defaultBlockState(), 3);
                     block.wasExploded(this.level, blockpos, ((Explosion) (Object) this));
                     this.level.getProfiler().pop();
                 }
@@ -307,46 +341,6 @@ public abstract class MixinExplosion implements InjectionExplosion {
                 }
             }
         }
-    }
-
-    private float callBlockExplodeEvent() {
-        org.bukkit.World world =  this.level.getWorld();
-        org.bukkit.entity.Entity exploder = this.source == null ? null :  this.source.getBukkitEntity();
-        Location location = new Location(world, this.x, this.y, this.z);
-        List<org.bukkit.block.Block> blockList = Lists.newArrayList();
-        for (int i = this.toBlow.size() - 1; i >= 0; i--) {
-            BlockPos blockPos = this.toBlow.get(i);
-            org.bukkit.block.Block block = world.getBlockAt(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-            if (!block.getType().isAir()) {
-                blockList.add(block);
-            }
-        }
-
-        boolean cancelled;
-        List<org.bukkit.block.Block> bukkitBlocks;
-        float bukkitYield;
-
-        if (exploder != null) {
-            EntityExplodeEvent event = new EntityExplodeEvent(exploder, location, blockList, this.blockInteraction == Explosion.BlockInteraction.DESTROY_WITH_DECAY ? 1.0F / this.radius : 1.0F);
-            Bukkit.getPluginManager().callEvent(event);
-            cancelled = event.isCancelled();
-            bukkitBlocks = event.blockList();
-            bukkitYield = event.getYield();
-        } else {
-            BlockExplodeEvent event = new BlockExplodeEvent(location.getBlock(), blockList, this.blockInteraction == Explosion.BlockInteraction.DESTROY_WITH_DECAY ? 1.0F / this.radius : 1.0F);
-            Bukkit.getPluginManager().callEvent(event);
-            cancelled = event.isCancelled();
-            bukkitBlocks = event.blockList();
-            bukkitYield = event.getYield();
-        }
-
-        this.toBlow.clear();
-
-        for (org.bukkit.block.Block block : bukkitBlocks) {
-            BlockPos blockPos = new BlockPos(block.getX(), block.getY(), block.getZ());
-            this.toBlow.add(blockPos);
-        }
-        return cancelled ? Float.NaN : bukkitYield;
     }
 
     @Override

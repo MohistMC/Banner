@@ -35,6 +35,6 @@ public abstract class MixinMinecartTNT extends AbstractMinecart {
             ci.cancel();
             return null;
         }
-        return level.explode((MinecartTNT) (Object) this, x, y, z, event.getRadius(), event.getFire(), interaction);
+        return level.explode(entity, source, calculator, x, y, z, event.getRadius(), event.getFire(), interaction);
     }
 }
