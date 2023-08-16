@@ -424,7 +424,7 @@ public class CraftEventFactory {
     }
 
     public static void handleBlockDropItemEvent(Block block, BlockState state, ServerPlayer player, List<ItemEntity> items) {
-        BlockDropItemEvent event = new BlockDropItemEvent(block, state, (CraftPlayer) player.getBukkitEntity(), Lists.transform(items, (item) -> (org.bukkit.entity.Item) item.getBukkitEntity()));
+        BlockDropItemEvent event = new BlockDropItemEvent(block, state, player.getBukkitEntity(), Lists.transform(items, (item) -> (org.bukkit.entity.Item) item.getBukkitEntity()));
         Bukkit.getPluginManager().callEvent(event);
 
         if (!event.isCancelled()) {
