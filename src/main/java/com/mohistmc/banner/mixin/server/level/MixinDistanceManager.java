@@ -5,7 +5,11 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.minecraft.core.SectionPos;
-import net.minecraft.server.level.*;
+import net.minecraft.server.level.DistanceManager;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.Ticket;
+import net.minecraft.server.level.TicketType;
+import net.minecraft.server.level.TickingTracker;
 import net.minecraft.util.SortedArraySet;
 import net.minecraft.world.level.ChunkPos;
 import org.spongepowered.asm.mixin.Final;
@@ -41,26 +45,6 @@ public abstract class MixinDistanceManager implements InjectionDistanceManager {
         if (set == null) {
             ci.cancel();
         }
-    }
-
-    @Redirect(method = "runAllUpdates", at = @At(value = "INVOKE", remap = false, target = "Ljava/util/Set;forEach(Ljava/util/function/Consumer;)V"))
-    private void arclight$safeIter(Set<ChunkHolder> instance, Consumer<ChunkHolder> consumer) {
-        // Iterate pending chunk updates with protection against concurrent modification exceptions
-        var iter = instance.iterator();
-        var expectedSize = instance.size();
-        do {
-            var chunkHolder = iter.next();
-            iter.remove();
-            expectedSize--;
-
-            consumer.accept(chunkHolder);
-
-            // Reset iterator if set was modified using add()
-            if (instance.size() != expectedSize) {
-                expectedSize = instance.size();
-                iter = instance.iterator();
-            }
-        } while (iter.hasNext());
     }
 
     @Override
