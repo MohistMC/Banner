@@ -318,8 +318,9 @@ public abstract class MixinExplosion implements InjectionExplosion {
                         });
 
                     }
-                    this.level.setBlock(blockpos, Blocks.AIR.defaultBlockState(), 3); // Update the block on the client
+
                     block.wasExploded(this.level, blockpos, ((Explosion) (Object) this));
+                    this.level.setBlock(blockpos, Blocks.AIR.defaultBlockState(), 3); // Update the block on the client
                     this.level.getProfiler().pop();
                 }
             }
