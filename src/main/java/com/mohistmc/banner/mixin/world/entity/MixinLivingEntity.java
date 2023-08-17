@@ -360,10 +360,14 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         }
     }
 
+    @Shadow public abstract boolean addEffect(MobEffectInstance effectInstanceIn, Entity entity);
+
+
     /**
      * @author IzzelAliz
      * @reason
      */
+    /*
     @Overwrite
     public boolean addEffect(MobEffectInstance effectInstanceIn, Entity entity) {
         EntityPotionEffectEvent.Cause cause = getEffectCause().orElse(EntityPotionEffectEvent.Cause.UNKNOWN);
@@ -399,6 +403,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
             }
         }
     }
+    */
 
     @SuppressWarnings("unused") // mock
     public MobEffectInstance c(@Nullable MobEffect potioneffectin, EntityPotionEffectEvent.Cause cause) {
