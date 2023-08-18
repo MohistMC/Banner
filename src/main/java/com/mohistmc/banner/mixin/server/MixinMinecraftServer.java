@@ -635,37 +635,42 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         // this.nextTickTime = SystemUtils.getMillis() + 10L;
         this.executeModerately();
         // Iterator iterator = this.levels.values().iterator();
+        Iterator var5 = this.levels.values().iterator();
 
-        if (true) {
-            ServerLevel worldserver1 = worldserver;
-            // CraftBukkit end
-            ForcedChunksSavedData forcedchunk = (ForcedChunksSavedData) worldserver1.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
+        while(true) {
+            ServerLevel serverLevel2;
+            ForcedChunksSavedData forcedChunksSavedData;
+            do {
+                if (!var5.hasNext()) {
+                    // CraftBukkit start
+                    // this.nextTickTime = SystemUtils.getMillis() + 10L;
+                    this.executeModerately();
+                    // CraftBukkit end
+                    listener.stop();
+                    // CraftBukkit start
+                    // this.updateMobSpawningFlags();
+                    worldserver.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
 
-            if (forcedchunk != null) {
-                LongIterator longiterator = forcedchunk.getChunks().iterator();
-
-                while (longiterator.hasNext()) {
-                    long i = longiterator.nextLong();
-                    ChunkPos chunkcoordintpair = new ChunkPos(i);
-
-                    worldserver1.getChunkSource().updateChunkForced(chunkcoordintpair, true);
+                    this.forceTicks = false;
+                    // CraftBukkit end
+                    return;
                 }
+
+                serverLevel2 = (ServerLevel)var5.next();
+                forcedChunksSavedData = (ForcedChunksSavedData)serverLevel2.getDataStorage().get(ForcedChunksSavedData::load, "chunks");
+            } while(forcedChunksSavedData == null);
+
+            LongIterator longIterator = forcedChunksSavedData.getChunks().iterator();
+
+            while(longIterator.hasNext()) {
+                long l = longIterator.nextLong();
+                ChunkPos chunkPos = new ChunkPos(l);
+                serverLevel2.getChunkSource().updateChunkForced(chunkPos, true);
             }
+
             worldserver.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API // Banner - tick to sync chunks
-            Bukkit.getPluginManager().callEvent(new WorldLoadEvent(worldserver1.getWorld()));
+            Bukkit.getPluginManager().callEvent(new WorldLoadEvent(serverLevel2.getWorld()));
         }
-
-        // CraftBukkit start
-        // this.nextTickTime = SystemUtils.getMillis() + 10L;
-        this.executeModerately();
-        // CraftBukkit end
-        listener.stop();
-        // CraftBukkit start
-        // this.updateMobSpawningFlags();
-        worldserver.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
-
-        this.forceTicks = false;
-        // CraftBukkit end
     }
 
     @Override

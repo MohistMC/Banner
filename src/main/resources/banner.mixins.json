@@ -11,7 +11,7 @@
     "maxShiftBy": 2,
     "defaultRequire": 1
   },
-  "mixinPriority": 500,
+  "mixinPriority": 400,
   "mixins": [
     "MixinCrashReport",
     "MixinCrashReportCategory",

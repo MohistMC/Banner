@@ -45,6 +45,9 @@ public abstract class MixinRecipeManager implements InjectionRecipeManager {
 
     public Map<RecipeType<?>, Object2ObjectLinkedOpenHashMap<ResourceLocation, Recipe<?>>> recipesCB = ImmutableMap.of(); // CraftBukkit  // Mohist use obf name
 
+
+    // Banner - fix mixin
+    protected Map<RecipeType<?>, Object2ObjectLinkedOpenHashMap<ResourceLocation, Recipe<?>>> map1;
     /**
      * @author wdog5
      * @reason bukkit current recipe
@@ -54,7 +57,7 @@ public abstract class MixinRecipeManager implements InjectionRecipeManager {
         this.hasErrors = false;
 
         // CraftBukkit start - SPIGOT-5667 make sure all types are populated and mutable
-        Map<RecipeType<?>, Object2ObjectLinkedOpenHashMap<ResourceLocation, Recipe<?>>> map1 = Maps.newHashMap();
+        map1 = Maps.newHashMap();
         for (RecipeType<?> recipeType : BuiltInRegistries.RECIPE_TYPE) {
             map1.put(recipeType, new Object2ObjectLinkedOpenHashMap<>());
         }

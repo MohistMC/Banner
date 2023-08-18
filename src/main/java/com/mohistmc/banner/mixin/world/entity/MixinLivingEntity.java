@@ -360,17 +360,17 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         }
     }
 
-    @Shadow public abstract boolean addEffect(MobEffectInstance effectInstanceIn, Entity entity);
+    // @Shadow public abstract boolean addEffect(MobEffectInstance effectInstanceIn, Entity entity);
 
-
+    // Banner - fix mixin(locals = LocalCapture.CAPTURE_FAILHARD)
+    public EntityPotionEffectEvent.Cause cause;
     /**
-     * @author IzzelAliz
+     * @author wdog5
      * @reason
      */
-    /*
     @Overwrite
     public boolean addEffect(MobEffectInstance effectInstanceIn, Entity entity) {
-        EntityPotionEffectEvent.Cause cause = getEffectCause().orElse(EntityPotionEffectEvent.Cause.UNKNOWN);
+        cause = getEffectCause().orElse(EntityPotionEffectEvent.Cause.UNKNOWN);
         if (isTickingEffects) {
             effectsToProcess.add(new ProcessableEffect(effectInstanceIn, cause));
             return true;
@@ -403,7 +403,6 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
             }
         }
     }
-    */
 
     @SuppressWarnings("unused") // mock
     public MobEffectInstance c(@Nullable MobEffect potioneffectin, EntityPotionEffectEvent.Cause cause) {
