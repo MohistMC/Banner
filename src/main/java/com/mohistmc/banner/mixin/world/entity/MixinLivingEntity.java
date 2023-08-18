@@ -226,6 +226,8 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         this.banner$FallState.set(state);
     }
 
+    // TODO
+    /*
     @Redirect(method = "checkFallDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;sendParticles(Lnet/minecraft/core/particles/ParticleOptions;DDDIDDDD)I"))
     private <T extends ParticleOptions>  int banner$addCheckFall(ServerLevel instance,  T type, double posX, double posY, double posZ, int particleCount, double xOffset, double yOffset, double zOffset, double speed) {
         // CraftBukkit start - visiblity api
@@ -238,6 +240,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
             return ((ServerLevel) this.level()).sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, banner$FallState.get()), this.getX(), this.getY(), this.getZ(), banner$i, 0.0D, 0.0D, 0.0D, 0.15000000596046448D);
         }
     }
+     */
 
     @Redirect(method = "onEquipItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isClientSide()Z"))
     private boolean banner$addSilentCheck(Level instance) {
