@@ -29,7 +29,7 @@ public class DefaultLibraries {
 
     public static void run() throws Exception {
         System.out.println(BannerMCStart.I18N.get("libraries.checking.start"));
-        System.out.println(BannerMCStart.I18N.get("libraries.downloadsource", DownloadSource.get()));
+        System.out.println(BannerMCStart.I18N.get("libraries.downloadsource", DownloadSource.get().name()));
         LinkedHashMap<File, String> libs = getDefaultLibs();
         AtomicLong currentSize = new AtomicLong();
         Set<File> defaultLibs = new LinkedHashSet<>();

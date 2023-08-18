@@ -1,4 +1,4 @@
-package com.mohistmc.banner.inventory;
+package com.mohistmc.banner.bukkit.inventory;
 
 import net.minecraft.world.Container;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventory;

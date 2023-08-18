@@ -1,31 +1,31 @@
-package com.mohistmc.banner.entity;
+package com.mohistmc.banner.bukkit.entity;
 
 import com.mohistmc.banner.api.EntityAPI;
-import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.monster.Monster;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftTameableAnimal;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftMonster;
 import org.bukkit.entity.EntityType;
 
 /**
  * Mohist
  *
  * @author Malcolm - m1lc0lm
- * @Created  at 20.02.2022 - 20:40 GMT+1
+ * @Created  at 20.02.2022 - 21:02 GMT+1
  * © Copyright 2021 / 2022 - M1lcolm
  */
-public class MohistModsTameableEntity extends CraftTameableAnimal {
+public class MohistModsMonster extends CraftMonster {
 
     public String entityName;
 
-    public MohistModsTameableEntity(CraftServer server, TamableAnimal entity) {
+    public MohistModsMonster(CraftServer server, Monster entity) {
         super(server, entity);
         this.entityName = EntityAPI.entityName(entity);
     }
 
 
     @Override
-    public TamableAnimal getHandle() {
-        return (TamableAnimal) entity;
+    public Monster getHandle() {
+        return (Monster) entity;
     }
 
     @Override
@@ -35,6 +35,6 @@ public class MohistModsTameableEntity extends CraftTameableAnimal {
 
     @Override
     public String toString() {
-        return "CraftCustomTameableAnimal{" + entityName + '}';
+        return "MohistModsMonster{" + entityName + '}';
     }
 }

@@ -1,4 +1,4 @@
-package com.mohistmc.banner.entity;
+package com.mohistmc.banner.bukkit.entity;
 
 import com.mohistmc.banner.api.EntityAPI;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;

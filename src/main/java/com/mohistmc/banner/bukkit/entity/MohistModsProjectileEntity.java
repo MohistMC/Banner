@@ -1,24 +1,25 @@
-package com.mohistmc.banner.entity;
+package com.mohistmc.banner.bukkit.entity;
 
 import com.mohistmc.banner.api.EntityAPI;
-import net.minecraft.world.entity.projectile.ThrowableProjectile;
+import net.minecraft.world.entity.projectile.Projectile;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftProjectile;
 import org.bukkit.entity.EntityType;
 
-public class MohistModsThrowableEntity extends CraftProjectile {
+public class MohistModsProjectileEntity extends CraftProjectile {
 
     public String entityName;
 
-    public MohistModsThrowableEntity(CraftServer server, ThrowableProjectile entity) {
+    public MohistModsProjectileEntity(CraftServer server, Projectile entity) {
         super(server, entity);
         this.entityName = EntityAPI.entityName(entity);
     }
 
     @Override
-    public ThrowableProjectile getHandle() {
-        return (ThrowableProjectile) entity;
+    public Projectile getHandle() {
+        return (Projectile) this.entity;
     }
+
 
     @Override
     public EntityType getType() {
@@ -27,6 +28,7 @@ public class MohistModsThrowableEntity extends CraftProjectile {
 
     @Override
     public String toString() {
-        return "MohistModsThrowableEntity{" + entityName + '}';
+        return "MohistModsProjectileEntity{" + entityName + '}';
     }
 }
+

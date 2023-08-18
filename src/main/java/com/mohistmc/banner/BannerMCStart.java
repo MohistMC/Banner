@@ -11,6 +11,7 @@ import com.mohistmc.banner.stackdeobf.util.RemappingRewritePolicy;
 import com.mohistmc.banner.util.EulaUtil;
 import com.mohistmc.i18n.i18n;
 import io.izzel.arclight.mixin.injector.EjectorInfo;
+import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.injection.struct.InjectionInfo;
@@ -56,7 +57,7 @@ public class BannerMCStart {
     }
 
     public static String getVersion() {
-      return (BannerMCStart.class.getPackage().getImplementationVersion() != null) ? BannerMCStart.class.getPackage().getImplementationVersion() : "1.20.1";
+      return FabricLoader.getInstance().getModContainer("banner").get().getMetadata().getVersion().getFriendlyString();
     }
 
     private static void injectDeobfStack() {

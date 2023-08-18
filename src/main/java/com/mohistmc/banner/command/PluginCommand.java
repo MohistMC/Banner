@@ -1,6 +1,6 @@
 package com.mohistmc.banner.command;
 
-import com.mohistmc.banner.util.pluginmanager.PluginManagers;
+import com.mohistmc.banner.plugins.pluginmanager.PluginManagers;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;

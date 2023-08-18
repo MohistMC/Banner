@@ -1,4 +1,4 @@
-package com.mohistmc.banner.util.pluginmanager;
+package com.mohistmc.banner.plugins.pluginmanager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;

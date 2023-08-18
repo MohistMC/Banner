@@ -1,4 +1,4 @@
-package com.mohistmc.banner.recipe;
+package com.mohistmc.banner.bukkit.inventory.recipe;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.world.item.crafting.ShapelessRecipe;

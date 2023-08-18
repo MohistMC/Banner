@@ -1,4 +1,4 @@
-package com.mohistmc.banner.inventory;
+package com.mohistmc.banner.bukkit.inventory;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;

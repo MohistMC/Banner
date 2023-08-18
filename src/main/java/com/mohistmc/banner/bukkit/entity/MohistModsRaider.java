@@ -1,4 +1,4 @@
-package com.mohistmc.banner.entity;
+package com.mohistmc.banner.bukkit.entity;
 
 import com.mohistmc.banner.api.EntityAPI;
 import net.minecraft.world.entity.raid.Raider;
