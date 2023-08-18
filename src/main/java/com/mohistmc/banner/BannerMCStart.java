@@ -56,12 +56,7 @@ public class BannerMCStart {
     }
 
     public static String getVersion() {
-        try {
-            Class<?> version = Class.forName("com.mohistmc.banner.VersionInfo");
-            return (String) version.getField("VERSION").get(null);
-        } catch (ClassNotFoundException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-            return "unknown";
-        }
+      return (BannerMCStart.class.getPackage().getImplementationVersion() != null) ? BannerMCStart.class.getPackage().getImplementationVersion() : "1.20.1";
     }
 
     private static void injectDeobfStack() {
