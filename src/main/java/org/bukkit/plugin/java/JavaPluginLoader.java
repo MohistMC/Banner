@@ -341,6 +341,10 @@ public final class JavaPluginLoader implements PluginLoader {
             } catch (Throwable ex) {
                 RemappingUtil.remapStackTraceElements(ex.getStackTrace());
                 server.getLogger().log(Level.SEVERE, "Error occurred while enabling " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
+                // Mohist start - Disable plugins that fail to load
+                this.server.getPluginManager().disablePlugin(jPlugin);
+                return;
+                // Mohist end
             }
 
             // Perhaps abort here, rather than continue going, but as it stands,
