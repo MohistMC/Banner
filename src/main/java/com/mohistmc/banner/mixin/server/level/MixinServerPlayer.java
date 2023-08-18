@@ -708,7 +708,12 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Inject(method = "closeContainer", at = @At("HEAD"))
     private void banner$closeMenu(CallbackInfo ci) {
-        CraftEventFactory.handleInventoryCloseEvent(this); // CraftBukkit
+        if (this.containerMenu != this.inventoryMenu) {
+            var old = BukkitCaptures.getContainerOwner();
+            BukkitCaptures.captureContainerOwner(this);
+            CraftEventFactory.handleInventoryCloseEvent(this);
+            BukkitCaptures.captureContainerOwner(old);
+        }
     }
 
     private AtomicReference<String> banner$deathString = new AtomicReference<>("null");
