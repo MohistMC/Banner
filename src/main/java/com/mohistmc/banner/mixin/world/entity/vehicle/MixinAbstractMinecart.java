@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.vehicle;
 
+import com.mohistmc.banner.injection.world.entity.vehicle.InjectionAbstractMinecart;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
@@ -37,7 +38,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 
 @Mixin(AbstractMinecart.class)
-public abstract class MixinAbstractMinecart extends Entity {
+public abstract class MixinAbstractMinecart extends Entity implements InjectionAbstractMinecart {
 
     // @formatter:off
     @Shadow public abstract void setHurtDir(int rollingDirection);
@@ -351,23 +352,47 @@ public abstract class MixinAbstractMinecart extends Entity {
         }
     }
 
+    @Override
     public Vector getFlyingVelocityMod() {
         return new Vector(flyingX, flyingY, flyingZ);
     }
 
+    @Override
     public void setFlyingVelocityMod(Vector flying) {
         flyingX = flying.getX();
         flyingY = flying.getY();
         flyingZ = flying.getZ();
     }
 
+    @Override
     public Vector getDerailedVelocityMod() {
         return new Vector(derailedX, derailedY, derailedZ);
     }
 
+    @Override
     public void setDerailedVelocityMod(Vector derailed) {
         derailedX = derailed.getX();
         derailedY = derailed.getY();
         derailedZ = derailed.getZ();
+    }
+
+    @Override
+    public double bridge$maxSpeed() {
+        return maxSpeed;
+    }
+
+    @Override
+    public void banner$setMaxSpeed(double maxSpeed) {
+        this.maxSpeed = maxSpeed;
+    }
+
+    @Override
+    public boolean bridge$slowWhenEmpty() {
+        return slowWhenEmpty;
+    }
+
+    @Override
+    public void banner$setSlowWhenEmpty(boolean slowWhenEmpty) {
+        this.slowWhenEmpty = slowWhenEmpty;
     }
 }
