@@ -14,7 +14,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftLocation;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftNamespacedKey;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
@@ -34,11 +33,6 @@ public class CraftVillager extends CraftAbstractVillager implements Villager {
     @Override
     public String toString() {
         return "CraftVillager";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.VILLAGER;
     }
 
     @Override

@@ -3,8 +3,8 @@ package com.mohistmc.banner.mixin.server;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.api.color.ColorsAPI;
-import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.config.BannerConfigUtil;
 import com.mohistmc.banner.fabric.BukkitRegistry;
@@ -264,7 +264,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         }
         Main.handleParser(parser, options);
         this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
-        this.worldLoader = BukkitCaptures.getDataLoadContext();
+        this.worldLoader = BukkitSnapshotCaptures.getDataLoadContext();
     }
 
     @Inject(method = "stopServer", at = @At(value = "INVOKE", remap = false, ordinal = 0, shift = At.Shift.AFTER, target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V"))

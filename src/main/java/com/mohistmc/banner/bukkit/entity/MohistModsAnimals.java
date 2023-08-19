@@ -4,7 +4,6 @@ import com.mohistmc.banner.api.EntityAPI;
 import net.minecraft.world.entity.animal.Animal;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftAnimals;
-import org.bukkit.entity.EntityType;
 
 /**
  * Mohist
@@ -25,11 +24,6 @@ public class MohistModsAnimals extends CraftAnimals {
     @Override
     public Animal getHandle() {
         return (Animal) entity;
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityAPI.entityType(entityName);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package org.bukkit.craftbukkit.v1_20_R1.entity;
 
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse.Variant;
 import org.bukkit.entity.ZombieHorse;
 
@@ -14,11 +13,6 @@ public class CraftZombieHorse extends CraftAbstractHorse implements ZombieHorse 
     @Override
     public String toString() {
         return "CraftZombieHorse";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.ZOMBIE_HORSE;
     }
 
     @Override

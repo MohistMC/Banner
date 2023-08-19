@@ -3,7 +3,6 @@ package org.bukkit.craftbukkit.v1_20_R1.entity;
 import com.google.common.base.Preconditions;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.entity.AnimalTamer;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fox;
 
 import java.util.Optional;
@@ -18,11 +17,6 @@ public class CraftFox extends CraftAnimals implements Fox {
     @Override
     public net.minecraft.world.entity.animal.Fox getHandle() {
         return (net.minecraft.world.entity.animal.Fox) super.getHandle();
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.FOX;
     }
 
     @Override

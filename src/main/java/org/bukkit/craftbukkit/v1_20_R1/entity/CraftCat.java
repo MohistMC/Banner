@@ -5,7 +5,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import org.bukkit.DyeColor;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.entity.Cat;
-import org.bukkit.entity.EntityType;
 
 public class CraftCat extends CraftTameableAnimal implements Cat {
 
@@ -16,11 +15,6 @@ public class CraftCat extends CraftTameableAnimal implements Cat {
     @Override
     public net.minecraft.world.entity.animal.Cat getHandle() {
         return (net.minecraft.world.entity.animal.Cat) super.getHandle();
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.CAT;
     }
 
     @Override

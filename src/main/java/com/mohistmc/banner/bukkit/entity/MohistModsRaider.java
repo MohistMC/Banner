@@ -5,7 +5,6 @@ import net.minecraft.world.entity.raid.Raider;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftRaider;
 import org.bukkit.entity.EntityCategory;
-import org.bukkit.entity.EntityType;
 
 public class MohistModsRaider extends CraftRaider {
 
@@ -19,12 +18,6 @@ public class MohistModsRaider extends CraftRaider {
     @Override
     public Raider getHandle() {
         return (Raider) this.entity;
-    }
-
-
-    @Override
-    public EntityType getType() {
-        return EntityAPI.entityType(entityName);
     }
 
     @Override

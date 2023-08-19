@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
-import com.mohistmc.banner.bukkit.BukkitCaptures;
+import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -20,9 +20,9 @@ public class MixinFungusBlock {
     @Inject(method = "performBonemeal", at = @At("HEAD"))
     private void banner$captureTree(ServerLevel worldIn, RandomSource rand, BlockPos pos, BlockState state, CallbackInfo ci) {
         if ((Object) this == Blocks.WARPED_FUNGUS) {
-            BukkitCaptures.captureTreeType(TreeType.WARPED_FUNGUS);
+            BukkitSnapshotCaptures.captureTreeType(TreeType.WARPED_FUNGUS);
         } else if ((Object) this == Blocks.CRIMSON_FUNGUS) {
-            BukkitCaptures.captureTreeType(TreeType.CRIMSON_FUNGUS);
+            BukkitSnapshotCaptures.captureTreeType(TreeType.CRIMSON_FUNGUS);
         }
     }
 }

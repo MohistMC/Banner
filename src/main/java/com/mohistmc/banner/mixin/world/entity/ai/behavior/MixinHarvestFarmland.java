@@ -1,7 +1,7 @@
 package com.mohistmc.banner.mixin.world.entity.ai.behavior;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
-import com.mohistmc.banner.bukkit.BukkitCaptures;
+import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.SimpleContainer;
@@ -82,6 +82,6 @@ public abstract class MixinHarvestFarmland extends Behavior<Villager> {
     @Inject(method = "tick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/npc/Villager;J)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
     private void banner$captureOn(ServerLevel worldIn, Villager owner, long gameTime, CallbackInfo ci) {
-        BukkitCaptures.captureEntityChangeBlock(owner);
+        BukkitSnapshotCaptures.captureEntityChangeBlock(owner);
     }
 }

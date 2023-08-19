@@ -1,7 +1,6 @@
 package org.bukkit.craftbukkit.v1_20_R1.entity;
 
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LightningStrike;
 
 public class CraftLightningStrike extends CraftEntity implements LightningStrike {
@@ -24,20 +23,15 @@ public class CraftLightningStrike extends CraftEntity implements LightningStrike
         return "CraftLightningStrike";
     }
 
-    @Override
-    public EntityType getType() {
-        return EntityType.LIGHTNING;
-    }
 
     // Spigot start
     private final LightningStrike.Spigot spigot = new LightningStrike.Spigot() {
 
-        /**
         @Override
         public boolean isSilent()
         {
-            return getHandle().isSilent;
-        }*/
+            return getHandle().bridge$isSilent();
+        }
     };
 
     @Override

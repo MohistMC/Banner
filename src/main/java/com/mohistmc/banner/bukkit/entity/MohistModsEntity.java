@@ -3,7 +3,6 @@ package com.mohistmc.banner.bukkit.entity;
 import com.mohistmc.banner.api.EntityAPI;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
-import org.bukkit.entity.EntityType;
 
 public class MohistModsEntity extends CraftEntity {
 
@@ -22,10 +21,5 @@ public class MohistModsEntity extends CraftEntity {
     @Override
     public String toString() {
         return "MohistModsEntity{" + entityName + '}';
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityAPI.entityType(entityName);
     }
 }

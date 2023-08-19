@@ -1,7 +1,6 @@
 package org.bukkit.craftbukkit.v1_20_R1.entity;
 
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ravager;
 
 public class CraftRavager extends CraftRaider implements Ravager {
@@ -13,11 +12,6 @@ public class CraftRavager extends CraftRaider implements Ravager {
     @Override
     public net.minecraft.world.entity.monster.Ravager getHandle() {
         return (net.minecraft.world.entity.monster.Ravager) super.getHandle();
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.RAVAGER;
     }
 
     @Override

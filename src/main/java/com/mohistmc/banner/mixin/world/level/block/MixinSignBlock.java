@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
 import com.mohistmc.banner.injection.world.level.block.InjectionSignBlock;
-import io.papermc.paper.event.player.PlayerOpenSignEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -14,6 +13,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlockStates;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftSign;
+import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
+import org.bukkit.event.player.PlayerSignOpenEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,8 +29,8 @@ public abstract class MixinSignBlock implements InjectionSignBlock {
 
     @Shadow public abstract void openTextEdit(Player player, SignBlockEntity signEntity, boolean isFrontText);
 
-    private AtomicReference<PlayerOpenSignEvent.Cause> banner$signOpenCause =
-            new AtomicReference<>(PlayerOpenSignEvent.Cause.UNKNOWN);
+    private AtomicReference<PlayerSignOpenEvent.Cause> banner$signOpenCause =
+            new AtomicReference<>(PlayerSignOpenEvent.Cause.UNKNOWN);
 
     @Inject(method = "openTextEdit",
             at = @At("HEAD"))
@@ -38,7 +39,7 @@ public abstract class MixinSignBlock implements InjectionSignBlock {
     }
 
     @Override
-    public void openTextEdit(Player player, SignBlockEntity signEntity, boolean isFrontText, PlayerOpenSignEvent.Cause cause) {
+    public void openTextEdit(Player player, SignBlockEntity signEntity, boolean isFrontText, PlayerSignOpenEvent.Cause cause) {
         cause = banner$signOpenCause.get();
         // Paper start
         org.bukkit.entity.Player bukkitPlayer = (org.bukkit.entity.Player) player.getBukkitEntity();
@@ -50,7 +51,7 @@ public abstract class MixinSignBlock implements InjectionSignBlock {
                         bukkitSign,
                         isFrontText ? org.bukkit.block.sign.Side.FRONT : org.bukkit.block.sign.Side.BACK,
                         cause);
-        if (!event.callEvent()) return;
+        if (!CraftEventFactory.callPlayerSignOpenEvent(player, signEntity, isFrontText, cause) || !event.callEvent()) return; // Banner
         // Paper end
     }
 
@@ -58,11 +59,11 @@ public abstract class MixinSignBlock implements InjectionSignBlock {
             target = "Lnet/minecraft/world/level/block/SignBlock;openTextEdit(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/block/entity/SignBlockEntity;Z)V"))
     private void banner$setCause(BlockState state, Level level, BlockPos pos, Player player,
                                  InteractionHand hand, BlockHitResult hit, CallbackInfoReturnable<InteractionResult> cir) {
-        pushOpenSignCause(PlayerOpenSignEvent.Cause.INTERACT);
+        pushOpenSignCause(PlayerSignOpenEvent.Cause.INTERACT);
     }
 
     @Override
-    public void pushOpenSignCause(PlayerOpenSignEvent.Cause cause) {
+    public void pushOpenSignCause(PlayerSignOpenEvent.Cause cause) {
         banner$signOpenCause.set(cause);
     }
 

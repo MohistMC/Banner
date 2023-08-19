@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.moster;
 
-import com.mohistmc.banner.bukkit.BukkitCaptures;
+import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import net.minecraft.world.entity.monster.ElderGuardian;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,6 +13,6 @@ public class MixinElderGuardian {
 
     @Inject(method = "customServerAiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/effect/MobEffectUtil;addEffectToPlayersAround(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;DLnet/minecraft/world/effect/MobEffectInstance;I)Ljava/util/List;"))
     private void banner$potionReason(CallbackInfo ci) {
-        BukkitCaptures.captureEffectCause(EntityPotionEffectEvent.Cause.ATTACK);
+        BukkitSnapshotCaptures.captureEffectCause(EntityPotionEffectEvent.Cause.ATTACK);
     }
 }

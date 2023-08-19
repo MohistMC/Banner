@@ -1,7 +1,7 @@
 package com.mohistmc.banner.mixin.server.network;
 
-import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.injection.server.network.InjectionServerGamePacketListenerImpl;
 import com.mojang.brigadier.ParseResults;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
@@ -1319,7 +1319,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                         return;
                     }
 
-                    BukkitCaptures.captureContainerOwner(this.player);
+                    BukkitSnapshotCaptures.captureContainerOwner(this.player);
                     InventoryView inventory = this.player.containerMenu.getBukkitView();
                     if(inventory == null) {
                         inventory = new CraftInventoryView(this.player.getBukkitEntity(), Bukkit.createInventory(this.player.getBukkitEntity(), InventoryType.CHEST), this.player.containerMenu);

@@ -2,7 +2,7 @@ package org.bukkit.craftbukkit.v1_20_R1.entity;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.mohistmc.banner.bukkit.BukkitCaptures;
+import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -284,7 +284,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
     @Override
     public InventoryView getOpenInventory() {
         // Banner start - capture player
-        BukkitCaptures.captureContainerOwner(this.getHandle());
+        BukkitSnapshotCaptures.captureContainerOwner(this.getHandle());
         // Banner end
         return getHandle().containerMenu.getBukkitView();
     }

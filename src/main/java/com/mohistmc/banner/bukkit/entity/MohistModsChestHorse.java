@@ -5,7 +5,6 @@ import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftChestedHorse;
 import org.bukkit.entity.EntityCategory;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
 
 public class MohistModsChestHorse extends CraftChestedHorse {
@@ -25,11 +24,6 @@ public class MohistModsChestHorse extends CraftChestedHorse {
     @Override
     public AbstractChestedHorse getHandle() {
         return (AbstractChestedHorse) entity;
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityAPI.entityType(entityName);
     }
 
     @Override

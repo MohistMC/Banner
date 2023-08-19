@@ -4,7 +4,6 @@ import com.mohistmc.banner.api.EntityAPI;
 import net.minecraft.world.entity.TamableAnimal;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftTameableAnimal;
-import org.bukkit.entity.EntityType;
 
 /**
  * Mohist
@@ -26,11 +25,6 @@ public class MohistModsTameableEntity extends CraftTameableAnimal {
     @Override
     public TamableAnimal getHandle() {
         return (TamableAnimal) entity;
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityAPI.entityType(entityName);
     }
 
     @Override

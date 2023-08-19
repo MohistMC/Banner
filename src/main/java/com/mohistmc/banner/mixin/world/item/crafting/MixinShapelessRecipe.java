@@ -1,7 +1,7 @@
 package com.mohistmc.banner.mixin.world.item.crafting;
 
-import com.mohistmc.banner.injection.world.item.crafting.InjectionShapelessRecipe;
 import com.mohistmc.banner.bukkit.inventory.recipe.BannerShapelessRecipe;
+import com.mohistmc.banner.injection.world.item.crafting.InjectionShapelessRecipe;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;

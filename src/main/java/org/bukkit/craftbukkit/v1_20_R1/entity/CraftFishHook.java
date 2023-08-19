@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import net.minecraft.core.BlockPos;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
 
 public class CraftFishHook extends CraftProjectile implements FishHook {
@@ -22,11 +21,6 @@ public class CraftFishHook extends CraftProjectile implements FishHook {
     @Override
     public String toString() {
         return "CraftFishingHook";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.FISHING_HOOK;
     }
 
     @Override

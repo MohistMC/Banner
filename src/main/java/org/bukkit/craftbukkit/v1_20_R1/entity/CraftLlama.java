@@ -3,7 +3,6 @@ package org.bukkit.craftbukkit.v1_20_R1.entity;
 import com.google.common.base.Preconditions;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventoryLlama;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Llama;
 import org.bukkit.inventory.LlamaInventory;
@@ -57,10 +56,5 @@ public class CraftLlama extends CraftChestedHorse implements Llama {
     @Override
     public String toString() {
         return "CraftLlama";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.LLAMA;
     }
 }

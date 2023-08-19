@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.inventory;
 
-import com.mohistmc.banner.bukkit.BukkitCaptures;
+import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -47,7 +47,7 @@ public abstract class MixinInventoryMenu extends RecipeBookMenu<CraftingContaine
 
     @Inject(method = "slotsChanged", at = @At("HEAD"))
     public void banner$captureContainer(Container inventoryIn, CallbackInfo ci) {
-        BukkitCaptures.captureWorkbenchContainer((AbstractContainerMenu) (Object) this);
+        BukkitSnapshotCaptures.captureWorkbenchContainer((AbstractContainerMenu) (Object) this);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.mohistmc.banner.eventhandler.dispatcher;
 
-import com.mohistmc.banner.bukkit.BukkitCaptures;
+import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
@@ -33,8 +33,8 @@ public class PlayerEventDispatcher {
             return InteractionResult.PASS;
         });
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            BukkitCaptures.capturePlaceEventHand(hand);
-            BukkitCaptures.getPlaceEventHand(InteractionHand.MAIN_HAND);
+            BukkitSnapshotCaptures.capturePlaceEventHand(hand);
+            BukkitSnapshotCaptures.getPlaceEventHand(InteractionHand.MAIN_HAND);
             return InteractionResult.PASS;
         });
     }

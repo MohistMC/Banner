@@ -1,6 +1,9 @@
 accessWidener	v1	named
 # Banner
 
+# 1.20.1
+accessible method net/minecraft/world/level/dimension/end/EndDragonFight respawnDragon (Ljava/util/List;)V
+
 # paper
 accessible field net/minecraft/server/level/ServerPlayer seenCredits Z
 

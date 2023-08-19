@@ -1,11 +1,9 @@
 package com.mohistmc.banner.mixin.world.entity;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.mohistmc.banner.bukkit.BukkitCaptures;
+import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.injection.world.entity.InjectionEntity;
 import net.minecraft.BlockUtil;
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
@@ -79,7 +77,6 @@ import org.jetbrains.annotations.Nullable;
 import org.spigotmc.ActivationRange;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -89,7 +86,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -787,9 +783,9 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Inject(method = "setSharedFlag", at = @At("HEAD"),
             cancellable = true)
     private void banner$forwardHandle(int flag, boolean set, CallbackInfo ci) {
-        if (BukkitCaptures.banner$stopGlide()) {
+        if (BukkitSnapshotCaptures.banner$stopGlide()) {
             if (!(getSharedFlag(flag) && !CraftEventFactory.callToggleGlideEvent((LivingEntity) (Object)this, false).isCancelled())) {
-                BukkitCaptures.capturebanner$stopGlide(false);
+                BukkitSnapshotCaptures.capturebanner$stopGlide(false);
                 ci.cancel();
                 return;
             }

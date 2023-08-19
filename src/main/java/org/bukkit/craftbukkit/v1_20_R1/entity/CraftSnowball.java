@@ -1,7 +1,6 @@
 package org.bukkit.craftbukkit.v1_20_R1.entity;
 
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Snowball;
 
 public class CraftSnowball extends CraftThrowableProjectile implements Snowball {
@@ -17,10 +16,5 @@ public class CraftSnowball extends CraftThrowableProjectile implements Snowball 
     @Override
     public String toString() {
         return "CraftSnowball";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.SNOWBALL;
     }
 }

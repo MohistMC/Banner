@@ -1,7 +1,6 @@
 package org.bukkit.craftbukkit.v1_20_R1.entity;
 
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TraderLlama;
 
 public class CraftTraderLlama extends CraftLlama implements TraderLlama {
@@ -18,10 +17,5 @@ public class CraftTraderLlama extends CraftLlama implements TraderLlama {
     @Override
     public String toString() {
         return "CraftTraderLlama";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.TRADER_LLAMA;
     }
 }

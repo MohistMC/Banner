@@ -27,7 +27,7 @@ public class BukkitContainer {
      * Treat all modded containers not having a "bottom" inventory.
      */
     public static InventoryView createInvView(AbstractContainerMenu container) {
-        var containerOwner = BukkitCaptures.getContainerOwner();
+        var containerOwner = BukkitSnapshotCaptures.getContainerOwner();
         Inventory viewing = createInv(containerOwner, container);
         return new CraftInventoryView(containerOwner.getBukkitEntity(), viewing, container);
     }

@@ -2,7 +2,6 @@ package org.bukkit.craftbukkit.v1_20_R1.entity;
 
 import com.google.common.base.Preconditions;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.MushroomCow;
 
 public class CraftMushroomCow extends CraftCow implements MushroomCow, io.papermc.paper.entity.PaperShearable { // Paper
@@ -30,10 +29,5 @@ public class CraftMushroomCow extends CraftCow implements MushroomCow, io.paperm
     @Override
     public String toString() {
         return "CraftMushroomCow";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.MUSHROOM_COW;
     }
 }

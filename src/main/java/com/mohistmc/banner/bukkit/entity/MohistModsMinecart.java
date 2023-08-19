@@ -4,9 +4,6 @@ import com.mohistmc.banner.api.EntityAPI;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftMinecart;
-import org.bukkit.entity.EntityType;
-import org.jetbrains.annotations.NotNull;
-
 
 public class MohistModsMinecart extends CraftMinecart {
 
@@ -20,13 +17,6 @@ public class MohistModsMinecart extends CraftMinecart {
     @Override
     public AbstractMinecart getHandle() {
         return (AbstractMinecart) this.entity;
-    }
-
-
-    @NotNull
-    @Override
-    public EntityType getType() {
-        return EntityAPI.entityType(entityName);
     }
 
     @Override

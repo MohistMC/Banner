@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class BukkitCaptures {
+public class BukkitSnapshotCaptures {
 
     private static boolean banner$stopGlide = false;
 
@@ -129,7 +129,7 @@ public class BukkitCaptures {
     private static String quitMessage;
 
     public static void captureQuitMessage(String quitMessage) {
-        BukkitCaptures.quitMessage = quitMessage;
+        BukkitSnapshotCaptures.quitMessage = quitMessage;
     }
 
     public static String getQuitMessage() {
@@ -143,7 +143,7 @@ public class BukkitCaptures {
     private static Direction placeEventDirection;
 
     public static void capturePlaceEventDirection(Direction direction) {
-        BukkitCaptures.placeEventDirection = direction;
+        BukkitSnapshotCaptures.placeEventDirection = direction;
     }
 
     public static Direction getPlaceEventDirection() {
@@ -157,7 +157,7 @@ public class BukkitCaptures {
     private static InteractionHand placeEventHand;
 
     public static void capturePlaceEventHand(InteractionHand hand) {
-        BukkitCaptures.placeEventHand = hand;
+        BukkitSnapshotCaptures.placeEventHand = hand;
     }
 
     public static InteractionHand getPlaceEventHand(InteractionHand hand) {
@@ -171,7 +171,7 @@ public class BukkitCaptures {
     private static TreeType treeType;
 
     public static void captureTreeType(TreeType treeType) {
-        BukkitCaptures.treeType = treeType;
+        BukkitSnapshotCaptures.treeType = treeType;
     }
 
     public static TreeType getTreeType() {

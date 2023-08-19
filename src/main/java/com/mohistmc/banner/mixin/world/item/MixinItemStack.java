@@ -3,7 +3,6 @@ package com.mohistmc.banner.mixin.world.item;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.injection.world.item.InjectionItemStack;
 import com.mojang.serialization.Dynamic;
-import io.papermc.paper.event.player.PlayerOpenSignEvent;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -61,6 +60,7 @@ import org.bukkit.craftbukkit.v1_20_R1.util.CraftLocation;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers;
 import org.bukkit.event.block.BlockFertilizeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerSignOpenEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -378,7 +378,7 @@ public abstract class MixinItemStack implements InjectionItemStack {
                         try {
                             if (world.getBlockEntity(BukkitExtraConstants.openSign) instanceof SignBlockEntity tileentitysign) {
                                 if (world.getBlockState(BukkitExtraConstants.openSign).getBlock() instanceof SignBlock blocksign) {
-                                    blocksign.pushOpenSignCause(PlayerOpenSignEvent.Cause.PLACE);
+                                    blocksign.pushOpenSignCause(PlayerSignOpenEvent.Cause.PLACE);
                                     blocksign.openTextEdit(player, tileentitysign, true);
                                 }
                             }

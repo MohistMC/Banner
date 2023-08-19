@@ -9,7 +9,6 @@ import org.bukkit.craftbukkit.v1_20_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.material.MaterialData;
 
 public class CraftEnderman extends CraftMonster implements Enderman {
@@ -47,11 +46,6 @@ public class CraftEnderman extends CraftMonster implements Enderman {
     @Override
     public String toString() {
         return "CraftEnderman";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.ENDERMAN;
     }
 
     @Override

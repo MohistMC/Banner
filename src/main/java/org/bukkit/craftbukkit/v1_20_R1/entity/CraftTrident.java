@@ -2,7 +2,6 @@ package org.bukkit.craftbukkit.v1_20_R1.entity;
 
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Trident;
 import org.bukkit.inventory.ItemStack;
 
@@ -30,10 +29,5 @@ public class CraftTrident extends CraftArrow implements Trident {
     @Override
     public String toString() {
         return "CraftTrident";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.TRIDENT;
     }
 }

@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.server.level;
 
-import com.mohistmc.banner.bukkit.BukkitCaptures;
+import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.bukkit.DoubleChestInventory;
 import com.mohistmc.banner.injection.server.level.InjectionServerPlayer;
 import com.mojang.authlib.GameProfile;
@@ -513,10 +513,10 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Inject(method = "doCloseContainer", at = @At("HEAD"))
     private void banner$invClose(CallbackInfo ci) {
         if (this.containerMenu != this.inventoryMenu) {
-            var old = BukkitCaptures.getContainerOwner();
-            BukkitCaptures.captureContainerOwner((ServerPlayer) (Object) this);
+            var old = BukkitSnapshotCaptures.getContainerOwner();
+            BukkitSnapshotCaptures.captureContainerOwner((ServerPlayer) (Object) this);
             CraftEventFactory.handleInventoryCloseEvent((ServerPlayer) (Object) this);
-            BukkitCaptures.captureContainerOwner(old);
+            BukkitSnapshotCaptures.captureContainerOwner(old);
         }
     }
 
@@ -657,7 +657,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         if (banner$container != null) {
             banner$container.setTitle(menuProvider.getDisplayName());
             boolean cancelled = false;
-            BukkitCaptures.captureContainerOwner((ServerPlayer) (Object) this);
+            BukkitSnapshotCaptures.captureContainerOwner((ServerPlayer) (Object) this);
             banner$container = CraftEventFactory.callInventoryOpenEvent((ServerPlayer) (Object) this, banner$container, cancelled);
             if (banner$container == null && !cancelled) {
                 if (menuProvider instanceof Container) {
@@ -709,10 +709,10 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Inject(method = "closeContainer", at = @At("HEAD"))
     private void banner$closeMenu(CallbackInfo ci) {
         if (this.containerMenu != this.inventoryMenu) {
-            var old = BukkitCaptures.getContainerOwner();
-            BukkitCaptures.captureContainerOwner(this);
+            var old = BukkitSnapshotCaptures.getContainerOwner();
+            BukkitSnapshotCaptures.captureContainerOwner(this);
             CraftEventFactory.handleInventoryCloseEvent(this);
-            BukkitCaptures.captureContainerOwner(old);
+            BukkitSnapshotCaptures.captureContainerOwner(old);
         }
     }
 

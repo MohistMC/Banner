@@ -2,7 +2,6 @@ package org.bukkit.craftbukkit.v1_20_R1.entity;
 
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventory;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.inventory.Inventory;
 
@@ -17,11 +16,6 @@ public final class CraftMinecartHopper extends CraftMinecartContainer implements
     @Override
     public String toString() {
         return "CraftMinecartHopper{" + "inventory=" + inventory + '}';
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.MINECART_HOPPER;
     }
 
     @Override

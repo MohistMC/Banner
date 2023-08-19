@@ -1,7 +1,7 @@
 package com.mohistmc.banner.mixin.world;
 
-import com.mohistmc.banner.injection.world.InjectionContainer;
 import com.mohistmc.banner.bukkit.inventory.InventoryOwner;
+import com.mohistmc.banner.injection.world.InjectionContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;

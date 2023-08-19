@@ -4,7 +4,6 @@ import com.mohistmc.banner.api.EntityAPI;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftProjectile;
-import org.bukkit.entity.EntityType;
 
 public class MohistModsThrowableEntity extends CraftProjectile {
 
@@ -18,11 +17,6 @@ public class MohistModsThrowableEntity extends CraftProjectile {
     @Override
     public ThrowableProjectile getHandle() {
         return (ThrowableProjectile) entity;
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityAPI.entityType(entityName);
     }
 
     @Override

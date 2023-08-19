@@ -16,7 +16,14 @@ public interface LightningStrike extends Entity {
 
     // Spigot start
     public class Spigot extends Entity.Spigot {
-
+        /*
+         * Returns whether the strike is silent.
+         *
+         * @return whether the strike is silent.
+         */
+        public boolean isSilent() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
     }
 
     @NotNull

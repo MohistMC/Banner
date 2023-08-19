@@ -4,7 +4,6 @@ import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.level.Level;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Rabbit;
 
 public class CraftRabbit extends CraftAnimals implements Rabbit {
@@ -21,11 +20,6 @@ public class CraftRabbit extends CraftAnimals implements Rabbit {
     @Override
     public String toString() {
         return "CraftRabbit{RabbitType=" + getRabbitType() + "}";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.RABBIT;
     }
 
     @Override

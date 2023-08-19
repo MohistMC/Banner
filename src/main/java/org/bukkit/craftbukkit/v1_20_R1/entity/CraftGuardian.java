@@ -2,7 +2,6 @@ package org.bukkit.craftbukkit.v1_20_R1.entity;
 
 import com.google.common.base.Preconditions;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Guardian;
 import org.bukkit.entity.LivingEntity;
 
@@ -22,11 +21,6 @@ public class CraftGuardian extends CraftMonster implements Guardian {
     @Override
     public String toString() {
         return "CraftGuardian";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.GUARDIAN;
     }
 
     @Override

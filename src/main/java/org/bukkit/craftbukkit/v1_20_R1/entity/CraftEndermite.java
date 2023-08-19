@@ -2,7 +2,6 @@ package org.bukkit.craftbukkit.v1_20_R1.entity;
 
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.entity.Endermite;
-import org.bukkit.entity.EntityType;
 
 public class CraftEndermite extends CraftMonster implements Endermite {
 
@@ -21,17 +20,12 @@ public class CraftEndermite extends CraftMonster implements Endermite {
     }
 
     @Override
-    public EntityType getType() {
-        return EntityType.ENDERMITE;
-    }
-
-    @Override
     public boolean isPlayerSpawned() {
         return false;
     }
 
     @Override
     public void setPlayerSpawned(boolean playerSpawned) {
-        // Nop
+        // Nop // Banner TODO
     }
 }

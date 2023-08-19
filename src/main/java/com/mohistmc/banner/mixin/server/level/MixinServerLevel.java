@@ -2,8 +2,8 @@ package com.mohistmc.banner.mixin.server.level;
 
 import com.google.common.collect.Lists;
 import com.mohistmc.banner.BannerServer;
-import com.mohistmc.banner.bukkit.BukkitCaptures;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.bukkit.DistValidate;
 import com.mohistmc.banner.bukkit.LevelPersistentData;
 import com.mohistmc.banner.config.BannerConfig;
@@ -472,13 +472,13 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
 
     @ModifyVariable(method = "tickBlock", ordinal = 0, argsOnly = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;tick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/util/RandomSource;)V"))
     private BlockPos banner$captureTickingBlock(BlockPos pos) {
-        BukkitCaptures.captureTickingBlock((ServerLevel) (Object) this, pos);
+        BukkitSnapshotCaptures.captureTickingBlock((ServerLevel) (Object) this, pos);
         return pos;
     }
 
     @ModifyVariable(method = "tickBlock", ordinal = 0, argsOnly = true, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/level/block/state/BlockState;tick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/util/RandomSource;)V"))
     private BlockPos banner$resetTickingBlock(BlockPos pos) {
-        BukkitCaptures.resetTickingBlock();
+        BukkitSnapshotCaptures.resetTickingBlock();
         return pos;
     }
 
@@ -502,12 +502,12 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         });
         if (!DistValidate.isValid(world)) {
             blockList.updateList();
-            BukkitCaptures.getEndPortalEntity();
+            BukkitSnapshotCaptures.getEndPortalEntity();
             return;
         }
         CraftWorld bworld = world.getWorld();
-        boolean spawnPortal = BukkitCaptures.getEndPortalSpawn();
-        Entity entity = BukkitCaptures.getEndPortalEntity();
+        boolean spawnPortal = BukkitSnapshotCaptures.getEndPortalSpawn();
+        Entity entity = BukkitSnapshotCaptures.getEndPortalEntity();
         PortalCreateEvent portalEvent = new PortalCreateEvent((List) blockList.getList(), bworld, entity == null ? null : entity.getBukkitEntity(), PortalCreateEvent.CreateReason.END_PLATFORM);
         portalEvent.setCancelled(!spawnPortal);
         Bukkit.getPluginManager().callEvent(portalEvent);
@@ -518,13 +518,13 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
 
     @ModifyVariable(method = "tickChunk", ordinal = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;randomTick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/util/RandomSource;)V"))
     private BlockPos banner$captureRandomTick(BlockPos pos) {
-        BukkitCaptures.captureTickingBlock((ServerLevel) (Object) this, pos);
+        BukkitSnapshotCaptures.captureTickingBlock((ServerLevel) (Object) this, pos);
         return pos;
     }
 
     @ModifyVariable(method = "tickChunk", ordinal = 0, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/level/block/state/BlockState;randomTick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/util/RandomSource;)V"))
     private BlockPos banner$resetRandomTick(BlockPos pos) {
-        BukkitCaptures.resetTickingBlock();
+        BukkitSnapshotCaptures.resetTickingBlock();
         return pos;
     }
 

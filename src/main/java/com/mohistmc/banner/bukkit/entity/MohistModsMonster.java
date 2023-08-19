@@ -4,7 +4,6 @@ import com.mohistmc.banner.api.EntityAPI;
 import net.minecraft.world.entity.monster.Monster;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftMonster;
-import org.bukkit.entity.EntityType;
 
 /**
  * Mohist
@@ -26,11 +25,6 @@ public class MohistModsMonster extends CraftMonster {
     @Override
     public Monster getHandle() {
         return (Monster) entity;
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityAPI.entityType(entityName);
     }
 
     @Override

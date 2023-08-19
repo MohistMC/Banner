@@ -1,7 +1,6 @@
 package org.bukkit.craftbukkit.v1_20_R1.entity;
 
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Snowman;
 
 public class CraftSnowman extends CraftGolem implements Snowman, io.papermc.paper.entity.PaperShearable { // Paper
@@ -27,10 +26,5 @@ public class CraftSnowman extends CraftGolem implements Snowman, io.papermc.pape
     @Override
     public String toString() {
         return "CraftSnowman";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.SNOWMAN;
     }
 }

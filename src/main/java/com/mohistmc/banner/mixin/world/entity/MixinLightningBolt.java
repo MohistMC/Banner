@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity;
 
-import com.mohistmc.banner.bukkit.BukkitCaptures;
+import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.injection.world.entity.InjectionLightningBolt;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
@@ -30,12 +30,12 @@ public class MixinLightningBolt implements InjectionLightningBolt {
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;thunderHit(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LightningBolt;)V"))
     private void banner$captureEntity(CallbackInfo ci) {
-        BukkitCaptures.captureDamageEventEntity((Entity) (Object) this);
+        BukkitSnapshotCaptures.captureDamageEventEntity((Entity) (Object) this);
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/Entity;thunderHit(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LightningBolt;)V"))
     private void banner$resetEntity(CallbackInfo ci) {
-        BukkitCaptures.captureDamageEventEntity(null);
+        BukkitSnapshotCaptures.captureDamageEventEntity(null);
     }
 
     @Redirect(method = "spawnFire", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))

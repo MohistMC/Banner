@@ -512,6 +512,7 @@
     "world.level.chunk.MixinLevelChunkSection",
     "world.level.chunk.storage.MixinChunkSerializer",
     "world.level.chunk.storage.MixinRegionFileStorage",
+    "world.level.dimension.end.MixinEndDragonFight",
     "world.level.entity.MixinPersistentEntitySectionManager",
     "world.level.gameevent.MixinGameEventDispatcher",
     "world.level.gameevent.vibrations.MixinVibrationSystem_Listener",

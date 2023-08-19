@@ -8,7 +8,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 
 public class CraftItemFrame extends CraftHanging implements ItemFrame {
@@ -162,10 +161,5 @@ public class CraftItemFrame extends CraftHanging implements ItemFrame {
     @Override
     public String toString() {
         return "CraftItemFrame{item=" + getItem() + ", rotation=" + getRotation() + "}";
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.ITEM_FRAME;
     }
 }
