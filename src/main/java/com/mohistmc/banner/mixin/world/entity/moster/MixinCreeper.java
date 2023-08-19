@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.moster;
 
+import com.mohistmc.banner.injection.world.entity.monster.InjectionCreeper;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -27,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.Collection;
 
 @Mixin(Creeper.class)
-public abstract class MixinCreeper extends Monster implements PowerableMob {
+public abstract class MixinCreeper extends Monster implements PowerableMob, InjectionCreeper {
 
     // @formatter:off
     @Shadow @Final private static EntityDataAccessor<Boolean> DATA_IS_POWERED;
@@ -76,6 +77,7 @@ public abstract class MixinCreeper extends Monster implements PowerableMob {
          this.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.EXPLOSION);
     }
 
+    @Override
     public void setPowered(boolean power) {
         this.entityData.set(DATA_IS_POWERED, power);
     }

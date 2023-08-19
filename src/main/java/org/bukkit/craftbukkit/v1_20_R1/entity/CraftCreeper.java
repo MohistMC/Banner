@@ -22,7 +22,7 @@ public class CraftCreeper extends CraftMonster implements Creeper {
 
         // only call event when we are not in world generation
         if (getHandle().bridge$generation() || !callPowerEvent(cause)) {
-            // getHandle().setPowered(powered); // Banner TODO
+            getHandle().setPowered(powered); // Banner TODO
         }
     }
 

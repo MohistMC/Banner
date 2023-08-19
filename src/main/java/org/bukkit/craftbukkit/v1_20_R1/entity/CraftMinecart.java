@@ -27,48 +27,44 @@ public abstract class CraftMinecart extends CraftVehicle implements Minecart {
 
     @Override
     public double getMaxSpeed() {
-        // Banner TODO return getHandle().maxSpeed;
-        return 0;
+       return getHandle().bridge$maxSpeed();
     }
 
     @Override
     public void setMaxSpeed(double speed) {
         if (speed >= 0D) {
-            //Banner TODO getHandle().maxSpeed = speed;
+            getHandle().banner$setMaxSpeed(speed);
         }
     }
 
     @Override
     public boolean isSlowWhenEmpty() {
-        //Banner TODO return getHandle().slowWhenEmpty;
-        return false;
+        return getHandle().bridge$slowWhenEmpty();
     }
 
     @Override
     public void setSlowWhenEmpty(boolean slow) {
-        //Banner TODO getHandle().slowWhenEmpty = slow;
+        getHandle().banner$setSlowWhenEmpty(slow);
     }
 
     @Override
     public Vector getFlyingVelocityMod() {
-        //Banner TODO return getHandle().getFlyingVelocityMod();
-        return null;
+        return getHandle().getFlyingVelocityMod();
     }
 
     @Override
     public void setFlyingVelocityMod(Vector flying) {
-        //Banner TODO getHandle().setFlyingVelocityMod(flying);
+        getHandle().setFlyingVelocityMod(flying);
     }
 
     @Override
     public Vector getDerailedVelocityMod() {
-        //Banner TODO return getHandle().getDerailedVelocityMod();
-        return null;
+        return getHandle().getDerailedVelocityMod();
     }
 
     @Override
     public void setDerailedVelocityMod(Vector derailed) {
-        //Banner TODO getHandle().setDerailedVelocityMod(derailed);
+        getHandle().setDerailedVelocityMod(derailed);
     }
 
     @Override
