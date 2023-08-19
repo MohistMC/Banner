@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.level;
 
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -20,11 +19,6 @@ public class MixinClipContext {
     @Redirect(method = "<init>", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/phys/shapes/CollisionContext;of(Lnet/minecraft/world/entity/Entity;)Lnet/minecraft/world/phys/shapes/CollisionContext;"))
     private CollisionContext banner$resetClipContext(Entity entity) {
-        if (FabricLoader.getInstance().isModLoaded("create")
-                || FabricLoader.getInstance().isModLoaded("porting_lib")) {
-            return CollisionContext.of(entity);
-        }else{
-            return (entity == null) ? CollisionContext.empty() : CollisionContext.of(entity); // CraftBukkit;
-        }
+        return (entity == null) ? CollisionContext.empty() : CollisionContext.of(entity); // CraftBukkit;
     }
 }

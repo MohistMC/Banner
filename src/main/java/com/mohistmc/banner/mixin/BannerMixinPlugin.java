@@ -156,6 +156,9 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
         if (mixinClassName.equals("com.mohistmc.banner.mixin.world.item.MixinChorusFruitItem")) {
             return !FabricLoader.getInstance().isModLoaded("openpartiesandclaims");
         }
+        if (mixinClassName.equals("com.mohistmc.banner.mixin.world.level.MixinClipContext")) {
+            return !FabricLoader.getInstance().isModLoaded("create") && !FabricLoader.getInstance().isModLoaded("porting_lib");
+        }
         if (mixinClassName.endsWith("ThreadingDetectorMixin")) {
             // added in 1.18-pre7
             return CompatUtil.WORLD_VERSION >= 2854;
