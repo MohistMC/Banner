@@ -7,6 +7,10 @@ plugins {
 version = project.minecraft_version + "-" + ci_version()
 group = project.maven_group
 
+base {
+	archivesName = project.archives_base_name
+}
+
 repositories {
 	maven {
 		name = 'spigot'
