@@ -30,7 +30,7 @@ public final class OldCraftChunkData implements ChunkGenerator.ChunkData {
         this.minHeight = minHeight;
         this.maxHeight = maxHeight;
         this.biomes = biomes;
-        this.sections = new LevelChunkSection[(((maxHeight - 1) >> 4) + 1) - (minHeight >> 4)];// Banner TODO
+        this.sections = new LevelChunkSection[(((maxHeight - 1) >> 4) + 1) - (minHeight >> 4)];
     }
 
     @Override
@@ -174,7 +174,7 @@ public final class OldCraftChunkData implements ChunkGenerator.ChunkData {
         int offset = (y - minHeight) >> 4;
         LevelChunkSection section = sections[offset];
         if (create && section == null) {
-            //sections[offset] = section = new LevelChunkSection(offset + (minHeight >> 4), biomes); // Banner TODO
+            sections[offset] = section = new LevelChunkSection(biomes);
         }
         return section;
     }

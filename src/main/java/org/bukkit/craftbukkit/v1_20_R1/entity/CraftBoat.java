@@ -38,50 +38,46 @@ public class CraftBoat extends CraftVehicle implements Boat {
 
     @Override
     public double getMaxSpeed() {
-        //TODO return getHandle().maxSpeed;
-        return 0;
+        return getHandle().bridge$maxSpeed();
     }
 
     @Override
     public void setMaxSpeed(double speed) {
         if (speed >= 0D) {
-            //TODO  getHandle().maxSpeed = speed;
+            getHandle().banner$setMaxSpeed(speed);
         }
     }
 
     @Override
     public double getOccupiedDeceleration() {
-        //TODO return getHandle().occupiedDeceleration;
-        return 0;
+        return getHandle().bridge$occupiedDeceleration();
     }
 
     @Override
     public void setOccupiedDeceleration(double speed) {
         if (speed >= 0D) {
-            //TODO getHandle().occupiedDeceleration = speed;
+            getHandle().banner$setOccupiedDeceleration(speed);
         }
     }
 
     @Override
     public double getUnoccupiedDeceleration() {
-        //TODO  return getHandle().unoccupiedDeceleration;
-        return 0;
+        return getHandle().bridge$unoccupiedDeceleration();
     }
 
     @Override
     public void setUnoccupiedDeceleration(double speed) {
-        //TODO getHandle().unoccupiedDeceleration = speed;
+        getHandle().banner$setUnoccupiedDeceleration(speed);
     }
 
     @Override
     public boolean getWorkOnLand() {
-        //TODO return getHandle().landBoats;
-        return false;
+        return getHandle().bridge$landBoats();
     }
 
     @Override
     public void setWorkOnLand(boolean workOnLand) {
-        //TODO  getHandle().landBoats = workOnLand;
+        getHandle().banner$setLandBoats(workOnLand);
     }
 
     @Override

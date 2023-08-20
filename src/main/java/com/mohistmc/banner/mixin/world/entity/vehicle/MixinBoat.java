@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.vehicle;
 
+import com.mohistmc.banner.injection.world.entity.vehicle.InjectionBoat;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -23,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Boat.class)
-public abstract class MixinBoat extends Entity {
+public abstract class MixinBoat extends Entity implements InjectionBoat {
 
 
     // @formatter:off
@@ -106,5 +107,45 @@ public abstract class MixinBoat extends Entity {
         } else {
             return true;
         }
+    }
+
+    @Override
+    public double bridge$maxSpeed() {
+        return maxSpeed;
+    }
+
+    @Override
+    public void banner$setMaxSpeed(double maxSpeed) {
+        this.maxSpeed = maxSpeed;
+    }
+
+    @Override
+    public double bridge$occupiedDeceleration() {
+        return occupiedDeceleration;
+    }
+
+    @Override
+    public void banner$setOccupiedDeceleration(double occupiedDeceleration) {
+        this.occupiedDeceleration = occupiedDeceleration;
+    }
+
+    @Override
+    public double bridge$unoccupiedDeceleration() {
+        return occupiedDeceleration;
+    }
+
+    @Override
+    public void banner$setUnoccupiedDeceleration(double occupiedDeceleration) {
+        this.occupiedDeceleration = occupiedDeceleration;
+    }
+
+    @Override
+    public boolean bridge$landBoats() {
+        return landBoats;
+    }
+
+    @Override
+    public void banner$setLandBoats(boolean landBoats) {
+        this.landBoats = landBoats;
     }
 }

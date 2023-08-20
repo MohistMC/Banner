@@ -26,6 +26,6 @@ public class CraftEndermite extends CraftMonster implements Endermite {
 
     @Override
     public void setPlayerSpawned(boolean playerSpawned) {
-        // Nop // Banner TODO
+        // Nop
     }
 }

@@ -126,6 +126,7 @@
       "net/minecraft/class_1621": ["com/mohistmc/banner/injection/world/entity/monster/InjectionSlime"],
       "net/minecraft/class_1548": ["com/mohistmc/banner/injection/world/entity/monster/InjectionCreeper"],
       "net/minecraft/class_1688": ["com/mohistmc/banner/injection/world/entity/vehicle/InjectionAbstractMinecart"],
+      "net/minecraft/class_1690": ["com/mohistmc/banner/injection/world/entity/vehicle/InjectionBoat"],
       "net/minecraft/class_1296": ["com/mohistmc/banner/injection/world/entity/InjectionAgeableMob"],
       "net/minecraft/class_1295": ["com/mohistmc/banner/injection/world/entity/InjectionAreaEffectCloud"],
       "net/minecraft/class_1922": ["com/mohistmc/banner/injection/world/level/InjectionBlockGetter"],

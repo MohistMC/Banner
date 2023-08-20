@@ -82,7 +82,7 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
         ServerLevel handle = ((CraftWorld) loc.getWorld()).getHandle();
         net.minecraft.world.level.storage.loot.LootParams.Builder builder = new net.minecraft.world.level.storage.loot.LootParams.Builder(handle);
         if (random != null) {
-            // builder = builder.withRandom(new RandomSourceWrapper(random)); // Banner TODO
+           // builder = builder.withRandom(new RandomSourceWrapper(random)); // Banner TODO
         }
         setMaybe(builder, LootContextParams.ORIGIN, CraftLocation.toVec3D(loc));
         if (getHandle() != LootTable.EMPTY) {
@@ -127,7 +127,7 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
 
     private <T> void setMaybe(net.minecraft.world.level.storage.loot.LootParams.Builder builder, LootContextParam<T> param, T value) {
         if (getHandle().getParamSet().getRequired().contains(param) || getHandle().getParamSet().getAllowed().contains(param)) {
-            //builder.withParameter(param, value); Banner - TODO
+            builder.withParameter(param, value);
         }
     }
 
