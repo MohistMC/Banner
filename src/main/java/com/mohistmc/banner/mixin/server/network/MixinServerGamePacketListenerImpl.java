@@ -1798,25 +1798,21 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         Player player = this.getCraftPlayer();
         Location from = player.getLocation();
         Location to = new Location(this.getCraftPlayer().getWorld(), x, y, z, yaw, pitch);
-        if (!from.equals(to)) {
-            PlayerTeleportEvent event = new PlayerTeleportEvent(player, from.clone(), to.clone(), cause);
-            this.cserver.getPluginManager().callEvent(event);
-            if (event.isCancelled() || !to.equals(event.getTo())) {
-                relativeSet.clear();
-                to = (event.isCancelled() ? event.getFrom() : event.getTo());
-                x = to.getX();
-                y = to.getY();
-                z = to.getZ();
-                yaw = to.getYaw();
-                pitch = to.getPitch();
-            }
+        if (from.equals(to)) {
+            this.internalTeleport(x, y, z, yaw, pitch, relativeSet);
+            return;
         }
 
-        if (Float.isNaN(yaw)) {
-            yaw = 0.0f;
-        }
-        if (Float.isNaN(pitch)) {
-            pitch = 0.0f;
+        PlayerTeleportEvent event = new PlayerTeleportEvent(player, from.clone(), to.clone(), cause);
+        this.cserver.getPluginManager().callEvent(event);
+        if (event.isCancelled() || !to.equals(event.getTo())) {
+            relativeSet.clear();
+            to = (event.isCancelled() ? event.getFrom() : event.getTo());
+            x = to.getX();
+            y = to.getY();
+            z = to.getZ();
+            yaw = to.getYaw();
+            pitch = to.getPitch();
         }
         this.internalTeleport(x, y, z, yaw, pitch, relativeSet);
     }
