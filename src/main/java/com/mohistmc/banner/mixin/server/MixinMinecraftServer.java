@@ -198,11 +198,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         try { Thread.sleep(100); } catch (InterruptedException ex) {} // CraftBukkit - SPIGOT-625 - give server at least a chance to send packets
     }
 
-    @ModifyConstant(method = "runServer", constant = @Constant(longValue = 15000L))
-    private long banner$changeWarningValue(long constant) {
-        return 30000L;
-    }
-
     @Inject(method = "runServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;nextTickTime:J", shift = At.Shift.BEFORE))
     private void banner$currentTick(CallbackInfo ci) {
         BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
