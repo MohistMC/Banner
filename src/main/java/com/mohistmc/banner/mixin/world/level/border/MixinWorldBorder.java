@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.level.border;
 
 import com.mohistmc.banner.injection.world.level.border.InjectionWorldBorder;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.border.WorldBorder;
 import org.spongepowered.asm.mixin.Final;
@@ -26,10 +27,10 @@ public abstract class MixinWorldBorder implements InjectionWorldBorder {
 
     @Shadow public abstract void lerpSizeBetween(double oldSize, double newSize, long time);
 
-    public net.minecraft.server.level.ServerLevel world; // CraftBukkit
+    public net.minecraft.world.level.Level world; // CraftBukkit
 
     @Override
-    public ServerLevel bridge$world() {
+    public Level bridge$world() {
         return world;
     }
 
@@ -79,7 +80,7 @@ public abstract class MixinWorldBorder implements InjectionWorldBorder {
     }
 
     @Override
-    public void banner$setWorld(ServerLevel world) {
+    public void banner$setWorld(Level world) {
         this.world = world;
     }
 }

@@ -141,7 +141,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             }
         }
         // CraftBukkit start
-        getWorldBorder().banner$setWorld(((ServerLevel) (Object) this));
+        getWorldBorder().banner$setWorld(((Level) (Object) this));
         // From PlayerList.setPlayerFileData
         getWorldBorder().addListener(new BorderChangeListener() {
             @Override

@@ -1,13 +1,13 @@
 package com.mohistmc.banner.injection.world.level.border;
 
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 
 public interface InjectionWorldBorder {
 
-    default ServerLevel bridge$world() {
+    default Level bridge$world() {
         return null;
     }
 
-    default void banner$setWorld(ServerLevel world) {
+    default void banner$setWorld(Level world) {
     }
 }
