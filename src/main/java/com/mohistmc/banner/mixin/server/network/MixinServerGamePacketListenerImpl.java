@@ -34,6 +34,7 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.network.protocol.game.ServerboundAcceptTeleportationPacket;
 import net.minecraft.network.protocol.game.ServerboundChatCommandPacket;
 import net.minecraft.network.protocol.game.ServerboundChatPacket;
+import net.minecraft.network.protocol.game.ServerboundChatSessionUpdatePacket;
 import net.minecraft.network.protocol.game.ServerboundContainerButtonClickPacket;
 import net.minecraft.network.protocol.game.ServerboundContainerClickPacket;
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
@@ -1704,6 +1705,15 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                 CraftEventFactory.callRecipeBookClickEvent(this.player, recipe, packet.isShiftDown());
         banner$recipeClickEvent.set(event);
         // Cast to keyed should be safe as the recipe will never be a MerchantRecipe.
+    }
+
+    @Inject(method = "handleChatSessionUpdate",
+            at = @At("HEAD"),
+            cancellable = true)
+    private void banner$checkReturnOfSession(ServerboundChatSessionUpdatePacket packet, CallbackInfo ci) {
+        if (true) {
+            ci.cancel();
+        }
     }
 
     @Redirect(method = "method_17820",
