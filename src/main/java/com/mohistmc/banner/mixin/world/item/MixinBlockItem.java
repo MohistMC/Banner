@@ -40,8 +40,6 @@ public abstract class MixinBlockItem {
     @Shadow protected abstract boolean mustSurvive();
 
     private AtomicReference<org.bukkit.block.BlockState> banner$stateCB = new AtomicReference<>(null);
-    private static final AtomicReference<BlockPos> banner$pos = new AtomicReference<>();
-    private static final AtomicReference<net.minecraft.world.entity.player.Player> banner$player = new AtomicReference<>();
 
     @Inject(method = "place", at= @At(value = "INVOKE",
             target = "Lnet/minecraft/world/item/BlockItem;getPlacementState(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;",
@@ -60,15 +58,13 @@ public abstract class MixinBlockItem {
             target = "Lnet/minecraft/world/level/block/Block;setPlacedBy(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V",
             shift = At.Shift.AFTER),
             locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
-    private void banner$postPlace0(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir,
-                                   BlockPlaceContext blockPlaceContext, BlockState blockState,
-                                   BlockPos blockPos, Level level, Player player,
-                                   ItemStack itemStack, BlockState blockState2) {
+    private void banner$postPlace0(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir, BlockPlaceContext blockPlaceContext, BlockState blockState, BlockPos blockPos, Level level, Player player, ItemStack itemStack, BlockState blockState2) {
         // CraftBukkit start
-        if (banner$stateCB.get() != null) {
-            BlockPlaceEvent placeEvent = CraftEventFactory.callBlockPlaceEvent((ServerLevel) level, player, blockPlaceContext.getHand(), banner$stateCB.get(), blockPos.getX(), blockPos.getY(), blockPos.getZ());
+        org.bukkit.block.BlockState state = banner$stateCB.getAndSet(null);
+        if (state != null) {
+            BlockPlaceEvent placeEvent = CraftEventFactory.callBlockPlaceEvent((ServerLevel) level, player, blockPlaceContext.getHand(), state, blockPos.getX(), blockPos.getY(), blockPos.getZ());
             if (placeEvent != null && (placeEvent.isCancelled() || !placeEvent.canBuild())) {
-                banner$stateCB.get().update(true, false);
+                state.update(true, false);
                 if (((BlockItem) (Object) this) instanceof SolidBucketItem) {
                     ((ServerPlayer) player).getBukkitEntity().updateInventory(); // SPIGOT-4541
                 }
@@ -79,9 +75,7 @@ public abstract class MixinBlockItem {
     }
 
     @Redirect(method = "place", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;playSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V"))
-    private void banner$cancelPlayerSound(Level instance, Player player,
-                                          BlockPos pos, SoundEvent sound,
-                                          SoundSource source, float volume, float pitch) {}
+    private void banner$cancelPlayerSound(Level instance, Player player, BlockPos pos, SoundEvent sound, SoundSource source, float volume, float pitch) {}
 
     private AtomicReference<Player> banner$placePlayer = new AtomicReference<>();
     private AtomicReference<ItemStack> banner$placeStack = new AtomicReference<>();
@@ -89,10 +83,7 @@ public abstract class MixinBlockItem {
     @Inject(method = "place", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/Level;gameEvent(Lnet/minecraft/world/level/gameevent/GameEvent;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/gameevent/GameEvent$Context;)V"),
             locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$setInfo(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir,
-                                BlockPlaceContext blockPlaceContext, BlockState blockState, BlockPos blockPos,
-                                Level level, Player player, ItemStack itemStack, BlockState blockState2,
-                                SoundType soundType) {
+    private void banner$setInfo(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir, BlockPlaceContext blockPlaceContext, BlockState blockState, BlockPos blockPos, Level level, Player player, ItemStack itemStack, BlockState blockState2, SoundType soundType) {
         banner$placePlayer.set(player);
         banner$placeStack.set(itemStack);
     }
@@ -100,14 +91,7 @@ public abstract class MixinBlockItem {
     @Redirect(method = "place", at = @At(value = "FIELD",
             target = "Lnet/minecraft/world/entity/player/Abilities;instabuild:Z"))
     private boolean banner$checkAbilities(Abilities instance) {
-        return banner$placePlayer.get().getAbilities().instabuild && banner$placeStack.get() == ItemStack.EMPTY;
-    }
-
-    @Inject(method = "updateCustomBlockEntityTag(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;)Z",
-            at = @At("HEAD"))
-    private static void banner$getPos(Level level, net.minecraft.world.entity.player.Player player, BlockPos pos, ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        banner$pos.set(pos);
-        banner$player.set(player);
+        return banner$placePlayer.getAndSet(null).getAbilities().instabuild && banner$placeStack.getAndSet(null) == ItemStack.EMPTY;
     }
 
     /**
