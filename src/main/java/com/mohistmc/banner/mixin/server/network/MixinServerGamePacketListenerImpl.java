@@ -1802,29 +1802,39 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
      * @reason bukkit
      */
     @Overwrite
-    public void teleport(double x, double y, double z, float yaw, float pitch, Set<RelativeMovement> relativeSet) {
+    public void teleport(double d0, double d1, double d2, float f, float f1, Set<RelativeMovement> set) {
         PlayerTeleportEvent.TeleportCause cause = banner$cause == null ? PlayerTeleportEvent.TeleportCause.UNKNOWN : banner$cause;
         banner$cause = null;
-        Player player = this.getCraftPlayer();
+        org.bukkit.entity.Player player = this.getCraftPlayer();
         Location from = player.getLocation();
+
+        double x = d0;
+        double y = d1;
+        double z = d2;
+        float yaw = f;
+        float pitch = f1;
+
         Location to = new Location(this.getCraftPlayer().getWorld(), x, y, z, yaw, pitch);
+        // SPIGOT-5171: Triggered on join
         if (from.equals(to)) {
-            this.internalTeleport(x, y, z, yaw, pitch, relativeSet);
-            return;
+            this.internalTeleport(d0, d1, d2, f, f1, set);
+            return; // CraftBukkit - Return event status
         }
 
         PlayerTeleportEvent event = new PlayerTeleportEvent(player, from.clone(), to.clone(), cause);
         this.cserver.getPluginManager().callEvent(event);
+
         if (event.isCancelled() || !to.equals(event.getTo())) {
-            relativeSet.clear();
-            to = (event.isCancelled() ? event.getFrom() : event.getTo());
-            x = to.getX();
-            y = to.getY();
-            z = to.getZ();
-            yaw = to.getYaw();
-            pitch = to.getPitch();
+            set.clear(); // Can't relative teleport
+            to = event.isCancelled() ? event.getFrom() : event.getTo();
+            d0 = to.getX();
+            d1 = to.getY();
+            d2 = to.getZ();
+            f = to.getYaw();
+            f1 = to.getPitch();
         }
-        this.internalTeleport(x, y, z, yaw, pitch, relativeSet);
+
+        this.internalTeleport(d0, d1, d2, f, f1, set);
     }
 
     @Override
