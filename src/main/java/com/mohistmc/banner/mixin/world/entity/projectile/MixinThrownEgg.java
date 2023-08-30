@@ -3,6 +3,7 @@ package com.mohistmc.banner.mixin.world.entity.projectile;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.Chicken;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.entity.projectile.ThrownEgg;
 import net.minecraft.world.level.Level;
@@ -36,24 +37,29 @@ public abstract class MixinThrownEgg extends ThrowableItemProjectile {
             if (this.random.nextInt(32) == 0) {
                 b0 = 4;
             }
+            org.bukkit.entity.EntityType hatchingType = org.bukkit.entity.EntityType.CHICKEN;
+            Entity shooter = this.getOwner();
             if (!hatching) {
                 b0 = 0;
             }
-            org.bukkit.entity.EntityType hatchingType = org.bukkit.entity.EntityType.CHICKEN;
-            Entity shooter = this.getOwner();
+
             if (shooter instanceof ServerPlayer) {
                 PlayerEggThrowEvent event = new PlayerEggThrowEvent(((ServerPlayer) shooter).getBukkitEntity(), (Egg) this.getBukkitEntity(), hatching, b0, hatchingType);
                 Bukkit.getPluginManager().callEvent(event);
                 b0 = event.getNumHatches();
                 hatching = event.isHatching();
                 hatchingType = event.getHatchingType();
+                // If hatching is set to false, ensure child count is 0
+                if (!hatching) {
+                    b0 = 0;
+                }
             }
             if (hatching) {
                 for (int i = 0; i < b0; ++i) {
-                    Entity entity = this.level().getWorld().createEntity(new Location(this.level().getWorld(), this.getX(), this.getY(), this.getZ(), this.getYRot(), 0.0f), hatchingType.getEntityClass());
+                    Chicken entity = (Chicken) this.level().getWorld().createEntity(new Location(this.level().getWorld(), this.getX(), this.getY(), this.getZ(), this.getYRot(), 0.0f), hatchingType.getEntityClass());
                     if (entity != null) {
                         if (entity.getBukkitEntity() instanceof Ageable) {
-                            ((Ageable) ((Entity) entity).getBukkitEntity()).setBaby();
+                            ((Ageable) entity.getBukkitEntity()).setBaby();
                         }
                         this.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.EGG);
                         this.level().addFreshEntity(entity);
