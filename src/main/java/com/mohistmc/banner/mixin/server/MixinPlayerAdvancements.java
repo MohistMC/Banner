@@ -53,7 +53,7 @@ public abstract class MixinPlayerAdvancements {
                     remap = false))
     private void banner$checkLogger(Logger instance, String s, Object o1, Object o2) {
         if (banner$entry.get().getKey().getNamespace().equals("minecraft")) {
-            LOGGER.warn("Ignored advancement '{}' in progress file {} - it doesn't exist anymore?", banner$entry.get().getKey(), this.playerSavePath);
+            LOGGER.warn("Ignored advancement '{}' in progress file {} - it doesn't exist anymore?", banner$entry.getAndSet(null).getKey(), this.playerSavePath);
         }
     }
 

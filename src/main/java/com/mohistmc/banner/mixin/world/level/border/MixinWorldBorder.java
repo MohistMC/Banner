@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.border;
 
 import com.mohistmc.banner.injection.world.level.border.InjectionWorldBorder;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.border.WorldBorder;

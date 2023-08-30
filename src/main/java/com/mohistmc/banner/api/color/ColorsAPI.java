@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import net.md_5.bungee.api.ChatColor;
 
 import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;

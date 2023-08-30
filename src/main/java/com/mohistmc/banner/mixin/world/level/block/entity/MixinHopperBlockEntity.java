@@ -98,8 +98,8 @@ public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockE
 
     @Redirect(method = "ejectItems", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;addItem(Lnet/minecraft/world/Container;Lnet/minecraft/world/Container;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/core/Direction;)Lnet/minecraft/world/item/ItemStack;"))
     private static ItemStack banner$moveItem(Container source, Container destination, ItemStack stack, Direction direction) {
-        var entity = banner$hopper.get();
-        var level = banner$world.get();
+        var entity = banner$hopper.getAndSet(null);
+        var level = banner$world.getAndSet(null);
         entity = entity == null ? (HopperBlockEntity) source : entity;
         CraftItemStack original = CraftItemStack.asCraftMirror(stack);
 

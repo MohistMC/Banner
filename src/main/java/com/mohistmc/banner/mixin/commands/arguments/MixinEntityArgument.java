@@ -29,6 +29,6 @@ public abstract class MixinEntityArgument implements InjectionEntityArgument {
     @Redirect(method = "parse(Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/commands/arguments/selector/EntitySelector;",
     at = @At(value = "INVOKE", target = "Lnet/minecraft/commands/arguments/selector/EntitySelectorParser;parse()Lnet/minecraft/commands/arguments/selector/EntitySelector;"))
     private EntitySelector banner$resetParse(EntitySelectorParser instance) throws CommandSyntaxException {
-        return instance.parse(banner$overridePerm.get());
+        return instance.parse(banner$overridePerm.getAndSet(false));
     }
 }

@@ -30,12 +30,12 @@ public abstract class MixinEntitySelectorParser implements InjectionEntitySelect
 
     @Redirect(method = "parseSelector", at = @At(value = "FIELD", target = "Lnet/minecraft/commands/arguments/selector/EntitySelectorParser;usesSelectors:Z"))
     private void banner$resetUseSelectors(EntitySelectorParser instance, boolean value) {
-        this.usesSelectors = !banner$overridePermissions.get();
+        this.usesSelectors = !banner$overridePermissions.getAndSet(false);
     }
 
     @Redirect(method = "parse", at = @At(value = "INVOKE", target = "Lnet/minecraft/commands/arguments/selector/EntitySelectorParser;parseSelector()V"))
     private void banner$resetParseSelectors(EntitySelectorParser instance) throws CommandSyntaxException {
-        this.parseSelector(banner$overridePermissions.get());
+        this.parseSelector(banner$overridePermissions.getAndSet(false));
     }
 
     @Override
