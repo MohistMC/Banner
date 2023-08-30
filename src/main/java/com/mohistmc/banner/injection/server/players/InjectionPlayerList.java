@@ -21,10 +21,6 @@ public interface InjectionPlayerList {
         return null;
     }
 
-    default String extra$remove(ServerPlayer entityplayer) { // CraftBukkit - return string
-        return null;
-    }
-
     default ServerPlayer canPlayerLogin(ServerLoginPacketListenerImpl handler, GameProfile gameProfile) {
         return null;
     }

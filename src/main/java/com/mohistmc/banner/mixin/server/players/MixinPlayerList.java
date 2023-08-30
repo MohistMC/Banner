@@ -375,7 +375,17 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     public void remove(ServerPlayer player) {
         ServerLevel serverLevel = player.serverLevel();
         player.awardStat(Stats.LEAVE_GAME);
-        this.extra$remove(player);
+        // CraftBukkit start - Quitting must be before we do final save of data, in case plugins need to modify it
+        // See SPIGOT-5799, SPIGOT-6145
+        if (player.containerMenu != player.inventoryMenu) {
+            player.closeContainer();
+        }
+
+        PlayerQuitEvent playerQuitEvent = new PlayerQuitEvent(player.getBukkitEntity(), player.bridge$kickLeaveMessage() != null ? player.bridge$kickLeaveMessage() : "\u00A7e" + player.getScoreboardName() + " left the game");
+        cserver.getPluginManager().callEvent(playerQuitEvent);
+        player.getBukkitEntity().disconnect(playerQuitEvent.getQuitMessage());
+        player.doTick(); // SPIGOT-924
+        // CraftBukkit end
         this.save(player);
         if (player.isPassenger()) {
             Entity entity = player.getRootVehicle();
@@ -394,7 +404,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         this.players.remove(player);
         this.server.getCustomBossEvents().onPlayerDisconnect(player);
         UUID uUID = player.getUUID();
-        ServerPlayer serverPlayer = (ServerPlayer)this.playersByUUID.get(uUID);
+        ServerPlayer serverPlayer = this.playersByUUID.get(uUID);
         if (serverPlayer == player) {
             this.playersByUUID.remove(uUID);
             // this.stats.remove(uUID);
@@ -402,9 +412,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         }
         // CraftBukkit start
         ClientboundPlayerInfoRemovePacket packet = new ClientboundPlayerInfoRemovePacket(List.of(serverPlayer.getUUID()));
-        for (ServerPlayer value : players) {
-            ServerPlayer entityplayer2 = (ServerPlayer) value;
-
+        for (ServerPlayer entityplayer2 : players) {
             if (entityplayer2.getBukkitEntity().canSee(player.getBukkitEntity())) {
                 entityplayer2.connection.send(packet);
             } else {
@@ -414,25 +422,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         // This removes the scoreboard (and player reference) for the specific player in the manager
         cserver.getScoreboardManager().removePlayer(player.getBukkitEntity());
         // CraftBukkit end
-    }
-
-    @Override
-    public String extra$remove(ServerPlayer playerIn) {
-        // CraftBukkit start - Quitting must be before we do final save of data, in case plugins need to modify it
-        // See SPIGOT-5799, SPIGOT-6145
-        if (playerIn.containerMenu != playerIn.inventoryMenu) {
-            playerIn.closeContainer();
-        }
-
-        PlayerQuitEvent playerQuitEvent = new PlayerQuitEvent(playerIn.getBukkitEntity(), playerIn.bridge$kickLeaveMessage() != null ?
-                playerIn.bridge$kickLeaveMessage() : "\u00A7e" + playerIn.getScoreboardName() + " left the game");
-        cserver.getPluginManager().callEvent(playerQuitEvent);
-        playerIn.getBukkitEntity().disconnect(playerQuitEvent.getQuitMessage());
-        playerIn.doTick(); // SPIGOT-924
-        // CraftBukkit end
-
         this.quitMsg = playerQuitEvent.getQuitMessage();
-        return playerQuitEvent.getQuitMessage();
     }
 
     public String bridge$quiltMsg() {

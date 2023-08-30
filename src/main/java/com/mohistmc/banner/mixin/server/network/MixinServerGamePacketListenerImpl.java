@@ -949,9 +949,13 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         }
     }
 
-    @Redirect(method = "onDisconnect", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V"))
-    private void banner$setQuitMsg(PlayerList instance, Component message, boolean bypassHiddenChat) {
+    @Redirect(method = "onDisconnect", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V"))
+    public void banner$captureQuit(PlayerList instance, Component p_240618_, boolean p_240644_) {
+        // do nothing
+    }
+
+    @Inject(method = "onDisconnect", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/players/PlayerList;remove(Lnet/minecraft/server/level/ServerPlayer;)V"))
+    private void banner$setQuitMsg(Component message, CallbackInfo ci) {
         String quitMessage = this.server.getPlayerList().bridge$quiltMsg();
         if ((quitMessage != null) && (!quitMessage.isEmpty())) {
             this.server.getPlayerList().broadcastMessage(CraftChatMessage.fromString(quitMessage));
