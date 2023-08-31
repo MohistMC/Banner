@@ -74,7 +74,7 @@ public abstract class MixinBoat extends Entity implements InjectionBoat {
 
     @Inject(method = "push", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;push(Lnet/minecraft/world/entity/Entity;)V"))
     private void banner$collideVehicle(Entity entityIn, CallbackInfo ci) {
-        if (isPassengerOfSameVehicle(entityIn)) {
+        if (!isPassengerOfSameVehicle(entityIn)) {
             VehicleEntityCollisionEvent event = new VehicleEntityCollisionEvent((Vehicle) this.getBukkitEntity(), entityIn.getBukkitEntity());
             Bukkit.getPluginManager().callEvent(event);
 
@@ -131,12 +131,12 @@ public abstract class MixinBoat extends Entity implements InjectionBoat {
 
     @Override
     public double bridge$unoccupiedDeceleration() {
-        return occupiedDeceleration;
+        return unoccupiedDeceleration;
     }
 
     @Override
-    public void banner$setUnoccupiedDeceleration(double occupiedDeceleration) {
-        this.occupiedDeceleration = occupiedDeceleration;
+    public void banner$setUnoccupiedDeceleration(double unoccupiedDeceleration) {
+        this.unoccupiedDeceleration = unoccupiedDeceleration;
     }
 
     @Override
