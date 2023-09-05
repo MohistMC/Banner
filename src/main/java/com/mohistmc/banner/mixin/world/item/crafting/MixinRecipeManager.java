@@ -144,6 +144,12 @@ public abstract class MixinRecipeManager implements InjectionRecipeManager {
 
     @Override
     public boolean removeRecipe(ResourceLocation mcKey) {
+        if (this.recipes instanceof ImmutableMap) {
+            this.recipes = new HashMap<>(recipes);
+        }
+        if (this.byName instanceof ImmutableMap) {
+            this.byName = new HashMap<>(byName);
+        }
         for (var recipes : recipes.values()) {
             recipes.remove(mcKey);
         }
