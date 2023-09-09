@@ -30,7 +30,7 @@ public class MixinBaseCommandBlock {
             command = command.substring(1);
         }
 
-        ServerCommandEvent event = new ServerCommandEvent(sender.getBukkitSender(), command);
+        ServerCommandEvent event = new ServerCommandEvent(sender.banner$getBukkitSender(), command);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return 0;

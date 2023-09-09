@@ -13,8 +13,12 @@ public abstract class MixinCommandBlockEntity_1 implements CommandSource {
 
     @Shadow(aliases = {"field_11921"}, remap = false) private CommandBlockEntity outerThis;
 
-    @Override
     public CommandSender getBukkitSender(CommandSourceStack wrapper) {
         return new CraftBlockCommandSender(wrapper, outerThis);
+    }
+
+    @Override
+    public CommandSender banner$getBukkitSender(CommandSourceStack wrapper) {
+        return getBukkitSender(wrapper);
     }
 }

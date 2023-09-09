@@ -51,9 +51,13 @@ public abstract class MixinCommandSourceStack implements InjectionCommandSourceS
         return ((getLevel() == null || !((CraftServer) Bukkit.getServer()).ignoreVanillaPermissions) && this.permissionLevel >= i) || getBukkitSender().hasPermission(bukkitPermission);
     }
 
-    @Override
     public CommandSender getBukkitSender() {
-        return this.source.getBukkitSender((CommandSourceStack) (Object) this);
+        return this.source.banner$getBukkitSender((CommandSourceStack) (Object) this);
+    }
+
+    @Override
+    public CommandSender banner$getBukkitSender() {
+        return getBukkitSender();
     }
 
     @Override

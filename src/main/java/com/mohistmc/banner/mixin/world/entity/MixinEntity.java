@@ -951,7 +951,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     }
 
     @Override
-    public CommandSender getBukkitSender(CommandSourceStack wrapper) {
+    public CommandSender banner$getBukkitSender(CommandSourceStack wrapper) {
         return getBukkitEntity();
     }
 

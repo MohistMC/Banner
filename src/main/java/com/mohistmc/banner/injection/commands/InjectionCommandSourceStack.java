@@ -12,7 +12,7 @@ public interface InjectionCommandSourceStack {
         return false;
     }
 
-    default org.bukkit.command.CommandSender getBukkitSender() {
+    default org.bukkit.command.CommandSender banner$getBukkitSender() {
         return null;
     }
 

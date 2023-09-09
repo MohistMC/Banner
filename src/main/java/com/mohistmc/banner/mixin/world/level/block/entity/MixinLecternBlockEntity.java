@@ -81,9 +81,13 @@ public abstract class MixinLecternBlockEntity extends BlockEntity implements Cle
         return false;
     }
 
-    @Override
     public CommandSender getBukkitSender(CommandSourceStack wrapper) {
-        return wrapper.getEntity() != null ?  wrapper.getEntity().getBukkitSender(wrapper) : new CraftBlockCommandSender(wrapper, (BlockEntity) (Object) this);
+        return wrapper.getEntity() != null ?  wrapper.getEntity().banner$getBukkitSender(wrapper) : new CraftBlockCommandSender(wrapper, (BlockEntity) (Object) this);
+    }
+
+    @Override
+    public CommandSender banner$getBukkitSender(CommandSourceStack wrapper) {
+        return getBukkitSender(wrapper);
     }
 
 }

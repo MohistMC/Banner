@@ -57,7 +57,7 @@ public abstract class MixinCommands implements InjectionCommands {
             command = command.substring(1);
         }
 
-        ServerCommandEvent event = new ServerCommandEvent(sender.getBukkitSender(), command);
+        ServerCommandEvent event = new ServerCommandEvent(sender.banner$getBukkitSender(), command);
         org.bukkit.Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return 0;
