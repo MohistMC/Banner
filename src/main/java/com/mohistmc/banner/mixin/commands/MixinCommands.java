@@ -114,7 +114,7 @@ public abstract class MixinCommands implements InjectionCommands {
         // Remove labels that were removed during the event
         for (String orig : bukkit) {
             if (!event.getCommands().contains(orig)) {
-                ((InjectionCommandNode) rootCommandNode).removeCommand(orig);
+                ((InjectionCommandNode) rootCommandNode).banner$removeCommand(orig);
             }
         }
         player.connection.send(new ClientboundCommandsPacket(rootCommandNode));

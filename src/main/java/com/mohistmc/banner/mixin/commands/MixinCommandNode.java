@@ -28,7 +28,7 @@ public abstract class MixinCommandNode<S> implements Comparable<CommandNode<S>>,
 
     // CraftBukkit start
     @Override
-    public void removeCommand(String name) {
+    public void banner$removeCommand(String name) {
         children.remove(name);
         literals.remove(name);
         arguments.remove(name);

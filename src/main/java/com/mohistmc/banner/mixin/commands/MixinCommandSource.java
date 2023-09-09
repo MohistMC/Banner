@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(CommandSource.class)
 public interface MixinCommandSource extends InjectionCommandSource {
 
-    @Override
-    CommandSender getBukkitSender(CommandSourceStack wrapper);
+    default CommandSender getBukkitSender(CommandSourceStack wrapper) {
+        return this.banner$getBukkitSender(wrapper);
+    }
 }
