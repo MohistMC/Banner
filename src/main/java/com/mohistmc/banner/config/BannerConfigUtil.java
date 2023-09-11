@@ -66,19 +66,17 @@ public class BannerConfigUtil {
     }
 
     public static void i18n() {
-        String banner_lang = yml.getString("banner.lang", "xx_XX");
-        String l = banner_lang.split("_")[0];
-        String c = banner_lang.split("_")[1];
-        BannerMCStart.I18N = new i18n(BannerMCStart.class.getClassLoader(), new Locale(l, c));
+        String mohist_lang = yml.getString("banner.lang", Locale.getDefault().toString());
+        BannerMCStart.I18N = new i18n(BannerMCStart.class.getClassLoader(), mohist_lang);
     }
 
     public static String lang() {
         String lang = "banner.lang";
         if (yml.get(lang) == null) {
-            yml.set(lang, "xx_XX");
+            yml.set(lang, Locale.getDefault().toString());
             save();
         }
-        return yml.getString(lang, "xx_XX");
+        return yml.getString(lang, Locale.getDefault().toString());
     }
 
     public static boolean showLogo() {
@@ -90,13 +88,8 @@ public class BannerConfigUtil {
         return yml.getBoolean(key, true);
     }
 
-    public static List<String> BLACKLIST_LIB() {
-        return yml.getStringList("libraries_black_list");
-    }
-
     public static boolean isCN() {
-        TimeZone timeZone = TimeZone.getDefault();
-        return "Asia/Shanghai".equals(timeZone.getID());
+        return BannerMCStart.I18N.isCN();
     }
 
     public static boolean skipOtherWorldPreparing() {
