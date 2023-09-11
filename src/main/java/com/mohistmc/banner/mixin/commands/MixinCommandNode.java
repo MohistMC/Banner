@@ -26,12 +26,16 @@ public abstract class MixinCommandNode<S> implements Comparable<CommandNode<S>>,
 
     @Shadow @Final private Predicate<S> requirement;
 
-    // CraftBukkit start
-    @Override
-    public void banner$removeCommand(String name) {
+    public void removeCommand(String name) {
         children.remove(name);
         literals.remove(name);
         arguments.remove(name);
+    }
+
+    // CraftBukkit start
+    @Override
+    public void banner$removeCommand(String name) {
+        removeCommand(name);
     }
     // CraftBukkit end
 
