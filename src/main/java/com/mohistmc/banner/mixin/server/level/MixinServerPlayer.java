@@ -640,12 +640,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         return containerCounter; // CraftBukkit
     }
 
-    @Override
-    public int nextContainerCounter() {
-        this.containerCounter = this.containerCounter % 100 + 1;
-        return containerCounter; // CraftBukkit
-    }
-
     private AtomicReference<AbstractContainerMenu> banner$containerMenu = new AtomicReference<>();
 
     @Inject(method = "openMenu", cancellable = true,

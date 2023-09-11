@@ -3,6 +3,7 @@ package org.bukkit.craftbukkit.v1_20_R1.entity;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
+import com.mohistmc.banner.bukkit.pluginfix.LuckPerms;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -70,7 +71,7 @@ import java.util.Set;
 public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
     private CraftInventoryPlayer inventory;
     private CraftInventory enderChest;// Banner - remove final
-    protected final PermissibleBase perm = new PermissibleBase(this);
+    public PermissibleBase perm = new PermissibleBase(this);
     private boolean op;
     private GameMode mode;
 
@@ -79,6 +80,16 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         mode = server.getDefaultGameMode();
         this.inventory = new CraftInventoryPlayer(entity.getInventory());
         enderChest = new CraftInventory(entity.getEnderChestInventory());
+        // Banner start - TODO
+        if (LuckPerms.perCache.containsKey(getUniqueId())) {
+            perm = LuckPerms.perCache.get(getUniqueId());
+        }
+        if (LuckPerms.perCache.get(getUniqueId()) != perm) {
+            if (!PermissibleBase.class.equals(perm.getClass())) {
+                LuckPerms.perCache.put(getUniqueId(), perm);
+            }
+        }
+        // Banner end
     }
 
     @Override

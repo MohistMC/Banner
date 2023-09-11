@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.bukkit.pluginfix.LuckPerms;
 import com.mohistmc.banner.fabric.BukkitRegistry;
 import com.mohistmc.banner.injection.server.players.InjectionPlayerList;
 import com.mojang.authlib.GameProfile;
@@ -84,6 +85,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSpawnChangeEvent;
+import org.bukkit.permissions.PermissibleBase;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
@@ -383,6 +385,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
         PlayerQuitEvent playerQuitEvent = new PlayerQuitEvent(player.getBukkitEntity(), player.bridge$kickLeaveMessage() != null ? player.bridge$kickLeaveMessage() : "\u00A7e" + player.getScoreboardName() + " left the game");
         cserver.getPluginManager().callEvent(playerQuitEvent);
+        LuckPerms.perCache.remove(player.getBukkitEntity().getUniqueId());
         player.getBukkitEntity().disconnect(playerQuitEvent.getQuitMessage());
         player.doTick(); // SPIGOT-924
         // CraftBukkit end
@@ -461,7 +464,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         // depending on the outcome.
 
         SocketAddress socketaddress = handler.connection.getRemoteAddress();
-        ServerPlayer entity = new ServerPlayer(this.server, this.server.getLevel(Level.OVERWORLD), gameProfile);
+        ServerPlayer entity = getPlayerForLogin(gameProfile);
         org.bukkit.entity.Player player = entity.getBukkitEntity();
         PlayerLoginEvent event = new PlayerLoginEvent(player, handler.connection.bridge$hostname(), ((java.net.InetSocketAddress) socketaddress).getAddress());
 
@@ -495,6 +498,11 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             handler.disconnect(event.getKickMessage());
             return null;
         }
+        // Banner start - TODO
+        if (!LuckPerms.perCache.containsKey(player.getUniqueId())) {
+            LuckPerms.perCache.put(player.getUniqueId(), ((CraftPlayer)player).perm);
+        }
+        // Banner end
         return entity;
     }
 
