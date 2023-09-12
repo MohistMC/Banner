@@ -213,8 +213,6 @@ public abstract class MixinItemStack implements InjectionItemStack {
         this.item = item;
     }
 
-    private final AtomicReference<InteractionHand> banner$hand = new AtomicReference<>(InteractionHand.MAIN_HAND);
-
     /**
      * @author wdog5
      * @reason functionality replaced
@@ -412,12 +410,5 @@ public abstract class MixinItemStack implements InjectionItemStack {
 
             return interactionResult;
         }
-    }
-
-    @Override
-    public InteractionResult useOn(UseOnContext itemactioncontext, InteractionHand enumhand) {
-        enumhand = itemactioncontext.getHand();
-        banner$hand.set(enumhand);
-        return useOn(itemactioncontext);
     }
 }

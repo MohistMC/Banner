@@ -437,10 +437,10 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
                 InteractionResult interactionResult2;
                 if (this.isCreative()) {
                     int i = stack.getCount();
-                    interactionResult2 = stack.useOn(useOnContext, hand);// Banner - add Hand
+                    interactionResult2 = stack.useOn(useOnContext);
                     stack.setCount(i);
                 } else {
-                    interactionResult2 = stack.useOn(useOnContext, hand);// Banner - add Hand
+                    interactionResult2 = stack.useOn(useOnContext);
                 }
 
                 if (interactionResult2.consumesAction()) {

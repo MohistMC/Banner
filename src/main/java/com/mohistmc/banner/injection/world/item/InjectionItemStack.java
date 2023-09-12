@@ -15,10 +15,6 @@ public interface InjectionItemStack {
     default void load(CompoundTag nbttagcompound) {
     }
 
-    default InteractionResult useOn(UseOnContext itemactioncontext, InteractionHand enumhand) { // CraftBukkit - add hand
-        return InteractionResult.PASS;
-    }
-
     default CompoundTag getTagClone() {
         return null;
     }

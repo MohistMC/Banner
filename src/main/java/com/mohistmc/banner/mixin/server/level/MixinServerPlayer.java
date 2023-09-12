@@ -7,6 +7,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Unit;
 import net.minecraft.BlockUtil;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.PositionImpl;
@@ -14,6 +15,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
+import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
 import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
 import net.minecraft.network.protocol.game.ServerboundClientInformationPacket;
 import net.minecraft.resources.ResourceKey;
@@ -640,40 +642,47 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         return containerCounter; // CraftBukkit
     }
 
-    private AtomicReference<AbstractContainerMenu> banner$containerMenu = new AtomicReference<>();
-
-    @Inject(method = "openMenu", cancellable = true,
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/MenuProvider;createMenu(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/inventory/AbstractContainerMenu;"),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$invOpen(MenuProvider menuProvider, CallbackInfoReturnable<OptionalInt> cir) {
-        AbstractContainerMenu banner$container = menuProvider.createMenu(this.containerCounter, this.getInventory(), this);
-        banner$containerMenu.set(banner$container);
-        if (banner$container != null) {
-            banner$container.setTitle(menuProvider.getDisplayName());
-            boolean cancelled = false;
-            BukkitSnapshotCaptures.captureContainerOwner((ServerPlayer) (Object) this);
-            banner$container = CraftEventFactory.callInventoryOpenEvent((ServerPlayer) (Object) this, banner$container, cancelled);
-            if (banner$container == null && !cancelled) {
-                if (menuProvider instanceof Container) {
-                    ((Container) menuProvider).stopOpen((ServerPlayer) (Object) this);
-                } else if (menuProvider instanceof DoubleChestInventory) {
-                    ((DoubleChestInventory) menuProvider).inventorylargechest.stopOpen(this);
+    /**
+     * @author
+     * @reason
+     */
+    @Overwrite
+    public OptionalInt openMenu(@Nullable MenuProvider menu) {
+        if (menu == null) {
+            return OptionalInt.empty();
+        } else {
+            if (this.containerMenu != this.inventoryMenu) {
+                this.closeContainer();
+            }
+            this.nextContainerCounterInt();
+            AbstractContainerMenu abstractContainerMenu = menu.createMenu(this.containerCounter, this.getInventory(), this);
+            if (abstractContainerMenu != null) {
+                abstractContainerMenu.setTitle(menu.getDisplayName());
+                boolean cancelled = false;
+                BukkitSnapshotCaptures.captureContainerOwner((ServerPlayer) (Object) this);
+                abstractContainerMenu = CraftEventFactory.callInventoryOpenEvent((ServerPlayer) (Object) this, abstractContainerMenu, cancelled);
+                if (abstractContainerMenu == null && !cancelled) {
+                    if (menu instanceof Container) {
+                        ((Container) menu).stopOpen((ServerPlayer) (Object) this);
+                    } else if (menu instanceof DoubleChestInventory) {
+                        ((DoubleChestInventory) menu).inventorylargechest.stopOpen(this);
+                    }
+                    return OptionalInt.empty();
                 }
-                cir.setReturnValue(OptionalInt.empty());
+            }
+            if (abstractContainerMenu == null) {
+                if (this.isSpectator()) {
+                    this.displayClientMessage(Component.translatable("container.spectatorCantOpen").withStyle(ChatFormatting.RED), true);
+                }
+
+                return OptionalInt.empty();
+            } else {
+                this.connection.send(new ClientboundOpenScreenPacket(abstractContainerMenu.containerId, abstractContainerMenu.getType(), menu.getDisplayName()));
+                this.initMenu(abstractContainerMenu);
+                this.containerMenu = abstractContainerMenu;
+                return OptionalInt.of(this.containerCounter);
             }
         }
-    }
-
-    @Redirect(method = "openMenu", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/MenuProvider;createMenu(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/inventory/AbstractContainerMenu;"))
-    private AbstractContainerMenu banner$resetMenu(MenuProvider instance, int i, Inventory inventory, Player player) {
-        return banner$containerMenu.get();
-    }
-
-    @Redirect(method = "openMenu", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/MenuProvider;getDisplayName()Lnet/minecraft/network/chat/Component;"))
-    private Component banner$sendData(MenuProvider instance) {
-        return banner$containerMenu.get().getTitle();
     }
 
     private AtomicReference<HorseInventoryMenu> banner$horseMenu = new AtomicReference<>();
