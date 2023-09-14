@@ -142,6 +142,16 @@ dependencies {
 	// Kyori
 	implementation(include("net.kyori:adventure-platform-fabric:5.9.0"))
 
+
+	// new LibraryLoader
+	implementation(include('com.mohistmc:mjson:1.4.2'))
+	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+	implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2'
+	implementation 'com.fasterxml.woodstox:woodstox-core:6.5.1'
+	implementation 'org.codehaus.woodstox:stax2-api:4.2.1'
+
 }
 
 loom {
