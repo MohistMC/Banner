@@ -151,7 +151,9 @@ public abstract class MixinRecipeManager implements InjectionRecipeManager {
             this.byName = new HashMap<>(byName);
         }
         for (var recipes : recipes.values()) {
-            recipes.remove(mcKey);
+            if (!(recipes instanceof ImmutableMap)) {
+                recipes.remove(mcKey);
+            }
         }
         for (Object2ObjectLinkedOpenHashMap<ResourceLocation, Recipe<?>> recipes0 : recipesCB.values()) {
             recipes0.remove(mcKey);
