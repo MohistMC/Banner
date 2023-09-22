@@ -139,6 +139,9 @@ public class BannerConfig {
     public static String motdFirstLine;
     public static String motdSecondLine;
 
+    public static boolean velocityEnabled;
+    public static String velocitySecret;
+
     private static void banner() {
         check_update = getBoolean("banner.check_update", false);
         check_libraries = getBoolean("banner.check_libraries", true);
@@ -158,5 +161,7 @@ public class BannerConfig {
         clear_item__time = getInt("entity.clear.item.time", 1800);
         motdFirstLine = ColorsAPI.of(getString("motd.firstline", "<RAINBOW1>A Minecraft Server</RAINBOW>"));
         motdFirstLine = ColorsAPI.of(getString("motd.secondline", ""));
+        velocityEnabled = getBoolean("proxies.velocity.enabled", false);
+        velocitySecret = getString("proxies.velocity.secret", "");
     }
 }

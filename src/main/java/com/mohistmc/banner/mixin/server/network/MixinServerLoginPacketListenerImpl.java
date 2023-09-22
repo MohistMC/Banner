@@ -1,5 +1,7 @@
 package com.mohistmc.banner.mixin.server.network;
 
+import com.mohistmc.banner.config.BannerConfig;
+import com.mohistmc.banner.config.BannerConfigUtil;
 import com.mohistmc.banner.injection.server.network.InjectionServerLoginPacketListenerImpl;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.DefaultUncaughtExceptionHandler;
@@ -10,12 +12,7 @@ import net.minecraft.network.TickablePacketListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientboundDisconnectPacket;
-import net.minecraft.network.protocol.login.ClientboundGameProfilePacket;
-import net.minecraft.network.protocol.login.ClientboundHelloPacket;
-import net.minecraft.network.protocol.login.ClientboundLoginCompressionPacket;
-import net.minecraft.network.protocol.login.ServerLoginPacketListener;
-import net.minecraft.network.protocol.login.ServerboundHelloPacket;
-import net.minecraft.network.protocol.login.ServerboundKeyPacket;
+import net.minecraft.network.protocol.login.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
@@ -29,10 +26,10 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerPreLoginEvent;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -143,6 +140,9 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
                 return ret;
             }
     );
+
+    @Unique
+    private int velocityLoginMessageId = -1;    // Paper - Velocity support.
     // Paper end
 
     /**
@@ -162,6 +162,16 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
                 this.state = ServerLoginPacketListenerImpl.State.KEY;
                 this.connection.send(new ClientboundHelloPacket("", this.server.getKeyPair().getPublic().getEncoded(), this.challenge));
             } else {
+                // Paper start - Velocity support
+                if (BannerConfig.velocityEnabled) {
+                    this.velocityLoginMessageId = java.util.concurrent.ThreadLocalRandom.current().nextInt();
+                    net.minecraft.network.FriendlyByteBuf buf = new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
+                    buf.writeByte(com.destroystokyo.paper.proxy.VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION);
+                    net.minecraft.network.protocol.login.ClientboundCustomQueryPacket packet1 = new net.minecraft.network.protocol.login.ClientboundCustomQueryPacket(this.velocityLoginMessageId, com.destroystokyo.paper.proxy.VelocityProxy.PLAYER_INFO_CHANNEL, buf);
+                    this.connection.send(packet1);
+                    return;
+                }
+                // Paper end
                 // Spigot start
                 // Paper start - Cache authenticator threads
                 authenticatorPool.execute(() -> {
@@ -254,6 +264,11 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
     }
 
     void banner$preLogin() throws Exception {
+        if (velocityLoginMessageId == -1 && BannerConfig.velocityEnabled) {
+            disconnect("This server requires you to connect with Velocity.");
+            return;
+        }
+
         String playerName = gameProfile.getName();
         InetAddress address = ((InetSocketAddress) connection.getRemoteAddress()).getAddress();
         UUID uniqueId = gameProfile.getId();
@@ -285,5 +300,52 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
         }
         LOGGER.info("UUID of player {} is {}", gameProfile.getName(), gameProfile.getId());
         state = ServerLoginPacketListenerImpl.State.READY_TO_ACCEPT;
+    }
+
+    @Inject(method = "handleCustomQueryPacket", at = @At("HEAD"), cancellable = true)
+    private void beforeCustomQuery(ServerboundCustomQueryPacket packet, CallbackInfo ci) {
+        // Paper start - Velocity support
+        if (BannerConfig.velocityEnabled && packet.getTransactionId() == this.velocityLoginMessageId) {
+            net.minecraft.network.FriendlyByteBuf buf = packet.getData();
+            if (buf == null) {
+                this.disconnect("This server requires you to connect with Velocity.");
+                ci.cancel();
+                return;
+            }
+
+            if (!com.destroystokyo.paper.proxy.VelocityProxy.checkIntegrity(buf)) {
+                this.disconnect("Unable to verify player details");
+                ci.cancel();
+                return;
+            }
+
+            int version = buf.readVarInt();
+            if (version > com.destroystokyo.paper.proxy.VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION) {
+                throw new IllegalStateException("Unsupported forwarding version " + version + ", wanted upto " + com.destroystokyo.paper.proxy.VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION);
+            }
+
+            java.net.SocketAddress listening = this.connection.getRemoteAddress();
+            int port = 0;
+            if (listening instanceof java.net.InetSocketAddress) {
+                port = ((java.net.InetSocketAddress) listening).getPort();
+            }
+            this.connection.address = new java.net.InetSocketAddress(com.destroystokyo.paper.proxy.VelocityProxy.readAddress(buf), port);
+
+            this.gameProfile = com.destroystokyo.paper.proxy.VelocityProxy.createProfile(buf);
+
+            //TODO Update handling for lazy sessions, might not even have to do anything?
+
+            // Proceed with login
+            authenticatorPool.execute(() -> {
+                try {
+                    banner$preLogin();
+                } catch (Exception ex) {
+                    this.disconnect("Failed to verify username!");
+                    LOGGER.warn("Exception verifying " + gameProfile.getName(), ex);
+                }
+            });
+            ci.cancel();
+        }
+        // Paper end
     }
 }
