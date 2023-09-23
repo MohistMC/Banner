@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.network;
 
+import com.destroystokyo.paper.proxy.VelocityProxy;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.config.BannerConfigUtil;
 import com.mohistmc.banner.injection.server.network.InjectionServerLoginPacketListenerImpl;
@@ -7,6 +8,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.DefaultUncaughtExceptionHandler;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.Connection;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.TickablePacketListener;
 import net.minecraft.network.chat.Component;
@@ -38,7 +40,9 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.PrivateKey;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Mixin(ServerLoginPacketListenerImpl.class)
@@ -164,11 +168,10 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
             } else {
                 // Paper start - Velocity support
                 if (BannerConfig.velocityEnabled) {
-                    this.velocityLoginMessageId = java.util.concurrent.ThreadLocalRandom.current().nextInt();
-                    net.minecraft.network.FriendlyByteBuf buf = new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
-                    buf.writeByte(com.destroystokyo.paper.proxy.VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION);
-                    net.minecraft.network.protocol.login.ClientboundCustomQueryPacket packet1 = new net.minecraft.network.protocol.login.ClientboundCustomQueryPacket(this.velocityLoginMessageId, com.destroystokyo.paper.proxy.VelocityProxy.PLAYER_INFO_CHANNEL, buf);
-                    this.connection.send(packet1);
+                    this.velocityLoginMessageId = ThreadLocalRandom.current().nextInt();
+                    FriendlyByteBuf buf = new FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
+                    buf.writeByte(VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION);
+                    this.connection.send(new ClientboundCustomQueryPacket(this.velocityLoginMessageId, VelocityProxy.PLAYER_INFO_CHANNEL, buf));
                     return;
                 }
                 // Paper end
@@ -302,20 +305,22 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
         state = ServerLoginPacketListenerImpl.State.READY_TO_ACCEPT;
     }
 
-    @Inject(method = "handleCustomQueryPacket", at = @At("HEAD"), cancellable = true)
-    private void beforeCustomQuery(ServerboundCustomQueryPacket packet, CallbackInfo ci) {
+    /**
+     * @author qyl27
+     * @reason Velocity support
+     */
+    @Overwrite
+    public void handleCustomQueryPacket(ServerboundCustomQueryPacket packet) {
         // Paper start - Velocity support
         if (BannerConfig.velocityEnabled && packet.getTransactionId() == this.velocityLoginMessageId) {
             net.minecraft.network.FriendlyByteBuf buf = packet.getData();
             if (buf == null) {
                 this.disconnect("This server requires you to connect with Velocity.");
-                ci.cancel();
                 return;
             }
 
             if (!com.destroystokyo.paper.proxy.VelocityProxy.checkIntegrity(buf)) {
                 this.disconnect("Unable to verify player details");
-                ci.cancel();
                 return;
             }
 
@@ -333,8 +338,6 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
 
             this.gameProfile = com.destroystokyo.paper.proxy.VelocityProxy.createProfile(buf);
 
-            //TODO Update handling for lazy sessions, might not even have to do anything?
-
             // Proceed with login
             authenticatorPool.execute(() -> {
                 try {
@@ -344,8 +347,10 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
                     LOGGER.warn("Exception verifying " + gameProfile.getName(), ex);
                 }
             });
-            ci.cancel();
+            return;
         }
         // Paper end
+
+        this.disconnect(Component.translatable("multiplayer.disconnect.unexpected_query_response"));
     }
 }
