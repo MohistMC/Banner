@@ -1,19 +1,14 @@
 package com.mohistmc.banner.network.download;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.util.MD5Util;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,7 +17,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static com.mohistmc.banner.network.download.NetworkUtil.getConn;
-import static com.mohistmc.banner.network.download.NetworkUtil.getInput;
+import mjson.Json;
 
 public class UpdateUtils {
 
@@ -33,11 +28,11 @@ public class UpdateUtils {
         System.out.println(BannerMCStart.I18N.get("update.stopcheck"));
 
         try {
-            JsonElement root = JsonParser.parseReader(new InputStreamReader(getInput("https://ci.codemc.io/job/MohistMC/job/Banner-1.20/lastSuccessfulBuild/api/json")));
+            Json json = Json.read(URI.create("https://ci.codemc.io/job/MohistMC/job/Banner-1.20/lastSuccessfulBuild/api/json").toURL());
 
             String jar_sha = BannerMCStart.getVersion();
-            String build_number = root.getAsJsonObject().get("number").toString();
-            String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.parseLong(root.getAsJsonObject().get("timestamp").toString())));
+            String build_number = json.asString("number");
+            String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(json.asLong("timestamp")));
 
             if (jar_sha.equals(build_number))
                 System.out.println(BannerMCStart.I18N.get("update.latest", jar_sha, build_number));
@@ -85,17 +80,5 @@ public class UpdateUtils {
 
     public static String getSize(long size) {
         return (size >= 1048576L) ? (float) size / 1048576.0F + "MB" : ((size >= 1024) ? (float) size / 1024.0F + " KB" : size + " B");
-    }
-
-    public static long getSizeOfDirectory(File path) throws IOException {
-        return Files.walk(path.toPath()).parallel()
-                .map(Path::toFile)
-                .filter(File::isFile)
-                .mapToLong(File::length)
-                .sum();
-    }
-
-    public static long getAllSizeOfUrl(String url) {
-        return getConn(url).getContentLength();
     }
 }

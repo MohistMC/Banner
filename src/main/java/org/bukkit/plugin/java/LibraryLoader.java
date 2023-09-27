@@ -2,9 +2,11 @@ package org.bukkit.plugin.java;
 
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.BannerServer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.mohistmc.banner.bukkit.nms.proxy.DelegateURLClassLoder;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.file.StandardOpenOption;
 import mjson.Json;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.jetbrains.annotations.NotNull;
@@ -69,15 +71,14 @@ class LibraryLoader {
             }
             try {
                 file.getParentFile().mkdirs();
-                file.createNewFile();
+
                 InputStream inputStream = new URL(mavenUrl).openStream();
-                try (FileOutputStream outputStream = new FileOutputStream(file)) {
-                    byte[] buffer = new byte[8 * 1024];
-                    int bytesRead;
-                    while ((bytesRead = inputStream.read(buffer)) != -1) {
-                        outputStream.write(buffer, 0, bytesRead);
-                    }
-                }
+                ReadableByteChannel rbc = Channels.newChannel(inputStream);
+                FileChannel fc = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+
+                fc.transferFrom(rbc, 0, Long.MAX_VALUE);
+                fc.close();
+                rbc.close();
 
                 libraries.add(file);
             } catch (IOException e) {
@@ -106,27 +107,27 @@ class LibraryLoader {
                 String group = dependency.group().replace(".", "/");
                 String fileName = "%s-%s.jar".formatted(dependency.name(), dependency.version());
                 String pomUrl = "https://repo.maven.apache.org/maven2/%s/%s/%s/%s".formatted(group, dependency.name(), dependency.version(), fileName.replace("jar", "pom"));
-                list.addAll(initDependencies(new URL(pomUrl)));
+                if (hasUrl(pomUrl)) list.addAll(initDependencies(new URL(pomUrl)));
             }
         }
         return list;
     }
 
-    public static List<Dependency> initDependencies(URL url) throws IOException {
-        Json json2Json = xml2Json(url);
+    public static List<Dependency> initDependencies(URL url) throws MalformedURLException {
         List<Dependency> list = new ArrayList<>();
-        String version = json2Json.at("parent") != null ? json2Json.at("parent").at("version").asString() : json2Json.at("version").asString();
+        Json json2Json = Json.readXml(url).at("project");
+        String version = json2Json.has("parent") ? json2Json.at("parent").asString("version") : json2Json.asString("version");
 
-        if (json2Json.at("dependencies") == null) return list;
+        if (!json2Json.has("dependencies")) return list;
         if (!json2Json.at("dependencies").toString().startsWith("{\"dependency\"")) return list;
         Json json3Json = json2Json.at("dependencies").at("dependency");
         if (json3Json.isArray()) {
-            for (Json o : json2Json.at("dependencies").at("dependency").asJsonList()) {
+            for (Json o : json2Json.at("dependencies").asJsonList("dependency")) {
                 if (o.toString().contains("groupId") && o.toString().contains("artifactId")) {
-                    String groupId = o.at("groupId").asString();
-                    String artifactId = o.at("artifactId").asString();
+                    String groupId = o.asString("groupId");
+                    String artifactId = o.asString("artifactId");
                     if (o.toString().contains("version")) {
-                        String versionAsString = o.at("version").asString();
+                        String versionAsString = o.asString("version");
                         if (versionAsString.contains("${project.version}")) {
                             Dependency dependency = new Dependency(groupId, artifactId, version, true);
                             list.add(dependency);
@@ -135,36 +136,33 @@ class LibraryLoader {
                             list.add(dependency);
                         }
                     } else {
-                        if (o.at("scope") != null && o.at("scope").asString().equals("compile")) {
+                        if (o.has("scope") && o.asString("scope").equals("compile")) {
                             URL mavenUrl = new URL("https://repo.maven.apache.org/maven2/%s/%s/%s".formatted(groupId.replace(".", "/"), artifactId, "maven-metadata.xml"));
-                            Json compile_json2Json = xml2Json(mavenUrl);
+                            Json compile_json2Json = Json.readXml(mavenUrl).at("metadata");;
 
-                            String compile_version = compile_json2Json.at("versioning").at("release").asString();
+                            String compile_version = compile_json2Json.at("versioning").asString("release");
 
                             Dependency dependency = new Dependency(groupId, artifactId, compile_version, true);
                             list.add(dependency);
-
                         }
                     }
-
                 }
             }
         } else {
-            Dependency dependency = new Dependency(json3Json.at("groupId").asString(), json3Json.at("artifactId").asString(), json3Json.at("version").asString(), true);
+            Dependency dependency = new Dependency(json3Json.asString("groupId"), json3Json.asString("artifactId"), json3Json.asString("version"), true);
             list.add(dependency);
         }
-
-
         return list;
     }
 
-    public static Json xml2Json(URL url) throws IOException {
-        XmlMapper compile_xmlMapper = new XmlMapper();
-        String compile_xml = compile_xmlMapper.readTree(url).toString();
-        ObjectMapper compile_objectMapper = new ObjectMapper();
-        Object compile_json = compile_objectMapper.readValue(compile_xml, Object.class);
-        String compile_jsonString = compile_objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(compile_json);
-        return Json.read(compile_jsonString);
+    public static boolean hasUrl(String s) {
+        try {
+            URL url = new URL(s);
+            url.openStream();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public record Dependency(String group, String name, String version, boolean extra) {
