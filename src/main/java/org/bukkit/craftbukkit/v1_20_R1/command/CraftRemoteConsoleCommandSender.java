@@ -4,6 +4,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.rcon.RconConsoleSource;
 import org.bukkit.command.RemoteConsoleCommandSender;
 
+import java.net.SocketAddress;
+
 public class CraftRemoteConsoleCommandSender extends ServerCommandSender implements RemoteConsoleCommandSender {
 
     private final RconConsoleSource listener;
@@ -15,6 +17,15 @@ public class CraftRemoteConsoleCommandSender extends ServerCommandSender impleme
     @Override
     public void sendMessage(String message) {
         listener.sendSystemMessage(Component.literal(message + "\n")); // Send a newline after each message, to preserve formatting.
+    }
+
+    public RconConsoleSource getListener() {
+        return listener;
+    }
+
+    @Override
+    public SocketAddress getAddress() {
+        return listener.bridge$socketAddress();
     }
 
     @Override
