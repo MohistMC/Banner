@@ -20,7 +20,12 @@ public abstract class MixinRconConsoleSource implements InjectionRconConsoleSour
     public SocketAddress socketAddress;
     private CraftRemoteConsoleCommandSender remoteConsole = null;
 
+    public void banner$constructor(MinecraftServer pServer) {
+        throw new RuntimeException();
+    }
+
     public void banner$constructor(MinecraftServer pServer, SocketAddress socketAddress) {
+        banner$constructor(pServer);
         this.socketAddress = socketAddress;
     }
 
