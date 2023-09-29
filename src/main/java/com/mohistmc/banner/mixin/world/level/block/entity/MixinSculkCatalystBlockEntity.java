@@ -25,9 +25,10 @@ public abstract class MixinSculkCatalystBlockEntity extends BlockEntity {
         super(blockEntityType, blockPos, blockState);
     }
 
-    @Inject(method = "<init>", at = @At("TAIL"))
-    private void banner$setServerLevel(BlockPos pos, BlockState blockState, CallbackInfo ci) {
-        //this.catalystListener.level = null;
+    @Override
+    public void setLevel(Level level) {
+        super.setLevel(level);
+        this.catalystListener.banner$setLevel(level);
     }
 
     @Inject(method = "serverTick", at = @At("HEAD"))

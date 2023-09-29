@@ -4,6 +4,8 @@ accessWidener	v1	named
 # 1.20.1
 accessible method net/minecraft/world/level/dimension/end/EndDragonFight respawnDragon (Ljava/util/List;)V
 accessible method net/minecraft/world/level/block/entity/SculkCatalystBlockEntity$CatalystListener bloom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/util/RandomSource;)V
+accessible field net/minecraft/world/level/block/SculkSpreader$ChargeCursor pos Lnet/minecraft/core/BlockPos;
+accessible field net/minecraft/world/level/block/SculkSpreader$ChargeCursor charge I
 
 # paper
 accessible field net/minecraft/server/level/ServerPlayer seenCredits Z
