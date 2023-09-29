@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
+import com.mohistmc.banner.injection.world.level.block.entity.InjectionCatalystListener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
@@ -14,7 +15,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(SculkCatalystBlockEntity.class)
 public abstract class MixinSculkCatalystBlockEntity extends BlockEntity {
@@ -28,7 +28,7 @@ public abstract class MixinSculkCatalystBlockEntity extends BlockEntity {
     @Override
     public void setLevel(Level level) {
         super.setLevel(level);
-        this.catalystListener.banner$setLevel(level);
+        ((InjectionCatalystListener) this.catalystListener).banner$setLevel(level);
     }
 
     @Inject(method = "serverTick", at = @At("HEAD"))
