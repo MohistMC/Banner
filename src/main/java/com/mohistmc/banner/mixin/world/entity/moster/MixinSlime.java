@@ -38,12 +38,13 @@ public abstract class MixinSlime extends Mob implements InjectionSlime {
 
     private boolean canWander = true;
 
+    private transient List<LivingEntity> banner$slimes;
+
     /**
      * @author wdog5
-     * @reason
+     * @reason bukkit
      */
     @Overwrite(remap = false)
-    @Override
     public void remove(Entity.RemovalReason reason) {
         int i = this.getSize();
         if (!this.level().isClientSide && i > 1 && this.isDeadOrDying()) {
@@ -53,14 +54,16 @@ public abstract class MixinSlime extends Mob implements InjectionSlime {
             int j = i / 2;
             int k = 2 + this.random.nextInt(3);
 
-            SlimeSplitEvent event = new SlimeSplitEvent((Slime) this.getBukkitEntity(), k);
-            Bukkit.getPluginManager().callEvent(event);
-            if (event.isCancelled() || event.getCount() <= 0) {
-                super.remove(reason);
-                return;
+            {
+                SlimeSplitEvent event = new SlimeSplitEvent((Slime) this.getBukkitEntity(), k);
+                Bukkit.getPluginManager().callEvent(event);
+                if (event.isCancelled() || event.getCount() <= 0) {
+                    super.remove(reason);
+                    return;
+                }
+                k = event.getCount();
             }
-            k = event.getCount();
-            List<LivingEntity> slimes = new ArrayList<>(k);
+            banner$slimes = new ArrayList<>(k);
 
             for (int l = 0; l < k; ++l) {
                 float f1 = ((float) (l % 2) - 0.5F) * f;
@@ -76,16 +79,22 @@ public abstract class MixinSlime extends Mob implements InjectionSlime {
                 slimeentity.setInvulnerable(this.isInvulnerable());
                 slimeentity.setSize(j, true);
                 slimeentity.moveTo(this.getX() + (double) f1, this.getY() + 0.5D, this.getZ() + (double) f2, this.random.nextFloat() * 360.0F, 0.0F);
-                slimes.add(slimeentity);
+                banner$slimes.add(slimeentity);
             }
-            if (CraftEventFactory.callEntityTransformEvent((net.minecraft.world.entity.monster.Slime) (Object) this, slimes, EntityTransformEvent.TransformReason.SPLIT).isCancelled()) {
+            if (CraftEventFactory.callEntityTransformEvent((net.minecraft.world.entity.monster.Slime) (Object) this, banner$slimes, EntityTransformEvent.TransformReason.SPLIT).isCancelled()) {
                 super.remove(reason);
+                banner$slimes = null;
                 return;
             }
-            for (LivingEntity living : slimes) {
+            for (int l = 0; l < banner$slimes.size(); l++) {
+                // Apotheosis compat
+                float f1 = ((float) (l % 2) - 0.5F) * f;
+                float f2 = ((float) (l / 2) - 0.5F) * f;
+                net.minecraft.world.entity.monster.Slime living = (net.minecraft.world.entity.monster.Slime) banner$slimes.get(l);
                 this.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.SLIME_SPLIT);
                 this.level().addFreshEntity(living);
             }
+            banner$slimes = null;
         }
         super.remove(reason);
     }
