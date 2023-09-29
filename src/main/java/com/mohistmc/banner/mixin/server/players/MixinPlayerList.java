@@ -85,7 +85,6 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSpawnChangeEvent;
-import org.bukkit.permissions.PermissibleBase;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
@@ -141,7 +140,8 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     @Shadow public abstract IpBanList getIpBans();
 
     @Shadow @Final private IpBanList ipBans;
-    @Shadow @Final protected int maxPlayers;
+    @Shadow
+    public int maxPlayers;
 
     @Shadow public abstract boolean canBypassPlayerLimit(GameProfile profile);
 
