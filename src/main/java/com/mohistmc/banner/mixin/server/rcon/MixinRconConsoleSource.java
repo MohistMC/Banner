@@ -16,12 +16,13 @@ import java.net.SocketAddress;
 public abstract class MixinRconConsoleSource implements InjectionRconConsoleSource {
 
     @Shadow @Final private StringBuffer buffer;
-
-    @Shadow @Final private MinecraftServer server;
-
     // CraftBukkit start
     public SocketAddress socketAddress;
-    private final CraftRemoteConsoleCommandSender remoteConsole = new CraftRemoteConsoleCommandSender((RconConsoleSource) (Object) this);
+    private CraftRemoteConsoleCommandSender remoteConsole = null;
+
+    public void banner$constructor(MinecraftServer pServer, SocketAddress socketAddress) {
+        this.socketAddress = socketAddress;
+    }
 
     @Override
     public SocketAddress bridge$socketAddress() {
@@ -40,6 +41,9 @@ public abstract class MixinRconConsoleSource implements InjectionRconConsoleSour
 
     @Override
     public CommandSender getBukkitSender(CommandSourceStack wrapper) {
-        return server.bridge$remoteConsole();
+        if (remoteConsole == null) {
+            remoteConsole = new CraftRemoteConsoleCommandSender((RconConsoleSource) (Object) this);
+        }
+        return this.remoteConsole;
     }
 }

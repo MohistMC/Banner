@@ -6,6 +6,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.server.WorldLoader;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.progress.ChunkProgressListener;
+import net.minecraft.server.rcon.RconConsoleSource;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WorldData;
@@ -57,12 +58,7 @@ public interface InjectionMinecraftServer {
         return null;
     }
 
-    default RemoteConsoleCommandSender bridge$remoteConsole() {
-        return null;
-    }
-
     default void banner$setConsole(ConsoleCommandSender console) {
-
     }
 
     default void banner$setRemoteConsole(RemoteConsoleCommandSender remoteConsole) {
@@ -102,5 +98,9 @@ public interface InjectionMinecraftServer {
 
     default double[] getTPS() {
         return new double[0];
+    }
+
+    default void banner$setRconConsoleSource(RconConsoleSource source) {
+
     }
 }
