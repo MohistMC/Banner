@@ -97,7 +97,6 @@ public class BukkitRegistry {
         loadEndDragonPhase();
         loadCookingBookCategory();
         loadFluids();
-        loadGameEvents();
 
         try {
             for (var field : org.bukkit.Registry.class.getFields()) {
@@ -152,24 +151,6 @@ public class BukkitRegistry {
             }
         }
         BannerServer.LOGGER.info(BannerMCStart.I18N.get("registry.block"), newTypes.size());
-    }
-
-    private static void loadGameEvents() {
-        try {
-            var constructor = GameEvent.class.getDeclaredConstructor(NamespacedKey.class);
-            constructor.setAccessible(true);
-            var handle = Unsafe.lookup().unreflectConstructor(constructor);
-            for (var gameEvent : BuiltInRegistries.GAME_EVENT) {
-                var key = BuiltInRegistries.GAME_EVENT.getKey(gameEvent);
-                var bukkit = GameEvent.getByKey(CraftNamespacedKey.fromMinecraft(key));
-                if (bukkit == null) {
-                    bukkit = (GameEvent) handle.invoke(CraftNamespacedKey.fromMinecraft(key));
-                    BannerServer.LOGGER.debug("Registered {} as game event {}", key, bukkit);
-                }
-            }
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
-        }
     }
 
     private static void loadFluids() {

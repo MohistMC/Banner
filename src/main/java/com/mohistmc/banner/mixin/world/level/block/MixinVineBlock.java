@@ -93,7 +93,6 @@ public abstract class MixinVineBlock extends Block {
                 } else {
                     if (direction == Direction.UP && pos.getY() < level.getMaxBuildHeight() - 1) {
                         if (this.canSupportAtFace(level, pos, direction)) {
-                            level.setBlock(pos, (BlockState)state.setValue(UP, true), 2);
                             CraftEventFactory.handleBlockGrowEvent(level, pos, (BlockState) state.setValue(VineBlock.UP, true), 2); // CraftBukkit
                             return;
                         }
