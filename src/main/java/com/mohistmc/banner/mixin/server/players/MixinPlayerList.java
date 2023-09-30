@@ -153,12 +153,12 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Shadow @Final public PlayerDataStorage playerIo;
     @Shadow @Final private static Logger LOGGER;
-
-    @Shadow public abstract ServerPlayer getPlayerForLogin(GameProfile profile);
-
     @Shadow protected abstract void save(ServerPlayer player);
 
     @Shadow @Final private Map<UUID, ServerStatsCounter> stats;
+
+    @Shadow public abstract ServerPlayer getPlayerForLogin(GameProfile profile);
+
     private CraftServer cserver;
 
     private static final AtomicReference<String> PROFILE_NAMES = new AtomicReference<>();
@@ -434,7 +434,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Override
     public ServerPlayer getPlayerForLogin(GameProfile gameprofile, ServerPlayer player) {
-        return this.getPlayerForLogin(gameprofile);
+        return getPlayerForLogin(gameprofile);
     }
 
     @Override
@@ -602,7 +602,10 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
                         f1 = (float) Mth.wrapDegrees(Mth.atan2(vec3d1.z, vec3d1.x) * 57.2957763671875D - 90.0D);
                     }
 
-                    // entityplayer1.setRespawnPosition(worldserver1.dimension(), blockposition, f, flag1, false); // CraftBukkit - not required, just copies old location into reused entity
+                    // Banner start - fix player login stuck under ground
+                    entityplayer1.moveTo(vec3d.x, vec3d.y, vec3d.z, f1, 0.0F);
+                    entityplayer1.setRespawnPosition(worldserver1.dimension(), blockposition, f, flag1, false); // CraftBukkit - not required, just copies old location into reused entity // Banner - remain for tp
+                    // Banner end
                     flag2 = !conqueredEnd && flag3;
                     isBedSpawn = true;
                     banner$loc = CraftLocation.toBukkit(vec3d, worldserver1.getWorld(), f1, 0.0F);
