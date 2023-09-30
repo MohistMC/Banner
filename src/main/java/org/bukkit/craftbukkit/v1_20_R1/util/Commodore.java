@@ -330,6 +330,12 @@ public class Commodore
                             return;
                         }
 
+                        if ( owner.startsWith( "org/bukkit" ) && desc.contains( "org/bukkit/util/Consumer" ) )
+                        {
+                            super.visitMethodInsn( opcode, owner, name, desc.replace( "org/bukkit/util/Consumer", "java/util/function/Consumer" ), itf );
+                            return;
+                        }
+
                         if ( modern )
                         {
                             if ( owner.equals( "org/bukkit/Material" ) )

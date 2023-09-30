@@ -90,6 +90,7 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SpawnCategory;
@@ -114,7 +115,6 @@ import org.bukkit.plugin.messaging.StandardMessenger;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Consumer;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.StructureSearchResult;
 import org.bukkit.util.Vector;
@@ -134,6 +134,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -477,7 +478,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
     }
 
     @Override
-    public org.bukkit.entity.Item dropItem(Location loc, ItemStack item, Consumer<org.bukkit.entity.Item> function) {
+    public org.bukkit.entity.Item dropItem(Location loc, ItemStack item, Consumer<Item> function) {
         Preconditions.checkArgument(loc != null, "Location cannot be null");
         Preconditions.checkArgument(item != null, "ItemStack cannot be null");
         ItemEntity entity = new ItemEntity(world, loc.getX(), loc.getY(), loc.getZ(), CraftItemStack.asNMSCopy(item));
