@@ -477,7 +477,7 @@
     "world.level.block.MixinWaterlilyBlock",
     "world.level.block.MixinWeightedPressurePlateBlock",
     "world.level.block.MixinWitherRoseBlock",
-    "world.level.block.MxinSculkSpreader",
+    "world.level.block.MixinSculkSpreader",
     "world.level.block.entity.MixinAbstractFurnaceBlockEntity",
     "world.level.block.entity.MixinBannerBlockEntity",
     "world.level.block.entity.MixinBarrelBlockEntity",

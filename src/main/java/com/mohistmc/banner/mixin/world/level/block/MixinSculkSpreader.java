@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(SculkSpreader.class)
-public abstract class MxinSculkSpreader implements InjectionSculkSpreader {
+public abstract class MixinSculkSpreader implements InjectionSculkSpreader {
 
     @Shadow public abstract boolean isWorldGeneration();
 

@@ -19,6 +19,7 @@ import org.bukkit.generator.structure.Structure;
 import org.bukkit.generator.structure.StructureType;
 import org.bukkit.inventory.meta.trim.TrimMaterial;
 import org.bukkit.inventory.meta.trim.TrimPattern;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -92,9 +93,15 @@ public class CraftRegistry<B extends Keyed, M> implements Registry<B> {
         return bukkit;
     }
 
+    @NotNull
+    @Override
+    public Stream<B> stream() {
+        return minecraftRegistry.keySet().stream().map(minecraftKey -> get(CraftNamespacedKey.fromMinecraft(minecraftKey)));
+    }
+
     @Override
     public Iterator<B> iterator() {
-        return values().iterator();
+        return stream().iterator();
     }
 
     public B createBukkit(NamespacedKey namespacedKey, M minecraft) {
