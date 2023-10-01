@@ -68,6 +68,7 @@ import org.bukkit.craftbukkit.v1_20_R1.event.CraftPortalEvent;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R1.util.BlockStateListPopulator;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftLocation;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedMainHandEvent;
@@ -345,9 +346,9 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     }
 
     @Override
-    public void setRespawnPosition(ResourceKey<Level> p_9159_, @Nullable BlockPos p_9160_, float p_9161_, boolean p_9162_, boolean p_9163_, PlayerSpawnChangeEvent.Cause cause) {
+    public void setRespawnPosition(ResourceKey<Level> level, @Nullable BlockPos pos, float pitch, boolean flag, boolean flag1, PlayerSpawnChangeEvent.Cause cause) {
         banner$spawnChangeCause = cause;
-        this.setRespawnPosition(p_9159_, p_9160_, p_9161_, p_9162_, p_9163_);
+        this.setRespawnPosition(level, pos, pitch, flag, flag1);
     }
 
     /**
@@ -359,7 +360,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         var cause = banner$spawnChangeCause == null ? PlayerSpawnChangeEvent.Cause.UNKNOWN : banner$spawnChangeCause;
         banner$spawnChangeCause = null;
         var newWorld = this.server.getLevel(resourceKey);
-        Location newSpawn = (blockPos != null) ? new Location(newWorld.getWorld(), blockPos.getX(), blockPos.getY(), blockPos.getZ(), x, 0) : null;
+        Location newSpawn = (blockPos != null) ? CraftLocation.toBukkit(blockPos, newWorld.getWorld(), x, 0) : null;
 
         PlayerSpawnChangeEvent event = new PlayerSpawnChangeEvent(this.getBukkitEntity(), newSpawn, y, cause);
         Bukkit.getServer().getPluginManager().callEvent(event);
