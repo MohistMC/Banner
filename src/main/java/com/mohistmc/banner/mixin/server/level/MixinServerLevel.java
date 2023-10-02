@@ -135,7 +135,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     private transient boolean banner$force;
     private transient LightningStrikeEvent.Cause banner$cause;
     private final AtomicReference<CreatureSpawnEvent.SpawnReason> banner$reason = new AtomicReference<>();
-    private final AtomicReference<Boolean> banner$timeSkipCancelled = new AtomicReference<>();
+    private final AtomicReference<Boolean> banner$timeSkipCancelled = new AtomicReference<>(false);
     public ResourceKey<LevelStem> typeKey;
 
     protected MixinServerLevel(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean bl, boolean bl2, long l, int i) {
