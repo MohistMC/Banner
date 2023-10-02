@@ -13,10 +13,12 @@ import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.TickablePacketListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundDisconnectPacket;
 import net.minecraft.network.protocol.login.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 import net.minecraft.util.Crypt;
 import net.minecraft.util.CryptException;
@@ -31,6 +33,7 @@ import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.crypto.Cipher;
@@ -48,29 +51,44 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Mixin(ServerLoginPacketListenerImpl.class)
 public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginPacketListener, TickablePacketListener,InjectionServerLoginPacketListenerImpl {
 
-    @Shadow public abstract void disconnect(Component reason);
+    @Shadow
+    public abstract void disconnect(Component reason);
 
-    @Shadow @Nullable GameProfile gameProfile;
+    @Shadow
+    @Nullable GameProfile gameProfile;
 
-    @Shadow protected abstract GameProfile createFakeProfile(GameProfile original);
+    @Shadow
+    protected abstract GameProfile createFakeProfile(GameProfile original);
 
-    @Shadow @Final
+    @Shadow
+    @Final
     MinecraftServer server;
 
-    @Shadow @Final public Connection connection;
+    @Shadow
+    @Final
+    public Connection connection;
 
     @Shadow
     ServerLoginPacketListenerImpl.State state;
 
-    @Shadow @Nullable private ServerPlayer delayedAcceptPlayer;
+    @Shadow
+    @Nullable
+    private ServerPlayer delayedAcceptPlayer;
 
-    @Shadow @Final private static Logger LOGGER;
+    @Shadow
+    @Final
+    private static Logger LOGGER;
 
-    @Shadow protected abstract void placeNewPlayer(ServerPlayer serverPlayer);
+    @Shadow
+    protected abstract void placeNewPlayer(ServerPlayer serverPlayer);
 
-    @Shadow @Final private byte[] challenge;
+    @Shadow
+    @Final
+    private byte[] challenge;
 
-    @Shadow @Final private static AtomicInteger UNIQUE_THREAD_ID;
+    @Shadow
+    @Final
+    private static AtomicInteger UNIQUE_THREAD_ID;
 
     // CraftBukkit start
     @Deprecated
@@ -80,15 +98,15 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
     }
 
     // Spigot start
-    public void initUUID()
-    {
-        UUID uid =  UUIDUtil.createOfflinePlayerUUID( this.gameProfile.getName() );
-        this.gameProfile = new GameProfile( uid, this.gameProfile.getName() );
+    public void initUUID() {
+        UUID uid = UUIDUtil.createOfflinePlayerUUID(this.gameProfile.getName());
+        this.gameProfile = new GameProfile(uid, this.gameProfile.getName());
     }
     // Spigot end
 
+
     /**
-     * @author wdog5
+     * @author Mgazul TODO
      * @reason bukkit
      */
     @Overwrite
@@ -97,12 +115,9 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
             // this.gameProfile = this.createFakeProfile(this.gameProfile);
         }
 
-        // CraftBukkit start - fire PlayerLoginEvent
-        ServerPlayer s = this.server.getPlayerList().canPlayerLogin(((ServerLoginPacketListenerImpl) (Object) this), this.gameProfile);
-
-        if (s == null) {
-            // this.disconnect(ichatbasecomponent);
-            // CraftBukkit end
+        Component component = this.server.getPlayerList().canPlayerLogin(this.connection.getRemoteAddress(), this.gameProfile);
+        if (component != null) {
+            this.disconnect(component);
         } else {
             this.state = ServerLoginPacketListenerImpl.State.ACCEPTED;
             if (this.server.getCompressionThreshold() >= 0 && !this.connection.isMemoryConnection()) {
@@ -112,25 +127,24 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
             }
 
             this.connection.send(new ClientboundGameProfilePacket(this.gameProfile));
-            ServerPlayer entityplayer = this.server.getPlayerList().getPlayer(this.gameProfile.getId());
+            ServerPlayer serverPlayer = this.server.getPlayerList().getPlayer(this.gameProfile.getId());
 
             try {
-                ServerPlayer entityplayer1 = this.server.getPlayerList().getPlayerForLogin(this.gameProfile, s); // CraftBukkit - add player reference
-
-                if (entityplayer != null) {
+                ServerPlayer serverPlayer2 = this.server.getPlayerList().getPlayerForLogin(this.gameProfile);
+                if (serverPlayer != null) {
                     this.state = ServerLoginPacketListenerImpl.State.DELAY_ACCEPT;
-                    this.delayedAcceptPlayer = entityplayer1;
+                    this.delayedAcceptPlayer = serverPlayer2;
                 } else {
-                    this.placeNewPlayer(entityplayer1);
+                    this.placeNewPlayer(serverPlayer2);
                 }
-            } catch (Exception exception) {
-                LOGGER.error("Couldn't place player in world", exception);
-                MutableComponent ichatmutablecomponent = Component.translatable("multiplayer.disconnect.invalid_player_data");
-
-                this.connection.send(new ClientboundDisconnectPacket(ichatmutablecomponent));
-                this.connection.disconnect(ichatmutablecomponent);
+            } catch (Exception var5) {
+                LOGGER.error("Couldn't place player in world", var5);
+                Component component2 = Component.translatable("multiplayer.disconnect.invalid_player_data");
+                this.connection.send(new ClientboundDisconnectPacket(component2));
+                this.connection.disconnect(component2);
             }
         }
+
     }
 
     // Paper start - Cache authenticator threads
@@ -161,7 +175,7 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
             this.gameProfile = gameProfile;
             this.state = ServerLoginPacketListenerImpl.State.READY_TO_ACCEPT;
         } else {
-            this.gameProfile = new GameProfile((UUID)null, packet.name());
+            this.gameProfile = new GameProfile((UUID) null, packet.name());
             if (this.server.usesAuthentication() && !this.connection.isMemoryConnection()) {
                 this.state = ServerLoginPacketListenerImpl.State.KEY;
                 this.connection.send(new ClientboundHelloPacket("", this.server.getKeyPair().getPublic().getEncoded(), this.challenge));

@@ -97,6 +97,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.io.File;
@@ -432,56 +433,34 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         return quitMsg;
     }
 
-    @Override
-    public ServerPlayer getPlayerForLogin(GameProfile gameprofile, ServerPlayer player) {
-        return getPlayerForLogin(gameprofile);
-    }
+    private AtomicReference<ServerPlayer> entity = new AtomicReference<>(null);
 
-    @Override
-    public ServerPlayer canPlayerLogin(ServerLoginPacketListenerImpl handler, GameProfile gameProfile) {
-        MutableComponent mutablecomponent1 = Component.empty();
-        // Moved from processLogin
-        UUID uuid = UUIDUtil.getOrCreatePlayerUUID(gameProfile);
-        List<ServerPlayer> list = Lists.newArrayList();
-
-        ServerPlayer entityplayer;
-
-        for (ServerPlayer value : this.players) {
-            entityplayer = (ServerPlayer) value;
-            if (entityplayer.getUUID().equals(uuid)) {
-                list.add(entityplayer);
-            }
-        }
-
-        for (ServerPlayer serverPlayer : list) {
-            entityplayer = serverPlayer;
-            save(entityplayer); // CraftBukkit - Force the player's inventory to be saved
-            entityplayer.connection.disconnect(Component.translatable("multiplayer.disconnect.duplicate_login"));
-        }
-
-        // Instead of kicking then returning, we need to store the kick reason
-        // in the event, check with plugins to see if it's ok, and THEN kick
-        // depending on the outcome.
-
-        SocketAddress socketaddress = handler.connection.getRemoteAddress();
-        ServerPlayer entity = getPlayerForLogin(gameProfile);
-        org.bukkit.entity.Player player = entity.getBukkitEntity();
-        PlayerLoginEvent event = new PlayerLoginEvent(player, handler.connection.bridge$hostname(), ((java.net.InetSocketAddress) socketaddress).getAddress());
+    /**
+     * @author Mgazul
+     * @reason bukkit
+     */
+    @Overwrite
+    public Component canPlayerLogin(SocketAddress socketaddress, GameProfile gameProfile) {
+        ServerPlayer serverPlayer = getPlayerForLogin(gameProfile);
+        entity.set(serverPlayer);
+        org.bukkit.entity.Player player = serverPlayer.getBukkitEntity();
+        String hostname = ((java.net.InetSocketAddress) socketaddress).getHostName() + ":" + ((java.net.InetSocketAddress) socketaddress).getPort();
+        PlayerLoginEvent event = new PlayerLoginEvent(player, hostname, ((java.net.InetSocketAddress) socketaddress).getAddress());
 
         if (getBans().isBanned(gameProfile) && !getBans().get(gameProfile).hasExpired()) {
             UserBanListEntry userbanlistentry = this.bans.get(gameProfile);
-            mutablecomponent1 = Component.translatable("multiplayer.disconnect.banned.reason", userbanlistentry.getReason());
+            MutableComponent mutablecomponent1 = Component.translatable("multiplayer.disconnect.banned.reason", userbanlistentry.getReason());
             if (userbanlistentry.getExpires() != null) {
                 mutablecomponent1.append(Component.translatable("multiplayer.disconnect.banned.expiration", BAN_DATE_FORMAT.format(userbanlistentry.getExpires())));
             }
 
             event.disallow(PlayerLoginEvent.Result.KICK_BANNED, org.spigotmc.SpigotConfig.whitelistMessage); // Spigot
         } else if (!this.isWhiteListed(gameProfile)) {
-            mutablecomponent1 = Component.translatable("multiplayer.disconnect.not_whitelisted");
+            MutableComponent mutablecomponent1 = Component.translatable("multiplayer.disconnect.not_whitelisted");
             event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, CraftChatMessage.fromComponent(mutablecomponent1));
         } else if (getIpBans().isBanned(socketaddress) && !getIpBans().get(socketaddress).hasExpired()) {
             IpBanListEntry ipbanlistentry = this.ipBans.get(socketaddress);
-            mutablecomponent1 = Component.translatable("multiplayer.disconnect.banned_ip.reason", ipbanlistentry.getReason());
+            MutableComponent mutablecomponent1 = Component.translatable("multiplayer.disconnect.banned_ip.reason", ipbanlistentry.getReason());
             if (ipbanlistentry.getExpires() != null) {
                 mutablecomponent1.append(Component.translatable("multiplayer.disconnect.banned_ip.expiration", BAN_DATE_FORMAT.format(ipbanlistentry.getExpires())));
             }
@@ -495,16 +474,23 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
         cserver.getPluginManager().callEvent(event);
         if (event.getResult() != PlayerLoginEvent.Result.ALLOWED) {
-            handler.disconnect(event.getKickMessage());
-            return null;
+            return Component.literal(event.getKickMessage());
         }
         // Banner start - TODO
         if (!LuckPerms.perCache.containsKey(player.getUniqueId())) {
             LuckPerms.perCache.put(player.getUniqueId(), ((CraftPlayer)player).perm);
         }
         // Banner end
-        return entity;
+        return null;
     }
+
+    @Inject(method = "getPlayerForLogin", at = @At("HEAD"), cancellable = true)
+    private void banner$getPlayerForLogin(GameProfile pProfile, CallbackInfoReturnable<ServerPlayer> ci) {
+        if(entity.get() != null) {
+            ci.setReturnValue(entity.getAndSet(null));
+        }
+    }
+
 
     private transient Location banner$loc;
     private transient PlayerRespawnEvent.RespawnReason banner$respawnReason;
@@ -550,7 +536,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         Optional optional_vanilla;
 
         if (worldserver_vanilla != null && blockposition != null) {
-            optional_vanilla = net.minecraft.world.entity.player.Player.findRespawnPositionAndUseSpawnBlock(worldserver_vanilla, blockposition, f, flag1, flag1);
+            optional_vanilla = net.minecraft.world.entity.player.Player.findRespawnPositionAndUseSpawnBlock(worldserver_vanilla, blockposition, f, flag1, conqueredEnd);
         } else {
             optional_vanilla = Optional.empty();
         }

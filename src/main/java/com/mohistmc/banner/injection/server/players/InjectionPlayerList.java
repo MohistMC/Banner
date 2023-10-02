@@ -21,14 +21,6 @@ public interface InjectionPlayerList {
         return null;
     }
 
-    default ServerPlayer canPlayerLogin(ServerLoginPacketListenerImpl handler, GameProfile gameProfile) {
-        return null;
-    }
-
-    default ServerPlayer getPlayerForLogin(GameProfile gameprofile, ServerPlayer player) { // CraftBukkit - added EntityPlayer
-        return null;
-    }
-
     default ServerPlayer respawn(ServerPlayer entityplayer, boolean flag, PlayerRespawnEvent.RespawnReason reason) {
         return null;
     }
