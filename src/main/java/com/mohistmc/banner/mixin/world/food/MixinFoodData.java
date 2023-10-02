@@ -2,7 +2,6 @@ package com.mohistmc.banner.mixin.world.food;
 
 import com.mohistmc.banner.injection.world.food.InjectionFoodData;
 import java.util.concurrent.atomic.AtomicBoolean;
-import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
@@ -14,7 +13,6 @@ import org.bukkit.event.entity.EntityExhaustionEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -48,22 +46,20 @@ public abstract class MixinFoodData implements InjectionFoodData {
 
     private AtomicBoolean duplicateCall = new AtomicBoolean(false);
 
-    /**
-     * @author Mgazul TODO
-     * @reason bukkit
-     */
-    @Overwrite
-    public void eat(int foodLevelModifier, float saturationLevelModifier) {
+    @Inject(method = "eat(IF)V", at = @At("HEAD"), cancellable = true)
+    private void banner$eatCake(int foodLevelModifier, float saturationLevelModifier, CallbackInfo ci) {
         // Banner start
         if (!duplicateCall.getAndSet(false)) {
             int old = this.foodLevel;
             FoodLevelChangeEvent event = CraftEventFactory.callFoodLevelChangeEvent(entityhuman, old + foodLevelModifier);
-            if (event.isCancelled()) return;
+            if (event.isCancelled()) ci.cancel();
             foodLevelModifier = event.getFoodLevel() - old;
         }
         // Banner end
-        this.foodLevel = Math.min(foodLevelModifier + this.foodLevel, 20);
-        this.saturationLevel = Math.min(this.saturationLevel + (float)foodLevelModifier * saturationLevelModifier * 2.0F, (float)this.foodLevel);
+    }
+
+    @Inject(method = "eat(IF)V", at = @At("TAIL"))
+    private void banner$sendUpdate(int foodLevelModifier, float saturationLevelModifier, CallbackInfo ci) {
         ((ServerPlayer) entityhuman).getBukkitEntity().sendHealthUpdate(); // Banner
     }
 
