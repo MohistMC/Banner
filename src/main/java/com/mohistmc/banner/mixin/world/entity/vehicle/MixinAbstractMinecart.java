@@ -142,6 +142,14 @@ public abstract class MixinAbstractMinecart extends Entity implements InjectionA
         }
     }
 
+    // Banner start - fix mixin by Spelunkery mod
+    private double prevX;
+    private double prevY;
+    private double prevZ;
+    private float prevYaw;
+    private float prevPitch;
+    // Banner end
+
     /**
      * @author wdog5
      * @reason
@@ -149,11 +157,11 @@ public abstract class MixinAbstractMinecart extends Entity implements InjectionA
     @Overwrite
     public void tick() {
         // CraftBukkit start
-        double prevX = this.getX();
-        double prevY = this.getY();
-        double prevZ = this.getZ();
-        float prevYaw = this.getYRot();
-        float prevPitch = this.getXRot();
+        this.prevX = this.getX();
+        this.prevY = this.getY();
+        this.prevZ = this.getZ();
+        this.prevYaw = this.getYRot();
+        this.prevPitch = this.getXRot();
         // CraftBukkit end
 
         if (this.getHurtTime() > 0) {
@@ -166,19 +174,16 @@ public abstract class MixinAbstractMinecart extends Entity implements InjectionA
 
         this.checkBelowWorld();
         // this.handleNetherPortal(); // CraftBukkit - handled in postTick
-        double d0;
-
         if (this.level().isClientSide) {
             if (this.lSteps > 0) {
-                d0 = this.getX() + (this.lx - this.getX()) / (double) this.lSteps;
-                double d1 = this.getY() + (this.ly - this.getY()) / (double) this.lSteps;
-                double d2 = this.getZ() + (this.lz - this.getZ()) / (double) this.lSteps;
-                double d3 = Mth.wrapDegrees(this.lyr - (double) this.getYRot());
-
-                this.setYRot(this.getYRot() + (float) d3 / (float) this.lSteps);
-                this.setXRot(this.getXRot() + (float) (this.lxr - (double) this.getXRot()) / (float) this.lSteps);
+                double d = this.getX() + (this.lx - this.getX()) / (double) this.lSteps;
+                double e = this.getY() + (this.ly - this.getY()) / (double)this.lSteps;
+                double f = this.getZ() + (this.lz - this.getZ()) / (double)this.lSteps;
+                double g = Mth.wrapDegrees(this.lyr - (double)this.getYRot());
+                this.setYRot(this.getYRot() + (float)g / (float)this.lSteps);
+                this.setXRot(this.getXRot() + (float)(this.lxr - (double)this.getXRot()) / (float)this.lSteps);
                 --this.lSteps;
-                this.setPos(d0, d1, d2);
+                this.setPos(d, e, f);
                 this.setRot(this.getYRot(), this.getXRot());
             } else {
                 this.reapplyPosition();
@@ -187,21 +192,19 @@ public abstract class MixinAbstractMinecart extends Entity implements InjectionA
 
         } else {
             if (!this.isNoGravity()) {
-                d0 = this.isInWater() ? -0.005D : -0.04D;
-                this.setDeltaMovement(this.getDeltaMovement().add(0.0D, d0, 0.0D));
+                double d = this.isInWater() ? -0.005D : -0.04D;
+                this.setDeltaMovement(this.getDeltaMovement().add(0.0D, d, 0.0D));
             }
 
             int i = Mth.floor(this.getX());
             int j = Mth.floor(this.getY());
             int k = Mth.floor(this.getZ());
-
             if (this.level().getBlockState(new BlockPos(i, j - 1, k)).is(BlockTags.RAILS)) {
                 --j;
             }
 
             BlockPos blockposition = new BlockPos(i, j, k);
             BlockState iblockdata = this.level().getBlockState(blockposition);
-
             this.onRails = BaseRailBlock.isRail(iblockdata);
             if (this.onRails) {
                 this.moveAlongTrack(blockposition, iblockdata);
