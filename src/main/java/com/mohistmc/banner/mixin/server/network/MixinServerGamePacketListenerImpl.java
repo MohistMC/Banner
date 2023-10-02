@@ -1639,7 +1639,10 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         if (this.player.gameMode.isCreative()) {
             final boolean flag = packetplayinsetcreativeslot.getSlotNum() < 0;
             ItemStack itemstack = packetplayinsetcreativeslot.getItem();
-            final CompoundTag nbttagcompound = BlockItem.getBlockEntityData(itemstack);
+            if (!itemstack.isItemEnabled(this.player.level().enabledFeatures())) {
+                return;
+            }
+            CompoundTag nbttagcompound = BlockItem.getBlockEntityData(itemstack);
             if (!itemstack.isEmpty() && nbttagcompound != null && nbttagcompound.contains("x") && nbttagcompound.contains("y") && nbttagcompound.contains("z")) {
                 BlockPos blockpos = BlockEntity.getPosFromTag(nbttagcompound);
                 if (this.player.level().isLoaded(blockpos)) {
@@ -1649,11 +1652,11 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                     }
                 }
             }
-            final boolean flag2 = packetplayinsetcreativeslot.getSlotNum() >= 1 && packetplayinsetcreativeslot.getSlotNum() <= 45;
-            boolean flag3 = itemstack.isEmpty() || (itemstack.getDamageValue() >= 0 && itemstack.getCount() <= 64 && !itemstack.isEmpty());
-            if (flag || (flag2 && !ItemStack.matches(this.player.inventoryMenu.getSlot(packetplayinsetcreativeslot.getSlotNum()).getItem(), packetplayinsetcreativeslot.getItem()))) {
-                final InventoryView inventory = this.player.inventoryMenu.getBukkitView();
-                final org.bukkit.inventory.ItemStack item = CraftItemStack.asBukkitCopy(packetplayinsetcreativeslot.getItem());
+            boolean flag1 = packetplayinsetcreativeslot.getSlotNum() >= 1 && packetplayinsetcreativeslot.getSlotNum() <= 45;
+            boolean flag2 = itemstack.isEmpty() || itemstack.getDamageValue() >= 0 && itemstack.getCount() <= 64 && !itemstack.isEmpty();
+            if (flag || (flag1 && !ItemStack.matches(this.player.inventoryMenu.getSlot(packetplayinsetcreativeslot.getSlotNum()).getItem(), packetplayinsetcreativeslot.getItem()))) {
+                InventoryView inventory = this.player.inventoryMenu.getBukkitView();
+                org.bukkit.inventory.ItemStack item = CraftItemStack.asBukkitCopy(packetplayinsetcreativeslot.getItem());
                 InventoryType.SlotType type = InventoryType.SlotType.QUICKBAR;
                 if (flag) {
                     type = InventoryType.SlotType.OUTSIDE;
@@ -1664,12 +1667,12 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                         type = InventoryType.SlotType.CONTAINER;
                     }
                 }
-                final InventoryCreativeEvent event = new InventoryCreativeEvent(inventory, type, flag ? -999 : packetplayinsetcreativeslot.getSlotNum(), item);
+                InventoryCreativeEvent event = new InventoryCreativeEvent(inventory, type, flag ? -999 : packetplayinsetcreativeslot.getSlotNum(), item);
                 this.cserver.getPluginManager().callEvent(event);
                 itemstack = CraftItemStack.asNMSCopy(event.getCursor());
                 switch (event.getResult()) {
                     case ALLOW: {
-                        flag3 = true;
+                        flag2 = true;
                         break;
                     }
                     case DEFAULT:
@@ -1683,10 +1686,10 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                     }
                 }
             }
-            if (flag2 && flag3) {
+            if (flag1 && flag2) {
                 this.player.inventoryMenu.getSlot(packetplayinsetcreativeslot.getSlotNum()).setByPlayer(itemstack);
                 this.player.inventoryMenu.broadcastChanges();
-            } else if (flag && flag3 && this.dropSpamTickCount < 200) {
+            } else if (flag && flag2 && this.dropSpamTickCount < 200) {
                 this.dropSpamTickCount+= 20;
                 this.player.drop(itemstack, true);
             }
