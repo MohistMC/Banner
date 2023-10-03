@@ -1832,7 +1832,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         this.cserver.getPluginManager().callEvent(event);
 
         if (event.isCancelled() || !to.equals(event.getTo())) {
-            set.clear(); // Can't relative teleport
+            set = Collections.emptySet(); // Banner TODO
             to = event.isCancelled() ? event.getFrom() : event.getTo();
             d0 = to.getX();
             d1 = to.getY();
