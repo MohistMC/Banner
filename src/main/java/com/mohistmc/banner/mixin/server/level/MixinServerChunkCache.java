@@ -57,15 +57,15 @@ public abstract class MixinServerChunkCache implements InjectionServerChunkCache
 
     @ModifyVariable(method = "getChunkFutureMainThread", index = 4, at = @At("HEAD"), argsOnly = true)
     private boolean banner$skipIfUnloading(boolean flag, int chunkX, int chunkZ) {
+        boolean currentlyUnloading = false;
         if (flag) {
             ChunkHolder chunkholder = this.getVisibleChunkIfPresent(ChunkPos.asLong(chunkX, chunkZ));
             if (chunkholder != null) {
                 FullChunkStatus chunkStatus = ChunkLevel.fullStatus(chunkholder.oldTicketLevel);
-               FullChunkStatus currentStatus = ChunkLevel.fullStatus(chunkholder.getTicketLevel());
-                return !chunkStatus.isOrAfter(FullChunkStatus.FULL) || currentStatus.isOrAfter(FullChunkStatus.FULL);
-            } else {
-                return true;
+                FullChunkStatus currentStatus = ChunkLevel.fullStatus(chunkholder.getTicketLevel());
+                currentlyUnloading = (chunkStatus.isOrAfter(FullChunkStatus.FULL) && !currentStatus.isOrAfter(FullChunkStatus.FULL));
             }
+            return !currentlyUnloading;
         } else {
             return false;
         }
