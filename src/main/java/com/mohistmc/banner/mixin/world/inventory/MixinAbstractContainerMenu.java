@@ -139,15 +139,10 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
      * @author wdog5
      * @reason bukkit
      */
-    @Overwrite
-    private void doClick(int i, int j, ClickType inventoryclicktype, Player entityhuman) {
-        Inventory playerinventory = entityhuman.getInventory();
-        Slot slot;
-        ItemStack itemstack;
-        int k;
-        ItemStack itemstack1;
-        int l;
 
+    @Overwrite
+    private void doClick(int i, int j, ClickType inventoryclicktype, Player player) {
+        Inventory playerinventory = player.getInventory();
         if (inventoryclicktype == ClickType.QUICK_CRAFT) {
             int i1 = this.quickcraftStatus;
 
@@ -158,41 +153,38 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
                 this.resetQuickCraft();
             } else if (this.quickcraftStatus == 0) {
                 this.quickcraftType = getQuickcraftType(j);
-                if (isValidQuickcraftType(this.quickcraftType, entityhuman)) {
+                if (isValidQuickcraftType(this.quickcraftType, player)) {
                     this.quickcraftStatus = 1;
                     this.quickcraftSlots.clear();
                 } else {
                     this.resetQuickCraft();
                 }
             } else if (this.quickcraftStatus == 1) {
-                slot = (Slot) this.slots.get(i);
-                itemstack = this.getCarried();
+                Slot slot = this.slots.get(i);
+                ItemStack itemstack = this.getCarried();
                 if (canItemQuickReplace(slot, itemstack, true) && slot.mayPlace(itemstack) && (this.quickcraftType == 2 || itemstack.getCount() > this.quickcraftSlots.size()) && this.canDragTo(slot)) {
                     this.quickcraftSlots.add(slot);
                 }
             } else if (this.quickcraftStatus == 2) {
                 if (!this.quickcraftSlots.isEmpty()) {
                     if (false && this.quickcraftSlots.size() == 1) { // CraftBukkit - treat everything as a drag since we are unable to easily call InventoryClickEvent instead
-                        k = ((Slot) this.quickcraftSlots.iterator().next()).index;
+                        int k = this.quickcraftSlots.iterator().next().index;
                         this.resetQuickCraft();
-                        this.doClick(k, this.quickcraftType, ClickType.PICKUP, entityhuman);
+                        this.doClick(k, this.quickcraftType, ClickType.PICKUP, player);
                         return;
                     }
 
-                    itemstack1 = this.getCarried().copy();
+                    ItemStack itemstack1 = this.getCarried().copy();
                     if (itemstack1.isEmpty()) {
                         this.resetQuickCraft();
                         return;
                     }
 
-                    l = this.getCarried().getCount();
-                    Iterator iterator = this.quickcraftSlots.iterator();
+                    int l = this.getCarried().getCount();
 
                     Map<Integer, ItemStack> draggedSlots = new HashMap<>(); // CraftBukkit - Store slots from drag in map (raw slot id -> new stack)
-                    while (iterator.hasNext()) {
-                        Slot slot1 = (Slot) iterator.next();
+                    for (Slot slot1 : this.quickcraftSlots) {
                         ItemStack itemstack2 = this.getCarried();
-
                         if (slot1 != null && canItemQuickReplace(slot1, itemstack2, true) && slot1.mayPlace(itemstack2) && (this.quickcraftType == 2 || itemstack2.getCount() >= this.quickcraftSlots.size()) && this.canDragTo(slot1)) {
                             int j1 = slot1.hasItem() ? slot1.getItem().getCount() : 0;
                             int k1 = Math.min(itemstack1.getMaxStackSize(), slot1.getMaxStackSize(itemstack1));
@@ -218,7 +210,7 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
                     this.setCarried(CraftItemStack.asNMSCopy(newcursor));
 
                     InventoryDragEvent event = new InventoryDragEvent(view, (newcursor.getType() != org.bukkit.Material.AIR ? newcursor : null), CraftItemStack.asBukkitCopy(oldCursor), this.quickcraftType == 1, eventmap);
-                    entityhuman.level().getCraftServer().getPluginManager().callEvent(event);
+                    player.level().getCraftServer().getPluginManager().callEvent(event);
 
                     // Whether or not a change was made to the inventory that requires an update.
                     boolean needsUpdate = event.getResult() != Event.Result.DEFAULT;
@@ -237,7 +229,7 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
                         this.setCarried(oldCursor);
                     }
 
-                    if (needsUpdate && entityhuman instanceof ServerPlayer) {
+                    if (needsUpdate && player instanceof ServerPlayer) {
                         this.sendAllDataToRemote();
                     }
                     // CraftBukkit end
@@ -249,173 +241,162 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
             }
         } else if (this.quickcraftStatus != 0) {
             this.resetQuickCraft();
-        } else {
-            int i2;
+        } else if ((inventoryclicktype == ClickType.PICKUP || inventoryclicktype == ClickType.QUICK_MOVE) && (j == 0 || j == 1)) {
+            ClickAction clickaction = j == 0 ? ClickAction.PRIMARY : ClickAction.SECONDARY;
 
-            if ((inventoryclicktype == ClickType.PICKUP || inventoryclicktype == ClickType.QUICK_MOVE) && (j == 0 || j == 1)) {
-                ClickAction clickaction = j == 0 ? ClickAction.PRIMARY : ClickAction.SECONDARY;
-
-                if (i == -999) {
-                    if (!this.getCarried().isEmpty()) {
-                        if (clickaction == ClickAction.PRIMARY) {
-                            // CraftBukkit start
-                            ItemStack carried = this.getCarried();
-                            this.setCarried(ItemStack.EMPTY);
-                            entityhuman.drop(carried, true);
-                            // CraftBukkit start
-                        } else {
-                            entityhuman.drop(this.getCarried().split(1), true);
-                        }
+            if (i == -999) {
+                if (!this.getCarried().isEmpty()) {
+                    if (clickaction == ClickAction.PRIMARY) {
+                        // CraftBukkit start
+                        ItemStack carried = this.getCarried();
+                        this.setCarried(ItemStack.EMPTY);
+                        player.drop(carried, true);
+                        // CraftBukkit start
+                    } else {
+                        player.drop(this.getCarried().split(1), true);
                     }
-                } else if (inventoryclicktype == ClickType.QUICK_MOVE) {
-                    if (i < 0) {
-                        return;
-                    }
+                }
+            } else if (inventoryclicktype == ClickType.QUICK_MOVE) {
+                if (i < 0) {
+                    return;
+                }
 
-                    slot = (Slot) this.slots.get(i);
-                    if (!slot.mayPickup(entityhuman)) {
-                        return;
-                    }
+                Slot slot = this.slots.get(i);
+                if (!slot.mayPickup(player)) {
+                    return;
+                }
 
-                    for (itemstack = this.quickMoveStack(entityhuman, i); !itemstack.isEmpty() && ItemStack.isSameItem(slot.getItem(), itemstack); itemstack = this.quickMoveStack(entityhuman, i)) {
-                        ;
-                    }
-                } else {
-                    if (i < 0) {
-                        return;
-                    }
-
-                    slot = (Slot) this.slots.get(i);
-                    itemstack = slot.getItem();
-                    ItemStack itemstack3 = this.getCarried();
-
-                    entityhuman.updateTutorialInventoryAction(itemstack3, slot.getItem(), clickaction);
-                    if (!this.tryItemClickBehaviourOverride(entityhuman, clickaction, slot, itemstack, itemstack3)) {
-                        if (itemstack.isEmpty()) {
-                            if (!itemstack3.isEmpty()) {
-                                i2 = clickaction == ClickAction.PRIMARY ? itemstack3.getCount() : 1;
-                                this.setCarried(slot.safeInsert(itemstack3, i2));
-                            }
-                        } else if (slot.mayPickup(entityhuman)) {
-                            if (itemstack3.isEmpty()) {
-                                i2 = clickaction == ClickAction.PRIMARY ? itemstack.getCount() : (itemstack.getCount() + 1) / 2;
-                                Optional<ItemStack> optional = slot.tryRemove(i2, Integer.MAX_VALUE, entityhuman);
-
-                                optional.ifPresent((itemstack4) -> {
-                                    this.setCarried(itemstack4);
-                                    slot.onTake(entityhuman, itemstack4);
-                                });
-                            } else if (slot.mayPlace(itemstack3)) {
-                                if (ItemStack.isSameItemSameTags(itemstack, itemstack3)) {
-                                    i2 = clickaction == ClickAction.PRIMARY ? itemstack3.getCount() : 1;
-                                    this.setCarried(slot.safeInsert(itemstack3, i2));
-                                } else if (itemstack3.getCount() <= slot.getMaxStackSize(itemstack3)) {
-                                    this.setCarried(itemstack);
-                                    slot.setByPlayer(itemstack3);
-                                }
-                            } else if (ItemStack.isSameItemSameTags(itemstack, itemstack3)) {
-                                Optional<ItemStack> optional1 = slot.tryRemove(itemstack.getCount(), itemstack3.getMaxStackSize() - itemstack3.getCount(), entityhuman);
-
-                                optional1.ifPresent((itemstack4) -> {
-                                    itemstack3.grow(itemstack4.getCount());
-                                    slot.onTake(entityhuman, itemstack4);
-                                });
-                            }
-                        }
-                    }
-
-                    slot.setChanged();
-                    // CraftBukkit start - Make sure the client has the right slot contents
-                    if (entityhuman instanceof ServerPlayer && slot.getMaxStackSize() != 64) {
-                        ((ServerPlayer) entityhuman).connection.send(new ClientboundContainerSetSlotPacket(this.containerId, this.incrementStateId(), slot.index, slot.getItem()));
-                        // Updating a crafting inventory makes the client reset the result slot, have to send it again
-                        if (this.getBukkitView().getType() == InventoryType.WORKBENCH || this.getBukkitView().getType() == InventoryType.CRAFTING) {
-                            ((ServerPlayer) entityhuman).connection.send(new ClientboundContainerSetSlotPacket(this.containerId, this.incrementStateId(), 0, this.getSlot(0).getItem()));
-                        }
-                    }
-                    // CraftBukkit end
+                for (ItemStack itemstack = this.quickMoveStack(player, i); !itemstack.isEmpty() && ItemStack.isSameItem(slot.getItem(), itemstack); itemstack = this.quickMoveStack(player, i)) {
+                    ;
                 }
             } else {
-                Slot slot2;
-                int j2;
+                if (i < 0) {
+                    return;
+                }
 
-                if (inventoryclicktype == ClickType.SWAP) {
-                    slot2 = (Slot) this.slots.get(i);
-                    itemstack1 = playerinventory.getItem(j);
-                    itemstack = slot2.getItem();
-                    if (!itemstack1.isEmpty() || !itemstack.isEmpty()) {
-                        if (itemstack1.isEmpty()) {
-                            if (slot2.mayPickup(entityhuman)) {
-                                playerinventory.setItem(j, itemstack);
-                                slot2.onSwapCraft(itemstack.getCount());
-                                slot2.setByPlayer(ItemStack.EMPTY);
-                                slot2.onTake(entityhuman, itemstack);
+                Slot slot = this.slots.get(i);
+                ItemStack itemstack = slot.getItem();
+                ItemStack itemstack3 = this.getCarried();
+
+                player.updateTutorialInventoryAction(itemstack3, slot.getItem(), clickaction);
+                if (!this.tryItemClickBehaviourOverride(player, clickaction, slot, itemstack, itemstack3)) {
+                    if (itemstack.isEmpty()) {
+                        if (!itemstack3.isEmpty()) {
+                            int i2 = clickaction == ClickAction.PRIMARY ? itemstack3.getCount() : 1;
+                            this.setCarried(slot.safeInsert(itemstack3, i2));
+                        }
+                    } else if (slot.mayPickup(player)) {
+                        if (itemstack3.isEmpty()) {
+                            int i2 = clickaction == ClickAction.PRIMARY ? itemstack.getCount() : (itemstack.getCount() + 1) / 2;
+                            Optional<ItemStack> optional = slot.tryRemove(i2, Integer.MAX_VALUE, player);
+
+                            optional.ifPresent((itemstack4) -> {
+                                this.setCarried(itemstack4);
+                                slot.onTake(player, itemstack4);
+                            });
+                        } else if (slot.mayPlace(itemstack3)) {
+                            if (ItemStack.isSameItemSameTags(itemstack, itemstack3)) {
+                                int i2 = clickaction == ClickAction.PRIMARY ? itemstack3.getCount() : 1;
+                                this.setCarried(slot.safeInsert(itemstack3, i2));
+                            } else if (itemstack3.getCount() <= slot.getMaxStackSize(itemstack3)) {
+                                this.setCarried(itemstack);
+                                slot.setByPlayer(itemstack3);
                             }
-                        } else if (itemstack.isEmpty()) {
-                            if (slot2.mayPlace(itemstack1)) {
-                                j2 = slot2.getMaxStackSize(itemstack1);
-                                if (itemstack1.getCount() > j2) {
-                                    slot2.setByPlayer(itemstack1.split(j2));
-                                } else {
-                                    playerinventory.setItem(j, ItemStack.EMPTY);
-                                    slot2.setByPlayer(itemstack1);
-                                }
-                            }
-                        } else if (slot2.mayPickup(entityhuman) && slot2.mayPlace(itemstack1)) {
-                            j2 = slot2.getMaxStackSize(itemstack1);
-                            if (itemstack1.getCount() > j2) {
-                                slot2.setByPlayer(itemstack1.split(j2));
-                                slot2.onTake(entityhuman, itemstack);
-                                if (!playerinventory.add(itemstack)) {
-                                    entityhuman.drop(itemstack, true);
-                                }
-                            } else {
-                                playerinventory.setItem(j, itemstack);
-                                slot2.setByPlayer(itemstack1);
-                                slot2.onTake(entityhuman, itemstack);
-                            }
+                        } else if (ItemStack.isSameItemSameTags(itemstack, itemstack3)) {
+                            Optional<ItemStack> optional1 = slot.tryRemove(itemstack.getCount(), itemstack3.getMaxStackSize() - itemstack3.getCount(), player);
+
+                            optional1.ifPresent((itemstack4) -> {
+                                itemstack3.grow(itemstack4.getCount());
+                                slot.onTake(player, itemstack4);
+                            });
                         }
                     }
-                } else if (inventoryclicktype == ClickType.CLONE && entityhuman.getAbilities().instabuild && this.getCarried().isEmpty() && i >= 0) {
-                    slot2 = (Slot) this.slots.get(i);
-                    if (slot2.hasItem()) {
-                        itemstack1 = slot2.getItem();
-                        this.setCarried(itemstack1.copyWithCount(itemstack1.getMaxStackSize()));
+                }
+
+                slot.setChanged();
+                // CraftBukkit start - Make sure the client has the right slot contents
+                if (player instanceof ServerPlayer && slot.getMaxStackSize() != 64) {
+                    ((ServerPlayer) player).connection.send(new ClientboundContainerSetSlotPacket(this.containerId, this.incrementStateId(), slot.index, slot.getItem()));
+                    // Updating a crafting inventory makes the client reset the result slot, have to send it again
+                    if (this.getBukkitView().getType() == InventoryType.WORKBENCH || this.getBukkitView().getType() == InventoryType.CRAFTING) {
+                        ((ServerPlayer) player).connection.send(new ClientboundContainerSetSlotPacket(this.containerId, this.incrementStateId(), 0, this.getSlot(0).getItem()));
                     }
-                } else if (inventoryclicktype == ClickType.THROW && this.getCarried().isEmpty() && i >= 0) {
-                    slot2 = (Slot) this.slots.get(i);
-                    k = j == 0 ? 1 : slot2.getItem().getCount();
-                    itemstack = slot2.safeTake(k, Integer.MAX_VALUE, entityhuman);
-                    entityhuman.drop(itemstack, true);
-                } else if (inventoryclicktype == ClickType.PICKUP_ALL && i >= 0) {
-                    slot2 = (Slot) this.slots.get(i);
-                    itemstack1 = this.getCarried();
-                    if (!itemstack1.isEmpty() && (!slot2.hasItem() || !slot2.mayPickup(entityhuman))) {
-                        l = j == 0 ? 0 : this.slots.size() - 1;
-                        j2 = j == 0 ? 1 : -1;
+                }
+                // CraftBukkit end
+            }
+        } else if (inventoryclicktype == ClickType.SWAP) {
+            Slot slot2 = this.slots.get(i);
+            ItemStack itemstack1 = playerinventory.getItem(j);
+            ItemStack itemstack = slot2.getItem();
+            if (!itemstack1.isEmpty() || !itemstack.isEmpty()) {
+                if (itemstack1.isEmpty()) {
+                    if (slot2.mayPickup(player)) {
+                        playerinventory.setItem(j, itemstack);
+                        slot2.onSwapCraft(itemstack.getCount());
+                        slot2.setByPlayer(ItemStack.EMPTY);
+                        slot2.onTake(player, itemstack);
+                    }
+                } else if (itemstack.isEmpty()) {
+                    if (slot2.mayPlace(itemstack1)) {
+                        int j2 = slot2.getMaxStackSize(itemstack1);
+                        if (itemstack1.getCount() > j2) {
+                            slot2.setByPlayer(itemstack1.split(j2));
+                        } else {
+                            playerinventory.setItem(j, ItemStack.EMPTY);
+                            slot2.setByPlayer(itemstack1);
+                        }
+                    }
+                } else if (slot2.mayPickup(player) && slot2.mayPlace(itemstack1)) {
+                    int j2 = slot2.getMaxStackSize(itemstack1);
+                    if (itemstack1.getCount() > j2) {
+                        slot2.setByPlayer(itemstack1.split(j2));
+                        slot2.onTake(player, itemstack);
+                        if (!playerinventory.add(itemstack)) {
+                            player.drop(itemstack, true);
+                        }
+                    } else {
+                        playerinventory.setItem(j, itemstack);
+                        slot2.setByPlayer(itemstack1);
+                        slot2.onTake(player, itemstack);
+                    }
+                }
+            }
+        } else if (inventoryclicktype == ClickType.CLONE && player.getAbilities().instabuild && this.getCarried().isEmpty() && i >= 0) {
+            Slot slot2 = this.slots.get(i);
+            if (slot2.hasItem()) {
+                ItemStack itemstack1 = slot2.getItem();
+                this.setCarried(itemstack1.copyWithCount(itemstack1.getMaxStackSize()));
+            }
+        } else if (inventoryclicktype == ClickType.THROW && this.getCarried().isEmpty() && i >= 0) {
+            Slot slot2 = this.slots.get(i);
+            int k = j == 0 ? 1 : slot2.getItem().getCount();
+            ItemStack itemstack = slot2.safeTake(k, Integer.MAX_VALUE, player);
+            player.drop(itemstack, true);
+        } else if (inventoryclicktype == ClickType.PICKUP_ALL && i >= 0) {
+            Slot slot2 = this.slots.get(i);
+            ItemStack itemstack1 = this.getCarried();
+            if (!itemstack1.isEmpty() && (!slot2.hasItem() || !slot2.mayPickup(player))) {
+                int l = j == 0 ? 0 : this.slots.size() - 1;
+                int j2 = j == 0 ? 1 : -1;
 
-                        for (i2 = 0; i2 < 2; ++i2) {
-                            for (int k2 = l; k2 >= 0 && k2 < this.slots.size() && itemstack1.getCount() < itemstack1.getMaxStackSize(); k2 += j2) {
-                                Slot slot3 = (Slot) this.slots.get(k2);
+                for (int i2 = 0; i2 < 2; ++i2) {
+                    for (int k2 = l; k2 >= 0 && k2 < this.slots.size() && itemstack1.getCount() < itemstack1.getMaxStackSize(); k2 += j2) {
+                        Slot slot3 = this.slots.get(k2);
 
-                                if (slot3.hasItem() && canItemQuickReplace(slot3, itemstack1, true) && slot3.mayPickup(entityhuman) && this.canTakeItemForPickAll(itemstack1, slot3)) {
-                                    ItemStack itemstack4 = slot3.getItem();
+                        if (slot3.hasItem() && canItemQuickReplace(slot3, itemstack1, true) && slot3.mayPickup(player) && this.canTakeItemForPickAll(itemstack1, slot3)) {
+                            ItemStack itemstack4 = slot3.getItem();
 
-                                    if (i2 != 0 || itemstack4.getCount() != itemstack4.getMaxStackSize()) {
-                                        ItemStack itemstack5 = slot3.safeTake(itemstack4.getCount(), itemstack1.getMaxStackSize() - itemstack1.getCount(), entityhuman);
+                            if (i2 != 0 || itemstack4.getCount() != itemstack4.getMaxStackSize()) {
+                                ItemStack itemstack5 = slot3.safeTake(itemstack4.getCount(), itemstack1.getMaxStackSize() - itemstack1.getCount(), player);
 
-                                        itemstack1.grow(itemstack5.getCount());
-                                    }
-                                }
+                                itemstack1.grow(itemstack5.getCount());
                             }
                         }
                     }
                 }
             }
         }
-
     }
-
 
     /**
      * @author wdog5

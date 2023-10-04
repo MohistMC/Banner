@@ -242,7 +242,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     private int dropCount;
     private int lastTick;
     private volatile int lastBookTick;
-    private int lastDropTick;
 
     private double lastPosX;
     private double lastPosY;
@@ -250,7 +249,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     private float lastPitch;
     private float lastYaw;
     private boolean justTeleported;
-    private boolean hasMoved;
+    private boolean hasMoved; // Spigot
 
     @Override
     public CraftPlayer getCraftPlayer() {
@@ -259,6 +258,14 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(MinecraftServer server, Connection networkManagerIn, ServerPlayer playerIn, CallbackInfo ci) {
+        allowedPlayerTicks = 1;
+        dropCount = 0;
+        lastPosX = Double.MAX_VALUE;
+        lastPosY = Double.MAX_VALUE;
+        lastPosZ = Double.MAX_VALUE;
+        lastPitch = Float.MAX_VALUE;
+        lastYaw = Float.MAX_VALUE;
+        justTeleported = false;
         this.cserver = ((CraftServer) Bukkit.getServer());
         this.chatMessageChain = new FutureChain(server.bridge$chatExecutor());
     }
@@ -1809,39 +1816,35 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
      * @reason bukkit
      */
     @Overwrite
-    public void teleport(double d0, double d1, double d2, float f, float f1, Set<RelativeMovement> set) {
+    public void teleport(double x, double y, double z, float yaw, float pitch, Set<RelativeMovement> set) {
         PlayerTeleportEvent.TeleportCause cause = banner$cause == null ? PlayerTeleportEvent.TeleportCause.UNKNOWN : banner$cause;
         banner$cause = null;
         org.bukkit.entity.Player player = this.getCraftPlayer();
         Location from = player.getLocation();
 
-        double x = d0;
-        double y = d1;
-        double z = d2;
-        float yaw = f;
-        float pitch = f1;
-
         Location to = new Location(this.getCraftPlayer().getWorld(), x, y, z, yaw, pitch);
         // SPIGOT-5171: Triggered on join
-        if (from.equals(to)) {
-            this.internalTeleport(d0, d1, d2, f, f1, set);
-            return; // CraftBukkit - Return event status
+        if (!from.equals(to)) {
+            PlayerTeleportEvent event = new PlayerTeleportEvent(player, from.clone(), to.clone(), cause);
+            this.cserver.getPluginManager().callEvent(event);
+
+            if (event.isCancelled() || !to.equals(event.getTo())) {
+                set = Collections.emptySet(); // Banner TODO
+                to = event.isCancelled() ? event.getFrom() : event.getTo();
+                x = to.getX();
+                y = to.getY();
+                z = to.getZ();
+                yaw = to.getYaw();
+                pitch = to.getPitch();
+            }
         }
-
-        PlayerTeleportEvent event = new PlayerTeleportEvent(player, from.clone(), to.clone(), cause);
-        this.cserver.getPluginManager().callEvent(event);
-
-        if (event.isCancelled() || !to.equals(event.getTo())) {
-            set = Collections.emptySet(); // Banner TODO
-            to = event.isCancelled() ? event.getFrom() : event.getTo();
-            d0 = to.getX();
-            d1 = to.getY();
-            d2 = to.getZ();
-            f = to.getYaw();
-            f1 = to.getPitch();
+        if (Float.isNaN(yaw)) {
+            yaw = 0.0f;
         }
-
-        this.internalTeleport(d0, d1, d2, f, f1, set);
+        if (Float.isNaN(pitch)) {
+            pitch = 0.0f;
+        }
+        this.internalTeleport(x, y, z, yaw, pitch, set);
     }
 
     @Override

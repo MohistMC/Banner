@@ -203,19 +203,11 @@ public interface InjectionServerPlayer extends InjectionPlayer {
 
     }
 
-    default Optional<PlayerTeleportEvent.TeleportCause> bridge$teleportCause() {
-        return Optional.empty();
-    }
-
     default void pushChangeSpawnCause(PlayerSpawnChangeEvent.Cause cause) {
 
     }
 
     default PortalInfo banner$findDimensionEntryPoint(ServerLevel destination) {
-        return null;
-    }
-
-    default PlayerTeleportEvent.TeleportCause bridge$changeDimensionCause() {
         return null;
     }
 }

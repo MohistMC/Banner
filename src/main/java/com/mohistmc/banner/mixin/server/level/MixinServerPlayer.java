@@ -829,15 +829,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         this.connection.pushTeleportCause(teleportCause);
     }
 
-    @Inject(method = "teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDFF)V", cancellable = true, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/level/ServerPlayer;stopRiding()V"))
-    private void banner$handleBy(ServerLevel world, double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {
-        PlayerTeleportEvent.TeleportCause cause = banner$changeDimensionCause.getAndSet(PlayerTeleportEvent.TeleportCause.UNKNOWN);
-        if (cause != PlayerTeleportEvent.TeleportCause.UNKNOWN) {
-            this.getBukkitEntity().teleport(new Location(world.getWorld(), x, y, z, yaw, pitch), cause);
-            ci.cancel();
-        }
-    }
-
     @Override
     public void teleportTo(ServerLevel worldserver, double d0, double d1, double d2, float f, float f1, PlayerTeleportEvent.TeleportCause cause) {
         pushChangeDimensionCause(cause);
@@ -870,20 +861,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Nullable
     public Component getTabListDisplayName() {
         return listName; // CraftBukkit
-    }
-
-    @Override
-    public PlayerTeleportEvent.TeleportCause bridge$changeDimensionCause() {
-        return banner$changeDimensionCause.get();
-    }
-
-    @Override
-    public Optional<PlayerTeleportEvent.TeleportCause> bridge$teleportCause() {
-        try {
-            return Optional.ofNullable(banner$changeDimensionCause.get());
-        } finally {
-            banner$changeDimensionCause.set(null);;
-        }
     }
 
     @Override
