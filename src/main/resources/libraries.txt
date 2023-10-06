@@ -27,9 +27,3 @@ libraries/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar|801b67
 libraries/net/md-5/bungeecord-chat/1.16-R0.4/bungeecord-chat-1.16-R0.4.jar|bf6464395a0951675c3bca47d3e1a13a|148961
 libraries/net/md-5/SpecialSource/1.11.2/SpecialSource-1.11.2.jar|adcca168c7f61188d6bf90c809d6eef1|89094
 libraries/jline/jline/2.14.6/jline-2.14.6.jar|480423551649bc6980b43f09e4717272|268780
-libraries/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar|71dabcaac955a8bd17b5bba6580aac5b|75567
-libraries/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar|e51fdee85b48e6637ad9e85ee76b58df|549207
-libraries/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar|20ac0d0526a456274409fa852eb74087|1620088
-libraries/com/fasterxml/jackson/dataformat/jackson-dataformat-xml/2.15.2/jackson-dataformat-xml-2.15.2.jar|6072619f2d755e442476e2a51676346a|126137
-libraries/com/fasterxml/woodstox/woodstox-core/6.5.1/woodstox-core-6.5.1.jar|961dd4b2afedf95293dfdd8adfc8f211|1586395
-libraries/org/codehaus/woodstox/stax2-api/4.2.1/stax2-api-4.2.1.jar|af8377bc7882332e22456616a9f164f6|195909
