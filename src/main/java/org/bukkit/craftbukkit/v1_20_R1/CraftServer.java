@@ -10,7 +10,6 @@ import com.google.common.collect.MapMaker;
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.api.ServerAPI;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
-import com.mohistmc.banner.bukkit.nms.utils.RemapUtils;
 import com.mohistmc.banner.plugins.BannerPlugin;
 import com.mohistmc.banner.util.I18n;
 import com.mojang.authlib.GameProfile;
@@ -424,7 +423,6 @@ public final class CraftServer implements Server {
 
     public void loadPlugins() {
         pluginManager.registerInterface(JavaPluginLoader.class);
-        RemapUtils.init();
 
         File pluginFolder = (File) console.bridge$options().valueOf("plugins");
 
