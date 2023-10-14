@@ -6,6 +6,14 @@ import com.mohistmc.banner.fabric.BukkitRegistry;
 import com.mohistmc.banner.fabric.WrappedWorlds;
 import com.mohistmc.banner.injection.world.level.InjectionLevel;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
@@ -65,15 +73,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
 
 @Mixin(Level.class)
 public abstract class MixinLevel implements LevelAccessor, AutoCloseable, InjectionLevel {

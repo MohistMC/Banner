@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.server.rcon;
 
 import com.mohistmc.banner.injection.server.rcon.InjectionRconConsoleSource;
+import java.net.SocketAddress;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.rcon.RconConsoleSource;
@@ -9,8 +10,6 @@ import org.bukkit.craftbukkit.v1_20_R1.command.CraftRemoteConsoleCommandSender;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-
-import java.net.SocketAddress;
 
 @Mixin(RconConsoleSource.class)
 public abstract class MixinRconConsoleSource implements InjectionRconConsoleSource {

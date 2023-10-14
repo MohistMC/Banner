@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
@@ -11,8 +12,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Optional;
 
 @Mixin(MultifaceSpreader.class)
 public class MixinMultifaceSpreader {

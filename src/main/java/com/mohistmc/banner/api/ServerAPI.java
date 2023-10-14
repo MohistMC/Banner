@@ -1,6 +1,12 @@
 package com.mohistmc.banner.api;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModEnvironment;
@@ -10,13 +16,6 @@ import org.bukkit.command.Command;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerAPI {
 

@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
 import com.mohistmc.banner.bukkit.DistValidate;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.Clearable;
@@ -20,9 +22,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Mixin(JukeboxBlockEntity.class)
 public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Clearable, ContainerSingleItem {

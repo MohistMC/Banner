@@ -1,5 +1,8 @@
 package com.mohistmc.banner.mixin.world.entity.ai.behavior;
 
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.behavior.BehaviorControl;
@@ -12,10 +15,6 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-
-import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Predicate;
 
 @Mixin(StopAttackingIfTargetInvalid.class)
 public abstract class MixinStopAttackingIfTargetInvalid {

@@ -1,9 +1,9 @@
 package com.mohistmc.banner.libraries;
 
-import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.network.download.DownloadSource;
 import com.mohistmc.banner.network.download.UpdateUtils;
-import com.mohistmc.banner.util.MD5Util;
+import com.mohistmc.banner.util.I18n;
+import com.mohistmc.tools.MD5Util;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.BufferedReader;
@@ -28,13 +28,13 @@ public class DefaultLibraries {
     }
 
     public static void run() throws Exception {
-        System.out.println(BannerMCStart.I18N.get("libraries.checking.start"));
-        System.out.println(BannerMCStart.I18N.get("libraries.downloadsource", DownloadSource.get().name()));
+        System.out.println(I18n.as("libraries.checking.start"));
+        System.out.println(I18n.as("libraries.downloadsource", DownloadSource.get().name()));
         LinkedHashMap<File, String> libs = getDefaultLibs();
         AtomicLong currentSize = new AtomicLong();
         Set<File> defaultLibs = new LinkedHashSet<>();
         for (File lib : getDefaultLibs().keySet()) {
-            if (lib.exists() && MD5Util.getMd5(lib).equals(libs.get(lib))) {
+            if (lib.exists() && MD5Util.get(lib).equals(libs.get(lib))) {
                 currentSize.addAndGet(lib.length());
                 continue;
             }
@@ -44,14 +44,14 @@ public class DefaultLibraries {
             lib.getParentFile().mkdirs();
 
             String u = libUrl(lib);
-            System.out.println(BannerMCStart.I18N.get("libraries.global.percentage", Math.round((float) (currentSize.get() * 100) / allSize.get()) + "%")); //Global percentage
+            System.out.println(I18n.as("libraries.global.percentage", Math.round((float) (currentSize.get() * 100) / allSize.get()) + "%")); //Global percentage
             try {
-                UpdateUtils.downloadFile(u, lib, libs.get(lib));
+                UpdateUtils.downloadFile(u, lib, libs.get(lib), true);
                 currentSize.addAndGet(lib.length());
                 fail.remove(u.replace(MAVENURL, ""));
             } catch (Exception e) {
                 if (e.getMessage() != null && !"md5".equals(e.getMessage())) {
-                    System.out.println(BannerMCStart.I18N.get("file.download.nook", u));
+                    System.out.println(I18n.as("file.download.nook", u));
                     lib.delete();
                 }
                 fail.put(u.replace(MAVENURL, ""), lib.getAbsolutePath());
@@ -61,7 +61,7 @@ public class DefaultLibraries {
         if (!fail.isEmpty()) {
             run();
         } else {
-            System.out.println(BannerMCStart.I18N.get("libraries.check.end"));
+            System.out.println(I18n.as("libraries.check.end"));
         }
     }
 

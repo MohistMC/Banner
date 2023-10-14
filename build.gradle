@@ -67,19 +67,17 @@ dependencies {
 		modImplementation(fabricApi.module(it, "${project.fabric_version}"))
 	}
 
-	// bukkit
-	implementation(include("org.yaml:snakeyaml:1.33"))
-	// LibraryLoader start
-	implementation "org.apache.maven:maven-resolver-provider:3.8.5"
-	implementation "org.apache.maven.resolver:maven-resolver-connector-basic:1.7.3"
-	implementation "org.apache.maven.resolver:maven-resolver-transport-http:1.7.3"
-	implementation "org.apache.maven:maven-artifact:3.8.5"
-	implementation "org.apache.maven:maven-builder-support:3.8.5"
-	implementation "org.apache.maven:maven-model:3.8.5"
-	implementation "org.apache.maven:maven-model-builder:3.8.5"
-	implementation "org.apache.maven:maven-repository-metadata:3.8.5"
 	compileOnly "org.jetbrains:annotations:21.0.1"
-	implementation(include("com.mohistmc:i18n:0.3"))
+
+	// bukkit
+	implementation(include("org.yaml:snakeyaml:2.0"))
+	implementation(include("com.mohistmc:i18n:0.5"))
+	implementation(include('com.mohistmc:json:0.2'))
+	implementation(include('com.mohistmc:tools:0.2'))
+	// jansi support
+	implementation(include("org.jline:jline-terminal:3.21.0"))
+	implementation(include("org.jline:jline-terminal-jansi:3.21.0"))
+	implementation(include("net.minecrell:terminalconsoleappender:1.4.0"))
 
 	// craftbukkit
 	implementation "org.fusesource.jansi:jansi:1.18"
@@ -126,11 +124,6 @@ dependencies {
 	implementation "io.netty:netty-transport-classes-epoll:4.1.82.Final"
 	implementation "io.netty:netty-transport-native-unix-common:4.1.82.Final"
 
-	// jansi support
-	implementation(include("org.jline:jline-terminal:3.21.0"))
-	implementation(include("org.jline:jline-terminal-jansi:3.21.0"))
-	implementation(include("net.minecrell:terminalconsoleappender:1.4.0"))
-
 	//class modify
 	modImplementation(include("com.github.wdog5:mixin-tools:1.0.1"))
 	include(implementation(annotationProcessor("com.github.llamalad7.mixinextras:mixinextras-fabric:0.2.0-beta.9")))
@@ -142,9 +135,6 @@ dependencies {
 	// Kyori
 	implementation(include("net.kyori:adventure-platform-fabric:5.9.0"))
 
-
-	// new LibraryLoader
-	implementation(include('com.mohistmc:json:0.2'))
 
 }
 

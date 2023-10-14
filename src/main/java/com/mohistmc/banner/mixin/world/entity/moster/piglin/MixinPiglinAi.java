@@ -1,5 +1,7 @@
 package com.mohistmc.banner.mixin.world.entity.moster.piglin;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -19,9 +21,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Mixin(PiglinAi.class)
 public abstract class MixinPiglinAi {

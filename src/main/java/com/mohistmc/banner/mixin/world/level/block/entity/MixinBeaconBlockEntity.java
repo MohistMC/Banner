@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.level.block.entity;
 
 import com.destroystokyo.paper.event.block.BeaconEffectEvent;
 import com.mohistmc.banner.injection.world.level.block.entity.InjectionBeaconBlockEntity;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffect;
@@ -25,8 +26,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.List;
 
 @Mixin(BeaconBlockEntity.class)
 public abstract class MixinBeaconBlockEntity extends BlockEntity implements InjectionBeaconBlockEntity{

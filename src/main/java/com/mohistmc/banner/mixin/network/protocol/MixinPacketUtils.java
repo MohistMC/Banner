@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.network.protocol;
 
+import static com.mohistmc.banner.BannerServer.LOGGER;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.protocol.Packet;
@@ -9,8 +10,6 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.thread.BlockableEventLoop;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
-
-import static com.mohistmc.banner.BannerServer.LOGGER;
 
 @Mixin(PacketUtils.class)
 public class MixinPacketUtils {

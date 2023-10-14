@@ -1,5 +1,8 @@
 package com.mohistmc.banner.mixin.world.entity.ai.behavior;
 
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,10 +17,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 @Mixin(StartAttacking.class)
 public class MixinStartAttacking {

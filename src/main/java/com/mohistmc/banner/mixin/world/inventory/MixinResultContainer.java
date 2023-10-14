@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.inventory;
 
+import java.util.List;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.ResultContainer;
@@ -11,8 +12,6 @@ import org.bukkit.inventory.InventoryHolder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-
-import java.util.List;
 
 @Mixin(ResultContainer.class)
 public abstract class MixinResultContainer implements Container {

@@ -3,6 +3,7 @@ package com.mohistmc.banner.mixin.world.level.storage.loot;
 import com.mohistmc.banner.injection.world.level.storage.loot.InjectionLootTable;
 import io.izzel.arclight.mixin.Eject;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -16,8 +17,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mixin(LootTable.class)
 public abstract class MixinLootTable implements InjectionLootTable {

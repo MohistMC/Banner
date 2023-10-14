@@ -1,5 +1,7 @@
 package com.mohistmc.banner.mixin.world.inventory;
 
+import java.util.List;
+import java.util.Map;
 import net.minecraft.Util;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -43,9 +45,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.List;
-import java.util.Map;
 
 @Mixin(EnchantmentMenu.class)
 public abstract class MixinEnchantmentMenu extends AbstractContainerMenu{

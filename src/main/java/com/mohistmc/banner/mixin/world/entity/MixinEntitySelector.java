@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.entity;
 
 import com.google.common.base.Predicates;
+import java.util.function.Predicate;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.player.Player;
@@ -9,8 +10,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-
-import java.util.function.Predicate;
 
 @Mixin(EntitySelector.class)
 public class MixinEntitySelector {

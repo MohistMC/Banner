@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.world.item;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
@@ -19,9 +21,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(ArmorItem.class)
 public class MixinArmorItem {

@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.level.storage.loot;
 
 import com.google.common.collect.ImmutableMap;
 import com.mohistmc.banner.injection.world.level.storage.loot.InjectionLootDataManager;
+import java.util.Map;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.LootDataId;
 import net.minecraft.world.level.storage.loot.LootDataManager;
@@ -12,8 +13,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Map;
 
 @Mixin(LootDataManager.class)
 public class MixinLootDataManager implements InjectionLootDataManager {

@@ -1,6 +1,6 @@
 package com.mohistmc.banner.command;
 
-import com.mohistmc.banner.util.HasteUtils;
+import com.mohistmc.tools.HasteUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;

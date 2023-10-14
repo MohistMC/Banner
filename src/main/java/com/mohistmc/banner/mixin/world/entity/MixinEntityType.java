@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.world.entity;
 
 import com.mohistmc.banner.injection.world.entity.InjectionEntityType;
+import java.util.Optional;
+import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -19,9 +21,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.Optional;
-import java.util.function.Consumer;
 
 @Mixin(EntityType.class)
 public abstract class MixinEntityType<T extends Entity> implements InjectionEntityType<T> {

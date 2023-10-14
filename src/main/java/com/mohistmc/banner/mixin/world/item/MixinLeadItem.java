@@ -1,5 +1,7 @@
 package com.mohistmc.banner.mixin.world.item;
 
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -15,9 +17,6 @@ import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
-
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(LeadItem.class)
 @SuppressWarnings("deprecation")

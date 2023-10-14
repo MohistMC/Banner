@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.item;
 
 import com.mohistmc.banner.bukkit.DistValidate;
 import io.izzel.arclight.mixin.Eject;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -17,8 +18,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mixin(CrossbowItem.class)
 public class MixinCrossbowItem {

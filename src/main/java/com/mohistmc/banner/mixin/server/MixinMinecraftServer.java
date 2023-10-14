@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.server;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.api.color.ColorsAPI;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
@@ -10,8 +9,27 @@ import com.mohistmc.banner.config.BannerConfigUtil;
 import com.mohistmc.banner.fabric.BukkitRegistry;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
 import com.mohistmc.banner.paper.RollingAverage;
+import com.mohistmc.banner.util.I18n;
 import com.mojang.datafixers.DataFixer;
 import it.unimi.dsi.fastutil.longs.LongIterator;
+import java.io.File;
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.net.Proxy;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.function.BooleanSupplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jline.console.ConsoleReader;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -66,7 +84,6 @@ import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WorldData;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.Main;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.scoreboard.CraftScoreboardManager;
@@ -90,25 +107,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.io.File;
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.net.Proxy;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.function.BooleanSupplier;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 // Banner - TODO fix inject method
 @Mixin(MinecraftServer.class)
@@ -614,7 +612,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         this.forceTicks = true;
         // CraftBukkit end
 
-        LOGGER.info(BannerMCStart.I18N.get("server.region.prepare"), worldserver.dimension().location());
+        LOGGER.info(I18n.as("server.region.prepare"), worldserver.dimension().location());
         BlockPos blockposition = worldserver.getSharedSpawnPos();
 
         listener.updateSpawnPos(new ChunkPos(blockposition));
@@ -679,7 +677,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         this.forceTicks = true;
         // CraftBukkit end
 
-        LOGGER.info(BannerMCStart.I18N.get("server.region.prepare"), worldserver.dimension().location());
+        LOGGER.info(I18n.as("server.region.prepare"), worldserver.dimension().location());
         BlockPos blockposition = worldserver.getSharedSpawnPos();
 
         listener.updateSpawnPos(new ChunkPos(blockposition));

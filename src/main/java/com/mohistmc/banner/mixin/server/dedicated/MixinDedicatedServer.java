@@ -1,10 +1,15 @@
 package com.mohistmc.banner.mixin.server.dedicated;
 
-import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.Metrics;
 import com.mohistmc.banner.config.BannerConfig;
+import com.mohistmc.banner.util.I18n;
 import com.mojang.datafixers.DataFixer;
+import java.io.IOException;
+import java.net.Proxy;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.ConsoleInput;
@@ -20,27 +25,17 @@ import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_20_R1.command.CraftRemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_20_R1.util.ForwardLogHandler;
 import org.bukkit.event.server.RemoteServerCommandEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.PluginLoadOrder;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.io.IOException;
-import java.net.Proxy;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(DedicatedServer.class)
 public abstract class MixinDedicatedServer extends MinecraftServer {
@@ -51,7 +46,7 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
 
     @Inject(method = "initServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/dedicated/DedicatedServer;usesAuthentication()Z", ordinal = 1))
     private void banner$initServer(CallbackInfoReturnable<Boolean> cir) {
-        BannerServer.LOGGER.info(BannerMCStart.I18N.get("bukkit.plugin.loading.info"));
+        BannerServer.LOGGER.info(I18n.as("bukkit.plugin.loading.info"));
         // CraftBukkit start
         this.bridge$server().loadPlugins();
         this.bridge$server().enablePlugins(PluginLoadOrder.STARTUP);

@@ -12,6 +12,7 @@ import com.mohistmc.banner.api.ServerAPI;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.bukkit.nms.utils.RemapUtils;
 import com.mohistmc.banner.plugins.BannerPlugin;
+import com.mohistmc.banner.util.I18n;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -431,7 +432,7 @@ public final class CraftServer implements Server {
             Plugin[] plugins = pluginManager.loadPlugins(pluginFolder);
             for (Plugin plugin : plugins) {
                 try {
-                    String message = String.format(BannerMCStart.I18N.get("bukkit.plugin.loading"), plugin.getDescription().getFullName());
+                    String message = String.format(I18n.as("bukkit.plugin.loading"), plugin.getDescription().getFullName());
                     plugin.getLogger().info(message);
                     plugin.onLoad();
                 } catch (Throwable ex) {

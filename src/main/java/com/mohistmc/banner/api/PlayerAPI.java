@@ -1,13 +1,12 @@
 package com.mohistmc.banner.api;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
-import net.minecraft.server.level.ServerPlayer;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
-import org.bukkit.entity.Player;
-
 import java.net.SocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import net.minecraft.server.level.ServerPlayer;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
+import org.bukkit.entity.Player;
 
 public class PlayerAPI {
 

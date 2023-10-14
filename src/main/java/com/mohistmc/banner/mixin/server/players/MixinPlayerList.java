@@ -1,17 +1,29 @@
 package com.mohistmc.banner.mixin.server.players;
 
-import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
-import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.pluginfix.LuckPerms;
 import com.mohistmc.banner.fabric.BukkitRegistry;
 import com.mohistmc.banner.injection.server.players.InjectionPlayerList;
+import com.mohistmc.banner.util.I18n;
 import com.mojang.authlib.GameProfile;
+import java.io.File;
+import java.net.SocketAddress;
+import java.nio.file.Path;
+import java.text.SimpleDateFormat;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.LayeredRegistryAccess;
-import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
@@ -43,7 +55,6 @@ import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 import net.minecraft.server.players.GameProfileCache;
 import net.minecraft.server.players.IpBanList;
 import net.minecraft.server.players.IpBanListEntry;
@@ -100,21 +111,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.io.File;
-import java.net.SocketAddress;
-import java.nio.file.Path;
-import java.text.SimpleDateFormat;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 // Banner - TODO fix inject method
 @Mixin(PlayerList.class)
 public abstract class MixinPlayerList implements InjectionPlayerList {
@@ -169,7 +165,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         this.players = new CopyOnWriteArrayList<>();
         minecraftServer.banner$setServer(this.cserver =
                 new CraftServer((DedicatedServer) minecraftServer, ((PlayerList) (Object) this)));
-        BannerServer.LOGGER.info(BannerMCStart.I18N.get("registry.begin"));
+        BannerServer.LOGGER.info(I18n.as("registry.begin"));
         BukkitRegistry.registerAll((DedicatedServer) minecraftServer);
         minecraftServer.banner$setConsole(ColouredConsoleSender.getInstance());
     }

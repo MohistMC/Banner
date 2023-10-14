@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
+import javax.annotation.Nullable;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
@@ -30,8 +31,6 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import javax.annotation.Nullable;
 
 @Mixin(LecternBlockEntity.class)
 public abstract class MixinLecternBlockEntity extends BlockEntity implements Clearable, MenuProvider, CommandSource {

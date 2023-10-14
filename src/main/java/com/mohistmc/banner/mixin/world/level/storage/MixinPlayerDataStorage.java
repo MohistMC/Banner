@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.world.level.storage;
 
 import com.mohistmc.banner.injection.world.level.storage.InjectionPlayerDataStorage;
+import java.io.File;
+import java.io.FileInputStream;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.level.ServerPlayer;
@@ -15,9 +17,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.io.File;
-import java.io.FileInputStream;
 
 @Mixin(PlayerDataStorage.class)
 public class MixinPlayerDataStorage implements InjectionPlayerDataStorage {

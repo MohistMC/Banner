@@ -2,6 +2,8 @@ package com.mohistmc.banner.mixin.world.entity.ai.behavior;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.SimpleContainer;
@@ -27,9 +29,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(HarvestFarmland.class)
 public abstract class MixinHarvestFarmland extends Behavior<Villager> {

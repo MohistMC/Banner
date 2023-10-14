@@ -1,13 +1,12 @@
 package com.mohistmc.banner.mixin.server.gui;
 
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import net.minecraft.server.gui.MinecraftServerGui;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 
 @Mixin(MinecraftServerGui.class)
 public class MixinMinecraftServerGui {

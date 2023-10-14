@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -17,8 +18,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(SculkBlock.class)
 public class MixinSculkBlock {

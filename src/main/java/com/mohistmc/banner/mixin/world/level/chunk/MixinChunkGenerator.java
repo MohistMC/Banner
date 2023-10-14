@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.world.level.chunk;
 
 import com.mohistmc.banner.injection.world.level.chunk.InjectionChunkGenerator;
+import java.util.Objects;
+import java.util.function.Predicate;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryAccess;
@@ -32,9 +34,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Objects;
-import java.util.function.Predicate;
 
 @Mixin(ChunkGenerator.class)
 public abstract class MixinChunkGenerator implements InjectionChunkGenerator {

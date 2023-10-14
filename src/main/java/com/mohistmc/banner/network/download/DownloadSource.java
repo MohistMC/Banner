@@ -2,6 +2,7 @@ package com.mohistmc.banner.network.download;
 
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.config.BannerConfigUtil;
+import com.mohistmc.tools.ConnectionUtil;
 import java.net.URI;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,14 +22,22 @@ public enum DownloadSource {
     GITHUB("https://mohistmc.github.io/maven/");
 
     public static final DownloadSource defaultSource = isCN() ? CHINA : MOHIST;
-    final
-    String url;
+    public final String url;
 
     public static DownloadSource get() {
         String ds = BannerConfigUtil.defaultSource();
+        DownloadSource urL;
         for (DownloadSource me : DownloadSource.values()) {
             if (me.name().equalsIgnoreCase(ds)) {
-                if (isDown(me.url) != 200) return GITHUB;
+                if (ConnectionUtil.isDown(me.url)) {
+                    if (ds.equals("CHINA")) {
+                        urL = MOHIST;
+                        if (ConnectionUtil.isDown(urL.url)) {
+                            return GITHUB;
+                        }
+                    }
+                    return GITHUB;
+                }
                 return me;
             }
         }
@@ -36,32 +45,6 @@ public enum DownloadSource {
     }
 
     public static boolean isCN() {
-        return BannerMCStart.I18N.isCN() && getUrlMillis(CHINA.url) < getUrlMillis(MOHIST.url);
-    }
-
-    public static int isDown(String s) {
-        try {
-            URL url = new URL(s);
-            URLConnection rulConnection = url.openConnection();
-            HttpURLConnection httpUrlConnection = (HttpURLConnection) rulConnection;
-            httpUrlConnection.connect();
-            return httpUrlConnection.getResponseCode();
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
-    public static long getUrlMillis(String link) {
-        try {
-            HttpURLConnection connection = (HttpURLConnection) URI.create(link).toURL().openConnection();
-            connection.setRequestMethod("GET");
-            connection.connect();
-            long start = System.currentTimeMillis();
-            int responseCode = connection.getResponseCode();
-            long end = System.currentTimeMillis();
-            return end - start;
-        } catch (Exception e) {
-            return -0L;
-        }
+        return BannerMCStart.I18N.isCN() && ConnectionUtil.getUrlMillis(CHINA.url) < ConnectionUtil.getUrlMillis(MOHIST.url);
     }
 }

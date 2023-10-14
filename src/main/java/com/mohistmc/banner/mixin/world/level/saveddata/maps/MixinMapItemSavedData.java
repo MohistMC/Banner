@@ -1,6 +1,9 @@
 package com.mohistmc.banner.mixin.world.level.saveddata.maps;
 
 import com.mohistmc.banner.injection.world.level.saveddata.maps.InjectionMapItemSavedData;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Supplier;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -17,10 +20,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Supplier;
 
 @Mixin(MapItemSavedData.class)
 public class MixinMapItemSavedData implements InjectionMapItemSavedData {

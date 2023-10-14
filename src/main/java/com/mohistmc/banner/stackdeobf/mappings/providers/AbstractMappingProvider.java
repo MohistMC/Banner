@@ -3,8 +3,8 @@ package com.mohistmc.banner.stackdeobf.mappings.providers;
 // Created by booky10 in StackDeobfuscator (14:35 23.03.23)
 
 import com.google.common.base.Preconditions;
-import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.stackdeobf.util.CompatUtil;
+import com.mohistmc.banner.util.I18n;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.mappingio.MappingVisitor;
 
@@ -75,21 +75,21 @@ public abstract class AbstractMappingProvider {
     }
 
     private CompletableFuture<Void> downloadMappings(Path cacheDir, Executor executor) {
-        CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.verifying"), this.name);
+        CompatUtil.LOGGER.info(I18n.as("stackdeobf.verifying"), this.name);
         return this.trackTime(this.downloadMappings0(cacheDir, executor)).thenAccept(timeDiff ->
-                CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.verified"), this.name, timeDiff));
+                CompatUtil.LOGGER.info(I18n.as("stackdeobf.verified"), this.name, timeDiff));
     }
 
     private CompletableFuture<Void> parseMappings(Executor executor) {
-        CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.parsing"), this.name);
+        CompatUtil.LOGGER.info(I18n.as("stackdeobf.parsing"), this.name);
         return this.trackTime(this.parseMappings0(executor)).thenAccept(timeDiff ->
-                CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.parsed"), this.name, timeDiff));
+                CompatUtil.LOGGER.info(I18n.as("stackdeobf.parsed"), this.name, timeDiff));
     }
 
     private CompletableFuture<Void> visitMappings(MappingVisitor visitor, Executor executor) {
-        CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.caching"), this.name);
+        CompatUtil.LOGGER.info(I18n.as("stackdeobf.caching"), this.name);
         return this.trackTime(this.visitMappings0(visitor, executor)).thenAccept(timeDiff ->
-                CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.cached"), this.name, timeDiff));
+                CompatUtil.LOGGER.info(I18n.as("stackdeobf.cached"), this.name, timeDiff));
     }
 
     protected abstract CompletableFuture<Void> downloadMappings0(Path cacheDir, Executor executor);

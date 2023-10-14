@@ -3,7 +3,6 @@ package com.mohistmc.banner.bukkit.nms.proxy;
 import com.mohistmc.banner.bukkit.nms.utils.ASMUtils;
 import com.mohistmc.banner.bukkit.nms.utils.ReflectionUtils;
 import com.mohistmc.banner.bukkit.nms.utils.RemapUtils;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 

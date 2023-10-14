@@ -1,6 +1,9 @@
 package com.mohistmc.banner.mixin.world.entity.moster.piglin;
 
 import com.mohistmc.banner.injection.world.entity.InjectionPiglin;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -20,10 +23,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Mixin(Piglin.class)
 public abstract class MixinPiglin extends AbstractPiglin implements InjectionPiglin {

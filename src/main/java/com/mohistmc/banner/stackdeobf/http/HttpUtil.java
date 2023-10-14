@@ -1,7 +1,7 @@
 package com.mohistmc.banner.stackdeobf.http;
 
-import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.stackdeobf.util.CompatUtil;
+import com.mohistmc.banner.util.I18n;
 import org.apache.commons.io.FileUtils;
 
 import java.net.URI;
@@ -43,14 +43,14 @@ public final class HttpUtil {
         HttpRequest request = HttpRequest.newBuilder(uri).build();
         HttpResponse.BodyHandler<byte[]> handler = HttpResponse.BodyHandlers.ofByteArray();
 
-        CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.requesting"), uri);
+        CompatUtil.LOGGER.info(I18n.as("stackdeobf.requesting"), uri);
         long start = System.currentTimeMillis();
 
         return getHttpClient(executor).sendAsync(request, handler).thenApplyAsync(resp -> {
             long timeDiff = System.currentTimeMillis() - start;
             byte[] bodyBytes = resp.body();
 
-            String message = BannerMCStart.I18N.get("stackdeobf.received");
+            String message = I18n.as("stackdeobf.received");
             Object[] args = {bodyBytes.length, FileUtils.byteCountToDisplaySize(bodyBytes.length),
                     resp.statusCode(), uri, timeDiff};
 

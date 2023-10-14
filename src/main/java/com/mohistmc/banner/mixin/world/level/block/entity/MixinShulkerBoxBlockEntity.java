@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
 import com.mohistmc.banner.injection.world.level.block.entity.InjectionShulkerBoxBlockEntity;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Player;
@@ -17,8 +18,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.List;
 
 @Mixin(ShulkerBoxBlockEntity.class)
 public abstract class MixinShulkerBoxBlockEntity extends RandomizableContainerBlockEntity implements InjectionShulkerBoxBlockEntity {

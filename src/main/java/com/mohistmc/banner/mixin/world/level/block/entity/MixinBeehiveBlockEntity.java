@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.level.block.entity;
 
 import com.google.common.collect.Lists;
 import com.mohistmc.banner.injection.world.level.block.entity.InjectionBeehiveBlockEntity;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.EntityTypeTags;
@@ -28,8 +29,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.List;
 
 @Mixin(BeehiveBlockEntity.class)
 public abstract class MixinBeehiveBlockEntity extends BlockEntity implements InjectionBeehiveBlockEntity {

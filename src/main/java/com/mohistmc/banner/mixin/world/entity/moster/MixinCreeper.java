@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.entity.moster;
 
 import com.mohistmc.banner.injection.world.entity.monster.InjectionCreeper;
+import java.util.Collection;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -24,8 +25,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.Collection;
 
 @Mixin(Creeper.class)
 public abstract class MixinCreeper extends Monster implements PowerableMob, InjectionCreeper {

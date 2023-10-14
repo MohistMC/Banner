@@ -4,6 +4,8 @@ import com.mohistmc.banner.injection.commands.InjectionCommandNode;
 import com.mojang.brigadier.tree.ArgumentCommandNode;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import java.util.Map;
+import java.util.function.Predicate;
 import net.minecraft.commands.CommandSourceStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -11,9 +13,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Map;
-import java.util.function.Predicate;
 
 @Mixin(value = CommandNode.class, remap = false)
 public abstract class MixinCommandNode<S> implements Comparable<CommandNode<S>>, InjectionCommandNode {

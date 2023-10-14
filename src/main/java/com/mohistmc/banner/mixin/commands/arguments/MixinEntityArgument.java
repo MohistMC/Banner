@@ -3,6 +3,7 @@ package com.mohistmc.banner.mixin.commands.arguments;
 import com.mohistmc.banner.injection.commands.arguments.InjectionEntityArgument;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.selector.EntitySelector;
 import net.minecraft.commands.arguments.selector.EntitySelectorParser;
@@ -10,8 +11,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mixin(EntityArgument.class)
 public abstract class MixinEntityArgument implements InjectionEntityArgument {

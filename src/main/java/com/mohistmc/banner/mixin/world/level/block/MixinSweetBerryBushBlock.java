@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
 import io.izzel.arclight.mixin.Eject;
+import java.util.Collections;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -21,8 +22,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Collections;
 
 @Mixin(SweetBerryBushBlock.class)
 public class MixinSweetBerryBushBlock {

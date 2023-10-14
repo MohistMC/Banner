@@ -9,6 +9,7 @@ import com.mohistmc.banner.stackdeobf.mappings.providers.MojangMappingProvider;
 import com.mohistmc.banner.stackdeobf.util.CompatUtil;
 import com.mohistmc.banner.stackdeobf.util.RemappingRewritePolicy;
 import com.mohistmc.banner.util.EulaUtil;
+import com.mohistmc.banner.util.I18n;
 import com.mohistmc.i18n.i18n;
 import io.izzel.arclight.mixin.injector.EjectorInfo;
 import net.fabricmc.loader.api.FabricLoader;
@@ -37,7 +38,7 @@ public class BannerMCStart {
             LOGGER.info("|  _  {   / / | | | |\\   | | |\\   | |  __|  |  _  /  ");
             LOGGER.info("| |_| |  / /  | | | | \\  | | | \\  | | |___  | | \\ \\  ");
             LOGGER.info("|_____/ /_/   |_| |_|  \\_| |_|  \\_| |_____| |_|  \\_\\ ");
-            LOGGER.info(I18N.get("banner.launch.welcomemessage") + " - " + getVersion() + ", Java " + javaVersion);
+            LOGGER.info(I18n.as("banner.launch.welcomemessage") + " - " + getVersion() + ", Java " + javaVersion);
         }
         if (System.getProperty("log4j.configurationFile") == null) {
             System.setProperty("log4j.configurationFile", "log4j2_banner.xml");
@@ -50,7 +51,7 @@ public class BannerMCStart {
         CustomLibraries.loadCustomLibs();
         injectDeobfStack();
         if (!EulaUtil.hasAcceptedEULA()) {
-            System.out.println(I18N.get("eula"));
+            System.out.println(I18n.as("eula"));
             while (!"true".equals(new Scanner(System.in).next()));
             EulaUtil.writeInfos();
         }
@@ -61,7 +62,7 @@ public class BannerMCStart {
     }
 
     private static void injectDeobfStack() {
-        CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.inject.logger"));
+        CompatUtil.LOGGER.info(I18n.as("stackdeobf.inject.logger"));
         RemappingRewritePolicy policy = new RemappingRewritePolicy();
         policy.inject((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger());
         CachedMappings.init(new MojangMappingProvider());

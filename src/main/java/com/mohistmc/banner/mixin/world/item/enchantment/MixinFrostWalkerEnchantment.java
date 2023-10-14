@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.item.enchantment;
 
+import java.util.Iterator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -15,8 +16,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.Iterator;
 
 @Mixin(FrostWalkerEnchantment.class)
 public class MixinFrostWalkerEnchantment {

@@ -4,10 +4,10 @@ package com.mohistmc.banner.stackdeobf.mappings.providers;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.config.BannerConfigUtil;
 import com.mohistmc.banner.stackdeobf.http.HttpUtil;
 import com.mohistmc.banner.stackdeobf.util.CompatUtil;
+import com.mohistmc.banner.util.I18n;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.mappingio.MappingReader;
@@ -39,11 +39,11 @@ import java.util.zip.GZIPOutputStream;
 public class MojangMappingProvider extends AbstractMappingProvider {
 
     private static final String LICENSE =
-            BannerMCStart.I18N.get("stackdeobf.mojang.licenseheader.1") + "\n"
-            + BannerMCStart.I18N.get("stackdeobf.mojang.licenseheader.2")+ "\n"
-            + BannerMCStart.I18N.get("stackdeobf.mojang.licenseheader.3")+ "\n"
-            + BannerMCStart.I18N.get("stackdeobf.mojang.licenseheader.4")+ "\n"
-            + BannerMCStart.I18N.get("stackdeobf.mojang.licenseheader.5")+ "\n"
+            I18n.as("stackdeobf.mojang.licenseheader.1") + "\n"
+            + I18n.as("stackdeobf.mojang.licenseheader.2")+ "\n"
+            + I18n.as("stackdeobf.mojang.licenseheader.3")+ "\n"
+            + I18n.as("stackdeobf.mojang.licenseheader.4")+ "\n"
+            + I18n.as("stackdeobf.mojang.licenseheader.5")+ "\n"
             + "\n";
 
     // the production/intermediary mappings need to be mapped back to their
@@ -59,7 +59,7 @@ public class MojangMappingProvider extends AbstractMappingProvider {
         Preconditions.checkState(CompatUtil.WORLD_VERSION >= 2203 || CompatUtil.WORLD_VERSION == 1976,
                 "Mojang mappings are only provided by mojang starting from 19w36a (excluding 1.14.4)");
 
-        CompatUtil.LOGGER.warn(BannerMCStart.I18N.get("stackdeobf.mojang.license"));
+        CompatUtil.LOGGER.warn(I18n.as("stackdeobf.mojang.license"));
         for (String line : StringUtils.split(LICENSE, '\n')) {
             CompatUtil.LOGGER.warn(line);
         }
@@ -124,7 +124,7 @@ public class MojangMappingProvider extends AbstractMappingProvider {
                 });
             }
 
-            throw new IllegalStateException(BannerMCStart.I18N.get("stackdeobf.invalid.mcversion") + " " + mcVersion + " " + BannerMCStart.I18N.get("stackdeobf.mcversion.notfound"));
+            throw new IllegalStateException(I18n.as("stackdeobf.invalid.mcversion") + " " + mcVersion + " " + I18n.as("stackdeobf.mcversion.notfound"));
         });
     }
 

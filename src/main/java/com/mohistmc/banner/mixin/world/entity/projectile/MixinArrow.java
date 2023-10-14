@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.entity.projectile;
 
 import com.mohistmc.banner.injection.world.entity.projectile.InjectionArrow;
+import java.util.Set;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.resources.ResourceLocation;
@@ -20,8 +21,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Set;
 
 @Mixin(Arrow.class)
 public abstract class MixinArrow extends AbstractArrow implements InjectionArrow {

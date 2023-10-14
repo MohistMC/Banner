@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
+import java.util.Arrays;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -20,8 +21,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.Arrays;
 
 @Mixin(BrushableBlockEntity.class)
 public abstract class MixinBrushableBlockEntity extends BlockEntity {

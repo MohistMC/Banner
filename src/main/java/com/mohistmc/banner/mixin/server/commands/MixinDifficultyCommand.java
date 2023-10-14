@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.commands;
 
+import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.commands.DifficultyCommand;
@@ -11,8 +12,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(DifficultyCommand.class)
 public class MixinDifficultyCommand {

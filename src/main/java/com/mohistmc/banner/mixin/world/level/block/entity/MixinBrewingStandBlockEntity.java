@@ -1,5 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
@@ -25,9 +27,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Mixin(value = BrewingStandBlockEntity.class, priority = 300)
 public abstract class MixinBrewingStandBlockEntity extends BaseContainerBlockEntity {

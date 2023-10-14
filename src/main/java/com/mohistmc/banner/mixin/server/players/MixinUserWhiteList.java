@@ -1,13 +1,12 @@
 package com.mohistmc.banner.mixin.server.players;
 
 import com.mojang.authlib.GameProfile;
+import java.io.File;
 import net.minecraft.server.players.StoredUserList;
 import net.minecraft.server.players.UserWhiteList;
 import net.minecraft.server.players.UserWhiteListEntry;
 import org.bukkit.craftbukkit.v1_20_R1.profile.CraftPlayerProfile;
 import org.spongepowered.asm.mixin.Mixin;
-
-import java.io.File;
 
 @Mixin(UserWhiteList.class)
 public abstract class MixinUserWhiteList extends StoredUserList<GameProfile, UserWhiteListEntry> {

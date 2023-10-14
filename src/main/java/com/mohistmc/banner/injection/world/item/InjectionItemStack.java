@@ -1,10 +1,7 @@
 package com.mohistmc.banner.injection.world.item;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.context.UseOnContext;
 import org.jetbrains.annotations.Nullable;
 
 public interface InjectionItemStack {

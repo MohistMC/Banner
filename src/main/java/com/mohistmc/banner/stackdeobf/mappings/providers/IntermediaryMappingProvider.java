@@ -1,11 +1,11 @@
 package com.mohistmc.banner.stackdeobf.mappings.providers;
 // Created by booky10 in StackDeobfuscator (20:56 30.03.23)
 
-import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.config.BannerConfigUtil;
 import com.mohistmc.banner.stackdeobf.http.HttpUtil;
 import com.mohistmc.banner.stackdeobf.util.CompatUtil;
 import com.mohistmc.banner.stackdeobf.util.MavenArtifactInfo;
+import com.mohistmc.banner.util.I18n;
 import net.fabricmc.mappingio.MappingReader;
 import net.fabricmc.mappingio.MappingVisitor;
 import net.fabricmc.mappingio.format.MappingFormat;
@@ -48,7 +48,7 @@ public class IntermediaryMappingProvider extends AbstractMappingProvider {
         }
 
         URI uri = MAPPINGS_ARTIFACT.buildUri(CompatUtil.VERSION_ID, "jar");
-        CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.downloading.intermediary"), CompatUtil.VERSION_ID);
+        CompatUtil.LOGGER.info(I18n.as("stackdeobf.downloading.intermediary"), CompatUtil.VERSION_ID);
 
         return HttpUtil.getAsync(uri, executor).thenAccept(jarBytes -> {
             byte[] mappingBytes = this.extractPackagedMappings(jarBytes);

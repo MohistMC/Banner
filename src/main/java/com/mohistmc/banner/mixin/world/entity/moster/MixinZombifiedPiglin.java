@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.moster;
 
+import java.util.UUID;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -17,8 +18,6 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-
-import java.util.UUID;
 
 @Mixin(ZombifiedPiglin.class)
 public abstract class MixinZombifiedPiglin extends Zombie {
