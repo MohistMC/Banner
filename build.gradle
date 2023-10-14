@@ -74,6 +74,7 @@ dependencies {
 	implementation(include("com.mohistmc:i18n:0.5"))
 	implementation(include('com.mohistmc:json:0.2'))
 	implementation(include('com.mohistmc:tools:0.2'))
+	implementation(include('javax.inject:javax.inject:1'))
 	// jansi support
 	implementation(include("org.jline:jline-terminal:3.21.0"))
 	implementation(include("org.jline:jline-terminal-jansi:3.21.0"))
