@@ -523,7 +523,6 @@ net/minecraft/class_2621 net/minecraft/class_2624
 net/minecraft/class_7133 net/minecraft/class_8514
 net/minecraft/class_5704 net/minecraft/class_8514
 net/minecraft/class_2625 net/minecraft/class_2165
-null net/minecraft/class_2165
 net/minecraft/class_2627 net/minecraft/class_1278
 net/minecraft/class_2631 net/minecraft/class_2586
 net/minecraft/class_2636 net/minecraft/class_2586

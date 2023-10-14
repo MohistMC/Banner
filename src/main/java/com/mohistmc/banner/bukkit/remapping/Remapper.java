@@ -23,12 +23,10 @@ import net.md_5.specialsource.provider.JointProvider;
 public class Remapper {
 
     public static final Remapper INSTANCE;
-    public static final Function<byte[], byte[]> SWITCH_TABLE_FIXER;
 
     static {
         try {
             INSTANCE = new Remapper();
-            SWITCH_TABLE_FIXER = (Function<byte[], byte[]>) Class.forName("com.mohistmc.asm.SwitchTableFixer").getField("INSTANCE").get(null);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
