@@ -86,6 +86,15 @@ public class BannerConfigUtil {
         return yml.getBoolean(key, true);
     }
 
+    public static boolean stackdeobf() {
+        String key = "banner.stackdeobf";
+        if (yml.get(key) == null) {
+            yml.set(key, true);
+            save();
+        }
+        return yml.getBoolean(key, true);
+    }
+
     public static boolean isCN() {
         return BannerMCStart.I18N.isCN();
     }

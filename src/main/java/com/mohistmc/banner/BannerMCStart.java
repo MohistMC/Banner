@@ -49,7 +49,7 @@ public class BannerMCStart {
         }
         DefaultLibraries.proposeFabricLibs();
         CustomLibraries.loadCustomLibs();
-        // injectDeobfStack();
+        if (BannerConfigUtil.stackdeobf()) injectDeobfStack();
         if (!EulaUtil.hasAcceptedEULA()) {
             System.out.println(I18n.as("eula"));
             while (!"true".equals(new Scanner(System.in).next()));
