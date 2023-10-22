@@ -27,6 +27,7 @@ public class PluginFixManager {
             case "com.sk89q.worldedit.bukkit.adapter.impl.v1_20_R1.PaperweightAdapter$SpigotWatchdog" -> WorldEdit::handleWatchdog;
             case "com.earth2me.essentials.utils.VersionUtil" -> node -> helloWorld(node, "net.fabricmc.loader.launch.knot.KnotServer", "hello.World");
             case "net.ess3.nms.refl.providers.ReflServerStateProvider" -> node -> helloWorld(node, "u", "U");
+            case "net.Zrips.CMILib.Reflections" -> node -> helloWorld(node, "bR", "field_7512");
             default -> null;
         };
         return patcher == null ? clazz : patch(clazz, patcher);
