@@ -490,7 +490,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     private transient Location banner$loc;
     private transient PlayerRespawnEvent.RespawnReason banner$respawnReason;
-    public ServerLevel banner$worldserver;
+    public ServerLevel banner$worldserver = null;
 
     // Banner start - Fix mixin by apoli
     public org.bukkit.World fromWorld;
@@ -584,9 +584,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
                         f1 = (float) Mth.wrapDegrees(Mth.atan2(vec3d1.z, vec3d1.x) * 57.2957763671875D - 90.0D);
                     }
 
-                    // Banner start - fix player login stuck under ground
-                    entityplayer1.moveTo(vec3d.x, vec3d.y, vec3d.z, f1, 0.0F);
-                    entityplayer1.setRespawnPosition(worldserver1.dimension(), blockposition, f, flag1, false); // CraftBukkit - not required, just copies old location into reused entity // Banner - remain for tp
                     // Banner end
                     flag2 = !conqueredEnd && flag3;
                     isBedSpawn = true;
@@ -622,8 +619,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             banner$loc.setWorld(banner$worldserver.getWorld());
         }
         worldserver1 = ((CraftWorld) banner$loc.getWorld()).getHandle();
-        entityplayer1.moveTo(banner$loc.getX(), banner$loc.getY(), banner$loc.getZ(), banner$loc.getYaw(), banner$loc.getPitch());
-        entityplayer1.connection.resetPosition();
+        entityplayer1.forceSetPositionRotation(banner$loc.getX(), banner$loc.getY(), banner$loc.getZ(), banner$loc.getYaw(), banner$loc.getPitch());
         // CraftBukkit end
 
         while (!worldserver1.noCollision((Entity) entityplayer1) && entityplayer1.getY() < (double) worldserver1.getMaxBuildHeight()) {
@@ -639,8 +635,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         entityplayer1.unsetRemoved();
         entityplayer1.connection.teleport(CraftLocation.toBukkit(entityplayer1.position(), worldserver1.getWorld(), entityplayer1.getYRot(), entityplayer1.getXRot()));
         entityplayer1.setShiftKeyDown(false);
-
-        // entityplayer1.connection.teleport(entityplayer1.getX(), entityplayer1.getY(), entityplayer1.getZ(), entityplayer1.getYRot(), entityplayer1.getXRot());
         entityplayer1.connection.send(new ClientboundSetDefaultSpawnPositionPacket(worldserver1.getSharedSpawnPos(), worldserver1.getSharedSpawnAngle()));
         entityplayer1.connection.send(new ClientboundChangeDifficultyPacket(worlddata.getDifficulty(), worlddata.isDifficultyLocked()));
         entityplayer1.connection.send(new ClientboundSetExperiencePacket(entityplayer1.experienceProgress, entityplayer1.totalExperience, entityplayer1.experienceLevel));
