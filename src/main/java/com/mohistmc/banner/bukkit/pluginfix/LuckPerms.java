@@ -1,10 +1,9 @@
 package com.mohistmc.banner.bukkit.pluginfix;
 
-import org.bukkit.permissions.PermissibleBase;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import org.bukkit.permissions.PermissibleBase;
 
 /**
  * @author Mgazul by MohistMC

@@ -3,6 +3,8 @@ package com.mohistmc.banner.injection.server.level;
 import com.mohistmc.banner.injection.world.entity.player.InjectionPlayer;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Unit;
+import java.util.Optional;
+import java.util.Set;
 import net.minecraft.BlockUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,9 +22,6 @@ import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.event.player.PlayerSpawnChangeEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.Set;
 
 public interface InjectionServerPlayer extends InjectionPlayer {
 

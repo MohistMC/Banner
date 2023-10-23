@@ -1,8 +1,7 @@
 package com.mohistmc.banner.injection.world.level.saveddata.maps;
 
-import org.bukkit.craftbukkit.v1_20_R1.map.CraftMapView;
-
 import java.util.UUID;
+import org.bukkit.craftbukkit.v1_20_R1.map.CraftMapView;
 
 public interface InjectionMapItemSavedData {
 

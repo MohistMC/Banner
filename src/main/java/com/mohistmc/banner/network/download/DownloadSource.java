@@ -3,14 +3,9 @@ package com.mohistmc.banner.network.download;
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.config.BannerConfigUtil;
 import com.mohistmc.tools.ConnectionUtil;
-import java.net.URI;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
-
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 
 @Getter
 @ToString

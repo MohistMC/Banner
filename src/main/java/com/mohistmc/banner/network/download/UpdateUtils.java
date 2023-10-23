@@ -1,7 +1,7 @@
 package com.mohistmc.banner.network.download;
 
 import com.mohistmc.banner.BannerMCStart;
-
+import static com.mohistmc.banner.network.download.NetworkUtil.getConn;
 import com.mohistmc.banner.util.I18n;
 import com.mohistmc.tools.MD5Util;
 import java.io.File;
@@ -13,8 +13,6 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import static com.mohistmc.banner.network.download.NetworkUtil.getConn;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;

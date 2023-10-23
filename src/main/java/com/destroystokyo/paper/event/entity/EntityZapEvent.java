@@ -1,14 +1,13 @@
 package com.destroystokyo.paper.event.entity;
 
 import com.google.common.base.Preconditions;
+import java.util.Collections;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityTransformEvent;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Collections;
 
 /**
  *  Fired when lightning strikes an entity

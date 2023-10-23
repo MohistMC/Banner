@@ -1,5 +1,6 @@
 package com.mohistmc.banner.bukkit.pluginfix;
 
+import java.util.function.Consumer;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -11,8 +12,6 @@ import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
-
-import java.util.function.Consumer;
 
 public class PluginFixManager {
 

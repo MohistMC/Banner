@@ -2,11 +2,10 @@ package com.destroystokyo.paper.util.maplist;
 
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.shorts.Short2LongOpenHashMap;
+import java.util.Arrays;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.GlobalPalette;
-
-import java.util.Arrays;
 
 /**
  * @author Spottedleaf

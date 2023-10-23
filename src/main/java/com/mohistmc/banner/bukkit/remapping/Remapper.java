@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import net.md_5.specialsource.InheritanceMap;
 import net.md_5.specialsource.JarMapping;
 import net.md_5.specialsource.JarRemapper;

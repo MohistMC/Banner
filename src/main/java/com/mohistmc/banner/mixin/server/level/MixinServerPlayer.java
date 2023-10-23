@@ -828,7 +828,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     }
 
     @Inject(method = "teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDFF)V", cancellable = true, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/level/ServerPlayer;stopRiding()V"))
-    private void arclight$handleBy(ServerLevel world, double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {
+    private void banner$handleBy(ServerLevel world, double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {
         this.getBukkitEntity().teleport(new Location(world.getWorld(), x, y, z, yaw, pitch), banner$changeDimensionCause.getAndSet(PlayerTeleportEvent.TeleportCause.UNKNOWN));
         ci.cancel();
     }

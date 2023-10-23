@@ -1,6 +1,7 @@
 package com.mohistmc.banner.bukkit.pluginfix;
 
 
+import java.util.Locale;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
@@ -13,8 +14,6 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
-
-import java.util.Locale;
 
 /**
  * @author Mgazul by MohistMC

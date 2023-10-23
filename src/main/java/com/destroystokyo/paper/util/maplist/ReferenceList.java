@@ -1,7 +1,6 @@
 package com.destroystokyo.paper.util.maplist;
 
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
-
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;

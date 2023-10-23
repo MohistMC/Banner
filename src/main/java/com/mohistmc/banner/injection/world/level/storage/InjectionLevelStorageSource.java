@@ -1,11 +1,10 @@
 package com.mohistmc.banner.injection.world.level.storage;
 
+import java.io.IOException;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.validation.ContentValidationException;
-
-import java.io.IOException;
 
 public interface InjectionLevelStorageSource {
 

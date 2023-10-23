@@ -1,18 +1,10 @@
 package com.destroystokyo.paper.event.player;
 
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.player.PlayerEvent;
-import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
+import org.bukkit.Material;
 import static org.bukkit.Material.CARVED_PUMPKIN;
 import static org.bukkit.Material.CHAINMAIL_BOOTS;
 import static org.bukkit.Material.CHAINMAIL_CHESTPLATE;
@@ -47,6 +39,12 @@ import static org.bukkit.Material.SKELETON_SKULL;
 import static org.bukkit.Material.TURTLE_HELMET;
 import static org.bukkit.Material.WITHER_SKELETON_SKULL;
 import static org.bukkit.Material.ZOMBIE_HEAD;
+import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Called when the player themselves change their armor items
