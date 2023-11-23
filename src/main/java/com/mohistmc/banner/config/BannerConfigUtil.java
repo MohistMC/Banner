@@ -88,10 +88,10 @@ public class BannerConfigUtil {
     public static boolean stackdeobf() {
         String key = "banner.stackdeobf";
         if (yml.get(key) == null) {
-            yml.set(key, true);
+            yml.set(key, false);
             save();
         }
-        return yml.getBoolean(key, true);
+        return yml.getBoolean(key, false);
     }
 
     public static boolean isCN() {

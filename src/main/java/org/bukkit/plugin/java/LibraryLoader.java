@@ -52,13 +52,20 @@ class LibraryLoader {
         var d = mohistLibs();
 
         for (Dependency dependency : dependencies) {
-            newDependencies.add(dependency);
             String group = dependency.group().replace(".", "/");
             String fileName = "%s-%s.jar".formatted(dependency.name(), dependency.version());
             if (!d.contains(fileName)) {
-                newDependencies.add(dependency);
-                String pomUrl = PluginsLibrarySource.DEFAULT + "%s/%s/%s/%s".formatted(group, dependency.name(), dependency.version(), fileName.replace("jar", "pom"));
-                newDependencies.addAll(initDependencies0(new URL(pomUrl)));
+                if (dependency.version().toString().equalsIgnoreCase("LATEST")) {
+                    URL mavenUrl = URI.create(PluginsLibrarySource.DEFAULT + "%s/%s/%s".formatted(group, dependency.name(), "maven-metadata.xml")).toURL();
+                    Json compile_json2Json = Json.readXml(mavenUrl).at("metadata");
+                    List<Object> v = compile_json2Json.at("versioning").at("versions").at("version").asList();
+                    Dependency dependency0 = new Dependency(group, dependency.name(),  v.get(v.size() - 1), false);
+                    newDependencies.add(dependency0);
+                } else {
+                    newDependencies.add(dependency);
+                    String pomUrl = PluginsLibrarySource.DEFAULT + "%s/%s/%s/%s".formatted(group, dependency.name(), dependency.version(), fileName.replace("jar", "pom"));
+                    newDependencies.addAll(initDependencies0(new URL(pomUrl)));
+                }
             }
         }
 

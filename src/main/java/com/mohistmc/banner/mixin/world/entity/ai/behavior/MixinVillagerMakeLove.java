@@ -20,8 +20,7 @@ public class MixinVillagerMakeLove {
             ordinal = 0))
     private void moveDownSetAge0(Villager instance, int i) {}
 
-    @Redirect(method = "breed", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;setAge(I)V",
-            ordinal = 1))
+    @Redirect(method = "breed", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;setAge(I)V", ordinal = 1))
     private void moveDownSetAge1(Villager instance, int i) {}
 
     @Inject(method = "breed", at = @At(value = "INVOKE",
