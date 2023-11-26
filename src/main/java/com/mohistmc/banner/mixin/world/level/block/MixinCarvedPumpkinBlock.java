@@ -24,8 +24,7 @@ public abstract class MixinCarvedPumpkinBlock {
     private static void banner$clearPattern(Level level, BlockPattern.BlockPatternMatch patternMatch, Entity golem, BlockPos pos, CallbackInfo ci) {
         if (!level.addFreshEntity(golem, CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM)) {
             ci.cancel();
-        }else {
-            CarvedPumpkinBlock.clearPatternBlocks(level, patternMatch);
         }
+        CarvedPumpkinBlock.clearPatternBlocks(level, patternMatch);
     }
 }
