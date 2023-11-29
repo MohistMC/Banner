@@ -9,6 +9,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -24,7 +25,7 @@ public class PluginFixManager {
             case "com.sk89q.worldedit.bukkit.BukkitAdapter" -> WorldEdit::handleBukkitAdapter;
             case "com.sk89q.worldedit.bukkit.adapter.Refraction" -> WorldEdit::handlePickName;
             case "com.sk89q.worldedit.bukkit.adapter.impl.v1_20_R1.PaperweightAdapter$SpigotWatchdog" -> WorldEdit::handleWatchdog;
-            case "com.earth2me.essentials.utils.VersionUtil" -> node -> helloWorld(node, "net.fabricmc.loader.launch.knot.KnotServer", "hello.World");
+            case "com.earth2me.essentials.utils.VersionUtil" -> node -> helloWorld(node, 110, 109);
             case "net.ess3.nms.refl.providers.ReflServerStateProvider" -> node -> helloWorld(node, "u", "U");
             case "net.Zrips.CMILib.Reflections" -> node -> helloWorld(node, "bR", "field_7512");
             default -> null;
@@ -64,6 +65,18 @@ public class PluginFixManager {
                         if (a.equals(str)) {
                             ldcInsnNode.cst = b;
                         }
+                    }
+                }
+            }
+        });
+    }
+
+    private static void helloWorld(ClassNode node, int a, int b) {
+        node.methods.forEach(method -> {
+            for (AbstractInsnNode next : method.instructions) {
+                if (next instanceof IntInsnNode ldcInsnNode) {
+                    if (ldcInsnNode.operand == a) {
+                        ldcInsnNode.operand = b;
                     }
                 }
             }
