@@ -86,7 +86,6 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(CallbackInfo ci) {
-        oldLevel = -1;
         this.foodData.setEntityhuman((net.minecraft.world.entity.player.Player) (Object) this);
         this.enderChestInventory.setOwner(this.getBukkitEntity());
     }

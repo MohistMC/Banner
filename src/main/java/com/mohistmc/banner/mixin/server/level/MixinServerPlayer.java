@@ -35,6 +35,7 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.stats.RecipeBook;
 import net.minecraft.stats.ServerRecipeBook;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.CombatTracker;
@@ -188,7 +189,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void banner$init(CallbackInfo ci) {
-        this.displayName = this.getGameProfile() != null ? getScoreboardName() : "~FakePlayer~";
+        this.displayName = getScoreboardName();
         this.banner$setBukkitPickUpLoot(true);
         this.maxHealthCache = this.getMaxHealth();
         this.banner$initialized = true;
@@ -288,7 +289,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
                 position = Vec3.atCenterOf(((ServerLevel) world).getSharedSpawnPos());
             }
             this.setLevel(world);
-            this.setPos(position.x(), position.y(), position.z());
+            this.setPos(position);
         }
         this.gameMode.setLevel((ServerLevel) world);
     }
@@ -416,29 +417,37 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Override
     public BlockPos getSpawnPoint(ServerLevel worldserver) {
         BlockPos blockposition = worldserver.getSharedSpawnPos();
+
         if (worldserver.dimensionType().hasSkyLight() && worldserver.serverLevelData.getGameType() != GameType.ADVENTURE) {
-            long k;
-            long l;
             int i = Math.max(0, this.server.getSpawnRadius(worldserver));
-            int j = Mth.floor(worldserver.getWorldBorder().getDistanceToBorder(blockposition.getX(), blockposition.getZ()));
+            int j = Mth.floor(worldserver.getWorldBorder().getDistanceToBorder((double) blockposition.getX(), (double) blockposition.getZ()));
+
             if (j < i) {
                 i = j;
             }
+
             if (j <= 1) {
                 i = 1;
             }
-            int i1 = (l = (k = (long) (i * 2 + 1)) * k) > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) l;
+
+            long k = (long) (i * 2 + 1);
+            long l = k * k;
+            int i1 = l > 2147483647L ? Integer.MAX_VALUE : (int) l;
             int j1 = this.getCoprime(i1);
-            int k1 = new Random().nextInt(i1);
+            int k1 = RandomSource.create().nextInt(i1);
+
             for (int l1 = 0; l1 < i1; ++l1) {
                 int i2 = (k1 + j1 * l1) % i1;
                 int j2 = i2 % (i * 2 + 1);
                 int k2 = i2 / (i * 2 + 1);
                 BlockPos blockposition1 = PlayerRespawnLogic.getOverworldRespawnPos(worldserver, blockposition.getX() + j2 - i, blockposition.getZ() + k2 - i);
-                if (blockposition1 == null) continue;
-                return blockposition1;
+
+                if (blockposition1 != null) {
+                    return blockposition1;
+                }
             }
         }
+
         return blockposition;
     }
 
