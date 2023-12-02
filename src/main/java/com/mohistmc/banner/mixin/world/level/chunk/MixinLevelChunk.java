@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.level.chunk;
 
 import com.mohistmc.banner.bukkit.DistValidate;
 import com.mohistmc.banner.injection.world.level.chunk.InjectionLevelChunk;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerLevel;
@@ -21,6 +22,8 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.ticks.LevelChunkTicks;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_20_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_20_R1.persistence.CraftPersistentDataContainer;
+import org.bukkit.craftbukkit.v1_20_R1.persistence.CraftPersistentDataTypeRegistry;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -44,22 +47,30 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
     @Mutable @Shadow @Final public Level level;
     // @formatter:on
 
+    @Shadow public abstract Level getLevel();
+
+    // CraftBukkit start
+    public org.bukkit.Chunk bukkitChunk;
+
     public boolean mustNotSave;
     public boolean needsDecoration;
-    private transient boolean banner$doPlace;
-    public ServerLevel r; // TODO check on update
+    private static final CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new org.bukkit.craftbukkit.v1_20_R1.persistence.CraftPersistentDataTypeRegistry();
+    public CraftPersistentDataContainer persistentDataContainer = new CraftPersistentDataContainer( DATA_TYPE_REGISTRY );
+    public AtomicBoolean banner$doPlace = new AtomicBoolean(true);
+    public ServerLevel r;
 
     @Inject(method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/ChunkPos;Lnet/minecraft/world/level/chunk/UpgradeData;Lnet/minecraft/world/ticks/LevelChunkTicks;Lnet/minecraft/world/ticks/LevelChunkTicks;J[Lnet/minecraft/world/level/chunk/LevelChunkSection;Lnet/minecraft/world/level/chunk/LevelChunk$PostLoadProcessor;Lnet/minecraft/world/level/levelgen/blending/BlendingData;)V", at = @At("RETURN"))
     private void banner$init(Level worldIn, ChunkPos p_196855_, UpgradeData p_196856_, LevelChunkTicks<Block> p_196857_, LevelChunkTicks<Fluid> p_196858_, long p_196859_, @Nullable LevelChunkSection[] p_196860_, @Nullable LevelChunk.PostLoadProcessor p_196861_, @Nullable BlendingData p_196862_, CallbackInfo ci) {
         if (DistValidate.isValid(worldIn)) {
             this.r = ((ServerLevel) worldIn);
         }
+        if (p_196855_ != null) this.bukkitChunk = new org.bukkit.craftbukkit.v1_20_R1.CraftChunk((LevelChunk) (Object) this);
     }
 
     @Inject(method = "<init>(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ProtoChunk;Lnet/minecraft/world/level/chunk/LevelChunk$PostLoadProcessor;)V", at = @At("RETURN"))
     private void banner$init(ServerLevel p_196850_, ProtoChunk protoChunk, @Nullable LevelChunk.PostLoadProcessor p_196852_, CallbackInfo ci) {
-        this.needsDecoration = true;
-        this.banner$setPersistentDataContainer(protoChunk.bridge$persistentDataContainer()); // SPIGOT-6814: copy PDC to account for 1.17 to 1.18 chunk upgrading.
+        this.needsDecoration = true; // CraftBukkit
+        this.persistentDataContainer = protoChunk.bridge$persistentDataContainer(); // SPIGOT-6814: copy PDC to account for 1.17 to 1.18 chunk upgrading.
     }
 
     @Inject(method = "removeBlockEntity", at = @At(value = "INVOKE_ASSIGN", remap = false, target = "Ljava/util/Map;remove(Ljava/lang/Object;)Ljava/lang/Object;"))
@@ -71,16 +82,16 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
 
     @Override
     public org.bukkit.Chunk getBukkitChunk() {
-        return new CraftChunk((LevelChunk) (Object) this);
+        return bukkitChunk;
     }
 
     @Override
     public BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving, boolean doPlace) {
-        this.banner$doPlace = doPlace;
+        this.banner$doPlace.set(doPlace);
         try {
             return this.setBlockState(pos, state, isMoving);
         } finally {
-            this.banner$doPlace = true;
+            this.banner$doPlace.set(true);
         }
     }
 
@@ -123,7 +134,7 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
 
     @Override
     public void unloadCallback() {
-        org.bukkit.Server server = Bukkit.getServer();
+        org.bukkit.Server server = this.getLevel().getCraftServer();
         var bukkitChunk = new CraftChunk((LevelChunk) (Object) this);
         org.bukkit.event.world.ChunkUnloadEvent unloadEvent = new org.bukkit.event.world.ChunkUnloadEvent(bukkitChunk, this.isUnsaved());
         server.getPluginManager().callEvent(unloadEvent);
@@ -133,7 +144,7 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
 
     @Redirect(method = "setBlockState", at = @At(value = "FIELD", ordinal = 1, target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
     public boolean banner$redirectIsRemote(Level world) {
-        return world.isClientSide && this.banner$doPlace;
+        return world.isClientSide && !this.banner$doPlace.getAndSet(true);
     }
 
     @Override

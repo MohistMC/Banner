@@ -1,5 +1,6 @@
 package com.mohistmc.banner.bukkit;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
@@ -15,8 +16,7 @@ public class DistValidate {
     }
 
     public static boolean isValid(LevelAccessor level) {
-        return level != null
-                && !level.isClientSide();
+        return level != null && level.getClass() == ServerLevel.class;
     }
 
     public static boolean isValid(BlockGetter getter) {
