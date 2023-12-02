@@ -352,10 +352,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
             else if (entity instanceof Display.TextDisplay) { return new CraftTextDisplay(server, (Display.TextDisplay) entity); }
             else { return new CraftDisplay(server, (Display) entity); }
         }
-        else if (entity instanceof Projectile) { return new MohistModsProjectileEntity(server, (Projectile) entity);
-        } else  { return new MohistModsEntity(server, entity); }
-        // CHECKSTYLE:ON
-        throw new AssertionError("Unknown entity " + (entity == null ? null : entity.getClass()));
+        return new MohistModsEntity(server, entity);
     }
 
     @Override
