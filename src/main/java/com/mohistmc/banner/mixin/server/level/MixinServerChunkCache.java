@@ -45,6 +45,10 @@ public abstract class MixinServerChunkCache implements InjectionServerChunkCache
         return chunk != null &&  chunk.getFullChunkNow() != null;
     }
 
+    public ThreadedLevelLightEngine a() {
+        return this.lightEngine;
+    }
+
     @Override
     public LevelChunk getChunkUnchecked(int chunkX, int chunkZ) {
         ChunkHolder chunk =  this.chunkMap.getUpdatingChunkIfPresent(ChunkPos.asLong(chunkX, chunkZ));

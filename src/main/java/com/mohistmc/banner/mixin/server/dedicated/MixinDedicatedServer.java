@@ -48,11 +48,11 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
     private void banner$initServer(CallbackInfoReturnable<Boolean> cir) {
         BannerServer.LOGGER.info(I18n.as("bukkit.plugin.loading.info"));
         // CraftBukkit start
-        this.bridge$server().loadPlugins();
-        this.bridge$server().enablePlugins(PluginLoadOrder.STARTUP);
         org.spigotmc.SpigotConfig.init((java.io.File) this.bridge$options().valueOf("spigot-settings"));
         BannerConfig.init((java.io.File) this.bridge$options().valueOf("banner-settings"));
         org.spigotmc.SpigotConfig.registerCommands();
+        this.bridge$server().loadPlugins();
+        this.bridge$server().enablePlugins(PluginLoadOrder.STARTUP);
     }
 
     @Inject(method = "initServer",
