@@ -367,7 +367,7 @@ public class CraftBlock implements Block {
             return null;
         }
 
-        return BukkitRegistry.BIOME_MAP.getOrDefault(base, Registry.BIOME.get(CraftNamespacedKey.fromMinecraft(registry.getKey(base))));
+        return BukkitRegistry.biomeBiomeMap.getOrDefault(base, Registry.BIOME.get(CraftNamespacedKey.fromMinecraft(registry.getKey(base))));
     }
 
     public static Holder<net.minecraft.world.level.biome.Biome> biomeToBiomeBase(net.minecraft.core.Registry<net.minecraft.world.level.biome.Biome> registry, Biome bio) {

@@ -1560,7 +1560,7 @@ public class CraftEventFactory {
         if (true) {
             org.bukkit.Statistic stat = CraftStatistic.getBukkitStatistic(statistic);
             if (stat == null) {
-                stat = BukkitRegistry.STATISTIC_MAP.get(statistic.getType());
+                stat = BukkitRegistry.statisticMap.get(statistic.getType());
             }
             if (stat == null) {
                 System.err.println("Unhandled statistic: " + statistic);

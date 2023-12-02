@@ -3,7 +3,7 @@ package org.bukkit;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.mohistmc.banner.api.DynamicEnumHelper;
+import com.mohistmc.dynamicenum.MohistDynamEnum;
 import net.minecraft.resources.ResourceLocation;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -4391,7 +4391,6 @@ public enum Material implements Keyed, Translatable {
     public static final String LEGACY_PREFIX = "LEGACY_";
 
     private final int id;
-    private int blockID;
     private final Constructor<? extends MaterialData> ctor;
     private static final Map<String, Material> BY_NAME = Maps.newHashMap();
     private final int maxStack;
@@ -4407,9 +4406,10 @@ public enum Material implements Keyed, Translatable {
     }
 
     // Banner start - constructor used to set if the Material is a block or not
-    private Material(final int id, final int stack, boolean isFabricBlock) {
+    private Material(final int id, final int stack, boolean isFabricBlock, boolean isFabricItem) {
         this(id, stack);
         this.isFabricBlock = isFabricBlock;
+        this.isFabricItem = isFabricItem;
     }
     // Banner end
 
@@ -4579,6 +4579,9 @@ public enum Material implements Keyed, Translatable {
      * @return true if this material is a block
      */
     public boolean isBlock() {
+        if (isFabricBlock) {
+            return true;
+        }
         switch (this) {
             //<editor-fold defaultstate="collapsed" desc="isBlock">
             case ACACIA_BUTTON:
@@ -10993,20 +10996,19 @@ public enum Material implements Keyed, Translatable {
         return Bukkit.getDataPackManager().isEnabledByFeature(this, world);
     }
 
-    public static Material addMaterial(String materialName, int id, int stack, boolean isBlock, ResourceLocation resourceLocation) {
+    public static Material addMaterial(String materialName, int id, int stack, boolean isBlock, boolean isItem, ResourceLocation resourceLocation) {
         if (isBlock) {
             Material material = BY_NAME.get(materialName);
             if (material != null){
-                material.blockID = id;
                 material.isFabricBlock = true;
             }else {
-                material = DynamicEnumHelper.addEnum(Material.class, materialName, List.of(Integer.TYPE, Integer.TYPE, Boolean.TYPE), List.of(id, stack, isBlock));
+                material = MohistDynamEnum.addEnum(Material.class, materialName, List.of(Integer.TYPE, Integer.TYPE, Boolean.TYPE, Boolean.TYPE), List.of(id, stack, isBlock, isItem));
             }
             BY_NAME.put(materialName, material);
             material.key = CraftNamespacedKey.fromMinecraft(resourceLocation);
             return material;
-        } else { // Fabric Items
-            Material material = DynamicEnumHelper.addEnum(Material.class, materialName, List.of(Integer.TYPE, Integer.TYPE, Boolean.TYPE), List.of(id, stack, isBlock));
+        } else { // Forge Items
+            Material material = MohistDynamEnum.addEnum(Material.class, materialName, List.of(Integer.TYPE, Integer.TYPE, Boolean.TYPE, Boolean.TYPE), List.of(id, stack, isBlock, isItem));
             BY_NAME.put(materialName, material);
             material.key = CraftNamespacedKey.fromMinecraft(resourceLocation);
             return material;

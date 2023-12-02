@@ -193,14 +193,14 @@ public class DumpCommand extends BukkitCommand {
         ResourceLocation resourceLocation;
         for (Item item : vanilla_item) {
             resourceLocation = vanilla_item.getKey(item);
-            if (BukkitRegistry.isMINECRAFT(resourceLocation)) {
+            if (!BukkitRegistry.isMods(resourceLocation)) {
                 sb.append(item).append("\n");
             }
         }
         var vanilla_block = BuiltInRegistries.BLOCK;
         for (Block block : vanilla_block) {
             resourceLocation = vanilla_block.getKey(block);
-            if (BukkitRegistry.isMINECRAFT(resourceLocation)) {
+            if (!BukkitRegistry.isMods(resourceLocation)) {
                 sb.append(block).append("\n");
             }
         }

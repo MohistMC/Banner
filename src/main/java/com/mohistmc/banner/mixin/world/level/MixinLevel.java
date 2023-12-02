@@ -203,7 +203,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                 }
             }
             if (environment == null) {
-                environment = BukkitRegistry.DIM_MAP.getOrDefault(getTypeKey(), World.Environment.CUSTOM);
+                environment = BukkitRegistry.environment.getOrDefault(getTypeKey(), World.Environment.CUSTOM);
             }
             if (generator == null) {
                 generator = getCraftServer().getGenerator(((ServerLevelData) this.getLevelData()).getLevelName());

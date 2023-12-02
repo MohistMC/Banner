@@ -1,9 +1,9 @@
 package com.mohistmc.banner.mixin.world.entity.boss.enderdragon.phases;
 
 import com.mohistmc.banner.BannerServer;
-import com.mohistmc.banner.api.DynamicEnumHelper;
 import com.mohistmc.banner.api.ServerAPI;
 import com.mohistmc.banner.injection.world.entity.boss.enderdragon.phases.InjectionEnderDragonPhase;
+import com.mohistmc.dynamicenum.MohistDynamEnum;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
 import org.spongepowered.asm.mixin.Final;
@@ -26,7 +26,7 @@ public class MixinEnderDragonPhase implements InjectionEnderDragonPhase {
                                                                         CallbackInfoReturnable<EnderDragonPhase<T>> cir,
                                                                         EnderDragonPhase<T> enderDragonPhase) {
         if (enderDragonPhase.getId() > 10) {
-            org.bukkit.entity.EnderDragon.Phase bukkit = DynamicEnumHelper.addEnum0(org.bukkit.entity.EnderDragon.Phase.class, enderDragonPhase.getName(), new Class[0]);
+            org.bukkit.entity.EnderDragon.Phase bukkit = MohistDynamEnum.addEnum(org.bukkit.entity.EnderDragon.Phase.class, enderDragonPhase.getName());
             ServerAPI.phasetypeMap.put(enderDragonPhase.getId(), bukkit);
             BannerServer.LOGGER.debug("Registered fabric PhaseType as EnderDragon.Phase {}", bukkit);
         }

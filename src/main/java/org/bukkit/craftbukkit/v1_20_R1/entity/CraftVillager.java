@@ -131,6 +131,6 @@ public class CraftVillager extends CraftAbstractVillager implements Villager {
     }
 
     public static VillagerProfession bukkitToNmsProfession(Profession bukkit) {
-        return !BukkitRegistry.PROFESSION.containsKey(bukkit) ? BuiltInRegistries.VILLAGER_PROFESSION.get(CraftNamespacedKey.toMinecraft(bukkit.getKey())) : BuiltInRegistries.VILLAGER_PROFESSION.get(BukkitRegistry.PROFESSION.get(bukkit));
+        return !BukkitRegistry.profession.containsKey(bukkit) ? BuiltInRegistries.VILLAGER_PROFESSION.get(CraftNamespacedKey.toMinecraft(bukkit.getKey())) : BuiltInRegistries.VILLAGER_PROFESSION.get(BukkitRegistry.profession.get(bukkit));
     }
 }
