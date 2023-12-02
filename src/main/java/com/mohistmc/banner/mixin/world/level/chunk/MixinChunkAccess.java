@@ -19,6 +19,7 @@ import net.minecraft.world.level.chunk.LightChunk;
 import net.minecraft.world.level.chunk.StructureAccess;
 import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.levelgen.blending.BlendingData;
+import org.bukkit.craftbukkit.v1_20_R1.persistence.CraftPersistentDataTypeRegistry;
 import org.bukkit.craftbukkit.v1_20_R1.persistence.DirtyCraftPersistentDataContainer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -38,10 +39,8 @@ public abstract class MixinChunkAccess implements BlockGetter, BiomeManager.Nois
     @Shadow public abstract int getMinBuildHeight();
 
     // CraftBukkit start - SPIGOT-6814: move to IChunkAccess to account for 1.17 to 1.18 chunk upgrading.
-    private static final org.bukkit.craftbukkit.v1_20_R1.persistence.CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY
-            = new org.bukkit.craftbukkit.v1_20_R1.persistence.CraftPersistentDataTypeRegistry();
-    public org.bukkit.craftbukkit.v1_20_R1.persistence.DirtyCraftPersistentDataContainer persistentDataContainer
-            = new org.bukkit.craftbukkit.v1_20_R1.persistence.DirtyCraftPersistentDataContainer(DATA_TYPE_REGISTRY);
+    private static final CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new CraftPersistentDataTypeRegistry();
+    public DirtyCraftPersistentDataContainer persistentDataContainer = new DirtyCraftPersistentDataContainer(DATA_TYPE_REGISTRY);
     // CraftBukkit end
     public Registry<Biome> biomeRegistry;
 
@@ -61,12 +60,6 @@ public abstract class MixinChunkAccess implements BlockGetter, BiomeManager.Nois
     private void banner$isDirty(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(cir.getReturnValueZ() || this.persistentDataContainer.dirty());
     }
-
-    @Override
-    public void banner$setPersistentDataContainer(DirtyCraftPersistentDataContainer persistentDataContainer) {
-        this.persistentDataContainer = persistentDataContainer;
-    }
-
 
     @Override
     public void setBiome(int i, int j, int k, Holder<Biome> biome) {

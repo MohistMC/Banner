@@ -9,9 +9,6 @@ public interface InjectionBlockEntity {
         return null;
     }
 
-    default void banner$setPersistentDataContainer(CraftPersistentDataContainer persistentDataContainer) {
-    }
-
     default InventoryHolder bridge$getOwner() {
         return null;
     }

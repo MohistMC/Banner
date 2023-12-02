@@ -56,9 +56,4 @@ public abstract class MixinBlockEntity implements InjectionBlockEntity {
     public CraftPersistentDataContainer bridge$persistentDataContainer() {
         return persistentDataContainer;
     }
-
-    @Override
-    public void banner$setPersistentDataContainer(CraftPersistentDataContainer persistentDataContainer) {
-        this.persistentDataContainer = persistentDataContainer;
-    }
 }
