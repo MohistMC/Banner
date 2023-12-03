@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
 import com.mohistmc.banner.bukkit.DistValidate;
+import com.mohistmc.banner.bukkit.inventory.InventoryOwner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -110,7 +111,7 @@ public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockE
             destinationInventory = destination.getOwner().getInventory();
         }
 
-        InventoryMoveItemEvent event = new InventoryMoveItemEvent(entity.bridge$getOwner().getInventory(), original.clone(), destinationInventory, true);
+        InventoryMoveItemEvent event = new InventoryMoveItemEvent(InventoryOwner.getInventory(entity), original.clone(), destinationInventory, true);
         Bukkit.getPluginManager().callEvent(event);
         banner$moveEvent.set(event);
         if (event.isCancelled()) {

@@ -5,6 +5,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlockEntityState;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 /**
@@ -12,6 +13,11 @@ import org.bukkit.inventory.InventoryHolder;
  * @date 2020/4/10 13:39
  */
 public class InventoryOwner {
+
+    public static Inventory getInventory(Container inventory) {
+        InventoryHolder owner = get(inventory);
+        return (owner == null ? new CraftCustomInventory(inventory).getInventory() : owner.getInventory());
+    }
 
     public static InventoryHolder get(BlockEntity te) {
         return get(te.getLevel(), te.getBlockPos(), true);
