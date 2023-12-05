@@ -117,8 +117,8 @@ public class ItemAPI {
 
     public static CompoundTag deserializeNbt(String serializeNBT) {
         if (serializeNBT != null) {
-            ByteArrayInputStream buf = new ByteArrayInputStream(Base64Coder.decodeLines(serializeNBT));
             try {
+                ByteArrayInputStream buf = new ByteArrayInputStream(Base64Coder.decodeLines(serializeNBT));
                 return NbtIo.readCompressed(buf);
             } catch (IOException e) {
                 BannerServer.LOGGER.error("Reading nbt ", e);

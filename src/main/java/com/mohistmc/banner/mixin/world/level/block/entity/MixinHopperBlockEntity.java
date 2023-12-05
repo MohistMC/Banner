@@ -108,17 +108,22 @@ public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockE
         if (destination instanceof CompoundContainer) {
             destinationInventory = new CraftInventoryDoubleChest(((CompoundContainer) destination));
         } else {
-            destinationInventory = destination.getOwner().getInventory();
+            destinationInventory = destination.getOwner() == null ? null: destination.getOwner().getInventory();
         }
 
-        InventoryMoveItemEvent event = new InventoryMoveItemEvent(InventoryOwner.getInventory(entity), original.clone(), destinationInventory, true);
-        Bukkit.getPluginManager().callEvent(event);
-        banner$moveEvent.set(event);
-        if (event.isCancelled()) {
-            entity.setCooldown(level.bridge$spigotConfig().hopperTransfer); // Delay hopper checks
-            return null;
+        ItemStack stack1 = stack;
+        if (destinationInventory != null) {
+            InventoryMoveItemEvent event = new InventoryMoveItemEvent(InventoryOwner.getInventory(entity), original.clone(), destinationInventory, true);
+            Bukkit.getPluginManager().callEvent(event);
+            banner$moveEvent.set(event);
+            if (event.isCancelled()) {
+                entity.setCooldown(level.bridge$spigotConfig().hopperTransfer); // Delay hopper checks
+                return null;
+            }
+            stack1 = CraftItemStack.asNMSCopy(event.getItem());
         }
-        return HopperBlockEntity.addItem(source, destination, CraftItemStack.asNMSCopy(event.getItem()), direction);
+
+        return HopperBlockEntity.addItem(source, destination, stack1, direction);
     }
 
     @Inject(method = "ejectItems",
