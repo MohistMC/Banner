@@ -1863,7 +1863,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     public boolean teleport(double d0, double d1, double d2, float f, float f1, Set<RelativeMovement> set, PlayerTeleportEvent.TeleportCause cause) {
         pushTeleportCause(cause);
         this.teleport(d0, d1, d2, f, f1, set);
-        return cancelledMoveEvent.get();
+        return cancelledMoveEvent.getAndSet(false);
     }
 
     @Override
@@ -1889,6 +1889,14 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         if (++this.awaitingTeleport == Integer.MAX_VALUE) {
             this.awaitingTeleport = 0;
         }
+
+        // CraftBukkit start - update last location
+        this.lastPosX = this.awaitingPositionFromClient.x;
+        this.lastPosY = this.awaitingPositionFromClient.y;
+        this.lastPosZ = this.awaitingPositionFromClient.z;
+        this.lastYaw = f;
+        this.lastPitch = f1;
+        // CraftBukkit end
 
         this.awaitingTeleportTime = this.tickCount;
         this.player.absMoveTo(d0, d1, d2, f, f1);

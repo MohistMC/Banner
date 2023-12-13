@@ -488,7 +488,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     }
 
 
-    private transient Location banner$loc;
+    private Location banner$loc = null;
     private transient PlayerRespawnEvent.RespawnReason banner$respawnReason;
     public ServerLevel banner$worldserver = null;
 
@@ -562,18 +562,10 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             boolean isBedSpawn = false;
             ServerLevel worldserver1 = this.server.getLevel(playerIn.getRespawnDimension());
             if (worldserver1 != null) {
-                Optional optional;
-
-                if (blockposition != null) {
-                    optional = net.minecraft.world.entity.player.Player.findRespawnPositionAndUseSpawnBlock(worldserver1, blockposition, f, flag1, conqueredEnd);
-                } else {
-                    optional = Optional.empty();
-                }
-
-                if (optional.isPresent()) {
+                if (optional_vanilla.isPresent()) {
                     BlockState iblockdata = worldserver1.getBlockState(blockposition);
                     boolean flag3 = iblockdata.is(Blocks.RESPAWN_ANCHOR);
-                    Vec3 vec3d = (Vec3) optional.get();
+                    Vec3 vec3d = (Vec3) optional_vanilla.get();
                     float f1;
 
                     if (!iblockdata.is(BlockTags.BEDS) && !flag3) {
@@ -740,7 +732,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     private void banner$castMsg(PlayerList instance, Packet<?> packet) {
         // CraftBukkit start
         for (int i = 0; i < this.players.size(); ++i) {
-            final ServerPlayer target = (ServerPlayer) this.players.get(i);
+            final ServerPlayer target = this.players.get(i);
 
             target.connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LATENCY), this.players.stream().filter(new Predicate<>() {
                 @Override

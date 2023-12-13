@@ -28,7 +28,6 @@ public class DefaultLibraries {
 
     public static void run() throws Exception {
         System.out.println(I18n.as("libraries.checking.start"));
-        System.out.println(I18n.as("libraries.downloadsource", DownloadSource.get().name()));
         LinkedHashMap<File, String> libs = getDefaultLibs();
         AtomicLong currentSize = new AtomicLong();
         Set<File> defaultLibs = new LinkedHashSet<>();
@@ -39,6 +38,7 @@ public class DefaultLibraries {
             }
             defaultLibs.add(lib);
         }
+        if (!defaultLibs.isEmpty()) System.out.println(I18n.as("libraries.downloadsource", DownloadSource.get().name()));
         for (File lib : defaultLibs) {
             lib.getParentFile().mkdirs();
 

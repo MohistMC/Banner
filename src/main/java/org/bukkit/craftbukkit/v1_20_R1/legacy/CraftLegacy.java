@@ -283,7 +283,7 @@ public final class CraftLegacy {
     }
 
     public static String name(Material material) {
-        if (BukkitRegistry.isMods(material.getKey())) {
+        if (material.isFabricBlock || material.isFabricItem) {
             return material.name();
         } else {
             return material.name().substring(Material.LEGACY_PREFIX.length());
