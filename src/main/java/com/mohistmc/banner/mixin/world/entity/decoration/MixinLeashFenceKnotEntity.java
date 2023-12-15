@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.entity.decoration;
 
-import java.util.List;
 import net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -16,6 +15,8 @@ import net.minecraft.world.phys.AABB;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+
+import java.util.List;
 
 @Mixin(LeashFenceKnotEntity.class)
 public abstract class MixinLeashFenceKnotEntity extends HangingEntity {

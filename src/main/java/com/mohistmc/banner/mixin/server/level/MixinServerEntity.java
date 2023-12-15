@@ -4,13 +4,6 @@ import com.google.common.collect.Lists;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.injection.server.level.InjectionServerEntity;
 import com.mojang.datafixers.util.Pair;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -56,6 +49,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 @Mixin(ServerEntity.class)
 public abstract class MixinServerEntity implements InjectionServerEntity {

@@ -1,6 +1,5 @@
 package com.mohistmc.banner.injection.server.network;
 
-import java.util.Set;
 import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.world.entity.RelativeMovement;
 import org.bukkit.Location;
@@ -8,6 +7,8 @@ import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.slf4j.Logger;
+
+import java.util.Set;
 
 public interface InjectionServerGamePacketListenerImpl {
 

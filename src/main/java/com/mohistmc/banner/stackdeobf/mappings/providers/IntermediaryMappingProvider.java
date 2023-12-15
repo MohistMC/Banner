@@ -6,6 +6,11 @@ import com.mohistmc.banner.stackdeobf.http.HttpUtil;
 import com.mohistmc.banner.stackdeobf.util.CompatUtil;
 import com.mohistmc.banner.stackdeobf.util.MavenArtifactInfo;
 import com.mohistmc.banner.util.I18n;
+import net.fabricmc.mappingio.MappingReader;
+import net.fabricmc.mappingio.MappingVisitor;
+import net.fabricmc.mappingio.format.MappingFormat;
+import net.fabricmc.mappingio.tree.MemoryMappingTree;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,10 +23,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-import net.fabricmc.mappingio.MappingReader;
-import net.fabricmc.mappingio.MappingVisitor;
-import net.fabricmc.mappingio.format.MappingFormat;
-import net.fabricmc.mappingio.tree.MemoryMappingTree;
 
 public class IntermediaryMappingProvider extends AbstractMappingProvider {
 

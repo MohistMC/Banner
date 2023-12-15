@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.world.inventory;
 
 import com.mohistmc.banner.injection.world.inventory.InjectionTransientCraftingContainer;
-import java.util.List;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
@@ -18,6 +17,8 @@ import org.bukkit.inventory.InventoryHolder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+
+import java.util.List;
 
 @Mixin(TransientCraftingContainer.class)
 public abstract class MixinTransientTransientCraftingContainer implements Container, InjectionTransientCraftingContainer {

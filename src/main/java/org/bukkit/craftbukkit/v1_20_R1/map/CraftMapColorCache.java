@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import net.minecraft.Util;
 import org.bukkit.map.MapPalette;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

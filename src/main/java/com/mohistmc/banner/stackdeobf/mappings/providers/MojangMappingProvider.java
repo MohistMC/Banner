@@ -8,6 +8,18 @@ import com.mohistmc.banner.config.BannerConfigUtil;
 import com.mohistmc.banner.stackdeobf.http.HttpUtil;
 import com.mohistmc.banner.stackdeobf.util.CompatUtil;
 import com.mohistmc.banner.util.I18n;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.mappingio.MappingReader;
+import net.fabricmc.mappingio.MappingVisitor;
+import net.fabricmc.mappingio.adapter.ForwardingMappingVisitor;
+import net.fabricmc.mappingio.adapter.MappingSourceNsSwitch;
+import net.fabricmc.mappingio.format.MappingFormat;
+import net.fabricmc.mappingio.tree.MappingTree;
+import net.fabricmc.mappingio.tree.MemoryMappingTree;
+import net.minecraft.util.GsonHelper;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,17 +35,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.mappingio.MappingReader;
-import net.fabricmc.mappingio.MappingVisitor;
-import net.fabricmc.mappingio.adapter.ForwardingMappingVisitor;
-import net.fabricmc.mappingio.adapter.MappingSourceNsSwitch;
-import net.fabricmc.mappingio.format.MappingFormat;
-import net.fabricmc.mappingio.tree.MappingTree;
-import net.fabricmc.mappingio.tree.MemoryMappingTree;
-import net.minecraft.util.GsonHelper;
-import org.apache.commons.lang3.StringUtils;
 
 public class MojangMappingProvider extends AbstractMappingProvider {
 

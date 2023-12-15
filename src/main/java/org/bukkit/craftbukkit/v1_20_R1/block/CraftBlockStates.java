@@ -1,6 +1,7 @@
 package org.bukkit.craftbukkit.v1_20_R1.block;
 
 import com.google.common.base.Preconditions;
+import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.LevelAccessor;
@@ -52,7 +53,6 @@ import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;

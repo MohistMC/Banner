@@ -2,9 +2,6 @@ package com.mohistmc.banner.mixin.world.entity;
 
 import com.google.common.collect.Lists;
 import com.mohistmc.banner.injection.world.entity.InjectionAreaEffectCloud;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -26,6 +23,10 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 @Mixin(AreaEffectCloud.class)
 public abstract class MixinAreaEffectCloud extends Entity implements TraceableEntity, InjectionAreaEffectCloud {

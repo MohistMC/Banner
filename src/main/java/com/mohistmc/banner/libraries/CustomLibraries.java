@@ -1,7 +1,8 @@
 package com.mohistmc.banner.libraries;
 
-import java.io.File;
 import net.fabricmc.loader.api.FabricLoader;
+
+import java.io.File;
 
 public class CustomLibraries {
 

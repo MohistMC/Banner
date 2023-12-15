@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.server.level;
 
 import com.mohistmc.banner.injection.server.level.InjectionServerEntity;
-import java.util.Set;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.network.ServerPlayerConnection;
@@ -12,6 +11,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Set;
 
 @Mixin(ChunkMap.TrackedEntity.class)
 public class MixinChunkMap_TrackedEntity {

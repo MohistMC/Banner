@@ -1,7 +1,8 @@
 package com.mohistmc.banner.injection.server.level;
 
-import java.util.Set;
 import net.minecraft.server.network.ServerPlayerConnection;
+
+import java.util.Set;
 
 public interface InjectionServerEntity {
 

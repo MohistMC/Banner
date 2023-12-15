@@ -1,9 +1,10 @@
 package com.mohistmc.banner.stackdeobf.util;
 
 import com.mohistmc.banner.stackdeobf.mappings.RemappingUtil;
-import java.lang.reflect.Field;
 import org.apache.logging.log4j.core.impl.ExtendedStackTraceElement;
 import org.apache.logging.log4j.core.impl.ThrowableProxy;
+
+import java.lang.reflect.Field;
 
 final class Log4jRemapUtil {
 

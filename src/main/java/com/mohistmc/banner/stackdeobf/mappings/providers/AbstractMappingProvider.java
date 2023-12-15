@@ -5,6 +5,9 @@ package com.mohistmc.banner.stackdeobf.mappings.providers;
 import com.google.common.base.Preconditions;
 import com.mohistmc.banner.stackdeobf.util.CompatUtil;
 import com.mohistmc.banner.util.I18n;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.mappingio.MappingVisitor;
+
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -12,8 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.mappingio.MappingVisitor;
 
 public abstract class AbstractMappingProvider {
 

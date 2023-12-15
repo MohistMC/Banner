@@ -3,7 +3,6 @@ package com.mohistmc.banner.mixin.server;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import java.util.Map;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementList;
 import net.minecraft.advancements.TreeNodePosition;
@@ -19,6 +18,8 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+
+import java.util.Map;
 
 @Mixin(ServerAdvancementManager.class)
 public class MixinServerAdvancementManager {

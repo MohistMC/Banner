@@ -3,8 +3,6 @@ package com.mohistmc.banner.mixin.server.network;
 import com.mohistmc.banner.bukkit.BannerServerListPingEvent;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.authlib.GameProfile;
-import java.util.Collections;
-import java.util.Optional;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
@@ -17,6 +15,9 @@ import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.Collections;
+import java.util.Optional;
 
 @Mixin(ServerStatusPacketListenerImpl.class)
 public class MixinServerStatusPacketListenerImpl {

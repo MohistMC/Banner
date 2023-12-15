@@ -1,7 +1,5 @@
 package com.mohistmc.banner.mixin.server.players;
 
-import java.io.File;
-import java.io.IOException;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import org.spongepowered.asm.mixin.Mixin;
@@ -9,6 +7,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.io.File;
+import java.io.IOException;
 
 @Mixin(targets = "net.minecraft.server.players.OldUsersConverter$5")
 public class MixinOldUsersConverter_5 {

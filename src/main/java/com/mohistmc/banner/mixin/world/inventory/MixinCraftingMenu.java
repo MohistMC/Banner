@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.world.inventory;
 
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
-import java.util.Optional;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -30,6 +29,8 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.Optional;
 
 @Mixin(CraftingMenu.class)
 public abstract class MixinCraftingMenu extends RecipeBookMenu<CraftingContainer> {

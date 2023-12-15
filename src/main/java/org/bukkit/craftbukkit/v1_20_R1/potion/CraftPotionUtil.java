@@ -3,14 +3,15 @@ package org.bukkit.craftbukkit.v1_20_R1.potion;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
-import java.util.HashMap;
-import java.util.Map;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CraftPotionUtil {
 

@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.server.level;
 
 import com.mohistmc.banner.injection.server.level.InjectionServerChunkCache;
-import java.io.IOException;
 import javax.annotation.Nullable;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkLevel;
@@ -22,6 +21,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.io.IOException;
 
 @Mixin(ServerChunkCache.class)
 public abstract class MixinServerChunkCache implements InjectionServerChunkCache {

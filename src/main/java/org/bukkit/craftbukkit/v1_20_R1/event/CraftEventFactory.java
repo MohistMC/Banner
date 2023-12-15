@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.mohistmc.banner.fabric.BukkitRegistry;
 import com.mojang.datafixers.util.Either;
+import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
@@ -231,7 +232,6 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.potion.PotionEffect;
 
-import javax.annotation.Nullable;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;

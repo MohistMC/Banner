@@ -1,7 +1,8 @@
 package com.mohistmc.banner.injection.world.level.block.entity;
 
-import java.util.List;
 import org.bukkit.entity.HumanEntity;
+
+import java.util.List;
 
 public interface InjectionShulkerBoxBlockEntity {
 

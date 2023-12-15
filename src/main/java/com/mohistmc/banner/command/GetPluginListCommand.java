@@ -1,11 +1,12 @@
 package com.mohistmc.banner.command;
 
 import com.mohistmc.tools.HasteUtils;
-import java.io.IOException;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.plugin.Plugin;
+
+import java.io.IOException;
 
 public class GetPluginListCommand extends BukkitCommand {
     private static String sendToHaste = "";

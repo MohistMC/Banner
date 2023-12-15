@@ -1,7 +1,5 @@
 package com.mohistmc.banner.mixin.world;
 
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -15,6 +13,9 @@ import org.bukkit.inventory.InventoryHolder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Mixin(SimpleContainer.class)
 public abstract class MixinSimpleContainer implements Container, StackedContentsCompatible {

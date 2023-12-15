@@ -7,8 +7,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 public abstract class MusicInstrument implements Keyed {
 

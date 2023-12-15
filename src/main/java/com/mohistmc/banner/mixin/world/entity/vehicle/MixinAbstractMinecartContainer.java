@@ -1,7 +1,5 @@
 package com.mohistmc.banner.mixin.world.entity.vehicle;
 
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
@@ -19,6 +17,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Mixin(AbstractMinecartContainer.class)
 public abstract class MixinAbstractMinecartContainer extends AbstractMinecart implements ContainerEntity {

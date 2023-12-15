@@ -1,7 +1,6 @@
 package com.mohistmc.banner.fabric;
 
 import com.mojang.serialization.Lifecycle;
-import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Difficulty;
@@ -14,6 +13,8 @@ import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.timers.TimerQueue;
+
+import java.util.UUID;
 
 public class BannerDerivedWorldInfo extends PrimaryLevelData {
 

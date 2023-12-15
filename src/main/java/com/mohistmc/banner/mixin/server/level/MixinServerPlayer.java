@@ -6,13 +6,6 @@ import com.mohistmc.banner.injection.server.level.InjectionServerPlayer;
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Unit;
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import net.minecraft.BlockUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -21,9 +14,14 @@ import net.minecraft.core.PositionImpl;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundChangeDifficultyPacket;
 import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
+import net.minecraft.network.protocol.game.ClientboundLevelEventPacket;
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
+import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
 import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
+import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
 import net.minecraft.network.protocol.game.ServerboundClientInformationPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -32,6 +30,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.players.PlayerList;
 import net.minecraft.stats.RecipeBook;
 import net.minecraft.stats.ServerRecipeBook;
 import net.minecraft.util.Mth;
@@ -40,6 +39,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.CombatTracker;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.RelativeMovement;
@@ -56,9 +56,11 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.portal.PortalInfo;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -80,6 +82,7 @@ import org.bukkit.craftbukkit.v1_20_R1.util.CraftLocation;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedMainHandEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerLocaleChangeEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerSpawnChangeEvent;
@@ -98,6 +101,14 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 @Mixin(ServerPlayer.class)
 public abstract class MixinServerPlayer extends Player implements InjectionServerPlayer {
@@ -153,8 +164,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Shadow private boolean respawnForced;
 
     @Shadow public abstract void setCamera(@Nullable Entity entityToSpectate);
-
-    @Shadow @Nullable protected abstract PortalInfo findDimensionEntryPoint(ServerLevel destination);
 
     @Shadow public abstract void resetFallDistance();
 
@@ -289,7 +298,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
                 position = Vec3.atCenterOf(((ServerLevel) world).getSharedSpawnPos());
             }
             this.setLevel(world);
-            this.setPos(position);
+            this.setPos(position.x(), position.y(), position.z());
         }
         this.gameMode.setLevel((ServerLevel) world);
     }
@@ -627,9 +636,26 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         // Paper end
     }
 
-    public PortalInfo banner$findDimensionEntryPoint(ServerLevel destination) {
-        return findDimensionEntryPoint(destination);
+    /**
+     * @author Mgazul
+     * @reason
+     */
+    @Nullable
+    @Overwrite
+    protected PortalInfo findDimensionEntryPoint(ServerLevel level) {
+        PortalInfo portalinfo = super.findDimensionEntryPoint(level);
+        level = portalinfo == null || portalinfo.bridge$getWorld() == null ? level : portalinfo.bridge$getWorld();
+        if (portalinfo != null && this.level().getTypeKey() == LevelStem.OVERWORLD && this.level().getTypeKey() == LevelStem.END) {
+            Vec3 vector3d = portalinfo.pos.add(0.0D, -1.0D, 0.0D);
+            PortalInfo newInfo = new PortalInfo(vector3d, Vec3.ZERO, 90.0F, 0.0F);
+            newInfo.banner$setWorld(level);
+            newInfo.banner$setPortalEventInfo(portalinfo.bridge$getPortalEventInfo());
+            return newInfo;
+        } else {
+            return portalinfo;
+        }
     }
+
     @Override
     public CraftPlayer getBukkitEntity() {
         return (CraftPlayer)super.getBukkitEntity();
@@ -817,13 +843,110 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Redirect(method = "die", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/scores/Scoreboard;forAllObjectives(Lnet/minecraft/world/scores/criteria/ObjectiveCriteria;Ljava/lang/String;Ljava/util/function/Consumer;)V"))
     private void banner$useBukkitScore(Scoreboard instance, ObjectiveCriteria criteria, String scoreboardName, Consumer<Score> action) {
-        this.setCamera(((ServerPlayer) (Object) this)); // Remove spectated target
+        this.setCamera((ServerPlayer) (Object) this); // Remove spectated target
         // CraftBukkit end
         // CraftBukkit - Get our scores instead
         this.level().getCraftServer().getScoreboardManager().getScoreboardScores(ObjectiveCriteria.DEATH_COUNT, this.getScoreboardName(), Score::increment);
     }
 
     private AtomicReference<PlayerTeleportEvent.TeleportCause> banner$changeDimensionCause = new AtomicReference<>(PlayerTeleportEvent.TeleportCause.UNKNOWN);
+
+    /**
+     * @author Mgazul
+     * @reason
+     */
+    @Nullable
+    @Overwrite
+    public Entity changeDimension(ServerLevel destination) {
+        if (this.isSleeping()) return this; // CraftBukkit - SPIGOT-3154
+        ServerLevel serverLevel = this.serverLevel();
+        ResourceKey<Level> resourceKey = serverLevel.dimension();
+        if (resourceKey == Level.END && destination.dimension() == Level.OVERWORLD) {
+            this.isChangingDimension = true; // CraftBukkit - Moved down from above
+            this.unRide();
+            this.serverLevel().removePlayerImmediately((ServerPlayer) (Object) this, RemovalReason.CHANGED_DIMENSION);
+            if (!this.wonGame) {
+                this.wonGame = true;
+                this.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.WIN_GAME, this.seenCredits ? 0.0F : 1.0F));
+                this.seenCredits = true;
+            }
+
+            return this;
+        } else {
+            /*
+            LevelData levelData = destination.getLevelData();
+            this.connection.send(new ClientboundRespawnPacket(destination.dimensionTypeId(), destination.dimension(), BiomeManager.obfuscateSeed(destination.getSeed()), this.gameMode.getGameModeForPlayer(), this.gameMode.getPreviousGameModeForPlayer(), destination.isDebug(), destination.isFlat(), (byte)3, this.getLastDeathLocation(), this.getPortalCooldown()));
+            this.connection.send(new ClientboundChangeDifficultyPacket(levelData.getDifficulty(), levelData.isDifficultyLocked()));
+            PlayerList playerList = this.server.getPlayerList();
+            playerList.sendPlayerPermissionLevel((ServerPlayer) (Object) this);
+            serverLevel.removePlayerImmediately((ServerPlayer) (Object) this, RemovalReason.CHANGED_DIMENSION);
+            this.unsetRemoved();
+             */
+            PortalInfo portalInfo = this.findDimensionEntryPoint(destination);
+            if (portalInfo != null) {
+                serverLevel.getProfiler().push("moving");
+                if (resourceKey == Level.OVERWORLD && destination.dimension() == Level.NETHER) {
+                    this.enteredNetherPosition = this.position();
+                } else if (destination.dimension() == Level.END) {
+                    this.createEndPlatform(destination, BlockPos.containing(portalInfo.pos));
+                }
+            } else {
+                return null;
+            }
+            Location enter = this.getBukkitEntity().getLocation();
+            Location exit = (destination == null) ? null : CraftLocation.toBukkit(portalInfo.pos, destination.getWorld(), portalInfo.yRot, portalInfo.xRot);
+            PlayerTeleportEvent tpEvent = new PlayerTeleportEvent(this.getBukkitEntity(), enter, exit, banner$changeDimensionCause.getAndSet(PlayerTeleportEvent.TeleportCause.UNKNOWN));
+            Bukkit.getServer().getPluginManager().callEvent(tpEvent);
+            if (tpEvent.isCancelled() || tpEvent.getTo() == null) {
+                return null;
+            }
+            exit = tpEvent.getTo();
+            destination = ((CraftWorld) exit.getWorld()).getHandle();
+            // CraftBukkit end
+
+            serverLevel.getProfiler().pop();
+            serverLevel.getProfiler().push("placing");
+            if (true) { // CraftBukkit
+                this.isChangingDimension = true; // CraftBukkit - Set teleport invulnerability only if player changing worlds
+
+                this.connection.send(new ClientboundRespawnPacket(destination.dimensionTypeId(), destination.dimension(), BiomeManager.obfuscateSeed(destination.getSeed()), this.gameMode.getGameModeForPlayer(), this.gameMode.getPreviousGameModeForPlayer(), destination.isDebug(), destination.isFlat(), (byte)3, this.getLastDeathLocation(), this.getPortalCooldown()));
+                this.connection.send(new ClientboundChangeDifficultyPacket(((ServerPlayer) (Object) this).serverLevel().getDifficulty(), ((ServerPlayer) (Object) this).serverLevel().getLevelData().isDifficultyLocked()));
+                PlayerList playerList = this.server.getPlayerList();
+
+                playerList.sendPlayerPermissionLevel((ServerPlayer) (Object) this);
+                serverLevel.removePlayerImmediately((ServerPlayer) (Object) this, RemovalReason.CHANGED_DIMENSION);
+                this.unsetRemoved();
+
+                this.setServerLevel(destination);
+                this.connection.teleport(exit);
+                this.connection.resetPosition();
+                destination.addDuringPortalTeleport((ServerPlayer) (Object) this);
+                serverLevel.getProfiler().pop();
+                this.triggerDimensionChangeTriggers(serverLevel);
+                this.connection.send(new ClientboundPlayerAbilitiesPacket(this.getAbilities()));
+                playerList.sendLevelInfo((ServerPlayer) (Object) this, destination);
+                playerList.sendAllPlayerInfo((ServerPlayer) (Object) this);
+                Iterator var7 = this.getActiveEffects().iterator();
+
+                while(var7.hasNext()) {
+                    MobEffectInstance mobEffectInstance = (MobEffectInstance)var7.next();
+                    this.connection.send(new ClientboundUpdateMobEffectPacket(this.getId(), mobEffectInstance));
+                }
+
+                this.connection.send(new ClientboundLevelEventPacket(1032, BlockPos.ZERO, 0, false));
+                this.lastSentExp = -1;
+                this.lastSentHealth = -1.0F;
+                this.lastSentFood = -1;
+
+                // CraftBukkit start
+                PlayerChangedWorldEvent changeEvent = new PlayerChangedWorldEvent(this.getBukkitEntity(), serverLevel.getWorld());
+                this.level().getCraftServer().getPluginManager().callEvent(changeEvent);
+                // CraftBukkit end
+            }
+
+            return this;
+        }
+    }
 
     @Override
     public Entity changeDimension(ServerLevel worldserver, PlayerTeleportEvent.TeleportCause cause) {
@@ -845,7 +968,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Override
     public void teleportTo(ServerLevel worldserver, double d0, double d1, double d2, float f, float f1, PlayerTeleportEvent.TeleportCause cause) {
         pushChangeDimensionCause(cause);
-        teleportTo(worldserver, d0, d1, d2, f, f1);
+        this.teleportTo(worldserver, d0, d1, d2, f, f1);
     }
 
     @Override
@@ -888,7 +1011,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     public CraftPortalEvent callPortalEvent(Entity entity, ServerLevel exitWorldServer, PositionImpl exitPosition, PlayerTeleportEvent.TeleportCause cause, int searchRadius, int creationRadius) {
         Location enter = this.getBukkitEntity().getLocation();
         Location exit = new Location(exitWorldServer.getWorld(), exitPosition.x(), exitPosition.y(), exitPosition.z(), this.getYRot(), this.getXRot());
-        PlayerPortalEvent event = new PlayerPortalEvent(this.getBukkitEntity(), enter, exit, cause, 128, true, creationRadius);
+        PlayerPortalEvent event = new PlayerPortalEvent(this.getBukkitEntity(), enter, exit, cause, searchRadius, true, creationRadius);
         Bukkit.getServer().getPluginManager().callEvent(event);
         if (event.isCancelled() || event.getTo() == null || event.getTo().getWorld() == null) {
             return null;

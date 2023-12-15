@@ -1,7 +1,5 @@
 package com.mohistmc.banner.mixin.server.network;
 
-import java.net.InetAddress;
-import java.util.HashMap;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.Connection;
 import net.minecraft.network.ConnectionProtocol;
@@ -18,6 +16,9 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+
+import java.net.InetAddress;
+import java.util.HashMap;
 
 //TODO fixed
 @Mixin(ServerHandshakePacketListenerImpl.class)

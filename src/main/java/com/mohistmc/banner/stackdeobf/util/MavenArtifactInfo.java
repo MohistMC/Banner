@@ -1,10 +1,11 @@
 package com.mohistmc.banner.stackdeobf.util;
 
 import com.google.common.base.Preconditions;
-import java.net.URI;
-import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
+
+import java.net.URI;
+import java.util.Objects;
 
 public record MavenArtifactInfo(String repoUrl, String groupId, String artifactId, String classifier) {
 

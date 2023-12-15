@@ -7,21 +7,6 @@ import com.mohistmc.banner.fabric.BukkitRegistry;
 import com.mohistmc.banner.injection.server.players.InjectionPlayerList;
 import com.mohistmc.banner.util.I18n;
 import com.mojang.authlib.GameProfile;
-import java.io.File;
-import java.net.SocketAddress;
-import java.nio.file.Path;
-import java.text.SimpleDateFormat;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.LayeredRegistryAccess;
@@ -111,6 +96,22 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.io.File;
+import java.net.SocketAddress;
+import java.nio.file.Path;
+import java.text.SimpleDateFormat;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 // Banner - TODO fix inject method
 @Mixin(PlayerList.class)

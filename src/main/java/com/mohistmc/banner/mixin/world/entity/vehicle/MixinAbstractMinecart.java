@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.vehicle;
 
 import com.mohistmc.banner.injection.world.entity.vehicle.InjectionAbstractMinecart;
-import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
@@ -35,6 +34,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.List;
 
 @Mixin(AbstractMinecart.class)
 public abstract class MixinAbstractMinecart extends Entity implements InjectionAbstractMinecart {

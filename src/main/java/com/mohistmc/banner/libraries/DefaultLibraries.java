@@ -4,6 +4,8 @@ import com.mohistmc.banner.network.download.DownloadSource;
 import com.mohistmc.banner.network.download.UpdateUtils;
 import com.mohistmc.banner.util.I18n;
 import com.mohistmc.tools.MD5Util;
+import net.fabricmc.loader.api.FabricLoader;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -13,7 +15,6 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
-import net.fabricmc.loader.api.FabricLoader;
 
 public class DefaultLibraries {
 

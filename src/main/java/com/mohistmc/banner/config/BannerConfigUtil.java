@@ -3,10 +3,11 @@ package com.mohistmc.banner.config;
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.network.download.DownloadSource;
 import com.mohistmc.i18n.i18n;
+import org.bukkit.configuration.file.YamlConfiguration;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 public class BannerConfigUtil {
 

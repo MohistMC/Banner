@@ -2,6 +2,8 @@ package com.mohistmc.banner.stackdeobf.http;
 
 import com.mohistmc.banner.stackdeobf.util.CompatUtil;
 import com.mohistmc.banner.util.I18n;
+import org.apache.commons.io.FileUtils;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -11,7 +13,6 @@ import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
-import org.apache.commons.io.FileUtils;
 
 public final class HttpUtil {
 

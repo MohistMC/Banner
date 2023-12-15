@@ -1,9 +1,6 @@
 package com.mohistmc.banner.mixin.server.level;
 
 import com.mohistmc.banner.injection.server.level.InjectionServerPlayerGameMode;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -56,6 +53,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(ServerPlayerGameMode.class)
 public abstract class MixinServerPlayerGameMode implements InjectionServerPlayerGameMode {

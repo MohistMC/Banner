@@ -1,8 +1,9 @@
 package com.mohistmc.banner.paper;
 
-import java.util.function.Predicate;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+
+import java.util.function.Predicate;
 
 public class PaperExtraConstants {
 
