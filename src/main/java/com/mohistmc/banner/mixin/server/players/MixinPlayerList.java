@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -491,6 +492,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     private Location banner$loc = null;
     private transient PlayerRespawnEvent.RespawnReason banner$respawnReason;
     public ServerLevel banner$worldserver = null;
+    public AtomicBoolean avoidSuffocation = new AtomicBoolean(true);
 
     // Banner start - Fix mixin by apoli
     public org.bukkit.World fromWorld;
@@ -505,6 +507,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         this.banner$loc = location;
         this.banner$worldserver = worldIn;
         this.banner$respawnReason = respawnReason;
+        this.avoidSuffocation.set(avoidSuffocation);
         return respawn(playerIn, flag);
     }
 
@@ -575,7 +578,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
                         f1 = (float) Mth.wrapDegrees(Mth.atan2(vec3d1.z, vec3d1.x) * 57.2957763671875D - 90.0D);
                     }
-
                     // Banner end
                     flag2 = !conqueredEnd && flag3;
                     isBedSpawn = true;
@@ -614,7 +616,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         entityplayer1.forceSetPositionRotation(banner$loc.getX(), banner$loc.getY(), banner$loc.getZ(), banner$loc.getYaw(), banner$loc.getPitch());
         // CraftBukkit end
 
-        while (!worldserver1.noCollision((Entity) entityplayer1) && entityplayer1.getY() < (double) worldserver1.getMaxBuildHeight()) {
+        while (avoidSuffocation.getAndSet(true) && !worldserver1.noCollision(entityplayer1) && entityplayer1.getY() < (double) worldserver1.getMaxBuildHeight()) {
             entityplayer1.setPos(entityplayer1.getX(), entityplayer1.getY() + 1.0D, entityplayer1.getZ());
         }
 

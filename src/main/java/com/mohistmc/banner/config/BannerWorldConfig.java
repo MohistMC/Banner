@@ -95,10 +95,4 @@ public class BannerWorldConfig {
         piglinsGuardChests = getBoolean("entities.behavior.piglinsGuardChests", true);
         zombiesTargetTurtleEggs = getBoolean("entities.behavior.zombiesTargetTurtleEggs", true);
     }
-
-    public boolean disableTeleportationSuffocationCheck;
-
-    private void environment() {
-        disableTeleportationSuffocationCheck = getBoolean("environment.disableTeleportationSuffocationCheck", false);
-    }
 }
