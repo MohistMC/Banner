@@ -10,9 +10,9 @@ import com.mohistmc.banner.bukkit.entity.MohistModsChestHorse;
 import com.mohistmc.banner.bukkit.entity.MohistModsEntity;
 import com.mohistmc.banner.bukkit.entity.MohistModsMinecart;
 import com.mohistmc.banner.bukkit.entity.MohistModsMinecartContainer;
-import com.mohistmc.banner.bukkit.entity.MohistModsProjectileEntity;
 import com.mohistmc.banner.bukkit.entity.MohistModsSkeleton;
 import com.mohistmc.banner.bukkit.entity.MohistModsTameableEntity;
+import com.mohistmc.banner.bukkit.entity.MohistModsThrowableEntity;
 import com.mohistmc.banner.bukkit.entity.MohistModsThrowableProjectile;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -55,7 +55,6 @@ import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.AbstractMinecartContainer;
@@ -297,14 +296,14 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
             if (entity instanceof ChestBoat) { return new CraftChestBoat(server, (ChestBoat) entity); }
             else { return new CraftBoat(server, (Boat) entity); }
         }
-        else if (entity instanceof net.minecraft.world.entity.projectile.ThrowableProjectile) {
+        else if (entity instanceof net.minecraft.world.entity.projectile.ThrowableProjectile throwableProjectile) {
             if (entity instanceof net.minecraft.world.entity.projectile.ThrownEgg) { return new CraftEgg(server, (net.minecraft.world.entity.projectile.ThrownEgg) entity); }
             else if (entity instanceof net.minecraft.world.entity.projectile.Snowball) { return new CraftSnowball(server, (net.minecraft.world.entity.projectile.Snowball) entity); }
             else if (entity instanceof net.minecraft.world.entity.projectile.ThrownPotion) { return new CraftThrownPotion(server, (net.minecraft.world.entity.projectile.ThrownPotion) entity); }
             else if (entity instanceof net.minecraft.world.entity.projectile.ThrownEnderpearl) { return new CraftEnderPearl(server, (net.minecraft.world.entity.projectile.ThrownEnderpearl) entity); }
             else if (entity instanceof net.minecraft.world.entity.projectile.ThrownExperienceBottle) { return new CraftThrownExpBottle(server, (net.minecraft.world.entity.projectile.ThrownExperienceBottle) entity); }
             else if (entity instanceof ThrowableItemProjectile) { return new MohistModsThrowableProjectile(server, (ThrowableItemProjectile) entity); }
-            else { return new MohistModsEntity( server, entity ); }
+            else { return new MohistModsThrowableEntity( server, throwableProjectile ); }
         }
         else if (entity instanceof FallingBlockEntity) { return new CraftFallingBlock(server, (FallingBlockEntity) entity); }
         else if (entity instanceof net.minecraft.world.entity.projectile.AbstractHurtingProjectile) {
