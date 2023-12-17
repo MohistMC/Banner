@@ -1,6 +1,7 @@
 package com.mohistmc.banner.stackdeobf.util;
 
 import com.mohistmc.banner.stackdeobf.mappings.RemappingUtil;
+import java.util.Set;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.Logger;
@@ -12,8 +13,6 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.impl.Log4jLogEvent;
 import org.apache.logging.log4j.core.impl.ThrowableProxy;
 import org.apache.logging.log4j.message.SimpleMessage;
-
-import java.util.Set;
 
 public final class RemappingRewritePolicy implements RewritePolicy {
 

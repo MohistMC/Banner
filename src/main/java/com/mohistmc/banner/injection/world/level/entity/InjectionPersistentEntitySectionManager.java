@@ -1,11 +1,10 @@
 package com.mohistmc.banner.injection.world.level.entity;
 
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.ChunkPos;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ChunkPos;
 
 public interface InjectionPersistentEntitySectionManager {
 

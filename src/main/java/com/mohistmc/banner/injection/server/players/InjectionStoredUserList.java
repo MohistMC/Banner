@@ -1,8 +1,7 @@
 package com.mohistmc.banner.injection.server.players;
 
-import net.minecraft.server.players.StoredUserEntry;
-
 import java.util.Collection;
+import net.minecraft.server.players.StoredUserEntry;
 
 public interface InjectionStoredUserList<K, V extends StoredUserEntry<K>> {
 

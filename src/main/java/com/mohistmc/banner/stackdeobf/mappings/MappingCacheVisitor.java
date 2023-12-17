@@ -2,11 +2,10 @@ package com.mohistmc.banner.stackdeobf.mappings;
 
 // Created by booky10 in StackDeobfuscator (15:08 23.03.23)
 
-import net.fabricmc.mappingio.MappedElementKind;
-import net.fabricmc.mappingio.MappingVisitor;
-
 import java.util.List;
 import java.util.Map;
+import net.fabricmc.mappingio.MappedElementKind;
+import net.fabricmc.mappingio.MappingVisitor;
 
 public class MappingCacheVisitor implements MappingVisitor {
 

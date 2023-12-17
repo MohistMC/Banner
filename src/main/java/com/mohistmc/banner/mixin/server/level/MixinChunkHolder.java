@@ -3,6 +3,8 @@ package com.mohistmc.banner.mixin.server.level;
 import com.mohistmc.banner.injection.server.level.InjectionChunkHolder;
 import com.mojang.datafixers.util.Either;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ChunkHolder;
@@ -20,9 +22,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
 // TODO fix inject method
 @Mixin(ChunkHolder.class)

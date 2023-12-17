@@ -2,6 +2,10 @@ package com.mohistmc.banner.mixin.world.inventory;
 
 import com.mohistmc.banner.bukkit.BukkitContainer;
 import com.mohistmc.banner.injection.world.inventory.InjectionAbstractContainerMenu;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
@@ -30,11 +34,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 @Mixin(AbstractContainerMenu.class)
 public abstract class MixinAbstractContainerMenu implements InjectionAbstractContainerMenu {

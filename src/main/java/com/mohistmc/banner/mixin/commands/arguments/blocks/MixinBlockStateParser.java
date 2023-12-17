@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.commands.arguments.blocks;
 
 import com.mojang.brigadier.StringReader;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import net.minecraft.commands.arguments.blocks.BlockStateParser;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -11,9 +13,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Mixin(BlockStateParser.class)
 public class MixinBlockStateParser {

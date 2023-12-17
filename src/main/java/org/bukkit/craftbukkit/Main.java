@@ -1,6 +1,5 @@
 package org.bukkit.craftbukkit;
 
-import static java.util.Arrays.asList;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.util.PathConverter;
@@ -12,6 +11,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.Arrays.asList;
 
 public class Main extends OptionParser {
 

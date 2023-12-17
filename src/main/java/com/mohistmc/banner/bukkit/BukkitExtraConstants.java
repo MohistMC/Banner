@@ -1,5 +1,8 @@
 package com.mohistmc.banner.bukkit;
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -35,10 +38,6 @@ import org.bukkit.TreeType;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
-
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
 
 public class BukkitExtraConstants {
 

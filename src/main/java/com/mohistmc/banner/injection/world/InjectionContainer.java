@@ -1,11 +1,10 @@
 package com.mohistmc.banner.injection.world;
 
+import java.util.Collections;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftHumanEntity;
 import org.bukkit.inventory.InventoryView;
-
-import java.util.Collections;
 
 public interface InjectionContainer {
 

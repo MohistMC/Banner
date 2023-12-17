@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.rcon.thread;
 
+import java.net.Socket;
 import net.minecraft.server.ServerInterface;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.rcon.RconConsoleSource;
@@ -8,8 +9,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.net.Socket;
 
 /**
  * @author Mgazul by MohistMC

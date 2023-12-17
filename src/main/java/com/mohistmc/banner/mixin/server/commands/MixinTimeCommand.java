@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.commands;
 
+import java.util.List;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.commands.TimeCommand;
@@ -9,8 +10,6 @@ import org.bukkit.event.world.TimeSkipEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import java.util.List;
 
 @Mixin(TimeCommand.class)
 public class MixinTimeCommand {

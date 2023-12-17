@@ -27,7 +27,8 @@ public class MixinNetherPortalBlock {
 
     @Inject(method = "entityInside", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;handleInsidePortal(Lnet/minecraft/core/BlockPos;)V"))
     public void banner$portalEnter(BlockState state, Level worldIn, BlockPos pos, Entity entityIn, CallbackInfo ci) {
-        EntityPortalEnterEvent event = new EntityPortalEnterEvent(entityIn.getBukkitEntity(), new Location(worldIn.getWorld(), pos.getX(), pos.getY(), pos.getZ()));
+        EntityPortalEnterEvent event = new EntityPortalEnterEvent(entityIn.getBukkitEntity(),
+                new Location(worldIn.getWorld(), pos.getX(), pos.getY(), pos.getZ()));
         Bukkit.getPluginManager().callEvent(event);
     }
 }

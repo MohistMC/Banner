@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.inventory;
 
 import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.injection.world.inventory.InjectionAnvilMenu;
+import java.util.function.BiConsumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.player.Inventory;
@@ -32,8 +33,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.function.BiConsumer;
 
 @Mixin(AnvilMenu.class)
 public abstract class MixinAnvilMenu extends ItemCombinerMenu implements InjectionAnvilMenu {

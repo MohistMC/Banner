@@ -3,6 +3,11 @@ package com.mohistmc.banner.mixin.server.level;
 import com.mohistmc.banner.bukkit.BukkitCallbackExecutor;
 import com.mohistmc.banner.injection.server.level.InjectionChunkMap;
 import com.mojang.datafixers.DataFixer;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
@@ -32,12 +37,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.nio.file.Path;
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 @Mixin(ChunkMap.class)
 public abstract class MixinChunkMap extends ChunkStorage implements InjectionChunkMap {

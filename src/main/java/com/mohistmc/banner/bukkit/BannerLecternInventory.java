@@ -1,15 +1,14 @@
 package com.mohistmc.banner.bukkit;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Spliterator;
+import java.util.function.Consumer;
 import net.minecraft.world.Container;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Spliterator;
-import java.util.function.Consumer;
 
 public class BannerLecternInventory extends CraftInventory {
 

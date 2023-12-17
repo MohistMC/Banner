@@ -1,7 +1,6 @@
 package com.mohistmc.banner.bukkit.remapping;
 
 import com.google.common.io.ByteStreams;
-
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;

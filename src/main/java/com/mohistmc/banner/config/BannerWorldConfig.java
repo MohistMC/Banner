@@ -1,9 +1,8 @@
 package com.mohistmc.banner.config;
 
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
-
-import java.util.List;
 
 public class BannerWorldConfig {
 

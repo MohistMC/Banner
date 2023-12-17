@@ -1,13 +1,12 @@
 package com.mohistmc.banner.bukkit.inventory;
 
+import java.util.List;
 import net.minecraft.world.Container;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventoryPlayer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-
-import java.util.List;
 
 public class CraftCustomInventory implements InventoryHolder {
 

@@ -1,13 +1,12 @@
 package com.mohistmc.banner.plugins.pluginmanager;
 
 import com.mohistmc.banner.util.I18n;
+import java.io.File;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.File;
 
 public class PluginManagers {
 

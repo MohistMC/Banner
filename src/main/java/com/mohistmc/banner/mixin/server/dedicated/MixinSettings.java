@@ -1,13 +1,12 @@
 package com.mohistmc.banner.mixin.server.dedicated;
 
+import java.nio.file.Path;
+import java.util.Properties;
 import net.minecraft.server.dedicated.Settings;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.nio.file.Path;
-import java.util.Properties;
 
 @Mixin(Settings.class)
 public class MixinSettings {

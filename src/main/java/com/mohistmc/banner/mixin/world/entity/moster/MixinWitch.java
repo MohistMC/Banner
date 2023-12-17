@@ -1,5 +1,7 @@
 package com.mohistmc.banner.mixin.world.entity.moster;
 
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,9 +21,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(Witch.class)
 public abstract class MixinWitch extends Raider {

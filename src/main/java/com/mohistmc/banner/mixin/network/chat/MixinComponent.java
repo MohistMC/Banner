@@ -2,17 +2,16 @@ package com.mohistmc.banner.mixin.network.chat;
 
 import com.google.common.collect.Streams;
 import com.mohistmc.banner.injection.network.chat.InjectionComponent;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 @Mixin(Component.class)
 public interface MixinComponent extends Iterable<Component>, InjectionComponent {

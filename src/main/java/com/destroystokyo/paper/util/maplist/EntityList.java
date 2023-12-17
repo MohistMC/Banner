@@ -1,11 +1,10 @@
 package com.destroystokyo.paper.util.maplist;
 
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import net.minecraft.world.entity.Entity;
-
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import net.minecraft.world.entity.Entity;
 
 // list with O(1) remove & contains
 /**

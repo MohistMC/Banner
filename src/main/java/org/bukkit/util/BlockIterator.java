@@ -6,12 +6,13 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
-import static org.bukkit.util.NumberConversions.floor;
-import static org.bukkit.util.NumberConversions.round;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import static org.bukkit.util.NumberConversions.floor;
+import static org.bukkit.util.NumberConversions.round;
 
 /**
  * This class performs ray tracing and iterates along blocks on a line

@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.minecraft.core.PositionImpl;
 import net.minecraft.world.level.dimension.LevelStem;
 import org.bukkit.Bukkit;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class EntityEventDispatcher {
@@ -26,6 +27,12 @@ public class EntityEventDispatcher {
                         PlayerTeleportEvent.TeleportCause.UNKNOWN,
                         0, 0);
             }
+        });
+        ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> {
+            // CraftBukkit start
+            PlayerChangedWorldEvent changeEvent = new PlayerChangedWorldEvent(player.getBukkitEntity(), origin.getWorld());
+            player.level().getCraftServer().getPluginManager().callEvent(changeEvent);
+            // CraftBukkit end
         });
     }
 }

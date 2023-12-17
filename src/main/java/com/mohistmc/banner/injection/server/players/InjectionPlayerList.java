@@ -1,5 +1,6 @@
 package com.mohistmc.banner.injection.server.players;
 
+import java.util.UUID;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerLevel;
@@ -10,8 +11,6 @@ import net.minecraft.world.level.Level;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.event.player.PlayerRespawnEvent;
-
-import java.util.UUID;
 
 public interface InjectionPlayerList {
 

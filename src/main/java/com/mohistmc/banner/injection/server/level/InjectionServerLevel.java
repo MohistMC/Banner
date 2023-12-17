@@ -1,6 +1,7 @@
 package com.mohistmc.banner.injection.server.level;
 
 import com.mohistmc.banner.injection.world.level.InjectionLevel;
+import java.util.UUID;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -9,8 +10,6 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
-
-import java.util.UUID;
 
 public interface InjectionServerLevel extends InjectionLevel {
 

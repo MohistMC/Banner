@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world;
 
 import com.mohistmc.banner.bukkit.inventory.InventoryOwner;
 import com.mohistmc.banner.injection.world.InjectionContainer;
+import java.util.Collections;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
@@ -11,8 +12,6 @@ import org.bukkit.craftbukkit.v1_20_R1.entity.CraftHumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.spongepowered.asm.mixin.Mixin;
-
-import java.util.Collections;
 
 @Mixin(Container.class)
 public interface MixinContainer extends InjectionContainer {
