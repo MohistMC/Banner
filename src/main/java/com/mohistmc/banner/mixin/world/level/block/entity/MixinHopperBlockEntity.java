@@ -147,20 +147,24 @@ public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockE
         if (source instanceof CompoundContainer) {
             sourceInventory = new CraftInventoryDoubleChest(((CompoundContainer) source));
         } else {
-            sourceInventory = source.getOwner().getInventory();
+            sourceInventory = source.getOwner() == null ? null : source.getOwner().getInventory();
         }
 
-        InventoryMoveItemEvent event = new InventoryMoveItemEvent(sourceInventory, original.clone(), destination.getOwner().getInventory(), false);
-        Bukkit.getPluginManager().callEvent(event);
-        banner$moveEvent.set(event);
-        if (event.isCancelled()) {
-            inv.setItem(index, origin);
-            if (destination instanceof HopperBlockEntity) {
-                ((HopperBlockEntity) destination).setCooldown(8); // Delay hopper checks
+        if (sourceInventory != null) {
+            InventoryMoveItemEvent event = new InventoryMoveItemEvent(sourceInventory, original.clone(), destination.getOwner().getInventory(), false);
+            Bukkit.getPluginManager().callEvent(event);
+            banner$moveEvent.set(event);
+            if (event.isCancelled()) {
+                inv.setItem(index, origin);
+                if (destination instanceof HopperBlockEntity) {
+                    ((HopperBlockEntity) destination).setCooldown(8); // Delay hopper checks
+                }
+                return null;
             }
-            return null;
+            return HopperBlockEntity.addItem(source, destination, CraftItemStack.asNMSCopy(event.getItem()), direction);
         }
-        return HopperBlockEntity.addItem(source, destination, CraftItemStack.asNMSCopy(event.getItem()), direction);
+
+        return HopperBlockEntity.addItem(source, destination, stack, direction);
     }
 
     @Inject(method = "tryTakeInItemFromSlot",
