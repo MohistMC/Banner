@@ -174,7 +174,7 @@ public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockE
                     ordinal = 1),
             cancellable = true)
     private static void banner$cancelIfNotTaken(Hopper hopper, Container container, int slot, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        if (banner$moveEvent.get().isCancelled()) {
+        if (banner$moveEvent.get() != null && banner$moveEvent.getAndSet(null).isCancelled()) {
             cir.setReturnValue(false);
         }
     }
