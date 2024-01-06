@@ -1783,7 +1783,8 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                     }
                 } catch (Exception ex) {
                     LOGGER.error("Couldn't register custom payload", ex);
-                    this.disconnect("Invalid payload REGISTER!");
+                    LOGGER.error("WARNING:Banner changed for letting you can enter the game, but you should take the risks by yourselves", ex);
+                    // this.disconnect("Invalid payload REGISTER!"); // Banner - allow enter when custom payload not register
                 }
             } else if (packet.identifier.equals(CUSTOM_UNREGISTER)) {
                 try {
@@ -1795,7 +1796,8 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                     }
                 } catch (Exception ex) {
                     LOGGER.error("Couldn't unregister custom payload", ex);
-                    this.disconnect("Invalid payload UNREGISTER!");
+                    LOGGER.error("WARNING:Banner changed for letting you can enter the game, but you should take the risks by yourselves", ex);
+                    // this.disconnect("Invalid payload UNREGISTER!"); // Banner - allow enter when custom payload not register
                 }
             } else {
                 try {
