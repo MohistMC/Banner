@@ -103,7 +103,7 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
     @Override
     public void loadCallback() {
         org.bukkit.Server server = Bukkit.getServer();
-        if (server != null) {
+        if (server != null && r != null) {
             /*
              * If it's a new world, the first few chunks are generated inside
              * the World constructor. We can't reliably alter that, so we have
@@ -116,20 +116,20 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
             if (this.needsDecoration) {
                 this.needsDecoration = false;
                 java.util.Random random = new java.util.Random();
-                random.setSeed(((ServerLevel) level).getSeed());
+                random.setSeed(this.r.getSeed());
                 long xRand = random.nextLong() / 2L * 2L + 1L;
                 long zRand = random.nextLong() / 2L * 2L + 1L;
-                random.setSeed((long) this.chunkPos.x * xRand + (long) this.chunkPos.z * zRand ^ ((ServerLevel) level).getSeed());
+                random.setSeed((long) this.chunkPos.x * xRand + (long) this.chunkPos.z * zRand ^ this.r.getSeed());
 
-                org.bukkit.World world = this.level.getWorld();
+                org.bukkit.World world = this.r.getWorld();
                 if (world != null) {
-                    this.level.banner$setPopulating(true);
+                    this.r.banner$setPopulating(true);
                     try {
                         for (org.bukkit.generator.BlockPopulator populator : world.getPopulators()) {
                             populator.populate(world, random, bukkitChunk);
                         }
                     } finally {
-                        this.level.banner$setPopulating(false);
+                        this.r.banner$setPopulating(false);
                     }
                 }
                 server.getPluginManager().callEvent(new org.bukkit.event.world.ChunkPopulateEvent(bukkitChunk));
@@ -139,12 +139,14 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
 
     @Override
     public void unloadCallback() {
-        org.bukkit.Server server = this.getLevel().getCraftServer();
-        var bukkitChunk = new CraftChunk((LevelChunk) (Object) this);
-        org.bukkit.event.world.ChunkUnloadEvent unloadEvent = new org.bukkit.event.world.ChunkUnloadEvent(bukkitChunk, this.isUnsaved());
-        server.getPluginManager().callEvent(unloadEvent);
-        // note: saving can be prevented, but not forced if no saving is actually required
-        this.mustNotSave = !unloadEvent.isSaveChunk();
+        if (this.r != null) {
+            org.bukkit.Server server = this.getLevel().getCraftServer();
+            var bukkitChunk = new CraftChunk((LevelChunk) (Object) this);
+            org.bukkit.event.world.ChunkUnloadEvent unloadEvent = new org.bukkit.event.world.ChunkUnloadEvent(bukkitChunk, this.isUnsaved());
+            server.getPluginManager().callEvent(unloadEvent);
+            // note: saving can be prevented, but not forced if no saving is actually required
+            this.mustNotSave = !unloadEvent.isSaveChunk();
+        }
     }
 
     @Redirect(method = "setBlockState", at = @At(value = "FIELD", ordinal = 1, target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
