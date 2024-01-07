@@ -65,5 +65,10 @@ public enum Pose {
     /**
      * Entity is digging.
      */
-    DIGGING;
+    DIGGING,
+    /**
+     * Pose is likely coming from a mod.
+     * codes from magma-1.20.1
+     */
+    MODDED
 }

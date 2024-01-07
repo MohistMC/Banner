@@ -341,7 +341,15 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
             ci.cancel();
             return;
         }
-        EntityPoseChangeEvent event = new EntityPoseChangeEvent(this.getBukkitEntity(), org.bukkit.entity.Pose.values()[pose.ordinal()]);
+
+        org.bukkit.entity.Pose pose2;
+        try {
+            pose2 = org.bukkit.entity.Pose.values()[pose.ordinal()];
+        } catch (IndexOutOfBoundsException ignored) {
+            pose2 = org.bukkit.entity.Pose.MODDED;
+        }
+
+        EntityPoseChangeEvent event = new EntityPoseChangeEvent(this.getBukkitEntity(), pose2);
         Bukkit.getPluginManager().callEvent(event);
     }
 
