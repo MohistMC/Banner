@@ -59,4 +59,8 @@ public interface InjectionServerLevel extends InjectionLevel {
     default PrimaryLevelData bridge$serverLevelDataCB() {
         return null;
     }
+
+    default boolean canAddFreshEntity() {
+        return false;
+    }
 }

@@ -1,5 +1,7 @@
 package com.mohistmc.banner.mixin.world.item;
 
+import com.mohistmc.banner.bukkit.DistValidate;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -34,7 +36,7 @@ public abstract class MixinBowItem extends ProjectileWeaponItem {
         super(properties);
     }
 
-    EntityShootBowEvent event;
+    private EntityShootBowEvent event;
 
     /**
      * @author wdog5
@@ -95,12 +97,17 @@ public abstract class MixinBowItem extends ProjectileWeaponItem {
 
                         // CraftBukkit start
                         if (event.getProjectile() == abstractArrow.getBukkitEntity()) {
-                            if (!level.addFreshEntity(abstractArrow)) {
-                                if (player instanceof ServerPlayer) {
-                                    ((ServerPlayer) player).getBukkitEntity().updateInventory();
+                            // Baner start - fix mixin
+                            level.addFreshEntity(abstractArrow);
+                            if (DistValidate.isValid(level)) {
+                                if (!((ServerLevel)level).canAddFreshEntity()) {
+                                    if (player instanceof ServerPlayer) {
+                                        ((ServerPlayer) player).getBukkitEntity().updateInventory();
+                                    }
+                                    return;
                                 }
-                                return;
                             }
+                            // Banner end
                         }
                         // CraftBukkit end
                     }
