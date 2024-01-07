@@ -33,6 +33,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.Item;
@@ -105,6 +106,7 @@ public class BukkitRegistry {
         loadEntities();
         loadVillagerProfessions();
         loadBiomes(console);
+        addPose();
         loadArts();
         loadStats();
         loadSpawnCategory();
@@ -231,6 +233,15 @@ public class BukkitRegistry {
                 Statistic statistic = MohistDynamEnum.addEnum(Statistic.class, name);
                 statisticMap.put(statType, statistic);
                 BannerServer.LOGGER.debug("Registered mod StatType as Statistic(Bukkit) {}", statistic.name());
+            }
+        }
+    }
+
+    private static void addPose() {
+        for (Pose pose : Pose.values()) {
+            if (pose.ordinal() > 14) {
+                org.bukkit.entity.Pose bukkit = MohistDynamEnum.addEnum(org.bukkit.entity.Pose.class, pose.name());
+                BannerServer.LOGGER.debug("Registered mod Pose as Pose(Bukkit) {}", bukkit);
             }
         }
     }
