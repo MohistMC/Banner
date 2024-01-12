@@ -12,7 +12,6 @@ import com.mohistmc.banner.fabric.WorldSymlink;
 import com.mohistmc.banner.injection.server.level.InjectionServerLevel;
 import com.mohistmc.banner.injection.world.level.storage.InjectionLevelStorageAccess;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -121,13 +120,13 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
 
     @Shadow @Final public static BlockPos END_SPAWN_POINT;
 
+    @Shadow public abstract boolean addEntity(Entity entity);
+
     @Shadow public abstract void addDuringTeleport(Entity entity);
     @Shadow public abstract boolean addWithUUID(Entity entity);
 
     @Shadow public abstract DimensionDataStorage getDataStorage();
     @Shadow public abstract ServerChunkCache getChunkSource();
-
-    @Shadow protected abstract Optional<BlockPos> findLightningRod(BlockPos pos);
 
     public LevelStorageSource.LevelStorageAccess convertable;
     public UUID uuid;
@@ -402,7 +401,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
      */
     @Overwrite
     public boolean addFreshEntity(Entity entity) {
-        boolean add = addFreshEntity(entity);
+        boolean add = addEntity(entity);
         canaddFreshEntity.set(add);
         return add;
     }
