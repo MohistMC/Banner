@@ -168,6 +168,7 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
      * @author wdog5
      * @reason bukkit
      */
+    @Overwrite
     public void handleHello(ServerboundHelloPacket packet) {
         Validate.validState(this.state == ServerLoginPacketListenerImpl.State.HELLO, "Unexpected hello packet", new Object[0]);
         // Validate.validState(isValidUsername(packet.name()), "Invalid characters in username", new Object[0]); // Mohist Chinese and other special characters are allowed
@@ -312,9 +313,11 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
                 disconnect(event.getKickMessage());
                 return;
             }
-        } else if (asyncEvent.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
-            disconnect(asyncEvent.getKickMessage());
-            return;
+        } else {
+            if (asyncEvent.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
+                disconnect(asyncEvent.getKickMessage());
+                return;
+            }
         }
         LOGGER.info("UUID of player {} is {}", gameProfile.getName(), gameProfile.getId());
         state = ServerLoginPacketListenerImpl.State.READY_TO_ACCEPT;
