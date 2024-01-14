@@ -327,6 +327,9 @@ public final class CraftItemStack extends ItemStack {
         if (item == null || item == net.minecraft.world.item.ItemStack.EMPTY)
             return null;
 
+        if (item.getTag() == null) {
+            return CraftItemFactory.instance().getItemMeta(getType(item));
+        }
         CraftMetaItem meta = switch (getType(item)) {
             case WRITTEN_BOOK -> new CraftMetaBookSigned(item.getTag());
             case WRITABLE_BOOK -> new CraftMetaBook(item.getTag());
