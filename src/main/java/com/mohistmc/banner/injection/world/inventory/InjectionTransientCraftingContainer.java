@@ -1,6 +1,7 @@
 package com.mohistmc.banner.injection.world.inventory;
 
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
 import org.bukkit.event.inventory.InventoryType;
 
 public interface InjectionTransientCraftingContainer {
@@ -10,6 +11,8 @@ public interface InjectionTransientCraftingContainer {
     }
 
     default void bridge$setResultInventory(Container resultInventory) {
+    }
 
+    default void setOwner(Player owner) {
     }
 }

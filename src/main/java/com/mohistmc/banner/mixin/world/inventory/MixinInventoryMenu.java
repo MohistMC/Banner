@@ -40,8 +40,8 @@ public abstract class MixinInventoryMenu extends RecipeBookMenu<CraftingContaine
     @Inject(method = "<init>", at = @At("RETURN"))
     public void banner$init(Inventory playerInventory, boolean localWorld, Player playerIn, CallbackInfo ci) {
         this.playerInventory = playerInventory;
-         this.craftSlots.setOwner(playerInventory.player.getBukkitEntity());
-         ((TransientCraftingContainer) this.craftSlots).bridge$setResultInventory(this.resultSlots);
+        ((TransientCraftingContainer)this.craftSlots).bridge$setResultInventory(this.resultSlots);
+        ((TransientCraftingContainer)this.craftSlots).setOwner(playerInventory.player);
         this.setTitle(Component.translatable("container.crafting"));
     }
 

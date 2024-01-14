@@ -66,6 +66,13 @@ public abstract class MixinTransientTransientCraftingContainer implements Contai
         return (owner == null) ? null : owner.getBukkitEntity();
     }
 
+    // Banner start
+    @Override
+    public void setOwner(Player owner) {
+        this.owner = owner;
+    }
+    // Banner end
+
     @Override
     public int getMaxStackSize() {
         return maxStack;
