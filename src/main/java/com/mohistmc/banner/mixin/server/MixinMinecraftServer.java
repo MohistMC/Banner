@@ -276,6 +276,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     private static final long MAX_CATCHUP_BUFFER = TICK_TIME * TPS * 60L;
     private long lastTick = 0;
     private long catchupTime = 0;
+    public final RollingAverage tps5s = new RollingAverage(5, TPS, SEC_IN_NANO); // Purpur
     public final RollingAverage tps1 = new RollingAverage(60, TPS, SEC_IN_NANO);
     public final RollingAverage tps5 = new RollingAverage(60 * 5, TPS, SEC_IN_NANO);
     public final RollingAverage tps15 = new RollingAverage(60 * 15, TPS, SEC_IN_NANO);
@@ -299,8 +300,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
             // Spigot start
             Arrays.fill( recentTps, 20 );
-            long start = System.nanoTime(), curTime, tickSection = start; // Paper - Further improve server tick loop
-            lastTick = start - TICK_TIME; // Paper
+            long tickSection = Util.getNanos(), curTime, tickCount = 1; // Paper
             while (this.running) {
                 long i = ((curTime = System.nanoTime()) / (1000L * 1000L)) - this.nextTickTime; // Paper
 
@@ -308,25 +308,30 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                     long j = i / 50L;
 
                     if (server.getWarnOnOverload()) // CraftBukkit
-                        MinecraftServer.LOGGER.warn("Can't keep up! Is the server overloaded? Running {}ms or {} ticks behind", i, j);
+                    MinecraftServer.LOGGER.warn("Can't keep up! Is the server overloaded? Running {}ms or {} ticks behind", i, j);
                     this.nextTickTime += j * 50L;
                     this.lastOverloadWarning = this.nextTickTime;
                 }
 
                 if ( ++currentTick % SAMPLE_INTERVAL == 0 )
                 {
+                    curTime = Util.getNanos();
                     final long diff = curTime - tickSection;
                     java.math.BigDecimal currentTps = TPS_BASE.divide(new java.math.BigDecimal(diff), 30, java.math.RoundingMode.HALF_UP);
+                    tps5s.add(currentTps, diff); // Purpur
                     tps1.add(currentTps, diff);
                     tps5.add(currentTps, diff);
                     tps15.add(currentTps, diff);
                     // Backwards compat with bad plugins
-                    this.recentTps[0] = tps1.getAverage();
-                    this.recentTps[1] = tps5.getAverage();
-                    this.recentTps[2] = tps15.getAverage();
+                    // Purpur start
+                    this.recentTps[0] = tps5s.getAverage();
+                    this.recentTps[1] = tps1.getAverage();
+                    this.recentTps[2] = tps5.getAverage();
+                    this.recentTps[3] = tps15.getAverage();
+                    // Purpur end
                     // Paper end
                     tickSection = curTime;
-                }
+                } else curTime = Util.getNanos();
                 // Spigot end
 
                 if (this.debugCommandProfilerDelayStart) {
@@ -335,6 +340,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                 }
 
                 // BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit  // Paper - don't overwrite current tick time
+                lastTick = curTime;
                 this.nextTickTime += 50L;
                 this.startMetricsRecordingTick();
                 this.profiler.push("tick");
@@ -925,6 +931,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Override
     public double[] getTPS() {
         return new double[] {
+                tps5s.getAverage(), // Purpur
                 tps1.getAverage(),
                 tps5.getAverage(),
                 tps15.getAverage()
