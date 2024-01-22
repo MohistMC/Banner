@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.network.protocol.game;
 
+import com.mohistmc.banner.config.BannerConfig;
 import com.mojang.brigadier.arguments.ArgumentType;
 import io.netty.buffer.Unpooled;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
@@ -19,11 +20,12 @@ public class MixinClientboundCommandsPacket_ArgumentNodeStub {
     @Inject(method = "serializeCap(Lnet/minecraft/network/FriendlyByteBuf;Lnet/minecraft/commands/synchronization/ArgumentTypeInfo;Lnet/minecraft/commands/synchronization/ArgumentTypeInfo$Template;)V",
             cancellable = true, at = @At("HEAD"))
     private static <A extends ArgumentType<?>, T extends ArgumentTypeInfo.Template<A>> void banner$wrapArgument(FriendlyByteBuf buf, ArgumentTypeInfo<A, T> type, ArgumentTypeInfo.Template<A> node, CallbackInfo ci) {
-        if (!SpigotConfig.bungee) {
+        if (!BannerConfig.velocityEnabled && !SpigotConfig.bungee) {
             return;
         }
         var key = BuiltInRegistries.COMMAND_ARGUMENT_TYPE.getKey(type);
-        if (key == null || key.getNamespace().equals("minecraft") || key.getNamespace().equals("brigadier")) {
+
+        if (key != null && (key.getNamespace().equals("minecraft") || key.getNamespace().equals("brigadier"))) {
             return;
         }
         ci.cancel();

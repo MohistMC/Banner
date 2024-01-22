@@ -21,8 +21,8 @@ public class PluginFixManager {
         if (className.endsWith("PaperLib")) {
             return patch(clazz, PluginFixManager::removePaper);
         }
-        if (className.endsWith("com.sk89q.worldedit.bukkit.WorldEditPlugin")) {
-            System.setProperty("worldedit.bukkit.adapter", "com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R1.PaperweightFaweAdapter");
+        if (className.equals("com.onarandombox.MultiverseCore.utils.WorldManager")) {
+            return patch(clazz, MultiverseCore::fix);
         }
         Consumer<ClassNode> patcher = switch (className) {
             case "com.sk89q.worldedit.bukkit.BukkitAdapter" -> WorldEdit::handleBukkitAdapter;
