@@ -14,6 +14,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
+
+import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
 import net.minecraft.DefaultUncaughtExceptionHandler;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.Connection;
@@ -170,7 +172,7 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
      */
     @Overwrite
     public void handleHello(ServerboundHelloPacket packet) {
-        Validate.validState(this.state == ServerLoginPacketListenerImpl.State.HELLO, "Unexpected hello packet", new Object[0]);
+        Validate.validState(this.state == ServerLoginPacketListenerImpl.State.HELLO, "Unexpected hello packet");
         // Validate.validState(isValidUsername(packet.name()), "Invalid characters in username", new Object[0]); // Mohist Chinese and other special characters are allowed
         GameProfile gameProfile = this.server.getSingleplayerProfile();
         if (gameProfile != null && packet.name().equalsIgnoreCase(gameProfile.getName())) {
@@ -258,15 +260,19 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
                         disconnect(Component.translatable("multiplayer.disconnect.unverified_username"));
                         LOGGER.error("Username '{}' tried to join with an invalid session", gameprofile.getName());
                     }
-                } catch (Exception var3) {
+                } catch (AuthenticationUnavailableException authenticationunavailableexception) {
                     if (server.isSingleplayer()) {
                         LOGGER.warn("Authentication servers are down but will let them in anyway!");
-                        gameProfile = createFakeProfile(gameprofile);
+                        gameProfile = gameprofile;
                         state = ServerLoginPacketListenerImpl.State.READY_TO_ACCEPT;
                     } else {
                         disconnect(Component.translatable("multiplayer.disconnect.authservers_down"));
                         LOGGER.error("Couldn't verify username because servers are unavailable");
                     }
+                }  catch (Exception exception) {
+                    disconnect("Failed to verify username!");
+                    LOGGER.warn("Exception verifying " + gameprofile.getName(), exception);
+                    // CraftBukkit end
                 }
 
             }
