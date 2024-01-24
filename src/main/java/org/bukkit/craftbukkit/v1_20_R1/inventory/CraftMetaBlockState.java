@@ -153,7 +153,7 @@ public class CraftMetaBlockState extends CraftMetaItem implements BlockStateMeta
         super(tag);
         this.material = material;
 
-        if (tag.contains(BLOCK_ENTITY_TAG.NBT, CraftMagicNumbers.NBT.TAG_COMPOUND)) {
+        if (tag != null && tag.contains(BLOCK_ENTITY_TAG.NBT, CraftMagicNumbers.NBT.TAG_COMPOUND)) {
             blockEntityTag = tag.getCompound(BLOCK_ENTITY_TAG.NBT).copy();
         } else {
             blockEntityTag = null;
