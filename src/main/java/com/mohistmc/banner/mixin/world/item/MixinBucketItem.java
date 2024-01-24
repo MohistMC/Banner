@@ -85,10 +85,10 @@ public abstract class MixinBucketItem extends Item {
     }
 
     @Inject(method = "use", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", remap = false, target = "Lnet/minecraft/world/item/BucketItem;emptyContents(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/BlockHitResult;)Z"))
-    private void banner$capture(Level worldIn, Player playerIn, InteractionHand handIn, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir, ItemStack stack, BlockHitResult result) {
-        banner$direction = result.getDirection();
-        banner$click = result.getBlockPos();
-        banner$hand = handIn;
+    private void banner$capture(Level level, Player player, InteractionHand usedHand, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir, ItemStack itemStack, BlockHitResult blockHitResult, BlockPos blockPos, Direction direction, BlockPos blockPos2, BlockState blockState, BlockPos blockPos3) {
+        banner$direction = blockHitResult.getDirection();
+        banner$click = blockHitResult.getBlockPos();
+        banner$hand = usedHand;
     }
 
     @Inject(method = "use", at = @At("RETURN"))
