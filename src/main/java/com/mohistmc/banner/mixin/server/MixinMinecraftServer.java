@@ -240,7 +240,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     public Commands vanillaCommandDispatcher;
     private boolean hasStopped = false;
     private final Object stopLock = new Object();
-    public final double[] recentTps = new double[3];
+    public final double[] recentTps = new double[4];
     private static final int TPS = 20;
     private static final int TICK_TIME = 1000000000 / TPS;
     private static final int SAMPLE_INTERVAL = 20; // Paper
