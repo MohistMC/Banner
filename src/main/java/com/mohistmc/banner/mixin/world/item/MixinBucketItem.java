@@ -32,6 +32,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -52,7 +53,8 @@ public abstract class MixinBucketItem extends Item {
     @Inject(method = "use",
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/block/BucketPickup;pickupBlock(Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/item/ItemStack;"),
-            locals = LocalCapture.CAPTURE_FAILHARD)
+            locals = LocalCapture.CAPTURE_FAILHARD,
+            cancellable = true)
     private void banner$use(Level level, Player player, InteractionHand usedHand,
                             CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir,
                             ItemStack itemStack, BlockHitResult blockHitResult, BlockPos blockPos,
@@ -70,12 +72,42 @@ public abstract class MixinBucketItem extends Item {
         }
     }
 
-    @Redirect(method = "use",
-            at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/item/ItemUtils;createFilledResult(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;"))
-    private ItemStack banner$filledResult(ItemStack emptyStack, Player player, ItemStack filledStack) {
-        return ItemUtils.createFilledResult(emptyStack, player, CraftItemStack.asNMSCopy(banner$bucketFillEvent.get().getItemStack())); // CraftBukkit
+    public boolean emptyContents(Player entity, Level world, BlockPos pos, @Nullable BlockHitResult result, Direction direction, BlockPos clicked, InteractionHand hand) {
+        banner$direction = direction;
+        banner$click = clicked;
+        banner$hand = hand;
+        try {
+            return this.emptyContents(entity, world, pos, result);
+        } finally {
+            banner$direction = null;
+            banner$click = null;
+        }
     }
+
+    @Inject(method = "use", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", remap = false, target = "Lnet/minecraft/world/item/BucketItem;emptyContents(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/BlockHitResult;)Z"))
+    private void banner$capture(Level worldIn, Player playerIn, InteractionHand handIn, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir, ItemStack stack, BlockHitResult result) {
+        banner$direction = result.getDirection();
+        banner$click = result.getBlockPos();
+        banner$hand = handIn;
+    }
+
+    @Inject(method = "use", at = @At("RETURN"))
+    private void banner$clean(Level worldIn, Player playerIn, InteractionHand handIn, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir) {
+        banner$captureItem = null;
+        banner$direction = null;
+        banner$click = null;
+    }
+
+    private transient org.bukkit.inventory.@Nullable ItemStack banner$captureItem;
+
+    @ModifyArg(method = "use", index = 2, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemUtils;createFilledResult(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;"))
+    private ItemStack banner$useEventItem(ItemStack itemStack) {
+        return banner$captureItem == null ? itemStack : CraftItemStack.asNMSCopy(banner$captureItem);
+    }
+
+    private transient Direction banner$direction;
+    private transient BlockPos banner$click;
+    private transient InteractionHand banner$hand;
 
     @Inject(method = "emptyContents", at = @At("HEAD"),
             cancellable = true)
@@ -90,12 +122,11 @@ public abstract class MixinBucketItem extends Item {
 
             // CraftBukkit start
             if (flag1 && entityhuman != null) {
-                PlayerBucketEmptyEvent event = CraftEventFactory.callPlayerBucketEmptyEvent((ServerLevel) world, entityhuman, blockposition, movingobjectpositionblock.getBlockPos(), movingobjectpositionblock.getDirection(), entityhuman.getItemInHand(entityhuman.getUsedItemHand()), entityhuman.getUsedItemHand());
+                PlayerBucketEmptyEvent event = CraftEventFactory.callPlayerBucketEmptyEvent((ServerLevel) world, entityhuman, blockposition, banner$click, banner$direction, entityhuman.getItemInHand(entityhuman.getUsedItemHand()), banner$hand == null ? InteractionHand.MAIN_HAND : banner$hand);
                 if (event.isCancelled()) {
                     ((ServerPlayer) entityhuman).connection.send(new ClientboundBlockUpdatePacket(world, blockposition));
                     (((ServerPlayer) entityhuman)).getBukkitEntity().updateInventory();
                     cir.setReturnValue(false);
-                    return;
                 }
             }
         }
