@@ -40,7 +40,7 @@ jobs:
         run: ./gradlew build
 
       - name: Publish to ModRinth
-        uses: Kir-Antipov/mc-publish@v3.2
+        uses: Kir-Antipov/mc-publish@v3.3.0
         with:
           modrinth-id: 7ntInrAy
           modrinth-token: "${{env.MODRINTH_TOKEN}}"
