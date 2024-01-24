@@ -350,6 +350,7 @@ public class BukkitRegistry {
                 String name = normalizeName(location.toString());
                 BannerPotionEffect effect = new BannerPotionEffect(eff, name);
                 PotionEffectType.registerPotionEffectType(effect);
+                CraftPotionUtil.mods_map.put(effect.getId(), effect);
                 BannerServer.LOGGER.debug("Registered {} as potion {}", location, effect);
             } catch (Exception e) {
                 BannerServer.LOGGER.error("Failed to register potion type {}: {}", eff, e);

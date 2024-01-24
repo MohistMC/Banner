@@ -15,6 +15,7 @@ import org.bukkit.potion.PotionType;
 public class CraftPotionUtil {
 
     public static Map<PotionType, String> mods = new HashMap<>();
+    public static Map<Integer, PotionEffectType> mods_map = new HashMap<>();
 
     private static final BiMap<PotionType, String> regular = ImmutableBiMap.<PotionType, String>builder()
             .put(PotionType.UNCRAFTABLE, "empty")
@@ -120,6 +121,9 @@ public class CraftPotionUtil {
 
     public static PotionEffect toBukkit(MobEffectInstance effect) {
         PotionEffectType type = PotionEffectType.getById(MobEffect.getId(effect.getEffect()));
+        if (type == null) {
+            type = mods_map.get(MobEffect.getId(effect.getEffect()));
+        }
         int amp = effect.getAmplifier();
         int duration = effect.getDuration();
         boolean ambient = effect.isAmbient();
