@@ -10,6 +10,7 @@ import com.google.common.collect.MapMaker;
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.api.ServerAPI;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.plugins.BannerPlugin;
 import com.mohistmc.banner.util.I18n;
 import com.mojang.authlib.GameProfile;
@@ -768,7 +769,7 @@ public final class CraftServer implements Server {
     @Override
     public long getConnectionThrottle() {
         // Spigot Start - Automatically set connection throttle for bungee configurations
-        if (org.spigotmc.SpigotConfig.bungee) {
+        if (BannerConfig.velocityEnabled || org.spigotmc.SpigotConfig.bungee) {
             return -1;
         } else {
             return this.configuration.getInt("settings.connection-throttle");
