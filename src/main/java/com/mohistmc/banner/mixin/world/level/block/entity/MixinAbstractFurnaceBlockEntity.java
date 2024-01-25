@@ -76,7 +76,7 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
     }
 
     @Eject(method = "serverTick",
-            at = @At(value = "INVOKE",
+            at = @At(value = "INVOKE", ordinal = 3,
             target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;isLit()Z"))
     private static boolean banner$setBurnTime(AbstractFurnaceBlockEntity furnace, CallbackInfo ci) {
         ItemStack itemStack = furnace.getItem(1);
