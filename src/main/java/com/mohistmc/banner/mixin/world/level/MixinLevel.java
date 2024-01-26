@@ -384,6 +384,13 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         // CraftBukkit end
     }
 
+    @Inject(method = "isThundering", at = @At("HEAD"), cancellable = true)
+    private void banner$isThundering(CallbackInfoReturnable<Boolean> cir) {
+        if (spigotConfig != null && spigotConfig.thunderChance <= 0) {
+            cir.setReturnValue(false);
+        }
+    }
+
     @Inject(method = "setBlockEntity",
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/Level;getChunkAt(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/chunk/LevelChunk;",

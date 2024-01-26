@@ -259,11 +259,6 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         return strikeLightning(entityIn, LightningStrikeEvent.Cause.WEATHER);
     }
 
-    @Redirect(method = "tickChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;isThundering()Z"))
-    private boolean banner$thunderChance(ServerLevel instance) {
-        return this.isRaining() && this.isThundering() && this.bridge$spigotConfig().thunderChance > 0;
-    }
-
     @ModifyConstant(method = "tickChunk", constant = @Constant(intValue = 100000))
     private int banner$configChane(int constant) {
         return this.bridge$spigotConfig().thunderChance;
