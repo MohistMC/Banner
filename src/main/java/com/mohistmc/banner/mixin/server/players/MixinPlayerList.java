@@ -206,7 +206,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
                                        ServerLevel serverLevel, ServerLevel serverLevel2, String string2) {
         // Spigot start - spawn location event
         org.bukkit.entity.Player spawnPlayer = player.getBukkitEntity();
-        org.spigotmc.event.player.PlayerSpawnLocationEvent ev = new com.destroystokyo.paper.event.player.PlayerInitialSpawnEvent(spawnPlayer, spawnPlayer.getLocation()); // Paper use our duplicate event
+        org.spigotmc.event.player.PlayerSpawnLocationEvent ev = new org.spigotmc.event.player.PlayerSpawnLocationEvent(spawnPlayer, spawnPlayer.getLocation()); // Paper use our duplicate event
         cserver.getPluginManager().callEvent(ev);
 
         Location loc = ev.getSpawnLocation();
@@ -214,10 +214,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
         player.spawnIn(serverLevel2);
         player.gameMode.setLevel((ServerLevel) player.level());
-        // Paper start - set raw so we aren't fully joined to the world (not added to chunk or world)
-        player.setPosRaw(loc.getX(), loc.getY(), loc.getZ());
-        player.setRot(loc.getYaw(), loc.getPitch());
-        // Paper end
+        player.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
     }
 
     @Redirect(method = "placeNewPlayer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/players/PlayerList;viewDistance:I"))
