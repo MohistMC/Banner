@@ -1811,6 +1811,23 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     private transient PlayerTeleportEvent.TeleportCause banner$cause;
     private AtomicBoolean cancelledMoveEvent = new AtomicBoolean(false);
 
+    @Override
+    public void teleport(double d0, double d1, double d2, float f, float f1, PlayerTeleportEvent.TeleportCause cause) {
+        this.teleport(d0, d1, d2, f, f1, Collections.emptySet(), cause);
+    }
+
+    @Override
+    public boolean teleport(double d0, double d1, double d2, float f, float f1, Set<RelativeMovement> set, PlayerTeleportEvent.TeleportCause cause) {
+        pushTeleportCause(cause);
+        this.teleport(d0, d1, d2, f, f1, set);
+        return cancelledMoveEvent.getAndSet(false);
+    }
+
+    @Override
+    public void teleport(Location dest) {
+        this.internalTeleport(dest.getX(), dest.getY(), dest.getZ(), dest.getYaw(), dest.getPitch(), Collections.emptySet());
+    }
+
     /**
      * @author wdog5
      * @reason bukkit
@@ -1852,23 +1869,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
 
         this.internalTeleport(d0, d1, d2, f, f1, set);
         this.cancelledMoveEvent.set(event.isCancelled()); // CraftBukkit - Return event status
-    }
-
-    @Override
-    public void teleport(double d0, double d1, double d2, float f, float f1, PlayerTeleportEvent.TeleportCause cause) {
-        this.teleport(d0, d1, d2, f, f1, Collections.emptySet(), cause);
-    }
-
-    @Override
-    public boolean teleport(double d0, double d1, double d2, float f, float f1, Set<RelativeMovement> set, PlayerTeleportEvent.TeleportCause cause) {
-        pushTeleportCause(cause);
-        this.teleport(d0, d1, d2, f, f1, set);
-        return cancelledMoveEvent.getAndSet(false);
-    }
-
-    @Override
-    public void teleport(Location dest) {
-        this.internalTeleport(dest.getX(), dest.getY(), dest.getZ(), dest.getYaw(), dest.getPitch(), Collections.emptySet());
     }
 
     @Override

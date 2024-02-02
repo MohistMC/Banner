@@ -133,7 +133,6 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     public PrimaryLevelData K;
 
     private transient boolean banner$force;
-    private transient LightningStrikeEvent.Cause banner$cause;
     private final AtomicReference<CreatureSpawnEvent.SpawnReason> banner$reason = new AtomicReference<>();
     private final AtomicReference<Boolean> banner$timeSkipCancelled = new AtomicReference<>(false);
     public ResourceKey<LevelStem> typeKey;
@@ -271,20 +270,15 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
 
     @Override
     public boolean strikeLightning(Entity entity, LightningStrikeEvent.Cause cause) {
-        if (banner$cause != null) {
-            cause = banner$cause;
-            banner$cause = null;
-        }
-        if (DistValidate.isValid((LevelAccessor) this)) {
-            // Banner start - Compat for Modded Weather,ignore modded weather effect
-            if (entity.getBukkitEntity() instanceof org.bukkit.entity.LightningStrike) {
-                LightningStrikeEvent lightning = CraftEventFactory.callLightningStrikeEvent((LightningStrike) entity.getBukkitEntity(), cause);
-                if (lightning.isCancelled()) {
-                    return false;
-                }
+        // Banner start - Compat for Modded Weather,ignore modded weather effect
+        if (entity.getBukkitEntity() instanceof org.bukkit.entity.LightningStrike) {
+            LightningStrikeEvent lightning = CraftEventFactory.callLightningStrikeEvent((LightningStrike) entity.getBukkitEntity(), cause);
+            if (lightning.isCancelled()) {
+                return false;
             }
-            // Banner end
         }
+        // Banner end
+
         return this.addFreshEntity(entity);
     }
 

@@ -129,8 +129,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Shadow public abstract ServerLevel overworld();
 
-    @Shadow protected abstract void updateMobSpawningFlags();
-
     @Shadow @Final private static int TICK_STATS_SPAN;
     @Shadow private long lastServerStatus;
 
@@ -142,18 +140,11 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Shadow public WorldData worldData;
 
-    @Shadow public abstract Set<ResourceKey<net.minecraft.world.level.Level>> levelKeys();
-
     @Shadow public abstract void executeIfPossible(Runnable task);
 
     @Shadow @Final public Executor executor;
-    @Shadow public LevelStorageSource.LevelStorageAccess storageSource;
-
-    @Shadow public abstract WorldData getWorldData();
 
     @Shadow public abstract RegistryAccess.Frozen registryAccess();
-
-    @Shadow public abstract CustomBossEvents getCustomBossEvents();
 
     @Shadow protected abstract boolean initServer() throws IOException;
 
@@ -207,24 +198,10 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow private long lastOverloadWarning;
     @Shadow private boolean debugCommandProfilerDelayStart;
     @Shadow @Nullable private MinecraftServer.TimeProfiler debugCommandProfiler;
-    @Shadow @Final private LayeredRegistryAccess<RegistryLayer> registries;
 
     @Shadow public abstract boolean isNetherEnabled();
 
-    @Shadow public abstract boolean isDemo();
-
     @Shadow @Final public ChunkProgressListenerFactory progressListenerFactory;
-
-    @Shadow protected abstract void readScoreboard(DimensionDataStorage dataStorage);
-
-    @Shadow @Nullable private CommandStorage commandStorage;
-
-    @Shadow(remap = false) public abstract String getServerModName();
-
-    @Shadow public abstract ModCheck getModdedStatus();
-
-    @Shadow protected abstract void forceDifficulty();
-
     @Shadow @Nullable public abstract ServerLevel getLevel(ResourceKey<net.minecraft.world.level.Level> dimension);
 
     // CraftBukkit start

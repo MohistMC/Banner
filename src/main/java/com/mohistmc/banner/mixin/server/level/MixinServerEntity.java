@@ -7,6 +7,7 @@ import com.mojang.datafixers.util.Pair;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -59,7 +60,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ServerEntity.class)
 public abstract class MixinServerEntity implements InjectionServerEntity {
-
 
     // @formatter:off
     @Shadow @Final private Entity entity;
@@ -123,111 +123,127 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
                 }
 
             });
+            this.lastPassengers = list;
         }
-        int elapsedTicks = BukkitExtraConstants.currentTick - this.lastTick;
-        if (elapsedTicks < 0) {
-            elapsedTicks = 0;
-        }
-        this.lastTick = BukkitExtraConstants.currentTick;
-        if (this.entity instanceof ItemFrame itemFrame) {
-            ItemStack itemstack = itemFrame.getItem();
-            if (this.tickCount / 10 != this.lastMapUpdate && itemstack.getItem() instanceof MapItem) {
-                MapItemSavedData mapdata = MapItem.getSavedData(itemstack, this.level);
-                if (mapdata != null) {
-                    for (ServerPlayerConnection connection : this.trackedPlayers) {
-                        var serverplayerentity = connection.getPlayer();
-                        mapdata.tickCarriedBy(serverplayerentity, itemstack);
-                        Packet<?> ipacket = ((MapItem) itemstack.getItem()).getUpdatePacket(itemstack, this.level, serverplayerentity);
-                        if (ipacket != null) {
-                            serverplayerentity.connection.send(ipacket);
+
+        Entity var3 = this.entity;
+        if (var3 instanceof ItemFrame itemFrame) {
+            if (this.tickCount % 10 == 0) {
+                ItemStack itemStack = itemFrame.getItem();
+                if (itemStack.getItem() instanceof MapItem) {
+                    Integer integer = MapItem.getMapId(itemStack);
+                    MapItemSavedData mapItemSavedData = MapItem.getSavedData(integer, this.level);
+                    if (mapItemSavedData != null) {
+                        Iterator var6 = this.level.players().iterator();
+
+                        while(var6.hasNext()) {
+                            ServerPlayer serverPlayer = (ServerPlayer)var6.next();
+                            mapItemSavedData.tickCarriedBy(serverPlayer, itemStack);
+                            Packet<?> packet = mapItemSavedData.getUpdatePacket(integer, serverPlayer);
+                            if (packet != null) {
+                                serverPlayer.connection.send(packet);
+                            }
                         }
                     }
                 }
+
+                this.sendDirtyEntityData();
             }
-            this.sendDirtyEntityData();
         }
-        if (this.tickCount / this.updateInterval != this.lastUpdate || this.entity.hasImpulse || this.entity.getEntityData().isDirty()) {
+
+        if (this.tickCount % this.updateInterval == 0 || this.entity.hasImpulse || this.entity.getEntityData().isDirty()) {
+            int i;
+            int j;
             if (this.entity.isPassenger()) {
-                int i1 = Mth.floor(this.entity.getYRot() * 256.0F / 360.0F);
-                int l1 = Mth.floor(this.entity.getXRot() * 256.0F / 360.0F);
-                boolean flag2 = Math.abs(i1 - this.yRotp) >= 1 || Math.abs(l1 - this.xRotp) >= 1;
-                if (flag2) {
-                    this.broadcast.accept(new ClientboundMoveEntityPacket.Rot(this.entity.getId(), (byte) i1, (byte) l1, this.entity.onGround()));
-                    this.yRotp = i1;
-                    this.xRotp = l1;
+                i = Mth.floor(this.entity.getYRot() * 256.0F / 360.0F);
+                j = Mth.floor(this.entity.getXRot() * 256.0F / 360.0F);
+                boolean bl = Math.abs(i - this.yRotp) >= 1 || Math.abs(j - this.xRotp) >= 1;
+                if (bl) {
+                    this.broadcast.accept(new ClientboundMoveEntityPacket.Rot(this.entity.getId(), (byte)i, (byte)j, this.entity.onGround()));
+                    this.yRotp = i;
+                    this.xRotp = j;
                 }
+
                 this.positionCodec.setBase(this.entity.trackingPosition());
                 this.sendDirtyEntityData();
                 this.wasRiding = true;
             } else {
-                this.teleportDelay += elapsedTicks;
-                int l = Mth.floor(this.entity.getYRot() * 256.0F / 360.0F);
-                int k1 = Mth.floor(this.entity.getXRot() * 256.0F / 360.0F);
-                Vec3 vector3d = this.entity.trackingPosition();
-                boolean flag3 = this.positionCodec.delta(vector3d).lengthSqr() >= 7.62939453125E-6D;
-                Packet<?> ipacket1 = null;
-                boolean flag4 = flag3 || this.tickCount / 60 != this.lastPosUpdate;
-                boolean flag = Math.abs(l - this.yRotp) >= 1 || Math.abs(k1 - this.xRotp) >= 1;
-                boolean pos = false;
-                boolean rot = false;
+                ++this.teleportDelay;
+                i = Mth.floor(this.entity.getYRot() * 256.0F / 360.0F);
+                j = Mth.floor(this.entity.getXRot() * 256.0F / 360.0F);
+                Vec3 vec3 = this.entity.trackingPosition();
+                boolean bl2 = this.positionCodec.delta(vec3).lengthSqr() >= 7.62939453125E-6;
+                Packet<?> packet2 = null;
+                boolean bl3 = bl2 || this.tickCount % 60 == 0;
+                boolean bl4 = Math.abs(i - this.yRotp) >= 1 || Math.abs(j - this.xRotp) >= 1;
+                boolean bl5 = false;
+                boolean bl6 = false;
                 if (this.tickCount > 0 || this.entity instanceof AbstractArrow) {
-                    long i = this.positionCodec.encodeX(vector3d);
-                    long j = this.positionCodec.encodeY(vector3d);
-                    long k = this.positionCodec.encodeZ(vector3d);
-                    boolean flag1 = i < -32768L || i > 32767L || j < -32768L || j > 32767L || k < -32768L || k > 32767L;
-                    if (!flag1 && this.teleportDelay <= 400 && !this.wasRiding && this.wasOnGround == this.entity.onGround()) {
-                        if ((!flag4 || !flag) && !(this.entity instanceof AbstractArrow)) {
-                            if (flag4) {
-                                ipacket1 = new ClientboundMoveEntityPacket.Pos(this.entity.getId(), (short) ((int) i), (short) ((int) j), (short) ((int) k), this.entity.onGround());
-                                pos = true;
-                            } else if (flag) {
-                                ipacket1 = new ClientboundMoveEntityPacket.Rot(this.entity.getId(), (byte) l, (byte) k1, this.entity.onGround());
-                                rot = true;
+                    long l = this.positionCodec.encodeX(vec3);
+                    long m = this.positionCodec.encodeY(vec3);
+                    long n = this.positionCodec.encodeZ(vec3);
+                    boolean bl7 = l < -32768L || l > 32767L || m < -32768L || m > 32767L || n < -32768L || n > 32767L;
+                    if (!bl7 && this.teleportDelay <= 400 && !this.wasRiding && this.wasOnGround == this.entity.onGround()) {
+                        if ((!bl3 || !bl4) && !(this.entity instanceof AbstractArrow)) {
+                            if (bl3) {
+                                packet2 = new ClientboundMoveEntityPacket.Pos(this.entity.getId(), (short)((int)l), (short)((int)m), (short)((int)n), this.entity.onGround());
+                                bl5 = true;
+                            } else if (bl4) {
+                                packet2 = new ClientboundMoveEntityPacket.Rot(this.entity.getId(), (byte)i, (byte)j, this.entity.onGround());
+                                bl6 = true;
                             }
                         } else {
-                            ipacket1 = new ClientboundMoveEntityPacket.PosRot(this.entity.getId(), (short) ((int) i), (short) ((int) j), (short) ((int) k), (byte) l, (byte) k1, this.entity.onGround());
-                            pos = rot = true;
+                            packet2 = new ClientboundMoveEntityPacket.PosRot(this.entity.getId(), (short)((int)l), (short)((int)m), (short)((int)n), (byte)i, (byte)j, this.entity.onGround());
+                            bl5 = true;
+                            bl6 = true;
                         }
                     } else {
                         this.wasOnGround = this.entity.onGround();
                         this.teleportDelay = 0;
-                        ipacket1 = new ClientboundTeleportEntityPacket(this.entity);
-                        pos = rot = true;
+                        packet2 = new ClientboundTeleportEntityPacket(this.entity);
+                        bl5 = true;
+                        bl6 = true;
                     }
                 }
-                if ((this.trackDelta || this.entity.hasImpulse || this.entity instanceof LivingEntity && ((LivingEntity) this.entity).isFallFlying()) && this.tickCount > 0) {
-                    Vec3 vector3d1 = this.entity.getDeltaMovement();
-                    double d0 = vector3d1.distanceToSqr(this.ap);
-                    if (d0 > 1.0E-7D || d0 > 0.0D && vector3d1.lengthSqr() == 0.0D) {
-                        this.ap = vector3d1;
+
+                if ((this.trackDelta || this.entity.hasImpulse || this.entity instanceof LivingEntity && ((LivingEntity)this.entity).isFallFlying()) && this.tickCount > 0) {
+                    Vec3 vec32 = this.entity.getDeltaMovement();
+                    double d = vec32.distanceToSqr(this.ap);
+                    if (d > 1.0E-7 || d > 0.0 && vec32.lengthSqr() == 0.0) {
+                        this.ap = vec32;
                         this.broadcast.accept(new ClientboundSetEntityMotionPacket(this.entity.getId(), this.ap));
                     }
                 }
-                if (ipacket1 != null) {
-                    this.broadcast.accept(ipacket1);
+
+                if (packet2 != null) {
+                    this.broadcast.accept(packet2);
                 }
+
                 this.sendDirtyEntityData();
-                if (pos) {
-                    this.positionCodec.setBase(vector3d);
+                if (bl5) {
+                    this.positionCodec.setBase(vec3);
                 }
-                if (rot) {
-                    this.yRotp = l;
-                    this.xRotp = k1;
+
+                if (bl6) {
+                    this.yRotp = i;
+                    this.xRotp = j;
                 }
+
                 this.wasRiding = false;
             }
-            int j1 = Mth.floor(this.entity.getYHeadRot() * 256.0F / 360.0F);
-            if (Math.abs(j1 - this.yHeadRotp) >= 1) {
-                this.broadcast.accept(new ClientboundRotateHeadPacket(this.entity, (byte) j1));
-                this.yHeadRotp = j1;
+
+            i = Mth.floor(this.entity.getYHeadRot() * 256.0F / 360.0F);
+            if (Math.abs(i - this.yHeadRotp) >= 1) {
+                this.broadcast.accept(new ClientboundRotateHeadPacket(this.entity, (byte)i));
+                this.yHeadRotp = i;
             }
+
             this.entity.hasImpulse = false;
         }
-        this.lastUpdate = this.tickCount / this.updateInterval;
-        this.lastPosUpdate = this.tickCount / 60;
-        this.lastMapUpdate = this.tickCount / 10;
-        this.tickCount += elapsedTicks;
+
+        ++this.tickCount;
         if (this.entity.hurtMarked) {
+            // CraftBukkit start - Create PlayerVelocity event
             boolean cancelled = false;
             if (this.entity instanceof ServerPlayer) {
                 Player player = ((ServerPlayer) this.entity).getBukkitEntity();
@@ -243,6 +259,7 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
             if (!cancelled) {
                 this.broadcastAndSend(new ClientboundSetEntityMotionPacket(this.entity));
             }
+            // CraftBukkit end
             this.entity.hurtMarked = false;
         }
     }
@@ -253,7 +270,6 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
      */
     @Overwrite
     public void sendPairingData(ServerPlayer serverPlayer, Consumer<Packet<ClientGamePacketListener>> consumer) {
-        Mob entityinsentient;
         if (this.entity.isRemoved()) {
             return;
         }
@@ -266,9 +282,11 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
         boolean flag = this.trackDelta;
         if (this.entity instanceof LivingEntity livingEntity) {
             Collection<AttributeInstance> collection = livingEntity.getAttributes().getSyncableAttributes();
+            // CraftBukkit start - If sending own attributes send scaled health instead of current maximum health
             if (this.entity.getId() == serverPlayer.getId()) {
                 ((ServerPlayer) this.entity).getBukkitEntity().injectScaledMaxHealth(collection, false);
             }
+            // CraftBukkit end
             if (!collection.isEmpty()) {
                 consumer.accept(new ClientboundUpdateAttributesPacket(this.entity.getId(), collection));
             }
@@ -281,36 +299,42 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
             consumer.accept(new ClientboundSetEntityMotionPacket(this.entity.getId(), this.ap));
         }
         if (this.entity instanceof LivingEntity) {
-            ArrayList<Pair<EquipmentSlot, ItemStack>> list = Lists.newArrayList();
-            for (EquipmentSlot enumitemslot : EquipmentSlot.values()) {
-                ItemStack itemstack = ((LivingEntity) this.entity).getItemBySlot(enumitemslot);
-                if (itemstack.isEmpty()) continue;
-                list.add(Pair.of(enumitemslot, itemstack.copy()));
+            List<Pair<EquipmentSlot, ItemStack>> list = Lists.newArrayList();
+            EquipmentSlot[] var6 = EquipmentSlot.values();
+            int var7 = var6.length;
+
+            for(int var8 = 0; var8 < var7; ++var8) {
+                EquipmentSlot equipmentSlot = var6[var8];
+                ItemStack itemStack = ((LivingEntity)this.entity).getItemBySlot(equipmentSlot);
+                if (!itemStack.isEmpty()) {
+                    list.add(Pair.of(equipmentSlot, itemStack.copy()));
+                }
             }
+
             if (!list.isEmpty()) {
                 consumer.accept(new ClientboundSetEquipmentPacket(this.entity.getId(), list));
             }
-        }
-        this.yHeadRotp = Mth.floor(this.entity.getYHeadRot() * 256.0f / 360.0f);
-        consumer.accept(new ClientboundRotateHeadPacket(this.entity, (byte) this.yHeadRotp));
-        if (this.entity instanceof LivingEntity livingEntity) {
-            for (MobEffectInstance mobeffect : livingEntity.getActiveEffects()) {
-                consumer.accept(new ClientboundUpdateMobEffectPacket(this.entity.getId(), mobeffect));
-            }
-            livingEntity.detectEquipmentUpdates();
+            ((LivingEntity) this.entity).detectEquipmentUpdates(); // CraftBukkit - SPIGOT-3789: sync again immediately after sending
         }
         // CraftBukkit start - MC-109346: Fix for nonsensical head yaw
         if (this.entity instanceof ServerPlayer) {
             consumer.accept(new ClientboundRotateHeadPacket(this.entity, (byte) Mth.floor(this.entity.getYHeadRot() * 256.0F / 360.0F)));
         }
+        // CraftBukkit end
+
         if (!this.entity.getPassengers().isEmpty()) {
             consumer.accept(new ClientboundSetPassengersPacket(this.entity));
         }
+
         if (this.entity.isPassenger()) {
             consumer.accept(new ClientboundSetPassengersPacket(this.entity.getVehicle()));
         }
-        if (this.entity instanceof Mob && (entityinsentient = (Mob) this.entity).isLeashed()) {
-            consumer.accept(new ClientboundSetEntityLinkPacket(entityinsentient, entityinsentient.getLeashHolder()));
+
+        if (this.entity instanceof Mob) {
+            Mob mob = (Mob)this.entity;
+            if (mob.isLeashed()) {
+                consumer.accept(new ClientboundSetEntityLinkPacket(mob, mob.getLeashHolder()));
+            }
         }
     }
 
