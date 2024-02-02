@@ -385,7 +385,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                     this.services.profileCache().clearExecutor();
                 }
 
-                //org.spigotmc.WatchdogThread.doStop(); // Spigot // Banner - disabled
+                org.spigotmc.WatchdogThread.doStop(); // Spigot
                 // CraftBukkit start - Restore terminal to original settings
                 try {
                     reader.getTerminal().restore();
@@ -756,6 +756,11 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Inject(method = "tickServer", at = @At("HEAD"))
     private void banner$serverTickStartEvent(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
         new com.destroystokyo.paper.event.server.ServerTickStartEvent(this.tickCount+1).callEvent(); // Paper
+    }
+
+    @Inject(method = "tickServer", at = @At("RETURN"))
+    private void banner$watchdogThreadStart(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
+        org.spigotmc.WatchdogThread.tick(); // Spigot
     }
 
     @Inject(method = "tickChildren",

@@ -52,7 +52,7 @@ public class RestartCommand extends Command
                 System.out.println( "Attempting to restart with " + restartScript );
 
                 // Disable Watchdog
-                // WatchdogThread.doStop(); // Banner - disabled
+                WatchdogThread.doStop();
 
                 // Kick all players
                 for ( ServerPlayer p : (List<ServerPlayer>) BukkitExtraConstants.getServer().getPlayerList().players )
