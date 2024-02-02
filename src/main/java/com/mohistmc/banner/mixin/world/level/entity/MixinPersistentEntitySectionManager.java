@@ -114,7 +114,7 @@ public abstract class MixinPersistentEntitySectionManager<T extends EntityAccess
     }
 
     @Override
-    public boolean storeChunkSections(long i, Consumer consumer, boolean callEvent) {
+    public boolean storeChunkSections(long i, Consumer<?> consumer, boolean callEvent) {
         // CraftBukkit start - add boolean for event call
         return storeChunkSections(i, consumer, false);
     }

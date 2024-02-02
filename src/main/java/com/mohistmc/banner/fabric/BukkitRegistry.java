@@ -2,18 +2,12 @@ package com.mohistmc.banner.fabric;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.api.ServerAPI;
-import com.mohistmc.banner.api.Unsafe;
-import com.mohistmc.banner.bukkit.entity.MohistModsEntity;
-import com.mohistmc.banner.bukkit.type.BannerEnchantment;
 import com.mohistmc.banner.bukkit.type.BannerPotionEffect;
 import com.mohistmc.banner.util.I18n;
 import com.mohistmc.dynamicenum.MohistDynamEnum;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,7 +22,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.stats.StatType;
-import net.minecraft.stats.Stats;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -37,7 +30,6 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.CookingBookCategory;
 import net.minecraft.world.level.block.Block;
@@ -49,14 +41,12 @@ import net.minecraft.world.level.block.entity.HangingSignBlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.TrappedChestBlockEntity;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.material.Fluid;
 import org.bukkit.Art;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Statistic;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_20_R1.CraftStatistic;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlockStates;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftChest;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftHangingSign;
@@ -296,7 +286,6 @@ public class BukkitRegistry {
 
     public static void registerEnvironments(Registry<LevelStem> registry) {
         int i = World.Environment.values().length;
-        List<World.Environment> newTypes = new ArrayList<>();
         for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry : registry.entrySet()) {
             ResourceKey<LevelStem> key = entry.getKey();
             World.Environment environment1 = environment.get(key);

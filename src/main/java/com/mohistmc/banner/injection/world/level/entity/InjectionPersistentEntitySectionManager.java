@@ -16,7 +16,7 @@ public interface InjectionPersistentEntitySectionManager {
         return false;
     }
 
-    default boolean storeChunkSections(long i, Consumer consumer, boolean callEvent) {
+    default boolean storeChunkSections(long i, Consumer<?> consumer, boolean callEvent) {
         return callEvent;
     }
 

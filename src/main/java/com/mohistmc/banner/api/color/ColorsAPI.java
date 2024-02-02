@@ -101,10 +101,9 @@ public class ColorsAPI {
      */
     @Nonnull
     public static String color(@Nonnull String string, @Nonnull Color start, @Nonnull Color end) {
-        String originalString = string;
 
         ChatColor[] colors = createGradient(start, end, withoutSpecialChar(string).length());
-        return apply(originalString, colors);
+        return apply(string, colors);
     }
 
     /**

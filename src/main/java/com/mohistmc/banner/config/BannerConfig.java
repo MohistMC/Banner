@@ -34,10 +34,7 @@ public class BannerConfig {
         try
         {
             config.load( CONFIG_FILE );
-        } catch ( IOException ex )
-        {
-        } catch ( InvalidConfigurationException ex )
-        {
+        } catch ( IOException | InvalidConfigurationException ex ) {
             Bukkit.getLogger().log( Level.SEVERE, "Could not load banner.yml, please correct your syntax errors", ex );
             throw Throwables.propagate( ex );
         }

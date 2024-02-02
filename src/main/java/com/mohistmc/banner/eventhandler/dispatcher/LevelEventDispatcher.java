@@ -7,8 +7,6 @@ import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 public class LevelEventDispatcher {
 
     public static void dispatchLevel() {
-        ServerWorldEvents.UNLOAD.register((server, world) -> {
-            ((CraftServer) Bukkit.getServer()).removeWorld(world);
-        });
+        ServerWorldEvents.UNLOAD.register((server, world) -> ((CraftServer) Bukkit.getServer()).removeWorld(world));
     }
 }

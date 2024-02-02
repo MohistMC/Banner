@@ -1,8 +1,8 @@
 package com.mohistmc.banner.network.download;
 
 import com.mohistmc.banner.BannerMCStart;
-import static com.mohistmc.banner.network.download.NetworkUtil.getConn;
 import com.mohistmc.banner.util.I18n;
+import com.mohistmc.tools.ConnectionUtil;
 import com.mohistmc.tools.MD5Util;
 import java.io.File;
 import java.net.URI;
@@ -48,8 +48,8 @@ public class UpdateUtils {
     }
 
     public static void downloadFile(String URL, File f, String md5, boolean showlog) throws Exception {
-        URLConnection conn = getConn(URL);
-        if (showlog) System.out.println(I18n.as("download.file", f.getName(), getSize(conn.getContentLength())));
+        URLConnection conn = ConnectionUtil.getConn(URL);
+        if (showlog) System.out.println(I18n.as("download.file", f.getName(), ConnectionUtil.getSize(conn.getContentLength())));
         ReadableByteChannel rbc = Channels.newChannel(conn.getInputStream());
         FileChannel fc = FileChannel.open(f.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
         int fS = conn.getContentLength();
@@ -76,9 +76,5 @@ public class UpdateUtils {
             throw new Exception("md5");
         }
         if (showlog) System.out.println(I18n.as("download.file.ok", f.getName()));
-    }
-
-    public static String getSize(long size) {
-        return (size >= 1048576L) ? (float) size / 1048576.0F + "MB" : ((size >= 1024) ? (float) size / 1024.0F + " KB" : size + " B");
     }
 }
