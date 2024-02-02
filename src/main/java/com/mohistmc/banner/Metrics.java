@@ -277,7 +277,7 @@ public class Metrics {
             String serverUUID = config.getString("serverUuid");
 
             if (config.getBoolean("enabled", true)) {
-                Metrics metrics = new Metrics("Banner", serverUUID);
+                Metrics metrics = new Metrics("Mohist", serverUUID);
 
                 metrics.addCustomChart(new SimplePie("minecraft_version", () -> {
                     String minecraftVersion = Bukkit.getVersion();
@@ -288,7 +288,7 @@ public class Metrics {
                 metrics.addCustomChart(new SingleLineChart("players", () -> Bukkit.getOnlinePlayers().size()));
                 metrics.addCustomChart(new SimplePie("online_mode", () -> Bukkit.getOnlineMode() ? "online" : "offline"));
                 metrics.addCustomChart(new SimplePie("banner_version", () -> "1.20.1"));
-                metrics.addCustomChart(new SimplePie("bungeecord", () -> SpigotConfig.bungee ? "true" : "false"));
+                metrics.addCustomChart(new SimplePie("bungeecord", () -> String.valueOf(SpigotConfig.bungee)));
 
                 metrics.addCustomChart(new DrilldownPie("java_version", () -> {
                     Map<String, Map<String, Integer>> map = new HashMap<>();
