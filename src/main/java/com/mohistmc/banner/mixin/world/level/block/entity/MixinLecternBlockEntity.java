@@ -46,7 +46,7 @@ public abstract class MixinLecternBlockEntity extends BlockEntity implements Cle
     }
     // @formatter:on
 
-    @Redirect(method = "createCommandSourceStack", at = @At(value = "NEW", target = "net/minecraft/commands/CommandSourceStack"))
+    @Redirect(method = "createCommandSourceStack", at = @At(value = "NEW", target = "(Lnet/minecraft/commands/CommandSource;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/Vec2;Lnet/minecraft/server/level/ServerLevel;ILjava/lang/String;Lnet/minecraft/network/chat/Component;Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/world/entity/Entity;)Lnet/minecraft/commands/CommandSourceStack;"))
     private CommandSourceStack banner$source(CommandSource source, Vec3 vec3d, Vec2 vec2f, ServerLevel world, int i, String s, Component component, MinecraftServer server, @Nullable Entity entity) {
         return new CommandSourceStack(this, vec3d, vec2f, world, i, s, component, server, entity);
     }

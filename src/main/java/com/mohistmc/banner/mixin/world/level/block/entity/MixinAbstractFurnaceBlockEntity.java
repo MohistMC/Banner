@@ -60,7 +60,7 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
     @Shadow public abstract List<Recipe<?>> getRecipesToAwardAndPopExperience(ServerLevel p_154996_, Vec3 p_154997_);
 
     @Shadow
-    protected static boolean canBurn(RegistryAccess p_266924_, @Nullable Recipe<?> p_155006_, NonNullList<ItemStack> p_155007_, int p_155008_) {
+    private static boolean canBurn(RegistryAccess p_266924_, @Nullable Recipe<?> p_155006_, NonNullList<ItemStack> p_155007_, int p_155008_) {
         return false;
     }
     // @formatter:on
