@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -23,9 +24,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GrindstoneMenu.class)
 public abstract class MixinGrindstoneMenu extends AbstractContainerMenu {
 
-    @Shadow @Final private Container repairSlots;
+    @Shadow @Final Container repairSlots;
     @Shadow @Final private Container resultSlots;
+    @Unique
     private CraftInventoryView bukkitEntity = null;
+    @Unique
     private Player player;
 
     protected MixinGrindstoneMenu(@Nullable MenuType<?> menuType, int i) {

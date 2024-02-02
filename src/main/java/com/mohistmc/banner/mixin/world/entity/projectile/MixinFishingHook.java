@@ -33,6 +33,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -50,20 +51,29 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
     @Shadow private int timeUntilHooked;
     @Shadow private int timeUntilLured;
     @Shadow @Final private int lureSpeed;
-    @Shadow protected abstract void pullEntity(Entity p_150156_);
+    @Shadow public abstract void pullEntity(Entity p_150156_);
     // @formatter:on
 
     @Shadow protected abstract boolean shouldStopFishing(Player player);
 
     @Shadow private float fishAngle;
+    @Unique
     public int minWaitTime = 100;
+    @Unique
     public int maxWaitTime = 600;
+    @Unique
     public boolean applyLure = true;
+    @Unique
     public int minLureTime = 20;
+    @Unique
     public int maxLureTime = 80;
+    @Unique
     public float minLureAngle = 0.0F;
+    @Unique
     public float maxLureAngle = 360.0F;
+    @Unique
     public boolean rainInfluenced = true;
+    @Unique
     public boolean skyInfluenced = true;
 
     public MixinFishingHook(EntityType<? extends Projectile> entityType, Level level) {

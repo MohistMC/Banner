@@ -6,11 +6,13 @@ import java.net.SocketAddress;
 import net.minecraft.network.Connection;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(Connection.class)
 public class MixinConnection implements InjectionConnection {
 
     @Shadow public Channel channel;
+    @Unique
     public String hostname = ""; // CraftBukkit - add field
 
     @Override

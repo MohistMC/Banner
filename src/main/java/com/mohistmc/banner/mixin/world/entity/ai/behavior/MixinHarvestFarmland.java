@@ -23,6 +23,7 @@ import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -34,8 +35,11 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public abstract class MixinHarvestFarmland extends Behavior<Villager> {
 
     @Shadow @Nullable private BlockPos aboveFarmlandPos;
+    @Unique
     private AtomicReference<Block> banner$planted = new AtomicReference<>();
+    @Unique
     private AtomicReference<Boolean> banner$flag = new AtomicReference<>();
+    @Unique
     private AtomicReference<Villager> banner$villager = new AtomicReference<>();
 
     public MixinHarvestFarmland(Map<MemoryModuleType<?>, MemoryStatus> map) {

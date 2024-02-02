@@ -14,6 +14,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -27,23 +28,32 @@ public abstract class MixinFoodData implements InjectionFoodData {
     @Shadow public int foodLevel;
     @Shadow private int lastFoodLevel;
     @Shadow public float saturationLevel;
+    @Unique
     private Player entityhuman;
+    @Unique
     public int saturatedRegenRate = 10;
+    @Unique
     public int unsaturatedRegenRate = 80;
+    @Unique
     public int starvationRate = 80;
 
+    @Unique
     public void banner$constructor() {
         throw new RuntimeException();
     }
 
+    @Unique
     public void banner$constructor(Player entityhuman) {
         org.apache.commons.lang.Validate.notNull(entityhuman);
         this.entityhuman = entityhuman;
     }
 
+    @Unique
     private transient Item banner$foodItem;
+    @Unique
     private transient ItemStack banner$foodStack;
 
+    @Unique
     private AtomicBoolean duplicateCall = new AtomicBoolean(false);
 
     @Inject(method = "eat(IF)V", at = @At("HEAD"), cancellable = true)

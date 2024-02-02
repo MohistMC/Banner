@@ -18,12 +18,15 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 //TODO fixed
 @Mixin(ServerHandshakePacketListenerImpl.class)
 public class MixinServerHandshakePacketListenerImpl {
 
+    @Unique
     private static final HashMap<InetAddress, Long> throttleTracker = new HashMap<>();
+    @Unique
     private static int throttleCounter = 0;
 
     @Shadow @Final private Connection connection;

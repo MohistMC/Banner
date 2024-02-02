@@ -31,6 +31,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -65,6 +66,7 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
 
     @Shadow @Final private Set<Slot> quickcraftSlots;
     @Shadow public NonNullList<Slot> slots;
+    @Unique
     private InventoryView bukkitView;
 
     @Shadow
@@ -99,7 +101,9 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
         return 0;
     }
 
+    @Unique
     public boolean checkReachable = true;
+    @Unique
     private Component title;
 
     @Override

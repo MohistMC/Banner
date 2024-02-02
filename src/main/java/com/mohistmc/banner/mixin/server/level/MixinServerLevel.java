@@ -89,6 +89,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -120,7 +121,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
 
     @Shadow @Final public static BlockPos END_SPAWN_POINT;
 
-    @Shadow public abstract boolean addEntity(Entity entity);
+    @Shadow protected abstract boolean addEntity(Entity entity);
 
     @Shadow public abstract void addDuringTeleport(Entity entity);
     @Shadow public abstract boolean addWithUUID(Entity entity);
@@ -128,23 +129,32 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     @Shadow public abstract DimensionDataStorage getDataStorage();
     @Shadow public abstract ServerChunkCache getChunkSource();
 
+    @Unique
     public LevelStorageSource.LevelStorageAccess convertable;
+    @Unique
     public UUID uuid;
+    @Unique
     public PrimaryLevelData K;
 
+    @Unique
     private transient boolean banner$force;
+    @Unique
     private final AtomicReference<CreatureSpawnEvent.SpawnReason> banner$reason = new AtomicReference<>();
+    @Unique
     private final AtomicReference<Boolean> banner$timeSkipCancelled = new AtomicReference<>(false);
+    @Unique
     public ResourceKey<LevelStem> typeKey;
 
     protected MixinServerLevel(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean bl, boolean bl2, long l, int i) {
         super(writableLevelData, resourceKey, registryAccess, holder, supplier, bl, bl2, l, i);
     }
 
+    @Unique
     public void banner$constructor(MinecraftServer minecraftServer, Executor backgroundExecutor, LevelStorageSource.LevelStorageAccess levelSave, ServerLevelData worldInfo, ResourceKey<Level> dimension, LevelStem levelStem, ChunkProgressListener statusListener, boolean isDebug, long seed, List<CustomSpawner> specialSpawners, boolean shouldBeTicking, RandomSequences randomSequences) {
         throw new RuntimeException();
     }
 
+    @Unique
     public void banner$constructor(MinecraftServer minecraftServer, Executor backgroundExecutor, LevelStorageSource.LevelStorageAccess levelSave, PrimaryLevelData worldInfo, ResourceKey<Level> dimension, LevelStem levelStem, ChunkProgressListener statusListener, boolean isDebug, long seed, List<CustomSpawner> specialSpawners, boolean shouldBeTicking, RandomSequences randomSequences, org.bukkit.World.Environment env, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider) {
         banner$constructor(minecraftServer, backgroundExecutor, levelSave, worldInfo, dimension, levelStem, statusListener, isDebug, seed, specialSpawners, shouldBeTicking, randomSequences);
         this.banner$setGenerator(gen);
@@ -376,6 +386,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     }
 
     // Banner start
+    @Unique
     public AtomicBoolean canaddFreshEntity = new AtomicBoolean(false);
 
     @Override

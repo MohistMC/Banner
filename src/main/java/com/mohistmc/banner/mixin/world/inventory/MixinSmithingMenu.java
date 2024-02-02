@@ -11,10 +11,12 @@ import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventoryView;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(SmithingMenu.class)
 public abstract class MixinSmithingMenu extends ItemCombinerMenu {
 
+    @Unique
     private CraftInventoryView bukkitEntity;
 
     public MixinSmithingMenu(@Nullable MenuType<?> menuType, int i, Inventory inventory, ContainerLevelAccess containerLevelAccess) {

@@ -16,6 +16,7 @@ import org.bukkit.inventory.InventoryView;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -25,7 +26,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinAbstractFurnaceMenu extends RecipeBookMenu<Container> {
 
     @Shadow @Final private Container container;
+    @Unique
     private CraftInventoryView bukkitEntity = null;
+    @Unique
     private Inventory player;
 
     public MixinAbstractFurnaceMenu(MenuType<?> menuType, int i) {

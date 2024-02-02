@@ -16,6 +16,7 @@ import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -33,7 +34,9 @@ public abstract class MixinPrimedTnt extends Entity implements TraceableEntity, 
     @Shadow public abstract void setFuse(int p_32086_);
     // @formatter:on
 
+    @Unique
     public float yield;
+    @Unique
     public boolean isIncendiary;
 
     @Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;)V", at = @At("RETURN"))

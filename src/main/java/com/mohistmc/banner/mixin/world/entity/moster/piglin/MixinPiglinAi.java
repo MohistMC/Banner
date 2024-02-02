@@ -17,6 +17,7 @@ import org.bukkit.event.entity.PiglinBarterEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -71,11 +72,13 @@ public abstract class MixinPiglinAi {
         }
     }
 
+    @Unique
     private static boolean isLovedByPiglin(ItemStack itemstack, Piglin piglin) {
         return isLovedItem(itemstack) || piglin.bridge$interestItems().contains(itemstack.getItem())
                 ||  piglin.bridge$allowedBarterItems().contains(itemstack.getItem());
     }
 
+    @Unique
     private static boolean isBarterItem(ItemStack itemstack, Piglin piglin) {
         return isBarterCurrency(itemstack) || piglin.bridge$allowedBarterItems().contains(itemstack.getItem());    }
 

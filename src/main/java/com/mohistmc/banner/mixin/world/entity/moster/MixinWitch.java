@@ -16,6 +16,7 @@ import net.minecraft.world.phys.Vec3;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -43,6 +44,7 @@ public abstract class MixinWitch extends Raider {
         // Paper end
     }
 
+    @Unique
     private AtomicReference<ItemStack> paperPotion = new AtomicReference<>();
 
     @Inject(method = "performRangedAttack",

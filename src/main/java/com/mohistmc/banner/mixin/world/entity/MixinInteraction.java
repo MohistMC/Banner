@@ -9,6 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -17,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Interaction.class)
 public class MixinInteraction {
 
+    @Unique
     private double banner$finalDamage;
 
     @Inject(method = "skipAttackInteraction", at = @At("HEAD"), cancellable = true)

@@ -19,6 +19,7 @@ import org.bukkit.entity.SpawnCategory;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -45,7 +46,7 @@ public abstract class MixinServerChunkCache implements InjectionServerChunkCache
         return chunk != null &&  chunk.getFullChunkNow() != null;
     }
 
-    public ThreadedLevelLightEngine a() {
+    @Unique public ThreadedLevelLightEngine a() {
         return this.lightEngine;
     }
 

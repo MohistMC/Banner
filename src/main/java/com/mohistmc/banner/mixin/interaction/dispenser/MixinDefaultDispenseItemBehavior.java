@@ -13,20 +13,27 @@ import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftVector;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(DefaultDispenseItemBehavior.class)
 public class MixinDefaultDispenseItemBehavior {
 
     // CraftBukkit start
+    @Unique
     private boolean dropper;
+    @Unique
     private static transient BlockSource banner$isourceblock;
+    @Unique
     private static transient boolean banner$dropper;
+    @Unique
     private static transient ItemEntity banner$itemEntity;
 
+    @Unique
     public void banner$constructor() {
         throw new RuntimeException();
     }
 
+    @Unique
     public void banner$constructor(boolean dropper) {
         banner$constructor();
         this.dropper = dropper;
@@ -57,6 +64,7 @@ public class MixinDefaultDispenseItemBehavior {
         level.addFreshEntity(itemEntity);
     }*/
 
+    @Unique
     private static boolean spawnItem(Level level, ItemStack stack, int speed, Direction facing, BlockSource isourceblock, boolean dropper) {
         banner$dropper = dropper;
         banner$isourceblock = isourceblock;

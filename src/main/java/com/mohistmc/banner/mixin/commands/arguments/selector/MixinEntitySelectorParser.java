@@ -7,6 +7,7 @@ import net.minecraft.commands.arguments.selector.EntitySelector;
 import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -19,6 +20,7 @@ public abstract class MixinEntitySelectorParser implements InjectionEntitySelect
 
     @Shadow private boolean usesSelectors;
 
+    @Unique
     private AtomicBoolean banner$overridePermissions = new AtomicBoolean(false);
 
     @Override

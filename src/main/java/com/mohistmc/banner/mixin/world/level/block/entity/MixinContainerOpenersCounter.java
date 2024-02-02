@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -24,6 +25,7 @@ public abstract class MixinContainerOpenersCounter implements InjectionContainer
     @Shadow protected abstract void openerCountChanged(Level p_155463_, BlockPos p_155464_, BlockState p_155465_, int p_155466_, int p_155467_);
     // @formatter:on
 
+    @Unique
     public boolean opened;// CraftBukkit
 
     public void onAPIOpen(Level world, BlockPos blockposition, BlockState iblockdata) {

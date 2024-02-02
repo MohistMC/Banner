@@ -9,6 +9,7 @@ import net.minecraft.commands.arguments.selector.EntitySelector;
 import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -17,6 +18,7 @@ public abstract class MixinEntityArgument implements InjectionEntityArgument {
 
     @Shadow public abstract EntitySelector parse(StringReader reader) throws CommandSyntaxException;
 
+    @Unique
     private AtomicBoolean banner$overridePerm = new AtomicBoolean(false);
 
     @Override

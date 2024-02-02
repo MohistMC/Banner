@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -24,26 +25,32 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinLecternMenu extends AbstractContainerMenu implements InjectionLecternMenu {
 
     @Shadow @Final private Container lectern;
+    @Unique
     private CraftInventoryView bukkitEntity;
+    @Unique
     private Inventory playerInventory;
 
     protected MixinLecternMenu(@Nullable MenuType<?> menuType, int i) {
         super(menuType, i);
     }
 
+    @Unique
     public void banner$constructor(int i) {
         throw new RuntimeException();
     }
 
+    @Unique
     public void banner$constructor(int i, Container inventory, ContainerData intArray) {
         throw new RuntimeException();
     }
 
+    @Unique
     public void banner$constructor(int i, Inventory playerInventory) {
         banner$constructor(i);
         this.playerInventory = playerInventory;
     }
 
+    @Unique
     public void banner$constructor(int i, Container inventory, ContainerData intArray, Inventory playerInventory) {
         banner$constructor(i, inventory, intArray);
         this.playerInventory = playerInventory;

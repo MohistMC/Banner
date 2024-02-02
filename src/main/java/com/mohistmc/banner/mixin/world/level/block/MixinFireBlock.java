@@ -25,6 +25,7 @@ import org.bukkit.event.block.TNTPrimeEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -40,6 +41,7 @@ public abstract class MixinFireBlock implements InjectionFireBlock {
     // @formatter:on
 
     @Shadow @Final private Object2IntMap<Block> burnOdds;
+    @Unique
     private AtomicReference<BlockPos> sourceposition = new AtomicReference<>();
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/server/level/ServerLevel;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))

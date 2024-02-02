@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -39,6 +40,7 @@ public abstract class MixinEnderMan extends Monster {
     }
     // @formatter:on
 
+    @Unique
     public void bridge$updateTarget(LivingEntity livingEntity) {
         AttributeInstance modifiableattributeinstance = this.getAttribute(Attributes.MOVEMENT_SPEED);
         if (livingEntity == null) {
@@ -73,6 +75,7 @@ public abstract class MixinEnderMan extends Monster {
         cir.cancel();
     }
 
+    @Unique
     private boolean isLookingAtMe_check(Player player) {
         ItemStack itemStack = (ItemStack) player.getInventory().armor.get(3);
         if (itemStack.is(Blocks.CARVED_PUMPKIN.asItem())) {

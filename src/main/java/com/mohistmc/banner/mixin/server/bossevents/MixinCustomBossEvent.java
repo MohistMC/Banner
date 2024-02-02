@@ -5,10 +5,12 @@ import net.minecraft.server.bossevents.CustomBossEvent;
 import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.craftbukkit.v1_20_R1.boss.CraftKeyedBossbar;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(CustomBossEvent.class)
 public class MixinCustomBossEvent implements InjectionCustomBossEvent {
 
+    @Unique
     private KeyedBossBar bossBar;
 
     @Override

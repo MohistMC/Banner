@@ -19,6 +19,7 @@ import org.bukkit.event.entity.SlimeSplitEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -35,8 +36,10 @@ public abstract class MixinSlime extends Mob implements InjectionSlime {
     @Shadow public abstract EntityType<? extends net.minecraft.world.entity.monster.Slime> getType();
     // @formatter:on
 
+    @Unique
     private boolean canWander = true;
 
+    @Unique
     private transient List<LivingEntity> banner$slimes;
 
     /**

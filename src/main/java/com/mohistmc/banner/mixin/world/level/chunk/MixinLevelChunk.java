@@ -30,6 +30,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -50,13 +51,20 @@ public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLe
     @Shadow public abstract Level getLevel();
 
     // CraftBukkit start
+    @Unique
     public org.bukkit.Chunk bukkitChunk;
 
+    @Unique
     public boolean mustNotSave;
+    @Unique
     public boolean needsDecoration;
+    @Unique
     private static final CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new org.bukkit.craftbukkit.v1_20_R1.persistence.CraftPersistentDataTypeRegistry();
+    @Unique
     public CraftPersistentDataContainer persistentDataContainer = new CraftPersistentDataContainer( DATA_TYPE_REGISTRY );
+    @Unique
     public AtomicBoolean banner$doPlace = new AtomicBoolean(true);
+    @Unique
     public ServerLevel r;
 
     @Override

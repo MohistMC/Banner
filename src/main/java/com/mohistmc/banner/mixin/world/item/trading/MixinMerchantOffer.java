@@ -6,6 +6,7 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftMerchantRecipe;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -18,12 +19,15 @@ public abstract class MixinMerchantOffer implements InjectionMerchantOffer {
 
     @Shadow public abstract ItemStack getCostA();
 
+    @Unique
     private CraftMerchantRecipe bukkitHandle;
 
+    @Unique
     public void banner$constructor(ItemStack buyingStackFirstIn, ItemStack buyingStackSecondIn, ItemStack sellingStackIn, int usesIn, int maxUsesIn, int givenEXPIn, float priceMultiplierIn, int demand) {
         throw new RuntimeException();
     }
 
+    @Unique
     public void banner$constructor(ItemStack buyingStackFirstIn, ItemStack buyingStackSecondIn, ItemStack sellingStackIn, int usesIn, int maxUsesIn, int givenEXPIn, float priceMultiplierIn, int demand, CraftMerchantRecipe bukkit) {
         banner$constructor(buyingStackFirstIn, buyingStackSecondIn, sellingStackIn, usesIn, maxUsesIn, givenEXPIn, priceMultiplierIn, demand);
         this.bukkitHandle = bukkit;

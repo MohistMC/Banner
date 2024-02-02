@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -35,6 +36,7 @@ public abstract class MixinAllay extends PathfinderMob implements InjectionAllay
         super(entityType, level);
     }
 
+    @Unique
     public boolean forceDancing = false;
 
     @Override
@@ -63,6 +65,7 @@ public abstract class MixinAllay extends PathfinderMob implements InjectionAllay
         }
     }
 
+    @Unique
     private transient Allay banner$duplicate;
 
     @Redirect(method = "duplicateAllay", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))

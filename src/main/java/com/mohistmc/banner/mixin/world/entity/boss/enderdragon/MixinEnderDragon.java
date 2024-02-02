@@ -31,6 +31,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -40,6 +41,7 @@ public abstract class MixinEnderDragon extends Mob {
     @Shadow
     @Nullable private EndDragonFight dragonFight;
 
+    @Unique
     private final Explosion explosionSource = new Explosion(this.level(), (EnderDragon) (Object) this, null, null, Double.NaN, Double.NaN, Double.NaN, Float.NaN, true, Explosion.BlockInteraction.DESTROY);
 
     protected MixinEnderDragon(EntityType<? extends Mob> entityType, Level level) {

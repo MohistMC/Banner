@@ -74,6 +74,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -190,19 +191,31 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         super(entityType, level);
     }
 
+    @Unique
     public int expToDrop;
+    @Unique
     public boolean forceDrops;
+    @Unique
     public ArrayList<org.bukkit.inventory.ItemStack> drops = new ArrayList<>();
+    @Unique
     public org.bukkit.craftbukkit.v1_20_R1.attribute.CraftAttributeMap craftAttributes;
+    @Unique
     public boolean collides = true;
+    @Unique
     public Set<UUID> collidableExemptions = new HashSet<>();
+    @Unique
     public boolean bukkitPickUpLoot;
+    @Unique
     private boolean isTickingEffects = false;
+    @Unique
     private List<ProcessableEffect> effectsToProcess = Lists.newArrayList();
 
     // Banner - add fields
+    @Unique
     private AtomicReference<BlockState> banner$FallState = new AtomicReference<>();
+    @Unique
     private AtomicBoolean banner$silent = new AtomicBoolean(false);
+    @Unique
     private transient EntityPotionEffectEvent.Cause banner$cause;
 
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setHealth(F)V"))
@@ -362,6 +375,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     // @Shadow public abstract boolean addEffect(MobEffectInstance effectInstanceIn, Entity entity);
 
     // Banner - fix mixin(locals = LocalCapture.CAPTURE_FAILHARD)
+    @Unique
     public EntityPotionEffectEvent.Cause cause;
     /**
      * @author wdog5
@@ -622,6 +636,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         return false; // CraftBukkit
     }
 
+    @Unique
     private transient EntityRegainHealthEvent.RegainReason banner$regainReason;
 
     @Override
@@ -836,6 +851,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         this.entityData.set(DATA_ARROW_COUNT_ID, count);
     }
 
+    @Unique
     private boolean banner$callArrowCountChange(int newCount, boolean reset) {
         return CraftEventFactory.callArrowBodyCountChangeEvent((LivingEntity) (Object) this, this.getArrowCount(), newCount, reset).isCancelled();
     }

@@ -6,6 +6,7 @@ import com.google.gson.JsonSerializationContext;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(LootPoolEntryContainer.Serializer.class)
 public abstract class MixinLootEntry_Serializer<T extends LootPoolEntryContainer> {
@@ -14,10 +15,12 @@ public abstract class MixinLootEntry_Serializer<T extends LootPoolEntryContainer
 
     @Shadow public abstract T deserialize(JsonObject json, JsonDeserializationContext serializationContext);
 
+    @Unique
     public final void a(JsonObject object, T t0, JsonSerializationContext context) {
         this.serialize(object, t0, context);
     }
 
+    @Unique
     public final T a(JsonObject object, JsonDeserializationContext context) {
         return this.deserialize(object, context);
     }

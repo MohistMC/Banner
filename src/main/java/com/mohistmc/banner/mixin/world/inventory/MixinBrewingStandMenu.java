@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -22,7 +23,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinBrewingStandMenu extends AbstractContainerMenu {
 
     @Shadow @Final private Container brewingStand;
+    @Unique
     private CraftInventoryView bukkitEntity = null;
+    @Unique
     private Inventory playerInventory;
 
     protected MixinBrewingStandMenu(@Nullable MenuType<?> menuType, int i) {

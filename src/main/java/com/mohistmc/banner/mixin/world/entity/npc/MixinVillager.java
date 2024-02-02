@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -31,6 +32,7 @@ public abstract class MixinVillager extends AbstractVillager {
 
     @Shadow @Final private static Logger LOGGER;
 
+    @Unique
     private AtomicReference<DamageSource> banner$damageSource = new AtomicReference<>();
     public MixinVillager(EntityType<? extends AbstractVillager> entityType, Level level) {
         super(entityType, level);

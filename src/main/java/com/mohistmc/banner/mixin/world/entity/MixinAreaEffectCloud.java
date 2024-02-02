@@ -26,6 +26,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(AreaEffectCloud.class)
 public abstract class MixinAreaEffectCloud extends Entity implements TraceableEntity, InjectionAreaEffectCloud {
@@ -59,6 +60,7 @@ public abstract class MixinAreaEffectCloud extends Entity implements TraceableEn
     @Shadow public int reapplicationDelay;
     @Shadow public float radiusOnUse;
     @Shadow public int durationOnUse;
+    @Unique
     List<LivingEntity> bukkitEntities = new java.util.ArrayList<>(); // CraftBukkit
 
     public MixinAreaEffectCloud(EntityType<?> entityType, Level level) {

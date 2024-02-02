@@ -16,6 +16,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -25,7 +26,9 @@ public abstract class MixinAbstractMinecartContainer extends AbstractMinecart im
 
     @Shadow private NonNullList<ItemStack> itemStacks;
 
+    @Unique
     public List<HumanEntity> transaction;
+    @Unique
     private int maxStack;
 
     protected MixinAbstractMinecartContainer(EntityType<?> entityType, Level level) {

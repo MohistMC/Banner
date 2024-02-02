@@ -34,6 +34,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -56,7 +57,9 @@ public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockE
 
     @Shadow protected abstract boolean inventoryFull();
 
+    @Unique
     public List<HumanEntity> transaction = new ArrayList<>();
+    @Unique
     private int maxStack = MAX_STACK;
 
     protected MixinHopperBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
@@ -72,6 +75,7 @@ public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockE
         return result;
     }
 
+    @Unique
     private static AtomicReference<HopperBlockEntity> banner$hopperEntity = new AtomicReference<>();
 
     @Inject(method = "tryMoveItems", at = @At("HEAD"))
@@ -86,10 +90,14 @@ public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockE
         return ejectItems(level, pos, state, sourceContainer, banner$hopperEntity.get());
     }
 
+    @Unique
     private static AtomicReference<HopperBlockEntity> banner$hopper = new AtomicReference<>();
+    @Unique
     private static AtomicReference<Level> banner$world = new AtomicReference<>();
+    @Unique
     private static AtomicReference<InventoryMoveItemEvent> banner$moveEvent = new AtomicReference<>();
 
+    @Unique
     private static boolean ejectItems(Level world, BlockPos blockposition, BlockState iblockdata, Container iinventory, HopperBlockEntity hopper) { // CraftBukkit
         banner$hopper.set(hopper);
         banner$world.set(world);
@@ -188,6 +196,7 @@ public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockE
         }
     }
 
+    @Unique
     private static Container runHopperInventorySearchEvent(Container inventory, CraftBlock hopper, CraftBlock searchLocation, HopperInventorySearchEvent.ContainerType containerType) {
         var event = new HopperInventorySearchEvent((inventory != null) ? new CraftInventory(inventory) : null, containerType, hopper, searchLocation);
         Bukkit.getServer().getPluginManager().callEvent(event);

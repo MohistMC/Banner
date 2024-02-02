@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -22,7 +23,9 @@ public abstract class MixinHorseInventoryMenu extends AbstractContainerMenu{
     @Shadow @Final private Container horseContainer;
     // @formatter:on
 
+    @Unique
     CraftInventoryView bukkitEntity;
+    @Unique
     Inventory playerInventory;
 
     protected MixinHorseInventoryMenu(@Nullable MenuType<?> menuType, int i) {

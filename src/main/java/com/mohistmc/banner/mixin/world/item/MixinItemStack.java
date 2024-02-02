@@ -80,7 +80,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinItemStack implements InjectionItemStack {
 
     // @formatter:off
-    @Shadow @Deprecated private Item item;
+    @Shadow @Deprecated public Item item;
     @Shadow private int count;
     // @formatter:on
     @Shadow public abstract CompoundTag save(CompoundTag compoundTag);

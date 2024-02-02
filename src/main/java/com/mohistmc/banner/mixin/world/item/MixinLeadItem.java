@@ -17,11 +17,13 @@ import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(LeadItem.class)
 @SuppressWarnings("deprecation")
 public abstract class MixinLeadItem {
 
+    @Unique
     private static AtomicReference<InteractionHand> banner$hand = new AtomicReference<>(InteractionHand.MAIN_HAND);
 
     /**
@@ -72,6 +74,7 @@ public abstract class MixinLeadItem {
         return bl ? InteractionResult.SUCCESS : InteractionResult.PASS;
     }
 
+    @Unique
     private static InteractionResult bindPlayerMobs(Player entityhuman, Level world, BlockPos blockposition, InteractionHand enumhand) { // CraftBukkit - Add EnumHand
        banner$hand.set(enumhand);
        return bindPlayerMobs(entityhuman, world, blockposition);

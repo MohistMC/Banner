@@ -16,6 +16,7 @@ import org.bukkit.craftbukkit.v1_20_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.event.block.BlockDispenseArmorEvent;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -25,6 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(ArmorItem.class)
 public class MixinArmorItem {
 
+    @Unique
     private static AtomicReference<BlockDispenseArmorEvent> banner$armorEvent = new AtomicReference<>();
 
     @Inject(method = "dispenseArmor",

@@ -67,6 +67,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -100,28 +101,46 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     @Shadow @Nullable public abstract MinecraftServer getServer();
 
     @Shadow @Final private ResourceKey<Level> dimension;
+    @Unique
     private CraftWorld world;
+    @Unique
     public boolean pvpMode;
+    @Unique
     public boolean keepSpawnInMemory = true;
+    @Unique
     public org.bukkit.generator.ChunkGenerator generator;
 
+    @Unique
     public boolean preventPoiUpdated = false; // CraftBukkit - SPIGOT-5710
+    @Unique
     public boolean captureBlockStates = false;
+    @Unique
     public boolean captureTreeGeneration = false;
+    @Unique
     public Map<BlockPos, CapturedBlockState> capturedBlockStates = new java.util.LinkedHashMap<>();
+    @Unique
     public Map<BlockPos, BlockEntity> capturedTileEntities = new HashMap<>();
+    @Unique
     public List<ItemEntity> captureDrops;
+    @Unique
     public final it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap<SpawnCategory> ticksPerSpawnCategory = new it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap<>();
+    @Unique
     public boolean populating;
+    @Unique
     private org.spigotmc.SpigotWorldConfig spigotConfig; // Spigot
+    @Unique
     protected org.bukkit.World.Environment environment;
+    @Unique
     protected org.bukkit.generator.BiomeProvider biomeProvider;
+    @Unique
     private com.mohistmc.banner.config.BannerWorldConfig bannerConfig;
 
+    @Unique
     public void banner$constructor(WritableLevelData worldInfo, ResourceKey<Level> dimension, RegistryAccess registryAccess, final Holder<DimensionType> dimensionType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdate) {
         throw new RuntimeException();
     }
 
+    @Unique
     public void banner$constructor(WritableLevelData worldInfo, ResourceKey<Level> dimension, RegistryAccess registryAccess, final Holder<DimensionType> dimensionType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdate, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider, org.bukkit.World.Environment env) {
         banner$constructor(worldInfo, dimension, registryAccess, dimensionType, profiler, isRemote, isDebug, seed, maxNeighborUpdate);
         this.generator = gen;
@@ -236,6 +255,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         return this.world;
     }
 
+    @Unique
     private AtomicBoolean captured = new AtomicBoolean(false);
 
     @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At("HEAD"), cancellable = true)
@@ -253,12 +273,13 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         // CraftBukkit end
     }
 
+    @Unique
     private AtomicReference<BlockState> banner$state = new AtomicReference<>();
 
     @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/level/chunk/LevelChunk;setBlockState(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;"),
-            locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+            locals = LocalCapture.CAPTURE_FAILHARD)
     private void banner$captrueBlock(BlockPos blockPos, BlockState blockState, int i, int j,
                                      CallbackInfoReturnable<Boolean> cir, LevelChunk levelChunk, Block block) {
         // CraftBukkit start - capture blockstates

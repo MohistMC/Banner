@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(BoneMealItem.class)
 public abstract class MixinBoneMealItem extends Item {
@@ -30,6 +31,7 @@ public abstract class MixinBoneMealItem extends Item {
         super(properties);
     }
 
+    @Unique
     private static InteractionResult applyBonemeal(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos blockPos = context.getClickedPos();

@@ -20,6 +20,7 @@ import org.bukkit.entity.HumanEntity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -27,8 +28,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Clearable, ContainerSingleItem {
 
     @Shadow @Final private NonNullList<ItemStack> items;
+    @Unique
     public List<HumanEntity> transaction = new ArrayList<>();
+    @Unique
     private int maxStack = DEFAULT_DISTANCE_LIMIT;
+    @Unique
     public boolean opened;
 
     public MixinJukeboxBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {

@@ -24,6 +24,7 @@ import org.bukkit.craftbukkit.v1_20_R1.persistence.DirtyCraftPersistentDataConta
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -39,9 +40,12 @@ public abstract class MixinChunkAccess implements BlockGetter, BiomeManager.Nois
     @Shadow public abstract int getMinBuildHeight();
 
     // CraftBukkit start - SPIGOT-6814: move to IChunkAccess to account for 1.17 to 1.18 chunk upgrading.
+    @Unique
     private static final CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new CraftPersistentDataTypeRegistry();
+    @Unique
     public DirtyCraftPersistentDataContainer persistentDataContainer = new DirtyCraftPersistentDataContainer(DATA_TYPE_REGISTRY);
     // CraftBukkit end
+    @Unique
     public Registry<Biome> biomeRegistry;
 
     @Inject(method = "<init>", at = @At("RETURN"))

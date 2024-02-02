@@ -99,6 +99,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -205,21 +206,37 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow @Nullable public abstract ServerLevel getLevel(ResourceKey<net.minecraft.world.level.Level> dimension);
 
     // CraftBukkit start
+    @Unique
     public WorldLoader.DataLoadContext worldLoader;
+    @Unique
     public org.bukkit.craftbukkit.v1_20_R1.CraftServer server;
+    @Unique
     public OptionSet options;
+    @Unique
     public org.bukkit.command.ConsoleCommandSender console;
+    @Unique
     public ConsoleReader reader;
+    @Unique
     private static int currentTick = BukkitExtraConstants.currentTick;
+    @Unique
     public java.util.Queue<Runnable> processQueue = BukkitExtraConstants.bridge$processQueue;
+    @Unique
     public int autosavePeriod = BukkitExtraConstants.bridge$autosavePeriod;
+    @Unique
     private boolean forceTicks;
+    @Unique
     public Commands vanillaCommandDispatcher;
+    @Unique
     private boolean hasStopped = false;
+    @Unique
     private final Object stopLock = new Object();
+    @Unique
     public final double[] recentTps = new double[4];
+    @Unique
     private static final int TPS = 20;
+    @Unique
     private static final int TICK_TIME = 1000000000 / TPS;
+    @Unique
     private static final int SAMPLE_INTERVAL = 20; // Paper
     // CraftBukkit end
 
@@ -249,14 +266,23 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     }
 
     // Paper start - Further improve server tick loop
+    @Unique
     private static final long SEC_IN_NANO = 1000000000;
+    @Unique
     private static final long MAX_CATCHUP_BUFFER = TICK_TIME * TPS * 60L;
+    @Unique
     private long lastTick = 0;
+    @Unique
     private long catchupTime = 0;
+    @Unique
     public final RollingAverage tps5s = new RollingAverage(5, TPS, SEC_IN_NANO); // Purpur
+    @Unique
     public final RollingAverage tps1 = new RollingAverage(60, TPS, SEC_IN_NANO);
+    @Unique
     public final RollingAverage tps5 = new RollingAverage(60 * 5, TPS, SEC_IN_NANO);
+    @Unique
     public final RollingAverage tps15 = new RollingAverage(60 * 15, TPS, SEC_IN_NANO);
+    @Unique
     private static final java.math.BigDecimal TPS_BASE = new java.math.BigDecimal(1E9).multiply(new java.math.BigDecimal(SAMPLE_INTERVAL));
     // Paper End
 
@@ -376,6 +402,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     }
 
+    @Unique
     private static double calcTps(double avg, double exp, double tps) {
         return (avg * exp) + (tps * (1 - exp));
     }
@@ -421,18 +448,22 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         }
     }
 
+    @Unique
     private boolean banner$isNotNetherAndEnd(ServerLevel worldserver) {
         return !banner$isNether(worldserver) && !banner$isEnd(worldserver);
     }
 
+    @Unique
     private boolean banner$isNether(ServerLevel worldserver) {
         return worldserver == this.getLevel(net.minecraft.world.level.Level.NETHER);
     }
 
+    @Unique
     private boolean banner$isEnd(ServerLevel worldserver) {
         return worldserver == this.getLevel(net.minecraft.world.level.Level.END);
     }
 
+    @Unique
     private void banner$prepareWorld(ServerLevel worldserver) {
         this.prepareLevels(worldserver.getChunkSource().chunkMap.progressListener, worldserver);
         worldserver.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API
@@ -510,6 +541,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         this.server = server;
     }
 
+    @Unique
     private static MinecraftServer getServer() {
         return Bukkit.getServer() instanceof CraftServer ? ((CraftServer) Bukkit.getServer()).getServer() : null;
     }
@@ -551,6 +583,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         banner$initializedLevel(serverWorld, worldInfo, saveData, worldOptions);
     }
 
+    @Unique
     private void banner$initLevel(ServerLevel serverWorld) {
         this.server.scoreboardManager = new CraftScoreboardManager((MinecraftServer) (Object) this, serverWorld.getScoreboard());
 
@@ -562,6 +595,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         Bukkit.getPluginManager().callEvent(new WorldInitEvent(serverWorld.getWorld()));
     }
 
+    @Unique
     private void banner$initializedLevel(ServerLevel serverWorld, ServerLevelData worldInfo, WorldData saveData, WorldOptions worldOptions) {
         boolean flag = saveData.isDebugWorld();
 
@@ -793,6 +827,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     }
 
     // CraftBukkit start
+    @Unique
     public final java.util.concurrent.ExecutorService chatExecutor = java.util.concurrent.Executors.newCachedThreadPool(
             new com.google.common.util.concurrent.ThreadFactoryBuilder().setDaemon(true).setNameFormat("Async Chat Thread - #%d").build());
 

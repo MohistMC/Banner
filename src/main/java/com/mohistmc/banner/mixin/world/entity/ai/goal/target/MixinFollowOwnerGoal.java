@@ -9,6 +9,7 @@ import org.bukkit.event.entity.EntityTeleportEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -21,6 +22,7 @@ public class MixinFollowOwnerGoal {
     @Shadow @Final private TamableAnimal tamable;
     // @formatter:on
 
+    @Unique
     private transient boolean banner$cancelled;
 
     @Redirect(method = "maybeTeleportTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/TamableAnimal;moveTo(DDDFF)V"))

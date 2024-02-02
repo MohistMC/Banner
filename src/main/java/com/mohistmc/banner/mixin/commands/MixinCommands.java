@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(Commands.class)
 public abstract class MixinCommands implements InjectionCommands {
@@ -35,6 +36,7 @@ public abstract class MixinCommands implements InjectionCommands {
 
     @Shadow public abstract int performPrefixedCommand(CommandSourceStack source, String command);
 
+    @Unique
     public void banner$constructor() {
         this.dispatcher.setConsumer((context, b, i) -> context.getSource().onCommandComplete(context, b, i));
     }

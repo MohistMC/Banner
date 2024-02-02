@@ -6,10 +6,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_20_R1.command.ServerCommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(targets = "net/minecraft/commands/CommandSource$1")
 public class MixinCommandSource1 implements InjectionCommandSource {
 
+    @Unique
     public CommandSender getBukkitSender(CommandSourceStack wrapper) {
         return new ServerCommandSender() {
             private final boolean isOp = wrapper.hasPermission(wrapper.getServer().getOperatorUserPermissionLevel());

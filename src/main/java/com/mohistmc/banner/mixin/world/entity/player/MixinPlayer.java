@@ -40,6 +40,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -79,9 +80,13 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
         super(entityType, level);
     }
 
+    @Unique
     public boolean fauxSleeping;
+    @Unique
     public int oldLevel = -1;
+    @Unique
     protected AtomicReference<Boolean> banner$forceSleep = new AtomicReference<>();
+    @Unique
     public boolean affectsSpawning = true;
 
     @Inject(method = "<init>", at = @At("RETURN"))
@@ -152,6 +157,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     }
 
     // Banner start
+    @Unique
     public AtomicBoolean spawnEntityFromShoulder = new AtomicBoolean(true);
 
     /**
@@ -197,6 +203,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
         return spawnEntityFromShoulder.getAndSet(true);
     }
 
+    @Unique
     private EntityExhaustionEvent.ExhaustionReason banner$exhaustReason;
 
     @Redirect(method = "causeFoodExhaustion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/food/FoodData;addExhaustion(F)V"))

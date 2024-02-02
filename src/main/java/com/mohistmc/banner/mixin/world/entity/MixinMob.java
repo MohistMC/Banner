@@ -32,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -61,12 +62,18 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
     @Shadow @Nullable public abstract Entity getLeashHolder();
     @Shadow @Nullable public abstract <T extends Mob> T convertTo(EntityType<T> entityType, boolean transferInventory);
 
+    @Unique
     public boolean aware = true; // CraftBukkit
 
+    @Unique
     protected transient boolean banner$targetSuccess = false;
+    @Unique
     private transient EntityTargetEvent.TargetReason banner$reason;
+    @Unique
     private transient boolean banner$fireEvent;
+    @Unique
     private transient ItemEntity banner$item;
+    @Unique
     private transient EntityTransformEvent.TransformReason banner$transform;
 
     protected MixinMob(EntityType<? extends LivingEntity> entityType, Level level) {

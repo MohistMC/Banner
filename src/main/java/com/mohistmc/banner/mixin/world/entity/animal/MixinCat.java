@@ -12,6 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -23,6 +24,7 @@ public abstract class MixinCat extends TamableAnimal {
         super(entityType, level);
     }
 
+    @Unique
     private AtomicReference<Player> bannerPlayer = new AtomicReference<>();
 
     @Inject(method = "mobInteract", at = @At("HEAD"))

@@ -14,13 +14,16 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(targets = "net/minecraft/world/level/block/entity/LecternBlockEntity$1")
 public abstract class MixinLecternBlockEntity1 implements Container {
 
     @Shadow(aliases = {"field_17391"}, remap = false) private LecternBlockEntity outerThis;
 
+    @Unique
     public List<HumanEntity> transaction = new ArrayList<>();
+    @Unique
     private int maxStack = 1;
 
     @Override
@@ -88,6 +91,7 @@ public abstract class MixinLecternBlockEntity1 implements Container {
     public void setCurrentRecipe(Recipe<?> recipe) {
     }
 
+    @Unique
     public LecternBlockEntity getLectern() {
         return outerThis;
     }

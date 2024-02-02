@@ -22,6 +22,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -32,7 +33,9 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public abstract class MixinBrewingStandBlockEntity extends BaseContainerBlockEntity {
 
     @Shadow private NonNullList<ItemStack> items;
+    @Unique
     public List<HumanEntity> transaction = new ArrayList<>();
+    @Unique
     private int maxStack = MAX_STACK;
 
     protected MixinBrewingStandBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {

@@ -87,6 +87,7 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
         return null;
     }
 
+    @Unique
     private Set<ServerPlayerConnection> trackedPlayers;
     @Unique private int lastTick;
     @Unique private int lastUpdate, lastPosUpdate, lastMapUpdate;
@@ -98,10 +99,12 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
         lastUpdate = lastPosUpdate = lastMapUpdate = -1;
     }
 
+    @Unique
     public void banner$constructor(ServerLevel serverWorld, Entity entity, int updateFrequency, boolean sendVelocityUpdates, Consumer<Packet<?>> packetConsumer) {
         throw new NullPointerException();
     }
 
+    @Unique
     public void banner$constructor(ServerLevel serverWorld, Entity entity, int updateFrequency, boolean sendVelocityUpdates, Consumer<Packet<?>> packetConsumer, Set<ServerPlayerConnection> set) {
         banner$constructor(serverWorld, entity, updateFrequency, sendVelocityUpdates, packetConsumer);
         this.trackedPlayers = set;

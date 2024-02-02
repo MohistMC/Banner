@@ -10,6 +10,7 @@ import net.minecraft.commands.CommandSourceStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -25,6 +26,7 @@ public abstract class MixinCommandNode<S> implements Comparable<CommandNode<S>>,
 
     @Shadow @Final private Predicate<S> requirement;
 
+    @Unique
     public void removeCommand(String name) {
         children.remove(name);
         literals.remove(name);

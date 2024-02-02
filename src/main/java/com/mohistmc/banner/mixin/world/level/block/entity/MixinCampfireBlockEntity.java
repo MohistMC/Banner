@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -45,9 +46,13 @@ public abstract class MixinCampfireBlockEntity extends BlockEntity {
 
 
     // Banner - fix mixin(locals = LocalCapture.CAPTURE_FAILSOFT)
+    @Unique
     private static Optional<CampfireCookingRecipe> recipe;
+    @Unique
     private static CraftItemStack source;
+    @Unique
     private static  org.bukkit.inventory.ItemStack result;
+    @Unique
     private static BlockCookEvent blockCookEvent;
 
     /**

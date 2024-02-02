@@ -11,6 +11,7 @@ import net.minecraft.world.phys.HitResult;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -24,7 +25,9 @@ public abstract class MixinAbstractHurtingProjectile extends Projectile implemen
     @Shadow public double xPower;
     @Shadow public double yPower;
     @Shadow public double zPower;
+    @Unique
     public float bukkitYield = 1; // CraftBukkit
+    @Unique
     public boolean isIncendiary = true; // CraftBukkit
 
     public MixinAbstractHurtingProjectile(EntityType<? extends Projectile> entityType, Level level) {

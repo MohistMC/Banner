@@ -10,6 +10,7 @@ import net.minecraft.world.phys.HitResult;
 import org.bukkit.projectiles.ProjectileSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -23,6 +24,7 @@ public abstract class MixinProjectile extends Entity implements InjectionProject
 
     @Shadow protected abstract void onHit(HitResult result);
 
+    @Unique
     private boolean hitCancelled = false;
 
     @Inject(method = "setOwner", at = @At("RETURN"))

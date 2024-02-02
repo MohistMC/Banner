@@ -12,12 +12,14 @@ import org.bukkit.inventory.InventoryHolder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(CompoundContainer.class)
 public abstract class MixinCompoundContainer implements Container {
 
     @Shadow @Final public Container container1;
     @Shadow @Final public Container container2;
+    @Unique
     public List<HumanEntity> transaction = new java.util.ArrayList<>();
 
     @Override

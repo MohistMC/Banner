@@ -11,6 +11,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(PlayerEnderChestContainer.class)
 public abstract class MixinPlayerEnderChestContainer extends SimpleContainer {
@@ -19,12 +20,15 @@ public abstract class MixinPlayerEnderChestContainer extends SimpleContainer {
     @Shadow private EnderChestBlockEntity activeChest;
     // @formatter:on
 
+    @Unique
     private Player owner;
 
+    @Unique
     public void banner$constructor$super(int numSlots, InventoryHolder owner) {
         throw new RuntimeException();
     }
 
+    @Unique
     public void banner$constructor(Player owner) {
         banner$constructor$super(27,  owner.getBukkitEntity());
         this.owner = owner;

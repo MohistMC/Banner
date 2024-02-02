@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.event.entity.EntityExhaustionEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -59,6 +60,7 @@ public abstract class MixinBlock extends BlockBehaviour implements InjectionBloc
         return tryDropExperience(level, pos, heldItem, amount);
     }
 
+    @Unique
     protected int tryDropExperience(ServerLevel worldserver, BlockPos blockposition, ItemStack itemstack, IntProvider intprovider) {
         if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, itemstack) == 0) {
             int i = intprovider.sample(worldserver.random);

@@ -16,6 +16,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 //TODO fix inject methods
 @Mixin(Inventory.class)
@@ -29,7 +30,9 @@ public abstract class MixinInventory implements Container, Nameable, InjectionIn
 
     @Shadow protected abstract boolean hasRemainingSpaceForItem(ItemStack destination, ItemStack origin);
 
+    @Unique
     public List<HumanEntity> transaction = new java.util.ArrayList<>();
+    @Unique
     private int maxStack = MAX_STACK;
 
     @Override

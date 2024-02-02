@@ -12,6 +12,7 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(Component.class)
 public interface MixinComponent extends Iterable<Component>, InjectionComponent {
@@ -20,6 +21,7 @@ public interface MixinComponent extends Iterable<Component>, InjectionComponent 
     @Shadow List<Component> getSiblings();
     // @formatter:on
 
+    @Unique
     default Stream<Component> stream() {
         class Func implements Function<Component, Stream<? extends Component>> {
 
@@ -41,6 +43,7 @@ public interface MixinComponent extends Iterable<Component>, InjectionComponent 
         return stream();
     }
 
+    @Unique
     private static MutableComponent a(String key, Object... args) {
         return MutableComponent.create(new TranslatableContents(key, (String)null, args));
     }

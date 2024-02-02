@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(BanListEntry.class)
 public abstract class MixinBanListEntry<T> extends StoredUserEntry<T> implements InjectionBanListEntry {
@@ -21,10 +22,12 @@ public abstract class MixinBanListEntry<T> extends StoredUserEntry<T> implements
 
     @Shadow @Final protected String reason;
 
+    @Unique
     public void banner$constructor$super(T object) {
         throw new RuntimeException();
     }
 
+    @Unique
     public void banner$constructor(T object, JsonObject jsonObject) {
         banner$constructor$super(checkExpiry(object, jsonObject));
     }
@@ -35,6 +38,7 @@ public abstract class MixinBanListEntry<T> extends StoredUserEntry<T> implements
 
 
     // CraftBukkit start
+    @Unique
     private static <T> T checkExpiry(T object, JsonObject jsonobject) {
         Date expires = null;
 

@@ -13,6 +13,7 @@ import org.bukkit.craftbukkit.v1_20_R1.entity.CraftHumanEntity;
 import org.bukkit.entity.HumanEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(BarrelBlockEntity.class)
 public abstract class MixinBarrelBlockEntity extends RandomizableContainerBlockEntity {
@@ -24,7 +25,9 @@ public abstract class MixinBarrelBlockEntity extends RandomizableContainerBlockE
     }
 
     // CraftBukkit start - add fields and methods
+    @Unique
     public List<HumanEntity> transaction = new ArrayList<>();
+    @Unique
     private int maxStack = MAX_STACK;
 
     @Override

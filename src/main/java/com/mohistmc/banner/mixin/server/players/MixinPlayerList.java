@@ -104,6 +104,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -157,8 +158,10 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Shadow public abstract ServerPlayer getPlayerForLogin(GameProfile profile);
 
+    @Unique
     private CraftServer cserver;
 
+    @Unique
     private static final AtomicReference<String> PROFILE_NAMES = new AtomicReference<>();
 
     @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/server/players/PlayerList;bans:Lnet/minecraft/server/players/UserBanList;"))
@@ -231,6 +234,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     private void banner$cancelMessage(PlayerList instance, Component message, boolean bypassHiddenChat) {
     }
 
+    @Unique
     private AtomicReference<String> banner$joinMsg = new AtomicReference<>();
 
     @Inject(method = "placeNewPlayer",
@@ -304,6 +308,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         player.getEntityData().refresh(player); // CraftBukkit - BungeeCord#2321, send complete data to self on spawn
     }
 
+    @Unique
     private static AtomicReference<ServerLevel> banner$level = new AtomicReference<>();
 
     @WrapWithCondition(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
@@ -340,6 +345,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     }
 
+    @Unique
     private final AtomicReference<ServerPlayer> banner$savePlayer = new AtomicReference<>();
 
     @Inject(method = "save", at = @At("HEAD"), cancellable = true)
@@ -362,6 +368,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         return banner$savePlayer.get().getAdvancements();
     }
 
+    @Unique
     public String quitMsg;
 
     /**
@@ -427,6 +434,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         return quitMsg;
     }
 
+    @Unique
     private AtomicReference<ServerPlayer> entity = new AtomicReference<>(null);
 
     /**
@@ -434,6 +442,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
      * @reason bukkit
      */
     @Overwrite
+    @Nullable
     public Component canPlayerLogin(SocketAddress socketaddress, GameProfile gameProfile) {
         ServerPlayer serverPlayer = getPlayerForLogin(gameProfile);
         entity.set(serverPlayer);
@@ -486,16 +495,25 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     }
 
 
+    @Unique
     private Location banner$loc = null;
+    @Unique
     private transient PlayerRespawnEvent.RespawnReason banner$respawnReason;
+    @Unique
     public ServerLevel banner$worldserver = null;
+    @Unique
     public AtomicBoolean avoidSuffocation = new AtomicBoolean(true);
 
     // Banner start - Fix mixin by apoli
+    @Unique
     public org.bukkit.World fromWorld;
+    @Unique
     public PlayerRespawnEvent respawnEvent;
+    @Unique
     public ServerLevel worldserver1;
+    @Unique
     public LevelData worlddata;
+    @Unique
     public ServerPlayer entityplayer_vanilla;
     // Banner end
 
@@ -867,6 +885,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         player.updateWeather(-level.rainLevel, level.rainLevel, -level.thunderLevel, level.thunderLevel);
     }
 
+    @Unique
     private AtomicReference<ServerPlayer> banner$worldBorderPlayer = new AtomicReference<>();
 
     @Inject(method = "sendLevelInfo", at = @At("HEAD"))

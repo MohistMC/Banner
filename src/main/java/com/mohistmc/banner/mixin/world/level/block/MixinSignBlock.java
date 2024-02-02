@@ -18,6 +18,7 @@ import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.event.player.PlayerSignOpenEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -28,6 +29,7 @@ public abstract class MixinSignBlock implements InjectionSignBlock {
 
     @Shadow public abstract void openTextEdit(Player player, SignBlockEntity signEntity, boolean isFrontText);
 
+    @Unique
     private AtomicReference<PlayerSignOpenEvent.Cause> banner$signOpenCause =
             new AtomicReference<>(PlayerSignOpenEvent.Cause.UNKNOWN);
 

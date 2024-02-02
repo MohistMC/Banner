@@ -16,6 +16,7 @@ import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -29,6 +30,7 @@ public abstract class MixinGoat extends Animal {
         super(entityType, level);
     }
 
+    @Unique
     private AtomicReference<PlayerBucketFillEvent> banner$event = new AtomicReference<>();
 
     @Inject(method = "mobInteract", at = @At(value = "INVOKE",

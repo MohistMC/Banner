@@ -15,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(FriendlyByteBuf.class)
 public abstract class MixinFriendlyByteBuf {
 
-
     @Shadow public abstract ByteBuf writeBoolean(boolean bl);
 
     @Inject(method = "writeItem", at = @At(value = "HEAD"))

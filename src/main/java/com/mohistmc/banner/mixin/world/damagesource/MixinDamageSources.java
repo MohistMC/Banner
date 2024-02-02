@@ -9,6 +9,7 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -17,11 +18,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinDamageSources implements InjectionDamageSources {
 
     // @formatter:off
-    @Shadow protected abstract DamageSource source(ResourceKey<DamageType> resourceKey);
+    @Shadow  public abstract DamageSource source(ResourceKey<DamageType> resourceKey);
     // @formatter:on
 
     // CraftBukkit start
+    @Unique
     public DamageSource melting;
+    @Unique
     public DamageSource poison;
 
     @Inject(method = "<init>", at = @At(value = "INVOKE",

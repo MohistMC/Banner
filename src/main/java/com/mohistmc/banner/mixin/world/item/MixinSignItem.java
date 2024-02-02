@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.SignBlock;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -18,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(SignItem.class)
 public class MixinSignItem {
 
+    @Unique
     private static BlockPos openSign = BukkitExtraConstants.openSign; // CraftBukkit
 
     @Redirect(method = "updateCustomBlockEntityTag", at = @At(value = "INVOKE",

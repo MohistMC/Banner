@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(PressurePlateBlock.class)
 public abstract class MixinPressurePlateBlock extends BasePressurePlateBlock {
@@ -31,6 +32,7 @@ public abstract class MixinPressurePlateBlock extends BasePressurePlateBlock {
     @Shadow @Final private PressurePlateBlock.Sensitivity sensitivity;
 
 
+    @Unique
     private static <T extends Entity> java.util.List<T> getEntities(Level world, AABB axisalignedbb, Class<T> oclass) {
         return world.getEntitiesOfClass(oclass, axisalignedbb, EntitySelector.NO_SPECTATORS.and((entity) -> {
             return !entity.isIgnoringBlockTriggers();

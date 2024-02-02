@@ -18,6 +18,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(TransientCraftingContainer.class)
 public abstract class MixinTransientTransientCraftingContainer implements Container, InjectionTransientCraftingContainer {
@@ -26,16 +27,23 @@ public abstract class MixinTransientTransientCraftingContainer implements Contai
 
     @Shadow @Final public AbstractContainerMenu menu;
     // CraftBukkit start - add fields
+    @Unique
     public List<HumanEntity> transaction = new java.util.ArrayList<>();
+    @Unique
     private Recipe<?> currentRecipe;
+    @Unique
     public Container resultInventory;
+    @Unique
     private Player owner;
+    @Unique
     private int maxStack = MAX_STACK;
 
+    @Unique
     public void banner$constructor(AbstractContainerMenu eventHandlerIn, int width, int height) {
         throw new RuntimeException();
     }
 
+    @Unique
     public void banner$constructor(AbstractContainerMenu eventHandlerIn, int width, int height, Player owner) {
         banner$constructor(eventHandlerIn, width, height);
         this.owner = owner;

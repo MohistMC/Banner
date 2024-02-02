@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -63,6 +64,7 @@ public abstract class MixinItemEntity extends Entity {
         // Spigot end
     }
 
+    @Unique
     private AtomicBoolean flyAtPlayer = new AtomicBoolean(false);// Paper
 
     @Inject(method = "playerTouch", at = @At(value = "FIELD",

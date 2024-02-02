@@ -92,6 +92,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -131,7 +132,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Shadow public boolean isChangingDimension;
     @Shadow public boolean wonGame;
-    @Shadow private boolean seenCredits;
+    @Shadow public boolean seenCredits;
     @Shadow @Nullable private Vec3 enteredNetherPosition;
 
     @Shadow protected abstract void createEndPlatform(ServerLevel serverLevel, BlockPos blockPos);
@@ -161,26 +162,45 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Shadow public abstract boolean canHarmPlayer(Player other);
 
     // CraftBukkit start
+    @Unique
     public String displayName;
+    @Unique
     public Component listName;
+    @Unique
     public org.bukkit.Location compassTarget;
+    @Unique
     public int newExp = 0;
+    @Unique
     public int newLevel = 0;
+    @Unique
     public int newTotalExp = 0;
+    @Unique
     public boolean keepLevel = false;
+    @Unique
     public double maxHealthCache;
+    @Unique
     public boolean joining = true;
+    @Unique
     public boolean sentListPacket = false;
+    @Unique
     public Integer clientViewDistance;
+    @Unique
     public String kickLeaveMessage = null; // SPIGOT-3034: Forward leave message to PlayerQuitEvent
     // CraftBukkit end
 
+    @Unique
     public long timeOffset = 0;
+    @Unique
     public WeatherType weather = null;
+    @Unique
     public boolean relativeTime = true;
+    @Unique
     public String locale = null; // CraftBukkit - add, lowercase // Paper - default to null
+    @Unique
     private boolean banner$initialized = false;
+    @Unique
     private float pluginRainPosition;
+    @Unique
     private float pluginRainPositionPrevious;
 
     public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
@@ -338,6 +358,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         this.connection.resetPosition();
     }
 
+    @Unique
     private transient PlayerSpawnChangeEvent.Cause banner$spawnChangeCause;
 
     @Override
@@ -694,6 +715,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         }
     }
 
+    @Unique
     private AtomicReference<HorseInventoryMenu> banner$horseMenu = new AtomicReference<>();
 
     @Inject(method = "openHorseInventory", at = @At("HEAD"), cancellable = true)
@@ -728,9 +750,12 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         }
     }
 
+    @Unique
     private AtomicReference<String> banner$deathString = new AtomicReference<>("null");
+    @Unique
     private AtomicReference<String> banner$deathMsg = new AtomicReference<>("null");
 
+    @Unique
     private AtomicReference<PlayerDeathEvent> banner$deathEvent = new AtomicReference<>();
 
     @Inject(method = "die", at = @At(value = "INVOKE",
@@ -823,6 +848,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         this.level().getCraftServer().getScoreboardManager().getScoreboardScores(ObjectiveCriteria.DEATH_COUNT, this.getScoreboardName(), Score::increment);
     }
 
+    @Unique
     private AtomicReference<PlayerTeleportEvent.TeleportCause> banner$changeDimensionCause = new AtomicReference<>(PlayerTeleportEvent.TeleportCause.UNKNOWN);
 
     @Override
@@ -910,6 +936,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         return optional1;
     }
 
+    @Unique
     private transient BlockStateListPopulator banner$populator;
 
 

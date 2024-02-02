@@ -41,6 +41,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -51,7 +52,7 @@ public abstract class MixinEnchantmentMenu extends AbstractContainerMenu{
 
     // @formatter:off
     @Shadow @Final private Container enchantSlots;
-    @Shadow @Final private ContainerLevelAccess access;
+    @Shadow @Final public ContainerLevelAccess access;
     @Shadow @Final private RandomSource random;
     @Shadow @Final private DataSlot enchantmentSeed;
     @Shadow @Final public int[] costs;
@@ -60,7 +61,9 @@ public abstract class MixinEnchantmentMenu extends AbstractContainerMenu{
     @Shadow protected abstract List<EnchantmentInstance> getEnchantmentList(ItemStack stack, int enchantSlot, int level);
     // @formatter:on
 
+    @Unique
     private CraftInventoryView bukkitEntity = null;
+    @Unique
     private org.bukkit.entity.Player player;
 
     protected MixinEnchantmentMenu(@Nullable MenuType<?> menuType, int i) {

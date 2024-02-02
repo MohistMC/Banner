@@ -18,6 +18,7 @@ import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -27,9 +28,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinRedStoneOreBlock {
 
     @Shadow
-    protected static void interact(BlockState state, Level level, BlockPos pos) {
+    private static void interact(BlockState state, Level level, BlockPos pos) {
     }
 
+    @Unique
     private static transient Entity banner$entity;
 
     @Inject(method = "attack", at = @At(value = "HEAD"))
@@ -68,6 +70,7 @@ public abstract class MixinRedStoneOreBlock {
         }
     }
 
+    @Unique
     private static void interact(BlockState blockState, Level world, BlockPos blockPos, Entity entity) {
         banner$entity = entity;
         interact(blockState, world, blockPos);

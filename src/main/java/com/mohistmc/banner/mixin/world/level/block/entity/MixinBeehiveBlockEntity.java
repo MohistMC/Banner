@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -36,12 +37,14 @@ public abstract class MixinBeehiveBlockEntity extends BlockEntity implements Inj
     @Shadow @Final private List<BeehiveBlockEntity.BeeData> stored;
 
     @Shadow
-    protected static boolean releaseOccupant(Level level, BlockPos pos, BlockState state, BeehiveBlockEntity.BeeData data, @Nullable List<Entity> storedInHives, BeehiveBlockEntity.BeeReleaseStatus releaseStatus, @Nullable BlockPos savedFlowerPos) {
+    private static boolean releaseOccupant(Level level, BlockPos pos, BlockState state, BeehiveBlockEntity.BeeData data, @Nullable List<Entity> storedInHives, BeehiveBlockEntity.BeeReleaseStatus releaseStatus, @Nullable BlockPos savedFlowerPos) {
         return false;
     }
 
     @Shadow @Nullable public BlockPos savedFlowerPos;
+    @Unique
     public int maxBees = 3; // CraftBukkit - allow setting max amount of bees a hive can hold
+    @Unique
     private static transient boolean banner$force;
 
     public MixinBeehiveBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
@@ -89,6 +92,7 @@ public abstract class MixinBeehiveBlockEntity extends BlockEntity implements Inj
         }
     }
 
+    @Unique
     private static boolean releaseBee(Level world, BlockPos pos, BlockState state, BeehiveBlockEntity.BeeData beeData, @Nullable List<Entity> list, BeehiveBlockEntity.BeeReleaseStatus status, @Nullable BlockPos pos1, boolean force) {
         banner$force = force;
         try {

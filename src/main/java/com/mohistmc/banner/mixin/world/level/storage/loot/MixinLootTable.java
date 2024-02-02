@@ -15,6 +15,7 @@ import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.event.world.LootGenerateEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -39,6 +40,7 @@ public abstract class MixinLootTable implements InjectionLootTable {
         return list;
     }
 
+    @Unique
     public AtomicBoolean isPlugin = new AtomicBoolean(false);
 
     @Override

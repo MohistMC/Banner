@@ -151,6 +151,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -234,21 +235,36 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
 
     @Shadow public abstract ServerPlayer getPlayer();
 
+    @Unique
     private static final int SURVIVAL_PLACE_DISTANCE_SQUARED = 6 * 6;
+    @Unique
     private static final int CREATIVE_PLACE_DISTANCE_SQUARED = 7 * 7;
+    @Unique
     private CraftServer cserver;
+    @Unique
     public boolean processedDisconnect;
+    @Unique
     private int allowedPlayerTicks;
+    @Unique
     private int dropCount;
+    @Unique
     private int lastTick;
+    @Unique
     private volatile int lastBookTick;
 
+    @Unique
     private double lastPosX;
+    @Unique
     private double lastPosY;
+    @Unique
     private double lastPosZ;
+    @Unique
     private float lastPitch;
+    @Unique
     private float lastYaw;
+    @Unique
     private boolean justTeleported;
+    @Unique
     private boolean hasMoved; // Spigot
 
     @Override
@@ -864,7 +880,9 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         this.player.stopUsingItem(); // CraftBukkit - SPIGOT-4706
     }
 
+    @Unique
     private int limitedPackets;
+    @Unique
     private long lastLimitedPacket = -1;
 
     @Override
@@ -1702,6 +1720,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         }
     }
 
+    @Unique
     private AtomicReference<PlayerRecipeBookClickEvent> banner$recipeClickEvent = new AtomicReference<>();
 
     @Inject(method = "handlePlaceRecipe",
@@ -1761,7 +1780,9 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         }
     }
 
+    @Unique
     private static final ResourceLocation CUSTOM_REGISTER = new ResourceLocation("register");
+    @Unique
     private static final ResourceLocation CUSTOM_UNREGISTER = new ResourceLocation("unregister");
 
     @Inject(method = "handleCustomPayload", at = @At("HEAD"))
@@ -1808,7 +1829,9 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         }
     }
 
+    @Unique
     private transient PlayerTeleportEvent.TeleportCause banner$cause;
+    @Unique
     private AtomicBoolean cancelledMoveEvent = new AtomicBoolean(false);
 
     @Override

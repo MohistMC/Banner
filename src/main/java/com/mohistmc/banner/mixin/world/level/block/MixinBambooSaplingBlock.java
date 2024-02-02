@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.BambooSaplingBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,6 +25,7 @@ public class MixinBambooSaplingBlock {
         return CraftEventFactory.handleBlockSpreadEvent(instance, pos.below(), pos, newState, flags);
     }
 
+    @Unique
     private AtomicReference<ServerLevel> banner$level = new AtomicReference<>();
 
     @Inject(method = "randomTick", at = @At("HEAD"))

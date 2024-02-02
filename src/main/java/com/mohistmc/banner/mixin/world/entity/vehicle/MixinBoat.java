@@ -17,6 +17,7 @@ import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.event.vehicle.VehicleUpdateEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -32,10 +33,15 @@ public abstract class MixinBoat extends Entity implements InjectionBoat {
     @Shadow public abstract void setDamage(float damageTaken);
     // @formatter:on
 
+    @Unique
     public double maxSpeed = 0.4D;
+    @Unique
     public double occupiedDeceleration = 0.2D;
+    @Unique
     public double unoccupiedDeceleration = -1;
+    @Unique
     public boolean landBoats = false;
+    @Unique
     private Location lastLocation;
 
     public MixinBoat(EntityType<?> entityType, Level level) {

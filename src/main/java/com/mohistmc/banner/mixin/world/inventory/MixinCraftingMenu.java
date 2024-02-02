@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -35,8 +36,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinCraftingMenu extends RecipeBookMenu<CraftingContainer> {
 
     // @formatter:off
-    @Mutable @Shadow @Final private CraftingContainer craftSlots;
-    @Shadow @Final private ResultContainer resultSlots;
+    @Mutable @Shadow @Final public CraftingContainer craftSlots;
+    @Shadow @Final public ResultContainer resultSlots;
 
     public MixinCraftingMenu(MenuType<?> menuType, int i) {
         super(menuType, i);
@@ -45,7 +46,9 @@ public abstract class MixinCraftingMenu extends RecipeBookMenu<CraftingContainer
     @Accessor("access") public abstract ContainerLevelAccess bridge$getWorldPos();
     // @formatter:on
 
+    @Unique
     private CraftInventoryView bukkitEntity;
+    @Unique
     private Inventory playerInventory;
 
     @Inject(method = "stillValid", cancellable = true, at = @At("HEAD"))
@@ -58,6 +61,7 @@ public abstract class MixinCraftingMenu extends RecipeBookMenu<CraftingContainer
         BukkitSnapshotCaptures.captureWorkbenchContainer((CraftingMenu) (Object) this);
     }
 
+    @Unique
     private static transient boolean banner$capture;
 
     @Redirect(method = "slotChangedCraftingGrid", at = @At(value = "INVOKE", remap = false, target = "Ljava/util/Optional;isPresent()Z"))

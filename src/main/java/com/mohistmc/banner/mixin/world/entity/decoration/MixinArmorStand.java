@@ -22,6 +22,7 @@ import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -34,6 +35,7 @@ public abstract class MixinArmorStand extends LivingEntity implements InjectionA
     @Shadow @Final private NonNullList<ItemStack> handItems;
     @Shadow @Final private NonNullList<ItemStack> armorItems;
     @Shadow private boolean invisible;
+    @Unique
     public boolean canMove = true; // Paper
 
     protected MixinArmorStand(EntityType<? extends LivingEntity> entityType, Level level) {
@@ -137,12 +139,14 @@ public abstract class MixinArmorStand extends LivingEntity implements InjectionA
         banner$callEntityDeath();
     }
 
+    @Unique
     private void banner$addDrops(Level worldIn, ItemStack stack) {
         if (!worldIn.isClientSide && !stack.isEmpty() && worldIn.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) { // Banner - prevents item dupe
             this.bridge$drops().add(CraftItemStack.asBukkitCopy(stack));
         }
     }
 
+    @Unique
     private void banner$callEntityDeath() {
         CraftEventFactory.callEntityDeathEvent((net.minecraft.world.entity.decoration.ArmorStand) (Object) this, this.bridge$drops());// CraftBukkit - call event
     }

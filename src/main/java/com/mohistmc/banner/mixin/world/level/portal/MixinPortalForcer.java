@@ -20,6 +20,7 @@ import org.bukkit.event.world.PortalCreateEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -31,13 +32,17 @@ public abstract class MixinPortalForcer implements InjectionPortalForcer {
 
     // @formatter:off
     @Shadow public abstract Optional<BlockUtil.FoundRectangle> createPortal(BlockPos pos, Direction.Axis axis);
-    @Shadow @Final protected ServerLevel level;
+    @Shadow @Final private ServerLevel level;
     @Shadow public abstract Optional<BlockUtil.FoundRectangle> findPortalAround(BlockPos p_192986_, boolean p_192987_, WorldBorder p_192988_);
     // @formatter:on
 
+    @Unique
     private AtomicReference<Integer> banner$searchRadius = new AtomicReference<>();
+    @Unique
     private transient BlockStateListPopulator banner$populator;
+    @Unique
     private transient Entity banner$entity;
+    @Unique
     private transient int banner$createRadius = -1;
 
     @Override

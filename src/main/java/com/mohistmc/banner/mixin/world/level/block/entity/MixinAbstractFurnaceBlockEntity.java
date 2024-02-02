@@ -42,6 +42,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -53,9 +54,9 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
 
     // @formatter:off
     @Shadow protected NonNullList<ItemStack> items;
-    @Shadow protected abstract int getBurnDuration(ItemStack stack);
-    @Shadow protected abstract boolean isLit();
-    @Shadow @Final private Object2IntOpenHashMap<ResourceLocation> recipesUsed;
+    @Shadow  public abstract int getBurnDuration(ItemStack stack);
+    @Shadow  public abstract boolean isLit();
+    @Shadow @Final public Object2IntOpenHashMap<ResourceLocation> recipesUsed;
     @Shadow public abstract List<Recipe<?>> getRecipesToAwardAndPopExperience(ServerLevel p_154996_, Vec3 p_154997_);
 
     @Shadow
@@ -64,11 +65,17 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
     }
     // @formatter:on
 
+    @Unique
     public List<HumanEntity> transaction = new ArrayList<>();
+    @Unique
     private int maxStack = MAX_STACK;
+    @Unique
     private static AbstractFurnaceBlockEntity banner$captureFurnace;
+    @Unique
     private static Player banner$capturePlayer;
+    @Unique
     private static ItemStack banner$item;
+    @Unique
     private static int banner$captureAmount;
 
     protected MixinAbstractFurnaceBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
@@ -108,9 +115,13 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
         ExperienceOrb.award(level, vec3, amount);
     }
 
+    @Unique
     private static AtomicReference<Level> banner$level = new AtomicReference<>();
+    @Unique
     private static AtomicReference<BlockPos> banner$pos = new AtomicReference<>();
+    @Unique
     private static AtomicReference<Level> banner$world = new AtomicReference<>();
+    @Unique
     private static AtomicReference<BlockPos> banner$blockPos = new AtomicReference<>();
 
     @Inject(method = "serverTick", at = @At("HEAD"))
@@ -127,6 +138,7 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
         return burn(banner$world.get(), banner$blockPos.get(), registryAccess, recipe, nonNullList, i);
     }
 
+    @Unique
     private static boolean burn(Level world, BlockPos blockposition, RegistryAccess iregistrycustom, @Nullable Recipe<?> irecipe, NonNullList<ItemStack> nonnulllist, int i) {
         banner$level.set(world);
         banner$pos.set(blockposition);

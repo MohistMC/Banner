@@ -11,6 +11,7 @@ import net.minecraft.world.scores.Scoreboard;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -36,6 +37,7 @@ public class MixinServerScoreboard {
         }
     }
 
+    @Unique
     private List<ServerPlayer> filterPlayer(List<ServerPlayer> list) {
         return list.stream()
                 .filter(it -> it.getBukkitEntity().getScoreboard().getHandle() == (Object) this)
@@ -43,6 +45,7 @@ public class MixinServerScoreboard {
     }
 
     // CraftBukkit start - Send to players
+    @Unique
     private void broadcastAll(Packet packet) {
         for (ServerPlayer entityplayer : (List<ServerPlayer>) this.server.getPlayerList().players) {
             if (entityplayer.getBukkitEntity().getScoreboard().getHandle() == ((Scoreboard) (Object) this)) {

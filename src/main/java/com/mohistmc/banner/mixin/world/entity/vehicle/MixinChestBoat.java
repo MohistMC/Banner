@@ -16,13 +16,16 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(ChestBoat.class)
 public abstract class MixinChestBoat extends Boat implements HasCustomInventoryScreen, ContainerEntity {
 
     @Shadow private NonNullList<ItemStack> itemStacks;
 
+    @Unique
     public List<HumanEntity> transaction = new ArrayList<>();
+    @Unique
     private int maxStack = MAX_STACK;
 
     public MixinChestBoat(EntityType<? extends Boat> entityType, Level level) {

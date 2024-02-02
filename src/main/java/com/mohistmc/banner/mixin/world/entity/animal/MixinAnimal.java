@@ -24,6 +24,7 @@ import org.bukkit.event.entity.EntityEnterLoveModeEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -45,6 +46,7 @@ public abstract class MixinAnimal extends AgeableMob implements InjectionAnimal 
 
     @Shadow public abstract void finalizeSpawnChildFromBreeding(ServerLevel serverLevel, Animal animal, @org.jetbrains.annotations.Nullable AgeableMob ageableMob);
 
+    @Unique
     public ItemStack breedItem;
 
     /**
@@ -66,6 +68,7 @@ public abstract class MixinAnimal extends AgeableMob implements InjectionAnimal 
         }
     }
 
+    @Unique
     private transient int banner$loveTime;
 
     @Inject(method = "setInLove(Lnet/minecraft/world/entity/player/Player;)V", at = @At(value = "FIELD", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/animal/Animal;inLove:I"))
@@ -86,6 +89,7 @@ public abstract class MixinAnimal extends AgeableMob implements InjectionAnimal 
          level.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.BREEDING);
     }
 
+    @Unique
     private AtomicInteger banner$exp = new AtomicInteger(this.getRandom().nextInt(7) + 1);
 
     @Redirect(method = "spawnChildFromBreeding", at = @At(value = "INVOKE",
@@ -106,6 +110,7 @@ public abstract class MixinAnimal extends AgeableMob implements InjectionAnimal 
         // CraftBukkit end
     }
 
+    @Unique
     public void finalizeSpawnChildFromBreeding(ServerLevel worldserver, Animal entityanimal, @Nullable AgeableMob entityageable, int experience) {
         banner$exp.set(experience);
         this.finalizeSpawnChildFromBreeding(worldserver, entityanimal, entityageable);

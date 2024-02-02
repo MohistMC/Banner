@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -83,6 +84,7 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity implements Inje
         return (hasSecondaryEffect(levels, primaryPower, secondaryPower)) ? CraftPotionUtil.toBukkit(new MobEffectInstance(this.secondaryPower, getLevel(this.levels), getAmplification(levels, primaryPower, secondaryPower), true, true)) : null;
     }
 
+    @Unique
     private static boolean hasSecondaryEffect(int i, @Nullable MobEffect mobeffectlist, @Nullable MobEffect mobeffectlist1) {
         {
             if (i >= 4 && mobeffectlist != mobeffectlist1 && mobeffectlist1 != null) {
@@ -95,6 +97,7 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity implements Inje
 
 
     // CraftBukkit start - split into components
+    @Unique
     private static byte getAmplification(int i, @Nullable MobEffect mobeffectlist, @Nullable MobEffect mobeffectlist1) {
         {
             byte b0 = 0;
@@ -107,6 +110,7 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity implements Inje
         }
     }
 
+    @Unique
     private static int getLevel(int i) {
         {
             int j = (9 + i * 2) * 20;

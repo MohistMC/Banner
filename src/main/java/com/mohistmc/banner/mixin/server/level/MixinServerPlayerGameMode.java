@@ -51,6 +51,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -265,6 +266,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
         }
     }
 
+    @Unique
     private final AtomicReference<BlockBreakEvent> banner$event = new AtomicReference<>();
 
     @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
@@ -362,10 +364,15 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
     }
 
     // CraftBukkit start - whole method
+    @Unique
     public boolean interactResult = false;
+    @Unique
     public boolean firedInteract = false;
+    @Unique
     public BlockPos interactPosition;
+    @Unique
     public InteractionHand interactHand;
+    @Unique
     public ItemStack interactItemStack;
 
     /**

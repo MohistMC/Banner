@@ -31,6 +31,7 @@ import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.PluginLoadOrder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -114,6 +115,7 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         return 0;
     }
 
+    @Unique
     public AtomicReference<RconConsoleSource> rconConsoleSource = new AtomicReference<>(null);
 
     @Override
@@ -154,6 +156,7 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         exitThread.start();
     }
 
+    @Unique
     private void banner$exit() {
         try {
             Thread.sleep(5000L);

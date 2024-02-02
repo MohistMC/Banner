@@ -9,6 +9,7 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -17,12 +18,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinLevelStorageAccess implements InjectionLevelStorageAccess {
 
     @Shadow @Final public LevelStorageSource.LevelDirectory levelDirectory;
+    @Unique
     public ResourceKey<LevelStem> dimensionType;
 
+    @Unique
     public void banner$constructor(LevelStorageSource saveFormat, String saveName) {
         throw new RuntimeException();
     }
 
+    @Unique
     public void banner$constructor(LevelStorageSource saveFormat, String saveName, ResourceKey<LevelStem> dimensionType) {
         banner$constructor(saveFormat, saveName);
         this.dimensionType = dimensionType;

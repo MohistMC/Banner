@@ -7,6 +7,7 @@ import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.world.level.storage.WorldData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(ReloadCommand.class)
 public abstract class MixinReloadCommand {
@@ -16,6 +17,7 @@ public abstract class MixinReloadCommand {
         return null;
     }
 
+    @Unique
     private static void reload(MinecraftServer minecraftserver) {
         PackRepository resourcePackList = minecraftserver.getPackRepository();
         WorldData configuration = minecraftserver.getWorldData();

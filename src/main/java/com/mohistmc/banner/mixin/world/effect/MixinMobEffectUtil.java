@@ -4,10 +4,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.world.effect.MobEffectUtil;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(MobEffectUtil.class)
 public class MixinMobEffectUtil {
 
+    @Unique
     private static AtomicReference<EntityPotionEffectEvent.Cause> banner$cause = new AtomicReference<>();
 
     /**

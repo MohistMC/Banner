@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -48,7 +49,9 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements Comman
         super(blockEntityType, blockPos, blockState);
     }
 
+    @Unique
     private AtomicReference<Player> banner$player = new AtomicReference<>();
+    @Unique
     private AtomicReference<BlockPos> banner$pos = new AtomicReference<>();
 
     @Inject(method = "executeClickCommandsIfPresent", at = @At("HEAD"))
@@ -65,7 +68,9 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements Comman
         }
     }
 
+    @Unique
     private AtomicBoolean banner$front = new AtomicBoolean();
+    @Unique
     private AtomicBoolean banner$bl = new AtomicBoolean();
 
     @Inject(method = "updateSignText", at = @At("HEAD"))
@@ -95,6 +100,7 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements Comman
         ((ServerPlayer) player).connection.send(this.getUpdatePacket()); // CraftBukkit
     }
 
+    @Unique
     private SignText setMessages(Player player, List<FilteredText> list, SignText signText, boolean front) {
         banner$front.set(front);
         return setMessages(player, list, signText);
@@ -140,6 +146,7 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements Comman
         return false;
     }
 
+    @Unique
     public CommandSender getBukkitSender(CommandSourceStack wrapper) {
         return wrapper.getEntity() != null ? wrapper.getEntity().banner$getBukkitSender(wrapper) : new CraftBlockCommandSender(wrapper, (BlockEntity) (Object) this);
     }

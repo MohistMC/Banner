@@ -12,6 +12,7 @@ import net.minecraft.server.commands.ScheduleCommand;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.timers.TimerQueue;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -20,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ScheduleCommand.class)
 public class MixinScheduleCommand {
 
+    @Unique
     private static final AtomicReference<CommandSourceStack> banner$source = new AtomicReference<>();
 
     @Inject(method = "schedule", at = @At("HEAD"))

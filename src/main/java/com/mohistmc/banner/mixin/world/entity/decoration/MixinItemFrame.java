@@ -18,6 +18,7 @@ import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -32,7 +33,7 @@ public abstract class MixinItemFrame extends HangingEntity implements InjectionI
     @Shadow protected abstract void onItemChanged(ItemStack item);
 
     @Shadow @Final
-    private static EntityDataAccessor<ItemStack> DATA_ITEM;
+    public static EntityDataAccessor<ItemStack> DATA_ITEM;
 
     @Inject(method = "hurt", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/ItemFrame;dropItem(Lnet/minecraft/world/entity/Entity;Z)V"))
     private void banner$damageNonLiving(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
@@ -57,6 +58,7 @@ public abstract class MixinItemFrame extends HangingEntity implements InjectionI
         }
     }
 
+    @Unique
     private static AABB calculateBoundingBox(Entity entity, BlockPos blockPosition, Direction direction, int width, int height) {
         double d0 = 0.46875;
         double locX = blockPosition.getX() + 0.5 - direction.getStepX() * 0.46875;

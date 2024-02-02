@@ -6,11 +6,14 @@ import net.minecraft.world.level.portal.PortalInfo;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftPortalEvent;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(PortalInfo.class)
 public class MixinPortalInfo implements InjectionPortalInfo {
 
+    @Unique
     public ServerLevel world;
+    @Unique
     public CraftPortalEvent portalEventInfo;
 
     @Override

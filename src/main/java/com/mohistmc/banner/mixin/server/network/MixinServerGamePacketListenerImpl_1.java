@@ -32,6 +32,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(targets = "net.minecraft.server.network.ServerGamePacketListenerImpl$1")
 public abstract class MixinServerGamePacketListenerImpl_1 {
@@ -45,6 +46,7 @@ public abstract class MixinServerGamePacketListenerImpl_1 {
     @Shadow @Final
     ServerLevel val$level;
 
+    @Unique
     private void performInteraction(InteractionHand enumhand, ServerGamePacketListenerImpl.EntityInteraction playerconnection_a, PlayerInteractEntityEvent event) { // CraftBukkit
         ItemStack itemstack = field_28963.player.getItemInHand(enumhand);
 

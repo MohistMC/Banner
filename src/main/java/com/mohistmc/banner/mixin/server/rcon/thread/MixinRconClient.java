@@ -6,6 +6,7 @@ import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.rcon.RconConsoleSource;
 import net.minecraft.server.rcon.thread.RconClient;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -17,9 +18,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(RconClient.class)
 public class MixinRconClient {
 
+    @Unique
     private DedicatedServer banner$serverInterface;
 
     // CraftBukkit start
+    @Unique
     private RconConsoleSource rconConsoleSource;
     // CraftBukkit end
 

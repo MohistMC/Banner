@@ -33,6 +33,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -48,6 +49,7 @@ public abstract class MixinChunkMap extends ChunkStorage implements InjectionChu
     @Shadow @Final @Mutable private RandomState randomState;
     // @formatter:on
 
+    @Unique
     public final BukkitCallbackExecutor callbackExecutor = new BukkitCallbackExecutor();
 
     public MixinChunkMap(Path path, DataFixer dataFixer, boolean bl) {
@@ -59,6 +61,7 @@ public abstract class MixinChunkMap extends ChunkStorage implements InjectionChu
         this.setChunkGenerator(this.generator);
     }
 
+    @Unique
     public void setChunkGenerator(ChunkGenerator generator) {
         this.generator = generator;
         if (generator instanceof CustomChunkGenerator custom) {

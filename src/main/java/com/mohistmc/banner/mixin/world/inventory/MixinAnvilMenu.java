@@ -27,6 +27,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -39,8 +40,11 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu implements Injecti
 
     @Shadow @Final public DataSlot cost;
     // CraftBukkit start
+    @Unique
     private static final int DEFAULT_DENIED_COST = -1;
+    @Unique
     public int maximumRepairCost = Math.min(Short.MAX_VALUE, Math.max(41, BannerConfig.maximumRepairCost));
+    @Unique
     private CraftInventoryView bukkitEntity;
     // CraftBukkit end
 

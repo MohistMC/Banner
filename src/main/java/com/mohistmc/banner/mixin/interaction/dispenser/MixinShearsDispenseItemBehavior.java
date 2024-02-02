@@ -26,14 +26,17 @@ import org.bukkit.event.block.BlockDispenseEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(ShearsDispenseItemBehavior.class)
 public abstract class MixinShearsDispenseItemBehavior extends OptionalDispenseItemBehavior {
 
+    @Unique
     private static transient org.bukkit.block.Block banner$bukkitBlock;
+    @Unique
     private static transient CraftItemStack banner$craftItem;
     @Shadow
-    protected static boolean tryShearBeehive(ServerLevel level, BlockPos pos) {
+    private static boolean tryShearBeehive(ServerLevel level, BlockPos pos) {
         return false;
     }
 
@@ -78,6 +81,7 @@ public abstract class MixinShearsDispenseItemBehavior extends OptionalDispenseIt
         return stack;
     }
 
+    @Unique
     private static boolean tryShearLivingEntity(ServerLevel worldserver, BlockPos blockposition, org.bukkit.block.Block bukkitBlock, CraftItemStack craftItem) { // CraftBukkit - add args
         banner$bukkitBlock = bukkitBlock;
         banner$craftItem = craftItem;

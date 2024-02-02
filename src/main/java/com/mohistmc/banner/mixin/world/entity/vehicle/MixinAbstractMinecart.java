@@ -31,6 +31,7 @@ import org.bukkit.util.Vector;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -60,13 +61,21 @@ public abstract class MixinAbstractMinecart extends Entity implements InjectionA
     // @formatter:on
 
     @Shadow private boolean onRails;
+    @Unique
     public boolean slowWhenEmpty = true;
+    @Unique
     private double derailedX = 0.5;
+    @Unique
     private double derailedY = 0.5;
+    @Unique
     private double derailedZ = 0.5;
+    @Unique
     private double flyingX = 0.95;
+    @Unique
     private double flyingY = 0.95;
+    @Unique
     private double flyingZ = 0.95;
+    @Unique
     public double maxSpeed = 0.4D;
 
     public MixinAbstractMinecart(EntityType<?> entityType, Level level) {
@@ -142,10 +151,15 @@ public abstract class MixinAbstractMinecart extends Entity implements InjectionA
     }
 
     // Banner start - fix mixin by Spelunkery mod
+    @Unique
     private double prevX;
+    @Unique
     private double prevY;
+    @Unique
     private double prevZ;
+    @Unique
     private float prevYaw;
+    @Unique
     private float prevPitch;
     // Banner end
 

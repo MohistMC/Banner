@@ -3,13 +3,17 @@ package com.mohistmc.banner.mixin.world.damagesource;
 import com.mohistmc.banner.injection.world.damagesource.InjectionDamageSource;
 import net.minecraft.world.damagesource.DamageSource;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(DamageSource.class)
 public class MixinDamageSource implements InjectionDamageSource {
 
     // CraftBukkit start
+    @Unique
     private boolean sweep;
+    @Unique
     private boolean melting;
+    @Unique
     private boolean poison;
 
     @Override

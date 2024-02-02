@@ -16,6 +16,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.event.block.TNTPrimeEvent;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -25,8 +26,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(TntBlock.class)
 public class MixinTntBlock {
 
+    @Unique
     private AtomicReference<BlockPos> banner$fromPos = new AtomicReference<>();
+    @Unique
     private AtomicReference<BlockPos> banner$originPos = new AtomicReference<>();
+    @Unique
     private AtomicReference<Player> banner$useTntPlayer = new AtomicReference<>();
 
     @WrapWithCondition(method = "onPlace", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/TntBlock;explode(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V"))

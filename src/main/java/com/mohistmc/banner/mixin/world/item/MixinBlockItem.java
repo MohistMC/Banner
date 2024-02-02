@@ -27,6 +27,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -38,6 +39,7 @@ public abstract class MixinBlockItem {
 
     @Shadow protected abstract boolean mustSurvive();
 
+    @Unique
     private AtomicReference<org.bukkit.block.BlockState> banner$stateCB = new AtomicReference<>(null);
 
     @Inject(method = "place", at= @At(value = "INVOKE",
@@ -76,7 +78,9 @@ public abstract class MixinBlockItem {
     @Redirect(method = "place", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;playSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V"))
     private void banner$cancelPlayerSound(Level instance, Player player, BlockPos pos, SoundEvent sound, SoundSource source, float volume, float pitch) {}
 
+    @Unique
     private AtomicReference<Player> banner$placePlayer = new AtomicReference<>();
+    @Unique
     private AtomicReference<ItemStack> banner$placeStack = new AtomicReference<>();
 
     @Inject(method = "place", at = @At(value = "INVOKE",

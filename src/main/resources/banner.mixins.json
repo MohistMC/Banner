@@ -204,6 +204,7 @@
     "world.entity.decoration.MixinArmorStand",
     "world.entity.decoration.MixinHangingEntity",
     "world.entity.decoration.MixinItemFrame",
+    "world.entity.decoration.MixinLeashFenceKnotEntity",
     "world.entity.item.MixinFallingBlockEntity",
     "world.entity.item.MixinHangingEntity",
     "world.entity.item.MixinItemEntity",

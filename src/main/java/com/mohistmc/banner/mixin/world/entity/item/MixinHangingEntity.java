@@ -18,6 +18,7 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -83,10 +84,12 @@ public abstract class MixinHangingEntity extends Entity{
         ci.cancel();
     }
 
+    @Unique
     private static double a(int i) {
         return i % 32 == 0 ? 0.5D : 0.0D;
     }
 
+    @Unique
     private static AABB calculateBoundingBox(Entity entity, BlockPos blockPosition, Direction direction, int width, int height) {
         double d0 = blockPosition.getX() + 0.5;
         double d2 = blockPosition.getY() + 0.5;

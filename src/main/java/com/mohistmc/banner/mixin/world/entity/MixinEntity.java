@@ -82,6 +82,7 @@ import org.spigotmc.ActivationRange;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -120,7 +121,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Shadow public abstract String getScoreboardName();
 
     @Shadow private float xRot;
-    @Shadow public int remainingFireTicks;
+    @Shadow private int remainingFireTicks;
     @Shadow public boolean horizontalCollision;
 
     @Shadow protected abstract Vec3 collide(Vec3 vec);
@@ -195,24 +196,41 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Shadow public abstract void setRemainingFireTicks(int remainingFireTicks);
 
     @Shadow private AABB bb;
+    @Unique
     private CraftEntity bukkitEntity;
+    @Unique
     public final org.spigotmc.ActivationRange.ActivationType activationType =
             org.spigotmc.ActivationRange.initializeEntityActivationType((Entity) (Object) this);
+    @Unique
     public boolean defaultActivationState;
+    @Unique
     public long activatedTick = Integer.MIN_VALUE;
+    @Unique
     public boolean generation;
+    @Unique
     public boolean persist = true;
+    @Unique
     public boolean visibleByDefault = true;
+    @Unique
     public boolean valid;
+    @Unique
     public int maxAirTicks = getDefaultMaxAirSupply(); // CraftBukkit - SPIGOT-6907: re-implement LivingEntity#setMaximumAir()
+    @Unique
     public org.bukkit.projectiles.ProjectileSource projectileSource; // For projectiles only
+    @Unique
     public boolean lastDamageCancelled; // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
+    @Unique
     public boolean persistentInvisibility = false;
+    @Unique
     public BlockPos lastLavaContact;
+    @Unique
     private static transient BlockPos banner$damageEventBlock;
+    @Unique
     private static final int CURRENT_LEVEL = 2;
+    @Unique
     @javax.annotation.Nullable
     private org.bukkit.util.Vector origin;
+    @Unique
     @javax.annotation.Nullable
     private UUID originWorld;
 
@@ -345,7 +363,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         Bukkit.getPluginManager().callEvent(event);
     }
 
-    @Inject(method = "setRot", cancellable = true, at = @At(value = "HEAD"))
+    @Inject(method = "setRot", at = @At(value = "HEAD"))
     public void banner$infCheck(float yaw, float pitch, CallbackInfo ci) {
         // CraftBukkit start - yaw was sometimes set to NaN, so we need to set it back to 0
         if (Float.isNaN(yaw)) {
@@ -514,6 +532,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         // Paper end
     }
 
+    @Unique
     private static boolean isLevelAtLeast(CompoundTag tag, int level) {
         return tag.contains("Bukkit.updateLevel") && tag.getInt("Bukkit.updateLevel") >= level;
     }
@@ -756,6 +775,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         // Paper end
     }
 
+    @Unique
     private AtomicReference<PositionImpl> banner$location = new AtomicReference<>();
 
     @Nullable
@@ -804,6 +824,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         return new CraftPortalEvent(event);
     }
 
+    @Unique
     protected Optional<BlockUtil.FoundRectangle> getExitPortal(ServerLevel serverWorld, BlockPos pos, boolean flag, WorldBorder worldborder, int searchRadius, boolean canCreatePortal, int createRadius) {
         return  serverWorld.getPortalForcer().findPortalAround(pos, worldborder, searchRadius);
     }

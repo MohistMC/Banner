@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -30,6 +31,7 @@ public abstract class MixinCommandSourceStack implements InjectionCommandSourceS
 
     @Mutable
     @Shadow @Final public CommandSource source;
+    @Unique
     public volatile CommandNode currentCommand; // CraftBukkit
 
     @Inject(method = "hasPermission", cancellable = true, at = @At("HEAD"))
@@ -51,6 +53,7 @@ public abstract class MixinCommandSourceStack implements InjectionCommandSourceS
         return ((getLevel() == null || !((CraftServer) Bukkit.getServer()).ignoreVanillaPermissions) && this.permissionLevel >= i) || getBukkitSender().hasPermission(bukkitPermission);
     }
 
+    @Unique
     public CommandSender getBukkitSender() {
         return this.source.banner$getBukkitSender((CommandSourceStack) (Object) this);
     }

@@ -80,7 +80,7 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
 
     @Shadow
     @Final
-    private static Logger LOGGER;
+    static Logger LOGGER;
 
     @Shadow
     protected abstract void placeNewPlayer(ServerPlayer serverPlayer);
@@ -101,6 +101,7 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
     }
 
     // Spigot start
+    @Unique
     public void initUUID() {
         UUID uid = UUIDUtil.createOfflinePlayerUUID(this.gameProfile.getName());
         this.gameProfile = new GameProfile(uid, this.gameProfile.getName());
@@ -151,7 +152,9 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
     }
 
     // Paper start - Cache authenticator threads
+    @Unique
     private static final AtomicInteger threadId = new AtomicInteger(0);
+    @Unique
     private static final java.util.concurrent.ExecutorService authenticatorPool = java.util.concurrent.Executors.newCachedThreadPool(
             r -> {
                 Thread ret = new Thread(r, "User Authenticator #" + threadId.incrementAndGet());
@@ -288,6 +291,7 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
         thread.start();
     }
 
+    @Unique
     void banner$preLogin() throws Exception {
         if (velocityLoginMessageId == -1 && BannerConfig.velocityEnabled) {
             disconnect("This server requires you to connect with Velocity.");

@@ -15,6 +15,7 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -24,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinSaplingBlock {
 
     @Shadow @Final private AbstractTreeGrower treeGrower;
+    @Unique
     private static TreeType treeType = BukkitExtraConstants.treeType; // CraftBukkit
 
 
