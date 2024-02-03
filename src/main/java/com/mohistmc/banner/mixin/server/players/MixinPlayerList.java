@@ -607,6 +607,10 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             if (banner$loc == null) {
                 worldserver1 = this.server.getLevel(Level.OVERWORLD);
                 blockposition = entityplayer1.getSpawnPoint(worldserver1);
+                if (null == blockposition) {
+                    blockposition = worldserver1.getSharedSpawnPos();
+                }
+
                 banner$loc = CraftLocation.toBukkit(blockposition, worldserver1.getWorld()).add(0.5F, 0.1F, 0.5F);
             }
 
