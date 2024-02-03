@@ -1,6 +1,10 @@
 package com.mohistmc.banner.bukkit.remapping;
 
 import com.google.common.io.ByteStreams;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.impl.transformer.FabricTransformer;
+import org.objectweb.asm.ClassReader;
+
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -36,6 +40,15 @@ public class RemapSourceHandler extends URLStreamHandler {
         @Override
         public void connect() throws IOException {
             byte[] bytes = ByteStreams.toByteArray(url.openStream());
+            String className = new ClassReader(bytes).getClassName();
+            if (className.startsWith("net/minecraft/") || className.equals("com/mojang/brigadier/tree/CommandNode")) {
+                String handledName = className.replace('/', '.');
+                try {
+                    bytes = FabricTransformer.transform(false, EnvType.SERVER, handledName, bytes);
+                } catch (Throwable e) {
+                    throw new IOException(e);
+                }
+            }
             this.array = Remapper.getResourceMapper().remapClassFile(bytes, GlobalClassRepo.INSTANCE);
         }
 
