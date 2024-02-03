@@ -1,6 +1,8 @@
 package org.spigotmc;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import java.util.Timer;
+import java.util.TimerTask;
 import org.bukkit.Bukkit;
 
 import java.lang.management.ManagementFactory;
@@ -87,7 +89,12 @@ public class WatchdogThread extends Thread
                     dumpThread( thread, log );
                 }
                 log.log( Level.SEVERE, "------------------------------" );
-
+                new Timer("WatchdogHaltTask").schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        Runtime.getRuntime().exit(0);
+                    }
+                }, 300000); // 5min
                 break;
             }
 
