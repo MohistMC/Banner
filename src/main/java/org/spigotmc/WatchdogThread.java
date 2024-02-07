@@ -89,12 +89,7 @@ public class WatchdogThread extends Thread
                     dumpThread( thread, log );
                 }
                 log.log( Level.SEVERE, "------------------------------" );
-                new Timer("WatchdogHaltTask").schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        Runtime.getRuntime().exit(0);
-                    }
-                }, 300000); // 5min
+                System.exit(0);
                 break;
             }
 
