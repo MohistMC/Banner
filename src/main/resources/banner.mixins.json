@@ -127,6 +127,7 @@
     "world.entity.MixinItemBasedSteering",
     "world.entity.MixinLightningBolt",
     "world.entity.MixinLivingEntity",
+    "world.entity.MixinLivingEntity$BukkitHurtDamage",
     "world.entity.MixinMob",
     "world.entity.MixinMob$PaperSpawnAffect",
     "world.entity.MixinNeutralMob",
