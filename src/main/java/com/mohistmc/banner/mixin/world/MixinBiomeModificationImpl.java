@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(BiomeModificationImpl.class, remap = false)
+@Mixin(value = BiomeModificationImpl.class, remap = false)
 public abstract class MixinBiomeModificationImpl {
 
     @Redirect(method = "finalizeWorldGen",
