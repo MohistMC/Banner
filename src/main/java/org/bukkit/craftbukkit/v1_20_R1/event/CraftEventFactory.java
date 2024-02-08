@@ -43,6 +43,7 @@ import net.minecraft.world.entity.raid.Raid;
 import net.minecraft.world.entity.raid.Raider;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MerchantMenu;
+import net.minecraft.world.inventory.RecipeBookType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
@@ -209,6 +210,7 @@ import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerItemMendEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.event.player.PlayerRecipeBookClickEvent;
+import org.bukkit.event.player.PlayerRecipeBookSettingsChangeEvent;
 import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerSignOpenEvent;
@@ -1524,6 +1526,11 @@ public class CraftEventFactory {
         }
 
         return itemInHand;
+    }
+
+    public static void callRecipeBookSettingsEvent(ServerPlayer player, RecipeBookType type, boolean open, boolean filter) {
+        PlayerRecipeBookSettingsChangeEvent.RecipeBookType bukkitType = org.bukkit.event.player.PlayerRecipeBookSettingsChangeEvent.RecipeBookType.values()[type.ordinal()];
+        Bukkit.getPluginManager().callEvent(new PlayerRecipeBookSettingsChangeEvent(player.getBukkitEntity(), bukkitType, open, filter));
     }
 
     public static PlayerUnleashEntityEvent callPlayerUnleashEntityEvent(Mob entity, net.minecraft.world.entity.player.Player player, InteractionHand enumhand) {
