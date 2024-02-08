@@ -59,7 +59,8 @@ dependencies {
 			"fabric-events-interaction-v0",
 			"fabric-entity-events-v1",
 			"fabric-lifecycle-events-v1",
-			"fabric-transitive-access-wideners-v1"
+			"fabric-transitive-access-wideners-v1",
+			"fabric-biome-api-v1"
 	]
 
 	// Add each module as a dependency

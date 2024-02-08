@@ -22,6 +22,8 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.Lifecycle;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.impl.biome.modification.BiomeModificationImpl;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.commands.CommandSourceStack;
@@ -1161,6 +1163,8 @@ public final class CraftServer implements Server {
         internal.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API
 
         pluginManager.callEvent(new WorldLoadEvent(internal.getWorld()));
+        ServerWorldEvents.LOAD.invoker().onWorldLoad(console, internal); // Banner - add for fabric events
+        BiomeModificationImpl.INSTANCE.finalizeWorldGen(console.registryAccess());// Banner - generate mod biomes
         return internal.getWorld();
     }
 
