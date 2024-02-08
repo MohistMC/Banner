@@ -108,6 +108,7 @@
     "util.MixinSpawnUtil",
     "util.MixinThreadingDetector",
     "util.datafix.MixinDataFixers",
+    "world.MixinBiomeModificationImpl",
     "world.MixinBlockGetter",
     "world.MixinCompoundContainer",
     "world.MixinContainer",
