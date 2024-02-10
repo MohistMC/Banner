@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world;
 
+import com.mohistmc.banner.fabric.FabricHooks;
 import net.fabricmc.fabric.impl.biome.modification.BiomeModificationImpl;
 import net.fabricmc.fabric.impl.biome.modification.BiomeModificationMarker;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,6 +14,9 @@ public abstract class MixinBiomeModificationImpl {
             at = @At(value = "INVOKE",
             target = "Lnet/fabricmc/fabric/impl/biome/modification/BiomeModificationMarker;fabric_markModified()V"))
     private void banner$markNone(BiomeModificationMarker instance) {
-        // Banner do not thing to modify
+        if (FabricHooks.banner$getBiomeModified()) {
+            instance.fabric_markModified();
+        }
+        // Banner change to modify
     }
 }

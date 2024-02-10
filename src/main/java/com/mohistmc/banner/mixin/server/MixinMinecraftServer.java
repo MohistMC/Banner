@@ -7,6 +7,7 @@ import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.config.BannerConfigUtil;
 import com.mohistmc.banner.fabric.BukkitRegistry;
+import com.mohistmc.banner.fabric.FabricHooks;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
 import com.mohistmc.banner.paper.RollingAverage;
 import com.mohistmc.banner.util.I18n;
@@ -256,6 +257,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         Main.handleParser(parser, options);
         this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
         this.worldLoader = BukkitSnapshotCaptures.getDataLoadContext();
+        FabricHooks.banner$captureBiomeModified(true);
     }
 
     @Inject(method = "stopServer", at = @At(value = "INVOKE", remap = false, ordinal = 0, shift = At.Shift.AFTER, target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V"))

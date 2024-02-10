@@ -11,6 +11,7 @@ import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.api.ServerAPI;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.config.BannerConfig;
+import com.mohistmc.banner.fabric.FabricHooks;
 import com.mohistmc.banner.plugins.BannerPlugin;
 import com.mohistmc.banner.util.I18n;
 import com.mojang.authlib.GameProfile;
@@ -1164,7 +1165,9 @@ public final class CraftServer implements Server {
 
         pluginManager.callEvent(new WorldLoadEvent(internal.getWorld()));
         ServerWorldEvents.LOAD.invoker().onWorldLoad(console, internal); // Banner - add for fabric events
+        FabricHooks.banner$captureBiomeModified(false);
         BiomeModificationImpl.INSTANCE.finalizeWorldGen(console.registryAccess());// Banner - generate mod biomes
+        FabricHooks.banner$captureBiomeModified(true);
         return internal.getWorld();
     }
 
