@@ -5,6 +5,8 @@ import com.mohistmc.banner.network.download.DownloadSource;
 import com.mohistmc.i18n.i18n;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -139,6 +141,15 @@ public class BannerConfigUtil {
         serverThread();
         motdFirstLine();
         motdSecondLine();
+        initDisableTpOffsetWorlds();
     }
 
+    public static List<?> initDisableTpOffsetWorlds() {
+        String key = "world-settings.tpOffset-disabled-worlds";
+        if (yml.get(key) == null) {
+            yml.set(key, "");
+            save();
+        }
+        return yml.getList(key, Collections.emptyList());
+    }
 }

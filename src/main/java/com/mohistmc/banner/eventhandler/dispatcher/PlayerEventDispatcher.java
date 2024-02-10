@@ -1,6 +1,8 @@
 package com.mohistmc.banner.eventhandler.dispatcher;
 
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
+import com.mohistmc.banner.config.BannerConfig;
+import com.mohistmc.banner.fabric.FabricHookBukkitEvent;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
@@ -15,7 +17,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
+
+import java.util.List;
+import java.util.Objects;
 
 public class PlayerEventDispatcher {
 
@@ -37,6 +47,36 @@ public class PlayerEventDispatcher {
             BukkitSnapshotCaptures.getPlaceEventHand(InteractionHand.MAIN_HAND);
             return InteractionResult.PASS;
         });
+        FabricHookBukkitEvent.EVENT.register(bukkitEvent -> {
+            if (bukkitEvent instanceof PlayerTeleportEvent event) {
+                List<String> disabledWorlds = BannerConfig.tpOffsetDisabledWorlds;
+                Location location = Objects.requireNonNull(event.getTo()).clone();
+
+                String worldName = Objects.requireNonNull(location.getWorld()).getName();
+                if (disabledWorlds.contains(worldName)) {
+                    location = findHighestNonAirBlockLocation(location);
+                }else{
+                    location.add(0, 3, 0);
+                }
+                event.setTo(location);
+            }
+        });
+    }
+
+    private static Location findHighestNonAirBlockLocation(Location location) {
+        World world = location.getWorld();
+        int x = location.getBlockX();
+        int z = location.getBlockZ();
+
+        assert world != null;
+        for (int y = world.getMaxHeight(); y >= 0; y--) {
+            Block block = world.getBlockAt(x, y, z);
+            if (!block.getType().isAir()) {
+                return block.getLocation();
+            }
+        }
+
+        return location;
     }
 
     // CraftBukkit start
