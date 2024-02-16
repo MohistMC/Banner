@@ -157,8 +157,4 @@ public interface InjectionLivingEntity extends InjectionEntity {
 
     default void setItemSlot(EquipmentSlot enumitemslot, ItemStack itemstack, boolean silent) {
     }
-
-    default boolean banner$damageResult() {
-        return false;
-    }
 }
