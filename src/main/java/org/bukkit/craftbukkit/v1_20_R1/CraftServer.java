@@ -1165,9 +1165,10 @@ public final class CraftServer implements Server {
 
         pluginManager.callEvent(new WorldLoadEvent(internal.getWorld()));
         ServerWorldEvents.LOAD.invoker().onWorldLoad(console, internal); // Banner - add for fabric events
+        /*
         FabricHooks.banner$captureBiomeModified(false);
         BiomeModificationImpl.INSTANCE.finalizeWorldGen(console.registryAccess());// Banner - generate mod biomes
-        FabricHooks.banner$captureBiomeModified(true);
+        FabricHooks.banner$captureBiomeModified(true);*/
         return internal.getWorld();
     }
 
