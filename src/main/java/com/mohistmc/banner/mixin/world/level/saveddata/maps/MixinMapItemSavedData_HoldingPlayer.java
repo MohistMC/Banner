@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.level.saveddata.maps;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.entity.player.Player;
@@ -25,15 +26,17 @@ public abstract class MixinMapItemSavedData_HoldingPlayer {
     @Shadow @Final private MapItemSavedData field_132;
     @Shadow @Final public Player player;
     @Unique
-    private RenderData render = field_132.bridge$mapView().render((CraftPlayer) this.player.getBukkitEntity()); // CraftBukkit
-    @Unique
     private byte[] banner$colors = field_132.colors;
     @Unique
     private java.util.Collection<MapDecoration> icons = new java.util.ArrayList<>();
 
+    private AtomicReference<RenderData> banner$render = new AtomicReference<>();
+
     @Inject(method = "nextUpdatePacket", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData$HoldingPlayer;createPatch()Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData$MapPatch;"))
     private void banner$checkColors(int mapId, CallbackInfoReturnable<Packet<?>> cir) {
+        RenderData render = field_132.bridge$mapView().render((CraftPlayer) this.player.getBukkitEntity()); // CraftBukkit
+        banner$render.set(render);
         field_132.colors = render.buffer;
     }
 
@@ -47,7 +50,7 @@ public abstract class MixinMapItemSavedData_HoldingPlayer {
     @Redirect(method = "nextUpdatePacket", at = @At(value = "INVOKE", target = "Ljava/util/Map;values()Ljava/util/Collection;"))
     private Collection<MapDecoration> banner$resetCollections(Map instance) {
         // CraftBukkit start
-        for (org.bukkit.map.MapCursor cursor : render.cursors) {
+        for (org.bukkit.map.MapCursor cursor : banner$render.get().cursors) {
             if (cursor.isVisible()) {
                 icons.add(new MapDecoration(MapDecoration.Type.byIcon(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), CraftChatMessage.fromStringOrNull(cursor.getCaption())));
             }
