@@ -141,5 +141,19 @@ public class BannerConfigUtil {
         serverThread();
         motdFirstLine();
         motdSecondLine();
+        initWatchDogTimeOut();
+    }
+
+    private static Double getYmlValue(String key) {
+        return yml.getDouble(key, 120);
+    }
+
+    private static void initWatchDogTimeOut() {
+        String key = "WatchDogTimeOut";
+        if (yml.get(key) == null) {
+            yml.set(key, 120);
+            save();
+        }
+        Double value = getYmlValue(key);
     }
 }
