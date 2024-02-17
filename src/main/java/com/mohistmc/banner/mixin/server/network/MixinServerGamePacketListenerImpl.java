@@ -156,6 +156,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -508,12 +509,19 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     }
 
     @Inject(method = "handleAcceptTeleportPacket",
-            at = @At(value = "FIELD",
-            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;awaitingPositionFromClient:Lnet/minecraft/world/phys/Vec3;",
-                    shift = At.Shift.AFTER,
-            ordinal = 7))
+            at = @At(value = "FIELD", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;awaitingPositionFromClient:Lnet/minecraft/world/phys/Vec3;"),
+            slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;isChangingDimension()Z")))
     private void banner$updateLoc(ServerboundAcceptTeleportationPacket packetIn, CallbackInfo ci) {
-        this.player.serverLevel().getChunkSource().move(this.player);// CraftBukkit
+        if (this.player.bridge$valid()) {
+            this.player.serverLevel().getChunkSource().move(this.player);
+        }
+    }
+
+    @Inject(method = "handleAcceptTeleportPacket", cancellable = true, at = @At(value = "FIELD", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;awaitingTeleport:I"))
+    private void banner$confirm(ServerboundAcceptTeleportationPacket packetIn, CallbackInfo ci) {
+        if (this.awaitingPositionFromClient == null) {
+            ci.cancel();
+        }
     }
 
     @Inject(method = "handleRecipeBookChangeSettingsPacket",

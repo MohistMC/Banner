@@ -141,15 +141,5 @@ public class BannerConfigUtil {
         serverThread();
         motdFirstLine();
         motdSecondLine();
-        initDisableTpOffsetWorlds();
-    }
-
-    public static List<?> initDisableTpOffsetWorlds() {
-        String key = "world-settings.tpOffset-disabled-worlds";
-        if (yml.get(key) == null) {
-            yml.set(key, "");
-            save();
-        }
-        return yml.getList(key, Collections.emptyList());
     }
 }

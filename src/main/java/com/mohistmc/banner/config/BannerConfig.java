@@ -138,7 +138,6 @@ public class BannerConfig {
 
     public static boolean velocityEnabled;
     public static String velocitySecret;
-    public static List<String> tpOffsetDisabledWorlds;
 
     private static void banner() {
         check_update = getBoolean("banner.check_update", false);
@@ -162,6 +161,5 @@ public class BannerConfig {
         motdFirstLine = ColorsAPI.of(getString("motd.secondline", ""));
         velocityEnabled = getBoolean("proxies.velocity.enabled", false);
         velocitySecret = getString("proxies.velocity.secret", "");
-        tpOffsetDisabledWorlds = getList("world-settings.tpOffset-disabled-worlds", Collections.emptyList());
     }
 }

@@ -47,36 +47,6 @@ public class PlayerEventDispatcher {
             BukkitSnapshotCaptures.getPlaceEventHand(InteractionHand.MAIN_HAND);
             return InteractionResult.PASS;
         });
-        FabricHookBukkitEvent.EVENT.register(bukkitEvent -> {
-            if (bukkitEvent instanceof PlayerTeleportEvent event) {
-                List<String> disabledWorlds = BannerConfig.tpOffsetDisabledWorlds;
-                Location location = Objects.requireNonNull(event.getTo()).clone();
-
-                String worldName = Objects.requireNonNull(location.getWorld()).getName();
-                if (disabledWorlds.contains(worldName)) {
-                    location = findHighestNonAirBlockLocation(location);
-                }else{
-                    location.add(0, 3, 0);
-                }
-                event.setTo(location);
-            }
-        });
-    }
-
-    private static Location findHighestNonAirBlockLocation(Location location) {
-        World world = location.getWorld();
-        int x = location.getBlockX();
-        int z = location.getBlockZ();
-
-        assert world != null;
-        for (int y = world.getMaxHeight(); y >= 0; y--) {
-            Block block = world.getBlockAt(x, y, z);
-            if (!block.getType().isAir()) {
-                return block.getLocation();
-            }
-        }
-
-        return location;
     }
 
     // CraftBukkit start
