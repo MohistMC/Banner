@@ -129,7 +129,6 @@ dependencies {
 
 	//class modify
 	modImplementation(include("com.github.wdog5:mixin-tools:1.0.1"))
-	include(implementation(annotationProcessor("com.github.llamalad7.mixinextras:mixinextras-fabric:0.2.0-beta.9")))
 	annotationProcessor 'com.github.wdog5:mixin-tools:1.0.1'
 
 	// mappings remapper
