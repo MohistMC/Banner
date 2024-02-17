@@ -31,8 +31,6 @@ public abstract class MixinBowItem extends ProjectileWeaponItem {
 
     @Unique
     private EntityShootBowEvent event;
-    @Unique
-    private Player banner$player;
 
     @Inject(method = "releaseUsing",
             at = @At(value = "INVOKE",
@@ -41,7 +39,6 @@ public abstract class MixinBowItem extends ProjectileWeaponItem {
     private void banner$shootBowEvent(ItemStack stack, Level level, LivingEntity livingEntity, int timeCharged,
                                       CallbackInfo ci, Player player, boolean bl, ItemStack itemStack, int i,
                                       float f, boolean bl2, ArrowItem arrowItem, AbstractArrow abstractArrow, int j, int k) {
-        banner$player = player;
         // CraftBukkit start
         event = CraftEventFactory.callEntityShootBowEvent(player, stack, itemStack,
                 abstractArrow, player.getUsedItemHand(), f, !bl2);
@@ -83,8 +80,8 @@ public abstract class MixinBowItem extends ProjectileWeaponItem {
             level.addFreshEntity(abstractArrow);
             if (DistValidate.isValid(level)) {
                 if (!((ServerLevel)level).canAddFreshEntity()) {
-                    if (banner$player instanceof ServerPlayer) {
-                        ((ServerPlayer) banner$player).getBukkitEntity().updateInventory();
+                    if (player instanceof ServerPlayer) {
+                        ((ServerPlayer) player).getBukkitEntity().updateInventory();
                     }
                     ci.cancel();
                 }
