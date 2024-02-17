@@ -765,17 +765,9 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         }
     }
 
-    /**
-     * @author wdog5
-     * @reason bukkit
-     */
-    @Overwrite
-    public ServerStatsCounter getPlayerStats(net.minecraft.world.entity.player.Player player) {
-        // Banner start - add a null method to provide a inject point to compat with easy auth
-        if (player == null) {
-            this.stats.put(player.getUUID(), null);
-        }
-        // Banner end
+
+    @Redirect(method = "getPlayerStats", at = @At("RETURN"))
+    private ServerStatsCounter banner$setReturn(net.minecraft.world.entity.player.Player player) {
         return getPlayerStats((ServerPlayer) player);
     }
 
