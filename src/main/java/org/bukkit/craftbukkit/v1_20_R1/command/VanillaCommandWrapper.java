@@ -21,6 +21,7 @@ import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftMinecartCommand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.minecart.CommandMinecart;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -97,5 +98,10 @@ public final class VanillaCommandWrapper extends BukkitCommand {
 
     private String toDispatcher(String[] args, String name) {
         return name + ((args.length > 0) ? " " + Joiner.on(' ').join(args) : "");
+    }
+
+    @Override
+    public boolean testPermission(@NotNull CommandSender target) {
+        return super.testPermission(target);
     }
 }

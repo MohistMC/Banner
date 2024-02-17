@@ -178,6 +178,12 @@ public abstract class Command {
      * @return true if they can use it, otherwise false
      */
     public boolean testPermission(@NotNull CommandSender target) {
+        // Banner start - do not test if target is null
+        if (target == null) {
+            System.out.println("[Banner]Waring:Command target is null!!!");
+            return false;
+        }
+        // Banner end
         if (testPermissionSilent(target)) {
             return true;
         }
@@ -203,6 +209,12 @@ public abstract class Command {
      * @return true if they can use it, otherwise false
      */
     public boolean testPermissionSilent(@NotNull CommandSender target) {
+        // Banner start - do not test if target is null
+        if (target == null) {
+            System.out.println("[Banner]Waring:Command target is null!!!");
+            return false;
+        }
+        // Banner end
         if ((permission == null) || (permission.length() == 0)) {
             return true;
         }
@@ -431,6 +443,12 @@ public abstract class Command {
             if (user instanceof CommandSender && user.hasPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE)) {
                 CommandSender target = (CommandSender) user;
 
+                // Banner start - do not test if target is null
+                if (target == null) {
+                    System.out.println("[Banner]Waring:Command target is null!!!");
+                    return;
+                }
+                // Banner end
                 if (target instanceof ConsoleCommandSender) {
                     target.sendMessage(result);
                 } else if (target != source) {
