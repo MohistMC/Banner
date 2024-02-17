@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MapItemSavedData.HoldingPlayer.class)
@@ -31,11 +32,17 @@ public abstract class MixinMapItemSavedData_HoldingPlayer {
     private java.util.Collection<MapDecoration> icons = new java.util.ArrayList<>();
 
     private AtomicReference<RenderData> banner$render = new AtomicReference<>();
+    private AtomicReference<Player> banner$player = new AtomicReference<>();
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void banner$initRender(MapItemSavedData mapItemSavedData, Player player, CallbackInfo ci) {
+        banner$player.set(player);
+    }
 
     @Inject(method = "nextUpdatePacket", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData$HoldingPlayer;createPatch()Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData$MapPatch;"))
     private void banner$checkColors(int mapId, CallbackInfoReturnable<Packet<?>> cir) {
-        RenderData render = field_132.bridge$mapView().render((CraftPlayer) this.player.getBukkitEntity()); // CraftBukkit
+        RenderData render = field_132.bridge$mapView().render((CraftPlayer) this.banner$player.getAndSet(null).getBukkitEntity()); // CraftBukkit
         banner$render.set(render);
         field_132.colors = render.buffer;
     }
@@ -50,7 +57,7 @@ public abstract class MixinMapItemSavedData_HoldingPlayer {
     @Redirect(method = "nextUpdatePacket", at = @At(value = "INVOKE", target = "Ljava/util/Map;values()Ljava/util/Collection;"))
     private Collection<MapDecoration> banner$resetCollections(Map instance) {
         // CraftBukkit start
-        for (org.bukkit.map.MapCursor cursor : banner$render.get().cursors) {
+        for (org.bukkit.map.MapCursor cursor : banner$render.getAndSet(null).cursors) {
             if (cursor.isVisible()) {
                 icons.add(new MapDecoration(MapDecoration.Type.byIcon(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), CraftChatMessage.fromStringOrNull(cursor.getCaption())));
             }
