@@ -765,12 +765,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         }
     }
 
-
-    @Redirect(method = "getPlayerStats", at = @At("RETURN"))
-    private ServerStatsCounter banner$setReturn(net.minecraft.world.entity.player.Player player) {
-        return getPlayerStats((ServerPlayer) player);
-    }
-
     @Override
     public ServerStatsCounter getPlayerStats(ServerPlayer entityhuman) {
         ServerStatsCounter serverstatisticmanager = entityhuman.getStats();
