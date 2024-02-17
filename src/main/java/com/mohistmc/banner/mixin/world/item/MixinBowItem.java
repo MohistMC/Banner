@@ -67,21 +67,30 @@ public abstract class MixinBowItem extends ProjectileWeaponItem {
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
     private boolean banner$checkAddEntity(Level level, Entity entity) {
+        return false;
+    }
+
+    @Inject(method = "releaseUsing",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
+            locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    private void banner$checkAddEntity(ItemStack stack, Level level, LivingEntity livingEntity, int timeCharged,
+                                       CallbackInfo ci, Player player, boolean bl, ItemStack itemStack, int i, float f,
+                                       boolean bl2, ArrowItem arrowItem, AbstractArrow abstractArrow) {
         // CraftBukkit start
-        if (event.getProjectile() == entity.getBukkitEntity()) {
+        if (event.getProjectile() == abstractArrow.getBukkitEntity()) {
             // Baner start - fix mixin
-            level.addFreshEntity(entity);
+            level.addFreshEntity(abstractArrow);
             if (DistValidate.isValid(level)) {
                 if (!((ServerLevel)level).canAddFreshEntity()) {
                     if (banner$player instanceof ServerPlayer) {
                         ((ServerPlayer) banner$player).getBukkitEntity().updateInventory();
                     }
-                    return false;
+                    ci.cancel();
                 }
             }
             // Banner end
         }
         // CraftBukkit end
-        return true;
     }
 }
