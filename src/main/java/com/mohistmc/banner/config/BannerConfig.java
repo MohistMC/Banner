@@ -138,6 +138,7 @@ public class BannerConfig {
 
     public static boolean velocityEnabled;
     public static String velocitySecret;
+    public static double WatchDogTimeOut;
 
     private static void banner() {
         check_update = getBoolean("banner.check_update", false);
