@@ -361,4 +361,17 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     public void banner$setAffectsSpawning(boolean affectsSpawning) {
         this.affectsSpawning = affectsSpawning;
     }
+
+    protected AtomicBoolean startSleepInBed_force = new AtomicBoolean(false);
+
+    @Override
+    public Player forceSleepInBed(boolean force) {
+        startSleepInBed_force.set(force);
+        return ((Player) (Object) this);
+    }
+
+    @Override
+    public AtomicBoolean bridge$startSleepInBed_force() {
+        return startSleepInBed_force;
+    }
 }

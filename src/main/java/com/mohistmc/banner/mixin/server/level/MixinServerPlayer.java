@@ -5,16 +5,15 @@ import com.mohistmc.banner.bukkit.DoubleChestInventory;
 import com.mohistmc.banner.injection.server.level.InjectionServerPlayer;
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Either;
-import com.mojang.datafixers.util.Unit;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import net.minecraft.BlockUtil;
 import net.minecraft.ChatFormatting;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.PositionImpl;
@@ -34,8 +33,10 @@ import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.stats.RecipeBook;
 import net.minecraft.stats.ServerRecipeBook;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.Unit;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.CombatTracker;
@@ -56,6 +57,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.WorldBorder;
@@ -473,33 +475,67 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     }
 
     @Override
-    public Either<BedSleepingProblem, Unit> getBedResult(BlockPos blockposition, Direction enumdirection) {
+    public Either<BedSleepingProblem, Unit> getBedResult(BlockPos blockPos, Direction enumdirection) {
+        boolean force = bridge$startSleepInBed_force().getAndSet(false);
+        Either<Player.BedSleepingProblem, Unit> bedResult = null;
+        Direction direction = this.level().getBlockState(blockPos).getValue(HorizontalDirectionalBlock.FACING);
         if (!this.isSleeping() && this.isAlive()) {
-            if (!this.level().dimensionType().natural() || !this.level().dimensionType().bedWorks()) {
-                return Either.left(Player.BedSleepingProblem.NOT_POSSIBLE_HERE);
-            }
-            if (!this.bedInRange(blockposition, enumdirection)) {
-                return Either.left(Player.BedSleepingProblem.TOO_FAR_AWAY);
-            }
-            if (this.bedBlocked(blockposition, enumdirection)) {
-                return Either.left(Player.BedSleepingProblem.OBSTRUCTED);
-            }
-            this.setRespawnPosition(this.level().dimension(), blockposition, this.getYRot(), false, true);
-            if (this.level().isDay()) {
-                return Either.left(Player.BedSleepingProblem.NOT_POSSIBLE_NOW);
-            }
-            if (!this.isCreative()) {
-                double d0 = 8.0;
-                double d1 = 5.0;
-                Vec3 vec3d = Vec3.atBottomCenterOf(blockposition);
-                List<Monster> list = this.level().getEntitiesOfClass(Monster.class, new AABB(vec3d.x() - 8.0, vec3d.y() - 5.0, vec3d.z() - 8.0, vec3d.x() + 8.0, vec3d.y() + 5.0, vec3d.z() + 8.0), entitymonster -> entitymonster.isPreventingPlayerRest((ServerPlayer) (Object) this));
-                if (!list.isEmpty()) {
-                    return Either.left(Player.BedSleepingProblem.NOT_SAFE);
+            if (!this.level().dimensionType().natural()) {
+                bedResult = Either.left(Player.BedSleepingProblem.NOT_POSSIBLE_HERE);
+            } else if (!this.bedInRange(blockPos, direction)) {
+                bedResult = Either.left(Player.BedSleepingProblem.TOO_FAR_AWAY);
+            } else if (this.bedBlocked(blockPos, direction)) {
+                bedResult = Either.left(Player.BedSleepingProblem.OBSTRUCTED);
+            } else {
+                this.setRespawnPosition(this.level().dimension(), blockPos, this.getYRot(), false, true);
+                if (this.level().isDay()) {
+                    bedResult = Either.left(Player.BedSleepingProblem.NOT_POSSIBLE_NOW);
+                } else {
+                    if (!this.isCreative()) {
+                        double d = 8.0;
+                        double e = 5.0;
+                        Vec3 vec3 = Vec3.atBottomCenterOf(blockPos);
+                        List<Monster> list = this.level().getEntitiesOfClass(Monster.class, new AABB(vec3.x() - 8.0, vec3.y() - 5.0, vec3.z() - 8.0, vec3.x() + 8.0, vec3.y() + 5.0, vec3.z() + 8.0), (monster) -> {
+                            return monster.isPreventingPlayerRest(this);
+                        });
+                        if (!list.isEmpty()) {
+                            return Either.left(BedSleepingProblem.NOT_SAFE);
+                        }
+                    }
+
+                    if (bedResult == null) {
+                        bedResult = Either.right(Unit.INSTANCE);
+                    }
                 }
             }
-            return Either.right(Unit.INSTANCE);
+        } else {
+            bedResult = Either.left(Player.BedSleepingProblem.OTHER_PROBLEM);
         }
-        return Either.left(Player.BedSleepingProblem.OTHER_PROBLEM);
+
+        if (bedResult.left().orElse(null) == Player.BedSleepingProblem.OTHER_PROBLEM) {
+            return bedResult; // return immediately if the result is not bypassable by plugins
+        }
+
+        if (force) {
+            bedResult = Either.right(Unit.INSTANCE);
+        }
+
+        bedResult = CraftEventFactory.callPlayerBedEnterEvent(this, blockPos, bedResult);
+
+        if (bedResult.left().isPresent()) {
+            return bedResult;
+        }
+
+        Either<Player.BedSleepingProblem, Unit> either = super.startSleepInBed(blockPos).ifRight((unit) -> {
+            this.awardStat(Stats.SLEEP_IN_BED);
+            CriteriaTriggers.SLEPT_IN_BED.trigger(((ServerPlayer) (Object) this));
+        });
+        if (!this.serverLevel().canSleepThroughNights()) {
+            this.displayClientMessage(Component.translatable("sleep.not_possible"), true);
+        }
+
+        ((ServerLevel) this.level()).updateSleepingPlayerList();
+        return either;
     }
 
     @Override
@@ -890,6 +926,47 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Override
     public void pushChangeDimensionCause(PlayerTeleportEvent.TeleportCause cause) {
         banner$changeDimensionCause.set(cause);
+    }
+
+    @Inject(method = "startSleepInBed", at = @At("HEAD"))
+    private void banner$bedEvent(BlockPos blockPos,
+                                 CallbackInfoReturnable<Either<BedSleepingProblem, Unit>> cir) {
+        boolean force = bridge$startSleepInBed_force().getAndSet(false);
+        Either<Player.BedSleepingProblem, Unit> bedResult = null;
+        Direction direction = this.level().getBlockState(blockPos).getValue(HorizontalDirectionalBlock.FACING);
+        if (!this.isSleeping() && this.isAlive()) {
+            if (!this.level().dimensionType().natural()) {
+                bedResult = Either.left(Player.BedSleepingProblem.NOT_POSSIBLE_HERE);
+            } else if (!this.bedInRange(blockPos, direction)) {
+                bedResult = Either.left(Player.BedSleepingProblem.TOO_FAR_AWAY);
+            } else if (this.bedBlocked(blockPos, direction)) {
+                bedResult = Either.left(Player.BedSleepingProblem.OBSTRUCTED);
+            } else {
+                if (this.level().isDay()) {
+                    bedResult = Either.left(Player.BedSleepingProblem.NOT_POSSIBLE_NOW);
+                } else {
+                    if (bedResult == null) {
+                        bedResult = Either.right(Unit.INSTANCE);
+                    }
+                }
+            }
+        } else {
+            bedResult = Either.left(Player.BedSleepingProblem.OTHER_PROBLEM);
+        }
+
+        if (bedResult.left().orElse(null) == Player.BedSleepingProblem.OTHER_PROBLEM) {
+            cir.setReturnValue(bedResult); // return immediately if the result is not bypassable by plugins
+        }
+
+        if (force) {
+            bedResult = Either.right(Unit.INSTANCE);
+        }
+
+        bedResult = CraftEventFactory.callPlayerBedEnterEvent(this, blockPos, bedResult);
+
+        if (bedResult.left().isPresent()) {
+            cir.setReturnValue(bedResult);
+        }
     }
 
     /**
