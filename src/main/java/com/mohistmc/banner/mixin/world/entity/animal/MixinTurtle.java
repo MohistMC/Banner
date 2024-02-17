@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.world.entity.animal;
 
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.animal.Animal;
@@ -10,6 +12,7 @@ import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Turtle.class)
@@ -29,13 +32,8 @@ public abstract class MixinTurtle extends Animal {
         this.banner$setForceDrops(false);
     }
 
-    @Inject(method = "thunderHit", at = @At("HEAD"))
-    private void banner$lightning(ServerLevel world, LightningBolt lightningBolt, CallbackInfo ci) {
-        CraftEventFactory.entityDamage = lightningBolt;
-    }
-
-    @Inject(method = "thunderHit", at = @At("RETURN"))
-    private void banner$lightningReset(ServerLevel world, LightningBolt lightningBolt, CallbackInfo ci) {
-        CraftEventFactory.entityDamage = null;
+    @Redirect(method = "thunderHit", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/damagesource/DamageSources;lightningBolt()Lnet/minecraft/world/damagesource/DamageSource;"))
+    private DamageSource banner$lightning(DamageSources instance, ServerLevel serverLevel, LightningBolt lightningBolt) {
+        return instance.lightningBolt().bridge$customCausingEntity(lightningBolt);
     }
 }

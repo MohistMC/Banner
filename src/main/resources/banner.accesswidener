@@ -6,6 +6,7 @@ accessible method net/minecraft/world/level/dimension/end/EndDragonFight respawn
 accessible method net/minecraft/world/level/block/entity/SculkCatalystBlockEntity$CatalystListener bloom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/util/RandomSource;)V
 accessible field net/minecraft/world/level/block/SculkSpreader$ChargeCursor pos Lnet/minecraft/core/BlockPos;
 accessible field net/minecraft/world/level/block/SculkSpreader$ChargeCursor charge I
+accessible method net/minecraft/world/damagesource/DamageSource <init> (Lnet/minecraft/core/Holder;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;)V
 
 # paper
 accessible field net/minecraft/server/level/ServerPlayer seenCredits Z

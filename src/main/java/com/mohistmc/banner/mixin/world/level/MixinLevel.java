@@ -438,15 +438,11 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         return spigotConfig;
     }
 
-    /**
-     * @author wdog5
-     * @reason functionality replaced
-     * TODO inline this with injects
-     */
-    @Overwrite
-    @Nullable
-    public BlockEntity getBlockEntity(BlockPos pos) {
-        return getBlockEntity(pos, true);
+    @Inject(method = "getBlockEntity", cancellable = true, at = @At(value = "HEAD"))
+    private void banner$getCaptureBlockEntity(BlockPos blockPos, CallbackInfoReturnable<BlockEntity> cir) {
+        if (this.capturedTileEntities.containsKey(blockPos)) {
+            cir.setReturnValue(this.capturedTileEntities.get(blockPos));
+        }
     }
 
     @Override

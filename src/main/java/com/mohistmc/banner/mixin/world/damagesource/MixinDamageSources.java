@@ -37,15 +37,25 @@ public abstract class MixinDamageSources implements InjectionDamageSources {
         // CraftBukkit end
     }
 
+    @Override
+    public DamageSource poison() {
+        return poison;
+    }
+
+    @Override
+    public DamageSource melting() {
+        return melting;
+    }
+
     // Banner start
     @Override
     public DamageSource bridge$melting() {
-        return melting;
+        return melting();
     }
 
     @Override
     public DamageSource bridge$poison() {
-        return poison;
+        return poison();
     }
     // Banner end
 }

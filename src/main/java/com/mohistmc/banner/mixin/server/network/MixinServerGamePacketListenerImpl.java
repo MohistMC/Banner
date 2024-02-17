@@ -533,7 +533,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
 
     @Inject(method = "handleSelectTrade", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/MerchantMenu;setSelectionHint(I)V"))
     private void banner$tradeSelect(ServerboundSelectTradePacket packet, CallbackInfo ci, int i, MerchantMenu merchantMenu) {
-        var event = CraftEventFactory.callTradeSelectEvent(this.player, i, (MerchantMenu) merchantMenu);
+        var event = CraftEventFactory.callTradeSelectEvent(this.player, i,  (MerchantMenu) this.player.containerMenu);
         if (event.isCancelled()) {
             this.player.getBukkitEntity().updateInventory();
             ci.cancel();

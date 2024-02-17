@@ -433,9 +433,10 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         }
     }
 
-    @Inject(method = "lavaHurt", at = @At("RETURN"))
-    private void banner$resetBlockDamage(CallbackInfo ci) {
-        CraftEventFactory.blockDamage = null;
+    @Redirect(method = "lavaHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/damagesource/DamageSources;lava()Lnet/minecraft/world/damagesource/DamageSource;"))
+    private DamageSource banner$resetBlockDamage(DamageSources instance) {
+        var damager = (lastLavaContact == null) ? null : CraftBlock.at(level(), lastLavaContact);
+        return instance.lava().bridge$directBlock(damager);
     }
 
     @ModifyArg(method = "move", index = 1, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;stepOn(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/Entity;)V"))
@@ -749,9 +750,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         if (this.fireImmune()) {
             return false;
         }
-        CraftEventFactory.entityDamage = instance;
-        if (!this.hurt(this.damageSources().lightningBolt(), amount)) {
-            CraftEventFactory.entityDamage = null;
+        if (!this.hurt((this.damageSources().lightningBolt()).bridge$customCausingEntity(instance), amount)) {
             return false;
         }
         return true;
