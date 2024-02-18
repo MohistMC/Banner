@@ -136,8 +136,6 @@ dependencies {
 
 	// Kyori
 	implementation(include("net.kyori:adventure-platform-fabric:5.9.0"))
-
-
 }
 
 loom {
@@ -183,6 +181,12 @@ jar {
 				'Implementation-Version': version,
 				'Implementation-Vendor' : 'MohistMC'
 		)
+	}
+}
+
+tasks.register('cleanBuild') {
+	doFirst {
+		project.file("build/libs").deleteDir()
 	}
 }
 
