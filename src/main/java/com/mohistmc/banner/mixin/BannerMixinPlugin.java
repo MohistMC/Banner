@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -144,11 +143,6 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (mixinClassName.equals("com.mohistmc.banner.mixin.world.level.block.MixinSpongeBlock")) {
-            for (ModContainer mod : FabricLoader.getInstance().getAllMods()) {
-                return !(mod.getMetadata().getAuthors().contains("Patbox"));
-            }
-        }
         if (mixinClassName.equals("com.mohistmc.banner.mixin.world.entity.MixinMob$PaperSpawnAffect")
                 || mixinClassName.equals("com.mohistmc.banner.mixin.server.players.MixinPlayerList$LoadRecursive")) {
             return !FabricLoader.getInstance().isModLoaded("vmp");
