@@ -15,6 +15,7 @@
   "mixins": [
     "MixinCrashReport",
     "MixinCrashReportCategory",
+    "MixinFabricTransformer",
     "advancement.MixinAdvancement",
     "advancement.MixinAdvancementList",
     "commands.MixinCommandDispatcher",
