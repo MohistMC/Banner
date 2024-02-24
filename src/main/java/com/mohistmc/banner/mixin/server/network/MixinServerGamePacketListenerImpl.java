@@ -1290,7 +1290,8 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         } else {
             this.chat(s, playerchatmessage, true);
         }
-        // this.server.getPlayerList().broadcastChatMessage(playerchatmessage, this.player, ChatMessageType.bind(ChatMessageType.CHAT, (Entity) this.player));
+        this.server.getPlayerList().banner$chat(false);
+        this.server.getPlayerList().broadcastChatMessage(playerchatmessage, this.player, ChatType.bind(ChatType.CHAT, this.player));
         this.detectRateSpam();
     }
 

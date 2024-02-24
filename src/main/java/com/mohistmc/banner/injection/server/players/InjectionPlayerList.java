@@ -46,4 +46,7 @@ public interface InjectionPlayerList {
     default String bridge$quiltMsg() {
         return null;
     }
+
+    default void banner$chat(boolean canSend) {
+    }
 }

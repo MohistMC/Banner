@@ -27,8 +27,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
+import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundChangeDifficultyPacket;
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
@@ -163,6 +165,9 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Unique
     private static final AtomicReference<String> PROFILE_NAMES = new AtomicReference<>();
+
+    @Unique
+    private static final AtomicBoolean BANNER_CHAT = new AtomicBoolean(true);
 
     @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/server/players/PlayerList;bans:Lnet/minecraft/server/players/UserBanList;"))
     public void banner$init(MinecraftServer minecraftServer, LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess, PlayerDataStorage playerDataStorage, int i, CallbackInfo ci) {
@@ -888,4 +893,17 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     private WorldBorder banner$useBukkitWorldBorder(ServerLevel instance) {
         return banner$worldBorderPlayer.get().level().getWorldBorder();
     }
+
+    @Inject(method = "broadcastChatMessage(Lnet/minecraft/network/chat/PlayerChatMessage;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/network/chat/ChatType$Bound;)V", at = @At("HEAD"), cancellable = true)
+    private void banner$broadcastChatMessage(PlayerChatMessage message, ServerPlayer sender, ChatType.Bound boundChatType, CallbackInfo ci) {
+        if (!BANNER_CHAT.getAndSet(true)) {
+            ci.cancel();
+        }
+    }
+
+    @Override
+    public void banner$chat(boolean canSend) {
+        BANNER_CHAT.set(canSend);
+    }
+
 }
