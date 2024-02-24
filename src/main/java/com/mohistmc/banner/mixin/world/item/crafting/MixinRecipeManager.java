@@ -135,7 +135,7 @@ public abstract class MixinRecipeManager implements InjectionRecipeManager {
 
         Object2ObjectLinkedOpenHashMap<ResourceLocation, Recipe<?>> craftbukkit = this.recipesCB.get(irecipe.getType()); // CraftBukkit
 
-        if (this.byName.containsKey(irecipe.getId()) || map0.containsKey(irecipe.getId()) || craftbukkit.containsKey(irecipe.getId())) {
+        if (this.byName.containsKey(irecipe.getId()) || map0.containsKey(irecipe.getId()) || (craftbukkit != null && craftbukkit.containsKey(irecipe.getId()))) {
             throw new IllegalStateException("Duplicate recipe ignored with ID " + irecipe.getId());
         } else {
             map0.putAndMoveToFirst(irecipe.getId(), irecipe);
