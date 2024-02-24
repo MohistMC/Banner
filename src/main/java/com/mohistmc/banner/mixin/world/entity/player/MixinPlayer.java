@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.player;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mohistmc.banner.injection.world.entity.player.InjectionPlayer;
 import com.mojang.datafixers.util.Either;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -206,14 +207,28 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     @Unique
     private EntityExhaustionEvent.ExhaustionReason banner$exhaustReason;
 
-    @Redirect(method = "causeFoodExhaustion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/food/FoodData;addExhaustion(F)V"))
-    private void banner$exhaustEvent(FoodData foodData, float amount) {
+    @ModifyExpressionValue(method = "causeFoodExhaustion", at = @At(value = "FIELD",
+            target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
+    private boolean banner$exhaustEvent(boolean original) {
+        if (banner$exhaustEvent.get() != null) {
+            return original && !banner$exhaustEvent.get().isCancelled();
+        }
+        return original;
+    }
+
+    private AtomicReference<EntityExhaustionEvent> banner$exhaustEvent = new AtomicReference<>();
+
+    @Inject(method = "causeFoodExhaustion", at = @At("HEAD"))
+    private void banner$getExhaustAmount(float amount, CallbackInfo ci) {
         EntityExhaustionEvent.ExhaustionReason reason = banner$exhaustReason == null ? EntityExhaustionEvent.ExhaustionReason.UNKNOWN : banner$exhaustReason;
         banner$exhaustReason = null;
         EntityExhaustionEvent event = CraftEventFactory.callPlayerExhaustionEvent((net.minecraft.world.entity.player.Player) (Object) this, reason, amount);
-        if (!event.isCancelled()) {
-            this.foodData.addExhaustion(event.getExhaustion());
-        }
+        banner$exhaustEvent.set(event);
+    }
+
+    @Inject(method = "causeFoodExhaustion", at = @At("TAIL"))
+    private void banner$setNullExhaustEvent(float exhaustion, CallbackInfo ci) {
+        banner$exhaustEvent.set(null);
     }
 
     @Override
