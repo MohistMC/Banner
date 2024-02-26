@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.entity.projectile;
 
 import com.mohistmc.banner.injection.world.entity.InjectionFishingHook;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -143,7 +144,7 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
             if (this.hookedIn != null) {
                 // CraftBukkit start
                 PlayerFishEvent playerFishEvent = new PlayerFishEvent((org.bukkit.entity.Player) entityhuman.getBukkitEntity(), this.hookedIn.getBukkitEntity(), (FishHook) this.getBukkitEntity(), PlayerFishEvent.State.CAUGHT_ENTITY);
-                this.level().getCraftServer().getPluginManager().callEvent(playerFishEvent);
+                Bukkit.getPluginManager().callEvent(playerFishEvent);
 
                 if (playerFishEvent.isCancelled()) {
                     return 0;
@@ -160,8 +161,11 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
 
                 CriteriaTriggers.FISHING_ROD_HOOKED.trigger((ServerPlayer) entityhuman, itemstack, ((FishingHook) (Object) this), list);
 
-                for (ItemStack itemstack1 : list) {
-                    ItemEntity entityitem = new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), itemstack1);
+                Iterator var7 = list.iterator();
+
+                while(var7.hasNext()) {
+                    ItemStack itemStack = (ItemStack)var7.next();
+                    ItemEntity entityitem = new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), itemStack);
                     // CraftBukkit start
                     PlayerFishEvent playerFishEvent = new PlayerFishEvent((org.bukkit.entity.Player) entityhuman.getBukkitEntity(), entityitem.getBukkitEntity(), (FishHook) this.getBukkitEntity(), PlayerFishEvent.State.CAUGHT_FISH);
                     playerFishEvent.setExpToDrop(this.random.nextInt(6) + 1);
@@ -183,7 +187,7 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
                         entityhuman.level().addFreshEntity(new ExperienceOrb(entityhuman.level(), entityhuman.getX(), entityhuman.getY() + 0.5D, entityhuman.getZ() + 0.5D, playerFishEvent.getExpToDrop()));
                     }
                     // CraftBukkit end
-                    if (itemstack1.is(ItemTags.FISHES)) {
+                    if (itemStack.is(ItemTags.FISHES)) {
                         entityhuman.awardStat(Stats.FISH_CAUGHT, 1);
                     }
                 }
