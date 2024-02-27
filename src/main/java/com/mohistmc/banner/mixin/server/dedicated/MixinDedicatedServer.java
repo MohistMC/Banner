@@ -51,6 +51,9 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         // CraftBukkit start
         org.spigotmc.SpigotConfig.init((java.io.File) this.bridge$options().valueOf("spigot-settings"));
         BannerConfig.init((java.io.File) this.bridge$options().valueOf("banner-settings"));
+        if (BannerConfig.motdEnable) {
+            this.setMotd(BannerConfig.motd());
+        }
         org.spigotmc.SpigotConfig.registerCommands();
         this.bridge$server().loadPlugins();
         this.bridge$server().enablePlugins(PluginLoadOrder.STARTUP);
