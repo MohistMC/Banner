@@ -928,7 +928,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         banner$changeDimensionCause.set(cause);
     }
 
-    @Inject(method = "startSleepInBed", at = @At("HEAD"))
+    @Inject(method = "startSleepInBed", at = @At("HEAD"), cancellable = true)
     private void banner$bedEvent(BlockPos blockPos,
                                  CallbackInfoReturnable<Either<BedSleepingProblem, Unit>> cir) {
         boolean force = bridge$startSleepInBed_force().getAndSet(false);
