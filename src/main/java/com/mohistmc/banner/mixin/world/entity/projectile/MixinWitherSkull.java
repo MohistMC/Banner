@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(WitherSkull.class)
 public abstract class MixinWitherSkull extends AbstractHurtingProjectile {
@@ -26,13 +27,13 @@ public abstract class MixinWitherSkull extends AbstractHurtingProjectile {
     }
 
     @Inject(method = "onHitEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;heal(F)V"))
-    private void banner$heal(EntityHitResult result, LivingEntity livingEntity, CallbackInfo ci) {
-        livingEntity.pushHealReason(EntityRegainHealthEvent.RegainReason.WITHER);
+    private void banner$heal(EntityHitResult result, CallbackInfo ci) {
+        if (this.getOwner() != null) ((LivingEntity)this.getOwner()).pushHealReason(EntityRegainHealthEvent.RegainReason.WITHER);
     }
 
     @Inject(method = "onHitEntity", require = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z"))
-    private void banner$effect(EntityHitResult result, LivingEntity livingEntity, CallbackInfo ci) {
-        livingEntity.pushEffectCause(EntityPotionEffectEvent.Cause.ATTACK);
+    private void banner$effect(EntityHitResult result, CallbackInfo ci) {
+        ((LivingEntity)result.getEntity()).pushEffectCause(EntityPotionEffectEvent.Cause.ATTACK);
     }
 
     @Redirect(method = "onHit", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;explode(Lnet/minecraft/world/entity/Entity;DDDFZLnet/minecraft/world/level/Level$ExplosionInteraction;)Lnet/minecraft/world/level/Explosion;"))
