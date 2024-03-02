@@ -282,10 +282,9 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         if (!player.connection.isAcceptingMessages()) {
             ci.cancel();
         }
-
-        banner$joinMsg.set(playerJoinEvent.getJoinMessage());
-        if (banner$joinMsg.get() != null && !banner$joinMsg.get().isEmpty()) {
-            for (Component line : CraftChatMessage.fromString(banner$joinMsg.get())) {
+        String joinMessage = playerJoinEvent.getJoinMessage();
+        if (joinMessage != null && joinMessage.isEmpty()) {
+            for (Component line : CraftChatMessage.fromString(joinMessage)) {
                 server.getPlayerList().broadcastSystemMessage(line, false);
             }
         }
@@ -295,17 +294,16 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         ClientboundPlayerInfoUpdatePacket packet = ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(player));
 
         for (ServerPlayer serverPlayer : this.players) {
-            ServerPlayer entityplayer1 = (ServerPlayer) serverPlayer;
 
-            if (entityplayer1.getBukkitEntity().canSee(bukkitPlayer)) {
-                entityplayer1.connection.send(packet);
+            if (serverPlayer.getBukkitEntity().canSee(bukkitPlayer)) {
+                serverPlayer.connection.send(packet);
             }
 
-            if (!bukkitPlayer.canSee(entityplayer1.getBukkitEntity())) {
+            if (!bukkitPlayer.canSee(serverPlayer.getBukkitEntity())) {
                 continue;
             }
 
-            player.connection.send(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(entityplayer1)));
+            player.connection.send(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(serverPlayer)));
         }
         player.banner$setSentListPacket(true);
         // CraftBukkit end
@@ -494,8 +492,9 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Inject(method = "getPlayerForLogin", at = @At("HEAD"), cancellable = true)
     private void banner$getPlayerForLogin(GameProfile pProfile, CallbackInfoReturnable<ServerPlayer> ci) {
-        if(entity.get() != null) {
-            ci.setReturnValue(entity.getAndSet(null));
+        ServerPlayer entity1 = entity.getAndSet(null);
+        if(entity1 != null) {
+            ci.setReturnValue(entity1);
         }
     }
 

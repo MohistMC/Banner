@@ -130,23 +130,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Shadow public abstract void initMenu(AbstractContainerMenu abstractContainerMenu);
 
-    @Shadow public abstract void initInventoryMenu();
-
-    @Shadow public boolean isChangingDimension;
-    @Shadow public boolean wonGame;
-    @Shadow public boolean seenCredits;
-    @Shadow @Nullable private Vec3 enteredNetherPosition;
-
-    @Shadow protected abstract void createEndPlatform(ServerLevel serverLevel, BlockPos blockPos);
-
-    @Shadow public abstract void triggerDimensionChangeTriggers(ServerLevel serverLevel);
-
-    @Shadow private int lastSentFood;
-    @Shadow private float lastSentHealth;
-    @Shadow @Nullable private Vec3 levitationStartPos;
-
-    @Shadow public abstract boolean canChatInColor();
-
     @Shadow public abstract boolean teleportTo(ServerLevel level, double x, double y, double z, Set<RelativeMovement> relativeMovements, float yRot, float xRot);
 
     @Shadow public abstract void teleportTo(ServerLevel newLevel, double x, double y, double z, float yaw, float pitch);
@@ -308,7 +291,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             }
             if (world == null || position == null) {
                 world = ((CraftWorld) Bukkit.getServer().getWorlds().get(0)).getHandle();
-                position = Vec3.atCenterOf(((ServerLevel) world).getSharedSpawnPos());
+                position = Vec3.atCenterOf(world.getSharedSpawnPos());
             }
             this.setLevel(world);
             this.setPos(position);
