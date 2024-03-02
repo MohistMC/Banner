@@ -3,6 +3,7 @@ package org.bukkit.command;
 import com.google.common.base.Preconditions;
 import com.mohistmc.banner.command.DumpCommand;
 import com.mohistmc.banner.command.GetPluginListCommand;
+import com.mohistmc.banner.command.ItemsCommand;
 import com.mohistmc.banner.command.ModListCommand;
 import com.mohistmc.banner.command.PluginCommand;
 import org.bukkit.Location;
@@ -45,6 +46,7 @@ public class SimpleCommandMap implements CommandMap {
         register("banner", new DumpCommand("dump"));
         register("banner", new PluginCommand("plugin"));
         register("banner", new GetPluginListCommand("getpluginlist"));
+        register("banner", new ItemsCommand("items"));
     }
 
     public void setFallbackCommands() {
