@@ -325,11 +325,15 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Override
     public void updateWeather(float oldRain, float newRain, float oldThunder, float newThunder) {
         if (this.weather == null) {
+            // Vanilla
             if (oldRain != newRain) {
                 this.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.RAIN_LEVEL_CHANGE, newRain));
             }
-        } else if (this.pluginRainPositionPrevious != this.pluginRainPosition) {
-            this.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.RAIN_LEVEL_CHANGE, this.pluginRainPosition));
+        } else {
+            // Plugin
+            if (this.pluginRainPositionPrevious != this.pluginRainPosition) {
+                this.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.RAIN_LEVEL_CHANGE, this.pluginRainPosition));
+            }
         }
         if (oldThunder != newThunder) {
             if (this.weather == WeatherType.DOWNFALL || this.weather == null) {

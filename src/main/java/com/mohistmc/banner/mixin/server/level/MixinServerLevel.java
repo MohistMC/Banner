@@ -39,6 +39,7 @@ import net.minecraft.world.RandomSequences;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.CustomSpawner;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.WorldGenLevel;
@@ -475,19 +476,20 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setDayTime(J)V"))
     private void banner$timeSkip(ServerLevel world, long time) {
         TimeSkipEvent event = new TimeSkipEvent(this.getWorld(), TimeSkipEvent.SkipReason.NIGHT_SKIP, (time - time % 24000L) - this.getDayTime());
-        Bukkit.getPluginManager().callEvent(event);
-        banner$timeSkipCancelled.set(event.isCancelled());
-        if (!event.isCancelled()) {
-            world.setDayTime(this.getDayTime() + event.getSkipAmount());
+        if (this.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT)) {
+            Bukkit.getPluginManager().callEvent(event);
+            banner$timeSkipCancelled.set(event.isCancelled());
+            if (!event.isCancelled()) {
+                world.setDayTime(this.getDayTime() + event.getSkipAmount());
+            }
         }
     }
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;wakeUpAllPlayers()V"))
     private void banner$notWakeIfCancelled(ServerLevel world) {
-        if (!banner$timeSkipCancelled.get()) {
+        if (!banner$timeSkipCancelled.getAndSet(false)) {
             this.wakeUpAllPlayers();
         }
-        banner$timeSkipCancelled.set(false);
     }
 
     @ModifyVariable(method = "tickBlock", ordinal = 0, argsOnly = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;tick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/util/RandomSource;)V"))
