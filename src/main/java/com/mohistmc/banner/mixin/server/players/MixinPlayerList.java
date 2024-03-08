@@ -361,7 +361,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         cserver.getPluginManager().callEvent(playerQuitEvent);
         LuckPerms.perCache.remove(player.getBukkitEntity().getUniqueId());
         player.getBukkitEntity().disconnect(playerQuitEvent.getQuitMessage());
-        player.doTick(); // SPIGOT-924
+        // player.doTick(); // SPIGOT-924 // Banner
         // CraftBukkit end
         this.save(player);
         if (player.isPassenger()) {
