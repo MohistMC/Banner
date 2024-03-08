@@ -204,25 +204,19 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         return name;
     }
 
-    @Inject(method = "placeNewPlayer",
-            locals = LocalCapture.CAPTURE_FAILHARD,
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/level/ServerLevel;getLevelData()Lnet/minecraft/world/level/storage/LevelData;", shift = At.Shift.BEFORE))
-    private void banner$callSpawnEvent(Connection netManager, ServerPlayer player, CallbackInfo ci,
-                                       GameProfile gameProfile, GameProfileCache gameProfileCache,
-                                       String string, CompoundTag compoundTag, ResourceKey resourceKey,
-                                       ServerLevel serverLevel, ServerLevel serverLevel2, String string2) {
+    @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))
+    private ServerLevel banner$callSpawnEvent(MinecraftServer minecraftServer, ResourceKey<Level> dimension, Connection netManager, ServerPlayer player) {
         // Spigot start - spawn location event
         org.bukkit.entity.Player spawnPlayer = player.getBukkitEntity();
         org.spigotmc.event.player.PlayerSpawnLocationEvent ev = new org.spigotmc.event.player.PlayerSpawnLocationEvent(spawnPlayer, spawnPlayer.getLocation()); // Paper use our duplicate event
         cserver.getPluginManager().callEvent(ev);
 
         Location loc = ev.getSpawnLocation();
-        serverLevel2 = ((CraftWorld) loc.getWorld()).getHandle();
+        ServerLevel world = ((CraftWorld) loc.getWorld()).getHandle();
 
-        player.spawnIn(serverLevel2);
-        player.gameMode.setLevel((ServerLevel) player.level());
+        player.setServerLevel(world);
         player.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        return world;
     }
 
     @Redirect(method = "placeNewPlayer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/players/PlayerList;viewDistance:I"))
