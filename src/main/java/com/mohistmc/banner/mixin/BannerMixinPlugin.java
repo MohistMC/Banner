@@ -143,8 +143,7 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (mixinClassName.equals("com.mohistmc.banner.mixin.world.entity.MixinMob$PaperSpawnAffect")
-                || mixinClassName.equals("com.mohistmc.banner.mixin.server.players.MixinPlayerList$LoadRecursive")) {
+        if (mixinClassName.equals("com.mohistmc.banner.mixin.world.entity.MixinMob$PaperSpawnAffect")) {
             return !FabricLoader.getInstance().isModLoaded("vmp");
         }
         if (mixinClassName.equals("com.mohistmc.banner.mixin.world.level.spawner.MixinNaturalSpawner")) {
