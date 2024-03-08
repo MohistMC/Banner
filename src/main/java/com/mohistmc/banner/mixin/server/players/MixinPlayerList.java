@@ -311,41 +311,16 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         player.getEntityData().refresh(player); // CraftBukkit - BungeeCord#2321, send complete data to self on spawn
     }
 
-    @Unique
-    private static AtomicReference<ServerLevel> banner$level = new AtomicReference<>();
-
-    @WrapWithCondition(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
-    private boolean banner$wrapAddNewPlayer(ServerLevel instance, ServerPlayer player) {
-        banner$level.set(instance);
-        return player.level() == instance && !instance.players().contains(player);
-    }
-
-    @WrapWithCondition(method = "placeNewPlayer", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/bossevents/CustomBossEvents;onPlayerConnect(Lnet/minecraft/server/level/ServerPlayer;)V"))
-    private boolean banner$wrapAddNewPlayer0(CustomBossEvents instance, ServerPlayer player) {
-        return player.level() == banner$level.get() && !banner$level.get().players().contains(player);
+    @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
+    private void banner$wrapAddNewPlayer(ServerLevel instance, ServerPlayer player) {
+        if (player.level() == instance && !instance.players().contains(player)) {
+            instance.addNewPlayer(player);
+        }
     }
 
     @ModifyVariable(method = "placeNewPlayer", ordinal = 1, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
     private ServerLevel banner$handleWorldChanges(ServerLevel value, Connection connection, ServerPlayer player) {
         return player.serverLevel();// CraftBukkit - Update in case join event changed it
-    }
-
-
-    @Mixin(PlayerList.class)
-    public static class LoadRecursive {
-        @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE",
-                target = "Lnet/minecraft/world/entity/EntityType;loadEntityRecursive(Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/world/level/Level;Ljava/util/function/Function;)Lnet/minecraft/world/entity/Entity;"))
-        private Entity banner$loadRecursive(CompoundTag compound, Level level, Function<Entity, Entity> entityFunction) {
-            // CraftBukkit start
-            ServerLevel finalWorldServer = banner$level.get();
-            finalWorldServer = finalWorldServer == null ? ((ServerLevel) level) : finalWorldServer;
-            ServerLevel finalWorldServer1 = finalWorldServer;
-            return EntityType.loadEntityRecursive(compound.getCompound("Entity"), finalWorldServer, (entityx) -> {
-                return !finalWorldServer1.addWithUUID(entityx) ? null : entityx;
-            });
-        }
-
     }
 
     @Unique
