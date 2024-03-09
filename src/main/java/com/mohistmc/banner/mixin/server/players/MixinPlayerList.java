@@ -276,9 +276,9 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         if (!player.connection.isAcceptingMessages()) {
             ci.cancel();
         }
-        String joinMessage = playerJoinEvent.getJoinMessage();
-        if (joinMessage != null && joinMessage.isEmpty()) {
-            for (Component line : CraftChatMessage.fromString(joinMessage)) {
+        banner$joinMsg.set(playerJoinEvent.getJoinMessage());
+        if (banner$joinMsg.get() != null && !banner$joinMsg.get().isEmpty()) {
+            for (Component line : CraftChatMessage.fromString(banner$joinMsg.get())) {
                 server.getPlayerList().broadcastSystemMessage(line, false);
             }
         }
