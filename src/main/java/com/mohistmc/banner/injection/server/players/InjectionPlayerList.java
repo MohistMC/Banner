@@ -5,6 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 import net.minecraft.stats.ServerStatsCounter;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -48,5 +49,8 @@ public interface InjectionPlayerList {
     }
 
     default void banner$chat(boolean canSend) {
+    }
+
+    default void banner$putHandler(ServerLoginPacketListenerImpl handler) {
     }
 }

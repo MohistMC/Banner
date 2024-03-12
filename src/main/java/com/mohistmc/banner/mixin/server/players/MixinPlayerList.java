@@ -8,6 +8,8 @@ import com.mohistmc.banner.injection.server.players.InjectionPlayerList;
 import com.mohistmc.banner.util.I18n;
 import com.mojang.authlib.GameProfile;
 import java.io.File;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
@@ -58,6 +60,7 @@ import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 import net.minecraft.server.players.GameProfileCache;
 import net.minecraft.server.players.IpBanList;
 import net.minecraft.server.players.IpBanListEntry;
@@ -408,6 +411,13 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Unique
     private AtomicReference<ServerPlayer> entity = new AtomicReference<>(null);
+    @Unique
+    public AtomicReference<ServerLoginPacketListenerImpl> handler = new AtomicReference<>(null);
+
+    @Override
+    public void banner$putHandler(ServerLoginPacketListenerImpl handler) {
+        this.handler.set(handler);
+    }
 
     /**
      * @author Mgazul
@@ -419,9 +429,11 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         ServerPlayer serverPlayer = getPlayerForLogin(gameProfile);
         entity.set(serverPlayer);
         org.bukkit.entity.Player player = serverPlayer.getBukkitEntity();
-        String hostname = ((java.net.InetSocketAddress) socketaddress).getHostName() + ":" + ((java.net.InetSocketAddress) socketaddress).getPort();
-        PlayerLoginEvent event = new PlayerLoginEvent(player, hostname, ((java.net.InetSocketAddress) socketaddress).getAddress());
+        ServerLoginPacketListenerImpl handleR = handler.getAndSet(null);
+        String hostname = handleR == null ? "" : handleR.connection.bridge$hostname();
+        InetAddress realAddress = handleR == null ? ((InetSocketAddress) socketaddress).getAddress() : ((InetSocketAddress) handleR.connection.channel.remoteAddress()).getAddress();
 
+        PlayerLoginEvent event = new PlayerLoginEvent(player, hostname, ((InetSocketAddress) socketaddress).getAddress(), realAddress);
         if (getBans().isBanned(gameProfile) && !getBans().get(gameProfile).hasExpired()) {
             UserBanListEntry userbanlistentry = this.bans.get(gameProfile);
             MutableComponent mutablecomponent1 = Component.translatable("multiplayer.disconnect.banned.reason", userbanlistentry.getReason());

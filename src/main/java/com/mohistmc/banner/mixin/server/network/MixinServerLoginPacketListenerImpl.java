@@ -56,48 +56,37 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
 
     @Shadow
     public abstract void disconnect(Component reason);
-
     @Shadow
     @Nullable GameProfile gameProfile;
-
     @Shadow
     protected abstract GameProfile createFakeProfile(GameProfile original);
-
     @Shadow
     @Final
     MinecraftServer server;
-
     @Shadow
     @Final
     public Connection connection;
-
     @Shadow
     ServerLoginPacketListenerImpl.State state;
-
     @Shadow
     @Nullable
     private ServerPlayer delayedAcceptPlayer;
-
     @Shadow
     @Final
     static Logger LOGGER;
-
     @Shadow
     protected abstract void placeNewPlayer(ServerPlayer serverPlayer);
-
     @Shadow
     @Final
     private byte[] challenge;
-
     @Shadow
     @Final
     private static AtomicInteger UNIQUE_THREAD_ID;
 
     // CraftBukkit start
-    @Deprecated
     @Override
     public void disconnect(String s) {
-        disconnect(Component.literal(s));
+        this.disconnect(Component.literal(s));
     }
 
     // Spigot start
@@ -119,6 +108,7 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
             // this.gameProfile = this.createFakeProfile(this.gameProfile);
         }
 
+        this.server.getPlayerList().banner$putHandler((ServerLoginPacketListenerImpl)(Object) this);
         Component component = this.server.getPlayerList().canPlayerLogin(this.connection.getRemoteAddress(), this.gameProfile);
         if (component != null) {
             this.disconnect(component);
