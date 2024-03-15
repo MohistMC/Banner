@@ -1,6 +1,8 @@
 package org.bukkit.event.server;
 
 import com.google.common.base.Preconditions;
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.bukkit.Bukkit;
 import org.bukkit.UndefinedNullability;
 import org.bukkit.entity.Player;
@@ -184,6 +186,22 @@ public class ServerListPingEvent extends ServerEvent implements Iterable<Player>
     @NotNull
     @Override
     public Iterator<Player> iterator() throws UnsupportedOperationException {
-        throw new UnsupportedOperationException();
+        return new Iterator<>() {
+
+            @Override
+            public boolean hasNext() {
+                return false;
+            }
+
+            @Override
+            public Player next() {
+                throw new NoSuchElementException("Iterator is empty, no more elements to return.");
+            }
+
+            @Override
+            public void remove() {
+                throw new IllegalStateException("Cannot remove from an empty iterator.");
+            }
+        };
     }
 }
