@@ -29,7 +29,7 @@ public class MixinDifficultyCommand {
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/level/storage/WorldData;getDifficulty()Lnet/minecraft/world/Difficulty;"))
     private static Difficulty banner$getDifficult(WorldData instance) {
-        return banner$serverLevel.getAndSet(null).getDifficulty();
+        return banner$serverLevel.get().getDifficulty();
     }
 
     @Redirect(method = "setDifficulty",
