@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.ai.behavior;
 
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition ;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;

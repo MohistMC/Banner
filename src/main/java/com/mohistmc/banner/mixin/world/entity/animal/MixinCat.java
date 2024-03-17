@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.animal;
 
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition ;
 import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;

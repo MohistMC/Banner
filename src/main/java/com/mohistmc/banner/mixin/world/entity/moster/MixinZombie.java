@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.moster;
 
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition ;
 import io.izzel.arclight.mixin.Eject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
