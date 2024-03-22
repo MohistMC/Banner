@@ -140,6 +140,7 @@ public class BannerConfig {
     public static boolean velocityEnabled;
     public static String velocitySecret;
     public static double WatchDogTimeOut;
+    public static boolean spawnForChunk;
 
     public static String motd() {
         return ColorsAPI.of(motdFirstLine) + "\n" + ColorsAPI.of(motdSecondLine);
@@ -159,6 +160,7 @@ public class BannerConfig {
         skipOtherWorldPreparing = getBoolean("compat.skipOtherWorldPreparing", false);
         server_thread = getInt("threadpriority.server_thread", 8);
         nospawnEntity = getList("entity.nospawn", Collections.emptyList());
+        spawnForChunk = getBoolean("entity.spawnForChunk", true);
         clear_item = getBoolean("entity.clear.item.enable", false);
         clear_item__whitelist = getList("entity.clear.item.whitelist", Collections.emptyList());
         clear_item__msg = getString("entity.clear.item.msg", "[Server] Cleaned up %size% drops");

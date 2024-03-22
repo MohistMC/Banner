@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.spawner;
 
+import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.injection.world.level.spawner.InjectionSpawnState;
 import java.util.Objects;
 import java.util.Optional;
@@ -83,6 +84,7 @@ public abstract class MixinNaturalSpawner {
     @Overwrite
     public static void spawnForChunk(ServerLevel worldserver, LevelChunk chunk, NaturalSpawner.SpawnState spawnercreature_d, boolean flag, boolean flag1, boolean flag2) {
         worldserver.getProfiler().push("spawner");
+        if (!BannerConfig.spawnForChunk) return;
         MobCategory[] aenumcreaturetype = SPAWNING_CATEGORIES;
         int i = aenumcreaturetype.length;
 
