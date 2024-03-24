@@ -120,7 +120,11 @@ public class CraftPotionUtil {
     }
 
     public static PotionEffect toBukkit(MobEffectInstance effect) {
-        PotionEffectType type = PotionEffectType.getById(MobEffect.getId(effect.getEffect()));
+        int entityId = MobEffect.getId(effect.getEffect());
+        PotionEffectType type = PotionEffectType.getById(entityId);
+        if (type == null && mods_map.containsKey(entityId)) {
+            type = mods_map.get(entityId);
+        }
         int amp = effect.getAmplifier();
         int duration = effect.getDuration();
         boolean ambient = effect.isAmbient();
