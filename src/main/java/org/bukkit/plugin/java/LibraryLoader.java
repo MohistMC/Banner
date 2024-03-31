@@ -4,6 +4,7 @@ import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.PluginsLibrarySource;
 import com.mohistmc.banner.bukkit.remapping.RemappingURLClassLoader;
 import com.mohistmc.banner.util.I18n;
+import com.mohistmc.mjson.Json;
 import com.mohistmc.tools.ConnectionUtil;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -12,7 +13,6 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.StandardOpenOption;
-import mjson.Json;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -121,7 +121,7 @@ class LibraryLoader {
                 String group = dependency.group().replace(".", "/");
                 String fileName = "%s-%s.jar".formatted(dependency.name(), dependency.version());
                 String pomUrl = PluginsLibrarySource.DEFAULT + "%s/%s/%s/%s".formatted(group, dependency.name(), dependency.version(), fileName.replace("jar", "pom"));
-                if (ConnectionUtil.hasUrl(pomUrl)) list.addAll(initDependencies(new URL(pomUrl)));
+                if (ConnectionUtil.isValid(pomUrl)) list.addAll(initDependencies(new URL(pomUrl)));
             }
         }
         return list;

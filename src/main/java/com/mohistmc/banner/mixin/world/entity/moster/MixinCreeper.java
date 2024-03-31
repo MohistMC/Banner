@@ -32,7 +32,6 @@ public abstract class MixinCreeper extends Monster implements PowerableMob, Inje
     // @formatter:off
     @Shadow @Final private static EntityDataAccessor<Boolean> DATA_IS_POWERED;
     @Shadow public int explosionRadius;
-    @Shadow protected abstract void spawnLingeringCloud();
     @Shadow
     public int swell;
     @Shadow public abstract boolean isPowered();
@@ -53,20 +52,13 @@ public abstract class MixinCreeper extends Monster implements PowerableMob, Inje
      * @author wdog5
      * @reason
      */
-    @Overwrite
-    public final void explodeCreeper() {
-        if (!this.level().isClientSide) {
-            final float f = this.isPowered() ? 2.0f : 1.0f;
-            final ExplosionPrimeEvent event = new ExplosionPrimeEvent(this.getBukkitEntity(), this.explosionRadius * f, false);
-            Bukkit.getPluginManager().callEvent(event);
-            if (!event.isCancelled()) {
-                this.dead = true;
-                this.level().explode((Creeper) (Object) this, this.getX(), this.getY(), this.getZ(), event.getRadius(), event.getFire(), Level.ExplosionInteraction.MOB);
-                this.discard();
-                this.spawnLingeringCloud();
-            } else {
-                this.swell = 0;
-            }
+    @Inject(method = "explodeCreeper", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/Creeper;isPowered()Z"))
+    public final void explodeCreeper(CallbackInfo ci) {
+        ExplosionPrimeEvent event = new ExplosionPrimeEvent(this.getBukkitEntity(), this.explosionRadius * (this.isPowered() ? 2.0f : 1.0f), false);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            this.swell = 0;
+            ci.cancel();
         }
     }
 

@@ -170,8 +170,6 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
 
     @Shadow public abstract boolean removeEffect(MobEffect effect);
 
-    @Shadow public abstract ItemStack getItemInHand(InteractionHand hand);
-
     @Shadow public abstract boolean onClimbable();
 
     @Shadow public abstract InteractionHand getUsedItemHand();
@@ -372,8 +370,6 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
             }
         }
     }
-
-    // @Shadow public abstract boolean addEffect(MobEffectInstance effectInstanceIn, Entity entity);
 
     // Banner - fix mixin(locals = LocalCapture.CAPTURE_FAILHARD)
     @Unique
@@ -694,54 +690,6 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     public boolean removeAllEffects(EntityPotionEffectEvent.Cause cause) {
         pushEffectCause(cause);
         return this.removeAllEffects();
-    }
-
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    private boolean checkTotemDeathProtection(DamageSource damageSourceIn) {
-        if (damageSourceIn.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
-            return false;
-        } else {
-            net.minecraft.world.item.ItemStack itemstack = null;
-
-            net.minecraft.world.item.ItemStack itemstack1 = ItemStack.EMPTY;
-            org.bukkit.inventory.EquipmentSlot bukkitHand = null;
-            for (InteractionHand hand : InteractionHand.values()) {
-                itemstack1 = this.getItemInHand(hand);
-                if (itemstack1.is(Items.TOTEM_OF_UNDYING)) {
-                    itemstack = itemstack1.copy();
-                    bukkitHand = CraftEquipmentSlot.getHand(hand);
-                    // itemstack1.shrink(1);
-                    break;
-                }
-            }
-
-            EntityResurrectEvent event = new EntityResurrectEvent((org.bukkit.entity.LivingEntity) this.getBukkitEntity(), bukkitHand);
-            event.setCancelled(itemstack == null);
-            Bukkit.getPluginManager().callEvent(event);
-
-            if (!event.isCancelled()) {
-                if (!itemstack1.isEmpty()) {
-                    itemstack1.shrink(1);
-                }
-                if (itemstack != null && (Object) this instanceof ServerPlayer serverplayerentity) {
-                    serverplayerentity.awardStat(Stats.ITEM_USED.get(Items.TOTEM_OF_UNDYING));
-                    CriteriaTriggers.USED_TOTEM.trigger(serverplayerentity, itemstack);
-                }
-
-                this.setHealth(1.0F);
-                this.removeAllEffects(EntityPotionEffectEvent.Cause.TOTEM);
-                this.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 900, 1), EntityPotionEffectEvent.Cause.TOTEM);
-                pushEffectCause(EntityPotionEffectEvent.Cause.TOTEM);
-                this.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 100, 1), EntityPotionEffectEvent.Cause.TOTEM);
-                this.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 800, 1), EntityPotionEffectEvent.Cause.TOTEM);
-                this.level().broadcastEntityEvent((Entity) (Object) this, (byte) 35);
-            }
-            return !event.isCancelled();
-        }
     }
 
     @Inject(method = "createWitherRose", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))

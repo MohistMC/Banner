@@ -2,8 +2,10 @@ package com.mohistmc.banner.network.download;
 
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.util.I18n;
+import com.mohistmc.mjson.Json;
 import com.mohistmc.tools.ConnectionUtil;
 import com.mohistmc.tools.MD5Util;
+import com.mohistmc.tools.NumberUtil;
 import java.io.File;
 import java.net.URI;
 import java.net.URLConnection;
@@ -16,7 +18,6 @@ import java.util.Date;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import mjson.Json;
 
 public class UpdateUtils {
 
@@ -49,7 +50,7 @@ public class UpdateUtils {
 
     public static void downloadFile(String URL, File f, String md5, boolean showlog) throws Exception {
         URLConnection conn = ConnectionUtil.getConn(URL);
-        if (showlog) System.out.println(I18n.as("download.file", f.getName(), ConnectionUtil.getSize(conn.getContentLength())));
+        if (showlog) System.out.println(I18n.as("download.file", f.getName(), NumberUtil.getSize(conn.getContentLength())));
         ReadableByteChannel rbc = Channels.newChannel(conn.getInputStream());
         FileChannel fc = FileChannel.open(f.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
         int fS = conn.getContentLength();

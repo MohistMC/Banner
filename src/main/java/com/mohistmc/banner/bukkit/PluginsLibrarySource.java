@@ -21,6 +21,6 @@ public enum PluginsLibrarySource {
     }
 
     public static boolean isCN() {
-        return BannerMCStart.I18N.isCN() && ConnectionUtil.getUrlMillis(ALIBABA.url) < ConnectionUtil.getUrlMillis(MAVEN2.url);
+        return BannerMCStart.I18N.isCN() && ConnectionUtil.measureLatency(ALIBABA.url) < ConnectionUtil.measureLatency(MAVEN2.url);
     }
 }
