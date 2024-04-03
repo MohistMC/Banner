@@ -61,11 +61,4 @@ public abstract class MixinChestBlockEntity extends RandomizableContainerBlockEn
     public void setMaxStackSize(int size) {
         this.maxStack = size;
     }
-
-    // CraftBukkit start
-    @Override
-    public boolean onlyOpCanSetNbt() {
-        return true;
-    }
-    // CraftBukkit end
 }
