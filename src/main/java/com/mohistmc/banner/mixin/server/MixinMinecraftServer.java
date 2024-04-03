@@ -231,15 +231,13 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     private boolean hasStopped = false;
     @Unique
     private final Object stopLock = new Object();
-    @Unique
-    public final double[] recentTps = new double[4];
-    @Unique
+
+    // Spigot start
     private static final int TPS = 20;
-    @Unique
-    private static final int TICK_TIME = 1000000000 / TPS;
-    @Unique
-    private static final int SAMPLE_INTERVAL = 20; // Paper
-    // CraftBukkit end
+    private  static final int TICK_TIME = 1000000000 / TPS;
+    private static final int SAMPLE_INTERVAL = 100;
+    public final double[] recentTps = new double[ 3 ];
+    // Spigot end
 
     public MixinMinecraftServer(String string) {
         super(string);
@@ -267,26 +265,10 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         }
     }
 
-    // Paper start - Further improve server tick loop
     @Unique
-    private static final long SEC_IN_NANO = 1000000000;
-    @Unique
-    private static final long MAX_CATCHUP_BUFFER = TICK_TIME * TPS * 60L;
-    @Unique
-    private long lastTick = 0;
-    @Unique
-    private long catchupTime = 0;
-    @Unique
-    public final RollingAverage tps5s = new RollingAverage(5, TPS, SEC_IN_NANO); // Purpur
-    @Unique
-    public final RollingAverage tps1 = new RollingAverage(60, TPS, SEC_IN_NANO);
-    @Unique
-    public final RollingAverage tps5 = new RollingAverage(60 * 5, TPS, SEC_IN_NANO);
-    @Unique
-    public final RollingAverage tps15 = new RollingAverage(60 * 15, TPS, SEC_IN_NANO);
-    @Unique
-    private static final java.math.BigDecimal TPS_BASE = new java.math.BigDecimal(1E9).multiply(new java.math.BigDecimal(SAMPLE_INTERVAL));
-    // Paper End
+    private static double calcTps(double avg, double exp, double tps) {
+        return (avg * exp) + (tps * (1 - exp));
+    }
 
     /**
      * @author wdog5
@@ -305,9 +287,9 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
             // Spigot start
             Arrays.fill( recentTps, 20 );
-            long tickSection = Util.getNanos(), curTime, tickCount = 1; // Paper
+            long curTime, tickSection = Util.getMillis(), tickCount = 1;
             while (this.running) {
-                long i = ((curTime = System.nanoTime()) / (1000L * 1000L)) - this.nextTickTime; // Paper
+                long i = (curTime = Util.getMillis()) - this.nextTickTime;
 
                 if (i > 5000L && this.nextTickTime - this.lastOverloadWarning >= 30000L) { // CraftBukkit
                     long j = i / 50L;
@@ -318,25 +300,14 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                     this.lastOverloadWarning = this.nextTickTime;
                 }
 
-                if ( ++currentTick % SAMPLE_INTERVAL == 0 )
+                if ( tickCount++ % SAMPLE_INTERVAL == 0 )
                 {
-                    curTime = Util.getNanos();
-                    final long diff = curTime - tickSection;
-                    java.math.BigDecimal currentTps = TPS_BASE.divide(new java.math.BigDecimal(diff), 30, java.math.RoundingMode.HALF_UP);
-                    tps5s.add(currentTps, diff); // Purpur
-                    tps1.add(currentTps, diff);
-                    tps5.add(currentTps, diff);
-                    tps15.add(currentTps, diff);
-                    // Backwards compat with bad plugins
-                    // Purpur start
-                    this.recentTps[0] = tps5s.getAverage();
-                    this.recentTps[1] = tps1.getAverage();
-                    this.recentTps[2] = tps5.getAverage();
-                    this.recentTps[3] = tps15.getAverage();
-                    // Purpur end
-                    // Paper end
+                    double currentTps = 1E3 / ( curTime - tickSection ) * SAMPLE_INTERVAL;
+                    recentTps[0] = calcTps( recentTps[0], 0.92, currentTps ); // 1/exp(5sec/1min)
+                    recentTps[1] = calcTps( recentTps[1], 0.9835, currentTps ); // 1/exp(5sec/5min)
+                    recentTps[2] = calcTps( recentTps[2], 0.9945, currentTps ); // 1/exp(5sec/15min)
                     tickSection = curTime;
-                } else curTime = Util.getNanos();
+                }
                 // Spigot end
 
                 if (this.debugCommandProfilerDelayStart) {
@@ -344,8 +315,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                     this.debugCommandProfiler = new MinecraftServer.TimeProfiler(Util.getNanos(), this.tickCount);
                 }
 
-                // BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit  // Paper - don't overwrite current tick time
-                lastTick = curTime;
+                BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
                 this.nextTickTime += 50L;
                 this.startMetricsRecordingTick();
                 this.profiler.push("tick");
@@ -361,12 +331,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             }
         } catch (Throwable throwable) {
             MinecraftServer.LOGGER.error("Encountered an unexpected exception", throwable);
-            // Spigot Start
-            if ( throwable.getCause() != null )
-            {
-                MinecraftServer.LOGGER.error( "\tCause of unexpected exception was", throwable.getCause() );
-            }
-            // Spigot End
             CrashReport crashreport = constructOrExtractCrashReport(throwable);
 
             this.fillSystemReport(crashreport.getSystemReport());
@@ -402,11 +366,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
         }
 
-    }
-
-    @Unique
-    private static double calcTps(double avg, double exp, double tps) {
-        return (avg * exp) + (tps * (1 - exp));
     }
 
     @Inject(method = "stopServer", at = @At("HEAD"), cancellable = true)
@@ -910,11 +869,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Override
     public double[] getTPS() {
-        return new double[] {
-                tps5s.getAverage(), // Purpur
-                tps1.getAverage(),
-                tps5.getAverage(),
-                tps15.getAverage()
-        };
+        return recentTps;
     }
 }
