@@ -127,7 +127,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     @Unique
     public boolean populating;
     @Unique
-    private org.spigotmc.SpigotWorldConfig spigotConfig; // Spigot
+    public org.spigotmc.SpigotWorldConfig spigotConfig; // Spigot
     @Unique
     protected org.bukkit.World.Environment environment;
     @Unique
