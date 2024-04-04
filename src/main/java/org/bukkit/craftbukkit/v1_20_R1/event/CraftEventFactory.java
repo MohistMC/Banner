@@ -1504,8 +1504,12 @@ public class CraftEventFactory {
         return event;
     }
 
-    public static void handleInventoryCloseEvent(net.minecraft.world.entity.player.Player  human) {
-        InventoryCloseEvent event = new InventoryCloseEvent(human.containerMenu.getBukkitView());
+    public static void handleInventoryCloseEvent(net.minecraft.world.entity.player.Player human) {
+        var bukkitview = human.containerMenu.getBukkitView();
+        if (bukkitview == null) {
+            return;
+        }
+        InventoryCloseEvent event = new InventoryCloseEvent(bukkitview);
         human.level().getCraftServer().getPluginManager().callEvent(event);
         human.containerMenu.transferTo(human.inventoryMenu, human.getBukkitEntity());
     }
