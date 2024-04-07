@@ -17,10 +17,10 @@ public abstract class MixinItemCombinerMenu extends AbstractContainerMenu {
         super(menuType, i);
     }
 
-    @Inject(method = "stillValid", at = @At("HEAD"))
+    @Inject(method = "stillValid", at = @At("HEAD"), cancellable = true)
     private void banner$addCheckReachAble(Player player, CallbackInfoReturnable<Boolean> cir) {
         if (!this.bridge$checkReachable()) {
-            cir.cancel();
+            cir.setReturnValue(true);
         }
     }
 }
