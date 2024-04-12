@@ -140,4 +140,11 @@ public interface InjectionLevel {
 
     default void banner$setBannerConfig(BannerWorldConfig bannerWorldConfig) {
     }
+
+    default void banner$callEvent(boolean call) {
+    }
+
+    default BlockState banner$defaultBlockState() {
+        return null;
+    }
 }

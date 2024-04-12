@@ -445,6 +445,29 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         }
     }
 
+    @Unique
+    private final AtomicBoolean callEvent = new AtomicBoolean(false);
+    @Unique
+    private BlockState banner$defaultBlockState;
+
+    @Override
+    public void banner$callEvent(boolean call) {
+        callEvent.set(call);
+    }
+
+    @Override
+    public BlockState banner$defaultBlockState() {
+        return banner$defaultBlockState;
+    }
+
+    @Inject(method = "setBlockAndUpdate", cancellable = true, at = @At(value = "HEAD"))
+    private void banner$setBlockAndUpdate(BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
+        banner$defaultBlockState = state;
+        if (callEvent.getAndSet(false)){
+            cir.setReturnValue(false);
+        }
+    }
+
     @Override
     public BlockEntity getBlockEntity(BlockPos blockposition, boolean validate) {
         // CraftBukkit start
