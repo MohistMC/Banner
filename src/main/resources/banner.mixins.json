@@ -34,7 +34,6 @@
     "interaction.dispenser.MixinShearsDispenseItemBehavior",
     "interaction.dispenser.MixinShulkerBoxDispenseBehavior",
     "network.MixinFriendlyByteBuf",
-    "network.MixinVarint21LengthFieldPrepender",
     "network.chat.MixinComponent",
     "network.chat.MixinTextColor",
     "network.connection.MixinConnection",
