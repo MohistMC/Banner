@@ -73,7 +73,7 @@ dependencies {
 	// bukkit
 	implementation(include("org.yaml:snakeyaml:2.0"))
 	implementation(include("com.mohistmc:i18n:0.6"))
-	implementation(include('com.mohistmc:json:0.4'))
+	implementation(include('com.mohistmc:json:0.5'))
 	implementation(include('com.mohistmc:tools:0.5.1'))
 	implementation(include('com.mohistmc:dynamicenum:0.3'))
 	implementation(include('javax.inject:javax.inject:1'))
