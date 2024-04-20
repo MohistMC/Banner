@@ -62,7 +62,7 @@ class LibraryLoader {
             String group = dependency.group().replace(".", "/");
             String fileName = "%s-%s.jar".formatted(dependency.name(), dependency.version());
             if (!d.contains(fileName)) {
-                if (dependency.version().toString().equalsIgnoreCase("LATEST")) {
+                if (dependency.version().equalsIgnoreCase("LATEST")) {
                     newDependencies.add(findDependency(group, dependency.name(), false));
                 } else {
                     newDependencies.add(dependency);
@@ -144,20 +144,22 @@ class LibraryLoader {
         Json json = Json.readXml(url);
         if (json != null) {
             Json json2Json = json.at("project");
-            String version = json2Json.has("parent") ? json2Json.at("parent").asString("version") : json2Json.asString("version");
-            String groupId = json2Json.has("parent") ? json2Json.at("parent").asString("groupId") : json2Json.asString("groupId");
+            if (json2Json != null) {
+                String version = json2Json.has("parent") ? json2Json.at("parent").asString("version") : json2Json.asString("version");
+                String groupId = json2Json.has("parent") ? json2Json.at("parent").asString("groupId") : json2Json.asString("groupId");
 
-            if (!json2Json.has("dependencies")) return list;
-            if (!json2Json.at("dependencies").toString().startsWith("{\"dependency\"")) return list;
-            Json json3Json = json2Json.at("dependencies").at("dependency");
-            if (json3Json.isArray()) {
-                for (Json o : json2Json.at("dependencies").asJsonList("dependency")) {
-                    dependency(o, list, version, groupId);
+                if (!json2Json.has("dependencies")) return list;
+                if (!json2Json.at("dependencies").toString().startsWith("{\"dependency\"")) return list;
+                Json json3Json = json2Json.at("dependencies").at("dependency");
+                if (json3Json.isArray()) {
+                    for (Json o : json2Json.at("dependencies").asJsonList("dependency")) {
+                        dependency(o, list, version, groupId);
+                    }
+                } else {
+                    dependency(json3Json, list, version, groupId);
                 }
-            } else {
-                dependency(json3Json, list, version, groupId);
+                list.addAll(findDependency(list));
             }
-            list.addAll(findDependency(list));
         }
         return list;
     }
@@ -166,6 +168,9 @@ class LibraryLoader {
         try {
             if (json.toString().contains("groupId") && json.toString().contains("artifactId")) {
                 String groupId = json.asString("groupId");
+                if (groupId.startsWith("${") ) {
+                    groupId = parent_groupId;
+                }
                 String artifactId = json.asString("artifactId");
                 DependencyIgnoreVersion d = new DependencyIgnoreVersion(groupId, artifactId);
                 if (dependencyIgnoreVersion.contains(d)) {
