@@ -48,7 +48,7 @@ public class IntermediaryMappingProvider extends AbstractMappingProvider {
         }
 
         URI uri = MAPPINGS_ARTIFACT.buildUri(CompatUtil.VERSION_ID, "jar");
-        CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.downloading.intermediary"), CompatUtil.VERSION_ID);
+        CompatUtil.LOGGER.info(BannerMCStart.I18N.as("stackdeobf.downloading.intermediary"), CompatUtil.VERSION_ID);
 
         return HttpUtil.getAsync(uri, executor).thenAccept(jarBytes -> {
             byte[] mappingBytes = this.extractPackagedMappings(jarBytes);

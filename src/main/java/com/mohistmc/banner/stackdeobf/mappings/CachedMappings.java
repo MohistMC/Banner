@@ -25,7 +25,7 @@ public final class CachedMappings {
     }
 
     public static void init(AbstractMappingProvider provider) {
-        CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.creating"));
+        CompatUtil.LOGGER.info(BannerMCStart.I18N.as("stackdeobf.creating"));
         ExecutorService cacheExecutor = Executors.newSingleThreadExecutor(
                 new ThreadFactoryBuilder().setNameFormat("Mappings Cache Thread").setDaemon(true).build());
         long start = System.currentTimeMillis();
@@ -34,17 +34,17 @@ public final class CachedMappings {
         provider.cacheMappings(new MappingCacheVisitor(CLASSES, METHODS, FIELDS), cacheExecutor)
                 .thenAccept($ -> {
                     long timeDiff = System.currentTimeMillis() - start;
-                    CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.cached.mappings"), timeDiff);
+                    CompatUtil.LOGGER.info(BannerMCStart.I18N.as("stackdeobf.cached.mappings"), timeDiff);
 
-                    CompatUtil.LOGGER.info(" " + BannerMCStart.I18N.get("stackdeobf.classes") + " " + CLASSES.size());
-                    CompatUtil.LOGGER.info(" " + BannerMCStart.I18N.get("stackdeobf.methods") + " " + METHODS.size());
-                    CompatUtil.LOGGER.info(" " + BannerMCStart.I18N.get("stackdeobf.fields") + " "  + FIELDS.size());
+                    CompatUtil.LOGGER.info(" " + BannerMCStart.I18N.as("stackdeobf.classes") + " " + CLASSES.size());
+                    CompatUtil.LOGGER.info(" " + BannerMCStart.I18N.as("stackdeobf.methods") + " " + METHODS.size());
+                    CompatUtil.LOGGER.info(" " + BannerMCStart.I18N.as("stackdeobf.fields") + " "  + FIELDS.size());
                 })
                 // needs to be executed asynchronously, otherwise the
                 // executor of the current thread would be shut down
                 .thenRunAsync(() -> {
-                    CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.shutting.down"));
-                    BannerMCStart.LOGGER.info(BannerMCStart.I18N.get("load.libraries"));
+                    CompatUtil.LOGGER.info(BannerMCStart.I18N.as("stackdeobf.shutting.down"));
+                    BannerMCStart.LOGGER.info(BannerMCStart.I18N.as("load.libraries"));
                     cacheExecutor.shutdown();
                 });
     }

@@ -43,14 +43,14 @@ public final class HttpUtil {
         HttpRequest request = HttpRequest.newBuilder(uri).build();
         HttpResponse.BodyHandler<byte[]> handler = HttpResponse.BodyHandlers.ofByteArray();
 
-        CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.requesting"), uri);
+        CompatUtil.LOGGER.info(BannerMCStart.I18N.as("stackdeobf.requesting"), uri);
         long start = System.currentTimeMillis();
 
         return getHttpClient(executor).sendAsync(request, handler).thenApplyAsync(resp -> {
             long timeDiff = System.currentTimeMillis() - start;
             byte[] bodyBytes = resp.body();
 
-            String message = BannerMCStart.I18N.get("stackdeobf.received");
+            String message = BannerMCStart.I18N.as("stackdeobf.received");
             Object[] args = {bodyBytes.length, FileUtils.byteCountToDisplaySize(bodyBytes.length),
                     resp.statusCode(), uri, timeDiff};
 

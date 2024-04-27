@@ -345,7 +345,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         ServerLevel banner$serverLevel = this.prepareLevels$serverlevel.getAndSet(this.overworld());
         banner$serverLevel = banner$serverLevel == null ? this.overworld() : banner$serverLevel;
         ServerLevel serverLevel = banner$serverLevel;
-        LOGGER.info(BannerMCStart.I18N.get("server.region.prepare"), serverLevel.dimension().location());
+        LOGGER.info(BannerMCStart.I18N.as("server.region.prepare"), serverLevel.dimension().location());
         BlockPos blockPos = serverLevel.getSharedSpawnPos();
         listener.updateSpawnPos(new ChunkPos(blockPos));
         ServerChunkCache serverChunkCache = serverLevel.getChunkSource();

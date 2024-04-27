@@ -269,6 +269,7 @@ final class PluginClassLoader extends URLClassLoader {
                     if (attributes != null) {
                         try {
                             try {
+                                /*
                                 Object versionInfo = MohistDynamEnum.getField(pkg, Package.class.getDeclaredField("versionInfo"));
                                 if (versionInfo != null) {
                                     Class<?> Package$VersionInfo = Class.forName("java.lang.Package$VersionInfo");
@@ -279,6 +280,7 @@ final class PluginClassLoader extends URLClassLoader {
                                     MohistDynamEnum.setField(versionInfo, attributes.getValue(Attributes.Name.SPECIFICATION_VERSION), Package$VersionInfo.getDeclaredField("specVersion"));
                                     MohistDynamEnum.setField(versionInfo, attributes.getValue(Attributes.Name.SPECIFICATION_VENDOR), Package$VersionInfo.getDeclaredField("specVendor"));
                                 }
+                                 */
                             } catch (Exception ignored) {
                             }
                         } finally {

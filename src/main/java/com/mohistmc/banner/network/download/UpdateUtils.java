@@ -29,8 +29,8 @@ public class UpdateUtils {
     private static int percentage = 0;
 
     public static void versionCheck() {
-        System.out.println(BannerMCStart.I18N.get("update.check"));
-        System.out.println(BannerMCStart.I18N.get("update.stopcheck"));
+        System.out.println(BannerMCStart.I18N.as("update.check"));
+        System.out.println(BannerMCStart.I18N.as("update.stopcheck"));
 
         try {
             JsonElement root = JsonParser.parseReader(new InputStreamReader(getInput("https://ci.codemc.io/job/MohistMC/job/Banner-1.19.4/lastSuccessfulBuild/api/json")));
@@ -40,12 +40,12 @@ public class UpdateUtils {
             String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.parseLong(root.getAsJsonObject().get("timestamp").toString())));
 
             if (jar_sha.equals(build_number))
-                System.out.println(BannerMCStart.I18N.get("update.latest", jar_sha, build_number));
+                System.out.println(BannerMCStart.I18N.as("update.latest", jar_sha, build_number));
             else {
-                System.out.println(BannerMCStart.I18N.get("update.detect", build_number, jar_sha, time));
+                System.out.println(BannerMCStart.I18N.as("update.detect", build_number, jar_sha, time));
             }
         } catch (Throwable e) {
-            System.out.println(BannerMCStart.I18N.get("check.update.noci"));
+            System.out.println(BannerMCStart.I18N.as("check.update.noci"));
         }
     }
 
@@ -55,7 +55,7 @@ public class UpdateUtils {
 
     public static void downloadFile(String URL, File f, String md5) throws Exception {
         URLConnection conn = getConn(URL);
-        System.out.println(BannerMCStart.I18N.get("download.file", f.getName(), getSize(conn.getContentLength())));
+        System.out.println(BannerMCStart.I18N.as("download.file", f.getName(), getSize(conn.getContentLength())));
         ReadableByteChannel rbc = Channels.newChannel(conn.getInputStream());
         FileChannel fc = FileChannel.open(f.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
         int fS = conn.getContentLength();
@@ -65,7 +65,7 @@ public class UpdateUtils {
                 () -> {
                     if (rbc.isOpen()) {
                         if (percentage != Math.round((float) f.length() / fS * 100) && percentage < 100) {
-                            System.out.println(BannerMCStart.I18N.get("file.download.percentage", f.getName(), percentage));
+                            System.out.println(BannerMCStart.I18N.as("file.download.percentage", f.getName(), percentage));
                         }
                         percentage = Math.round((float) f.length() / fS * 100);
                     }
@@ -77,10 +77,10 @@ public class UpdateUtils {
         String MD5 = MD5Util.getMd5(f);
         if (f.getName().endsWith(".jar") && md5 != null && MD5 != null && !MD5.equals(md5.toLowerCase())) {
             f.delete();
-            System.out.println(BannerMCStart.I18N.get("file.download.nook.md5", URL, MD5, md5.toLowerCase()));
+            System.out.println(BannerMCStart.I18N.as("file.download.nook.md5", URL, MD5, md5.toLowerCase()));
             throw new Exception("md5");
         }
-        System.out.println(BannerMCStart.I18N.get("download.file.ok", f.getName()));
+        System.out.println(BannerMCStart.I18N.as("download.file.ok", f.getName()));
     }
 
     public static String getSize(long size) {

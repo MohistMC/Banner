@@ -78,7 +78,7 @@ public class FabricInjectBukkit {
             if (environment1 == null) {
                 String name = normalizeName(key.location().toString());
                 int id = i - 1;
-                environment1 = MohistDynamEnum.addEnum(World.Environment.class, name, new Class[]{Integer.TYPE}, new Object[]{id});
+                environment1 = MohistDynamEnum.addEnum(World.Environment.class, name,  List.of(Integer.TYPE),  List.of(id));
                 DIM_MAP.put(key, environment1);
                 BannerServer.LOGGER.debug("Registered fabric DimensionType as environment {}", environment1);
                 i++;
@@ -145,7 +145,7 @@ public class FabricInjectBukkit {
             if (CraftPotionUtil.toBukkit(resourceLocation.toString()).getType() == PotionType.UNCRAFTABLE && potion != Potions.EMPTY) {
                 String name = normalizeName(resourceLocation.toString());
                 MobEffectInstance effectInstance = potion.getEffects().isEmpty() ? null : potion.getEffects().get(0);
-                PotionType potionType = MohistDynamEnum.addEnum0(PotionType.class, name, new Class[]{PotionEffectType.class, Boolean.TYPE, Boolean.TYPE}, effectInstance == null ? null : PotionEffectType.getById(MobEffect.getId(effectInstance.getEffect())), false, false);
+                PotionType potionType = MohistDynamEnum.addEnum(PotionType.class, name,  List.of(PotionEffectType.class, Boolean.TYPE, Boolean.TYPE),  List.of(effectInstance == null ? null : PotionEffectType.getById(MobEffect.getId(effectInstance.getEffect())), false, false));
                 if (potionType != null) {
                     BannerServer.LOGGER.debug("Save-PotionType:" + name + " - " + potionType.name());
                 }
@@ -159,7 +159,7 @@ public class FabricInjectBukkit {
             ResourceLocation resourceLocation = registry.getKey(particleType);
             String name = normalizeName(resourceLocation.toString());
             if (!resourceLocation.getNamespace().equals(NamespacedKey.MINECRAFT)) {
-                Particle particle = MohistDynamEnum.addEnum0(Particle.class, name, new Class[0]);
+                Particle particle = MohistDynamEnum.addEnum(Particle.class, name,  List.of(),  List.of());
                 if (particle != null) {
                     org.bukkit.craftbukkit.v1_19_R3.CraftParticle.putParticles(particle, resourceLocation);
                     BannerServer.LOGGER.debug("Save-ParticleType:" + name + " - " + particle.name());
@@ -176,7 +176,7 @@ public class FabricInjectBukkit {
             String biomeName = normalizeName(resourceLocation.toString());
             if (!isMINECRAFT(resourceLocation) && !map.contains(biomeName)) {
                 map.add(biomeName);
-                org.bukkit.block.Biome biomeCB = MohistDynamEnum.addEnum0(org.bukkit.block.Biome.class, biomeName, new Class[0]);
+                org.bukkit.block.Biome biomeCB = MohistDynamEnum.addEnum(org.bukkit.block.Biome.class, biomeName,  List.of(),  List.of());
                 BannerServer.LOGGER.debug("Save-BIOME:" + biomeCB.name() + " - " + biomeName);
             }
         }
@@ -190,7 +190,7 @@ public class FabricInjectBukkit {
             if (!isMINECRAFT(resourceLocation)) {
                 String entityType = normalizeName(resourceLocation.toString());
                 int typeId = entityType.hashCode();
-                EntityType bukkitType = MohistDynamEnum.addEnum0(EntityType.class, entityType, new Class[]{String.class, Class.class, Integer.TYPE, Boolean.TYPE}, entityType.toLowerCase(), MohistModsEntity.class, typeId, false);
+                EntityType bukkitType = MohistDynamEnum.addEnum(EntityType.class, entityType,  List.of(String.class, Class.class, Integer.TYPE, Boolean.TYPE),  List.of(entityType.toLowerCase(), MohistModsEntity.class, typeId, false));
                 EntityType.NAME_MAP.put(entityType.toLowerCase(), bukkitType);
                 EntityType.ID_MAP.put((short) typeId, bukkitType);
                 ServerAPI.entityTypeMap.put(entity, entityType);
@@ -204,7 +204,7 @@ public class FabricInjectBukkit {
             ResourceLocation resourceLocation = registry.getKey(villagerProfession);
             if (!isMINECRAFT(resourceLocation)) {
                 String name = normalizeName(resourceLocation.toString());
-                Villager.Profession vp = MohistDynamEnum.addEnum0(Villager.Profession.class, name, new Class[0]);
+                Villager.Profession vp = MohistDynamEnum.addEnum(Villager.Profession.class, name,  List.of(),  List.of());
                 profession.put(vp, resourceLocation);
                 BannerServer.LOGGER.debug("Registered fabric VillagerProfession as Profession {}", vp.name());
             }
@@ -217,7 +217,7 @@ public class FabricInjectBukkit {
             ResourceLocation resourceLocation = registry.getKey(fluidType);
             String name = normalizeName(resourceLocation.getPath());
             if (!isMINECRAFT(resourceLocation)) {
-                Fluid fluid = MohistDynamEnum.addEnum0(Fluid.class, name, new Class[0]);
+                Fluid fluid = MohistDynamEnum.addEnum(Fluid.class, name, List.of(),  List.of());
                 CraftMagicNumbers.FLUIDTYPE_FLUID.put(fluidType, fluid);
                 BannerServer.LOGGER.debug("Registered fabric Fluid as Fluid(Bukkit) {}", fluid.name());
             }
@@ -230,7 +230,7 @@ public class FabricInjectBukkit {
             ResourceLocation resourceLocation = registry.getKey(statType);
             String name = normalizeName(resourceLocation.getPath());
             if (!isMINECRAFT(resourceLocation)) {
-                Statistic statistic = MohistDynamEnum.addEnum0(Statistic.class, name, new Class[0]);
+                Statistic statistic = MohistDynamEnum.addEnum(Statistic.class, name,  List.of(),  List.of());
                 statisticMap.put(statType, statistic);
                 BannerServer.LOGGER.debug("Registered fabric StatType as Statistic(Bukkit) {}", statistic.name());
             }

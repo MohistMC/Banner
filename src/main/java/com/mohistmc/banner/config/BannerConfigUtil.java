@@ -67,9 +67,7 @@ public class BannerConfigUtil {
 
     public static void i18n() {
         String banner_lang = yml.getString("banner.lang", "xx_XX");
-        String l = banner_lang.split("_")[0];
-        String c = banner_lang.split("_")[1];
-        BannerMCStart.I18N = new i18n(BannerMCStart.class.getClassLoader(), new Locale(l, c));
+        BannerMCStart.I18N = new i18n(BannerMCStart.class.getClassLoader(), banner_lang);
     }
 
     public static String lang() {

@@ -57,12 +57,12 @@ public class BuildBasedMappingProvider extends AbstractMappingProvider {
 
                     // already cached, don't download anything
                     if (Files.exists(this.path)) {
-                        CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.download.already"), this.name, build);
+                        CompatUtil.LOGGER.info(BannerMCStart.I18N.as("stackdeobf.download.already"), this.name, build);
                         return CompletableFuture.completedFuture(null);
                     }
 
                     URI uri = this.artifactInfo.buildUri(build, "jar");
-                    CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.downloading"), this.name, build);
+                    CompatUtil.LOGGER.info(BannerMCStart.I18N.as("stackdeobf.downloading"), this.name, build);
 
                     return HttpUtil.getAsync(uri, executor).thenAccept(mappingJarBytes -> {
                         byte[] mappingBytes = this.extractPackagedMappings(mappingJarBytes);
@@ -87,11 +87,11 @@ public class BuildBasedMappingProvider extends AbstractMappingProvider {
                     long maxTimeDiff = Long.getLong("stackdeobf.build-refresh-cooldown", 2 * 24 * 60 /* specified in minutes */);
                     if (timeDiff <= maxTimeDiff) {
                         // latest build has already been fetched in the last x minutes (default: 2 days)
-                        CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.getbuild"),
+                        CompatUtil.LOGGER.info(BannerMCStart.I18N.as("stackdeobf.getbuild"),
                                 this.name, (long) Math.floor(timeDiff / 60d), (long) Math.ceil((maxTimeDiff - timeDiff) / 60d));
                         return CompletableFuture.completedFuture(Files.readString(versionCachePath).trim());
                     } else {
-                        CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.refreshing"),
+                        CompatUtil.LOGGER.info(BannerMCStart.I18N.as("stackdeobf.refreshing"),
                                 this.name, (long) Math.ceil(timeDiff / 60d));
                     }
                 } catch (IOException exception) {
@@ -100,7 +100,7 @@ public class BuildBasedMappingProvider extends AbstractMappingProvider {
             }
 
             URI metaUri = this.artifactInfo.buildMetaUri();
-            CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.fetching"), this.name);
+            CompatUtil.LOGGER.info(BannerMCStart.I18N.as("stackdeobf.fetching"), this.name);
 
             return HttpUtil.getAsync(metaUri, executor).thenApply(resp -> {
                 try (InputStream input = new ByteArrayInputStream(resp)) {
@@ -130,14 +130,14 @@ public class BuildBasedMappingProvider extends AbstractMappingProvider {
                         }
 
                         Files.writeString(versionCachePath, version);
-                        CompatUtil.LOGGER.info(BannerMCStart.I18N.get("stackdeobf.cached.lastest"), this.name, version);
+                        CompatUtil.LOGGER.info(BannerMCStart.I18N.as("stackdeobf.cached.lastest"), this.name, version);
 
                         return version;
                     }
 
-                    throw new IllegalArgumentException(BannerMCStart.I18N.get("stackdeobf.cantfind") + " " + this.name + " " + BannerMCStart.I18N.get("stackdeobf.mappings.version") + " " + mcVersion);
+                    throw new IllegalArgumentException(BannerMCStart.I18N.as("stackdeobf.cantfind") + " " + this.name + " " + BannerMCStart.I18N.as("stackdeobf.mappings.version") + " " + mcVersion);
                 } catch (IOException exception) {
-                    throw new RuntimeException(BannerMCStart.I18N.get("stackdeobf.cantparse") + " " + metaUri + " " + BannerMCStart.I18N.get("stackdeobf.for") + " " + mcVersion, exception);
+                    throw new RuntimeException(BannerMCStart.I18N.as("stackdeobf.cantparse") + " " + metaUri + " " + BannerMCStart.I18N.as("stackdeobf.for") + " " + mcVersion, exception);
                 }
             });
         }, executor);

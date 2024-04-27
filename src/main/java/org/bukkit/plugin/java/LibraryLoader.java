@@ -28,7 +28,7 @@ class LibraryLoader {
         if (desc.getLibraries().isEmpty()) {
             return null;
         }
-        BannerServer.LOGGER.info(BannerMCStart.I18N.get("spigot.lib.loading"), desc.getName(), desc.getLibraries().size());
+        BannerServer.LOGGER.info(BannerMCStart.I18N.as("spigot.lib.loading"), desc.getName(), desc.getLibraries().size());
 
         List<Dependency> dependencies = new ArrayList<>();
         for (String libraries : desc.getLibraries()) {
@@ -50,7 +50,7 @@ class LibraryLoader {
             File file = new File(new File(FabricLoader.getInstance().getGameDir().toFile(), "libraries/spigot-lib"), "%s/%s/%s/%s".formatted(group, dependency.name(), dependency.version(), fileName));
 
             if (file.exists()) {
-                BannerServer.LOGGER.info(BannerMCStart.I18N.get("spigot.lib.found"), desc.getName(), file);
+                BannerServer.LOGGER.info(BannerMCStart.I18N.as("spigot.lib.found"), desc.getName(), file);
                 libraries.add(file);
                 continue;
             }
@@ -77,7 +77,7 @@ class LibraryLoader {
         for (File file : libraries) {
             try {
                 jarFiles.add(file.toURI().toURL());
-                BannerServer.LOGGER.info(BannerMCStart.I18N.get("spigot.lib.loaded"), desc.getName(), file);
+                BannerServer.LOGGER.info(BannerMCStart.I18N.as("spigot.lib.loaded"), desc.getName(), file);
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }

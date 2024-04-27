@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import java.lang.reflect.Constructor;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -11108,12 +11109,12 @@ public enum Material implements Keyed, Translatable {
                 material.blockID = id;
                 material.isFabricBlock = true;
             }else {
-                material = (Material) MohistDynamEnum.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE}, new Object[]{id, true});
+                material = MohistDynamEnum.addEnum(Material.class, materialName, List.of(Integer.TYPE, Boolean.TYPE), List.of(id, true));
             }
             BY_NAME.put(materialName, material);
             return material;
         } else { // Fabric Items
-            Material material = (Material) MohistDynamEnum.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE}, new Object[]{id, false});
+            Material material = MohistDynamEnum.addEnum(Material.class, materialName, List.of(Integer.TYPE, Boolean.TYPE), List.of(id, false));
             BY_NAME.put(materialName, material);
             return material;
         }
@@ -11127,12 +11128,12 @@ public enum Material implements Keyed, Translatable {
                 material.blockID = id;
                 material.isFabricBlock = true;
             }else {
-                material = (Material) MohistDynamEnum.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE, String.class}, new Object[]{id, true, modName});
+                material = MohistDynamEnum.addEnum(Material.class, materialName,  List.of(Integer.TYPE, Boolean.TYPE, String.class),  List.of(id, true, modName));
             }
             BY_NAME.put(materialName, material);
             return material;
         } else { // Fabric Items
-            Material material = (Material) MohistDynamEnum.addEnum(Material.class, materialName, new Class[]{Integer.TYPE, Boolean.TYPE, String.class}, new Object[]{id, false, modName});
+            Material material = MohistDynamEnum.addEnum(Material.class, materialName,  List.of(Integer.TYPE, Boolean.TYPE, String.class),  List.of(id, false, modName));
             BY_NAME.put(materialName, material);
             return material;
         }

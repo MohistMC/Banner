@@ -382,7 +382,7 @@ public final class CraftServer implements Server {
             Plugin[] plugins = pluginManager.loadPlugins(pluginFolder);
             for (Plugin plugin : plugins) {
                 try {
-                    String message = String.format(BannerMCStart.I18N.get("bukkit.plugin.loading"), plugin.getDescription().getFullName());
+                    String message = String.format(BannerMCStart.I18N.as("bukkit.plugin.loading"), plugin.getDescription().getFullName());
                     plugin.getLogger().info(message);
                     plugin.onLoad();
                 } catch (Throwable ex) {
