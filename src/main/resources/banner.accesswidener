@@ -1,12 +1,35 @@
 accessWidener	v1	named
 # Banner
 
+# 1.20.4
+accessible field net/minecraft/world/entity/ai/attributes/AttributeModifier name Ljava/lang/String;
+accessible field net/minecraft/world/level/block/entity/CrafterBlockEntity craftingTicksRemaining I
+accessible field net/minecraft/world/entity/projectile/AbstractArrow pickupItemStack Lnet/minecraft/world/item/ItemStack;
+accessible field net/minecraft/world/level/levelgen/structure/StructurePiece SHAPE_CHECK_BLOCKS Ljava/util/Set;
+accessible method net/minecraft/world/entity/projectile/WindCharge explode ()V
+accessible method net/minecraft/world/level/LevelAccessor createTick (Lnet/minecraft/core/BlockPos;Ljava/lang/Object;ILnet/minecraft/world/ticks/TickPriority;)Lnet/minecraft/world/ticks/ScheduledTick;
+accessible method net/minecraft/world/level/LevelAccessor createTick (Lnet/minecraft/core/BlockPos;Ljava/lang/Object;I)Lnet/minecraft/world/ticks/ScheduledTick;
+accessible method net/minecraft/world/entity/ExperienceOrb xpToDurability (I)I
+accessible method net/minecraft/world/entity/ExperienceOrb durabilityToXp (I)I
+accessible method net/minecraft/world/entity/AreaEffectCloud updateColor ()V
+accessible field net/minecraft/world/entity/Display DATA_POS_ROT_INTERPOLATION_DURATION_ID Lnet/minecraft/network/syncher/EntityDataAccessor;
+accessible field net/minecraft/world/entity/projectile/EvokerFangs warmupDelayTicks I
+accessible method net/minecraft/world/entity/projectile/Arrow updateColor ()V
+accessible field net/minecraft/world/entity/projectile/Arrow potion Lnet/minecraft/world/item/alchemy/Potion;
+accessible field net/minecraft/server/level/ServerPlayer language Ljava/lang/String;
+accessible field net/minecraft/world/entity/Entity random Lnet/minecraft/util/RandomSource;
+
+# 1.20.2
+accessible field net/minecraft/server/network/ServerCommonPacketListenerImpl latency I
+accessible field net/minecraft/server/network/ServerCommonPacketListenerImpl connection Lnet/minecraft/network/Connection;
+accessible method net/minecraft/world/item/crafting/SmithingTrimRecipe <init> (Lnet/minecraft/world/item/crafting/Ingredient;Lnet/minecraft/world/item/crafting/Ingredient;Lnet/minecraft/world/item/crafting/Ingredient;)V
+accessible field net/minecraft/server/ServerAdvancementManager advancements Ljava/util/Map;
+
 # 1.20.1
 accessible method net/minecraft/world/level/dimension/end/EndDragonFight respawnDragon (Ljava/util/List;)V
 accessible method net/minecraft/world/level/block/entity/SculkCatalystBlockEntity$CatalystListener bloom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/util/RandomSource;)V
 accessible field net/minecraft/world/level/block/SculkSpreader$ChargeCursor pos Lnet/minecraft/core/BlockPos;
 accessible field net/minecraft/world/level/block/SculkSpreader$ChargeCursor charge I
-accessible method net/minecraft/world/damagesource/DamageSource <init> (Lnet/minecraft/core/Holder;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;)V
 
 # paper
 accessible field net/minecraft/server/level/ServerPlayer seenCredits Z
@@ -44,8 +67,8 @@ accessible class net/minecraft/world/entity/monster/Slime$SlimeMoveControl
 accessible class net/minecraft/world/level/border/WorldBorder$BorderExtent
 
 # public methods
-accessible method net/minecraft/world/level/block/DispenserBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)V
-accessible method net/minecraft/world/level/block/DropperBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)V
+accessible method net/minecraft/world/level/block/DispenserBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)V
+accessible method net/minecraft/world/level/block/DropperBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)V
 accessible method net/minecraft/world/entity/decoration/HangingEntity setDirection (Lnet/minecraft/core/Direction;)V
 accessible method net/minecraft/world/entity/decoration/ItemFrame setDirection (Lnet/minecraft/core/Direction;)V
 accessible method net/minecraft/server/level/ServerLevel getEntities ()Lnet/minecraft/world/level/entity/LevelEntityGetter;
@@ -76,8 +99,8 @@ accessible method net/minecraft/world/entity/Display createTransformation (Lnet/
 accessible method net/minecraft/world/entity/Display getBrightnessOverride ()Lnet/minecraft/util/Brightness;
 accessible method net/minecraft/world/entity/Display getGlowColorOverride ()I
 accessible method net/minecraft/world/entity/Display getHeight ()F
-accessible method net/minecraft/world/entity/Display getInterpolationDelay ()I
-accessible method net/minecraft/world/entity/Display getInterpolationDuration ()I
+accessible method net/minecraft/world/entity/Display getTransformationInterpolationDelay ()I
+accessible method net/minecraft/world/entity/Display getTransformationInterpolationDuration ()I
 accessible method net/minecraft/world/entity/Display getShadowRadius ()F
 accessible method net/minecraft/world/entity/Display getShadowStrength ()F
 accessible method net/minecraft/world/entity/Display getViewRange ()F
@@ -86,8 +109,8 @@ accessible method net/minecraft/world/entity/Display setBillboardConstraints (Ln
 accessible method net/minecraft/world/entity/Display setBrightnessOverride (Lnet/minecraft/util/Brightness;)V
 accessible method net/minecraft/world/entity/Display setGlowColorOverride (I)V
 accessible method net/minecraft/world/entity/Display setHeight (F)V
-accessible method net/minecraft/world/entity/Display setInterpolationDelay (I)V
-accessible method net/minecraft/world/entity/Display setInterpolationDuration (I)V
+accessible method net/minecraft/world/entity/Display setTransformationInterpolationDelay (I)V
+accessible method net/minecraft/world/entity/Display setTransformationInterpolationDuration (I)V
 accessible method net/minecraft/world/entity/Display setShadowRadius (F)V
 accessible method net/minecraft/world/entity/Display setShadowStrength (F)V
 accessible method net/minecraft/world/entity/Display setTransformation (Lcom/mojang/math/Transformation;)V
@@ -223,13 +246,10 @@ accessible method net/minecraft/world/entity/Entity setRot (FF)V
 
 # public fields
 accessible field net/minecraft/ChatFormatting code C
-accessible field net/minecraft/advancements/AdvancementList advancements Ljava/util/Map;
 accessible field net/minecraft/commands/CommandSourceStack source Lnet/minecraft/commands/CommandSource;
 accessible field net/minecraft/network/Connection address Ljava/net/SocketAddress;
 accessible field net/minecraft/network/Connection channel Lio/netty/channel/Channel;
 accessible field net/minecraft/network/chat/TextColor name Ljava/lang/String;
-accessible field net/minecraft/network/protocol/game/ServerboundCustomPayloadPacket data Lnet/minecraft/network/FriendlyByteBuf;
-accessible field net/minecraft/network/protocol/game/ServerboundCustomPayloadPacket identifier Lnet/minecraft/resources/ResourceLocation;
 accessible field net/minecraft/network/protocol/game/ServerboundMovePlayerPacket hasPos Z
 accessible field net/minecraft/network/protocol/game/ServerboundMovePlayerPacket hasRot Z
 accessible field net/minecraft/network/protocol/game/ServerboundMovePlayerPacket x D
@@ -237,16 +257,12 @@ accessible field net/minecraft/network/protocol/game/ServerboundMovePlayerPacket
 accessible field net/minecraft/network/protocol/game/ServerboundMovePlayerPacket y D
 accessible field net/minecraft/network/protocol/game/ServerboundMovePlayerPacket yRot F
 accessible field net/minecraft/network/protocol/game/ServerboundMovePlayerPacket z D
-accessible field net/minecraft/network/protocol/game/ServerboundResourcePackPacket action Lnet/minecraft/network/protocol/game/ServerboundResourcePackPacket$Action;
-accessible field net/minecraft/network/protocol/game/ServerboundClientInformationPacket language Ljava/lang/String;
-accessible field net/minecraft/network/protocol/game/ServerboundClientInformationPacket viewDistance I
 accessible field net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket blockState Lnet/minecraft/world/level/block/state/BlockState;
 accessible field net/minecraft/network/protocol/game/ClientboundTabListPacket header Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/network/protocol/game/ClientboundTabListPacket footer Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/network/protocol/game/ClientboundSetDefaultSpawnPositionPacket pos Lnet/minecraft/core/BlockPos;
 accessible field net/minecraft/network/protocol/handshake/ClientIntentionPacket port I
 accessible field net/minecraft/server/ServerAdvancementManager GSON Lcom/google/gson/Gson;
-accessible field net/minecraft/server/ServerAdvancementManager advancements Lnet/minecraft/advancements/AdvancementList;
 accessible field net/minecraft/server/MinecraftServer LOGGER Lorg/slf4j/Logger;
 accessible field net/minecraft/server/MinecraftServer executor Ljava/util/concurrent/Executor;
 accessible field net/minecraft/server/MinecraftServer fixerUpper Lcom/mojang/datafixers/DataFixer;
@@ -397,7 +413,6 @@ accessible field net/minecraft/world/entity/projectile/FishingHook currentState 
 accessible field net/minecraft/world/entity/projectile/FishingHook hookedIn Lnet/minecraft/world/entity/Entity;
 accessible field net/minecraft/world/entity/projectile/LargeFireball explosionPower I
 accessible field net/minecraft/world/entity/projectile/SpectralArrow duration I
-accessible field net/minecraft/world/entity/projectile/ThrownTrident tridentItem Lnet/minecraft/world/item/ItemStack;
 accessible field net/minecraft/world/entity/projectile/Arrow effects Ljava/util/Set;
 accessible field net/minecraft/world/entity/raid/Raids raidMap Ljava/util/Map;
 accessible field net/minecraft/world/entity/raid/Raid badOmenLevel I
@@ -554,7 +569,6 @@ accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamagePe
 accessible field net/minecraft/world/level/block/entity/LecternBlockEntity book Lnet/minecraft/world/item/ItemStack;
 accessible field net/minecraft/world/level/block/entity/BlockEntity level Lnet/minecraft/world/level/Level;
 accessible field net/minecraft/world/level/block/entity/BlockEntity worldPosition Lnet/minecraft/core/BlockPos;
-accessible field net/minecraft/server/network/ServerGamePacketListenerImpl connection Lnet/minecraft/network/Connection;
 accessible field net/minecraft/world/entity/AreaEffectCloud DATA_COLOR Lnet/minecraft/network/syncher/EntityDataAccessor;
 accessible field net/minecraft/world/entity/Entity boardingCooldown I
 accessible field net/minecraft/world/level/storage/DerivedLevelData wrapped Lnet/minecraft/world/level/storage/ServerLevelData;
