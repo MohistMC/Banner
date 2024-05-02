@@ -2,16 +2,15 @@ package org.bukkit.plugin.messaging;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Standard implementation to {@link Messenger}
@@ -498,7 +497,7 @@ public class StandardMessenger implements Messenger {
             return "BungeeCord";
         }
         if (channel.length() > Messenger.MAX_CHANNEL_SIZE) {
-            // throw new ChannelNameTooLongException(channel);
+            throw new ChannelNameTooLongException(channel);
         }
         if (channel.indexOf(':') == -1) {
             throw new IllegalArgumentException("Channel must contain : separator (attempted to use " + channel + ")");

@@ -1,24 +1,6 @@
 package org.bukkit.command;
 
 import com.google.common.base.Preconditions;
-import com.mohistmc.banner.command.DumpCommand;
-import com.mohistmc.banner.command.GetPluginListCommand;
-import com.mohistmc.banner.command.ItemsCommand;
-import com.mohistmc.banner.command.ModListCommand;
-import com.mohistmc.banner.command.PluginCommand;
-import org.bukkit.Location;
-import org.bukkit.Server;
-import org.bukkit.command.defaults.BukkitCommand;
-import org.bukkit.command.defaults.HelpCommand;
-import org.bukkit.command.defaults.PluginsCommand;
-import org.bukkit.command.defaults.ReloadCommand;
-import org.bukkit.command.defaults.TimingsCommand;
-import org.bukkit.command.defaults.VersionCommand;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,6 +9,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.Location;
+import org.bukkit.Server;
+import org.bukkit.command.defaults.BukkitCommand;
+import org.bukkit.command.defaults.HelpCommand;
+import org.bukkit.command.defaults.PluginsCommand;
+import org.bukkit.command.defaults.ReloadCommand;
+import org.bukkit.command.defaults.VersionCommand;
+import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SimpleCommandMap implements CommandMap {
     protected final Map<String, Command> knownCommands = new HashMap<String, Command>();
@@ -41,12 +34,6 @@ public class SimpleCommandMap implements CommandMap {
         register("bukkit", new VersionCommand("version"));
         register("bukkit", new ReloadCommand("reload"));
         register("bukkit", new PluginsCommand("plugins"));
-        register("bukkit", new TimingsCommand("timings"));
-        register("banner", new ModListCommand("fabricmods"));
-        register("banner", new DumpCommand("dump"));
-        register("banner", new PluginCommand("plugin"));
-        register("banner", new GetPluginListCommand("getpluginlist"));
-        register("banner", new ItemsCommand("items"));
     }
 
     public void setFallbackCommands() {
@@ -158,12 +145,9 @@ public class SimpleCommandMap implements CommandMap {
             // Note: we don't return the result of target.execute as thats success / failure, we return handled (true) or not handled (false)
             target.execute(sender, sentCommandLabel, Arrays.copyOfRange(args, 1, args.length));
         } catch (CommandException ex) {
-            server.getPluginManager().callEvent(new com.destroystokyo.paper.event.server.ServerExceptionEvent(new com.destroystokyo.paper.exception.ServerCommandException(ex, target, sender, args))); // Paper
             throw ex;
         } catch (Throwable ex) {
-            String msg = "Unhandled exception executing '" + commandLine + "' in " + target;
-            server.getPluginManager().callEvent(new com.destroystokyo.paper.event.server.ServerExceptionEvent(new com.destroystokyo.paper.exception.ServerCommandException(ex, target, sender, args))); // Paper
-            throw new CommandException(msg, ex);
+            throw new CommandException("Unhandled exception executing '" + commandLine + "' in " + target, ex);
         }
 
         // return true as command was handled
@@ -242,9 +226,7 @@ public class SimpleCommandMap implements CommandMap {
         } catch (CommandException ex) {
             throw ex;
         } catch (Throwable ex) {
-            String msg = "Unhandled exception executing tab-completer for '" + cmdLine + "' in " + target;
-            server.getPluginManager().callEvent(new com.destroystokyo.paper.event.server.ServerExceptionEvent(new com.destroystokyo.paper.exception.ServerTabCompleteException(msg, ex, target, sender, args))); // Paper
-            throw new CommandException(msg, ex);
+            throw new CommandException("Unhandled exception executing tab-completer for '" + cmdLine + "' in " + target, ex);
         }
     }
 
@@ -294,10 +276,4 @@ public class SimpleCommandMap implements CommandMap {
             }
         }
     }
-
-    // Banner start - add methods to support plugin manager
-    public Map<String, Command> getKnownCommands() {
-        return knownCommands;
-    }
-    // Banner - end
 }

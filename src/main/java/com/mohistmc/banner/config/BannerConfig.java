@@ -34,7 +34,10 @@ public class BannerConfig {
         try
         {
             config.load( CONFIG_FILE );
-        } catch ( IOException | InvalidConfigurationException ex ) {
+        } catch ( IOException ex )
+        {
+        } catch ( InvalidConfigurationException ex )
+        {
             Bukkit.getLogger().log( Level.SEVERE, "Could not load banner.yml, please correct your syntax errors", ex );
             throw Throwables.propagate( ex );
         }
@@ -133,18 +136,11 @@ public class BannerConfig {
     public static List<String> clear_item__whitelist;
     public static String clear_item__msg;
     public static int clear_item__time;
-    public static boolean motdEnable;
     public static String motdFirstLine;
     public static String motdSecondLine;
 
     public static boolean velocityEnabled;
     public static String velocitySecret;
-    public static double WatchDogTimeOut;
-    public static boolean spawnForChunk;
-
-    public static String motd() {
-        return ColorsAPI.of(motdFirstLine) + "\n" + ColorsAPI.of(motdSecondLine);
-    }
 
     private static void banner() {
         check_update = getBoolean("banner.check_update", false);
@@ -152,7 +148,7 @@ public class BannerConfig {
         libraries_downloadsource = getString("banner.libraries_downloadsource", DownloadSource.defaultSource.name());
         lang = getString("banner.lang", "xx_XX");
         showLogo = getBoolean("banner.show_logo", true);
-        stackdeobf = getBoolean("banner.stackdeobf", false);
+        stackdeobf = getBoolean("banner.stackdeobf", true);
         maximumRepairCost = getInt("anvilfix.maximumrepaircost", 40);
         enchantment_fix = getBoolean("anvilfix.enchantment_fix", false);
         max_enchantment_level = getInt("anvilfix.max_enchantment_level", 32767);
@@ -160,14 +156,12 @@ public class BannerConfig {
         skipOtherWorldPreparing = getBoolean("compat.skipOtherWorldPreparing", false);
         server_thread = getInt("threadpriority.server_thread", 8);
         nospawnEntity = getList("entity.nospawn", Collections.emptyList());
-        spawnForChunk = getBoolean("entity.spawnForChunk", true);
         clear_item = getBoolean("entity.clear.item.enable", false);
         clear_item__whitelist = getList("entity.clear.item.whitelist", Collections.emptyList());
         clear_item__msg = getString("entity.clear.item.msg", "[Server] Cleaned up %size% drops");
         clear_item__time = getInt("entity.clear.item.time", 1800);
-        motdEnable = getBoolean("motd.enable", true);
-        motdFirstLine = getString("motd.firstline", "<RAINBOW1>A Minecraft Server</RAINBOW>");
-        motdSecondLine = getString("motd.secondline", "");
+        motdFirstLine = ColorsAPI.of(getString("motd.firstline", "<RAINBOW1>A Minecraft Server</RAINBOW>"));
+        motdFirstLine = ColorsAPI.of(getString("motd.secondline", ""));
         velocityEnabled = getBoolean("proxies.velocity.enabled", false);
         velocitySecret = getString("proxies.velocity.secret", "");
     }

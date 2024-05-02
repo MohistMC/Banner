@@ -10,9 +10,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.LevelStem;
-import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_20_R1.block.CapturedBlockState;
+import org.bukkit.craftbukkit.CraftServer;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.block.CapturedBlockState;
 import org.bukkit.entity.SpawnCategory;
 import org.spigotmc.SpigotWorldConfig;
 
@@ -101,7 +101,7 @@ public interface InjectionLevel {
 
     }
 
-    default boolean bridge$KeepSpawnInMemory() {
+    default boolean bridge$keepSpawnInMemory() {
         return false;
     }
 
@@ -139,12 +139,5 @@ public interface InjectionLevel {
     }
 
     default void banner$setBannerConfig(BannerWorldConfig bannerWorldConfig) {
-    }
-
-    default void banner$callEvent(boolean call) {
-    }
-
-    default BlockState banner$defaultBlockState() {
-        return null;
     }
 }

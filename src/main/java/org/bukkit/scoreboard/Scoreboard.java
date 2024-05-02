@@ -1,10 +1,9 @@
 package org.bukkit.scoreboard;
 
+import java.util.Set;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Set;
 
 /**
  * A scoreboard
@@ -40,6 +39,7 @@ public interface Scoreboard {
      *     exists
      * @deprecated use {@link #registerNewObjective(String, Criteria, String)}
      */
+    @Deprecated
     @NotNull
     Objective registerNewObjective(@NotNull String name, @NotNull String criteria, @NotNull String displayName);
 
@@ -57,6 +57,7 @@ public interface Scoreboard {
      *     exists
      * @deprecated use {@link #registerNewObjective(String, Criteria, String, RenderType)}
      */
+    @Deprecated
     @NotNull
     Objective registerNewObjective(@NotNull String name, @NotNull String criteria, @NotNull String displayName, @NotNull RenderType renderType);
 

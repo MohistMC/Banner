@@ -1,5 +1,8 @@
 package org.bukkit.entity;
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Nameable;
@@ -21,12 +24,11 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 /**
  * Represents a base entity in the world
+ * <p>
+ * Not all methods are guaranteed to work/may have side effects when
+ * {@link #isInWorld()} is false.
  */
 public interface Entity extends Metadatable, CommandSender, Nameable, PersistentDataHolder {
 
@@ -255,6 +257,8 @@ public interface Entity extends Metadatable, CommandSender, Nameable, Persistent
 
     /**
      * Mark the entity's removal.
+     *
+     * @throws UnsupportedOperationException if you try to remove a {@link Player} use {@link Player#kickPlayer(String)} in this case instead
      */
     public void remove();
 
@@ -266,8 +270,8 @@ public interface Entity extends Metadatable, CommandSender, Nameable, Persistent
     public boolean isDead();
 
     /**
-     * Returns false if the entity has died or been despawned for some other
-     * reason.
+     * Returns false if the entity has died, been despawned for some other
+     * reason, or has not been added to the world.
      *
      * @return True if valid.
      */
@@ -391,7 +395,9 @@ public interface Entity extends Metadatable, CommandSender, Nameable, Persistent
      * Record the last {@link EntityDamageEvent} inflicted on this entity
      *
      * @param event a {@link EntityDamageEvent}
+     * @deprecated method is for internal use only and will be removed
      */
+    @Deprecated(forRemoval = true)
     public void setLastDamageCause(@Nullable EntityDamageEvent event);
 
     /**
@@ -530,9 +536,7 @@ public interface Entity extends Metadatable, CommandSender, Nameable, Persistent
      * will need to be called before the entity is visible to a given player.
      *
      * @param visible default visibility status
-     * @apiNote draft API
      */
-    @ApiStatus.Experimental
     public void setVisibleByDefault(boolean visible);
 
     /**
@@ -543,10 +547,21 @@ public interface Entity extends Metadatable, CommandSender, Nameable, Persistent
      * will need to be called before the entity is visible to a given player.
      *
      * @return default visibility status
-     * @apiNote draft API
      */
-    @ApiStatus.Experimental
     public boolean isVisibleByDefault();
+
+    /**
+     * Get all players that are currently tracking this entity.
+     * <p>
+     * 'Tracking' means that this entity has been sent to the player and that
+     * they are receiving updates on its state. Note that the client's {@code
+     * 'Entity Distance'} setting does not affect the range at which entities
+     * are tracked.
+     *
+     * @return the players tracking this entity, or an empty set if none
+     */
+    @NotNull
+    Set<Player> getTrackedBy();
 
     /**
      * Sets whether the entity has a team colored (default: white) glow.
@@ -711,8 +726,6 @@ public interface Entity extends Metadatable, CommandSender, Nameable, Persistent
      * @param sneak true if the entity should be sneaking
      */
     void setSneaking(boolean sneak);
-
-    // Paper start
     // Paper end
 
     /**
@@ -723,6 +736,56 @@ public interface Entity extends Metadatable, CommandSender, Nameable, Persistent
     @NotNull
     SpawnCategory getSpawnCategory();
 
+    /**
+     * Checks if this entity has been spawned in a world. <br>
+     * Entities not spawned in a world will not tick, be sent to players, or be
+     * saved to the server files.
+     *
+     * @return whether the entity has been spawned in a world
+     */
+    boolean isInWorld();
+
+    /**
+     * Get this entity as an NBT string.
+     * <p>
+     * This string should not be relied upon as a serializable value.
+     *
+     * @return the NBT string or null if one cannot be made
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    String getAsString();
+
+    /**
+     * Crates an {@link EntitySnapshot} representing the current state of this entity.
+     *
+     * @return a snapshot representing this entity or null if one cannot be made
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    EntitySnapshot createSnapshot();
+
+    /**
+     * Creates a copy of this entity and all its data. Does not spawn the copy in
+     * the world. <br>
+     * <b>Note:</b> Players cannot be copied.
+     *
+     * @return a copy of this entity.
+     */
+    @NotNull
+    @ApiStatus.Experimental
+    Entity copy();
+
+    /**
+     * Creates a copy of this entity and all its data. Spawns the copy at the given location. <br>
+     * <b>Note:</b> Players cannot be copied.
+     * @param to the location to copy to
+     * @return a copy of this entity.
+     */
+    @NotNull
+    @ApiStatus.Experimental
+    Entity copy(@NotNull Location to);
+
     // Spigot start
     public class Spigot extends CommandSender.Spigot {
 
@@ -732,16 +795,4 @@ public interface Entity extends Metadatable, CommandSender, Nameable, Persistent
     @Override
     Spigot spigot();
     // Spigot end
-
-    // Paper start
-    /**
-     * Gets the location where this entity originates from.
-     * <p>
-     * This value can be null if the entity hasn't yet been added to the world.
-     *
-     * @return Location where entity originates or null if not yet added
-     */
-    @Nullable
-    Location getOrigin();
-    // Paper end
 }

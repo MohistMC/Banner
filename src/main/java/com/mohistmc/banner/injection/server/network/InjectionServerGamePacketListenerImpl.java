@@ -4,18 +4,15 @@ import java.util.Set;
 import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.world.entity.RelativeMovement;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.CraftServer;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.slf4j.Logger;
 
-public interface InjectionServerGamePacketListenerImpl {
+public interface InjectionServerGamePacketListenerImpl extends InjectionServerCommonPacketListenerImpl {
 
     default CraftPlayer getCraftPlayer() {
         return null;
-    }
-
-    default void disconnect(String s) {
     }
 
     default void teleport(double d0, double d1, double d2, float f, float f1, PlayerTeleportEvent.TeleportCause cause) {
@@ -43,13 +40,6 @@ public interface InjectionServerGamePacketListenerImpl {
 
     default boolean checkLimit(long timestamp) {
         return false;
-    }
-
-    default boolean bridge$processedDisconnect() {
-        return false;
-    }
-
-    default void setProcessedDisconnect(boolean processedDisconnect) {
     }
 
     default CraftServer bridge$craftServer() {

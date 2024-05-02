@@ -1,16 +1,15 @@
 package org.bukkit.inventory;
 
 import com.google.common.base.Preconditions;
-import org.bukkit.Material;
-import org.bukkit.Tag;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import org.bukkit.Material;
+import org.bukkit.Tag;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a potential item match within a recipe. All choices within a
@@ -145,8 +144,8 @@ public interface RecipeChoice extends Predicate<ItemStack>, Cloneable {
     }
 
     /**
-     * Represents a choice that will be valid only one of the stacks is exactly
-     * matched (aside from stack size).
+     * Represents a choice that will be valid only if one of the stacks is
+     * exactly matched (aside from stack size).
      * <br>
      * <b>Only valid for shaped recipes</b>
      */

@@ -11,7 +11,9 @@ public interface InjectionTransientCraftingContainer {
     }
 
     default void bridge$setResultInventory(Container resultInventory) {
+
     }
+
 
     default void setOwner(Player owner) {
     }

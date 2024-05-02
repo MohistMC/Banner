@@ -13,7 +13,7 @@ import lombok.ToString;
 public enum DownloadSource {
 
     MOHIST("https://maven.mohistmc.com/"),
-    CHINA("https://libraries.mohistmc.cn:25119/releases/"),
+    CHINA("http://s1.devicloud.cn:25119/"),
     GITHUB("https://mohistmc.github.io/maven/");
 
     public static final DownloadSource defaultSource = isCN() ? CHINA : MOHIST;
@@ -24,10 +24,10 @@ public enum DownloadSource {
         DownloadSource urL;
         for (DownloadSource me : DownloadSource.values()) {
             if (me.name().equalsIgnoreCase(ds)) {
-                if (!ConnectionUtil.canAccess(me.url.replace("releases/", ""))) {
+                if (ConnectionUtil.isDown(me.url)) {
                     if (ds.equals("CHINA")) {
                         urL = MOHIST;
-                        if (!ConnectionUtil.canAccess(urL.url)) {
+                        if (ConnectionUtil.isDown(urL.url)) {
                             return GITHUB;
                         }
                     }
@@ -40,6 +40,6 @@ public enum DownloadSource {
     }
 
     public static boolean isCN() {
-        return BannerMCStart.I18N.isCN() && ConnectionUtil.measureLatency(CHINA.url.replace("releases/", "")) < ConnectionUtil.measureLatency(MOHIST.url);
+        return BannerMCStart.I18N.isCN() && ConnectionUtil.getUrlMillis(CHINA.url) < ConnectionUtil.getUrlMillis(MOHIST.url);
     }
 }

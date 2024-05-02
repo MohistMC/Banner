@@ -1,17 +1,14 @@
 package org.bukkit.event.server;
 
 import com.google.common.base.Preconditions;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.net.InetAddress;
+import java.util.Iterator;
 import org.bukkit.Bukkit;
 import org.bukkit.UndefinedNullability;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.util.CachedServerIcon;
 import org.jetbrains.annotations.NotNull;
-
-import java.net.InetAddress;
-import java.util.Iterator;
 
 /**
  * Called when a server list ping is coming in. Displayed players can be
@@ -186,22 +183,6 @@ public class ServerListPingEvent extends ServerEvent implements Iterable<Player>
     @NotNull
     @Override
     public Iterator<Player> iterator() throws UnsupportedOperationException {
-        return new Iterator<>() {
-
-            @Override
-            public boolean hasNext() {
-                return false;
-            }
-
-            @Override
-            public Player next() {
-                throw new NoSuchElementException("Iterator is empty, no more elements to return.");
-            }
-
-            @Override
-            public void remove() {
-                throw new IllegalStateException("Cannot remove from an empty iterator.");
-            }
-        };
+        throw new UnsupportedOperationException();
     }
 }

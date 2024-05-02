@@ -1,7 +1,5 @@
 package org.bukkit.plugin;
 
-import com.mohistmc.banner.fabric.FabricHookBukkitEvent;
-import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventException;
@@ -68,9 +66,6 @@ public class RegisteredListener {
             if (((Cancellable) event).isCancelled() && isIgnoringCancelled()) {
                 return;
             }
-        }
-        if (Bukkit.getServer() != null) {
-            FabricHookBukkitEvent.EVENT.invoker().hook(event);
         }
         executor.execute(listener, event);
     }

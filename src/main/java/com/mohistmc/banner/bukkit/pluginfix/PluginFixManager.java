@@ -1,5 +1,6 @@
 package com.mohistmc.banner.bukkit.pluginfix;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -21,8 +22,11 @@ public class PluginFixManager {
         if (className.endsWith("PaperLib")) {
             return patch(clazz, PluginFixManager::removePaper);
         }
-        if (className.equals("com.onarandombox.MultiverseCore.utils.WorldManager")) {
-            return patch(clazz, MultiverseCore::fix);
+        if (className.equals("com.comphenix.protocol.ProtocolConfig")) {
+            return removeProtocolASM(clazz);
+        }
+        if (className.endsWith("com.sk89q.worldedit.bukkit.WorldEditPlugin")) {
+            System.setProperty("worldedit.bukkit.adapter", "com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R1.PaperweightFaweAdapter");
         }
         Consumer<ClassNode> patcher = switch (className) {
             case "com.sk89q.worldedit.bukkit.BukkitAdapter" -> WorldEdit::handleBukkitAdapter;
@@ -40,6 +44,24 @@ public class PluginFixManager {
         ClassNode node = new ClassNode();
         new ClassReader(basicClass).accept(node, 0);
         handler.accept(node);
+        ClassWriter writer = new ClassWriter(0);
+        node.accept(writer);
+        return writer.toByteArray();
+    }
+
+    private static byte[] removeProtocolASM(byte[] basicClass) {
+        ClassReader reader = new ClassReader(basicClass);
+        ClassNode node = new ClassNode();
+        reader.accept(node, 0);
+
+        for (MethodNode method : node.methods) {
+            if (Objects.equals(method.name, "isBackgroundCompilerEnabled") && Objects.equals(method.desc, "()Z")) {
+                method.instructions.clear();
+                method.instructions.add(new InsnNode(Opcodes.ICONST_0));
+                method.instructions.add(new InsnNode(Opcodes.IRETURN));
+            }
+        }
+
         ClassWriter writer = new ClassWriter(0);
         node.accept(writer);
         return writer.toByteArray();

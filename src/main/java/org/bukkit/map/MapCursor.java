@@ -1,5 +1,7 @@
 package org.bukkit.map;
 
+import org.bukkit.Keyed;
+import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -222,42 +224,59 @@ public final class MapCursor {
     /**
      * Represents the standard types of map cursors. More may be made
      * available by resource packs - the value is used by the client as an
-     * index in the file './misc/mapicons.png' from minecraft.jar or from a
+     * index in the file './assets/minecraft/textures/map/map_icons.png' from minecraft.jar or from a
      * resource pack.
      */
-    public enum Type {
-        WHITE_POINTER(0),
-        GREEN_POINTER(1),
-        RED_POINTER(2),
-        BLUE_POINTER(3),
-        WHITE_CROSS(4),
-        RED_MARKER(5),
-        WHITE_CIRCLE(6),
-        SMALL_WHITE_CIRCLE(7),
-        MANSION(8),
-        TEMPLE(9),
-        BANNER_WHITE(10),
-        BANNER_ORANGE(11),
-        BANNER_MAGENTA(12),
-        BANNER_LIGHT_BLUE(13),
-        BANNER_YELLOW(14),
-        BANNER_LIME(15),
-        BANNER_PINK(16),
-        BANNER_GRAY(17),
-        BANNER_LIGHT_GRAY(18),
-        BANNER_CYAN(19),
-        BANNER_PURPLE(20),
-        BANNER_BLUE(21),
-        BANNER_BROWN(22),
-        BANNER_GREEN(23),
-        BANNER_RED(24),
-        BANNER_BLACK(25),
-        RED_X(26);
+    public enum Type implements Keyed {
+        PLAYER(0, "player"),
+        FRAME(1, "frame"),
+        RED_MARKER(2, "red_marker"),
+        BLUE_MARKER(3, "blue_marker"),
+        TARGET_X(4, "target_x"),
+        TARGET_POINT(5, "target_point"),
+        PLAYER_OFF_MAP(6, "player_off_map"),
+        PLAYER_OFF_LIMITS(7, "player_off_limits"),
+        MANSION(8, "mansion"),
+        MONUMENT(9, "monument"),
+        BANNER_WHITE(10, "banner_white"),
+        BANNER_ORANGE(11, "banner_orange"),
+        BANNER_MAGENTA(12, "banner_magenta"),
+        BANNER_LIGHT_BLUE(13, "banner_light_blue"),
+        BANNER_YELLOW(14, "banner_yellow"),
+        BANNER_LIME(15, "banner_lime"),
+        BANNER_PINK(16, "banner_pink"),
+        BANNER_GRAY(17, "banner_gray"),
+        BANNER_LIGHT_GRAY(18, "banner_light_gray"),
+        BANNER_CYAN(19, "banner_cyan"),
+        BANNER_PURPLE(20, "banner_purple"),
+        BANNER_BLUE(21, "banner_blue"),
+        BANNER_BROWN(22, "banner_brown"),
+        BANNER_GREEN(23, "banner_green"),
+        BANNER_RED(24, "banner_red"),
+        BANNER_BLACK(25, "banner_black"),
+        RED_X(26, "red_x"),
+        VILLAGE_DESERT(27, "village_desert"),
+        VILLAGE_PLAINS(28, "village_plains"),
+        VILLAGE_SAVANNA(29, "village_savanna"),
+        VILLAGE_SNOWY(30, "village_snowy"),
+        VILLAGE_TAIGA(31, "village_taiga"),
+        JUNGLE_TEMPLE(32, "jungle_temple"),
+        SWAMP_HUT(33, "swamp_hut"),
+        TRIAL_CHAMBERS(34, "trial_chambers")
+        ;
 
         private byte value;
+        private final NamespacedKey key;
 
-        private Type(int value) {
+        private Type(int value, String key) {
             this.value = (byte) value;
+            this.key = NamespacedKey.minecraft(key);
+        }
+
+        @NotNull
+        @Override
+        public NamespacedKey getKey() {
+            return key;
         }
 
         /**

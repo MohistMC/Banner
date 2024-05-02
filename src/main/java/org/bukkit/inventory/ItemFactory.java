@@ -3,11 +3,14 @@ package org.bukkit.inventory;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -136,7 +139,7 @@ public interface ItemFactory {
      * The input should match the same input as expected by Minecraft's {@code /give}
      * command. For example, "minecraft:diamond_sword{Enchantments:[{id:"minecraft:sharpness", lvl:3}]}"
      * would yield an ItemStack of {@link Material#DIAMOND_SWORD} with an {@link ItemMeta}
-     * containing a level 3 {@link Enchantment#DAMAGE_ALL}
+     * containing a level 3 {@link Enchantment#SHARPNESS}
      * enchantment.
      *
      * @param input the item input string
@@ -155,12 +158,11 @@ public interface ItemFactory {
      * @param material material
      * @return updated material
      * @throws IllegalArgumentException if bad material or data
-     * @deprecated for internal use only
+     * @apiNote for internal use only
      */
-    @Deprecated
+    @ApiStatus.Internal
     @NotNull
     Material updateMaterial(@NotNull final ItemMeta meta, @NotNull final Material material) throws IllegalArgumentException;
-
 
     /**
      * Gets a {@link Material} representing the spawn egg for the provided
@@ -172,4 +174,45 @@ public interface ItemFactory {
      */
     @Nullable
     Material getSpawnEgg(@NotNull EntityType type);
+
+    /**
+     * Enchants the given item at the provided level.
+     * <br>
+     * If an item that is air is passed through an error is thrown.
+     *
+     * @param entity the entity to use as a source of randomness
+     * @param item the item to enchant
+     * @param level the level to use, which is the level in the enchantment table
+     * @param allowTreasures allows treasure enchants, e.g. mending, if true.
+     * @return a new ItemStack containing the result of the Enchantment
+     */
+    @NotNull
+    ItemStack enchantItem(@NotNull final Entity entity, @NotNull final ItemStack item, final int level, final boolean allowTreasures);
+
+    /**
+     * Enchants the given item at the provided level.
+     * <br>
+     * If an item that is air is passed through an error is thrown.
+     *
+     * @param world the world to use as a source of randomness
+     * @param item the item to enchant
+     * @param level the level to use, which is the level in the enchantment table
+     * @param allowTreasures allow the treasure enchants, e.g. mending, if true.
+     * @return a new ItemStack containing the result of the Enchantment
+     */
+    @NotNull
+    ItemStack enchantItem(@NotNull final World world, @NotNull final ItemStack item, final int level, final boolean allowTreasures);
+
+    /**
+     * Enchants the given item at the provided level.
+     * <br>
+     * If an item that is air is passed through an error is thrown.
+     *
+     * @param item the item to enchant
+     * @param level the level to use, which is the level in the enchantment table
+     * @param allowTreasures allow treasure enchantments, e.g. mending, if true.
+     * @return a new ItemStack containing the result of the Enchantment
+     */
+    @NotNull
+    ItemStack enchantItem(@NotNull final ItemStack item, final int level, final boolean allowTreasures);
 }

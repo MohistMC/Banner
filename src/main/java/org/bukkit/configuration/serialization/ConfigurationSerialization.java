@@ -1,20 +1,6 @@
 package org.bukkit.configuration.serialization;
 
 import com.google.common.base.Preconditions;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
-import org.bukkit.Location;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.block.banner.Pattern;
-import org.bukkit.configuration.Configuration;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.util.BlockVector;
-import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -23,6 +9,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.Location;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.spawner.SpawnRule;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.util.BlockVector;
+import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Utility class for storing and retrieving classes for {@link Configuration}.
@@ -43,6 +43,7 @@ public class ConfigurationSerialization {
         registerClass(Location.class);
         registerClass(AttributeModifier.class);
         registerClass(BoundingBox.class);
+        registerClass(SpawnRule.class);
     }
 
     protected ConfigurationSerialization(@NotNull Class<? extends ConfigurationSerializable> clazz) {

@@ -5,23 +5,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.Graphs;
 import com.google.common.graph.MutableGraph;
-import com.mohistmc.banner.plugins.BannerPlugin;
-import org.bukkit.Server;
-import org.bukkit.World;
-import org.bukkit.command.Command;
-import org.bukkit.command.PluginCommandYamlParser;
-import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.bukkit.permissions.Permissible;
-import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionDefault;
-import org.bukkit.util.FileUtil;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -41,6 +24,21 @@ import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.bukkit.Server;
+import org.bukkit.World;
+import org.bukkit.command.Command;
+import org.bukkit.command.PluginCommandYamlParser;
+import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.permissions.Permissible;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.util.FileUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Handles all plugin management from the Server
@@ -116,12 +114,25 @@ public final class SimplePluginManager implements PluginManager {
         Preconditions.checkArgument(directory != null, "Directory cannot be null");
         Preconditions.checkArgument(directory.isDirectory(), "Directory must be a directory");
 
-        List<Plugin> result = new ArrayList<Plugin>();
-        Set<Pattern> filters = fileAssociations.keySet();
-
         if (!(server.getUpdateFolder().equals(""))) {
             updateDirectory = new File(directory, server.getUpdateFolder());
         }
+
+        return loadPlugins(directory.listFiles());
+    }
+
+    /**
+     * Loads the plugins in the list of the files
+     *
+     * @param files List of files containing plugins to load
+     * @return A list of all plugins loaded
+     */
+    @NotNull
+    public Plugin[] loadPlugins(@NotNull File[] files) {
+        Preconditions.checkArgument(files != null, "File list cannot be null");
+
+        List<Plugin> result = new ArrayList<Plugin>();
+        Set<Pattern> filters = fileAssociations.keySet();
 
         Map<String, File> plugins = new HashMap<String, File>();
         Set<String> loadedPlugins = new HashSet<String>();
@@ -130,7 +141,7 @@ public final class SimplePluginManager implements PluginManager {
         Map<String, Collection<String>> softDependencies = new HashMap<String, Collection<String>>();
 
         // This is where it figures out all possible plugins
-        for (File file : directory.listFiles()) {
+        for (File file : files) {
             PluginLoader loader = null;
             for (Pattern filter : filters) {
                 Matcher match = filter.matcher(file.getName());
@@ -146,25 +157,24 @@ public final class SimplePluginManager implements PluginManager {
                 description = loader.getPluginDescription(file);
                 String name = description.getName();
                 if (name.equalsIgnoreCase("bukkit") || name.equalsIgnoreCase("minecraft") || name.equalsIgnoreCase("mojang")) {
-                    server.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "': Restricted Name");
+                    server.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "': Restricted Name");
                     continue;
                 } else if (description.rawName.indexOf(' ') != -1) {
-                    server.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "': uses the space-character (0x20) in its name");
+                    server.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "': uses the space-character (0x20) in its name");
                     continue;
                 }
             } catch (InvalidDescriptionException ex) {
-                server.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "'", ex);
+                server.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "'", ex);
                 continue;
             }
 
             File replacedFile = plugins.put(description.getName(), file);
             if (replacedFile != null) {
                 server.getLogger().severe(String.format(
-                    "Ambiguous plugin name `%s' for files `%s' and `%s' in `%s'",
-                    description.getName(),
-                    file.getPath(),
-                    replacedFile.getPath(),
-                    directory.getPath()
+                        "Ambiguous plugin name `%s' for files `%s' and `%s'",
+                        description.getName(),
+                        file.getPath(),
+                        replacedFile.getPath()
                 ));
             }
 
@@ -181,11 +191,10 @@ public final class SimplePluginManager implements PluginManager {
                 File pluginFile = plugins.get(provided);
                 if (pluginFile != null) {
                     server.getLogger().warning(String.format(
-                            "`%s provides `%s' while this is also the name of `%s' in `%s'",
+                            "`%s provides `%s' while this is also the name of `%s'",
                             file.getPath(),
                             provided,
-                            pluginFile.getPath(),
-                            directory.getPath()
+                            pluginFile.getPath()
                     ));
                 } else {
                     String replacedPlugin = pluginsProvided.put(provided, description.getName());
@@ -266,9 +275,9 @@ public final class SimplePluginManager implements PluginManager {
                             dependencies.remove(plugin);
 
                             server.getLogger().log(
-                                Level.SEVERE,
-                                "Could not load '" + entry.getValue().getPath() + "' in folder '" + directory.getPath() + "'",
-                                new UnknownDependencyException("Unknown dependency " + dependency + ". Please download and install " + dependency + " to run this plugin."));
+                                    Level.SEVERE,
+                                    "Could not load '" + entry.getValue().getPath() + "'",
+                                    new UnknownDependencyException("Unknown dependency " + dependency + ". Please download and install " + dependency + " to run this plugin."));
                             break;
                         }
                     }
@@ -306,11 +315,11 @@ public final class SimplePluginManager implements PluginManager {
                             loadedPlugins.add(loadedPlugin.getName());
                             loadedPlugins.addAll(loadedPlugin.getDescription().getProvides());
                         } else {
-                            server.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "'");
+                            server.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "'");
                         }
                         continue;
                     } catch (InvalidPluginException ex) {
-                        server.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "'", ex);
+                        server.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "'", ex);
                     }
                 }
             }
@@ -337,11 +346,11 @@ public final class SimplePluginManager implements PluginManager {
                                 loadedPlugins.add(loadedPlugin.getName());
                                 loadedPlugins.addAll(loadedPlugin.getDescription().getProvides());
                             } else {
-                                server.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "'");
+                                server.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "'");
                             }
                             break;
                         } catch (InvalidPluginException ex) {
-                            server.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "'", ex);
+                            server.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "'", ex);
                         }
                     }
                 }
@@ -354,7 +363,7 @@ public final class SimplePluginManager implements PluginManager {
                     while (failedPluginIterator.hasNext()) {
                         File file = failedPluginIterator.next();
                         failedPluginIterator.remove();
-                        server.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "': circular dependency detected");
+                        server.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "': circular dependency detected");
                     }
                 }
             }
@@ -481,8 +490,7 @@ public final class SimplePluginManager implements PluginManager {
             try {
                 plugin.getPluginLoader().enablePlugin(plugin);
             } catch (Throwable ex) {
-                handlePluginException("Error occurred (in the plugin loader) while enabling "
-                        + plugin.getDescription().getFullName() + " (Is it up to date?)", ex, plugin);
+                server.getLogger().log(Level.SEVERE, "Error occurred (in the plugin loader) while enabling " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
             }
 
             HandlerList.bakeAll();
@@ -503,37 +511,32 @@ public final class SimplePluginManager implements PluginManager {
             try {
                 plugin.getPluginLoader().disablePlugin(plugin);
             } catch (Throwable ex) {
-                handlePluginException("Error occurred (in the plugin loader) while disabling "
-                        + plugin.getDescription().getFullName() + " (Is it up to date?)", ex, plugin); // Paper
+                server.getLogger().log(Level.SEVERE, "Error occurred (in the plugin loader) while disabling " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
             }
 
             try {
                 server.getScheduler().cancelTasks(plugin);
             } catch (Throwable ex) {
-                handlePluginException("Error occurred (in the plugin loader) while cancelling tasks for "
-                        + plugin.getDescription().getFullName() + " (Is it up to date?)", ex, plugin); // Paper
+                server.getLogger().log(Level.SEVERE, "Error occurred (in the plugin loader) while cancelling tasks for " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
             }
 
             try {
                 server.getServicesManager().unregisterAll(plugin);
             } catch (Throwable ex) {
-                handlePluginException("Error occurred (in the plugin loader) while unregistering services for "
-                        + plugin.getDescription().getFullName() + " (Is it up to date?)", ex, plugin); // Paper
+                server.getLogger().log(Level.SEVERE, "Error occurred (in the plugin loader) while unregistering services for " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
             }
 
             try {
                 HandlerList.unregisterAll(plugin);
             } catch (Throwable ex) {
-                handlePluginException("Error occurred (in the plugin loader) while unregistering events for "
-                        + plugin.getDescription().getFullName() + " (Is it up to date?)", ex, plugin); // Paper
+                server.getLogger().log(Level.SEVERE, "Error occurred (in the plugin loader) while unregistering events for " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
             }
 
             try {
                 server.getMessenger().unregisterIncomingPluginChannel(plugin);
                 server.getMessenger().unregisterOutgoingPluginChannel(plugin);
             } catch (Throwable ex) {
-                handlePluginException("Error occurred (in the plugin loader) while unregistering plugin channels for "
-                        + plugin.getDescription().getFullName() + " (Is it up to date?)", ex, plugin); // Paper
+                server.getLogger().log(Level.SEVERE, "Error occurred (in the plugin loader) while unregistering plugin channels for " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
             }
 
             try {
@@ -545,13 +548,6 @@ public final class SimplePluginManager implements PluginManager {
             }
         }
     }
-
-    // Paper start
-    private void handlePluginException(String msg, Throwable ex, Plugin plugin) {
-        server.getLogger().log(Level.SEVERE, msg, ex);
-        callEvent(new com.destroystokyo.paper.event.server.ServerExceptionEvent(new com.destroystokyo.paper.exception.ServerPluginEnableDisableException(msg, ex, plugin)));
-    }
-    // Paper end
 
     @Override
     public void clearPlugins() {
@@ -616,16 +612,9 @@ public final class SimplePluginManager implements PluginManager {
                             ));
                 }
             } catch (Throwable ex) {
-                // Paper start - error reporting
-                String msg = "Could not pass event " + event.getEventName() + " to " + registration.getPlugin().getDescription().getFullName();
-                server.getLogger().log(Level.SEVERE, msg, ex);
-                if (!(event instanceof com.destroystokyo.paper.event.server.ServerExceptionEvent)) { // We don't want to cause an endless event loop
-                    callEvent(new com.destroystokyo.paper.event.server.ServerExceptionEvent(new com.destroystokyo.paper.exception.ServerEventException(msg, ex, registration.getPlugin(), registration.getListener(), event)));
-                }
-                // Paper end
+                server.getLogger().log(Level.SEVERE, "Could not pass event " + event.getEventName() + " to " + registration.getPlugin().getDescription().getFullName(), ex);
             }
         }
-        BannerPlugin.registerListener(event);
     }
 
     @Override
@@ -899,18 +888,4 @@ public final class SimplePluginManager implements PluginManager {
     public void useTimings(boolean use) {
         useTimings = use;
     }
-
-    // Banner start - add methods to support plugin manager
-    public List<Plugin> getPluginList() {
-        return plugins;
-    }
-
-    public Map<String, Plugin> getLookupNames() {
-        return lookupNames;
-    }
-
-    public SimpleCommandMap getCommandMap() {
-        return commandMap;
-    }
-    // Banner end
 }

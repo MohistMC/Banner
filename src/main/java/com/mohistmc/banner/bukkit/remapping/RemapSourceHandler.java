@@ -1,7 +1,6 @@
 package com.mohistmc.banner.bukkit.remapping;
 
 import com.google.common.io.ByteStreams;
-import java.lang.invoke.MethodHandles;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.impl.transformer.FabricTransformer;
 import org.objectweb.asm.ClassReader;
@@ -67,7 +66,7 @@ public class RemapSourceHandler extends URLStreamHandler {
     @SuppressWarnings("unchecked")
     public static void register() {
         try {
-            MethodHandles.lookup().ensureInitialized(URL.class);
+            Unsafe.ensureClassInitialized(URL.class);
             MethodHandle getter = Unsafe.lookup().findStaticGetter(URL.class, "handlers", Hashtable.class);
             Hashtable<String, URLStreamHandler> handlers = (Hashtable<String, URLStreamHandler>) getter.invokeExact();
             handlers.put("remap", new RemapSourceHandler());

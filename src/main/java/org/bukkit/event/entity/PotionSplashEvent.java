@@ -1,15 +1,18 @@
 package org.bukkit.event.entity;
 
 import com.google.common.base.Preconditions;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Called when a splash potion hits an area
@@ -19,9 +22,13 @@ public class PotionSplashEvent extends ProjectileHitEvent implements Cancellable
     private boolean cancelled;
     private final Map<LivingEntity, Double> affectedEntities;
 
+    @Deprecated
     public PotionSplashEvent(@NotNull final ThrownPotion potion, @NotNull final Map<LivingEntity, Double> affectedEntities) {
-        super(potion);
+        this(potion, null, null, null, affectedEntities);
+    }
 
+    public PotionSplashEvent(@NotNull final ThrownPotion potion, @Nullable Entity hitEntity, @Nullable Block hitBlock, @Nullable BlockFace hitFace, @NotNull final Map<LivingEntity, Double> affectedEntities) {
+        super(potion, hitEntity, hitBlock, hitFace);
         this.affectedEntities = affectedEntities;
     }
 

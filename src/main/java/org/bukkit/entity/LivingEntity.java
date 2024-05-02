@@ -1,5 +1,9 @@
 package org.bukkit.entity;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,15 +17,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * Represents a living entity, such as a monster or player
@@ -196,6 +197,32 @@ public interface LivingEntity extends Attributable, Damageable, ProjectileSource
     public void setMaximumAir(int ticks);
 
     /**
+     * Gets the item that the player is using (eating food, drawing back a bow,
+     * blocking, etc.)
+     *
+     * @return the item being used by the player, or null if they are not using
+     * an item
+     */
+    @Nullable
+    public ItemStack getItemInUse();
+
+    /**
+     * Gets the number of ticks remaining for the current item's usage.
+     *
+     * @return The number of ticks remaining
+     */
+    public int getItemInUseTicks();
+
+    /**
+     * Sets the number of ticks that remain for the current item's usage.
+     * Applies to items that take time to use, like eating food, drawing a bow,
+     * or throwing a trident.
+     *
+     * @param ticks The number of ticks remaining
+     */
+    public void setItemInUseTicks(int ticks);
+
+    /**
      * Gets the time in ticks until the next arrow leaves the entity's body.
      *
      * @return ticks until arrow leaves
@@ -364,31 +391,6 @@ public interface LivingEntity extends Attributable, Damageable, ProjectileSource
      * @param type the potion type to remove
      */
     public void removePotionEffect(@NotNull PotionEffectType type);
-
-    // Paper start - LivingEntity#clearActivePotionEffects();
-    /**
-     * Removes all active potion effects for this entity.
-     *
-     * @return true if any were removed
-     */
-    boolean clearActivePotionEffects();
-
-    /**
-     * Gets entity body yaw
-     *
-     * @return entity body yaw
-     * @see Location#getYaw()
-     */
-    float getBodyYaw();
-
-    /**
-     * Sets entity body yaw
-     *
-     * @param bodyYaw new entity body yaw
-     * @see Location#setYaw(float)
-     */
-    void setBodyYaw(float bodyYaw);
-    // Paper end
 
     /**
      * Returns all currently active {@link PotionEffect}s on the living
@@ -573,7 +575,6 @@ public interface LivingEntity extends Attributable, Damageable, ProjectileSource
      */
     public void swingOffHand();
 
-
     /**
      * Makes this entity flash red as if they were damaged.
      *
@@ -588,6 +589,14 @@ public interface LivingEntity extends Attributable, Damageable, ProjectileSource
      * <p>
      * Exemptions to this rule can be managed with
      * {@link #getCollidableExemptions()}
+     * <p>
+     * Note that the client may predict the collision between itself and another
+     * entity, resulting in this flag not working for player collisions. This
+     * method should therefore only be used to set the collision status of
+     * non-player entities.
+     * <p>
+     * To control player collisions, use {@link Team.Option#COLLISION_RULE} in
+     * combination with a {@link Scoreboard} and a {@link Team}.
      *
      * @param collidable collision status
      */
@@ -602,6 +611,15 @@ public interface LivingEntity extends Attributable, Damageable, ProjectileSource
      * Please note that this method returns only the custom collidable state,
      * not whether the entity is non-collidable for other reasons such as being
      * dead.
+     * <p>
+     * Note that the client may predict the collision between itself and another
+     * entity, resulting in this flag not being accurate for player collisions.
+     * This method should therefore only be used to check the collision status
+     * of non-player entities.
+     * <p>
+     * To check the collision behavior for a player, use
+     * {@link Team.Option#COLLISION_RULE} in combination with a
+     * {@link Scoreboard} and a {@link Team}.
      *
      * @return collision status
      */
@@ -619,6 +637,14 @@ public interface LivingEntity extends Attributable, Damageable, ProjectileSource
      * entity is in this set then it will still collide with it.
      * <p>
      * Note these exemptions are not (currently) persistent.
+     * <p>
+     * Note that the client may predict the collision between itself and another
+     * entity, resulting in those exemptions not being accurate for player
+     * collisions. This method should therefore only be used to exempt
+     * non-player entities.
+     * <p>
+     * To exempt collisions for a player, use {@link Team.Option#COLLISION_RULE}
+     * in combination with a {@link Scoreboard} and a {@link Team}.
      *
      * @return the collidable exemption set
      */
@@ -732,8 +758,10 @@ public interface LivingEntity extends Attributable, Damageable, ProjectileSource
      * debuffs.
      *
      * @return the entity category
+     * @deprecated entity groupings are now managed by tags, not categories
      */
     @NotNull
+    @Deprecated
     public EntityCategory getCategory();
 
     /**
@@ -749,9 +777,4 @@ public interface LivingEntity extends Attributable, Damageable, ProjectileSource
      * @return Whether the entity is invisible
      */
     public boolean isInvisible();
-
-    // Banner - add to fix ItemsAdder bugs in adventure mode
-    public default Block getTargetBlock(int maxDistance) {
-        return getTargetBlockExact(maxDistance);
-    }
 }

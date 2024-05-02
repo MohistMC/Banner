@@ -3,6 +3,9 @@ package com.mohistmc.banner.bukkit;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+
+import com.mohistmc.dynamicenum.MohistDynamEnum;
+import com.mojang.datafixers.DSL;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -14,6 +17,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.util.Unit;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -35,7 +39,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.phys.AABB;
 import org.bukkit.Bukkit;
 import org.bukkit.TreeType;
-import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
+import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
 
@@ -46,12 +50,14 @@ public class BukkitExtraConstants {
     public static int bridge$autosavePeriod;
     public static java.util.Queue<Runnable> bridge$processQueue =
             new java.util.concurrent.ConcurrentLinkedQueue<>();
-    public static int currentTick = 0; // Paper - Further improve tick loop
+    public static int currentTick = (int) (System.currentTimeMillis() / 50);
     public static boolean dispenser_eventFired = false; // CraftBukkit
     public static final TicketType<org.bukkit.plugin.Plugin> PLUGIN_TICKET =
             TicketType.create("plugin_ticket", Comparator.comparing(plugin -> plugin.getClass().getName())); // CraftBukkit
     public static final LootContextParam<Integer> LOOTING_MOD = new LootContextParam<>(new ResourceLocation("bukkit:looting_mod")); // CraftBukkit
     public static final TicketType<Unit> PLUGIN = TicketType.create("plugin", (a, b) -> 0); // CraftBukkit
+    private static final DSL.TypeReference PDC_TYPE = () -> "bukkit_pdc";
+    public static final DataFixTypes BUKKIT_PDC = MohistDynamEnum.addEnum(DataFixTypes.class, "BUKKIT_PDC", List.of(DSL.TypeReference.class), List.of(PDC_TYPE));
 
     public static List getHumansInRange(Level world, BlockPos blockposition, int i) {
         {

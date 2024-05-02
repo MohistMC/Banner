@@ -1,8 +1,7 @@
 package org.bukkit.attribute;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a mutable instance of an attribute and its associated modifiers
@@ -46,16 +45,6 @@ public interface AttributeInstance {
      * @param modifier to add
      */
     void addModifier(@NotNull AttributeModifier modifier);
-
-    // Paper start - Transient modifier API
-    /**
-     * Add a transient modifier to this instance.
-     * Transient modifiers are not persisted (saved with the NBT data)
-     *
-     * @param modifier to add
-     */
-    void addTransientModifier(@NotNull AttributeModifier modifier);
-    // Paper end
 
     /**
      * Remove a modifier from this instance.

@@ -1,11 +1,9 @@
 package com.mohistmc.banner.network.download;
 
 import com.mohistmc.banner.BannerMCStart;
+import static com.mohistmc.banner.network.download.NetworkUtil.getConn;
 import com.mohistmc.banner.util.I18n;
-import com.mohistmc.mjson.Json;
-import com.mohistmc.tools.ConnectionUtil;
 import com.mohistmc.tools.MD5Util;
-import com.mohistmc.tools.NumberUtil;
 import java.io.File;
 import java.net.URI;
 import java.net.URLConnection;
@@ -18,6 +16,7 @@ import java.util.Date;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import mjson.Json;
 
 public class UpdateUtils {
 
@@ -28,7 +27,7 @@ public class UpdateUtils {
         System.out.println(I18n.as("update.stopcheck"));
 
         try {
-            Json json = Json.read(URI.create("https://ci.codemc.io/job/MohistMC/job/Banner-1.20/lastSuccessfulBuild/api/json").toURL());
+            Json json = Json.read(URI.create("https://ci.codemc.io/job/MohistMC/job/Banner-1.20.4/lastSuccessfulBuild/api/json").toURL());
 
             String jar_sha = BannerMCStart.getVersion();
             String build_number = json.asString("number");
@@ -49,8 +48,8 @@ public class UpdateUtils {
     }
 
     public static void downloadFile(String URL, File f, String md5, boolean showlog) throws Exception {
-        URLConnection conn = ConnectionUtil.getConn(URL);
-        if (showlog) System.out.println(I18n.as("download.file", f.getName(), NumberUtil.getSize(conn.getContentLength())));
+        URLConnection conn = getConn(URL);
+        if (showlog) System.out.println(I18n.as("download.file", f.getName(), getSize(conn.getContentLength())));
         ReadableByteChannel rbc = Channels.newChannel(conn.getInputStream());
         FileChannel fc = FileChannel.open(f.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
         int fS = conn.getContentLength();
@@ -77,5 +76,9 @@ public class UpdateUtils {
             throw new Exception("md5");
         }
         if (showlog) System.out.println(I18n.as("download.file.ok", f.getName()));
+    }
+
+    public static String getSize(long size) {
+        return (size >= 1048576L) ? (float) size / 1048576.0F + "MB" : ((size >= 1024) ? (float) size / 1024.0F + " KB" : size + " B");
     }
 }

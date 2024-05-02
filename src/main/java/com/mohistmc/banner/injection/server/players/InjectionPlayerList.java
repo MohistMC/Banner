@@ -5,12 +5,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 import net.minecraft.stats.ServerStatsCounter;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
+import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 public interface InjectionPlayerList {
@@ -46,11 +45,5 @@ public interface InjectionPlayerList {
 
     default String bridge$quiltMsg() {
         return null;
-    }
-
-    default void banner$chat(boolean canSend) {
-    }
-
-    default void banner$putHandler(ServerLoginPacketListenerImpl handler) {
     }
 }

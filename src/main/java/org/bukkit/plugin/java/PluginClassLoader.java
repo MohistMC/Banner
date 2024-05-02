@@ -2,42 +2,36 @@ package org.bukkit.plugin.java;
 
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
-import com.mohistmc.banner.bukkit.pluginfix.PluginFixManager;
-import com.mohistmc.banner.bukkit.remapping.ClassLoaderRemapper;
-import com.mohistmc.banner.bukkit.remapping.Remapper;
-import com.mohistmc.banner.bukkit.remapping.RemappingClassLoader;
-import io.izzel.tools.product.Product2;
-import org.bukkit.Bukkit;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.security.CodeSigner;
+import java.security.CodeSource;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
+import java.util.logging.Level;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.SimplePluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.URLConnection;
-import java.security.CodeSource;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
-import java.util.logging.Level;
-
 /**
  * A ClassLoader for plugins, to allow shared classes across multiple plugins
  */
-final class PluginClassLoader extends URLClassLoader implements RemappingClassLoader {
+final class PluginClassLoader extends URLClassLoader {
     private final JavaPluginLoader loader;
     private final Map<String, Class<?>> classes = new ConcurrentHashMap<String, Class<?>>();
     private final PluginDescriptionFile description;
@@ -56,16 +50,6 @@ final class PluginClassLoader extends URLClassLoader implements RemappingClassLo
         ClassLoader.registerAsParallelCapable();
     }
 
-    private ClassLoaderRemapper remapper;
-
-    @Override
-    public ClassLoaderRemapper getRemapper() {
-        if (remapper == null) {
-            remapper = Remapper.createClassLoaderRemapper(this);
-        }
-        return remapper;
-    }
-
     PluginClassLoader(@NotNull final JavaPluginLoader loader, @Nullable final ClassLoader parent, @NotNull final PluginDescriptionFile description, @NotNull final File dataFolder, @NotNull final File file, @Nullable ClassLoader libraryLoader) throws IOException, InvalidPluginException, MalformedURLException {
         super(new URL[] {file.toURI().toURL()}, parent);
         Preconditions.checkArgument(loader != null, "Loader cannot be null");
@@ -79,26 +63,37 @@ final class PluginClassLoader extends URLClassLoader implements RemappingClassLo
         this.url = file.toURI().toURL();
         this.libraryLoader = libraryLoader;
 
+        Class<?> jarClass;
         try {
-            Class<?> jarClass;
-            try {
-                jarClass = Class.forName(description.getMain(), true, this);
-            } catch (ClassNotFoundException ex) {
-                throw new InvalidPluginException("Cannot find main class `" + description.getMain() + "'", ex);
-            }
+            jarClass = Class.forName(description.getMain(), true, this);
+        } catch (ClassNotFoundException ex) {
+            throw new InvalidPluginException("Cannot find main class `" + description.getMain() + "'", ex);
+        }
 
-            Class<? extends JavaPlugin> pluginClass;
-            try {
-                pluginClass = jarClass.asSubclass(JavaPlugin.class);
-            } catch (ClassCastException ex) {
-                throw new InvalidPluginException("main class `" + description.getMain() + "' does not extend JavaPlugin", ex);
-            }
+        Class<? extends JavaPlugin> pluginClass;
+        try {
+            pluginClass = jarClass.asSubclass(JavaPlugin.class);
+        } catch (ClassCastException ex) {
+            throw new InvalidPluginException("main class `" + description.getMain() + "' must extend JavaPlugin", ex);
+        }
 
-            plugin = pluginClass.newInstance();
+        Constructor<? extends JavaPlugin> pluginConstructor;
+        try {
+            pluginConstructor = pluginClass.getDeclaredConstructor();
+        } catch (NoSuchMethodException ex) {
+            throw new InvalidPluginException("main class `" + description.getMain() + "' must have a public no-args constructor", ex);
+        }
+
+        try {
+            plugin = pluginConstructor.newInstance();
         } catch (IllegalAccessException ex) {
-            throw new InvalidPluginException("No public constructor", ex);
+            throw new InvalidPluginException("main class `" + description.getMain() + "' constructor must be public", ex);
         } catch (InstantiationException ex) {
-            throw new InvalidPluginException("Abnormal plugin type", ex);
+            throw new InvalidPluginException("main class `" + description.getMain() + "' must not be abstract", ex);
+        } catch (IllegalArgumentException ex) {
+            throw new InvalidPluginException("Could not invoke main class `" + description.getMain() + "' constructor", ex);
+        } catch (ExceptionInInitializerError | InvocationTargetException ex) {
+            throw new InvalidPluginException("Exception initializing main class `" + description.getMain() + "'", ex);
         }
     }
 
@@ -174,28 +169,18 @@ final class PluginClassLoader extends URLClassLoader implements RemappingClassLo
 
         if (result == null) {
             String path = name.replace('.', '/').concat(".class");
-            URL url = this.findResource(path);
+            JarEntry entry = jar.getJarEntry(path);
 
-            if (url != null) {
+            if (entry != null) {
+                byte[] classBytes;
 
-                URLConnection connection;
-                Callable<byte[]> byteSource;
-                try {
-                    connection = url.openConnection();
-                    connection.connect();
-                    byteSource = () -> {
-                        try (InputStream is = connection.getInputStream()) {
-                            byte[] classBytes = ByteStreams.toByteArray(is);
-                            classBytes = Bukkit.getUnsafe().processClass(description, path, classBytes);
-                            classBytes = PluginFixManager.injectPluginFix(name, classBytes); // Mohist - Inject plugin fix
-                            return classBytes;
-                        }
-                    };
-                } catch (IOException e) {
-                    throw new ClassNotFoundException(name, e);
+                try (InputStream is = jar.getInputStream(entry)) {
+                    classBytes = ByteStreams.toByteArray(is);
+                } catch (IOException ex) {
+                    throw new ClassNotFoundException(name, ex);
                 }
 
-                Product2<byte[], CodeSource> classBytes = this.getRemapper().remapClass(name, byteSource, connection);
+                classBytes = loader.server.getUnsafe().processClass(description, path, classBytes);
 
                 int dot = name.lastIndexOf('.');
                 if (dot != -1) {
@@ -215,7 +200,10 @@ final class PluginClassLoader extends URLClassLoader implements RemappingClassLo
                     }
                 }
 
-                result = defineClass(name, classBytes._1, 0, classBytes._1.length, classBytes._2);
+                CodeSigner[] signers = entry.getCodeSigners();
+                CodeSource source = new CodeSource(url, signers);
+
+                result = defineClass(name, classBytes, 0, classBytes.length, source);
             }
 
             if (result == null) {

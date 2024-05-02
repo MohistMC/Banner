@@ -1,5 +1,10 @@
 package org.bukkit;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import org.bukkit.block.Biome;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
@@ -8,12 +13,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * A RegionAccessor gives access to getting, modifying and spawning {@link Biome}, {@link BlockState} and {@link Entity},
@@ -183,7 +182,7 @@ public interface RegionAccessor {
      * @param stateConsumer The consumer which should get called for every block which gets changed
      * @return true if the tree was created successfully, otherwise false
      */
-    boolean generateTree(@NotNull Location location, @NotNull Random random, @NotNull TreeType type, @Nullable Consumer<BlockState> stateConsumer);
+    boolean generateTree(@NotNull Location location, @NotNull Random random, @NotNull TreeType type, @Nullable Consumer<? super BlockState> stateConsumer);
 
     /**
      * Creates a tree at the given {@link Location}
@@ -203,7 +202,7 @@ public interface RegionAccessor {
      * @param statePredicate The predicate which should get used to test if a block should be set or not.
      * @return true if the tree was created successfully, otherwise false
      */
-    boolean generateTree(@NotNull Location location, @NotNull Random random, @NotNull TreeType type, @Nullable Predicate<BlockState> statePredicate);
+    boolean generateTree(@NotNull Location location, @NotNull Random random, @NotNull TreeType type, @Nullable Predicate<? super BlockState> statePredicate);
 
     /**
      * Creates a entity at the given {@link Location}
@@ -281,6 +280,24 @@ public interface RegionAccessor {
     Collection<Entity> getEntitiesByClasses(@NotNull Class<?>... classes);
 
     /**
+     * Creates an entity of a specific class at the given {@link Location} but
+     * does not spawn it in the world.
+     * <p>
+     * <b>Note:</b> The created entity keeps a reference to the world it was
+     * created in, care should be taken that the entity does not outlive the
+     * world instance as this will lead to memory leaks.
+     *
+     * @param <T> the class of the {@link Entity} to create
+     * @param location the {@link Location} to create the entity at
+     * @param clazz the class of the {@link Entity} to spawn
+     * @return an instance of the created {@link Entity}
+     * @see #addEntity(Entity)
+     * @see Entity#createSnapshot()
+     */
+    @NotNull
+    <T extends Entity> T createEntity(@NotNull Location location, @NotNull Class<T> clazz);
+
+    /**
      * Spawn an entity of a specific class at the given {@link Location}
      *
      * @param location the {@link Location} to spawn the entity at
@@ -310,7 +327,7 @@ public interface RegionAccessor {
      *     {@link Entity} requested cannot be spawned
      */
     @NotNull
-    <T extends Entity> T spawn(@NotNull Location location, @NotNull Class<T> clazz, @Nullable Consumer<T> function) throws IllegalArgumentException;
+    <T extends Entity> T spawn(@NotNull Location location, @NotNull Class<T> clazz, @Nullable Consumer<? super T> function) throws IllegalArgumentException;
 
     /**
      * Creates a new entity at the given {@link Location} with the supplied
@@ -348,7 +365,7 @@ public interface RegionAccessor {
      * @throws IllegalArgumentException if either the world or clazz parameter are null.
      */
     @NotNull
-    public <T extends Entity> T spawn(@NotNull Location location, @NotNull Class<T> clazz, boolean randomizeData, @Nullable Consumer<T> function) throws IllegalArgumentException;
+    public <T extends Entity> T spawn(@NotNull Location location, @NotNull Class<T> clazz, boolean randomizeData, @Nullable Consumer<? super T> function) throws IllegalArgumentException;
 
     /**
      * Gets the highest non-empty (impassable) coordinate at the given
@@ -394,4 +411,15 @@ public interface RegionAccessor {
      * {@link HeightMap}
      */
     public int getHighestBlockYAt(@NotNull Location location, @NotNull HeightMap heightMap);
+
+    /**
+     * Spawns a previously created entity in the world. <br>
+     * The provided entity must not have already been spawned in a world.
+     *
+     * @param <T> the generic type of the entity that is being added.
+     * @param entity the entity to add
+     * @return the entity now in the world
+     */
+    @NotNull
+    public <T extends Entity> T addEntity(@NotNull T entity);
 }

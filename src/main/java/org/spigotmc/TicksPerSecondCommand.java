@@ -1,5 +1,6 @@
 package org.spigotmc;
 
+import net.minecraft.server.MinecraftServer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -18,15 +19,15 @@ public class TicksPerSecondCommand extends Command
     @Override
     public boolean execute(CommandSender sender, String currentAlias, String[] args)
     {
-        if ( !testPermission( sender ) )
+        if ( !this.testPermission( sender ) )
         {
             return true;
         }
 
         StringBuilder sb = new StringBuilder( ChatColor.GOLD + "TPS from last 1m, 5m, 15m: " );
-        for (double tps : org.bukkit.Bukkit.getTPS())
+        for ( double tps : MinecraftServer.getServer().recentTps )
         {
-            sb.append( format( tps ) );
+            sb.append( this.format( tps ) );
             sb.append( ", " );
         }
         sender.sendMessage( sb.substring( 0, sb.length() - 2 ) );

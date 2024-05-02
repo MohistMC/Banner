@@ -24,13 +24,14 @@
     ]
   },
   "mixins": [
-    "banner.mixins.json"
+    "banner.core.mixins.json",
+    "banner.translate.mixins.json"
   ],
 
   "depends": {
     "fabricloader": ">=0.14.17",
     "fabric-api": "*",
-    "minecraft": ">=1.20 <1.20.2-",
+    "minecraft": ">=1.20 <1.20.6-",
     "java": ">=17"
   },
   "custom": {
@@ -57,7 +58,7 @@
       "net/minecraft/class_1531": ["com/mohistmc/banner/injection/world/entity/decoration/InjectionArmorStand"],
       "net/minecraft/class_1657": ["com/mohistmc/banner/injection/world/entity/player/InjectionPlayer"],
       "net/minecraft/class_1661": ["com/mohistmc/banner/injection/world/entity/player/InjectionInventory"],
-      "net/minecraft/class_161": ["com/mohistmc/banner/injection/advancements/InjectionAdvancement"],
+      "net/minecraft/class_8779": ["com/mohistmc/banner/injection/advancements/InjectionAdvancementHolder"],
       "net/minecraft/class_2170": ["com/mohistmc/banner/injection/commands/InjectionCommands"],
       "net/minecraft/class_2168": ["com/mohistmc/banner/injection/commands/InjectionCommandSourceStack"],
       "net/minecraft/class_2165": ["com/mohistmc/banner/injection/commands/InjectionCommandSource"],
@@ -77,7 +78,6 @@
       "net/minecraft/class_7128": ["com/mohistmc/banner/injection/world/level/block/InjectionSculkSpreader"],
       "net/minecraft/class_5454": ["com/mohistmc/banner/injection/world/level/portal/InjectionPortalInfo"],
       "net/minecraft/class_1946": ["com/mohistmc/banner/injection/world/level/portal/InjectionPortalForcer"],
-      "net/minecraft/class_2647": ["com/mohistmc/banner/injection/world/level/block/InjectionAbstractTreeGrower"],
       "net/minecraft/class_2535": ["com/mohistmc/banner/injection/network/connection/InjectionConnection"],
       "net/minecraft/class_2945": ["com/mohistmc/banner/injection/network/syncher/InjectionSynchedEntityData"],
       "net/minecraft/class_5251": ["com/mohistmc/banner/injection/network/chat/InjectionTextColor"],
@@ -102,6 +102,7 @@
       "net/minecraft/class_3225": ["com/mohistmc/banner/injection/server/level/InjectionServerPlayerGameMode"],
       "net/minecraft/class_3350": ["com/mohistmc/banner/injection/server/rcon/InjectionRconConsoleSource"],
       "net/minecraft/class_3244": ["com/mohistmc/banner/injection/server/network/InjectionServerGamePacketListenerImpl"],
+      "net/minecraft/class_8609": ["com/mohistmc/banner/injection/server/network/InjectionServerCommonPacketListenerImpl"],
       "net/minecraft/class_3242": ["com/mohistmc/banner/injection/server/network/InjectionServerConnectionListener"],
       "net/minecraft/class_3248": ["com/mohistmc/banner/injection/server/network/InjectionServerLoginPacketListenerImpl"],
       "net/minecraft/class_52": ["com/mohistmc/banner/injection/world/level/storage/loot/InjectionLootTable"],
@@ -142,6 +143,7 @@
       "net/minecraft/class_1715": ["com/mohistmc/banner/injection/world/inventory/InjectionTransientCraftingContainer"],
       "net/minecraft/class_3916": ["com/mohistmc/banner/injection/world/inventory/InjectionLecternMenu"],
       "net/minecraft/class_1860": ["com/mohistmc/banner/injection/world/item/crafting/InjectionRecipe"],
+      "net/minecraft/class_8786": ["com/mohistmc/banner/injection/world/item/crafting/InjectionRecipeHolder"],
       "net/minecraft/class_1863": ["com/mohistmc/banner/injection/world/item/crafting/InjectionRecipeManager"],
       "net/minecraft/class_1856": ["com/mohistmc/banner/injection/world/item/crafting/InjectionIngredient"],
       "net/minecraft/class_1867": ["com/mohistmc/banner/injection/world/item/crafting/InjectionShapelessRecipe"],

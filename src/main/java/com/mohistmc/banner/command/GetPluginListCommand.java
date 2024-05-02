@@ -21,7 +21,7 @@ public class GetPluginListCommand extends BukkitCommand {
     public boolean execute(CommandSender sender, String currentAlias, String[] args) {
         if (!testPermission(sender)) return true;
         for (Plugin p : Bukkit.getServer().getPluginManager().getPlugins()) {
-            sendToHaste = "%s\nName : %s\nVersion : %s\n---------".formatted(sendToHaste, p.getName(), p.getDescription().getVersion());
+            sendToHaste = sendToHaste + "\nName : " + p.getName() + "\nVersion : " + p.getDescription().getVersion() + "\n---------";
         }
         try {
             sender.sendMessage("Link of the list of your plugins : " + HasteUtils.pasteMohist(sendToHaste));

@@ -1,13 +1,12 @@
 package org.bukkit.inventory.meta;
 
+import java.util.List;
 import org.bukkit.Color;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  * Represents a potion or item that can have custom effects.
@@ -15,19 +14,26 @@ import java.util.List;
 public interface PotionMeta extends ItemMeta {
 
     /**
-     * Sets the underlying potion data
+     * Sets the underlying potion type
      *
-     * @param data PotionData to set the base potion state to
+     * @param type PotionType to set the base potion state to
      */
-    void setBasePotionData(@NotNull PotionData data);
+    void setBasePotionType(@Nullable PotionType type);
 
     /**
-     * Returns the potion data about the base potion
+     * Returns the potion type about the base potion
      *
-     * @return a PotionData object
+     * @return a PotionType object
      */
-    @NotNull
-    PotionData getBasePotionData();
+    @Nullable
+    PotionType getBasePotionType();
+
+    /**
+     * Checks for the presence of a base potion type
+     *
+     * @return true if a base potion type is present
+     */
+    boolean hasBasePotionType();
 
     /**
      * Checks for the presence of custom potion effects.
@@ -81,7 +87,7 @@ public interface PotionMeta extends ItemMeta {
      *
      * @param type the potion effect type to move
      * @return true if the potion meta changed as a result of this call
-     * @deprecated use {@link #setBasePotionData(org.bukkit.potion.PotionData)}
+     * @deprecated use {@link #setBasePotionType(org.bukkit.potion.PotionType)}
      */
     @Deprecated
     boolean setMainEffect(@NotNull PotionEffectType type);

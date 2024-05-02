@@ -75,7 +75,7 @@ public enum ClickType {
      * @return true if this ClickType represents the pressing of a key
      */
     public boolean isKeyboardClick() {
-        return (this == ClickType.NUMBER_KEY) || (this == ClickType.DROP) || (this == ClickType.CONTROL_DROP);
+        return (this == ClickType.NUMBER_KEY) || (this == ClickType.DROP) || (this == ClickType.CONTROL_DROP) || (this == ClickType.SWAP_OFFHAND);
     }
 
     /**

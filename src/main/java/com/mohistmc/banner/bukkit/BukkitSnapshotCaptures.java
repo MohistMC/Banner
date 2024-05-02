@@ -7,7 +7,6 @@ import java.util.Stack;
 import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.PositionImpl;
 import net.minecraft.server.WorldLoader;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -16,9 +15,10 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.TreeType;
 import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_20_R1.event.CraftPortalEvent;
+import org.bukkit.craftbukkit.event.CraftPortalEvent;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 
@@ -34,13 +34,13 @@ public class BukkitSnapshotCaptures {
         return banner$stopGlide;
     }
 
-    private static PositionImpl positionImpl;
+    private static Vec3 positionImpl;
 
-    public static void capturePositionImpl(PositionImpl position) {
+    public static void capturePositionImpl(Vec3 position) {
         positionImpl = position;
     }
 
-    public static PositionImpl getPositionImpl() {
+    public static Vec3 getPositionImpl() {
         try {
             return positionImpl;
         } finally {
@@ -227,6 +227,10 @@ public class BukkitSnapshotCaptures {
 
     public static void captureContainerOwner(Player entity) {
         containerOwner = entity;
+    }
+
+    public static void resetContainerOwner() {
+        containerOwner = null;
     }
 
     public static Player getContainerOwner() {

@@ -4,11 +4,12 @@ import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
+import org.bukkit.Translatable;
 
 /**
  * Represents a pattern that may be used in an {@link ArmorTrim}.
  */
-public interface TrimPattern extends Keyed {
+public interface TrimPattern extends Keyed, Translatable {
 
     /**
      * {@link Material#SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE}.
@@ -74,4 +75,12 @@ public interface TrimPattern extends Keyed {
      * {@link Material#HOST_ARMOR_TRIM_SMITHING_TEMPLATE}.
      */
     public static final TrimPattern HOST = Registry.TRIM_PATTERN.get(NamespacedKey.minecraft("host"));
+    /**
+     * {@link Material#FLOW_ARMOR_TRIM_SMITHING_TEMPLATE}.
+     */
+    public static final TrimPattern FLOW = Registry.TRIM_PATTERN.get(NamespacedKey.minecraft("flow"));
+    /**
+     * {@link Material#BOLT_ARMOR_TRIM_SMITHING_TEMPLATE}.
+     */
+    public static final TrimPattern BOLT = Registry.TRIM_PATTERN.get(NamespacedKey.minecraft("bolt"));
 }

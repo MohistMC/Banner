@@ -1,6 +1,6 @@
 package com.mohistmc.banner.injection.world.level.block.entity;
 
-import org.bukkit.craftbukkit.v1_20_R1.persistence.CraftPersistentDataContainer;
+import org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer;
 import org.bukkit.inventory.InventoryHolder;
 
 public interface InjectionBlockEntity {

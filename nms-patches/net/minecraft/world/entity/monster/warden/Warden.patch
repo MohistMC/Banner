@@ -1,0 +1,69 @@
+--- a/net/minecraft/world/entity/monster/warden/Warden.java
++++ b/net/minecraft/world/entity/monster/warden/Warden.java
+@@ -371,7 +371,7 @@
+ 
+     @Override
+     public BehaviorController<Warden> getBrain() {
+-        return super.getBrain();
++        return (BehaviorController<Warden>) super.getBrain(); // CraftBukkit - decompile error
+     }
+ 
+     @Override
+@@ -408,13 +408,13 @@
+     public static void applyDarknessAround(WorldServer worldserver, Vec3D vec3d, @Nullable Entity entity, int i) {
+         MobEffect mobeffect = new MobEffect(MobEffects.DARKNESS, 260, 0, false, false);
+ 
+-        MobEffectUtil.addEffectToPlayersAround(worldserver, entity, vec3d, (double) i, mobeffect, 200);
++        MobEffectUtil.addEffectToPlayersAround(worldserver, entity, vec3d, i, mobeffect, 200, org.bukkit.event.entity.EntityPotionEffectEvent.Cause.WARDEN); // CraftBukkit - Add EntityPotionEffectEvent.Cause
+     }
+ 
+     @Override
+     public void addAdditionalSaveData(NBTTagCompound nbttagcompound) {
+         super.addAdditionalSaveData(nbttagcompound);
+-        DataResult dataresult = AngerManagement.codec(this::canTargetEntity).encodeStart(DynamicOpsNBT.INSTANCE, this.angerManagement);
++        DataResult<net.minecraft.nbt.NBTBase> dataresult = AngerManagement.codec(this::canTargetEntity).encodeStart(DynamicOpsNBT.INSTANCE, this.angerManagement); // CraftBukkit - decompile error
+         Logger logger = Warden.LOGGER;
+ 
+         Objects.requireNonNull(logger);
+@@ -439,7 +439,7 @@
+             dataresult = AngerManagement.codec(this::canTargetEntity).parse(new Dynamic(DynamicOpsNBT.INSTANCE, nbttagcompound.get("anger")));
+             logger = Warden.LOGGER;
+             Objects.requireNonNull(logger);
+-            dataresult.resultOrPartial(logger::error).ifPresent((angermanagement) -> {
++            ((DataResult<AngerManagement>) dataresult).resultOrPartial(logger::error).ifPresent((angermanagement) -> { // CraftBukkit - decompile error
+                 this.angerManagement = angermanagement;
+             });
+             this.syncClientAngerLevel();
+@@ -449,7 +449,7 @@
+             dataresult = VibrationSystem.a.CODEC.parse(new Dynamic(DynamicOpsNBT.INSTANCE, nbttagcompound.getCompound("listener")));
+             logger = Warden.LOGGER;
+             Objects.requireNonNull(logger);
+-            dataresult.resultOrPartial(logger::error).ifPresent((vibrationsystem_a) -> {
++            ((DataResult<VibrationSystem.a>) dataresult).resultOrPartial(logger::error).ifPresent((vibrationsystem_a) -> { // CraftBukkit - decompile error
+                 this.vibrationData = vibrationsystem_a;
+             });
+         }
+@@ -547,7 +547,7 @@
+ 
+     public void setAttackTarget(EntityLiving entityliving) {
+         this.getBrain().eraseMemory(MemoryModuleType.ROAR_TARGET);
+-        this.getBrain().setMemory(MemoryModuleType.ATTACK_TARGET, (Object) entityliving);
++        this.getBrain().setMemory(MemoryModuleType.ATTACK_TARGET, entityliving); // CraftBukkit - decompile error
+         this.getBrain().eraseMemory(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
+         SonicBoom.setCooldown(this, 200);
+     }
+@@ -582,12 +582,12 @@
+ 
+     @Override
+     protected NavigationAbstract createNavigation(World world) {
+-        return new Navigation(this, this, world) {
++        return new Navigation(this, world) { // CraftBukkit - decompile error
+             @Override
+             protected Pathfinder createPathFinder(int i) {
+                 this.nodeEvaluator = new PathfinderNormal();
+                 this.nodeEvaluator.setCanPassDoors(true);
+-                return new Pathfinder(this, this.nodeEvaluator, i) {
++                return new Pathfinder(this.nodeEvaluator, i) { // CraftBukkit - decompile error
+                     @Override
+                     protected float distance(PathPoint pathpoint, PathPoint pathpoint1) {
+                         return pathpoint.distanceToXZ(pathpoint1);

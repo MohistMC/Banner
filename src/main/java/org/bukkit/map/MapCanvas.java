@@ -1,9 +1,9 @@
 package org.bukkit.map;
 
+import java.awt.Color;
+import java.awt.Image;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.awt.*;
 
 /**
  * Represents a canvas for drawing to a map. Each canvas is associated with a
@@ -86,6 +86,7 @@ public interface MapCanvas {
      * @param color The color. See {@link MapPalette}.
      * @deprecated Magic value, use {@link #setPixelColor(int, int, Color)}
      */
+    @Deprecated
     public void setPixel(int x, int y, byte color);
 
     /**

@@ -2,7 +2,6 @@ package org.bukkit.entity;
 
 import org.bukkit.block.data.BlockData;
 import org.bukkit.material.MaterialData;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,7 +40,6 @@ public interface Enderman extends Monster {
      */
     public void setCarriedBlock(@Nullable BlockData blockData);
 
-
     /**
      * Randomly teleports the Enderman in a 64x64x64 block cuboid region.
      * <p>
@@ -54,7 +52,6 @@ public interface Enderman extends Monster {
      *
      * @return true if the teleport succeeded.
      */
-    @ApiStatus.Experimental
     public boolean teleport();
 
     /**
@@ -73,6 +70,5 @@ public interface Enderman extends Monster {
      * @param entity The entity to teleport towards.
      * @return true if the teleport succeeded.
      */
-    @ApiStatus.Experimental
     public boolean teleportTowards(@NotNull Entity entity);
 }

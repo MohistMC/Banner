@@ -1,12 +1,11 @@
 package org.bukkit.boss;
 
+import java.util.Collection;
 import org.bukkit.Location;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.EnderDragon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
 
 /**
  * Represents a dragon battle state for a world with an end environment.
@@ -56,6 +55,17 @@ public interface DragonBattle {
      * @return true if killed before, false otherwise
      */
     public boolean hasBeenPreviouslyKilled();
+
+    /**
+     * Sets whether the first dragon has been killed already.
+     * <br>
+     * If the dragon has not previously been killed, a portal will be generated
+     * when it is finally killed.
+     *
+     * @param previouslyKilled true if the dragon has been killed before, false
+     * otherwise
+     */
+    public void setPreviouslyKilled(boolean previouslyKilled);
 
     /**
      * Try to initiate a respawn sequence to summon the dragon as though a player has

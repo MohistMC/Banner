@@ -1,5 +1,9 @@
 package org.bukkit;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
+import java.util.UUID;
 import org.bukkit.ban.ProfileBanList;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.AnimalTamer;
@@ -9,11 +13,6 @@ import org.bukkit.permissions.ServerOperator;
 import org.bukkit.profile.PlayerProfile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
-import java.util.UUID;
 
 /**
  * Represents a reference to a player identity and the data belonging to a
@@ -172,9 +171,23 @@ public interface OfflinePlayer extends ServerOperator, AnimalTamer, Configuratio
      * they have not slept in one or their current bed spawn is invalid.
      *
      * @return Bed Spawn Location if bed exists, otherwise null.
+     *
+     * @see #getRespawnLocation()
+     * @deprecated Misleading name. This method also returns the location of
+     * respawn anchors.
      */
     @Nullable
+    @Deprecated
     public Location getBedSpawnLocation();
+
+    /**
+     * Gets the Location where the player will spawn at, null if they
+     * don't have a valid respawn point.
+     *
+     * @return respawn location if exists, otherwise null.
+     */
+    @Nullable
+    public Location getRespawnLocation();
 
     /**
      * Increments the given statistic for this player.
@@ -426,4 +439,13 @@ public interface OfflinePlayer extends ServerOperator, AnimalTamer, Configuratio
      */
     @Nullable
     public Location getLastDeathLocation();
+
+    /**
+     * Gets the player's current location.
+     *
+     * @return the player's location, {@code null} if player hasn't ever played
+     * before.
+     */
+    @Nullable
+    public Location getLocation();
 }

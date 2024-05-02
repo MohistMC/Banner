@@ -1,30 +1,29 @@
 package org.bukkit.entity;
 
+import java.util.List;
 import org.bukkit.Color;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public interface Arrow extends AbstractArrow {
 
     /**
-     * Sets the underlying potion data
+     * Sets the underlying potion type
      *
-     * @param data PotionData to set the base potion state to
+     * @param type PotionType to set the base potion state to
      */
-    void setBasePotionData(@NotNull PotionData data);
+    void setBasePotionType(@Nullable PotionType type);
 
     /**
-     * Returns the potion data about the base potion
+     * Returns the potion type about the base potion
      *
-     * @return a PotionData object
+     * @return a PotionType object
      */
-    @NotNull
-    PotionData getBasePotionData();
+    @Nullable
+    PotionType getBasePotionType();
 
     /**
      * Gets the color of this arrow.

@@ -5,6 +5,9 @@ import org.bukkit.advancement.Advancement;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.damage.DamageEffect;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.CreativeCategory;
 import org.bukkit.inventory.EquipmentSlot;
@@ -12,6 +15,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.potion.PotionType;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,8 +56,7 @@ public interface UnsafeValues {
      * The advancement format is governed by Minecraft and has no specified
      * layout.
      * <br>
-     * It is currently a JSON object, as described by the Minecraft Wiki:
-     * http://minecraft.gamepedia.com/Advancements
+     * It is currently a JSON object, as described by the <a href="https://minecraft.wiki/w/Advancements">Minecraft wiki</a>.
      * <br>
      * Loaded advancements will be stored and persisted across server restarts
      * and reloads.
@@ -90,6 +94,30 @@ public interface UnsafeValues {
 
     String getTranslationKey(ItemStack itemStack);
 
+    String getTranslationKey(Attribute attribute);
+
     @Nullable
     FeatureFlag getFeatureFlag(@NotNull NamespacedKey key);
+
+    /**
+     * Do not use, method will get removed, and the plugin won't run
+     *
+     * @param key of the potion type
+     * @return an internal potion data
+     */
+    PotionType.InternalPotionData getInternalPotionData(NamespacedKey key);
+
+    @ApiStatus.Internal
+    @Nullable
+    DamageEffect getDamageEffect(@NotNull String key);
+
+    /**
+     * Create a new {@link DamageSource.Builder}.
+     *
+     * @param damageType the {@link DamageType} to use
+     * @return a {@link DamageSource.Builder}
+     */
+    @ApiStatus.Internal
+    @NotNull
+    DamageSource.Builder createDamageSourceBuilder(@NotNull DamageType damageType);
 }

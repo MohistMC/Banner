@@ -3,18 +3,26 @@ package com.mohistmc.banner.injection.world.entity;
 import java.util.Set;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.PositionImpl;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.RelativeMovement;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_20_R1.event.CraftPortalEvent;
+import org.bukkit.craftbukkit.entity.CraftEntity;
+import org.bukkit.craftbukkit.event.CraftPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.jetbrains.annotations.Nullable;
 
 public interface InjectionEntity {
+
+    default boolean bridge$inWorld() {
+        return false;
+    }
+
+    default void banner$setInWorld(boolean inWorld) {
+
+    }
 
     default void banner$setBukkitEntity(CraftEntity bukkitEntity) {
 
@@ -144,7 +152,7 @@ public interface InjectionEntity {
 
     }
 
-    default Entity teleportTo(ServerLevel worldserver, PositionImpl location) {
+    default Entity teleportTo(ServerLevel worldserver, Vec3 location) {
         return null;
     }
 
@@ -175,7 +183,7 @@ public interface InjectionEntity {
         return false;
     }
 
-    default CraftPortalEvent callPortalEvent(Entity entity, ServerLevel exitWorldServer, PositionImpl exitPosition, PlayerTeleportEvent.TeleportCause cause, int searchRadius, int creationRadius) {
+    default CraftPortalEvent callPortalEvent(Entity entity, ServerLevel exitWorldServer, Vec3 exitPosition, PlayerTeleportEvent.TeleportCause cause, int searchRadius, int creationRadius) {
         return null;
     }
 }

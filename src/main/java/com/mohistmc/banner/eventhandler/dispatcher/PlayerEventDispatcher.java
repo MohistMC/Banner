@@ -1,8 +1,6 @@
 package com.mohistmc.banner.eventhandler.dispatcher;
 
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
-import com.mohistmc.banner.config.BannerConfig;
-import com.mohistmc.banner.fabric.FabricHookBukkitEvent;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
@@ -17,15 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
-
-import java.util.List;
-import java.util.Objects;
+import org.bukkit.craftbukkit.event.CraftEventFactory;
 
 public class PlayerEventDispatcher {
 

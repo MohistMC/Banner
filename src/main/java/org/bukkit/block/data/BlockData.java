@@ -1,5 +1,6 @@
 package org.bukkit.block.data;
 
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
@@ -205,6 +206,14 @@ public interface BlockData extends Cloneable {
     boolean isFaceSturdy(@NotNull BlockFace face, @NotNull BlockSupport support);
 
     /**
+     * Gets the color this block should appear as when rendered on a map.
+     *
+     * @return the color associated with this BlockData
+     */
+    @NotNull
+    Color getMapColor();
+
+    /**
      * Gets the material that a player would use to place this block.
      * <p>
      * For most blocks this is the same as {@link #getMaterial()} but some blocks
@@ -237,6 +246,16 @@ public interface BlockData extends Cloneable {
      * @param mirror the mirror
      */
     void mirror(@NotNull Mirror mirror);
+
+    /**
+     * Copies all applicable properties from this BlockData to the provided
+     * BlockData.
+     * <p>
+     * Only modifies properties that both blocks share in common.
+     *
+     * @param other the BlockData to copy properties to
+     */
+    void copyTo(@NotNull BlockData other);
 
     /**
      * Creates a new default {@link BlockState} for this type of Block, not

@@ -1,6 +1,9 @@
 package org.bukkit.event.inventory;
 
+import org.bukkit.MinecraftExperimental;
+import org.bukkit.MinecraftExperimental.Requires;
 import org.bukkit.inventory.InventoryHolder;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -82,7 +85,7 @@ public enum InventoryType {
      */
     ANVIL(3, "Repairing"),
     /**
-     * A smithing inventory, with 3 CRAFTING slots and 1 RESULT slot
+     * A smithing inventory, with 3 CRAFTING slots and 1 RESULT slot.
      */
     SMITHING(4, "Upgrade Gear"),
     /**
@@ -142,6 +145,12 @@ public enum InventoryType {
      * Pseudo jukebox inventory with 1 slot of undefined type.
      */
     JUKEBOX(1, "Jukebox", false),
+    /**
+     * A crafter inventory, with 9 CRAFTING slots.
+     */
+    @MinecraftExperimental(Requires.UPDATE_1_21)
+    @ApiStatus.Experimental
+    CRAFTER(9, "Crafter"),
     /**
      * The new smithing inventory, with 3 CRAFTING slots and 1 RESULT slot.
      *

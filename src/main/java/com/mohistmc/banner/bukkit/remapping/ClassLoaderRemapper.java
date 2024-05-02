@@ -6,7 +6,6 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import io.izzel.tools.product.Product;
 import io.izzel.tools.product.Product2;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -334,7 +333,7 @@ public class ClassLoaderRemapper extends LenientJarRemapper {
             node.accept(visitor);
             byte[] bytes = writer.toByteArray();
             Class<?> cl = Unsafe.defineClass(name.replace('/', '.'), bytes, 0, bytes.length, getClass().getClassLoader(), getClass().getProtectionDomain());
-            MethodHandles.lookup().ensureInitialized(cl);
+            Unsafe.ensureClassInitialized(cl);
 
             Field remapper = cl.getField("remapper");
             remapper.set(null, this);

@@ -18,7 +18,7 @@ public interface SculkShrieker extends TileState {
      */
     int getWarningLevel();
 
-     /**
+    /**
      * Sets the most recent warning level of this block.
      *
      * When the warning level reaches 4, the shrieker will attempt to spawn a

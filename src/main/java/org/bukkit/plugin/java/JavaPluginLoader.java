@@ -1,8 +1,24 @@
 package org.bukkit.plugin.java;
 
 import com.google.common.base.Preconditions;
-import com.mohistmc.banner.stackdeobf.mappings.RemappingUtil;
-import com.mohistmc.banner.util.I18n;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.regex.Pattern;
 import org.bukkit.Server;
 import org.bukkit.Warning;
 import org.bukkit.Warning.WarningState;
@@ -27,26 +43,8 @@ import org.bukkit.plugin.TimedRegisteredListener;
 import org.bukkit.plugin.UnknownDependencyException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.yaml.snakeyaml.error.YAMLException;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.logging.Level;
-import java.util.regex.Pattern;
+import org.spigotmc.CustomTimingsHandler; // Spigot
+import com.mohistmc.org.yaml.snakeyaml .error.YAMLException;
 
 /**
  * Represents a Java plugin loader, allowing plugins in the form of .jar
@@ -56,6 +54,7 @@ public final class JavaPluginLoader implements PluginLoader {
     private final Pattern[] fileFilters = new Pattern[]{Pattern.compile("\\.jar$")};
     private final List<PluginClassLoader> loaders = new CopyOnWriteArrayList<PluginClassLoader>();
     private final LibraryLoader libraryLoader;
+    public static final CustomTimingsHandler pluginParentTimer = new CustomTimingsHandler("** Plugins"); // Spigot
 
     /**
      * This class was not meant to be constructed explicitly
@@ -69,11 +68,10 @@ public final class JavaPluginLoader implements PluginLoader {
 
         LibraryLoader libraryLoader = null;
         try {
-            libraryLoader = new LibraryLoader();
+            libraryLoader = new LibraryLoader(server.getLogger());
         } catch (NoClassDefFoundError ex) {
             // Provided depends were not added back
             server.getLogger().warning("Could not initialize LibraryLoader (missing dependencies?)");
-            server.getLogger().warning("Caused by " + ex.getCause());
         }
         this.libraryLoader = libraryLoader;
     }
@@ -148,7 +146,6 @@ public final class JavaPluginLoader implements PluginLoader {
         } catch (InvalidPluginException ex) {
             throw ex;
         } catch (Throwable ex) {
-            RemappingUtil.remapStackTraceElements(ex.getStackTrace());
             throw new InvalidPluginException(ex);
         }
 
@@ -295,6 +292,7 @@ public final class JavaPluginLoader implements PluginLoader {
                 }
             }
 
+            final CustomTimingsHandler timings = new CustomTimingsHandler("Plugin: " + plugin.getDescription().getFullName() + " Event: " + listener.getClass().getName() + "::" + method.getName() + "(" + eventClass.getSimpleName() + ")", pluginParentTimer); // Spigot
             EventExecutor executor = new EventExecutor() {
                 @Override
                 public void execute(@NotNull Listener listener, @NotNull Event event) throws EventException {
@@ -302,11 +300,15 @@ public final class JavaPluginLoader implements PluginLoader {
                         if (!eventClass.isAssignableFrom(event.getClass())) {
                             return;
                         }
+                        // Spigot start
+                        boolean isAsync = event.isAsynchronous();
+                        if (!isAsync) timings.startTiming();
                         method.invoke(listener, event);
+                        if (!isAsync) timings.stopTiming();
+                        // Spigot end
                     } catch (InvocationTargetException ex) {
                         throw new EventException(ex.getCause());
                     } catch (Throwable t) {
-                        RemappingUtil.remapStackTraceElements(t.getStackTrace());
                         throw new EventException(t);
                     }
                 }
@@ -325,7 +327,7 @@ public final class JavaPluginLoader implements PluginLoader {
         Preconditions.checkArgument(plugin instanceof JavaPlugin, "Plugin is not associated with this PluginLoader");
 
         if (!plugin.isEnabled()) {
-            plugin.getLogger().info(I18n.as("bukkit.plugin.enabling") + " " + plugin.getDescription().getFullName());
+            plugin.getLogger().info("Enabling " + plugin.getDescription().getFullName());
 
             JavaPlugin jPlugin = (JavaPlugin) plugin;
 
@@ -339,12 +341,7 @@ public final class JavaPluginLoader implements PluginLoader {
             try {
                 jPlugin.setEnabled(true);
             } catch (Throwable ex) {
-                RemappingUtil.remapStackTraceElements(ex.getStackTrace());
                 server.getLogger().log(Level.SEVERE, "Error occurred while enabling " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
-                // Mohist start - Disable plugins that fail to load
-                this.server.getPluginManager().disablePlugin(jPlugin);
-                return;
-                // Mohist end
             }
 
             // Perhaps abort here, rather than continue going, but as it stands,
@@ -358,7 +355,7 @@ public final class JavaPluginLoader implements PluginLoader {
         Preconditions.checkArgument(plugin instanceof JavaPlugin, "Plugin is not associated with this PluginLoader");
 
         if (plugin.isEnabled()) {
-            String message = String.format(I18n.as("bukkit.plugin.disabling"), plugin.getDescription().getFullName());
+            String message = String.format("Disabling %s", plugin.getDescription().getFullName());
             plugin.getLogger().info(message);
 
             server.getPluginManager().callEvent(new PluginDisableEvent(plugin));
@@ -369,7 +366,6 @@ public final class JavaPluginLoader implements PluginLoader {
             try {
                 jPlugin.setEnabled(false);
             } catch (Throwable ex) {
-                RemappingUtil.remapStackTraceElements(ex.getStackTrace());
                 server.getLogger().log(Level.SEVERE, "Error occurred while disabling " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
             }
 

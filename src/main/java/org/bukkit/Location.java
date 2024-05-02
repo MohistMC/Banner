@@ -1,17 +1,16 @@
 package org.bukkit;
 
 import com.google.common.base.Preconditions;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Represents a 3-dimensional position in a world.
@@ -21,7 +20,7 @@ import java.util.Map;
  * magnitude than 360 are valid, but may be normalized to any other equivalent
  * representation by the implementation.
  */
-public class Location implements Cloneable, ConfigurationSerializable, io.papermc.paper.math.FinePosition { // Paper
+public class Location implements Cloneable, ConfigurationSerializable {
     private Reference<World> world;
     private double x;
     private double y;
@@ -586,28 +585,6 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
         World world = (this.world == null) ? null : this.world.get();
         return "Location{" + "world=" + world + ",x=" + x + ",y=" + y + ",z=" + z + ",pitch=" + pitch + ",yaw=" + yaw + '}';
     }
-
-    // Paper - add Position
-    @Override
-    public double x() {
-        return this.getX();
-    }
-
-    @Override
-    public double y() {
-        return this.getY();
-    }
-
-    @Override
-    public double z() {
-        return this.getZ();
-    }
-
-    @Override
-    public @NotNull Location toLocation(@NotNull World world) {
-        return new Location(world, this.x(), this.y(), this.z(), this.getYaw(), this.getPitch());
-    }
-    // Paper end
 
     /**
      * Constructs a new {@link Vector} based on this Location

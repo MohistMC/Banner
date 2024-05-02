@@ -1,49 +1,7 @@
 package org.bukkit;
 
 import com.google.common.collect.ImmutableList;
-import org.bukkit.Warning.WarningState;
-import org.bukkit.advancement.Advancement;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarFlag;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
-import org.bukkit.boss.KeyedBossBar;
-import org.bukkit.command.CommandException;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.SpawnCategory;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.server.ServerListPingEvent;
-import org.bukkit.generator.ChunkGenerator;
-import org.bukkit.help.HelpMap;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemFactory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Merchant;
-import org.bukkit.inventory.Recipe;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.loot.LootTable;
-import org.bukkit.map.MapView;
-import org.bukkit.packs.DataPackManager;
-import org.bukkit.permissions.Permissible;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.ServicesManager;
-import org.bukkit.plugin.messaging.Messenger;
-import org.bukkit.profile.PlayerProfile;
-import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.scoreboard.Criteria;
-import org.bukkit.scoreboard.ScoreboardManager;
-import org.bukkit.structure.StructureManager;
-import org.bukkit.util.CachedServerIcon;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
+import com.mohistmc.mohist.Mohist;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.Serializable;
@@ -57,6 +15,52 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
+import org.bukkit.Warning.WarningState;
+import org.bukkit.advancement.Advancement;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarFlag;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
+import org.bukkit.boss.KeyedBossBar;
+import org.bukkit.command.CommandException;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityFactory;
+import org.bukkit.entity.EntitySnapshot;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.SpawnCategory;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.server.ServerListPingEvent;
+import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.help.HelpMap;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemCraftResult;
+import org.bukkit.inventory.ItemFactory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Merchant;
+import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.loot.LootTable;
+import org.bukkit.map.MapView;
+import org.bukkit.packs.DataPackManager;
+import org.bukkit.packs.ResourcePack;
+import org.bukkit.permissions.Permissible;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.ServicesManager;
+import org.bukkit.plugin.messaging.Messenger;
+import org.bukkit.profile.PlayerProfile;
+import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scoreboard.Criteria;
+import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.structure.StructureManager;
+import org.bukkit.util.CachedServerIcon;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents the Bukkit core, for version and Server singleton handling
@@ -92,7 +96,7 @@ public final class Bukkit {
         }
 
         Bukkit.server = server;
-        server.getLogger().info("This server is running " + getName() + " version " + getVersion() + " (Implementing API version " + getBukkitVersion() + ")");
+        server.getLogger().info("This server is running " + getName() + " version " + getVersion() + " (Implementing API version " + getBukkitVersion() + ", Forge version " + Mohist.versionInfo.forge() + ")");
     }
 
     /**
@@ -260,6 +264,15 @@ public final class Bukkit {
         return server.getAllowNether();
     }
 
+    /**
+     * Gets whether the server is logging the IP addresses of players.
+     *
+     * @return whether the server is logging the IP addresses of players
+     */
+    public static boolean isLoggingIPs() {
+        return server.isLoggingIPs();
+    }
+
     @NotNull
     public static List<String> getInitialEnabledPacks() {
         return server.getInitialEnabledPacks();
@@ -278,6 +291,26 @@ public final class Bukkit {
     @NotNull
     public static DataPackManager getDataPackManager() {
         return server.getDataPackManager();
+    }
+
+    /**
+     * Gets the resource pack configured to be sent to clients by the server.
+     *
+     * @return the resource pack
+     */
+    @Nullable
+    public static ResourcePack getServerResourcePack() {
+        return server.getServerResourcePack();
+    }
+
+    /**
+     * Get the ServerTick Manager.
+     *
+     * @return the manager
+     */
+    @NotNull
+    public static ServerTickManager getServerTickManager() {
+        return server.getServerTickManager();
     }
 
     /**
@@ -966,12 +999,85 @@ public final class Bukkit {
      *                       Must not contain more than 9 items.
      * @param world The world the crafting takes place in.
      * @param player The player to imitate the crafting event on.
+     * @return resulting {@link ItemCraftResult} containing the resulting item, matrix and any overflow items.
+     */
+    @NotNull
+    public static ItemCraftResult craftItemResult(@NotNull ItemStack[] craftingMatrix, @NotNull World world, @NotNull Player player) {
+        return server.craftItemResult(craftingMatrix, world, player);
+    }
+    /**
+     * Get the crafted item using the list of {@link ItemStack} provided.
+     *
+     * <p>The list is formatted as a crafting matrix where the index follow
+     * the pattern below:</p>
+     *
+     * <pre>
+     * [ 0 1 2 ]
+     * [ 3 4 5 ]
+     * [ 6 7 8 ]
+     * </pre>
+     *
+     * @param craftingMatrix list of items to be crafted from.
+     *                       Must not contain more than 9 items.
+     * @param world The world the crafting takes place in.
+     * @return resulting {@link ItemCraftResult} containing the resulting item, matrix and any overflow items.
+     */
+    @NotNull
+    public static ItemCraftResult craftItemResult(@NotNull ItemStack[] craftingMatrix, @NotNull World world) {
+        return server.craftItemResult(craftingMatrix, world);
+    }
+
+    /**
+     * Get the crafted item using the list of {@link ItemStack} provided.
+     *
+     * <p>The list is formatted as a crafting matrix where the index follow
+     * the pattern below:</p>
+     *
+     * <pre>
+     * [ 0 1 2 ]
+     * [ 3 4 5 ]
+     * [ 6 7 8 ]
+     * </pre>
+     *
+     * <p>The {@link World} and {@link Player} arguments are required to fulfill the Bukkit Crafting
+     * events.</p>
+     *
+     * <p>Calls {@link org.bukkit.event.inventory.PrepareItemCraftEvent} to imitate the {@link Player}
+     * initiating the crafting event.</p>
+     *
+     * @param craftingMatrix list of items to be crafted from.
+     *                       Must not contain more than 9 items.
+     * @param world The world the crafting takes place in.
+     * @param player The player to imitate the crafting event on.
      * @return the {@link ItemStack} resulting from the given crafting matrix, if no recipe is found
      * an ItemStack of {@link Material#AIR} is returned.
      */
     @NotNull
     public static ItemStack craftItem(@NotNull ItemStack[] craftingMatrix, @NotNull World world, @NotNull Player player) {
         return server.craftItem(craftingMatrix, world, player);
+    }
+
+    /**
+     * Get the crafted item using the list of {@link ItemStack} provided.
+     *
+     * <p>The list is formatted as a crafting matrix where the index follow
+     * the pattern below:</p>
+     *
+     * <pre>
+     * [ 0 1 2 ]
+     * [ 3 4 5 ]
+     * [ 6 7 8 ]
+     * </pre>
+     *
+     * @param craftingMatrix list of items to be crafted from.
+     *                       Must not contain more than 9 items.
+     * @param world The world the crafting takes place in.
+     * @return the {@link ItemStack} resulting from the given crafting matrix, if no recipe is found
+     * an ItemStack of {@link Material#AIR} is returned.
+     */
+    @NotNull
+    public static ItemStack craftItem(@NotNull ItemStack[] craftingMatrix, @NotNull World world) {
+        return server.craftItem(craftingMatrix, world);
     }
 
     /**
@@ -1060,6 +1166,16 @@ public final class Bukkit {
      */
     public static boolean isEnforcingSecureProfiles() {
         return server.isEnforcingSecureProfiles();
+    }
+
+    /**
+     * Gets whether this server is allowing connections transferred from other
+     * servers.
+     *
+     * @return true if the server accepts transfers, false otherwise
+     */
+    public static boolean isAcceptingTransfers() {
+        return server.isAcceptingTransfers();
     }
 
     /**
@@ -1227,7 +1343,6 @@ public final class Bukkit {
     public static void unbanIP(@NotNull String address) {
         server.unbanIP(address);
     }
-
 
     /**
      * Bans the specified address from the server.
@@ -1419,6 +1534,24 @@ public final class Bukkit {
         return server.createInventory(owner, size);
     }
 
+    // Paper start
+    /**
+     * Creates an empty inventory of type {@link InventoryType#CHEST} with the
+     * specified size and title.
+     *
+     * @param owner the holder of the inventory, or null to indicate no holder
+     * @param size a multiple of 9 as the size of inventory to create
+     * @param title the title of the inventory, displayed when inventory is
+     *     viewed
+     * @return a new inventory
+     * @throws IllegalArgumentException if the size is not a multiple of 9
+     */
+    @NotNull
+    public static Inventory createInventory(@Nullable InventoryHolder owner, int size, net.kyori.adventure.text.@NotNull Component title) throws IllegalArgumentException {
+        return server.createInventory(owner, size, title);
+    }
+    // Paper end
+
     /**
      * Creates an empty inventory of type {@link InventoryType#CHEST} with the
      * specified size and title.
@@ -1607,6 +1740,17 @@ public final class Bukkit {
     @NotNull
     public static ItemFactory getItemFactory() {
         return server.getItemFactory();
+    }
+
+    /**
+     * Gets the instance of the entity factory (for {@link EntitySnapshot}).
+     *
+     * @return the entity factory
+     * @see EntityFactory
+     */
+    @NotNull
+    public static EntityFactory getEntityFactory() {
+        return server.getEntityFactory();
     }
 
     /**
@@ -1873,7 +2017,7 @@ public final class Bukkit {
      * @return new data instance
      */
     @NotNull
-    public static BlockData createBlockData(@NotNull Material material, @Nullable Consumer<BlockData> consumer) {
+    public static BlockData createBlockData(@NotNull Material material, @Nullable Consumer<? super BlockData> consumer) {
         return server.createBlockData(material, consumer);
     }
 

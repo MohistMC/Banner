@@ -1,5 +1,7 @@
 package org.bukkit.plugin;
 
+import java.io.File;
+import java.util.Set;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -8,9 +10,6 @@ import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.File;
-import java.util.Set;
 
 /**
  * Handles all plugin management from the Server
@@ -89,6 +88,15 @@ public interface PluginManager {
      */
     @NotNull
     public Plugin[] loadPlugins(@NotNull File directory);
+
+    /**
+     * Loads the plugins in the list of the files
+     *
+     * @param files List of files containing plugins to load
+     * @return A list of all plugins loaded
+     */
+    @NotNull
+    public Plugin[] loadPlugins(@NotNull File[] files);
 
     /**
      * Disables all the loaded plugins

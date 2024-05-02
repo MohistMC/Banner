@@ -84,7 +84,6 @@ public interface EnderDragon extends ComplexLivingEntity, Boss, Mob, Enemy {
 
     /**
      * Get the {@link DragonBattle} associated with this EnderDragon.
-     *
      * <br>
      * This will return null for the following reasons:
      * <ul>

@@ -1,12 +1,11 @@
 package org.spigotmc;
 
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import java.io.File;
+import java.util.List;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-
-import java.io.File;
-import java.util.List;
 
 public class RestartCommand extends Command
 {
@@ -22,14 +21,14 @@ public class RestartCommand extends Command
     @Override
     public boolean execute(CommandSender sender, String currentAlias, String[] args)
     {
-        if ( testPermission( sender ) )
+        if ( this.testPermission( sender ) )
         {
-            BukkitExtraConstants.getServer().bridge$processQueue().add(new Runnable()
+            MinecraftServer.getServer().processQueue.add( new Runnable()
             {
                 @Override
                 public void run()
                 {
-                    restart();
+                    RestartCommand.restart();
                 }
             } );
         }
@@ -38,7 +37,7 @@ public class RestartCommand extends Command
 
     public static void restart()
     {
-        restart( SpigotConfig.restartScript );
+        RestartCommand.restart( SpigotConfig.restartScript );
     }
 
     private static void restart(final String restartScript)
@@ -55,7 +54,7 @@ public class RestartCommand extends Command
                 WatchdogThread.doStop();
 
                 // Kick all players
-                for ( ServerPlayer p : (List<ServerPlayer>) BukkitExtraConstants.getServer().getPlayerList().players )
+                for ( ServerPlayer p : (List<ServerPlayer>) MinecraftServer.getServer().getPlayerList().players )
                 {
                     p.connection.disconnect(SpigotConfig.restartMessage);
                 }
@@ -67,7 +66,7 @@ public class RestartCommand extends Command
                 {
                 }
                 // Close the socket so we can rebind with the new process
-                BukkitExtraConstants.getServer().getConnection().stop();
+                MinecraftServer.getServer().getConnection().stop();
 
                 // Give time for it to kick in
                 try
@@ -80,7 +79,7 @@ public class RestartCommand extends Command
                 // Actually shutdown
                 try
                 {
-                    BukkitExtraConstants.getServer().close();
+                    MinecraftServer.getServer().close();
                 } catch ( Throwable t )
                 {
                 }
@@ -117,7 +116,7 @@ public class RestartCommand extends Command
                 // Actually shutdown
                 try
                 {
-                    BukkitExtraConstants.getServer().close();
+                    MinecraftServer.getServer().close();
                 } catch ( Throwable t )
                 {
                 }

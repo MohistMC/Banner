@@ -5,8 +5,6 @@ import com.mohistmc.banner.network.download.DownloadSource;
 import com.mohistmc.i18n.i18n;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -141,19 +139,6 @@ public class BannerConfigUtil {
         serverThread();
         motdFirstLine();
         motdSecondLine();
-        initWatchDogTimeOut();
     }
 
-    private static Double getYmlValue(String key) {
-        return yml.getDouble(key, 120);
-    }
-
-    private static void initWatchDogTimeOut() {
-        String key = "WatchDogTimeOut";
-        if (yml.get(key) == null) {
-            yml.set(key, 120);
-            save();
-        }
-        Double value = getYmlValue(key);
-    }
 }

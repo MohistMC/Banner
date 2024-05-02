@@ -1,6 +1,6 @@
 package com.mohistmc.banner.injection.world.level.levelgen.structure.templatesystem;
 
-import org.bukkit.craftbukkit.v1_20_R1.persistence.CraftPersistentDataContainer;
+import org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer;
 
 public interface InjectionStructureTemplate {
 

@@ -1,6 +1,10 @@
 package org.bukkit.entity;
 
+import com.google.common.base.Preconditions;
 import org.bukkit.DyeColor;
+import org.bukkit.Keyed;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -67,4 +71,43 @@ public interface Wolf extends Tameable, Sittable {
      * @param interested Whether the wolf is interested
      */
     public void setInterested(boolean interested);
+
+    /**
+     * Get the variant of this wolf.
+     *
+     * @return wolf variant
+     */
+    @NotNull
+    Variant getVariant();
+
+    /**
+     * Set the variant of this wolf.
+     *
+     * @param variant wolf variant
+     */
+    void setVariant(@NotNull Variant variant);
+
+    /**
+     * Represents the variant of a wolf.
+     */
+    interface Variant extends Keyed {
+
+        Variant PALE = getVariant("pale");
+        Variant SPOTTED = getVariant("spotted");
+        Variant SNOWY = getVariant("snowy");
+        Variant BLACK = getVariant("black");
+        Variant ASHEN = getVariant("ashen");
+        Variant RUSTY = getVariant("rusty");
+        Variant WOODS = getVariant("woods");
+        Variant CHESTNUT = getVariant("chestnut");
+        Variant STRIPED = getVariant("striped");
+
+        @NotNull
+        private static Variant getVariant(@NotNull String key) {
+            NamespacedKey namespacedKey = NamespacedKey.minecraft(key);
+            Variant variant = Registry.WOLF_VARIANT.get(namespacedKey);
+            Preconditions.checkNotNull(variant, "No Wolf Variant found for %s. This is a bug.", namespacedKey);
+            return variant;
+        }
+    }
 }

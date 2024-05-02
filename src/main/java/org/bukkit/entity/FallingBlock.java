@@ -49,7 +49,6 @@ public interface FallingBlock extends Entity {
      */
     void setDropItem(boolean drop);
 
-
     /**
      * Get if the falling block will not become a block upon landing and not drop
      * an item.
@@ -127,15 +126,4 @@ public interface FallingBlock extends Entity {
      * @param damage the max damage to set. Must be >= 0
      */
     void setMaxDamage(int damage);
-
-    /**
-     * Gets the source block location of the FallingBlock
-     *
-     * @return the source block location the FallingBlock was spawned from
-     * @deprecated replaced by {@link Entity#getOrigin()}
-     */
-    @Deprecated
-    default org.bukkit.Location getSourceLoc() {
-        return this.getOrigin();
-    }
 }

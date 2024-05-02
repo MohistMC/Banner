@@ -2,6 +2,10 @@ package org.bukkit.command;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameRule;
@@ -14,11 +18,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Represents a Command, which executes various tasks upon user input
@@ -34,6 +33,7 @@ public abstract class Command {
     protected String usageMessage;
     private String permission;
     private String permissionMessage;
+
     protected Command(@NotNull String name) {
         this(name, "", "/" + name, new ArrayList<String>());
     }
@@ -178,12 +178,6 @@ public abstract class Command {
      * @return true if they can use it, otherwise false
      */
     public boolean testPermission(@NotNull CommandSender target) {
-        // Banner start - do not test if target is null
-        if (target == null) {
-            System.out.println("[Banner]Waring:Command target is null!!!");
-            return false;
-        }
-        // Banner end
         if (testPermissionSilent(target)) {
             return true;
         }
@@ -209,12 +203,6 @@ public abstract class Command {
      * @return true if they can use it, otherwise false
      */
     public boolean testPermissionSilent(@NotNull CommandSender target) {
-        // Banner start - do not test if target is null
-        if (target == null) {
-            System.out.println("[Banner]Waring:Command target is null!!!");
-            return false;
-        }
-        // Banner end
         if ((permission == null) || (permission.length() == 0)) {
             return true;
         }
@@ -326,7 +314,14 @@ public abstract class Command {
      * command
      *
      * @return Permission check failed message
+     * @deprecated permission messages have not worked for player-executed
+     * commands since 1.13 as clients without permission to execute a command
+     * are unaware of its existence and therefore will not send an unknown
+     * command execution to the server. This message will only ever be shown to
+     * consoles or when this command is executed with
+     * {@link Bukkit#dispatchCommand(CommandSender, String)}.
      */
+    @Deprecated
     @Nullable
     public String getPermissionMessage() {
         return permissionMessage;
@@ -390,7 +385,14 @@ public abstract class Command {
      * @param permissionMessage new permission message, null to indicate
      *     default message, or an empty string to indicate no message
      * @return this command object, for chaining
+     * @deprecated permission messages have not worked for player-executed
+     * commands since 1.13 as clients without permission to execute a command
+     * are unaware of its existence and therefore will not send an unknown
+     * command execution to the server. This message will only ever be shown to
+     * consoles or when this command is executed with
+     * {@link Bukkit#dispatchCommand(CommandSender, String)}.
      */
+    @Deprecated
     @NotNull
     public Command setPermissionMessage(@Nullable String permissionMessage) {
         this.permissionMessage = permissionMessage;
@@ -443,12 +445,6 @@ public abstract class Command {
             if (user instanceof CommandSender && user.hasPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE)) {
                 CommandSender target = (CommandSender) user;
 
-                // Banner start - do not test if target is null
-                if (target == null) {
-                    System.out.println("[Banner]Waring:Command target is null!!!");
-                    return;
-                }
-                // Banner end
                 if (target instanceof ConsoleCommandSender) {
                     target.sendMessage(result);
                 } else if (target != source) {

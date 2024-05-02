@@ -2,6 +2,8 @@ package org.bukkit.inventory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Translatable;
@@ -13,9 +15,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Represents a stack of items.
@@ -68,6 +67,7 @@ public class ItemStack implements Cloneable, ConfigurationSerializable, Translat
      * @param damage durability / damage
      * @deprecated see {@link #setDurability(short)}
      */
+    @Deprecated
     public ItemStack(@NotNull final Material type, final int amount, final short damage) {
         this(type, amount, damage, null);
     }
@@ -231,18 +231,21 @@ public class ItemStack implements Cloneable, ConfigurationSerializable, Translat
     }
 
     /**
-     * Get the maximum stacksize for the material hold in this ItemStack.
-     * (Returns -1 if it has no idea)
+     * Get the maximum stack size for this item. If this item has a max stack
+     * size component ({@link ItemMeta#hasMaxStackSize()}), the value of that
+     * component will be returned. Otherwise, this item's Material's {@link
+     * Material#getMaxStackSize() default maximum stack size} will be returned
+     * instead.
      *
-     * @return The maximum you can stack this material to.
+     * @return The maximum you can stack this item to.
      */
     @Utility
     public int getMaxStackSize() {
-        Material material = getType();
-        if (material != null) {
-            return material.getMaxStackSize();
+        if (meta != null && meta.hasMaxStackSize()) {
+            return meta.getMaxStackSize();
         }
-        return -1;
+
+        return getType().getMaxStackSize();
     }
 
     private void createData(final byte data) {
@@ -448,6 +451,17 @@ public class ItemStack implements Cloneable, ConfigurationSerializable, Translat
         }
         meta.removeEnchant(ench);
         return level;
+    }
+
+    /**
+     * Removes all enchantments on this ItemStack.
+     */
+    public void removeEnchantments() {
+        if (meta == null) {
+            return;
+        }
+
+        meta.removeEnchantments();
     }
 
     @Override

@@ -8,4 +8,8 @@ public interface InjectionIngredient {
 
     default void banner$setExact(boolean exact) {
     }
+
+    default boolean isVanilla() {
+        return false;
+    }
 }

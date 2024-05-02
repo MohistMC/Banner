@@ -1,16 +1,16 @@
 package com.mohistmc.banner.injection.world.level.block;
 
-import io.papermc.paper.event.player.PlayerOpenSignEvent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
+import org.bukkit.event.player.PlayerSignOpenEvent;
 
 public interface InjectionSignBlock {
 
-    default void pushOpenSignCause(PlayerOpenSignEvent.Cause cause) {
+    default void pushOpenSignCause(PlayerSignOpenEvent.Cause cause) {
 
     }
 
-    default void openTextEdit(Player player, SignBlockEntity signEntity, boolean isFrontText, PlayerOpenSignEvent.Cause cause) {
+    default void openTextEdit(Player player, SignBlockEntity signEntity, boolean isFrontText, PlayerSignOpenEvent.Cause cause) {
 
     }
 }

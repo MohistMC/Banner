@@ -1,6 +1,6 @@
 package com.mohistmc.banner.injection.world.item.trading;
 
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftMerchant;
+import org.bukkit.craftbukkit.inventory.CraftMerchant;
 
 public interface InjectionMerchant {
 

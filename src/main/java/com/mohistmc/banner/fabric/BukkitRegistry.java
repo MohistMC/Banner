@@ -5,17 +5,17 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.api.ServerAPI;
-import com.mohistmc.banner.bukkit.type.BannerPotionEffect;
 import com.mohistmc.banner.util.I18n;
 import com.mohistmc.dynamicenum.MohistDynamEnum;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -23,14 +23,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.stats.StatType;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.CookingBookCategory;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ChestBlock;
@@ -44,27 +41,23 @@ import net.minecraft.world.level.dimension.LevelStem;
 import org.bukkit.Art;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
 import org.bukkit.Statistic;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlockStates;
-import org.bukkit.craftbukkit.v1_20_R1.block.CraftChest;
-import org.bukkit.craftbukkit.v1_20_R1.block.CraftHangingSign;
-import org.bukkit.craftbukkit.v1_20_R1.block.CraftSign;
-import org.bukkit.craftbukkit.v1_20_R1.enchantments.CraftEnchantment;
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftRecipe;
-import org.bukkit.craftbukkit.v1_20_R1.potion.CraftPotionUtil;
-import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers;
-import org.bukkit.craftbukkit.v1_20_R1.util.CraftNamespacedKey;
-import org.bukkit.craftbukkit.v1_20_R1.util.CraftSpawnCategory;
-import org.bukkit.enchantments.Enchantment;
+import org.bukkit.craftbukkit.block.CraftBlockStates;
+import org.bukkit.craftbukkit.block.CraftChest;
+import org.bukkit.craftbukkit.block.CraftHangingSign;
+import org.bukkit.craftbukkit.block.CraftSign;
+import org.bukkit.craftbukkit.inventory.CraftRecipe;
+import org.bukkit.craftbukkit.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.util.CraftNamespacedKey;
+import org.bukkit.craftbukkit.util.CraftSpawnCategory;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.SpawnCategory;
 import org.bukkit.entity.Villager;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 
 @SuppressWarnings({"ConstantConditions", "deprecation"})
 public class BukkitRegistry {
@@ -87,6 +80,8 @@ public class BukkitRegistry {
     public static Map<org.bukkit.attribute.Attribute, ResourceLocation> attributemap = new HashMap<>();
     public static Map<StatType<?>, Statistic> statisticMap = new HashMap<>();
     public static Map<net.minecraft.world.level.biome.Biome, Biome> biomeBiomeMap = new HashMap<>();
+    public static Map<NamespacedKey, EntityType> entityTypeMap = new HashMap<>();
+    public static Map<NamespacedKey, Particle> particleMap = new HashMap<>();
 
     public static void registerAll(DedicatedServer console) {
         loadItems();
@@ -96,6 +91,7 @@ public class BukkitRegistry {
         loadEntities();
         loadVillagerProfessions();
         loadBiomes(console);
+        loadPoses();
         addPose();
         loadArts();
         loadStats();
@@ -103,6 +99,7 @@ public class BukkitRegistry {
         loadEndDragonPhase();
         loadCookingBookCategory();
         loadFluids();
+        loadParticles();
     }
 
     public static void loadItems() {
@@ -227,6 +224,18 @@ public class BukkitRegistry {
         }
     }
 
+    private static void loadPoses() {
+        var newTypes = new ArrayList<org.bukkit.entity.Pose>();
+        for (Pose pose : Pose.values()) {
+            if (pose.ordinal() > 14) {
+                org.bukkit.entity.Pose bukkit = MohistDynamEnum.addEnum(org.bukkit.entity.Pose.class, pose.name());
+                newTypes.add(bukkit);
+                BannerServer.LOGGER.debug("Registered mod Pose as Poses(Bukkit) {}", bukkit);
+            }
+        }
+        BannerServer.LOGGER.info("Registered {} new Poses", newTypes.size());
+    }
+
     private static void addPose() {
         for (Pose pose : Pose.values()) {
             if (pose.ordinal() > 14) {
@@ -252,6 +261,23 @@ public class BukkitRegistry {
                 Art.BY_ID.put(id, art);
                 BannerServer.LOGGER.debug("Registered mod PaintingType as Art {}", art);
                 i++;
+            }
+        }
+    }
+
+    public static void loadParticles() {
+        var registry = BuiltInRegistries.PARTICLE_TYPE;
+        for (ParticleType<?> particleType : BuiltInRegistries.PARTICLE_TYPE) {
+            ResourceLocation resourceLocation = registry.getKey(particleType);
+            String name = normalizeName(resourceLocation.toString());
+            if (!resourceLocation.getNamespace().equals(NamespacedKey.MINECRAFT)) {
+                NamespacedKey namespacedKey = CraftNamespacedKey.fromMinecraft(resourceLocation);
+                Particle particle = MohistDynamEnum.addEnum(Particle.class, name, List.of(String.class), List.of(namespacedKey.toString()));
+                if (particle != null) {
+                    particle.key = namespacedKey;
+                    particleMap.put(namespacedKey, particle);
+                    BannerServer.LOGGER.debug("Save-ParticleType:" + name + " - " + particle.name());
+                }
             }
         }
     }
@@ -286,6 +312,7 @@ public class BukkitRegistry {
 
     public static void registerEnvironments(Registry<LevelStem> registry) {
         int i = World.Environment.values().length;
+        List<World.Environment> newTypes = new ArrayList<>();
         for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry : registry.entrySet()) {
             ResourceKey<LevelStem> key = entry.getKey();
             World.Environment environment1 = environment.get(key);
@@ -311,6 +338,7 @@ public class BukkitRegistry {
                 int typeId = entityType.hashCode();
                 EntityType bukkitType = MohistDynamEnum.addEnum(EntityType.class, entityType, List.of(String.class, Class.class, Integer.TYPE, Boolean.TYPE), List.of(entityType.toLowerCase(), Entity.class, typeId, false));
                 bukkitType.key = key;
+                entityTypeMap.put(key, bukkitType);
                 EntityType.NAME_MAP.put(entityType.toLowerCase(), bukkitType);
                 EntityType.ID_MAP.put((short) typeId, bukkitType);
                 ServerAPI.entityTypeMap.put(entity, entityType);
@@ -322,24 +350,26 @@ public class BukkitRegistry {
     }
 
     private static void loadEnchantments() {
+        /*
         for (net.minecraft.world.item.enchantment.Enchantment enc : BuiltInRegistries.ENCHANTMENT) {
             try {
-                Enchantment.registerEnchantment(new CraftEnchantment(enc));
+                Enchantment.getByKey(new CraftEnchantment(enc));
             } catch (Exception e) {
                 BannerServer.LOGGER.error("Failed to register enchantment {}: {}", enc, e);
             }
         }
         Enchantment.stopAcceptingRegistrations();
+        */
     }
 
     private static void loadPotions() {
+        /*
         for (MobEffect eff : BuiltInRegistries.MOB_EFFECT) {
             try {
                 var location = BuiltInRegistries.MOB_EFFECT.getKey(eff);
                 String name = normalizeName(location.toString());
                 BannerPotionEffect effect = new BannerPotionEffect(eff, name);
                 PotionEffectType.registerPotionEffectType(effect);
-                CraftPotionUtil.mods_map.put(effect.getId(), effect);
                 BannerServer.LOGGER.debug("Registered {} as potion {}", location, effect);
             } catch (Exception e) {
                 BannerServer.LOGGER.error("Failed to register potion type {}: {}", eff, e);
@@ -351,13 +381,13 @@ public class BukkitRegistry {
             if (isMods(location) && CraftPotionUtil.toBukkit(location.toString()).getType() == PotionType.UNCRAFTABLE && potion != Potions.EMPTY) {
                 String name = normalizeName(location.toString());
                 MobEffectInstance effectInstance = potion.getEffects().isEmpty() ? null : potion.getEffects().get(0);
-                PotionType potionType = MohistDynamEnum.addEnum(PotionType.class, name, Arrays.asList(PotionEffectType.class, Boolean.TYPE, Boolean.TYPE), Arrays.asList(effectInstance == null ? null : PotionEffectType.getById(MobEffect.getId(effectInstance.getEffect())), false, false));
+                PotionType potionType = MohistDynamEnum.addEnum(PotionType.class, name, Arrays.asList(PotionEffectType.class, Boolean.TYPE, Boolean.TYPE), Arrays.asList(effectInstance == null ? null : PotionEffectType.getByKey(CraftNamespacedKey.fromMinecraft(BuiltInRegistries.MOB_EFFECT.getKey(effectInstance.getEffect()))), false, false));
                 if (potionType != null) {
                     CraftPotionUtil.mods.put(potionType, location.toString());
                     BannerServer.LOGGER.debug("Registered {} as potion type {}", location, potionType);
                 }
             }
-        }
+        }*/
     }
 
     public static String normalizeName(String name) {

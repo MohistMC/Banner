@@ -3,7 +3,6 @@ package org.bukkit;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -13,17 +12,24 @@ import java.util.stream.StreamSupport;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Biome;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.boss.KeyedBossBar;
+import org.bukkit.damage.DamageType;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Cat;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Frog;
 import org.bukkit.entity.Villager;
+import org.bukkit.entity.Wolf;
 import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.generator.structure.Structure;
 import org.bukkit.generator.structure.StructureType;
 import org.bukkit.inventory.meta.trim.TrimMaterial;
 import org.bukkit.inventory.meta.trim.TrimPattern;
 import org.bukkit.loot.LootTables;
+import org.bukkit.map.MapCursor;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -75,6 +81,12 @@ public interface Registry<T extends Keyed> extends Iterable<T> {
      */
     Registry<Attribute> ATTRIBUTE = new SimpleRegistry<>(Attribute.class);
     /**
+     * Server banner patterns.
+     *
+     * @see PatternType
+     */
+    Registry<PatternType> BANNER_PATTERN = new SimpleRegistry<>(PatternType.class);
+    /**
      * Server biomes.
      *
      * @see Biome
@@ -107,30 +119,17 @@ public interface Registry<T extends Keyed> extends Iterable<T> {
         }
     };
     /**
+     * Server cat types.
+     *
+     * @see Cat.Type
+     */
+    Registry<Cat.Type> CAT_VARIANT = new SimpleRegistry<>(Cat.Type.class);
+    /**
      * Server enchantments.
      *
-     * @see Enchantment#getByKey(org.bukkit.NamespacedKey)
+     * @see Enchantment
      */
-    Registry<Enchantment> ENCHANTMENT = new Registry<Enchantment>() {
-
-        @Nullable
-        @Override
-        public Enchantment get(@NotNull NamespacedKey key) {
-            return Enchantment.getByKey(key);
-        }
-
-        @NotNull
-        @Override
-        public Stream<Enchantment> stream() {
-            return StreamSupport.stream(spliterator(), false);
-        }
-
-        @NotNull
-        @Override
-        public Iterator<Enchantment> iterator() {
-            return Arrays.asList(Enchantment.values()).iterator();
-        }
-    };
+    Registry<Enchantment> ENCHANTMENT = Objects.requireNonNull(Bukkit.getRegistry(Enchantment.class), "No registry present for Enchantment. This is a bug.");
     /**
      * Server entity types.
      *
@@ -155,6 +154,24 @@ public interface Registry<T extends Keyed> extends Iterable<T> {
      * @see Material
      */
     Registry<Material> MATERIAL = new SimpleRegistry<>(Material.class, (mat) -> !mat.isLegacy());
+    /**
+     * Server mob effects.
+     *
+     * @see PotionEffectType
+     */
+    Registry<PotionEffectType> EFFECT = Objects.requireNonNull(Bukkit.getRegistry(PotionEffectType.class), "No registry present for PotionEffectType. This is a bug.");
+    /**
+     * Server particles.
+     *
+     * @see Particle
+     */
+    Registry<Particle> PARTICLE_TYPE = new SimpleRegistry<>(Particle.class, (par) -> par.register);
+    /**
+     * Server potions.
+     *
+     * @see PotionType
+     */
+    Registry<PotionType> POTION = new SimpleRegistry<>(PotionType.class);
     /**
      * Server statistics.
      *
@@ -193,6 +210,13 @@ public interface Registry<T extends Keyed> extends Iterable<T> {
      */
     @ApiStatus.Experimental
     Registry<TrimPattern> TRIM_PATTERN = Bukkit.getRegistry(TrimPattern.class);
+    /**
+     * Damage types.
+     *
+     * @see DamageType
+     */
+    @ApiStatus.Experimental
+    Registry<DamageType> DAMAGE_TYPE = Objects.requireNonNull(Bukkit.getRegistry(DamageType.class), "No registry present for DamageType. This is a bug.");
     /**
      * Villager profession.
      *
@@ -243,6 +267,19 @@ public interface Registry<T extends Keyed> extends Iterable<T> {
      */
     Registry<Frog.Variant> FROG_VARIANT = new SimpleRegistry<>(Frog.Variant.class);
     /**
+     * Wolf variants.
+     *
+     * @see Wolf.Variant
+     */
+    Registry<Wolf.Variant> WOLF_VARIANT = Objects.requireNonNull(Bukkit.getRegistry(Wolf.Variant.class), "No registry present for Wolf Variant. This is a bug.");
+    /**
+     * Map cursor types.
+     *
+     * @see MapCursor.Type
+     */
+    @ApiStatus.Internal
+    Registry<MapCursor.Type> MAP_DECORATION_TYPE = new SimpleRegistry<>(MapCursor.Type.class);
+    /**
      * Game events.
      *
      * @see GameEvent
@@ -285,26 +322,22 @@ public interface Registry<T extends Keyed> extends Iterable<T> {
 
     static final class SimpleRegistry<T extends Enum<T> & Keyed> implements Registry<T> {
 
-        private Map<NamespacedKey, T> map;// Banner - remove final
-        public Runnable reloader; // Banner
+        private final Map<NamespacedKey, T> map;
 
         protected SimpleRegistry(@NotNull Class<T> type) {
             this(type, Predicates.<T>alwaysTrue());
         }
 
         protected SimpleRegistry(@NotNull Class<T> type, @NotNull Predicate<T> predicate) {
-            reloader = () -> { // Banner
-                ImmutableMap.Builder<NamespacedKey, T> builder = ImmutableMap.builder();
+            ImmutableMap.Builder<NamespacedKey, T> builder = ImmutableMap.builder();
 
-                for (T entry : type.getEnumConstants()) {
-                    if (predicate.test(entry)) {
-                        builder.put(entry.getKey(), entry);
-                    }
+            for (T entry : type.getEnumConstants()) {
+                if (predicate.test(entry)) {
+                    builder.put(entry.getKey(), entry);
                 }
+            }
 
-                map = builder.build();
-            }; // Banner
-            reloader.run(); // Banner
+            map = builder.build();
         }
 
         @Nullable

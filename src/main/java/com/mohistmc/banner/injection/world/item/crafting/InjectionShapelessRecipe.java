@@ -1,8 +1,10 @@
 package com.mohistmc.banner.injection.world.item.crafting;
 
+import org.bukkit.NamespacedKey;
+
 public interface InjectionShapelessRecipe {
 
-    default org.bukkit.inventory.ShapelessRecipe toBukkitRecipe() {
+    default org.bukkit.inventory.ShapelessRecipe toBukkitRecipe(NamespacedKey id) {
         return null;
     }
 }

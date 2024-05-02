@@ -2,6 +2,7 @@ package com.mohistmc.banner.injection.world.inventory;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import org.bukkit.craftbukkit.entity.CraftHumanEntity;
 import org.bukkit.inventory.InventoryView;
 
 public interface InjectionAbstractContainerMenu {
@@ -21,7 +22,7 @@ public interface InjectionAbstractContainerMenu {
 
     }
 
-    default void transferTo(AbstractContainerMenu other, org.bukkit.craftbukkit.v1_20_R1.entity.CraftHumanEntity player) {
+    default void transferTo(AbstractContainerMenu other, CraftHumanEntity player) {
     }
 
     default Component getTitle() {
