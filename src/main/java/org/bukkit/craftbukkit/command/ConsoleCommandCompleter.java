@@ -29,7 +29,7 @@ public class ConsoleCommandCompleter implements Completer {
                 return tabEvent.isCancelled() ? Collections.EMPTY_LIST : tabEvent.getCompletions();
             }
         };
-        this.server.getServer().processQueue.add(waitable);
+        this.server.getServer().bridge$processQueue().add(waitable);
         try {
             List<String> offers = waitable.get();
             if (offers == null) {

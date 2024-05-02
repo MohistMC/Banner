@@ -5,6 +5,8 @@ import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
 
@@ -74,16 +76,19 @@ public class WatchdogThread extends Thread
                 log.log( Level.SEVERE, "Be sure to include ALL relevant console errors and Minecraft crash reports" );
                 log.log( Level.SEVERE, "Spigot version: " + Bukkit.getServer().getVersion() );
                 //
+                // Banner start - disable
+                /*
                 if ( net.minecraft.world.level.Level.lastPhysicsProblem != null )
                 {
                     log.log( Level.SEVERE, "------------------------------" );
                     log.log( Level.SEVERE, "During the run of the server, a physics stackoverflow was supressed" );
                     log.log( Level.SEVERE, "near " + net.minecraft.world.level.Level.lastPhysicsProblem );
-                }
+                }*/
+                // Banner end
                 //
                 log.log( Level.SEVERE, "------------------------------" );
                 log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Spigot!):" );
-                WatchdogThread.dumpThread( ManagementFactory.getThreadMXBean().getThreadInfo( MinecraftServer.getServer().serverThread.getId(), Integer.MAX_VALUE ), log );
+                WatchdogThread.dumpThread( ManagementFactory.getThreadMXBean().getThreadInfo( BukkitExtraConstants.getServer().serverThread.getId(), Integer.MAX_VALUE ), log );
                 log.log( Level.SEVERE, "------------------------------" );
                 //
                 log.log( Level.SEVERE, "Entire Thread Dump:" );
@@ -94,7 +99,7 @@ public class WatchdogThread extends Thread
                 }
                 log.log( Level.SEVERE, "------------------------------" );
 
-                if ( this.restart && !MinecraftServer.getServer().hasStopped() )
+                if ( this.restart && !BukkitExtraConstants.getServer().hasStopped() )
                 {
                     RestartCommand.restart();
                 }

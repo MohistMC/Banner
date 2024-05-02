@@ -1,6 +1,14 @@
 accessWidener	v1	named
 # Banner
 
+# 1.20.6
+accessible method net/minecraft/world/level/storage/PlayerDataStorage load (Lnet/minecraft/world/entity/player/Player;Ljava/lang/String;)Ljava/util/Optional;
+accessible field net/minecraft/world/entity/raid/Raid raidOmenLevel I
+accessible field net/minecraft/server/level/ChunkMap serverViewDistance I
+accessible field net/minecraft/server/level/DistanceManager simulationDistance I
+accessible field net/minecraft/world/level/dimension/end/EndDragonFight previouslyKilled Z
+accessible method net/minecraft/world/damagesource/DamageSource <init> (Lnet/minecraft/core/Holder;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;)V
+
 # 1.20.4
 accessible field net/minecraft/world/entity/ai/attributes/AttributeModifier name Ljava/lang/String;
 accessible field net/minecraft/world/level/block/entity/CrafterBlockEntity craftingTicksRemaining I

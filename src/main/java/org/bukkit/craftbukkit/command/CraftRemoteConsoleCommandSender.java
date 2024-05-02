@@ -19,7 +19,7 @@ public class CraftRemoteConsoleCommandSender extends ServerCommandSender impleme
 
     @Override
     public SocketAddress getAddress() {
-       return this.listener.socketAddress;
+       return this.listener.bridge$socketAddress();
     }
 
     @Override

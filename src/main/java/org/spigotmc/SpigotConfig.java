@@ -13,9 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import org.apache.logging.log4j.LogManager;
@@ -48,7 +49,6 @@ public class SpigotConfig
     static int version;
     static Map<String, Command> commands;
     /*========================================================================*/
-    private static Metrics metrics;
 
     public static void init(File configFile)
     {
@@ -80,19 +80,7 @@ public class SpigotConfig
     {
         for ( Map.Entry<String, Command> entry : SpigotConfig.commands.entrySet() )
         {
-            MinecraftServer.getServer().server.getCommandMap().register( entry.getKey(), "Spigot", entry.getValue() );
-        }
-
-        if ( SpigotConfig.metrics == null )
-        {
-            try
-            {
-                SpigotConfig.metrics = new Metrics();
-                SpigotConfig.metrics.start();
-            } catch ( IOException ex )
-            {
-                Bukkit.getServer().getLogger().log( Level.SEVERE, "Could not start metrics service", ex );
-            }
+            BukkitExtraConstants.getServer().bridge$server().getCommandMap().register( entry.getKey(), "Spigot", entry.getValue() );
         }
     }
 

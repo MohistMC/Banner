@@ -1,5 +1,6 @@
 package org.spigotmc;
 
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
@@ -77,10 +78,10 @@ public class ActivationRange
      */
     public static boolean initializeEntityActivationState(Entity entity, SpigotWorldConfig config)
     {
-        if ( ( entity.activationType == ActivationType.MISC && config.miscActivationRange == 0 )
-                || ( entity.activationType == ActivationType.RAIDER && config.raiderActivationRange == 0 )
-                || ( entity.activationType == ActivationType.ANIMAL && config.animalActivationRange == 0 )
-                || ( entity.activationType == ActivationType.MONSTER && config.monsterActivationRange == 0 )
+        if ( ( entity.bridge$activationType() == ActivationType.MISC && config.miscActivationRange == 0 )
+                || ( entity.bridge$activationType() == ActivationType.RAIDER && config.raiderActivationRange == 0 )
+                || ( entity.bridge$activationType() == ActivationType.ANIMAL && config.animalActivationRange == 0 )
+                || ( entity.bridge$activationType() == ActivationType.MONSTER && config.monsterActivationRange == 0 )
                 || entity instanceof Player
                 || entity instanceof ThrowableProjectile
                 || entity instanceof EnderDragon
@@ -108,20 +109,20 @@ public class ActivationRange
     public static void activateEntities(Level world)
     {
         SpigotTimings.entityActivationCheckTimer.startTiming();
-        final int miscActivationRange = world.spigotConfig.miscActivationRange;
-        final int raiderActivationRange = world.spigotConfig.raiderActivationRange;
-        final int animalActivationRange = world.spigotConfig.animalActivationRange;
-        final int monsterActivationRange = world.spigotConfig.monsterActivationRange;
+        final int miscActivationRange = world.bridge$spigotConfig().miscActivationRange;
+        final int raiderActivationRange = world.bridge$spigotConfig().raiderActivationRange;
+        final int animalActivationRange = world.bridge$spigotConfig().animalActivationRange;
+        final int monsterActivationRange = world.bridge$spigotConfig().monsterActivationRange;
 
         int maxRange = Math.max( monsterActivationRange, animalActivationRange );
         maxRange = Math.max( maxRange, raiderActivationRange );
         maxRange = Math.max( maxRange, miscActivationRange );
-        maxRange = Math.min( ( world.spigotConfig.simulationDistance << 4 ) - 8, maxRange );
+        maxRange = Math.min( ( world.bridge$spigotConfig().simulationDistance << 4 ) - 8, maxRange );
 
         for ( Player player : world.players() )
         {
-            player.activatedTick = MinecraftServer.currentTick;
-            if ( world.spigotConfig.ignoreSpectatorActivation && player.isSpectator() )
+            player.banner$setActivatedTick(BukkitExtraConstants.currentTick);
+            if ( world.bridge$spigotConfig().ignoreSpectatorActivation && player.isSpectator() )
             {
                 continue;
             }
@@ -144,16 +145,16 @@ public class ActivationRange
      */
     private static void activateEntity(Entity entity)
     {
-        if ( MinecraftServer.currentTick > entity.activatedTick )
+        if ( BukkitExtraConstants.currentTick > entity.bridge$activatedTick() )
         {
-            if ( entity.defaultActivationState )
+            if ( entity.bridge$defaultActivationState() )
             {
-                entity.activatedTick = MinecraftServer.currentTick;
+                entity.banner$setActivatedTick(BukkitExtraConstants.currentTick);
                 return;
             }
-            if ( entity.activationType.boundingBox.intersects( entity.getBoundingBox() ) )
+            if ( entity.bridge$activationType().boundingBox.intersects( entity.getBoundingBox() ) )
             {
-                entity.activatedTick = MinecraftServer.currentTick;
+                entity.banner$setActivatedTick(BukkitExtraConstants.currentTick);
             }
         }
     }
@@ -236,23 +237,23 @@ public class ActivationRange
             return true;
         }
 
-        boolean isActive = entity.activatedTick >= MinecraftServer.currentTick || entity.defaultActivationState;
+        boolean isActive = entity.bridge$activatedTick() >= BukkitExtraConstants.currentTick || entity.bridge$defaultActivationState();
 
         // Should this entity tick?
         if ( !isActive )
         {
-            if ( ( MinecraftServer.currentTick - entity.activatedTick - 1 ) % 20 == 0 )
+            if ( ( BukkitExtraConstants.currentTick - entity.bridge$activatedTick() - 1 ) % 20 == 0 )
             {
                 // Check immunities every 20 ticks.
                 if ( ActivationRange.checkEntityImmunities( entity ) )
                 {
                     // Triggered some sort of immunity, give 20 full ticks before we check again.
-                    entity.activatedTick = MinecraftServer.currentTick + 20;
+                    entity.banner$setActivatedTick(BukkitExtraConstants.currentTick + 20);
                 }
                 isActive = true;
             }
             // Add a little performance juice to active entities. Skip 1/4 if not immune.
-        } else if ( !entity.defaultActivationState && entity.tickCount % 4 == 0 && !ActivationRange.checkEntityImmunities( entity ) )
+        } else if ( !entity.bridge$defaultActivationState() && entity.tickCount % 4 == 0 && !ActivationRange.checkEntityImmunities( entity ) )
         {
             isActive = false;
         }

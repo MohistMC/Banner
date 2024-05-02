@@ -1,6 +1,7 @@
 package com.mohistmc.banner.injection.world.damagesource;
 
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 
 public interface InjectionDamageSource {
 
@@ -38,5 +39,29 @@ public interface InjectionDamageSource {
 
     default boolean bridge$poison() {
         return false;
+    }
+
+    default Entity getCausingEntity() {
+        return null;
+    }
+
+    default DamageSource customCausingEntity(Entity entity) {
+        return null;
+    }
+
+    default org.bukkit.block.Block getDirectBlock() {
+        return null;
+    }
+
+    default DamageSource directBlock(net.minecraft.world.level.Level world, net.minecraft.core.BlockPos blockPosition) {
+        return null;
+    }
+
+    default DamageSource directBlock(org.bukkit.block.Block block) {
+        return null;
+    }
+
+    default DamageSource cloneInstance() {
+        return null;
     }
 }

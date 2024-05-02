@@ -39,12 +39,12 @@ public class BukkitCommandWrapper implements com.mojang.brigadier.Command<Comman
 
     @Override
     public boolean test(CommandSourceStack wrapper) {
-        return this.command.testPermissionSilent(wrapper.getBukkitSender());
+        return this.command.testPermissionSilent(wrapper.banner$getBukkitSender());
     }
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        CommandSender sender = context.getSource().getBukkitSender();
+        CommandSender sender = context.getSource().banner$getBukkitSender();
 
         try {
             return this.server.dispatchCommand(sender, context.getInput()) ? 1 : 0;
@@ -57,7 +57,7 @@ public class BukkitCommandWrapper implements com.mojang.brigadier.Command<Comman
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
-        List<String> results = this.server.tabComplete(context.getSource().getBukkitSender(), builder.getInput(), context.getSource().getLevel(), context.getSource().getPosition(), true);
+        List<String> results = this.server.tabComplete(context.getSource().banner$getBukkitSender(), builder.getInput(), context.getSource().getLevel(), context.getSource().getPosition(), true);
 
         // Defaults to sub nodes, but we have just one giant args node, so offset accordingly
         builder = builder.createOffset(builder.getInput().lastIndexOf(' ') + 1);

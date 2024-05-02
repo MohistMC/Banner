@@ -951,7 +951,7 @@ public class CraftEventFactory {
             DamageCause damageCause = (damager.getBukkitEntity() instanceof org.bukkit.entity.TNTPrimed) ? DamageCause.BLOCK_EXPLOSION : DamageCause.ENTITY_EXPLOSION;
             return CraftEventFactory.callEntityDamageEvent(damager, entity, damageCause, bukkitDamageSource, modifiers, modifierFunctions, cancelled);
         } else if (damager != null || source.getDirectEntity() != null) {
-            DamageCause cause = (source.isSweep()) ? DamageCause.ENTITY_SWEEP_ATTACK : DamageCause.ENTITY_ATTACK;
+            DamageCause cause = (source.isWithSweep()) ? DamageCause.ENTITY_SWEEP_ATTACK : DamageCause.ENTITY_ATTACK;
 
             if (damager instanceof net.minecraft.world.entity.projectile.Projectile) {
                 if (damager.getBukkitEntity() instanceof ThrownPotion) {
