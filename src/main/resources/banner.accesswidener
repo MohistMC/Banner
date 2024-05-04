@@ -22,6 +22,8 @@ accessible method net/minecraft/world/entity/animal/Cat setCollarColor (Lnet/min
 accessible method net/minecraft/world/entity/projectile/windcharge/AbstractWindCharge explode ()V
 accessible method net/minecraft/world/entity/projectile/Arrow getPotionContents ()Lnet/minecraft/world/item/alchemy/PotionContents;
 accessible method net/minecraft/world/entity/projectile/Arrow setPotionContents (Lnet/minecraft/world/item/alchemy/PotionContents;)V
+accessible class net/minecraft/world/level/block/entity/BlockEntity$DataComponentInput
+accessible method net/minecraft/world/level/block/entity/BlockEntity$DataComponentInput getOrDefault (Lnet/minecraft/core/component/DataComponentType;Ljava/lang/Object;)Ljava/lang/Object;
 
 # 1.20.4
 accessible field net/minecraft/world/entity/ai/attributes/AttributeModifier name Ljava/lang/String;

@@ -27,7 +27,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
-import net.minecraft.world.level.block.EnchantmentTableBlock;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.inventory.CraftInventoryEnchanting;
 import org.bukkit.craftbukkit.inventory.CraftInventoryView;

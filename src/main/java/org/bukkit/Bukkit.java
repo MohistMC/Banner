@@ -1,7 +1,6 @@
 package org.bukkit;
 
 import com.google.common.collect.ImmutableList;
-import com.mohistmc.mohist.Mohist;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.Serializable;
@@ -96,7 +95,7 @@ public final class Bukkit {
         }
 
         Bukkit.server = server;
-        server.getLogger().info("This server is running " + getName() + " version " + getVersion() + " (Implementing API version " + getBukkitVersion() + ", Forge version " + Mohist.versionInfo.forge() + ")");
+        server.getLogger().info("This server is running " + getName() + " version " + getVersion() + " (Implementing API version " + getBukkitVersion()  + ")");
     }
 
     /**
@@ -1533,24 +1532,6 @@ public final class Bukkit {
     public static Inventory createInventory(@Nullable InventoryHolder owner, int size) throws IllegalArgumentException {
         return server.createInventory(owner, size);
     }
-
-    // Paper start
-    /**
-     * Creates an empty inventory of type {@link InventoryType#CHEST} with the
-     * specified size and title.
-     *
-     * @param owner the holder of the inventory, or null to indicate no holder
-     * @param size a multiple of 9 as the size of inventory to create
-     * @param title the title of the inventory, displayed when inventory is
-     *     viewed
-     * @return a new inventory
-     * @throws IllegalArgumentException if the size is not a multiple of 9
-     */
-    @NotNull
-    public static Inventory createInventory(@Nullable InventoryHolder owner, int size, net.kyori.adventure.text.@NotNull Component title) throws IllegalArgumentException {
-        return server.createInventory(owner, size, title);
-    }
-    // Paper end
 
     /**
      * Creates an empty inventory of type {@link InventoryType#CHEST} with the
