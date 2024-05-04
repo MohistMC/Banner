@@ -4,6 +4,9 @@ import com.mohistmc.banner.asm.annotation.CreateConstructor;
 import com.mohistmc.banner.asm.annotation.ShadowConstructor;
 import com.mohistmc.banner.injection.world.food.InjectionFoodData;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
@@ -30,6 +33,9 @@ public abstract class MixinFoodData implements InjectionFoodData {
     @Shadow public int foodLevel;
     @Shadow private int lastFoodLevel;
     @Shadow public float saturationLevel;
+
+    @Shadow protected abstract void add(int i, float f);
+
     private Player entityhuman;
     public int saturatedRegenRate = 10;
     public int unsaturatedRegenRate = 80;
@@ -46,7 +52,6 @@ public abstract class MixinFoodData implements InjectionFoodData {
         this.entityhuman = entityhuman;
     }
 
-    private transient Item banner$foodItem;
     private transient ItemStack banner$foodStack;
 
     private AtomicBoolean duplicateCall = new AtomicBoolean(false);
@@ -68,22 +73,21 @@ public abstract class MixinFoodData implements InjectionFoodData {
         ((ServerPlayer) entityhuman).getBukkitEntity().sendHealthUpdate(); // Banner
     }
 
-    @Inject(method = "eat(Lnet/minecraft/world/item/Item;Lnet/minecraft/world/item/ItemStack;)V", at = @At("HEAD"))
-    private void banner$setFoodInformation(Item item, ItemStack stack, CallbackInfo ci) {
-        this.banner$foodItem = item;
-        this.banner$foodStack = stack;
+    @Inject(method = "eat(Lnet/minecraft/world/item/ItemStack;)V", at = @At("HEAD"))
+    private void banner$setFoodInformation(ItemStack itemStack, CallbackInfo ci) {
+        this.banner$foodStack = itemStack;
     }
 
-    @Redirect(method = "eat(Lnet/minecraft/world/item/Item;Lnet/minecraft/world/item/ItemStack;)V",
-            at = @At(value = "INVOKE",target = "Lnet/minecraft/world/food/FoodData;eat(IF)V"))
-    private void banner$foodLevelChange(FoodData instance, int foodLevelModifier, float saturationLevelModifier) {
+    @Redirect(method = "eat(Lnet/minecraft/world/item/ItemStack;)V",
+            at = @At(value = "INVOKE",target = "Lnet/minecraft/world/food/FoodData;add(IF)V"))
+    private void banner$foodLevelChange(FoodData instance, int i, float f) {
         int oldFoodLevel = foodLevel;
-        FoodProperties foodInfo = banner$foodItem.getFoodProperties();
-        FoodLevelChangeEvent event = CraftEventFactory.callFoodLevelChangeEvent(entityhuman, foodInfo.getNutrition() + oldFoodLevel, banner$foodStack);
+        FoodProperties foodInfo =  (FoodProperties)banner$foodStack.get(DataComponents.FOOD);
+        FoodLevelChangeEvent event = CraftEventFactory.callFoodLevelChangeEvent(entityhuman, foodInfo.nutrition() + oldFoodLevel, banner$foodStack);
 
         if (!event.isCancelled()) {
             duplicateCall.set(true);
-            instance.eat(event.getFoodLevel() - oldFoodLevel, saturationLevelModifier);
+            this.add(event.getFoodLevel() - oldFoodLevel, foodInfo.saturation());
         }
         // CraftBukkit end
     }

@@ -3,29 +3,29 @@ package com.mohistmc.banner.mixin.core.interaction.dispenser;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
-import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
 import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
+import net.minecraft.core.dispenser.ProjectileDispenseBehavior;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ProjectileItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.entity.DispenserBlockEntity;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.projectiles.CraftBlockProjectileSource;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(AbstractProjectileDispenseBehavior.class)
-public abstract class MixinAbstractProjectileDispenseBehavior {
+@Mixin(ProjectileDispenseBehavior.class)
+public abstract class MixinProjectileDispenseBehavior {
 
-    @Shadow protected abstract Projectile getProjectile(Level level, Position position, ItemStack stack);
+    @Shadow @Final private ProjectileItem projectileItem;
 
-    @Shadow protected abstract float getPower();
-
-    @Shadow protected abstract float getUncertainty();
+    @Shadow @Final private ProjectileItem.DispenseConfig dispenseConfig;
 
     /**
      * @author wdog5
@@ -36,7 +36,7 @@ public abstract class MixinAbstractProjectileDispenseBehavior {
         Level level = isourceblock.level();
         Position position = DispenserBlock.getDispensePosition(isourceblock);
         Direction direction = (Direction)isourceblock.state().getValue(DispenserBlock.FACING);
-        Projectile projectile = this.getProjectile(level, position, stack);
+        Projectile projectile = this.projectileItem.asProjectile(level, position, stack, direction);
         // CraftBukkit start
         //projectile.shoot((double)direction.getStepX(), (double)((float)direction.getStepY() + 0.1F), (double)direction.getStepZ(), this.getPower(), this.getUncertainty());
         ItemStack itemstack1 = stack.split(1);
@@ -63,7 +63,7 @@ public abstract class MixinAbstractProjectileDispenseBehavior {
                 return stack;
             }
         }
-        projectile.shoot(event.getVelocity().getX(), event.getVelocity().getY(), event.getVelocity().getZ(), this.getPower(), this.getUncertainty());
+        projectile.shoot(event.getVelocity().getX(), event.getVelocity().getY(), event.getVelocity().getZ(), this.dispenseConfig.power(), this.dispenseConfig.uncertainty());
         projectile.banner$setProjectileSource(new CraftBlockProjectileSource((DispenserBlockEntity) isourceblock.blockEntity()));
 
         level.addFreshEntity(projectile);

@@ -109,7 +109,6 @@ dependencies {
 loom {
 	accessWidenerPath = file("src/main/resources/banner.accesswidener")
 	log4jConfigs.from(file("src/main/resources/log4j2_banner.xml"))
-	serverOnlyMinecraftJar()
 }
 
 processResources {
