@@ -45,7 +45,7 @@ public class CraftLlama extends CraftChestedHorse implements Llama {
     public void setStrength(int strength) {
         Preconditions.checkArgument(1 <= strength && strength <= 5, "strength must be [1,5]");
         if (strength == this.getStrength()) return;
-        this.getHandle().setStrengthPublic(strength);
+        this.getHandle().setStrength(strength);
         this.getHandle().createInventory();
     }
 

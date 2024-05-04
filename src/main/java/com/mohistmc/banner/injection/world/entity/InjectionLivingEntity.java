@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+
+import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
@@ -118,7 +120,7 @@ public interface InjectionLivingEntity extends InjectionEntity {
         return null;
     }
 
-    default boolean removeEffect(MobEffect mobeffectlist, EntityPotionEffectEvent.Cause cause) {
+    default boolean removeEffect(Holder<MobEffect> holder, EntityPotionEffectEvent.Cause cause) {
         return false;
     }
 

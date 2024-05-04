@@ -1,7 +1,6 @@
 plugins {
 	id 'fabric-loom' version '1.6-SNAPSHOT'
 	id 'maven-publish'
-	id 'org.ajoberstar.grgit' version '5.2.0'
 }
 
 version = project.minecraft_version + "-" + ci_version()
@@ -74,7 +73,7 @@ dependencies {
 	implementation(include("com.mohistmc:i18n:0.6"))
 	implementation(include('com.mohistmc:json:0.5'))
 	implementation(include('com.mohistmc:tools:0.5.1'))
-	implementation(include('com.mohistmc:dynamicenum:0.3'))
+	implementation(include('com.mohistmc:dynamicenum:0.2'))
 	implementation(include('javax.inject:javax.inject:1'))
 	// jansi support
 	implementation(include("org.jline:jline-terminal:3.21.0"))
@@ -86,7 +85,7 @@ dependencies {
 	implementation "jline:jline:2.14.6"
 	implementation "com.googlecode.json-simple:json-simple:1.1.1"
 	implementation "org.xerial:sqlite-jdbc:3.42.0.0"
-	implementation "com.mysql:mysql-connector-j:8.0.33"
+	implementation 'com.mysql:mysql-connector-j:8.2.0'
 
 	implementation "net.md-5:SpecialSource:1.11.2"
 
@@ -94,37 +93,7 @@ dependencies {
 	implementation "net.md-5:bungeecord-chat:1.16-R0.4"
 	implementation "io.izzel:tools:1.3.0"
 
-	implementation "com.google.guava:failureaccess:1.0.1"
-	implementation "com.google.guava:guava:31.0.1-jre"
-	implementation "com.google.code.gson:gson:2.10"
-	implementation "com.mojang:authlib:3.17.30"
-	implementation "com.mojang:logging:1.1.1"
-	compileOnly "commons-lang:commons-lang:2.6"
-	implementation "org.slf4j:slf4j-api:2.0.6"
-
-	implementation "org.apache.logging.log4j:log4j-core:2.20.0"
 	implementation(include("org.apache.logging.log4j:log4j-iostreams:2.20.0"))
-	implementation "org.apache.logging.log4j:log4j-api:2.20.0"
-	implementation "org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0"
-	implementation "org.apache.commons:commons-lang3:3.12.0"
-	implementation "net.sf.jopt-simple:jopt-simple:5.0.4"
-	implementation "net.java.dev.jna:jna-platform:5.13.0"
-	implementation "net.java.dev.jna:jna:5.13.0"
-	implementation "it.unimi.dsi:fastutil:8.5.12"
-	implementation "commons-io:commons-io:2.11.0"
-	implementation "com.mojang:javabridge:2.0.25"
-	implementation "com.mojang:datafixerupper:6.0.6"
-	implementation "com.mojang:brigadier:1.0.18"
-	implementation "com.github.oshi:oshi-core:6.4.0"
-
-	implementation "io.netty:netty-buffer:4.1.82.Final"
-	implementation "io.netty:netty-codec:4.1.82.Final"
-	implementation "io.netty:netty-common:4.1.82.Final"
-	implementation "io.netty:netty-handler:4.1.82.Final"
-	implementation "io.netty:netty-resolver:4.1.82.Final"
-	implementation "io.netty:netty-transport:4.1.82.Final"
-	implementation "io.netty:netty-transport-classes-epoll:4.1.82.Final"
-	implementation "io.netty:netty-transport-native-unix-common:4.1.82.Final"
 
 	//class modify
 	modImplementation(include("com.github.wdog5:mixin-tools:1.0.1"))
@@ -133,22 +102,8 @@ dependencies {
 	// mappings remapper
 	implementation(include("net.fabricmc:mapping-io:0.3.0"))
 
-	// Kyori
-	implementation(include("net.kyori:adventure-platform-fabric:5.9.0"))
-	// Paper start
-	implementation(include("net.kyori:adventure-api:4.14.0"))
-	implementation(include("net.kyori:adventure-key:4.14.0"))
-	implementation(include("net.kyori:adventure-text-minimessage:4.14.0"))
-	implementation(include("net.kyori:adventure-text-serializer-gson:4.14.0"))
-	implementation(include("net.kyori:adventure-text-serializer-json:4.14.0"))
-	implementation(include("net.kyori:adventure-text-serializer-legacy:4.14.0"))
-	implementation(include("net.kyori:adventure-text-serializer-plain:4.14.0"))
-	implementation(include("net.kyori:adventure-text-serializer-ansi:4.14.0"))
-	implementation(include("net.kyori:adventure-text-logger-slf4j:4.14.0"))
-	implementation(include("net.kyori:ansi:1.0.3"))
-	implementation(include("net.kyori:examination-api:1.3.0"))
-	implementation(include("net.kyori:examination-string:1.3.0"))
-	// Paper end
+	// mohist lib
+	implementation(include("com.mohistmc:librariesvault:1.20.2"))
 }
 
 loom {
@@ -167,14 +122,14 @@ processResources {
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -197,12 +152,6 @@ jar {
 	}
 }
 
-tasks.register('cleanBuild') {
-	doFirst {
-		project.file("build/libs").deleteDir()
-	}
-}
-
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
@@ -217,7 +166,7 @@ publishing {
 import groovy.json.JsonSlurper
 static String ci_version() {
 	try {
-		def conn = new URL("https://ci.codemc.io/job/MohistMC/job/Banner-1.20/api/json").openConnection()
+		def conn = new URL("https://ci.codemc.io/job/MohistMC/job/Banner-1.20.6/api/json").openConnection()
 		conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36")
 		conn.connect()
 		def root = conn.content.text
@@ -227,6 +176,6 @@ static String ci_version() {
 		def number = data.substring(data.indexOf("number")).split(",")
 		return Integer.valueOf(number[0].replace("number=", "")).intValue()
 	} catch (Exception ignored) {
-		return "1.20.1"
+		return "1.20.6"
 	}
 }

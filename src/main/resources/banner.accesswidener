@@ -8,6 +8,20 @@ accessible field net/minecraft/server/level/ChunkMap serverViewDistance I
 accessible field net/minecraft/server/level/DistanceManager simulationDistance I
 accessible field net/minecraft/world/level/dimension/end/EndDragonFight previouslyKilled Z
 accessible method net/minecraft/world/damagesource/DamageSource <init> (Lnet/minecraft/core/Holder;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;)V
+accessible field net/minecraft/world/entity/AreaEffectCloud potionContents Lnet/minecraft/world/item/alchemy/PotionContents;
+accessible method net/minecraft/world/entity/animal/allay/Allay duplicateAllay ()V
+accessible method net/minecraft/world/entity/OminousItemSpawner setItem (Lnet/minecraft/world/item/ItemStack;)V
+accessible field net/minecraft/world/entity/OminousItemSpawner spawnItemAfterTicks J
+accessible field net/minecraft/world/entity/animal/MushroomCow stewEffects Lnet/minecraft/world/item/component/SuspiciousStewEffects;
+accessible field net/minecraft/world/entity/vehicle/AbstractMinecartContainer lootTable Lnet/minecraft/resources/ResourceKey;
+accessible field net/minecraft/world/entity/LivingEntity useItemRemaining I
+accessible method net/minecraft/world/entity/projectile/AbstractHurtingProjectile assignPower (DDD)V
+accessible field net/minecraft/world/entity/LightningBolt flashes I
+accessible field net/minecraft/world/entity/LightningBolt life I
+accessible method net/minecraft/world/entity/animal/Cat setCollarColor (Lnet/minecraft/world/item/DyeColor;)V
+accessible method net/minecraft/world/entity/projectile/windcharge/AbstractWindCharge explode ()V
+accessible method net/minecraft/world/entity/projectile/Arrow getPotionContents ()Lnet/minecraft/world/item/alchemy/PotionContents;
+accessible method net/minecraft/world/entity/projectile/Arrow setPotionContents (Lnet/minecraft/world/item/alchemy/PotionContents;)V
 
 # 1.20.4
 accessible field net/minecraft/world/entity/ai/attributes/AttributeModifier name Ljava/lang/String;
@@ -430,7 +444,6 @@ accessible field net/minecraft/world/entity/raid/Raid ticksActive J
 accessible field net/minecraft/world/entity/raid/Raid totalHealth F
 accessible field net/minecraft/world/entity/vehicle/Boat status Lnet/minecraft/world/entity/vehicle/Boat$Status;
 accessible field net/minecraft/world/entity/vehicle/MinecartCommandBlock DATA_ID_COMMAND_NAME Lnet/minecraft/network/syncher/EntityDataAccessor;
-accessible field net/minecraft/world/entity/vehicle/AbstractMinecartContainer lootTable Lnet/minecraft/resources/ResourceLocation;
 accessible field net/minecraft/world/entity/vehicle/AbstractMinecartContainer lootTableSeed J
 accessible field net/minecraft/world/entity/vehicle/MinecartFurnace fuel I
 accessible field net/minecraft/world/food/FoodData exhaustionLevel F

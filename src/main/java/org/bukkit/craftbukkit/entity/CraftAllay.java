@@ -70,20 +70,20 @@ public class CraftAllay extends CraftCreature implements org.bukkit.entity.Allay
 
     @Override
     public void startDancing() {
-        this.getHandle().forceDancing = true;
+        this.getHandle().banner$setForceDancing(true);
         this.getHandle().setDancing(true);
     }
 
     @Override
     public void stopDancing() {
-        this.getHandle().forceDancing = false;
+        this.getHandle().banner$setForceDancing(false);
         this.getHandle().jukeboxPos = null;
         this.getHandle().setJukeboxPlaying(null, false);
     }
 
     @Override
     public org.bukkit.entity.Allay duplicateAllay() {
-        Allay nmsAllay = this.getHandle().duplicateAllay();
+        Allay nmsAllay = this.getHandle().duplicateAllay0();
         return (nmsAllay != null) ? (org.bukkit.entity.Allay) nmsAllay.getBukkitEntity() : null;
     }
 

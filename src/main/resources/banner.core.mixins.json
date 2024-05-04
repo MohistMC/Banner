@@ -538,6 +538,7 @@
     "world.level.levelgen.MixinPatrolSpawner",
     "world.level.levelgen.MixinPhantomSpawner",
     "world.level.levelgen.MixinWanderingTraderSpawner",
+    "world.level.levelgen.structure.MixinStructureStart",
     "world.level.levelgen.structure.MixinSwampHutPiece",
     "world.level.levelgen.structure.templatesystem.MixinStructurePlaceSettings",
     "world.level.levelgen.structure.templatesystem.MixinStructureTemplate",

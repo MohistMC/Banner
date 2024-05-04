@@ -83,37 +83,4 @@ public interface ExperienceOrb extends Entity {
          */
         UNKNOWN
     }
-
-    /**
-     * If this experience orb was triggered to be spawned by
-     * an entity such as a player, due to events such as killing entity,
-     * breaking blocks, smelting in a furnace, etc, this will return the UUID
-     * of the entity that triggered this orb to drop.
-     *
-     * In the case of an entity being killed, this will be the killers UUID.
-     *
-     * @return UUID of the player that triggered this orb to drop, or null if unknown/no triggering entity
-     */
-    @Nullable java.util.UUID getTriggerEntityId();
-
-    /**
-     * If this experience orb was spawned in relation to another
-     * entity, such as a player or other living entity death, or breeding,
-     * return the source entity UUID.
-     *
-     * In the case of breeding, this will be the new baby entities UUID.
-     * In the case of an entity being killed, this will be the dead entities UUID.
-     *
-     * @return The UUID of the entity that sourced this experience orb
-     */
-    @Nullable java.util.UUID getSourceEntityId();
-
-    /**
-     * Gets the reason that this experience orb was spawned. For any case that we
-     * do not know, such as orbs spawned before this API was added, UNKNOWN is returned.
-     * @return The reason for this orb being spawned.
-     */
-    @NotNull
-    SpawnReason getSpawnReason();
-    // Paper end
 }

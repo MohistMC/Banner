@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.FloatTag;
@@ -51,6 +52,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Equipable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -89,9 +91,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public abstract class MixinLivingEntity extends Entity implements InjectionLivingEntity {
 
     @Shadow @Final public static EntityDataAccessor<Float> DATA_HEALTH_ID;
-
-    @Shadow public abstract double getAttributeValue(Attribute attribute);
-
     @Shadow @Final private AttributeMap attributes;
 
     @Shadow public abstract SoundEvent getEatingSound(net.minecraft.world.item.ItemStack stack);
@@ -103,9 +102,6 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     @Shadow @Nullable protected abstract SoundEvent getDeathSound();
 
     @Shadow public abstract void onEquipItem(EquipmentSlot equipmentSlot, ItemStack itemStack, ItemStack itemStack2);
-
-    @Shadow @Nullable public abstract AttributeInstance getAttribute(Attribute attribute);
-
     @Shadow @Final public Map<MobEffect, MobEffectInstance> activeEffects;
 
     @Shadow protected abstract void onEffectUpdated(MobEffectInstance effectInstance, boolean forced, @Nullable Entity entity);
@@ -115,17 +111,11 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     @Shadow public boolean effectsDirty;
 
     @Shadow protected abstract void updateInvisibilityStatus();
-
-    @Shadow @Final private static EntityDataAccessor<Integer> DATA_EFFECT_COLOR_ID;
-
     @Shadow @Final private static EntityDataAccessor<Boolean> DATA_EFFECT_AMBIENCE_ID;
 
     @Shadow public abstract boolean canBeAffected(MobEffectInstance effectInstance);
 
     @Shadow protected abstract void onEffectAdded(MobEffectInstance instance, @Nullable Entity entity);
-
-    @Shadow @Nullable public abstract MobEffectInstance removeEffectNoUpdate(@Nullable MobEffect effect);
-
     @Shadow public abstract boolean wasExperienceConsumed();
 
     @Shadow protected abstract boolean isAlwaysExperienceDropper();
@@ -141,10 +131,6 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     @Shadow public abstract ItemStack getItemBySlot(EquipmentSlot slot);
 
     @Shadow public abstract boolean isDamageSourceBlocked(DamageSource damageSource);
-
-    @Shadow @Nullable public abstract MobEffectInstance getEffect(MobEffect effect);
-
-    @Shadow public abstract boolean hasEffect(MobEffect effect);
 
     @Shadow protected abstract float getDamageAfterArmorAbsorb(DamageSource damageSource, float damageAmount);
 
@@ -169,9 +155,6 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     @Shadow public abstract void setHealth(float health);
 
     @Shadow public abstract void heal(float healAmount);
-
-    @Shadow public abstract boolean removeEffect(MobEffect effect);
-
     @Shadow public abstract ItemStack getItemInHand(InteractionHand hand);
 
     @Shadow public abstract boolean onClimbable();
@@ -229,6 +212,10 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     @Shadow public int hurtTime;
 
     @Shadow protected int noActionTime;
+
+    @Shadow public abstract double getAttributeValue(Holder<Attribute> holder);
+
+    @Shadow @Nullable public abstract AttributeInstance getAttribute(Holder<Attribute> holder);
 
     public MixinLivingEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -454,15 +441,15 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     }
 
     @Inject(method = "removeEffectNoUpdate", cancellable = true, at = @At("HEAD"))
-    public void banner$clearActive(MobEffect effect, CallbackInfoReturnable<MobEffectInstance> cir) {
+    public void banner$clearActive(Holder<MobEffect> holder, CallbackInfoReturnable<MobEffectInstance> cir) {
         EntityPotionEffectEvent.Cause cause = getEffectCause().orElse(EntityPotionEffectEvent.Cause.UNKNOWN);
         if (isTickingEffects) {
-            effectsToProcess.add(new ProcessableEffect(effect, cause));
+            effectsToProcess.add(new ProcessableEffect(holder, cause));
             cir.setReturnValue(null);
             return;
         }
 
-        MobEffectInstance effectInstance = this.activeEffects.get(effect);
+        MobEffectInstance effectInstance = this.activeEffects.get(holder);
         if (effectInstance == null) {
             cir.setReturnValue(null);
             return;
@@ -1012,7 +999,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     }
 
     @Inject(method = "addEatEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;addEffect(Lnet/minecraft/world/effect/MobEffectInstance;)Z"))
-    public void banner$foodEffectCause(ItemStack food, Level level, LivingEntity livingEntity, CallbackInfo ci) {
+    public void banner$foodEffectCause(FoodProperties foodProperties, CallbackInfo ci) {
         livingEntity.pushEffectCause(EntityPotionEffectEvent.Cause.FOOD);
     }
 
