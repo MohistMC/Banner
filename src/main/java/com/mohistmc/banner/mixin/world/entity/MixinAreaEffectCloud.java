@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.entity;
 
 import com.google.common.collect.Lists;
+import com.mohistmc.banner.bukkit.entity.MohistModsEntity;
 import com.mohistmc.banner.injection.world.entity.InjectionAreaEffectCloud;
 import java.util.Collection;
 import java.util.List;
@@ -168,7 +169,9 @@ public abstract class MixinAreaEffectCloud extends Entity implements TraceableEn
                                 double d1 = livingentity.getZ() - this.getZ();
                                 double d3 = d8 * d8 + d1 * d1;
                                 if (d3 <= (double) (f * f)) {
-                                    entities.add((org.bukkit.entity.LivingEntity) livingentity.getBukkitEntity());
+                                    if (!(livingentity.getBukkitEntity() instanceof MohistModsEntity)) {
+                                        entities.add((org.bukkit.entity.LivingEntity) livingentity.getBukkitEntity());
+                                    }
                                 }
                             }
                         }
