@@ -3,7 +3,6 @@ package org.bukkit.craftbukkit.v1_19_R3.inventory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Optional;
 
 import com.mohistmc.banner.bukkit.BannerLecternInventory;
 import net.minecraft.world.Container;
@@ -11,7 +10,6 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.MerchantContainer;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.level.block.ComposterBlock;
-import net.minecraft.world.level.block.JukeboxBlock;
 import net.minecraft.world.level.block.entity.*;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
@@ -500,7 +498,7 @@ public class CraftInventory implements Inventory {
             return InventoryType.STONECUTTER;
         } else if (inventory instanceof ComposterBlock.EmptyContainer || inventory instanceof ComposterBlock.InputContainer || inventory instanceof ComposterBlock.OutputContainer) {
             return InventoryType.COMPOSTER;
-        } else if (inventory instanceof JukeboxBlock) {
+        } else if (inventory instanceof JukeboxBlockEntity) {
             return InventoryType.JUKEBOX;
         } else if (this instanceof CraftInventorySmithingNew) {
             return InventoryType.SMITHING_NEW;
