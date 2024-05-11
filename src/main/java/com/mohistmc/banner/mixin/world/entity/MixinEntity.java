@@ -854,8 +854,8 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         // CraftBukkit end
     }
 
-    @Inject(method = "absMoveTo(DDD)V", at = @At("RETURN"))
-    private void banner$loadChunk(double x, double y, double z, CallbackInfo ci) {
+    @Inject(method = "absMoveTo(DDDFF)V", at = @At("RETURN"))
+    private void banner$loadChunk(double x, double y, double z, float yRot, float xRot, CallbackInfo ci) {
         if (this.valid) this.level().getChunk((int) Math.floor(this.getX()) >> 4, (int) Math.floor(this.getZ()) >> 4);
     }
 
