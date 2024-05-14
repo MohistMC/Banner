@@ -1,7 +1,6 @@
 package org.bukkit.plugin.java;
 
 import com.google.common.base.Preconditions;
-import com.mohistmc.banner.stackdeobf.mappings.RemappingUtil;
 import com.mohistmc.banner.util.I18n;
 import org.bukkit.Server;
 import org.bukkit.Warning;
@@ -148,7 +147,6 @@ public final class JavaPluginLoader implements PluginLoader {
         } catch (InvalidPluginException ex) {
             throw ex;
         } catch (Throwable ex) {
-            RemappingUtil.remapStackTraceElements(ex.getStackTrace());
             throw new InvalidPluginException(ex);
         }
 
@@ -306,7 +304,6 @@ public final class JavaPluginLoader implements PluginLoader {
                     } catch (InvocationTargetException ex) {
                         throw new EventException(ex.getCause());
                     } catch (Throwable t) {
-                        RemappingUtil.remapStackTraceElements(t.getStackTrace());
                         throw new EventException(t);
                     }
                 }
@@ -339,7 +336,6 @@ public final class JavaPluginLoader implements PluginLoader {
             try {
                 jPlugin.setEnabled(true);
             } catch (Throwable ex) {
-                RemappingUtil.remapStackTraceElements(ex.getStackTrace());
                 server.getLogger().log(Level.SEVERE, "Error occurred while enabling " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
                 // Mohist start - Disable plugins that fail to load
                 this.server.getPluginManager().disablePlugin(jPlugin);
@@ -369,7 +365,6 @@ public final class JavaPluginLoader implements PluginLoader {
             try {
                 jPlugin.setEnabled(false);
             } catch (Throwable ex) {
-                RemappingUtil.remapStackTraceElements(ex.getStackTrace());
                 server.getLogger().log(Level.SEVERE, "Error occurred while disabling " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
             }
 

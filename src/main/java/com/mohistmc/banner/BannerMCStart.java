@@ -4,10 +4,6 @@ import com.mohistmc.banner.config.BannerConfigUtil;
 import com.mohistmc.banner.libraries.CustomLibraries;
 import com.mohistmc.banner.libraries.DefaultLibraries;
 import com.mohistmc.banner.network.download.UpdateUtils;
-import com.mohistmc.banner.stackdeobf.mappings.CachedMappings;
-import com.mohistmc.banner.stackdeobf.mappings.providers.MojangMappingProvider;
-import com.mohistmc.banner.stackdeobf.util.CompatUtil;
-import com.mohistmc.banner.stackdeobf.util.RemappingRewritePolicy;
 import com.mohistmc.banner.util.EulaUtil;
 import com.mohistmc.banner.util.I18n;
 import com.mohistmc.i18n.i18n;
@@ -48,7 +44,6 @@ public class BannerMCStart {
         }
         DefaultLibraries.proposeFabricLibs();
         CustomLibraries.loadCustomLibs();
-        if (BannerConfigUtil.stackdeobf()) injectDeobfStack();
         if (!EulaUtil.hasAcceptedEULA()) {
             System.out.println(I18n.as("eula"));
             while (!"true".equals(new Scanner(System.in).next()));
@@ -58,12 +53,5 @@ public class BannerMCStart {
 
     public static String getVersion() {
       return FabricLoader.getInstance().getModContainer("banner").get().getMetadata().getVersion().getFriendlyString();
-    }
-
-    private static void injectDeobfStack() {
-        CompatUtil.LOGGER.info(I18n.as("stackdeobf.inject.logger"));
-        RemappingRewritePolicy policy = new RemappingRewritePolicy();
-        policy.inject((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger());
-        CachedMappings.init(new MojangMappingProvider());
     }
 }

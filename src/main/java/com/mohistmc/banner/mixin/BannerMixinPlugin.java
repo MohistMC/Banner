@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.mohistmc.banner.BannerMCStart;
-import com.mohistmc.banner.stackdeobf.util.CompatUtil;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
@@ -158,10 +157,6 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
         }
         if (mixinClassName.equals("com.mohistmc.banner.mixin.world.level.MixinClipContext")) {
             return !FabricLoader.getInstance().isModLoaded("create") && !FabricLoader.getInstance().isModLoaded("porting_lib");
-        }
-        if (mixinClassName.endsWith("ThreadingDetectorMixin")) {
-            // added in 1.18-pre7
-            return CompatUtil.WORLD_VERSION >= 2854;
         }
         return true;
     }
