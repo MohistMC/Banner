@@ -3,7 +3,6 @@ package com.mohistmc.banner.fabric;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.util.I18n;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import net.minecraft.world.level.storage.DerivedLevelData;
@@ -23,10 +22,7 @@ public class WorldSymlink {
                 }
                 Files.createSymbolicLink(source, dest);
             }
-        } catch (UnsupportedOperationException e) {
-            BannerServer.LOGGER.warn(I18n.as("error-symlink"), e);
-        } catch (IOException e) {
-            BannerServer.LOGGER.error("Error creating symlink", e);
+        } catch (Exception ignored) {
         }
     }
 }
