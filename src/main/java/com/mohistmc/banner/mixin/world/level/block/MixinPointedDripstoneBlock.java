@@ -9,9 +9,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.PointedDripstoneBlock;
-import static net.minecraft.world.level.block.PointedDripstoneBlock.THICKNESS;
-import static net.minecraft.world.level.block.PointedDripstoneBlock.TIP_DIRECTION;
-import static net.minecraft.world.level.block.PointedDripstoneBlock.WATERLOGGED;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DripstoneThickness;
 import net.minecraft.world.level.material.Fluids;
@@ -23,6 +20,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+
+import static net.minecraft.world.level.block.PointedDripstoneBlock.THICKNESS;
+import static net.minecraft.world.level.block.PointedDripstoneBlock.TIP_DIRECTION;
+import static net.minecraft.world.level.block.PointedDripstoneBlock.WATERLOGGED;
 
 @Mixin(PointedDripstoneBlock.class)
 public class MixinPointedDripstoneBlock {

@@ -34,6 +34,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -266,22 +267,13 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
         Bukkit.getPluginManager().callEvent(new EntityUnleashEvent(this.getBukkitEntity(), EntityUnleashEvent.UnleashReason.UNKNOWN));
     }
 
-    @Eject(method = "convertTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
-    private boolean banner$copySpawn(net.minecraft.world.level.Level world, Entity entityIn, CallbackInfoReturnable<Mob> cir) {
+    @Inject(method = "convertTo", at = @At(value = "INVOKE", shift = Shift.BEFORE, target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    private void banner$copySpawn(EntityType<?> entityType, boolean transferInventory, CallbackInfoReturnable<?> cir) {
         EntityTransformEvent.TransformReason transformReason = banner$transform == null ? EntityTransformEvent.TransformReason.UNKNOWN : banner$transform;
         banner$transform = null;
-        if (CraftEventFactory.callEntityTransformEvent((Mob) (Object) this, (LivingEntity) entityIn, transformReason).isCancelled()) {
+        if (CraftEventFactory.callEntityTransformEvent((Mob) (Object) this, (Mob)entityType.create(this.level()), transformReason).isCancelled()) {
             cir.setReturnValue(null);
-            return false;
-        } else {
-            return world.addFreshEntity(entityIn);
         }
-    }
-
-    @Inject(method = "convertTo", at = @At("RETURN"))
-    private <T extends Mob> void banner$cleanReason(EntityType<T> p_233656_1_, boolean p_233656_2_, CallbackInfoReturnable<T> cir) {
-        this.level().pushAddEntityReason(null);
-        this.banner$transform = null;
     }
 
     @Redirect(method = "doHurtTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;setSecondsOnFire(I)V"))
