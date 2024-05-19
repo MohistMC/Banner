@@ -1,4 +1,4 @@
-package com.mohistmc.banner.mixin.interaction.cauldron;
+package com.mohistmc.banner.mixin.core.cauldron;
 
 import com.mohistmc.banner.bukkit.BukkitCauldronHooks;
 import net.minecraft.core.cauldron.CauldronInteraction;

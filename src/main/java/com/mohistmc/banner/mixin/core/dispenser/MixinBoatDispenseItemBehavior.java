@@ -1,4 +1,4 @@
-package com.mohistmc.banner.mixin.interaction.dispenser;
+package com.mohistmc.banner.mixin.core.dispenser;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.BlockPos;
@@ -9,6 +9,7 @@ import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.ChestBoat;
 import net.minecraft.world.item.ItemStack;
@@ -38,19 +39,20 @@ public abstract class MixinBoatDispenseItemBehavior {
     public ItemStack execute(BlockSource source, ItemStack stack) {
         Direction direction = (Direction)source.getBlockState().getValue(DispenserBlock.FACING);
         Level level = source.getLevel();
-        double d = source.x() + (double)((float)direction.getStepX() * 1.125F);
-        double e = source.y() + (double)((float)direction.getStepY() * 1.125F);
-        double f = source.z() + (double)((float)direction.getStepZ() * 1.125F);
+        double d = 0.5625 + (double)EntityType.BOAT.getWidth() / 2.0;
+        double e = source.x() + (double)direction.getStepX() * d;
+        double f = source.y() + (double)((float)direction.getStepY() * 1.125F);
+        double g = source.z() + (double)direction.getStepZ() * d;
         BlockPos blockPos = source.getPos().relative(direction);
-        double g;
+        double h;
         if (level.getFluidState(blockPos).is(FluidTags.WATER)) {
-            g = 1.0;
+            h = 1.0;
         } else {
             if (!level.getBlockState(blockPos).isAir() || !level.getFluidState(blockPos.below()).is(FluidTags.WATER)) {
                 return this.defaultDispenseItemBehavior.dispense(source, stack);
             }
 
-            g = 0.0;
+            h = 0.0;
         }
 
         //Boat boat = this.isChestBoat ? new ChestBoat(level, d, e + g, f) : new Boat(level, d, e + g, f);
@@ -60,7 +62,7 @@ public abstract class MixinBoatDispenseItemBehavior {
         org.bukkit.block.Block block = level.getWorld().getBlockAt(source.getPos().getX(), source.getPos().getY(), source.getPos().getZ());
         CraftItemStack craftItem = CraftItemStack.asCraftMirror(itemstack1);
 
-        BlockDispenseEvent event = new BlockDispenseEvent(block, craftItem.clone(), new org.bukkit.util.Vector(d, e + g, f));
+        BlockDispenseEvent event = new BlockDispenseEvent(block, craftItem.clone(), new org.bukkit.util.Vector(e, f + h, g));
         if (!BukkitExtraConstants.dispenser_eventFired) {
             level.getCraftServer().getPluginManager().callEvent(event);
         }

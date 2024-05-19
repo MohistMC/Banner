@@ -1,4 +1,4 @@
-package com.mohistmc.banner.mixin.interaction.dispenser;
+package com.mohistmc.banner.mixin.core.dispenser;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import java.util.List;
