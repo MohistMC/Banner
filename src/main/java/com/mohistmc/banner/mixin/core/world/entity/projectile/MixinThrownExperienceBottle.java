@@ -5,11 +5,12 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.entity.projectile.ThrownExperienceBottle;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
+import org.bukkit.event.entity.EntityRemoveEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -33,9 +34,10 @@ public abstract class MixinThrownExperienceBottle extends ThrowableItemProjectil
             ExpBottleEvent event = CraftEventFactory.callExpBottleEvent((((ThrownExperienceBottle) (Object) this)), result, i);
             i = event.getExperience();
             if (event.getShowEffect()) {
-                this.level().levelEvent(2002, this.blockPosition(), PotionUtils.getColor(Potions.WATER));
+                this.level().levelEvent(2002, this.blockPosition(), PotionContents.getColor(Potions.WATER));
             }
             ExperienceOrb.award((ServerLevel) this.level(), this.position(), i);
+           // this.putRemoveCause(EntityRemoveEvent.Cause.HIT); // CraftBukkit - add Bukkit remove cause // Banner TODO
             this.discard();
         }
     }

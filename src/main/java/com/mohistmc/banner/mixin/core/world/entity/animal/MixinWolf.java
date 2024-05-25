@@ -30,13 +30,6 @@ public abstract class MixinWolf extends TamableAnimal {
     private void banner$handledBy(Wolf wolfEntity, boolean fire) {
     }
 
-    @Inject(method = "setTame", at = @At("RETURN"))
-    private void banner$healToMax(boolean tamed, CallbackInfo ci) {
-        if (tamed) {
-            this.setHealth(this.getMaxHealth());
-        }
-    }
-
     // CraftBukkit - add overriden version
     public boolean setTarget(LivingEntity entityliving, org.bukkit.event.entity.EntityTargetEvent.TargetReason reason, boolean fire) {
         if (!super.setTarget(entityliving, reason, fire)) {
@@ -61,10 +54,5 @@ public abstract class MixinWolf extends TamableAnimal {
     @Inject(method = "mobInteract", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/Wolf;setTarget(Lnet/minecraft/world/entity/LivingEntity;)V"))
     private void banner$attackReason(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
         bridge$pushGoalTargetReason(EntityTargetEvent.TargetReason.FORGOT_TARGET, true);
-    }
-
-    @ModifyConstant(method = "setTame", constant = @Constant(floatValue = 20.0F))
-    private float banner$resetHealth(float constant) {
-        return this.getMaxHealth(); // CraftBukkit - 20.0 -> getMaxHealth()
     }
 }
