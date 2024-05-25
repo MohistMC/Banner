@@ -83,18 +83,7 @@ public abstract class MixinMain {
             shift = At.Shift.BEFORE),
             remap = false,
             locals = LocalCapture.CAPTURE_FAILHARD)
-    private static void banner$addYmlInfo(String[] strings, CallbackInfo ci,
-                                          OptionParser optionParser,
-                                          OptionSpec optionSpec, OptionSpec optionSpec2,
-                                          OptionSpec optionSpec3, OptionSpec optionSpec4,
-                                          OptionSpec optionSpec5, OptionSpec optionSpec6,
-                                          OptionSpec optionSpec7, OptionSpec optionSpec8,
-                                          OptionSpec optionSpec9, OptionSpec optionSpec10,
-                                          OptionSpec optionSpec11, OptionSpec optionSpec12,
-                                          OptionSpec optionSpec13, OptionSpec optionSpec14,
-                                          OptionSpec optionSpec15, OptionSet optionSet, Path path,
-                                          Path path2, DedicatedServerSettings dedicatedServerSettings,
-                                          Path path3, Eula eula) throws IOException {
+    private static void banner$addYmlInfo(String[] strings, CallbackInfo ci, OptionParser optionParser, OptionSpec optionSpec, OptionSpec optionSpec2, OptionSpec optionSpec3, OptionSpec optionSpec4, OptionSpec optionSpec5, OptionSpec optionSpec6, OptionSpec optionSpec7, OptionSpec optionSpec8, OptionSpec optionSpec9, OptionSpec optionSpec10, OptionSpec optionSpec11, OptionSpec optionSpec12, OptionSpec optionSpec13, OptionSpec optionSpec14, OptionSpec optionSpec15, OptionSpec optionSpec16, OptionSet optionSet, Path path, Path path2, DedicatedServerSettings dedicatedServerSettings, Path path3, Eula eula) throws IOException {
         // CraftBukkit start - SPIGOT-5761: Create bukkit.yml and commands.yml if not present
         File configFile = (File) optionSet.valueOf("bukkit-settings");
         YamlConfiguration configuration = YamlConfiguration.loadConfiguration(configFile);
@@ -113,21 +102,7 @@ public abstract class MixinMain {
     @Inject(method = "main", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/server/packs/repository/ServerPacksSource;createPackRepository(Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;)Lnet/minecraft/server/packs/repository/PackRepository;"),
             locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-    private static void banner$createBukkitDatapack(String[] strings, CallbackInfo ci,
-                                                    OptionParser optionParser, OptionSpec optionSpec,
-                                                    OptionSpec optionSpec2, OptionSpec optionSpec3,
-                                                    OptionSpec optionSpec4, OptionSpec optionSpec5,
-                                                    OptionSpec optionSpec6, OptionSpec optionSpec7,
-                                                    OptionSpec optionSpec8, OptionSpec optionSpec9,
-                                                    OptionSpec optionSpec10, OptionSpec optionSpec11,
-                                                    OptionSpec optionSpec12, OptionSpec optionSpec13,
-                                                    OptionSpec optionSpec14, OptionSpec optionSpec15,
-                                                    OptionSet optionSet, Path path, Path path2,
-                                                    DedicatedServerSettings dedicatedServerSettings,
-                                                    Path path3, Eula eula, File file, Services services,
-                                                    String string, LevelStorageSource levelStorageSource,
-                                                    LevelStorageSource.LevelStorageAccess levelStorageAccess,
-                                                    Dynamic dynamic, Dynamic dynamic2, boolean bl) {
+    private static void banner$createBukkitDatapack(String[] strings, CallbackInfo ci, OptionParser optionParser, OptionSpec optionSpec, OptionSpec optionSpec2, OptionSpec optionSpec3, OptionSpec optionSpec4, OptionSpec optionSpec5, OptionSpec optionSpec6, OptionSpec optionSpec7, OptionSpec optionSpec8, OptionSpec optionSpec9, OptionSpec optionSpec10, OptionSpec optionSpec11, OptionSpec optionSpec12, OptionSpec optionSpec13, OptionSpec optionSpec14, OptionSpec optionSpec15, OptionSpec optionSpec16, OptionSet optionSet, Path path, Path path2, DedicatedServerSettings dedicatedServerSettings, Path path3, Eula eula, File file, Services services, String string, LevelStorageSource levelStorageSource, LevelStorageSource.LevelStorageAccess levelStorageAccess, Dynamic dynamic, Dynamic dynamic2, boolean bl) {
         // CraftBukkit start
         File bukkitDataPackFolder = new File(levelStorageAccess.getLevelPath(LevelResource.DATAPACK_DIR).toFile(), "bukkit");
         if (!bukkitDataPackFolder.exists()) {

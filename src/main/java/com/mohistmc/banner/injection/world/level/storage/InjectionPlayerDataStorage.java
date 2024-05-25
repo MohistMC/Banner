@@ -1,6 +1,8 @@
 package com.mohistmc.banner.injection.world.level.storage;
 
 import java.io.File;
+import java.util.Optional;
+
 import net.minecraft.nbt.CompoundTag;
 
 public interface InjectionPlayerDataStorage {
@@ -11,5 +13,16 @@ public interface InjectionPlayerDataStorage {
 
     default File getPlayerDir() {
         return null;
+    }
+
+    default Optional<CompoundTag> load(String name, String s1, String s) { // name, uuid, extension
+        return Optional.empty();
+    }
+
+    default Optional<CompoundTag> load(String name, String uuid) {
+        return Optional.empty();
+    }
+
+    default void backup(String name, String s1, String s) {
     }
 }

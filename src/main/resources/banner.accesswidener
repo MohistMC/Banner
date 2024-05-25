@@ -24,6 +24,8 @@ accessible method net/minecraft/world/entity/projectile/Arrow getPotionContents 
 accessible method net/minecraft/world/entity/projectile/Arrow setPotionContents (Lnet/minecraft/world/item/alchemy/PotionContents;)V
 accessible class net/minecraft/world/level/block/entity/BlockEntity$DataComponentInput
 accessible method net/minecraft/world/level/block/entity/BlockEntity$DataComponentInput getOrDefault (Lnet/minecraft/core/component/DataComponentType;Ljava/lang/Object;)Ljava/lang/Object;
+accessible method net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplateManager loadFromResource (Lnet/minecraft/resources/ResourceLocation;)Ljava/util/Optional;
+accessible method net/minecraft/nbt/ListTag <init> (Ljava/util/List;B)V
 
 # 1.20.4
 accessible field net/minecraft/world/entity/ai/attributes/AttributeModifier name Ljava/lang/String;

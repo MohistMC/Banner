@@ -8,6 +8,7 @@ import com.mohistmc.dynamicenum.MohistDynamEnum;
 import com.mojang.datafixers.DSL;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
@@ -39,6 +40,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.phys.AABB;
 import org.bukkit.Bukkit;
 import org.bukkit.TreeType;
+import org.bukkit.craftbukkit.CraftRegistry;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
@@ -68,35 +70,6 @@ public class BukkitExtraConstants {
 
             return list;
         }
-    }
-
-    public static ZombieVillager zombifyVillager(ServerLevel level, Villager villager, BlockPos blockPosition, boolean silent, CreatureSpawnEvent.SpawnReason spawnReason) {
-        villager.level().pushAddEntityReason(spawnReason);
-        villager.bridge$pushTransformReason(EntityTransformEvent.TransformReason.INFECTION);
-        ZombieVillager zombieVillager = villager.convertTo(EntityType.ZOMBIE_VILLAGER, false);
-        if (zombieVillager != null) {
-            zombieVillager.finalizeSpawn(level, level.getCurrentDifficultyAt(zombieVillager.blockPosition()), MobSpawnType.CONVERSION, new net.minecraft.world.entity.monster.Zombie.ZombieGroupData(false, true), null);
-            zombieVillager.setVillagerData(villager.getVillagerData());
-            zombieVillager.setGossips(villager.getGossips().store(NbtOps.INSTANCE));
-            zombieVillager.setTradeOffers(villager.getOffers().createTag());
-            zombieVillager.setVillagerXp(villager.getVillagerXp());
-            if (!silent) {
-                level.levelEvent(null, 1026, blockPosition, 0);
-            }
-        }
-        return zombieVillager;
-    }
-
-    public static BlockState getBlockState(BlockState blockState, CompoundTag nbt) {
-        StateDefinition<Block, BlockState> statecontainer = blockState.getBlock().getStateDefinition();
-        for (String s : nbt.getAllKeys()) {
-            Property<?> iproperty = statecontainer.getProperty(s);
-            if (iproperty != null) {
-                String s1 = nbt.get(s).getAsString();
-                blockState = BlockItem.updateState(blockState, iproperty, s1);
-            }
-        }
-        return blockState;
     }
 
     public static FallingBlockEntity fall(Level level, BlockPos pos, BlockState blockState, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason spawnReason) {
@@ -187,4 +160,10 @@ public class BukkitExtraConstants {
         return value;
     }
     // Spigot end
+
+    @Deprecated
+    public static RegistryAccess getDefaultRegistryAccess() {
+        return CraftRegistry.getMinecraftRegistry();
+    }
+    // CraftBukkit end
 }

@@ -91,7 +91,7 @@ public class CraftBlockProjectileSource implements BlockProjectileSource {
                 launch = new net.minecraft.world.entity.projectile.Arrow(world, iposition.x(), iposition.y(), iposition.z(), new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW));
             }
             ((net.minecraft.world.entity.projectile.AbstractArrow) launch).pickup = net.minecraft.world.entity.projectile.AbstractArrow.Pickup.ALLOWED;
-            ((net.minecraft.world.entity.projectile.AbstractArrow) launch).projectileSource = this;
+            ((net.minecraft.world.entity.projectile.AbstractArrow) launch).banner$setProjectileSource(this);
         } else if (Fireball.class.isAssignableFrom(projectile)) {
             double d0 = iposition.x() + (double) ((float) enumdirection.getStepX() * 0.3F);
             double d1 = iposition.y() + (double) ((float) enumdirection.getStepY() * 0.3F);
@@ -121,14 +121,14 @@ public class CraftBlockProjectileSource implements BlockProjectileSource {
                 ((AbstractHurtingProjectile) launch).zPower = d5 / d6 * 0.1D;
             }
 
-            ((AbstractHurtingProjectile) launch).projectileSource = this;
+            ((AbstractHurtingProjectile) launch).banner$setProjectileSource(this);
         }
 
         Preconditions.checkArgument(launch != null, "Projectile not supported");
 
         if (launch instanceof net.minecraft.world.entity.projectile.Projectile) {
             if (launch instanceof ThrowableProjectile) {
-                ((ThrowableProjectile) launch).projectileSource = this;
+                ((ThrowableProjectile) launch).banner$setProjectileSource(this);
             }
             // Values from DispenseBehaviorProjectile
             float a = 6.0F;

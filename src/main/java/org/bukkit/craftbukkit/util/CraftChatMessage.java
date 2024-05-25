@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.ClickEvent.Action;
@@ -190,7 +192,7 @@ public final class CraftChatMessage {
     }
 
     public static String toJSON(Component component) {
-        return Component.Serializer.toJson(component, MinecraftServer.getDefaultRegistryAccess());
+        return Component.Serializer.toJson(component, BukkitExtraConstants.getDefaultRegistryAccess());
     }
 
     public static String toJSONOrNull(Component component) {
@@ -201,7 +203,7 @@ public final class CraftChatMessage {
     public static Component fromJSON(String jsonMessage) throws JsonParseException {
         // Note: This also parses plain Strings to text components.
         // Note: An empty message (empty, or only consisting of whitespace) results in null rather than a parse exception.
-        return Component.Serializer.fromJson(jsonMessage, MinecraftServer.getDefaultRegistryAccess());
+        return Component.Serializer.fromJson(jsonMessage, BukkitExtraConstants.getDefaultRegistryAccess());
     }
 
     public static Component fromJSONOrNull(String jsonMessage) {
@@ -302,13 +304,13 @@ public final class CraftChatMessage {
         StringBuilder out = new StringBuilder();
 
         boolean hadFormat = false;
-        for (Component c : component) {
+        for (Component c : list(component)) {
             Style modi = c.getStyle();
             TextColor color = modi.getColor();
             if (c.getContents() != PlainTextContents.EMPTY || color != null) {
                 if (color != null) {
-                    if (color.format != null) {
-                        out.append(color.format);
+                    if (color.bridge$format() != null) {
+                        out.append(color.bridge$format());
                     } else {
                         out.append(ChatColor.COLOR_CHAR).append("x");
                         for (char magic : color.serialize().substring(1).toCharArray()) {
@@ -347,6 +349,16 @@ public final class CraftChatMessage {
             });
         }
         return out.toString();
+    }
+
+    public static ArrayList<Component> list(Component txt) {
+        ArrayList<Component> arr = new ArrayList<>();
+        if (!arr.contains(txt))
+            arr.add(txt);
+        for (Component tx : txt.getSiblings()) {
+            arr.addAll(list(tx) );
+        }
+        return arr;
     }
 
     public static Component fixComponent(MutableComponent component) {

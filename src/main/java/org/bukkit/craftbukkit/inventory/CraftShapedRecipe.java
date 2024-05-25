@@ -2,6 +2,8 @@ package org.bukkit.craftbukkit.inventory;
 
 import java.util.Map;
 import java.util.Optional;
+
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.NonNullList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -58,6 +60,6 @@ public class CraftShapedRecipe extends ShapedRecipe implements CraftRecipe {
                 data.set(i * width + j, this.toNMS(ingred.get(row.charAt(j)), false));
             }
         }
-        MinecraftServer.getServer().getRecipeManager().addRecipe(new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.getKey()), new net.minecraft.world.item.crafting.ShapedRecipe(this.getGroup(), CraftRecipe.getCategory(this.getCategory()), new ShapedRecipePattern(width, shape.length, data, Optional.empty()), CraftItemStack.asNMSCopy(this.getResult()))));
+        BukkitExtraConstants.getServer().getRecipeManager().addRecipe(new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.getKey()), new net.minecraft.world.item.crafting.ShapedRecipe(this.getGroup(), CraftRecipe.getCategory(this.getCategory()), new ShapedRecipePattern(width, shape.length, data, Optional.empty()), CraftItemStack.asNMSCopy(this.getResult()))));
     }
 }

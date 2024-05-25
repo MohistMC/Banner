@@ -1,5 +1,6 @@
 package org.bukkit.craftbukkit.inventory;
 
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.crafting.CustomRecipe;
@@ -31,6 +32,6 @@ public class CraftComplexRecipe implements CraftRecipe, ComplexRecipe {
 
     @Override
     public void addToCraftingManager() {
-        MinecraftServer.getServer().getRecipeManager().addRecipe(new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.key), this.recipe));
+        BukkitExtraConstants.getServer().getRecipeManager().addRecipe(new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.key), this.recipe));
     }
 }
