@@ -12,6 +12,7 @@ import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -103,9 +104,6 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Shadow public abstract double getZ();
 
     @Shadow protected abstract void handleNetherPortal();
-
-    @Shadow public abstract void setSecondsOnFire(int seconds);
-
     @Shadow protected abstract SoundEvent getSwimSound();
 
     @Shadow protected abstract SoundEvent getSwimSplashSound();
@@ -135,9 +133,6 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Shadow public abstract void setInvisible(boolean invisible);
 
     @Shadow @Nullable private Entity vehicle;
-
-    @Shadow public abstract void gameEvent(net.minecraft.world.level.gameevent.GameEvent event, @Nullable Entity entity);
-
     @Shadow public ImmutableList<Entity> passengers;
 
     @Shadow @Nullable public abstract Entity getFirstPassenger();
@@ -192,6 +187,11 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Shadow public abstract void setRemainingFireTicks(int remainingFireTicks);
 
     @Shadow private AABB bb;
+
+    @Shadow public abstract void igniteForSeconds(int i);
+
+    @Shadow public abstract void gameEvent(Holder<GameEvent> holder, @Nullable Entity entity);
+
     private CraftEntity bukkitEntity;
     public final org.spigotmc.ActivationRange.ActivationType activationType =
             org.spigotmc.ActivationRange.initializeEntityActivationType((Entity) (Object) this);
@@ -282,7 +282,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         }
     }
 
-    @Inject(method = "setSecondsOnFire", at = @At("HEAD"))
+    @Inject(method = "igniteForSeconds", at = @At("HEAD"))
     private void banner$setSecondsOnFire(int seconds, CallbackInfo ci) {
         setSecondsOnFire(seconds, true);
     }
@@ -394,27 +394,21 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         return ret;
     }
 
-    @Redirect(method = "lavaHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;setSecondsOnFire(I)V"))
+    @Redirect(method = "lavaHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(I)V"))
     public void banner$setOnFireFromLava$bukkitEvent(Entity entity, int seconds) {
         var damager = (lastLavaContact == null) ? null : CraftBlock.at(level, lastLavaContact);
-        CraftEventFactory.blockDamage = damager;
         if ((Object) this instanceof LivingEntity && remainingFireTicks <= 0) {
             var damagee = this.getBukkitEntity();
             EntityCombustEvent combustEvent = new EntityCombustByBlockEvent(damager, damagee, 15);
             Bukkit.getPluginManager().callEvent(combustEvent);
 
             if (!combustEvent.isCancelled()) {
-                this.setSecondsOnFire(combustEvent.getDuration());
+                this.igniteForSeconds(combustEvent.getDuration());
             }
         } else {
             // This will be called every single tick the entity is in lava, so don't throw an event
-            this.setSecondsOnFire(15);
+            this.igniteForSeconds(15);
         }
-    }
-
-    @Inject(method = "lavaHurt", at = @At("RETURN"))
-    private void banner$resetBlockDamage(CallbackInfo ci) {
-        CraftEventFactory.blockDamage = null;
     }
 
     @ModifyArg(method = "move", index = 1, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;stepOn(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/Entity;)V"))
@@ -679,7 +673,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         // CraftBukkit end
     }
 
-    @Redirect(method = "thunderHit", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;setSecondsOnFire(I)V"))
+    @Redirect(method = "thunderHit", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(I)V"))
     public void banner$onStruckByLightning$EntityCombustByEntityEvent0(Entity entity, int seconds) {
         final org.bukkit.entity.Entity thisBukkitEntity = this.getBukkitEntity();
         final org.bukkit.entity.Entity stormBukkitEntity = entity.getBukkitEntity();
@@ -688,7 +682,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         EntityCombustByEntityEvent entityCombustEvent = new EntityCombustByEntityEvent(stormBukkitEntity, thisBukkitEntity, 8);
         pluginManager.callEvent(entityCombustEvent);
         if (!entityCombustEvent.isCancelled()) {
-            this.setSecondsOnFire(entityCombustEvent.getDuration());
+            this.igniteForSeconds(entityCombustEvent.getDuration());
         }
         // CraftBukkit end
     }
@@ -727,9 +721,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         if (this.fireImmune()) {
             return false;
         }
-        CraftEventFactory.entityDamage = instance;
         if (!this.hurt(this.damageSources().lightningBolt(), amount)) {
-            CraftEventFactory.entityDamage = null;
             return false;
         }
         return true;

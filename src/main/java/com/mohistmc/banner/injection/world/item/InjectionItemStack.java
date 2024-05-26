@@ -6,9 +6,6 @@ import org.jetbrains.annotations.Nullable;
 
 public interface InjectionItemStack {
 
-    default void convertStack(int version) {
-    }
-
     default void load(CompoundTag nbttagcompound) {
     }
 
