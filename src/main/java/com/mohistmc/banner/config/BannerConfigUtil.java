@@ -44,10 +44,10 @@ public class BannerConfigUtil {
     public static String defaultSource() {
         String key = "banner.libraries_downloadsource";
         if (yml.get(key) == null) {
-            yml.set(key, DownloadSource.defaultSource.name());
+            yml.set(key, DownloadSource.MOHIST.name());
             save();
         }
-        return yml.getString(key, DownloadSource.defaultSource.name());
+        return yml.getString(key, DownloadSource.MOHIST.name());
     }
 
     public static boolean aBoolean(String key, boolean defaultReturn) {
