@@ -35,10 +35,6 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity implements Inje
 
     @Shadow public int levels;
 
-    @Shadow @Nullable public MobEffect secondaryPower;
-
-    @Shadow @Nullable public MobEffect primaryPower;
-
     public MixinBeaconBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
     }

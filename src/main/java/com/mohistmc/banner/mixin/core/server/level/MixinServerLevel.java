@@ -53,6 +53,7 @@ import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
@@ -213,10 +214,10 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     }
 
     @Inject(method = "gameEvent", cancellable = true, at = @At("HEAD"))
-    private void banner$gameEventEvent(GameEvent gameEvent, Vec3 pos, GameEvent.Context context, CallbackInfo ci) {
+    private void banner$gameEventEvent(Holder<GameEvent> holder, Vec3 vec3, GameEvent.Context context, CallbackInfo ci) {
         var entity = context.sourceEntity();
-        var i = gameEvent.getNotificationRadius();
-        GenericGameEvent event = new GenericGameEvent(org.bukkit.GameEvent.getByKey(CraftNamespacedKey.fromMinecraft(BuiltInRegistries.GAME_EVENT.getKey(gameEvent))), new Location(this.getWorld(), pos.x(), pos.y(), pos.z()), (entity == null) ? null : entity.getBukkitEntity(), i, !Bukkit.isPrimaryThread());
+        var i = holder.value().notificationRadius();
+        GenericGameEvent event = new GenericGameEvent(org.bukkit.GameEvent.getByKey(CraftNamespacedKey.fromMinecraft(BuiltInRegistries.GAME_EVENT.getKey(holder.value()))), new Location(this.getWorld(), vec3.x(), vec3.y(), vec3.z()), (entity == null) ? null : entity.getBukkitEntity(), i, !Bukkit.isPrimaryThread());
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             ci.cancel();
@@ -345,7 +346,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         // CraftBukkit start - moved from MinecraftServer.saveAllChunks
         if (this.serverLevelData instanceof PrimaryLevelData worldInfo) {
             worldInfo.setWorldBorder(this.getWorldBorder().createSettings());
-            worldInfo.setCustomBossEvents(this.getServer().getCustomBossEvents().save());
+            worldInfo.setCustomBossEvents(this.getServer().getCustomBossEvents().save(this.registryAccess()));
             this.convertable.saveDataTag(this.getServer().registryAccess(), worldInfo, this.getServer().getPlayerList().getSingleplayerData());
         }
         // CraftBukkit end
@@ -441,23 +442,23 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     }
 
     @Inject(method = "getMapData", at = @At("RETURN"))
-    private void banner$getMapSetId(String id, CallbackInfoReturnable<MapItemSavedData> cir) {
+    private void banner$getMapSetId(MapId mapId, CallbackInfoReturnable<MapItemSavedData> cir) {
         var data = cir.getReturnValue();
         if (data != null) {
-            data.banner$setId(id);
+            data.banner$setId(mapId.key());
         }
     }
 
     @Inject(method = "setMapData", at = @At("HEAD"))
-    private void banner$setMapSetId(String id, MapItemSavedData data, CallbackInfo ci) {
-        data.banner$setId(id);
-        MapInitializeEvent event = new MapInitializeEvent(data.bridge$mapView());
+    private void banner$setMapSetId(MapId mapId, MapItemSavedData mapItemSavedData, CallbackInfo ci) {
+        mapItemSavedData.banner$setId(mapId.key());
+        MapInitializeEvent event = new MapInitializeEvent(mapItemSavedData.bridge$mapView());
         Bukkit.getServer().getPluginManager().callEvent(event);
     }
 
     @Inject(method = "setMapData", at = @At("HEAD"))
-    private void banner$mapSetId(String id, MapItemSavedData data, CallbackInfo ci) {
-        data.banner$setId(id);
+    private void banner$mapSetId(MapId mapId, MapItemSavedData mapItemSavedData, CallbackInfo ci) {
+        mapItemSavedData.banner$setId(mapId.key());
     }
 
     @Inject(method = "blockUpdated", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;updateNeighborsAt(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;)V"))

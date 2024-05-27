@@ -39,6 +39,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Attackable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -88,7 +89,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(LivingEntity.class)
-public abstract class MixinLivingEntity extends Entity implements InjectionLivingEntity {
+public abstract class MixinLivingEntity extends Entity implements Attackable, InjectionLivingEntity {
 
     @Shadow @Final public static EntityDataAccessor<Float> DATA_HEALTH_ID;
     @Shadow @Final private AttributeMap attributes;
@@ -217,6 +218,8 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
 
     @Shadow @Nullable public abstract AttributeInstance getAttribute(Holder<Attribute> holder);
 
+    @Shadow public abstract boolean hasEffect(Holder<MobEffect> holder);
+
     public MixinLivingEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }
@@ -318,6 +321,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
      * @author wdog5
      * @reason
      */
+    /*
     @Overwrite
     protected void tickEffects() {
         this.isTickingEffects = true;
@@ -385,10 +389,10 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
                 double d0 = (double) (i >> 16 & 255) / 255.0D;
                 double d1 = (double) (i >> 8 & 255) / 255.0D;
                 double d2 = (double) (i >> 0 & 255) / 255.0D;
-                this.level().addParticle(flag1 ? ParticleTypes.AMBIENT_ENTITY_EFFECT : ParticleTypes.ENTITY_EFFECT, this.getX() + (this.random.nextDouble() - 0.5D) * (double) this.getBbWidth(), this.getY() + this.random.nextDouble() * (double) this.getBbHeight(), this.getZ() + (this.random.nextDouble() - 0.5D) * (double) this.getBbWidth(), d0, d1, d2);
+                this.level().addParticle(flag1 ? ParticleTypes.A : ParticleTypes.ENTITY_EFFECT, this.getX() + (this.random.nextDouble() - 0.5D) * (double) this.getBbWidth(), this.getY() + this.random.nextDouble() * (double) this.getBbHeight(), this.getZ() + (this.random.nextDouble() - 0.5D) * (double) this.getBbWidth(), d0, d1, d2);
             }
         }
-    }
+    }*/
 
     // @Shadow public abstract boolean addEffect(MobEffectInstance effectInstanceIn, Entity entity);
 
@@ -421,7 +425,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
                 return false;
             }
             if (effectinstance == null) {
-                this.activeEffects.put(effectInstanceIn.getEffect(), effectInstanceIn);
+               // this.activeEffects.put(effectInstanceIn.getEffect(), effectInstanceIn); // Banner TODO
                 this.onEffectAdded(effectInstanceIn, entity);
                 return true;
             } else if (event.isOverride()) {
@@ -435,16 +439,17 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     }
 
     @SuppressWarnings("unused") // mock
+    /*
     public MobEffectInstance c(@Nullable MobEffect potioneffectin, EntityPotionEffectEvent.Cause cause) {
         pushEffectCause(cause);
         return removeEffectNoUpdate(potioneffectin);
-    }
+    }*/
 
     @Inject(method = "removeEffectNoUpdate", cancellable = true, at = @At("HEAD"))
     public void banner$clearActive(Holder<MobEffect> holder, CallbackInfoReturnable<MobEffectInstance> cir) {
         EntityPotionEffectEvent.Cause cause = getEffectCause().orElse(EntityPotionEffectEvent.Cause.UNKNOWN);
         if (isTickingEffects) {
-            effectsToProcess.add(new ProcessableEffect(holder, cause));
+            effectsToProcess.add(new ProcessableEffect(holder.value(), cause));
             cir.setReturnValue(null);
             return;
         }
@@ -646,6 +651,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
 
     @Override
     public boolean damageEntity0(DamageSource damagesource, float f) {
+        /*
         if (!this.isInvulnerableTo(damagesource)) {
             final boolean human = ((LivingEntity) (Object) this) instanceof Player;
             if (f <= 0) return banner$damageResult = true;
@@ -685,7 +691,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
                 @Override
                 public Double apply(Double f) {
                     if (!damagesource.is(DamageTypeTags.BYPASSES_EFFECTS) && hasEffect(MobEffects.DAMAGE_RESISTANCE) && !damagesource.is(DamageTypeTags.BYPASSES_RESISTANCE)) {
-                        int i = (getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier() + 1) * 5;
+                        int i = (this.getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier() + 1) * 5;
                         int j = 25 - i;
                         float f1 = f.floatValue() * (float) j;
                         return -(f - (f1 / 25.0F));
@@ -816,6 +822,8 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
             }
         }
         return banner$damageResult = false; // CraftBukkit
+         */
+        return true;
     }
 
     private transient EntityRegainHealthEvent.RegainReason banner$regainReason;
@@ -854,12 +862,6 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
                     remap = false))
     private void banner$logNamedDeaths(Logger instance, String s, Object o1, Object o2) {
         if (org.spigotmc.SpigotConfig.logNamedDeaths) LOGGER.info("Named entity {} died: {}", ((LivingEntity) (Object) this), this.getCombatTracker().getDeathMessage().getString()); // Spigot
-    }
-
-    @Override
-    public boolean removeEffect(MobEffect effect, EntityPotionEffectEvent.Cause cause) {
-        pushEffectCause(cause);
-        return removeEffect(effect);
     }
 
     @Override
@@ -1000,7 +1002,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
 
     @Inject(method = "addEatEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;addEffect(Lnet/minecraft/world/effect/MobEffectInstance;)Z"))
     public void banner$foodEffectCause(FoodProperties foodProperties, CallbackInfo ci) {
-        livingEntity.pushEffectCause(EntityPotionEffectEvent.Cause.FOOD);
+        ((LivingEntity) (Object) this).pushEffectCause(EntityPotionEffectEvent.Cause.FOOD);
     }
 
     @Inject(method = "setArrowCount", cancellable = true, at = @At("HEAD"))
@@ -1039,11 +1041,11 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     @Override
     public void equipEventAndSound(EquipmentSlot slot, ItemStack oldItem, ItemStack newItem, boolean silent) {
         boolean flag = newItem.isEmpty() && oldItem.isEmpty();
-        if (!flag && !ItemStack.isSameItemSameTags(oldItem, newItem) && !this.firstTick) {
+        if (!flag && !ItemStack.isSameItem(oldItem, newItem) && !this.firstTick) {
             Equipable equipable = Equipable.get(newItem);
             if (equipable != null && !this.isSpectator() && equipable.getEquipmentSlot() == slot) {
                 if (!this.level().isClientSide() && !this.isSilent() && !silent) {
-                    this.level().playSound(null, this.getX(), this.getY(), this.getZ(), equipable.getEquipSound(), this.getSoundSource(), 1.0F, 1.0F);
+                    this.level().playSound(null, this.getX(), this.getY(), this.getZ(), equipable.getEquipSound().value(), this.getSoundSource(), 1.0F, 1.0F);
                 }
 
                 if (this.doesEmitEquipEvent(slot)) {
@@ -1056,7 +1058,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
 
     @Override
     public void setItemSlot(EquipmentSlot slotIn, ItemStack stack, boolean silent) {
-        this.setItemSlot(slotIn, stack);
+        this.setItemSlot(slotIn, stack, silent);
     }
 
     @Override

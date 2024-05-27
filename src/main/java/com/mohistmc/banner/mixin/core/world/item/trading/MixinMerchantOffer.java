@@ -4,6 +4,7 @@ import com.mohistmc.banner.asm.annotation.CreateConstructor;
 import com.mohistmc.banner.asm.annotation.ShadowConstructor;
 import com.mohistmc.banner.injection.world.item.trading.InjectionMerchantOffer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
 import org.bukkit.craftbukkit.inventory.CraftMerchantRecipe;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,10 +17,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(MerchantOffer.class)
 public abstract class MixinMerchantOffer implements InjectionMerchantOffer {
 
-    @Shadow public ItemStack baseCostA;
-
     @Shadow public abstract ItemStack getCostA();
 
+    @Shadow public ItemCost baseCostA;
     private CraftMerchantRecipe bukkitHandle;
 
     @ShadowConstructor
@@ -40,7 +40,7 @@ public abstract class MixinMerchantOffer implements InjectionMerchantOffer {
 
     @Inject(method = "getCostA", cancellable = true, at = @At("HEAD"))
     private void banner$fix(CallbackInfoReturnable<ItemStack> cir) {
-        if (this.baseCostA.getCount() <= 0) {
+        if (this.baseCostA.count() <= 0) {
             cir.setReturnValue(ItemStack.EMPTY);
         }
     }

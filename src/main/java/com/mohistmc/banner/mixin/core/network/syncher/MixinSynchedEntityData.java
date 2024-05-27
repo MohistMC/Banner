@@ -2,13 +2,9 @@ package com.mohistmc.banner.mixin.core.network.syncher;
 
 import com.mohistmc.banner.injection.network.syncher.InjectionSynchedEntityData;
 import java.util.List;
-import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -19,10 +15,6 @@ public abstract class MixinSynchedEntityData implements InjectionSynchedEntityDa
 
     @Shadow private boolean isDirty;
     @Shadow @Nullable public abstract List<SynchedEntityData.DataValue<?>> getNonDefaultValues();
-
-    @Shadow @Final private Entity entity;
-
-    @Shadow public abstract boolean isDirty();
 
     @Override
     public <T> void markDirty(EntityDataAccessor<T> datawatcherobject) {

@@ -120,7 +120,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
      */
     @Overwrite
     public void handleBlockBreakAction(BlockPos blockposition, ServerboundPlayerActionPacket.Action packetplayinblockdig_enumplayerdigtype, Direction enumdirection, int i, int j) {
-        if (this.player.getEyePosition().distanceToSqr(Vec3.atCenterOf(blockposition)) > ServerGamePacketListenerImpl.MAX_INTERACTION_DISTANCE) {
+        if (!this.player.canInteractWithBlock(blockposition, 1.0)) {
             this.debugLogging(blockposition, false, j, "too far");
         } else if (blockposition.getY() >= i) {
             this.player.connection.send(new ClientboundBlockUpdatePacket(blockposition, this.level.getBlockState(blockposition)));
@@ -424,7 +424,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
             boolean bl2 = player.isSecondaryUseActive() && bl;
             ItemStack itemStack = stack.copy();
             if (!bl2) {
-                enuminteractionresult = blockState.use(level, player, hand, hitResult);
+                enuminteractionresult = blockState.useWithoutItem(level, player, hitResult);
                 if (enuminteractionresult.consumesAction()) {
                     CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger(player, blockPos, itemStack);
                     return enuminteractionresult;

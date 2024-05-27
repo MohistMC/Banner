@@ -16,14 +16,4 @@ public class MixinFireworkRocketEntity {
             ci.cancel();
         }
     }
-
-    @Inject(method = "dealExplosionDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
-    private void banner$damageSource(CallbackInfo ci) {
-        CraftEventFactory.entityDamage = (FireworkRocketEntity) (Object) this;
-    }
-
-    @Inject(method = "dealExplosionDamage", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/LivingEntity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
-    private void banner$damageSourceReset(CallbackInfo ci) {
-        CraftEventFactory.entityDamage = null;
-    }
 }

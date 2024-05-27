@@ -70,8 +70,10 @@ public abstract class MixinShearsDispenseItemBehavior extends OptionalDispenseIt
         if (!level.isClientSide()) {
             BlockPos blockPos = source.pos().relative((Direction)source.state().getValue(DispenserBlock.FACING));
             this.setSuccess(tryShearBeehive((ServerLevel)level, blockPos) || tryShearLivingEntity((ServerLevel)level, blockPos, bukkitBlock, craftItem)); // CraftBukkit
-            if (this.isSuccess() && stack.hurt(1, level.getRandom(), (ServerPlayer)null)) {
-                stack.setCount(0);
+            if (this.isSuccess()) {
+                stack.hurtAndBreak(1, level.getRandom(), (ServerPlayer)null, () -> {
+                    stack.setCount(0);
+                });
             }
         }
 

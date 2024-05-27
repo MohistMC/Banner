@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+
+import com.mohistmc.banner.bukkit.BannerLecternInventory;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.MerchantContainer;
@@ -493,7 +495,7 @@ public class CraftInventory implements Inventory {
             return InventoryType.SHULKER_BOX;
         } else if (this.inventory instanceof BarrelBlockEntity) {
             return InventoryType.BARREL;
-        } else if (this.inventory instanceof LecternBlockEntity.LecternInventory) {
+        } else if (this.inventory instanceof BannerLecternInventory) {
             return InventoryType.LECTERN;
         } else if (this.inventory instanceof ChiseledBookShelfBlockEntity) {
             return InventoryType.CHISELED_BOOKSHELF;

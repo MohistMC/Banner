@@ -21,6 +21,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.LightChunkGetter;
 import net.minecraft.world.level.chunk.storage.ChunkStorage;
+import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.entity.ChunkStatusUpdateListener;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
@@ -48,11 +49,11 @@ public abstract class MixinChunkMap extends ChunkStorage implements InjectionChu
     @Shadow @Final @Mutable private RandomState randomState;
     // @formatter:on
 
-    public final BukkitCallbackExecutor callbackExecutor = new BukkitCallbackExecutor();
-
-    public MixinChunkMap(Path path, DataFixer dataFixer, boolean bl) {
-        super(path, dataFixer, bl);
+    public MixinChunkMap(RegionStorageInfo regionStorageInfo, Path path, DataFixer dataFixer, boolean bl) {
+        super(regionStorageInfo, path, dataFixer, bl);
     }
+
+    public final BukkitCallbackExecutor callbackExecutor = new BukkitCallbackExecutor();
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$updateRandom(ServerLevel serverLevel, LevelStorageSource.LevelStorageAccess levelStorageAccess, DataFixer dataFixer, StructureTemplateManager structureTemplateManager, Executor executor, BlockableEventLoop blockableEventLoop, LightChunkGetter lightChunkGetter, ChunkGenerator chunkGenerator, ChunkProgressListener chunkProgressListener, ChunkStatusUpdateListener chunkStatusUpdateListener, Supplier supplier, int i, boolean bl, CallbackInfo ci) {

@@ -8,8 +8,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.handshake.ClientIntent;
 import net.minecraft.network.protocol.handshake.ClientIntentionPacket;
+import net.minecraft.network.protocol.handshake.ServerHandshakePacketListener;
 import net.minecraft.network.protocol.login.ClientboundLoginDisconnectPacket;
+import net.minecraft.network.protocol.login.LoginProtocols;
 import net.minecraft.network.protocol.status.ServerStatus;
+import net.minecraft.network.protocol.status.StatusProtocols;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerHandshakePacketListenerImpl;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
@@ -21,7 +24,7 @@ import org.spongepowered.asm.mixin.Shadow;
 
 //TODO fixed
 @Mixin(ServerHandshakePacketListenerImpl.class)
-public class MixinServerHandshakePacketListenerImpl {
+public abstract class MixinServerHandshakePacketListenerImpl implements ServerHandshakePacketListener {
 
     private static final HashMap<InetAddress, Long> throttleTracker = new HashMap<>();
     private static int throttleCounter = 0;
@@ -29,6 +32,8 @@ public class MixinServerHandshakePacketListenerImpl {
     @Shadow @Final private Connection connection;
     @Shadow @Final private MinecraftServer server;
     @Shadow @Final private static Component IGNORE_STATUS_REASON;
+
+    @Shadow protected abstract void beginLogin(ClientIntentionPacket clientIntentionPacket, boolean bl);
 
     /**
      * @author wdog5
@@ -39,7 +44,7 @@ public class MixinServerHandshakePacketListenerImpl {
         this.connection.banner$setHostName(packet.hostName + ":" + packet.port); // CraftBukkit  - set hostname
         switch (packet.intention()) {
             case LOGIN -> {
-                this.connection.setClientboundProtocolAfterHandshake(ClientIntent.LOGIN);
+                this.beginLogin(packet, false);
                 // CraftBukkit start - Connection throttle
                 try {
                     long currentTime = System.currentTimeMillis();
@@ -85,14 +90,13 @@ public class MixinServerHandshakePacketListenerImpl {
                     this.connection.send(new ClientboundLoginDisconnectPacket(component));
                     this.connection.disconnect(component);
                 } else {
-                    this.connection.setListener(new ServerLoginPacketListenerImpl(this.server, this.connection));
+                    this.connection.setupInboundProtocol(LoginProtocols.SERVERBOUND, new ServerLoginPacketListenerImpl(this.server, this.connection, false));
                 }
             }
             case STATUS -> {
                 ServerStatus serverStatus = this.server.getStatus();
                 if (this.server.repliesToStatus() && serverStatus != null) {
-                    this.connection.setClientboundProtocolAfterHandshake(ClientIntent.STATUS);
-                    this.connection.setListener(new ServerStatusPacketListenerImpl(serverStatus, this.connection));
+                    this.connection.setupInboundProtocol(StatusProtocols.SERVERBOUND, new ServerStatusPacketListenerImpl(serverStatus, this.connection));
                 } else {
                     this.connection.disconnect(IGNORE_STATUS_REASON);
                 }
