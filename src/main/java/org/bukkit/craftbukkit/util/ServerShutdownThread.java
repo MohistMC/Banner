@@ -16,7 +16,7 @@ public class ServerShutdownThread extends Thread {
             this.server.close();
         } finally {
             try {
-                this.server.reader.getTerminal().restore();
+                this.server.bridge$reader().getTerminal().restore();
             } catch (Exception e) {
             }
         }

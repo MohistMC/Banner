@@ -1,6 +1,7 @@
 package org.bukkit.craftbukkit.entity;
 
 import com.google.common.base.Preconditions;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.monster.Zombie;
@@ -92,7 +93,7 @@ public class CraftVillager extends CraftAbstractVillager implements Villager {
         Preconditions.checkArgument(location != null, "Location cannot be null");
         Preconditions.checkArgument(location.getWorld() != null, "Location needs to be in a world");
         Preconditions.checkArgument(location.getWorld().equals(this.getWorld()), "Cannot sleep across worlds");
-        Preconditions.checkState(!this.getHandle().generation, "Cannot sleep during world generation");
+        Preconditions.checkState(!this.getHandle().bridge$generation(), "Cannot sleep during world generation");
 
         BlockPos position = CraftLocation.toBlockPosition(location);
         BlockState iblockdata = this.getHandle().level().getBlockState(position);
@@ -107,7 +108,7 @@ public class CraftVillager extends CraftAbstractVillager implements Villager {
     @Override
     public void wakeup() {
         Preconditions.checkState(this.isSleeping(), "Cannot wakeup if not sleeping");
-        Preconditions.checkState(!this.getHandle().generation, "Cannot wakeup during world generation");
+        Preconditions.checkState(!this.getHandle().bridge$generation(), "Cannot wakeup during world generation");
 
         this.getHandle().stopSleeping();
     }
@@ -119,7 +120,7 @@ public class CraftVillager extends CraftAbstractVillager implements Villager {
 
     @Override
     public ZombieVillager zombify() {
-        net.minecraft.world.entity.monster.ZombieVillager entityzombievillager = Zombie.zombifyVillager(this.getHandle().level().getMinecraftWorld(), this.getHandle(), this.getHandle().blockPosition(), this.isSilent(), CreatureSpawnEvent.SpawnReason.CUSTOM);
+        net.minecraft.world.entity.monster.ZombieVillager entityzombievillager = BukkitExtraConstants.zombifyVillager(this.getHandle().level().getMinecraftWorld(), this.getHandle(), this.getHandle().blockPosition(), this.isSilent(), CreatureSpawnEvent.SpawnReason.CUSTOM);
         return (entityzombievillager != null) ? (ZombieVillager) entityzombievillager.getBukkitEntity() : null;
     }
 

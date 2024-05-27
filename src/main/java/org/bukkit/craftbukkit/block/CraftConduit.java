@@ -2,6 +2,8 @@ package org.bukkit.craftbukkit.block;
 
 import java.util.ArrayList;
 import java.util.Collection;
+
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.ConduitBlockEntity;
 import net.minecraft.world.phys.AABB;
@@ -73,7 +75,7 @@ public class CraftConduit extends CraftBlockEntityState<ConduitBlockEntity> impl
     public int getRange() {
         this.ensureNoWorldGeneration();
         ConduitBlockEntity conduit = (ConduitBlockEntity) this.getTileEntityFromWorld();
-        return (conduit != null) ? ConduitBlockEntity.getRange(conduit.effectBlocks) : 0;
+        return (conduit != null) ? BukkitExtraConstants.getRange(conduit.effectBlocks) : 0;
     }
 
     @Override
@@ -101,7 +103,7 @@ public class CraftConduit extends CraftBlockEntityState<ConduitBlockEntity> impl
             conduit.destroyTargetUUID = target.getUniqueId();
         }
 
-        ConduitBlockEntity.updateDestroyTarget(conduit.getLevel(), this.getPosition(), this.data, conduit.effectBlocks, conduit, false);
+        ConduitBlockEntity.updateDestroyTarget(conduit.getLevel(), this.getPosition(), this.data, conduit.effectBlocks, conduit); // Banner TODO
         return true;
     }
 

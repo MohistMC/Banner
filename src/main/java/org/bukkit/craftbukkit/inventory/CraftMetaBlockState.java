@@ -211,7 +211,7 @@ public class CraftMetaBlockState extends CraftMetaItem implements BlockStateMeta
             this.blockEntityTag.applyComponents(track, tag);
             // Mark applied components as handled
             for (DataComponentType<?> seen : track.seen) {
-                this.unhandledTags.clear(seen);
+                this.unhandledTags.remove(seen);
             }
         }
     }

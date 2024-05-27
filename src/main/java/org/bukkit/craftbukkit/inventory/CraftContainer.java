@@ -213,7 +213,7 @@ public class CraftContainer extends AbstractContainerMenu {
                 this.delegate = new BlastFurnaceMenu(windowId, bottom, top, new SimpleContainerData(4));
                 break;
             case LECTERN:
-                this.delegate = new LecternMenu(windowId, top, new SimpleContainerData(1), bottom);
+                this.delegate = new LecternMenu(windowId);
                 break;
             case SMOKER:
                 this.delegate = new SmokerMenu(windowId, bottom, top, new SimpleContainerData(4));

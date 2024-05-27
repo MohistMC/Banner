@@ -30,7 +30,7 @@ public abstract class MixinIngredient implements InjectionIngredient {
         for (ItemStack banner$stack : this.getItems()) {
             // CraftBukkit start
             if (exact) {
-                if (ItemStack.isSameItemSameTags(banner$stack, stack)) {
+                if (ItemStack.isSameItemSameComponents(banner$stack, stack)) {
                     cir.setReturnValue(true);
                 }
                 continue;

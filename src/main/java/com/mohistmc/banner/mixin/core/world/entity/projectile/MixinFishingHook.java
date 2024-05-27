@@ -70,10 +70,11 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
         super(entityType, level);
     }
 
+    /*
     @Redirect(method = "checkCollision", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/FishingHook;onHit(Lnet/minecraft/world/phys/HitResult;)V"))
     private void banner$collide(FishingHook fishingHook, HitResult hitResult) {
         this.preOnHit(hitResult);
-    }
+    }*/
 
     @Inject(method = "catchingFish", at = @At(value = "FIELD", shift = At.Shift.AFTER, ordinal = 0, target = "Lnet/minecraft/world/entity/projectile/FishingHook;timeUntilHooked:I"))
     private void banner$attemptFail(BlockPos blockPos, CallbackInfo ci) {
@@ -145,7 +146,7 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
                 i = this.hookedIn instanceof ItemEntity ? 3 : 5;
             } else if (this.nibble > 0) {
                 LootParams lootparams = (new LootParams.Builder((ServerLevel) this.level())).withParameter(LootContextParams.ORIGIN, this.position()).withParameter(LootContextParams.TOOL, itemstack).withParameter(LootContextParams.THIS_ENTITY, this).withLuck((float) this.luck + entityhuman.getLuck()).create(LootContextParamSets.FISHING);
-                LootTable loottable = this.level().getServer().getLootData().getLootTable(BuiltInLootTables.FISHING);
+                LootTable loottable = this.level().getServer().reloadableRegistries().getLootTable(BuiltInLootTables.FISHING);
                 List<ItemStack> list = loottable.getRandomItems(lootparams);
 
                 CriteriaTriggers.FISHING_ROD_HOOKED.trigger((ServerPlayer) entityhuman, itemstack, ((FishingHook) (Object) this), list);

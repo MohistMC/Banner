@@ -1952,7 +1952,7 @@ public final class Bukkit {
      */
     @NotNull
     public static double[] getTPS() {
-        return server.getTPS();
+        return new double[0];
     }
 
     /**

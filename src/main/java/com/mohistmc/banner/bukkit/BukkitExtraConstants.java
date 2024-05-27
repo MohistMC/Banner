@@ -166,4 +166,50 @@ public class BukkitExtraConstants {
         return CraftRegistry.getMinecraftRegistry();
     }
     // CraftBukkit end
+
+    public static int getRange(List<BlockPos> list) {
+        int i = list.size();
+        int j = i / 7 * 16;
+        return j;
+    }
+
+    public static AABB calculateBoundingBox(Entity entity, BlockPos blockPosition, Direction direction, int width, int height) {
+        double d0 = 0.46875;
+        double locX = blockPosition.getX() + 0.5 - direction.getStepX() * 0.46875;
+        double locY = blockPosition.getY() + 0.5 - direction.getStepY() * 0.46875;
+        double locZ = blockPosition.getZ() + 0.5 - direction.getStepZ() * 0.46875;
+        if (entity != null) {
+            entity.setPosRaw(locX, locY, locZ);
+        }
+        double d2 = width;
+        double d3 = height;
+        double d4 = width;
+        Direction.Axis enumdirection_enumaxis = direction.getAxis();
+        switch (enumdirection_enumaxis) {
+            case X -> d2 = 1.0;
+            case Y -> d3 = 1.0;
+            case Z -> d4 = 1.0;
+        }
+        d2 /= 32.0;
+        d3 /= 32.0;
+        d4 /= 32.0;
+        return new AABB(locX - d2, locY - d3, locZ - d4, locX + d2, locY + d3, locZ + d4);
+    }
+
+    public static ZombieVillager zombifyVillager(ServerLevel level, Villager villager, BlockPos blockPosition, boolean silent, CreatureSpawnEvent.SpawnReason spawnReason) {
+        villager.level().pushAddEntityReason(spawnReason);
+        villager.bridge$pushTransformReason(EntityTransformEvent.TransformReason.INFECTION);
+        ZombieVillager zombieVillager = villager.convertTo(EntityType.ZOMBIE_VILLAGER, false);
+        if (zombieVillager != null) {
+            zombieVillager.finalizeSpawn(level, level.getCurrentDifficultyAt(zombieVillager.blockPosition()), MobSpawnType.CONVERSION, new net.minecraft.world.entity.monster.Zombie.ZombieGroupData(false, true));
+            zombieVillager.setVillagerData(villager.getVillagerData());
+            zombieVillager.setGossips(villager.getGossips().store(NbtOps.INSTANCE));
+            zombieVillager.setTradeOffers(villager.getOffers().copy());
+            zombieVillager.setVillagerXp(villager.getVillagerXp());
+            if (!silent) {
+                level.levelEvent(null, 1026, blockPosition, 0);
+            }
+        }
+        return zombieVillager;
+    }
 }

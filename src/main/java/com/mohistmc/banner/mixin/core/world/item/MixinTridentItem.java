@@ -3,6 +3,7 @@ package com.mohistmc.banner.mixin.core.world.item;
 import java.util.function.Consumer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrownTrident;
@@ -22,8 +23,8 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(TridentItem.class)
 public class MixinTridentItem {
 
-    @Redirect(method = "releaseUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;hurtAndBreak(ILnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;)V"))
-    public void banner$cancelBreak(ItemStack stack, int amount, LivingEntity entityIn, Consumer<LivingEntity> onBroken) {
+    @Redirect(method = "releaseUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;hurtAndBreak(ILnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;)V"))
+    public void banner$cancelBreak(ItemStack instance, int i, LivingEntity livingEntity, EquipmentSlot equipmentSlot) {
     }
 
     @Redirect(method = "releaseUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
@@ -43,8 +44,7 @@ public class MixinTridentItem {
             }
             ci.cancel();
         }
-        stack.hurtAndBreak(1, player, (entity) ->
-                entity.broadcastBreakEvent(livingEntity.getUsedItemHand()));
+        stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(livingEntity.getUsedItemHand()));
         ((ThrownTrident) thrownTrident).pickupItemStack = stack.copy();// SPIGOT-4511 update since damage call moved
         // CraftBukkkit end
     }
@@ -59,9 +59,7 @@ public class MixinTridentItem {
         if (i >= 10) {
             if (j <= 0 || player.isInWaterOrRain()) {
                 if (!level.isClientSide && j != 0) {
-                    stack.hurtAndBreak(1, player, (entityhuman1) -> {
-                        entityhuman1.broadcastBreakEvent(livingEntity.getUsedItemHand());
-                    });
+                    stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(livingEntity.getUsedItemHand()));
                     // CraftBukkkit end
                 }
             }

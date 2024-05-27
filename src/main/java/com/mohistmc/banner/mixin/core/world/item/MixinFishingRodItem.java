@@ -5,6 +5,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.FishingRodItem;
@@ -35,9 +36,7 @@ public class MixinFishingRodItem extends Item{
         if (player.fishing != null) {
             if (!level.isClientSide) {
                 int i = player.fishing.retrieve(itemstack);
-                itemstack.hurtAndBreak(i, player, (p_41288_) -> {
-                    p_41288_.broadcastBreakEvent(interactionHand);
-                });
+                itemstack.hurtAndBreak(i, player, LivingEntity.getSlotForHand(interactionHand));
             }
 
             level.playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.FISHING_BOBBER_RETRIEVE, SoundSource.NEUTRAL, 1.0F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));

@@ -17,9 +17,10 @@ public abstract class MixinPlayerHeadItem extends Item {
         super(properties);
     }
 
+    /*
     @Inject(method = "verifyComponentsAfterLoad", at = @At("TAIL"))
     private void banner$verifyTag(ItemStack itemStack, CallbackInfo ci) {
-        boolean banner$flag = compoundTag.contains("SkullOwner", 8)
+        boolean banner$flag = components().get("SkullOwner", 8)
                 && !Util.isBlank(compoundTag.getString("SkullOwner"));
         // CraftBukkit start
         if (!banner$flag) {
@@ -37,5 +38,5 @@ public abstract class MixinPlayerHeadItem extends Item {
             }
             // CraftBukkit end
         }
-    }
+    }*/
 }

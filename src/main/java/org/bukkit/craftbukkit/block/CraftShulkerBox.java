@@ -45,23 +45,23 @@ public class CraftShulkerBox extends CraftLootable<ShulkerBoxBlockEntity> implem
     @Override
     public void open() {
         this.requirePlaced();
-        if (!this.getTileEntity().opened && this.getWorldHandle() instanceof net.minecraft.world.level.Level) {
+        if (!this.getTileEntity().bridge$opened() && this.getWorldHandle() instanceof net.minecraft.world.level.Level) {
             net.minecraft.world.level.Level world = this.getTileEntity().getLevel();
             world.blockEvent(this.getPosition(), this.getTileEntity().getBlockState().getBlock(), 1, 1);
             world.playSound(null, this.getPosition(), SoundEvents.SHULKER_BOX_OPEN, SoundSource.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
         }
-        this.getTileEntity().opened = true;
+        this.getTileEntity().banner$setOpened(true);
     }
 
     @Override
     public void close() {
         this.requirePlaced();
-        if (this.getTileEntity().opened && this.getWorldHandle() instanceof net.minecraft.world.level.Level) {
+        if (this.getTileEntity().bridge$opened() && this.getWorldHandle() instanceof net.minecraft.world.level.Level) {
             net.minecraft.world.level.Level world = this.getTileEntity().getLevel();
             world.blockEvent(this.getPosition(), this.getTileEntity().getBlockState().getBlock(), 1, 0);
             world.playSound(null, this.getPosition(), SoundEvents.SHULKER_BOX_OPEN, SoundSource.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
         }
-        this.getTileEntity().opened = false;
+        this.getTileEntity().banner$setOpened(false);
     }
 
     @Override

@@ -42,7 +42,7 @@ public abstract class MixinMapItemSavedData_HoldingPlayer {
 
     @Inject(method = "nextUpdatePacket", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData$HoldingPlayer;createPatch()Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData$MapPatch;"))
-    private void banner$checkColors(int mapId, CallbackInfoReturnable<Packet<?>> cir) {
+    private void banner$checkColors(MapId mapId, CallbackInfoReturnable<Packet<?>> cir) {
         RenderData render = field_132.bridge$mapView().render((CraftPlayer) this.banner$player.getAndSet(null).getBukkitEntity()); // CraftBukkit
         banner$render.set(render);
         field_132.colors = render.buffer;
@@ -55,6 +55,7 @@ public abstract class MixinMapItemSavedData_HoldingPlayer {
         field_132.colors = banner$colors;
     }
 
+    /*
     @Redirect(method = "nextUpdatePacket", at = @At(value = "INVOKE", target = "Ljava/util/Map;values()Ljava/util/Collection;"))
     private Collection<MapDecoration> banner$resetCollections(Map instance) {
         // CraftBukkit start
@@ -65,5 +66,5 @@ public abstract class MixinMapItemSavedData_HoldingPlayer {
         }
         return icons;
         // CraftBukkit end
-    }
+    }*/
 }

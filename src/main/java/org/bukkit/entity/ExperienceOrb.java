@@ -22,18 +22,6 @@ public interface ExperienceOrb extends Entity {
      */
     public void setExperience(int value);
 
-    // Paper start
-    /**
-     * Check if this orb was spawned from a {@link ThrownExpBottle}
-     *
-     * @return if orb was spawned from a bottle
-     * @deprecated Use getSpawnReason() == EXP_BOTTLE
-     */
-    @Deprecated
-    default boolean isFromBottle() {
-        return getSpawnReason() == SpawnReason.EXP_BOTTLE;
-    }
-
     /**
      * Reasons for why this Experience Orb was spawned
      */

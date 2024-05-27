@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.core.world.item;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.FlintAndSteelItem;
 import net.minecraft.world.item.context.UseOnContext;
@@ -25,9 +26,7 @@ public class MixinFlintAndSteelItem {
                                    Player player, Level level, BlockPos blockPos, BlockState blockState) {
         // CraftBukkit start - Store the clicked block
         if (CraftEventFactory.callBlockIgniteEvent(level, blockPos, BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL, player).isCancelled()) {
-            context.getItemInHand().hurtAndBreak(1, player, (entityhuman1) -> {
-                entityhuman1.broadcastBreakEvent(context.getHand());
-            });
+            context.getItemInHand().hurtAndBreak(1, player, LivingEntity.getSlotForHand(context.getHand()));
             cir.setReturnValue(InteractionResult.PASS);
         }
         // CraftBukkit end

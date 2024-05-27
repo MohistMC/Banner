@@ -29,6 +29,16 @@ accessible method net/minecraft/nbt/ListTag <init> (Ljava/util/List;B)V
 accessible method net/minecraft/world/level/block/state/BlockBehaviour onPlace (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)V
 accessible field net/minecraft/world/item/enchantment/ItemEnchantments showInTooltip Z
 accessible field net/minecraft/world/item/enchantment/ItemEnchantments$Mutable showInTooltip Z
+accessible method net/minecraft/world/level/block/ChiseledBookShelfBlock getSection (F)I
+accessible field net/minecraft/world/level/block/entity/ConduitBlockEntity effectBlocks Ljava/util/List;
+accessible field net/minecraft/world/level/block/entity/ConduitBlockEntity destroyTarget Lnet/minecraft/world/entity/LivingEntity;
+accessible field net/minecraft/world/level/block/entity/ConduitBlockEntity destroyTargetUUID Ljava/util/UUID;
+accessible method net/minecraft/world/level/block/entity/ConduitBlockEntity updateDestroyTarget (Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Ljava/util/List;Lnet/minecraft/world/level/block/entity/ConduitBlockEntity;)V
+accessible method net/minecraft/world/level/block/entity/ConduitBlockEntity getDestroyRangeAABB (Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/phys/AABB;
+accessible field net/minecraft/world/item/armortrim/ArmorTrim showInTooltip Z
+accessible field net/minecraft/world/item/crafting/RecipeManager byType Lcom/google/common/collect/Multimap;
+accessible method net/minecraft/world/entity/animal/Wolf setCollarColor (Lnet/minecraft/world/item/DyeColor;)V
+
 # 1.20.4
 accessible field net/minecraft/world/entity/ai/attributes/AttributeModifier name Ljava/lang/String;
 accessible field net/minecraft/world/level/block/entity/CrafterBlockEntity craftingTicksRemaining I

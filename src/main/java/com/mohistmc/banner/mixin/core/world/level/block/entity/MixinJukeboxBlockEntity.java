@@ -27,7 +27,7 @@ public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Cle
 
     @Shadow private ItemStack item;
     public List<HumanEntity> transaction = new ArrayList<>();
-    private int maxStack = DEFAULT_DISTANCE_LIMIT;
+    private int maxStack = MAX_STACK;
     public boolean opened;
 
     public MixinJukeboxBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {

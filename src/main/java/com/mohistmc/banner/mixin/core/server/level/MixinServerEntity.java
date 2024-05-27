@@ -299,7 +299,7 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
         consumer.accept(new ClientboundRotateHeadPacket(this.entity, (byte) this.yHeadRotp));
         if (this.entity instanceof LivingEntity livingEntity) {
             for (MobEffectInstance mobeffect : livingEntity.getActiveEffects()) {
-                consumer.accept(new ClientboundUpdateMobEffectPacket(this.entity.getId(), mobeffect));
+                consumer.accept(new ClientboundUpdateMobEffectPacket(this.entity.getId(), mobeffect, true));
             }
             livingEntity.detectEquipmentUpdates();
         }

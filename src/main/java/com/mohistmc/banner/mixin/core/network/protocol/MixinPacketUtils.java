@@ -20,6 +20,7 @@ public class MixinPacketUtils {
      * @author wdog5
      * @reason bukkit reason
      */
+    /*
     @Overwrite
     public static <T extends PacketListener> void ensureRunningOnSameThread(Packet<T> packet, T processor, BlockableEventLoop<?> executor) throws RunningOnDifferentThreadException {
         if (!executor.isSameThread()) {
@@ -34,7 +35,7 @@ public class MixinPacketUtils {
                                 throw var3;
                             }
                         }
-                        if (processor.shouldPropagateHandlingExceptions()) {
+                        if (processor.isAcceptingMessages()) {
                             if (var3 instanceof ReportedException r) {
                                 processor.fillCrashReport(r.getReport());
                                 throw var3;
@@ -58,5 +59,5 @@ public class MixinPacketUtils {
             throw RunningOnDifferentThreadException.RUNNING_ON_DIFFERENT_THREAD;
             // CraftBukkit end
         }
-    }
+    }*/
 }

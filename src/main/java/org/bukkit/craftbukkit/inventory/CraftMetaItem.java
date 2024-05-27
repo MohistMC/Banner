@@ -1569,7 +1569,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
             }
         }
 
-        if (!this.unhandledTags.isEmpty()) {
+        if (!this.unhandledTags.build().isEmpty()) {
             Tag unhandled = DataComponentPatch.CODEC.encodeStart(BukkitExtraConstants.getDefaultRegistryAccess().createSerializationContext(NbtOps.INSTANCE), this.unhandledTags.build()).getOrThrow(IllegalStateException::new);
             try {
                 ByteArrayOutputStream buf = new ByteArrayOutputStream();

@@ -293,14 +293,14 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
                                 slot.onTake(player, itemstack4);
                             });
                         } else if (slot.mayPlace(itemstack3)) {
-                            if (ItemStack.isSameItemSameTags(itemstack, itemstack3)) {
+                            if (ItemStack.isSameItemSameComponents(itemstack, itemstack3)) {
                                 int i2 = clickaction == ClickAction.PRIMARY ? itemstack3.getCount() : 1;
                                 this.setCarried(slot.safeInsert(itemstack3, i2));
                             } else if (itemstack3.getCount() <= slot.getMaxStackSize(itemstack3)) {
                                 this.setCarried(itemstack);
                                 slot.setByPlayer(itemstack3);
                             }
-                        } else if (ItemStack.isSameItemSameTags(itemstack, itemstack3)) {
+                        } else if (ItemStack.isSameItemSameComponents(itemstack, itemstack3)) {
                             Optional<ItemStack> optional1 = slot.tryRemove(itemstack.getCount(), itemstack3.getMaxStackSize() - itemstack3.getCount(), player);
 
                             optional1.ifPresent((itemstack4) -> {

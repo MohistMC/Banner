@@ -24,14 +24,4 @@ public class MixinConduitBlockEntity {
         player.pushEffectCause(EntityPotionEffectEvent.Cause.CONDUIT);
         return player.addEffect(eff);
     }
-
-    @Inject(method = "updateDestroyTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
-    private static void banner$attackReason(Level level, BlockPos pos, BlockState p_155411_, List<BlockPos> p_155412_, ConduitBlockEntity p_155413_, CallbackInfo ci) {
-        CraftEventFactory.blockDamage = CraftBlock.at(level, pos);
-    }
-
-    @Inject(method = "updateDestroyTarget", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/LivingEntity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
-    private static void banner$attackReasonReset(CallbackInfo ci) {
-        CraftEventFactory.blockDamage = null;
-    }
 }

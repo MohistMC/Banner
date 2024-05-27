@@ -19,7 +19,7 @@ public class DefaultLibraries {
 
     public static final HashMap<String, String> fail = new HashMap<>();
     public static final AtomicLong allSize = new AtomicLong(); // global
-    public static final String MAVENURL = DownloadSource.get().getUrl();
+    public static final String MAVENURL = DownloadSource.get().url;
 
 
     public static String libUrl(File lib) {
