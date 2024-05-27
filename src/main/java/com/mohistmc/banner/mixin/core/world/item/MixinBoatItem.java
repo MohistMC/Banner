@@ -55,7 +55,7 @@ public abstract class MixinBoatItem extends Item {
 
     @Inject(method = "use",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/Level;gameEvent(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/level/gameevent/GameEvent;Lnet/minecraft/world/phys/Vec3;)V",
+            target = "Lnet/minecraft/world/level/Level;gameEvent(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/Holder;Lnet/minecraft/world/phys/Vec3;)V",
             shift = At.Shift.BEFORE),
             locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private void banner$handleBoatEntityAdd(Level level, Player player, InteractionHand usedHand,

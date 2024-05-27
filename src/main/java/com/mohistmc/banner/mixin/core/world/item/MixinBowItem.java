@@ -34,9 +34,10 @@ public abstract class MixinBowItem extends ProjectileWeaponItem {
         super(properties);
     }
 
+    /*
     @Inject(method = "releaseUsing",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/item/ItemStack;hurtAndBreak(ILnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;)V"),
+                    target = "hur"),
             locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private void banner$shootBowEvent(ItemStack stack, Level level, LivingEntity livingEntity, int timeCharged,
                                       CallbackInfo ci, Player player, boolean bl, ItemStack itemStack, int i,
@@ -93,4 +94,5 @@ public abstract class MixinBowItem extends ProjectileWeaponItem {
         }
         // CraftBukkit end
     }
+    */
 }

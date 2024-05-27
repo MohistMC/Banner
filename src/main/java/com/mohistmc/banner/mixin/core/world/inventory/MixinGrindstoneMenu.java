@@ -42,7 +42,7 @@ public abstract class MixinGrindstoneMenu extends AbstractContainerMenu {
         CraftEventFactory.callPrepareGrindstoneEvent(getBukkitView(), stack);
     }
 
-    @Inject(method = "createResult", at = @At(value = "INVOKE", ordinal = 3, target = "Lnet/minecraft/world/inventory/GrindstoneMenu;broadcastChanges()V"))
+    @Inject(method = "createResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/GrindstoneMenu;broadcastChanges()V"))
     private void banner$sync(CallbackInfo ci) {
         sendAllDataToRemote();
     }

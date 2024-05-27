@@ -11,6 +11,7 @@ import net.minecraft.world.entity.decoration.LeashFenceKnotEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.LeadItem;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import org.bukkit.craftbukkit.CraftEquipmentSlot;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.event.hanging.HangingPlaceEvent;
@@ -38,7 +39,7 @@ public abstract class MixinLeadItem {
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/decoration/LeashFenceKnotEntity;playPlacementSound()V"),
             locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
-    private static void banner$bindPlayerMobs(Player player, Level level, BlockPos pos, CallbackInfoReturnable<InteractionResult> cir, LeashFenceKnotEntity leashFenceKnotEntity, boolean bl, double d, int i, int j, int k, List list, Iterator var11, Mob mob) {
+    private static void banner$bindPlayerMobs(Player player, Level level, BlockPos blockPos, CallbackInfoReturnable<InteractionResult> cir, LeashFenceKnotEntity leashFenceKnotEntity, double d, int i, int j, int k, AABB aABB, List list, Iterator var11, Mob mob) {
         // CraftBukkit start - fire HangingPlaceEvent
         org.bukkit.inventory.EquipmentSlot hand = CraftEquipmentSlot.getHand(banner$hand.get());
         HangingPlaceEvent event = new HangingPlaceEvent((org.bukkit.entity.Hanging) leashFenceKnotEntity.getBukkitEntity(), player != null ? (org.bukkit.entity.Player) player.getBukkitEntity() : null, level.getWorld().getBlockAt(i, j, k), org.bukkit.block.BlockFace.SELF, hand);
@@ -54,7 +55,7 @@ public abstract class MixinLeadItem {
     @Inject(method = "bindPlayerMobs", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/entity/Mob;setLeashedTo(Lnet/minecraft/world/entity/Entity;Z)V"),
             locals = LocalCapture.CAPTURE_FAILHARD)
-    private static void banner$continueSet(Player player, Level level, BlockPos pos, CallbackInfoReturnable<InteractionResult> cir, LeashFenceKnotEntity leashFenceKnotEntity, boolean bl, double d, int i, int j, int k, List list, Iterator var11, Mob mob) {
+    private static void banner$continueSet(Player player, Level level, BlockPos blockPos, CallbackInfoReturnable<InteractionResult> cir, LeashFenceKnotEntity leashFenceKnotEntity, double d, int i, int j, int k, AABB aABB, List list, Iterator var11, Mob mob) {
         // CraftBukkit start
         if (player != null && CraftEventFactory.callPlayerLeashEntityEvent(mob, leashFenceKnotEntity, player, banner$hand.get()).isCancelled()) {
             cir.cancel();

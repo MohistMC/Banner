@@ -59,6 +59,7 @@ public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockE
         super(blockEntityType, blockPos, blockState);
     }
 
+    /*
     @Redirect(method = "pushItemsTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;tryMoveItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/HopperBlockEntity;Ljava/util/function/BooleanSupplier;)Z"))
     private static boolean banner$hopperCheck(Level level, BlockPos pos, BlockState state, HopperBlockEntity hopper, BooleanSupplier flag) {
         var result = tryMoveItems(level, pos, state, hopper, flag);
@@ -83,6 +84,7 @@ public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockE
         return ejectItems(level, pos, state, sourceContainer, banner$hopperEntity.get());
     }*/
 
+    /*
     private static AtomicReference<HopperBlockEntity> banner$hopper = new AtomicReference<>();
     private static AtomicReference<Level> banner$world = new AtomicReference<>();
     private static AtomicReference<InventoryMoveItemEvent> banner$moveEvent = new AtomicReference<>();
@@ -94,6 +96,7 @@ public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockE
         return shadow$ejectItems(world, blockposition, iblockdata, iinventory);
     }*/
 
+    /*
     @Redirect(method = "ejectItems", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;addItem(Lnet/minecraft/world/Container;Lnet/minecraft/world/Container;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/core/Direction;)Lnet/minecraft/world/item/ItemStack;"))
     private static ItemStack banner$moveItem(Container source, Container destination, ItemStack stack, Direction direction) {
         var entity = banner$hopper.getAndSet(null);
@@ -208,7 +211,7 @@ public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockE
         var hopperBlock = CraftBlock.at(level, blockPos);
         var containerBlock = CraftBlock.at(level, blockPos.above());
         cir.setReturnValue(runHopperInventorySearchEvent(container, hopperBlock, containerBlock, HopperInventorySearchEvent.ContainerType.SOURCE));
-    }
+    }*/
 
     @Override
     public List<ItemStack> getContents() {

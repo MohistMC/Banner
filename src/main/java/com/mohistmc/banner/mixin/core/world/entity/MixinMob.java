@@ -59,7 +59,8 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
     @Shadow protected abstract void setItemSlotAndDropWhenKilled(EquipmentSlot slot, ItemStack stack);
 
     @Shadow @Nullable public abstract Entity getLeashHolder();
-    @Shadow @Nullable public abstract <T extends Mob> T convertTo(EntityType<T> entityType, boolean transferInventory);
+
+    @Shadow @Nullable public abstract <T extends Mob> T convertTo(EntityType<T> entityType, boolean bl);
 
     public boolean aware = true; // CraftBukkit
 
@@ -259,6 +260,7 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
         Bukkit.getPluginManager().callEvent(new EntityUnleashEvent(this.getBukkitEntity(), EntityUnleashEvent.UnleashReason.UNKNOWN));
     }
 
+    /*
     @Eject(method = "convertTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
     private boolean banner$copySpawn(net.minecraft.world.level.Level world, Entity entityIn, CallbackInfoReturnable<Mob> cir) {
         EntityTransformEvent.TransformReason transformReason = banner$transform == null ? EntityTransformEvent.TransformReason.UNKNOWN : banner$transform;
@@ -269,7 +271,7 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
         } else {
             return world.addFreshEntity(entityIn);
         }
-    }
+    }*/
 
     @Inject(method = "convertTo", at = @At("RETURN"))
     private <T extends Mob> void banner$cleanReason(EntityType<T> p_233656_1_, boolean p_233656_2_, CallbackInfoReturnable<T> cir) {
@@ -277,7 +279,7 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
         this.banner$transform = null;
     }
 
-    @Redirect(method = "doHurtTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;setSecondsOnFire(I)V"))
+    @Redirect(method = "doHurtTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(I)V"))
     public void banner$attackCombust(Entity entity, int seconds) {
         EntityCombustByEntityEvent combustEvent = new EntityCombustByEntityEvent(this.getBukkitEntity(), entity.getBukkitEntity(), seconds);
         org.bukkit.Bukkit.getPluginManager().callEvent(combustEvent);
