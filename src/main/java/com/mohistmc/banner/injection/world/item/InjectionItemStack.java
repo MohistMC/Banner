@@ -1,22 +1,20 @@
 package com.mohistmc.banner.injection.world.item;
 
+import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.Nullable;
 
 public interface InjectionItemStack {
 
-    default void load(CompoundTag nbttagcompound) {
+    @Deprecated
+    default void setItem(Item item) {
     }
 
-    default CompoundTag getTagClone() {
+    default PatchedDataComponentMap getComponentsClone() {
         return null;
     }
 
-    default void setTagClone(@Nullable CompoundTag nbtttagcompound) {
-    }
-
-    @Deprecated
-    default void setItem(Item item) {
+    default void setComponentsClone(@Nullable PatchedDataComponentMap patchedDataComponentMap) {
     }
 }

@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.core.world.level.gameevent.vibrations;
 
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -25,40 +26,40 @@ public abstract class MixinVibrationSystem_Listener {
     @Shadow
     private static boolean isOccluded(Level level, Vec3 vec3, Vec3 vec32) {return false;}
 
-    @Shadow protected abstract void scheduleVibration(ServerLevel serverLevel, VibrationSystem.Data data, GameEvent gameEvent, GameEvent.Context context, Vec3 vec3, Vec3 vec32);
+    @Shadow protected abstract void scheduleVibration(ServerLevel serverLevel, VibrationSystem.Data data, Holder<GameEvent> holder, GameEvent.Context context, Vec3 vec3, Vec3 vec32);
 
     /**
      * @author wdog5
      * @reason bukkit
      */
     @Overwrite
-    public boolean handleGameEvent(ServerLevel level, GameEvent gameEvent, GameEvent.Context context, Vec3 pos) {
+    public boolean handleGameEvent(ServerLevel serverLevel, Holder<GameEvent> holder, GameEvent.Context context, Vec3 vec3) {
         VibrationSystem.Data data = this.system.getVibrationData();
         VibrationSystem.User user = this.system.getVibrationUser();
         if (data.getCurrentVibration() != null) {
             return false;
-        } else if (!user.isValidVibration(gameEvent, context)) {
+        } else if (!user.isValidVibration(holder, context)) {
             return false;
         } else {
-            Optional<Vec3> optional = user.getPositionSource().getPosition(level);
-
+            Optional<Vec3> optional = user.getPositionSource().getPosition(serverLevel);
             if (optional.isEmpty()) {
                 return false;
             } else {
-                Vec3 vec3 = (Vec3)optional.get();
+                Vec3 vec32 = (Vec3)optional.get();
 
-                boolean defaultCancel = !user.canReceiveVibration(level, BlockPos.containing(pos), gameEvent, context);
+                boolean defaultCancel = !user.canReceiveVibration(serverLevel, BlockPos.containing(vec3), holder, context);
                 Entity entity = context.sourceEntity();
-                BlockReceiveGameEvent event = new BlockReceiveGameEvent(CraftGameEvent.minecraftToBukkit(gameEvent), CraftBlock.at(level, BlockPos.containing(pos)), (entity == null) ? null : entity.getBukkitEntity());
+                BlockReceiveGameEvent event = new BlockReceiveGameEvent(CraftGameEvent.minecraftToBukkit(holder.value()), CraftBlock.at(serverLevel, BlockPos.containing(vec3)), (entity == null) ? null : entity.getBukkitEntity());
                 event.setCancelled(defaultCancel);
                 Bukkit.getPluginManager().callEvent(event);
+
                 if (event.isCancelled()) {
                     // CraftBukkit end
                     return false;
-                } else if (isOccluded(level, pos, vec3)) {
+                } else if (isOccluded(serverLevel, vec3, vec32)) {
                     return false;
                 } else {
-                    this.scheduleVibration(level, data, gameEvent, context, pos, vec3);
+                    this.scheduleVibration(serverLevel, data, holder, context, vec3, vec32);
                     return true;
                 }
             }

@@ -47,15 +47,6 @@ public abstract class MixinAnimal extends AgeableMob implements InjectionAnimal 
 
     public ItemStack breedItem;
 
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    public boolean hurt(DamageSource source, float amount) {
-        return super.hurt(source, amount);
-    }
-
     @Inject(method = "setInLove(Lnet/minecraft/world/entity/player/Player;)V", cancellable = true, at = @At("HEAD"))
     private void banner$enterLove(Player player, CallbackInfo ci) {
         EntityEnterLoveModeEvent event = CraftEventFactory.callEntityEnterLoveModeEvent(player, (Animal) (Object) this, 600);

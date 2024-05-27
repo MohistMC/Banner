@@ -56,7 +56,6 @@ public abstract class MixinEnchantmentMenu extends AbstractContainerMenu{
     @Shadow @Final public int[] costs;
     @Shadow @Final public int[] enchantClue;
     @Shadow @Final public int[] levelClue;
-    @Shadow protected abstract List<EnchantmentInstance> getEnchantmentList(ItemStack stack, int enchantSlot, int level);
     // @formatter:on
 
     private CraftInventoryView bukkitEntity = null;

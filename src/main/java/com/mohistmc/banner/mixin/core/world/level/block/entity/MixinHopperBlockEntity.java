@@ -49,11 +49,6 @@ public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockE
     @Shadow private static boolean tryMoveItems(Level p_155579_, BlockPos p_155580_, BlockState p_155581_, HopperBlockEntity p_155582_, BooleanSupplier p_155583_) { return false; }
     // @formatter:on
 
-    @Shadow(prefix = "shadow$")
-    private static boolean shadow$ejectItems(Level level, BlockPos pos, BlockState state, Container sourceContainer) {
-        return false;
-    }
-
     @Shadow protected abstract boolean inventoryFull();
 
     public List<HumanEntity> transaction = new ArrayList<>();

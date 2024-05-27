@@ -3,7 +3,7 @@ package com.mohistmc.banner.mixin.core.world.entity.projectile;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
@@ -17,6 +17,7 @@ import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.entity.projectile.ThrownPotion;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractCandleBlock;
 import net.minecraft.world.level.block.Blocks;
@@ -29,6 +30,7 @@ import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
@@ -38,34 +40,38 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+// Banner - TODO fix patches
 @Mixin(ThrownPotion.class)
 public abstract class MixinThrownPotion extends ThrowableItemProjectile {
 
 
     @Unique
-    private transient HitResult arclight$hitResult;
+    private transient HitResult banner$hitResult;
 
     public MixinThrownPotion(EntityType<? extends ThrowableItemProjectile> entityType, Level level) {
         super(entityType, level);
     }
 
-    @Redirect(method = "onHit", at = @At(value = "INVOKE", remap = false, ordinal = 1, target = "Ljava/util/List;isEmpty()Z"))
+
+    /**
+    @Redirect(method = "onHit", at = @At(value = "INVOKE", remap = false, target = "Ljava/util/List;isEmpty()Z"))
     private boolean banner$callEvent(List list, HitResult hitResult) {
-        arclight$hitResult = hitResult;
+        banner$hitResult = hitResult;
         return false;
     }
 
     @Inject(method = "onHit", at = @At("RETURN"))
     private void banner$resetResult(HitResult p_37543_, CallbackInfo ci) {
-        arclight$hitResult = null;
+        banner$hitResult = null;
     }
 
     /**
      * @author wdog5
      * @reason bukkit
      */
+    /**
     @Overwrite
-    private void applySplash(List<MobEffectInstance> list, @Nullable Entity entity) {
+    private void applySplash(Iterable<MobEffectInstance> list, @Nullable Entity entity) {
         AABB axisalignedbb = this.getBoundingBox().inflate(4.0, 2.0, 4.0);
         List<LivingEntity> list2 = this.level().getEntitiesOfClass(LivingEntity.class, axisalignedbb);
         Map<org.bukkit.entity.LivingEntity, Double> affected = new HashMap<>();
@@ -84,7 +90,7 @@ public abstract class MixinThrownPotion extends ThrowableItemProjectile {
                 }
             }
         }
-        PotionSplashEvent event = CraftEventFactory.callPotionSplashEvent((ThrownPotion) (Object) this, arclight$hitResult, affected);
+        PotionSplashEvent event = CraftEventFactory.callPotionSplashEvent((ThrownPotion) (Object) this, banner$hitResult, affected);
         if (!event.isCancelled() && list != null && !list.isEmpty()) {
             for (org.bukkit.entity.LivingEntity victim : event.getAffectedEntities()) {
                 if (!(victim instanceof CraftLivingEntity)) {
@@ -116,13 +122,13 @@ public abstract class MixinThrownPotion extends ThrowableItemProjectile {
     }
 
     @Inject(method = "makeAreaOfEffectCloud", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
-    private void banner$makeCloud(ItemStack p_190542_1_, Potion p_190542_2_, CallbackInfo ci, AreaEffectCloud entity) {
-        LingeringPotionSplashEvent event = CraftEventFactory.callLingeringPotionSplashEvent((ThrownPotion) (Object) this, arclight$hitResult, entity);
+    private void banner$makeCloud(PotionContents potionContents, CallbackInfo ci, AreaEffectCloud areaEffectCloud, LivingEntity livingEntity, Entity entity) {
+        LingeringPotionSplashEvent event = CraftEventFactory.callLingeringPotionSplashEvent((ThrownPotion) (Object) this, banner$hitResult, entity);
         if (event.isCancelled() || entity.isRemoved()) {
             ci.cancel();
             entity.discard();
         }
-    }
+    }*/
 
     @Inject(method = "dowseFire", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;destroyBlock(Lnet/minecraft/core/BlockPos;ZLnet/minecraft/world/entity/Entity;)Z"))
     private void banner$entityChangeBlock(BlockPos pos, CallbackInfo ci) {

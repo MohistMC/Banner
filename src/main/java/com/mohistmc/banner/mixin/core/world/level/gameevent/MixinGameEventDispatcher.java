@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.core.world.level.gameevent;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.gameevent.GameEventDispatcher;
@@ -25,10 +26,9 @@ public class MixinGameEventDispatcher {
     @Inject(method = "post", cancellable = true, at = @At(value = "INVOKE",
             target = "Lnet/minecraft/core/SectionPos;blockToSectionCoord(I)I", ordinal = 0),
             locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$gameEvent(GameEvent gameevent, Vec3 pos, GameEvent.Context context,
-                                  CallbackInfo ci, int i, BlockPos blockPos) {
+    private void banner$gameEvent(Holder<GameEvent> holder, Vec3 vec3, GameEvent.Context context, CallbackInfo ci, int i, BlockPos blockPos) {
         // CraftBukkit start
-        GenericGameEvent event = new GenericGameEvent(CraftGameEvent.minecraftToBukkit(gameevent), CraftLocation.toBukkit(pos, level.getWorld()), (context.sourceEntity() == null) ? null : context.sourceEntity().getBukkitEntity(), i, !Bukkit.isPrimaryThread());
+        GenericGameEvent event = new GenericGameEvent(CraftGameEvent.minecraftToBukkit(holder.value()), CraftLocation.toBukkit(blockPos, level.getWorld()), (context.sourceEntity() == null) ? null : context.sourceEntity().getBukkitEntity(), i, !Bukkit.isPrimaryThread());
         level.getCraftServer().getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             ci.cancel();

@@ -174,9 +174,6 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     @Shadow private double vehicleFirstGoodY;
     @Shadow private double vehicleFirstGoodX;
     @Shadow @Nullable private Vec3 awaitingPositionFromClient;
-
-    @Shadow protected abstract void updateBookPages(List<FilteredText> pages, UnaryOperator<String> unaryOperator, ItemStack book);
-
     @Shadow private int tickCount;
 
     @Shadow public abstract void resetPosition();
@@ -200,7 +197,6 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     @Shadow protected abstract void handleMessageDecodeFailure(SignedMessageChain.DecodeException exception);
     @Shadow protected abstract CompletableFuture<FilteredText> filterTextPacket(String text);
     @Shadow protected abstract ParseResults<CommandSourceStack> parseCommand(String command);
-    @Shadow protected abstract Map<String, PlayerChatMessage> collectSignedArguments(ServerboundChatCommandPacket packet, SignableCommand<?> command, LastSeenMessages lastSeenMessages) throws SignedMessageChain.DecodeException;
     @Shadow protected abstract void detectRateSpam();
 
     @Shadow private int dropSpamTickCount;
@@ -213,9 +209,6 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     @Shadow private int chatSpamTickCount;
 
     @Shadow public abstract ServerPlayer getPlayer();
-
-    @Shadow protected abstract Optional<LastSeenMessages> tryHandleChat(LastSeenMessages.Update update);
-
     @Shadow public abstract void teleport(double d, double e, double f, float g, float h);
 
     private static final int SURVIVAL_PLACE_DISTANCE_SQUARED = 6 * 6;
@@ -489,7 +482,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         ItemStack old = this.player.getInventory().getItem(slot);
         if (old.is(Items.WRITABLE_BOOK)) {
             ItemStack itemstack = old.copy();
-            this.updateBookPages(list, UnaryOperator.identity(), itemstack);
+            this.updateBookContents(list, UnaryOperator.identity(), itemstack);
             CraftEventFactory.handleEditBookEvent(player, slot, old, itemstack);
         }
     }

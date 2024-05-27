@@ -28,10 +28,6 @@ public abstract class MixinArrow extends AbstractArrow implements InjectionArrow
 
     @Shadow @Final private static EntityDataAccessor<Integer> ID_EFFECT_COLOR;
 
-    @Shadow private Potion potion;
-
-    @Shadow @Final public Set<MobEffectInstance> effects;
-
     protected MixinArrow(EntityType<? extends AbstractArrow> entityType, Level level, ItemStack itemStack) {
         super(entityType, level, itemStack);
     }

@@ -15,7 +15,7 @@ public class CraftInventoryDoubleChest extends CraftInventory implements DoubleC
     private final CraftInventory left;
     private final CraftInventory right;
 
-    public CraftInventoryDoubleChest(ChestBlock.DoubleInventory block) {
+    public CraftInventoryDoubleChest(com.mohistmc.banner.bukkit.DoubleChestInventory block) {
         super(block.inventorylargechest);
         this.tile = block;
         this.left = new CraftInventory(block.inventorylargechest.container1);

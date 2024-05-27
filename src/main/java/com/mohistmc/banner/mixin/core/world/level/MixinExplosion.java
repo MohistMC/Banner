@@ -207,7 +207,6 @@ public abstract class MixinExplosion implements InjectionExplosion {
                             continue;
                         }
 
-                        CraftEventFactory.entityDamage = source;
                         entity.banner$setLastDamageCancelled(false);
 
                         if (entity instanceof EnderDragon) {
@@ -223,7 +222,6 @@ public abstract class MixinExplosion implements InjectionExplosion {
                             entity.hurt(this.damageSource, (float) ((int) ((d13 * d13 + d13) / 2.0D * 7.0D * (double) f2 + 1.0D)));
                         }
 
-                        CraftEventFactory.entityDamage = null;
                         if (entity.bridge$lastDamageCancelled()) { // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Skip entity if damage event was cancelled
                             continue;
                         }
@@ -265,7 +263,7 @@ public abstract class MixinExplosion implements InjectionExplosion {
     @Overwrite
     public void finalizeExplosion(boolean spawnParticles) {
         if (this.level.isClientSide) {
-            this.level.playLocalSound(this.x, this.y, this.z, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0F, (1.0F + (this.level.random.nextFloat() - this.level.random.nextFloat()) * 0.2F) * 0.7F, false);
+            this.level.playLocalSound(this.x, this.y, this.z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 4.0F, (1.0F + (this.level.random.nextFloat() - this.level.random.nextFloat()) * 0.2F) * 0.7F, false);
         }
 
         boolean flag = this.interactsWithBlocks();

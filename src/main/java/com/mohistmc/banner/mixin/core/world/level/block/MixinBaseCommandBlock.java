@@ -8,6 +8,7 @@ import net.minecraft.world.level.BaseCommandBlock;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.event.server.ServerCommandEvent;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,12 +17,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BaseCommandBlock.class)
-public class MixinBaseCommandBlock {
+public abstract class MixinBaseCommandBlock {
 
-
-    // @formatter:off
-    @Shadow private Component name;
-    // @formatter:on
+    @Shadow @Nullable private Component customName;
 
     @Redirect(method = "performCommand", at = @At(value = "INVOKE", target = "Lnet/minecraft/commands/Commands;performPrefixedCommand(Lnet/minecraft/commands/CommandSourceStack;Ljava/lang/String;)V"))
     private void banner$serverCommand(Commands commands, CommandSourceStack sender, String command) {
@@ -56,10 +54,10 @@ public class MixinBaseCommandBlock {
         commands.performPrefixedCommand(sender, joiner.join(args));
     }
 
-    @Inject(method = "setName", at = @At("RETURN"))
+    @Inject(method = "setCustomName", at = @At("RETURN"))
     public void banner$setName(Component nameIn, CallbackInfo ci) {
-        if (this.name == null) {
-            this.name = Component.literal("@");
+        if (this.customName == null) {
+            this.customName = Component.literal("@");
         }
     }
 }

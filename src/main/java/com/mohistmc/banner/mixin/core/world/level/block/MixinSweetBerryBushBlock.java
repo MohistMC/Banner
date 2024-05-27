@@ -35,16 +35,6 @@ public class MixinSweetBerryBushBlock {
         return true;
     }
 
-    @Inject(method = "entityInside", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
-    public void banner$damagePre(BlockState state, Level worldIn, BlockPos pos, Entity entityIn, CallbackInfo ci) {
-        CraftEventFactory.blockDamage = CraftBlock.at(worldIn, pos);
-    }
-
-    @Inject(method = "entityInside", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/Entity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
-    public void banner$damagePost(BlockState state, Level worldIn, BlockPos pos, Entity entityIn, CallbackInfo ci) {
-        CraftEventFactory.blockDamage = null;
-    }
-
     @Eject(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/SweetBerryBushBlock;popResource(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;)V"))
     private void banner$playerHarvest(Level worldIn, BlockPos pos, ItemStack stack, CallbackInfoReturnable<InteractionResult> cir,
                                         BlockState state, Level worldIn1, BlockPos pos1, Player player, InteractionHand hand) {

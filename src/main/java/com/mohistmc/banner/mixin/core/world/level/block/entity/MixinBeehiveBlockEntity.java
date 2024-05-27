@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.mohistmc.banner.injection.world.level.block.entity.InjectionBeehiveBlockEntity;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.entity.Entity;
@@ -35,12 +36,10 @@ public abstract class MixinBeehiveBlockEntity extends BlockEntity implements Inj
 
     @Shadow @Final private List<BeehiveBlockEntity.BeeData> stored;
 
-    @Shadow
-    protected static boolean releaseOccupant(Level level, BlockPos pos, BlockState state, BeehiveBlockEntity.BeeData data, @Nullable List<Entity> storedInHives, BeehiveBlockEntity.BeeReleaseStatus releaseStatus, @Nullable BlockPos savedFlowerPos) {
-        return false;
-    }
-
     @Shadow @Nullable public BlockPos savedFlowerPos;
+
+    @Shadow protected abstract boolean releaseOccupant(Level level, BlockPos blockPos, BlockState blockState, BeehiveBlockEntity.Occupant occupant, @Nullable List<Entity> list, BeehiveBlockEntity.BeeReleaseStatus beeReleaseStatus, @Nullable BlockPos blockPos2);
+
     public int maxBees = 3; // CraftBukkit - allow setting max amount of bees a hive can hold
     private static transient boolean banner$force;
 
@@ -130,8 +129,8 @@ public abstract class MixinBeehiveBlockEntity extends BlockEntity implements Inj
     }
 
     @Inject(method = "saveAdditional", at = @At("RETURN"))
-    private void banner$writeMax(CompoundTag compound, CallbackInfo ci) {
-        compound.putInt("Bukkit.MaxEntities", this.maxBees);
+    private void banner$writeMax(CompoundTag compoundTag, HolderLookup.Provider provider, CallbackInfo ci) {
+        compoundTag.putInt("Bukkit.MaxEntities", this.maxBees);
     }
 
     @Override

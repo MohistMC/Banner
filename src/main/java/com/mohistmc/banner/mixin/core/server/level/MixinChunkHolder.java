@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.core.server.level;
 
 import com.mohistmc.banner.injection.server.level.InjectionChunkHolder;
-import com.mojang.datafixers.util.Either;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -10,11 +9,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkLevel;
 import net.minecraft.server.level.ChunkMap;
+import net.minecraft.server.level.ChunkResult;
 import net.minecraft.server.level.FullChunkStatus;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,11 +30,12 @@ public abstract class MixinChunkHolder implements InjectionChunkHolder {
 
     // @formatter:off
     @Shadow public int oldTicketLevel;
-    @Shadow public abstract CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> getFutureIfPresentUnchecked(ChunkStatus p_219301_1_);
     @Shadow @Final private ShortSet[] changedBlocksPerSection;
     @Shadow private int ticketLevel;
     @Shadow @Final ChunkPos pos;
     // @formatter:on
+
+    @Shadow public abstract CompletableFuture<ChunkResult<ChunkAccess>> getFutureIfPresentUnchecked(ChunkStatus chunkStatus);
 
     @Override
     public LevelChunk getFullChunkNow() {
@@ -46,9 +47,9 @@ public abstract class MixinChunkHolder implements InjectionChunkHolder {
 
     @Override
     public LevelChunk getFullChunkNowUnchecked() {
-        CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> statusFuture = this.getFutureIfPresentUnchecked(ChunkStatus.FULL);
-        Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure> either = statusFuture.getNow(null);
-        return (either == null) ? null : (LevelChunk) either.left().orElse(null);
+        CompletableFuture<ChunkResult<ChunkAccess>> statusFuture = this.getFutureIfPresentUnchecked(ChunkStatus.FULL);
+        ChunkResult<ChunkAccess> either = statusFuture.getNow(null);
+        return (either == null) ? null : (LevelChunk) either.orElse(null);
     }
 
     @Inject(method = "blockChanged", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD,
@@ -67,7 +68,7 @@ public abstract class MixinChunkHolder implements InjectionChunkHolder {
         // ChunkUnloadEvent: Called before the chunk is unloaded: isChunkLoaded is still true and chunk can still be modified by plugins.
         if (ChunkLevel.fullStatus(this.oldTicketLevel).isOrAfter(FullChunkStatus.FULL) && !ChunkLevel.fullStatus(this.ticketLevel).isOrAfter(FullChunkStatus.FULL)) {
             this.getFutureIfPresentUnchecked(ChunkStatus.FULL).thenAccept((either) -> {
-                LevelChunk chunk = (LevelChunk)either.left().orElse(null);
+                LevelChunk chunk = (LevelChunk)either.orElse(null);
                 if (chunk != null) {
                     chunkMap.bridge$callbackExecutor().execute(() -> {
                         // Minecraft will apply the chunks tick lists to the world once the chunk got loaded, and then store the tick
@@ -95,7 +96,7 @@ public abstract class MixinChunkHolder implements InjectionChunkHolder {
         // ChunkLoadEvent: Called after the chunk is loaded: isChunkLoaded returns true and chunk is ready to be modified by plugins.
         if (!ChunkLevel.fullStatus(this.oldTicketLevel).isOrAfter(FullChunkStatus.FULL) && ChunkLevel.fullStatus(this.ticketLevel).isOrAfter(FullChunkStatus.FULL)) {
             this.getFutureIfPresentUnchecked(ChunkStatus.FULL).thenAccept((either) -> {
-                LevelChunk chunk = (LevelChunk)either.left().orElse(null);
+                LevelChunk chunk = (LevelChunk)either.orElse(null);
                 if (chunk != null) {
                     chunkMap.bridge$callbackExecutor().execute(() -> {
                         chunk.loadCallback();

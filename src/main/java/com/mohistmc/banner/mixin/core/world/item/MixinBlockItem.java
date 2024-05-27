@@ -45,10 +45,7 @@ public abstract class MixinBlockItem {
 
     @Shadow protected abstract boolean mustSurvive();
 
-    @Shadow
-    public static <T extends Comparable<T>> BlockState updateState(BlockState blockState, Property<T> property, String string) {
-        return null;
-    }
+    @Shadow protected abstract SoundEvent getPlaceSound(BlockState blockState);
 
     private AtomicReference<org.bukkit.block.BlockState> banner$stateCB = new AtomicReference<>(null);
 
@@ -129,7 +126,7 @@ public abstract class MixinBlockItem {
             Property<?> iproperty = statecontainer.getProperty(s);
             if (iproperty != null) {
                 String s1 = nbt.get(s).getAsString();
-                blockState = updateState(blockState, iproperty, s1);
+                blockState = getPlaceSound(blockState, iproperty, s1);
             }
         }
         return blockState;

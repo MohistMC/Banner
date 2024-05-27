@@ -616,7 +616,7 @@ public final class CraftItemStack extends ItemStack {
             return false;
         }
         if (CraftItemFactory.instance().equals(itemMeta, null)) {
-            item.restorePatch(DataComponentPatch.EMPTY);
+            item.applyComponents(DataComponentPatch.EMPTY);
             return true;
         }
         if (!CraftItemFactory.instance().isApplicable(itemMeta, CraftItemStack.getType(item))) {
@@ -636,7 +636,7 @@ public final class CraftItemStack extends ItemStack {
             CraftMetaItem.Applicator tag = new CraftMetaItem.Applicator();
 
             ((CraftMetaItem) itemMeta).applyToItem(tag);
-            item.restorePatch(tag.build());
+            item.applyComponents(tag.build());
         }
         // SpigotCraft#463 this is required now by the Vanilla client, so mimic ItemStack constructor in ensuring it
         if (item.getItem() != null && item.getMaxDamage() > 0) {
@@ -645,6 +645,20 @@ public final class CraftItemStack extends ItemStack {
 
         return true;
     }
+
+    // Paper start - MC Utils
+    public static net.minecraft.world.item.ItemStack unwrap(ItemStack bukkit) {
+        if (bukkit instanceof CraftItemStack craftItemStack) {
+            return craftItemStack.handle != null ? craftItemStack.handle : net.minecraft.world.item.ItemStack.EMPTY;
+        } else {
+            return asNMSCopy(bukkit);
+        }
+    }
+
+    public static net.minecraft.world.item.ItemStack getOrCloneOnMutation(ItemStack old, ItemStack newInstance) {
+        return old == newInstance ? unwrap(old) : asNMSCopy(newInstance);
+    }
+    // Paper end - MC Utils
 
     @Override
     public boolean isSimilar(ItemStack stack) {
