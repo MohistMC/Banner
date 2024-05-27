@@ -25,21 +25,6 @@ public class BannerDerivedWorldInfo extends PrimaryLevelData {
     }
 
     @Override
-    public int getXSpawn() {
-        return derivedWorldInfo.getXSpawn();
-    }
-
-    @Override
-    public int getYSpawn() {
-        return derivedWorldInfo.getYSpawn();
-    }
-
-    @Override
-    public int getZSpawn() {
-        return derivedWorldInfo.getZSpawn();
-    }
-
-    @Override
     public float getSpawnAngle() {
         return derivedWorldInfo.getSpawnAngle();
     }
@@ -95,26 +80,6 @@ public class BannerDerivedWorldInfo extends PrimaryLevelData {
     }
 
     @Override
-    public void setXSpawn(int x) {
-        derivedWorldInfo.setXSpawn(x);
-    }
-
-    @Override
-    public void setYSpawn(int y) {
-        derivedWorldInfo.setYSpawn(y);
-    }
-
-    @Override
-    public void setZSpawn(int z) {
-        derivedWorldInfo.setZSpawn(z);
-    }
-
-    @Override
-    public void setSpawnAngle(float angle) {
-        derivedWorldInfo.setSpawnAngle(angle);
-    }
-
-    @Override
     public void setGameTime(long time) {
         derivedWorldInfo.setGameTime(time);
     }
@@ -157,11 +122,6 @@ public class BannerDerivedWorldInfo extends PrimaryLevelData {
     @Override
     public boolean isHardcore() {
         return derivedWorldInfo.isHardcore();
-    }
-
-    @Override
-    public boolean getAllowCommands() {
-        return derivedWorldInfo.getAllowCommands();
     }
 
     @Override

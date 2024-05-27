@@ -40,6 +40,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+// Banner TODO fix patches
 @Mixin(HopperBlockEntity.class)
 public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockEntity implements Hopper {
 
@@ -74,22 +75,24 @@ public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockE
         banner$hopperEntity.set(blockEntity);
     }
 
+    /*
     @Redirect(method = "tryMoveItems",
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;ejectItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/Container;)Z"))
     private static boolean banner$changeEjects(Level level, BlockPos pos, BlockState state, Container sourceContainer) {
         return ejectItems(level, pos, state, sourceContainer, banner$hopperEntity.get());
-    }
+    }*/
 
     private static AtomicReference<HopperBlockEntity> banner$hopper = new AtomicReference<>();
     private static AtomicReference<Level> banner$world = new AtomicReference<>();
     private static AtomicReference<InventoryMoveItemEvent> banner$moveEvent = new AtomicReference<>();
 
+    /*
     private static boolean ejectItems(Level world, BlockPos blockposition, BlockState iblockdata, Container iinventory, HopperBlockEntity hopper) { // CraftBukkit
         banner$hopper.set(hopper);
         banner$world.set(world);
         return shadow$ejectItems(world, blockposition, iblockdata, iinventory);
-    }
+    }*/
 
     @Redirect(method = "ejectItems", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;addItem(Lnet/minecraft/world/Container;Lnet/minecraft/world/Container;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/core/Direction;)Lnet/minecraft/world/item/ItemStack;"))
     private static ItemStack banner$moveItem(Container source, Container destination, ItemStack stack, Direction direction) {

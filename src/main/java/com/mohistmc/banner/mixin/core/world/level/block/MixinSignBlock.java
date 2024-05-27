@@ -54,10 +54,9 @@ public abstract class MixinSignBlock implements InjectionSignBlock {
         // Paper end
     }
 
-    @Inject(method = "use", at = @At(value = "INVOKE",
+    @Inject(method = "useWithoutItem", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/block/SignBlock;openTextEdit(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/block/entity/SignBlockEntity;Z)V"))
-    private void banner$setCause(BlockState state, Level level, BlockPos pos, Player player,
-                                 InteractionHand hand, BlockHitResult hit, CallbackInfoReturnable<InteractionResult> cir) {
+    private void banner$setCause(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult blockHitResult, CallbackInfoReturnable<InteractionResult> cir) {
         pushOpenSignCause(PlayerSignOpenEvent.Cause.INTERACT);
     }
 

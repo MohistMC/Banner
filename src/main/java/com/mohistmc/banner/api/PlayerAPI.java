@@ -53,8 +53,9 @@ public class PlayerAPI {
         return getNMSPlayer(player).connection.connection.getRemoteAddress();
     }
 
+    /*
     public static boolean ignoreOp() {
         return CraftPlayer.ignoreOp.getAndSet(false);
-    }
+    }*/
 }
 

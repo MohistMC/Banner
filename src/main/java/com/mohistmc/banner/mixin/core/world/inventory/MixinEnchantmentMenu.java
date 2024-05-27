@@ -45,6 +45,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+// Banner TODO fix patches
 @Mixin(EnchantmentMenu.class)
 public abstract class MixinEnchantmentMenu extends AbstractContainerMenu{
 
@@ -79,6 +80,7 @@ public abstract class MixinEnchantmentMenu extends AbstractContainerMenu{
      * @author wdog5
      * @reason bukkit
      */
+    /*
     @Overwrite
     public boolean clickMenuButton(net.minecraft.world.entity.player.Player player, int id) {
         if (id >= 0 && id < this.costs.length) {
@@ -139,6 +141,7 @@ public abstract class MixinEnchantmentMenu extends AbstractContainerMenu{
                                 }
                             } catch (IllegalArgumentException e) {
                                 /* Just swallow invalid enchantments */
+    /*
                             }
                         }
 
@@ -178,6 +181,7 @@ public abstract class MixinEnchantmentMenu extends AbstractContainerMenu{
      * @author wdog5
      * @reason bukkit
      */
+    /*
     @Overwrite
     public void slotsChanged(Container container) {
         if (container == this.enchantSlots) {
@@ -260,7 +264,7 @@ public abstract class MixinEnchantmentMenu extends AbstractContainerMenu{
             }
         }
 
-    }
+    }*/
 
     @Override
     public CraftInventoryView getBukkitView() {

@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -433,6 +435,25 @@ public class CraftBlock implements Block {
         return this.getNMS().liquid();
     }
 
+    // Paper start
+    @Override
+    public boolean isBuildable() {
+        return this.getNMS().isSolid(); // This is in fact isSolid, despite the fact that isSolid below returns blocksMotion
+    }
+    @Override
+    public boolean isBurnable() {
+        return this.getNMS().ignitedByLava();
+    }
+    @Override
+    public boolean isReplaceable() {
+        return this.getNMS().canBeReplaced();
+    }
+    @Override
+    public boolean isSolid() {
+        return this.getNMS().blocksMotion();
+    }
+    // Paper end
+
     @Override
     public PistonMoveReaction getPistonMoveReaction() {
         return PistonMoveReaction.getById(this.getNMS().getPistonPushReaction().ordinal());
@@ -469,15 +490,15 @@ public class CraftBlock implements Block {
         UseOnContext context = new UseOnContext(world, null, InteractionHand.MAIN_HAND, Items.BONE_MEAL.getDefaultInstance(), new BlockHitResult(Vec3.ZERO, direction, this.getPosition(), false));
 
         // SPIGOT-6895: Call StructureGrowEvent and BlockFertilizeEvent
-        world.captureTreeGeneration = true;
-        InteractionResult result = BoneMealItem.applyBonemeal(context);
-        world.captureTreeGeneration = false;
+        world.banner$setCaptureTreeGeneration(true);
+        InteractionResult result = BukkitExtraConstants.applyBonemeal(context);
+        world.banner$setCaptureTreeGeneration(false);
 
-        if (world.capturedBlockStates.size() > 0) {
-            TreeType treeType = SaplingBlock.treeType;
-            SaplingBlock.treeType = null;
-            List<BlockState> blocks = new ArrayList<>(world.capturedBlockStates.values());
-            world.capturedBlockStates.clear();
+        if (world.bridge$capturedBlockStates().size() > 0) {
+            TreeType treeType = BukkitExtraConstants.treeType;
+            BukkitExtraConstants.treeType = null;
+            List<BlockState> blocks = new ArrayList<>(world.bridge$capturedBlockStates().values());
+            world.bridge$capturedBlockStates().clear();
             StructureGrowEvent structureEvent = null;
 
             if (treeType != null) {

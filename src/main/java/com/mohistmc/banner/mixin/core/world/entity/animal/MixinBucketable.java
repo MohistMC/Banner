@@ -40,7 +40,7 @@ public interface MixinBucketable {
             if (event.isCancelled()) {
                 player.containerMenu.sendAllDataToRemote(); // We need to update inventory to resync client's bucket
                 ((ServerPlayer) player).connection.send(new ClientboundAddEntityPacket(entity)); // We need to play out these packets as the client assumes the fish is gone
-                livingEntity.getEntityData().refresh((ServerPlayer) player); // Need to send data such as the display name to client
+                livingEntity.refreshEntityData((ServerPlayer) player); // Need to send data such as the display name to client
                 return Optional.of(InteractionResult.FAIL);
             }
             entity.playSound(entity.getPickupSound(), 1.0F, 1.0F);

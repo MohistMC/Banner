@@ -4,6 +4,7 @@ import com.mohistmc.banner.bukkit.DistValidate;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
@@ -87,9 +88,9 @@ public abstract class MixinChiseledBookShelfBlockEntity extends BlockEntity impl
         }
     }
 
-    @Inject(method = "load", at = @At("HEAD"))
-    private void banner$load(CompoundTag compoundTag, CallbackInfo ci) {
-        super.load(compoundTag); // CraftBukkit - SPIGOT-7393: Load super Bukkit data
+    @Inject(method = "loadAdditional", at = @At("HEAD"))
+    private void banner$load(CompoundTag compoundTag, HolderLookup.Provider provider, CallbackInfo ci) {
+        super.loadAdditional(compoundTag, provider); // CraftBukkit - SPIGOT-7393: Load super Bukkit data
     }
 
     @Inject(method = "removeItem",

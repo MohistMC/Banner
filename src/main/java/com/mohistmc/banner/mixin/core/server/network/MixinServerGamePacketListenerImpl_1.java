@@ -70,7 +70,7 @@ public abstract class MixinServerGamePacketListenerImpl_1 {
 
             if (event.isCancelled() || field_28963.player.getInventory().getSelected() == null || field_28963.player.getInventory().getSelected().getItem() != origItem) {
                 // Refresh the current entity metadata
-                val$target.getEntityData().refresh(field_28963.player);
+                val$target.refreshEntityData(field_28963.player);
                 // SPIGOT-7136 - Allays
                 if (val$target instanceof Allay) {
                     field_28963.send(new ClientboundSetEquipmentPacket(val$target.getId(), Arrays.stream(EquipmentSlot.values()).map((slot) -> Pair.of(slot, ((LivingEntity) val$target).getItemBySlot(slot).copy())).collect(Collectors.toList())));

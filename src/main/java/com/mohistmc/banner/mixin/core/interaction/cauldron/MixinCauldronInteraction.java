@@ -14,9 +14,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+// Banner TODO fix patches
 @Mixin(CauldronInteraction.class)
 public interface MixinCauldronInteraction {
 
+    /*
     @Redirect(method = "<clinit>", at = @At(value = "FIELD",
             target = "Lnet/minecraft/core/cauldron/CauldronInteraction;SHULKER_BOX:Lnet/minecraft/core/cauldron/CauldronInteraction;"))
     private static void banner$resetShulkerBox(CauldronInteraction value) {
@@ -32,7 +34,7 @@ public interface MixinCauldronInteraction {
                     }
                     // CraftBukkit end
                     ItemStack itemStack2 = new ItemStack(Blocks.SHULKER_BOX);
-                    if (itemStack.hasTag()) {
+                    if (itemStack.has()) {
                         itemStack2.setTag(itemStack.getTag().copy());
                     }
 
@@ -81,5 +83,5 @@ public interface MixinCauldronInteraction {
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
         };
-    }
+    }*/
 }

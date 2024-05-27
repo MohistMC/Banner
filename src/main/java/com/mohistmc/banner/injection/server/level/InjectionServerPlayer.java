@@ -210,4 +210,8 @@ public interface InjectionServerPlayer extends InjectionPlayer {
     default PortalInfo banner$findDimensionEntryPoint(ServerLevel destination) {
         return null;
     }
+
+    default CraftPlayer.TransferCookieConnection bridge$transferCookieConnection() {
+        return null;
+    }
 }

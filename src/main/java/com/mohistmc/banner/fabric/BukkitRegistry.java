@@ -111,7 +111,7 @@ public class BukkitRegistry {
                 // inject item materials into Bukkit for Fabric
                 String materialName = normalizeName(resourceLocation.toString());
                 int id = Item.getId(item);
-                Material material = Material.addMaterial(materialName, id, item.getMaxStackSize(), false, true, resourceLocation);
+                Material material = Material.addMaterial(materialName, id, item.getDefaultMaxStackSize(), false, true, resourceLocation);
 
                 newTypes.add(material);
 
@@ -134,7 +134,7 @@ public class BukkitRegistry {
                 String materialName = normalizeName(resourceLocation.toString());
                 int id = Item.getId(block.asItem());
                 Item item = Item.byId(id);
-                Material material = Material.addMaterial(materialName, id, item.getMaxStackSize(), true, false, resourceLocation);
+                Material material = Material.addMaterial(materialName, id, item.getDefaultMaxStackSize(), true, false, resourceLocation);
                 newTypes.add(material);
 
                 if (material != null) {

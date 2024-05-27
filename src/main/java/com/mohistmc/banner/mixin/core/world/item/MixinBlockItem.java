@@ -45,8 +45,6 @@ public abstract class MixinBlockItem {
 
     @Shadow protected abstract boolean mustSurvive();
 
-    @Shadow protected abstract SoundEvent getPlaceSound(BlockState blockState);
-
     private AtomicReference<org.bukkit.block.BlockState> banner$stateCB = new AtomicReference<>(null);
 
     @Inject(method = "place", at= @At(value = "INVOKE",
@@ -82,26 +80,6 @@ public abstract class MixinBlockItem {
         // CraftBukkit end
     }
 
-    @Redirect(method = "place", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;playSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V"))
-    private void banner$cancelPlayerSound(Level instance, Player player, BlockPos pos, SoundEvent sound, SoundSource source, float volume, float pitch) {}
-
-    private AtomicReference<Player> banner$placePlayer = new AtomicReference<>();
-    private AtomicReference<ItemStack> banner$placeStack = new AtomicReference<>();
-
-    @Inject(method = "place", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/Level;gameEvent(Lnet/minecraft/world/level/gameevent/GameEvent;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/gameevent/GameEvent$Context;)V"),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$setInfo(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir, BlockPlaceContext blockPlaceContext, BlockState blockState, BlockPos blockPos, Level level, Player player, ItemStack itemStack, BlockState blockState2, SoundType soundType) {
-        banner$placePlayer.set(player);
-        banner$placeStack.set(itemStack);
-    }
-
-    @Redirect(method = "place", at = @At(value = "FIELD",
-            target = "Lnet/minecraft/world/entity/player/Abilities;instabuild:Z"))
-    private boolean banner$checkAbilities(Abilities instance) {
-        return banner$placePlayer.getAndSet(null).getAbilities().instabuild && banner$placeStack.getAndSet(null) == ItemStack.EMPTY;
-    }
-
     /**
      * @author wdog5
      * @reason bukkit event
@@ -117,18 +95,5 @@ public abstract class MixinBlockItem {
         context.getLevel().getCraftServer().getPluginManager().callEvent(event);
         return event.isBuildable();
         // CraftBukkit end
-    }
-
-    @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
-    private static BlockState getBlockState(BlockState blockState, CompoundTag nbt) {
-        StateDefinition<Block, BlockState> statecontainer = blockState.getBlock().getStateDefinition();
-        for (String s : nbt.getAllKeys()) {
-            Property<?> iproperty = statecontainer.getProperty(s);
-            if (iproperty != null) {
-                String s1 = nbt.get(s).getAsString();
-                blockState = getPlaceSound(blockState, iproperty, s1);
-            }
-        }
-        return blockState;
     }
 }

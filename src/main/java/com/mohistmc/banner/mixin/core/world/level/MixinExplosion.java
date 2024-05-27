@@ -82,9 +82,6 @@ public abstract class MixinExplosion implements InjectionExplosion {
     // @formatter:on
 
     @Shadow @Final private DamageSource damageSource;
-
-    @Shadow @Final private SoundEvent explosionSound;
-
     @Inject(method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/Entity;DDDFZLnet/minecraft/world/level/Explosion$BlockInteraction;)V",
             at = @At("RETURN"))
     public void banner$adjustSize(Level worldIn, Entity exploderIn, double xIn, double yIn, double zIn, float sizeIn, boolean causesFireIn, Explosion.BlockInteraction modeIn, CallbackInfo ci) {

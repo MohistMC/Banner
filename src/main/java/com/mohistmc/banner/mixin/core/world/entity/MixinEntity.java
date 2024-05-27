@@ -3,6 +3,8 @@ package com.mohistmc.banner.mixin.core.world.entity;
 import com.google.common.collect.ImmutableList;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.injection.world.entity.InjectionEntity;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -15,6 +17,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
@@ -963,5 +966,14 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Override
     public void banner$setInWorld(boolean inWorld) {
         this.inWorld = inWorld;
+    }
+
+    @Override
+    public void refreshEntityData(ServerPlayer to) {
+        List<SynchedEntityData.DataValue<?>> list = this.getEntityData().getNonDefaultValues();
+
+        if (list != null) {
+            to.connection.send(new ClientboundSetEntityDataPacket(this.getId(), list));
+        }
     }
 }

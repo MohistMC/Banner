@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.core.world.level.block.entity;
 
 import com.mohistmc.banner.injection.world.level.block.entity.InjectionCatalystListener;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -41,8 +42,8 @@ public abstract class MixinSculkCatalystBlockEntity extends BlockEntity {
         CraftEventFactory.sourceBlockOverride = null;
     }
 
-    @Inject(method = "load", at = @At("HEAD"))
-    private void banner$load(CompoundTag compoundTag, CallbackInfo ci) {
-        super.load(compoundTag); // CraftBukkit - SPIGOT-7393: Load super Bukkit data
+    @Inject(method = "loadAdditional", at = @At("HEAD"))
+    private void banner$load(CompoundTag compoundTag, HolderLookup.Provider provider, CallbackInfo ci) {
+        super.loadAdditional(compoundTag, provider); // CraftBukkit - SPIGOT-7393: Load super Bukkit data
     }
 }

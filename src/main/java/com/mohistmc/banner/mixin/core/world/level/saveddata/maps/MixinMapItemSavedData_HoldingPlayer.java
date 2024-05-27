@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.saveddata.maps.MapDecoration;
+import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.map.RenderData;
@@ -50,7 +51,7 @@ public abstract class MixinMapItemSavedData_HoldingPlayer {
     @Inject(method = "nextUpdatePacket", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData$HoldingPlayer;createPatch()Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData$MapPatch;",
             shift = At.Shift.AFTER))
-    private void banner$setColors(int mapId, CallbackInfoReturnable<Packet<?>> cir) {
+    private void banner$setColors(MapId mapId, CallbackInfoReturnable<Packet<?>> cir) {
         field_132.colors = banner$colors;
     }
 
@@ -59,7 +60,7 @@ public abstract class MixinMapItemSavedData_HoldingPlayer {
         // CraftBukkit start
         for (org.bukkit.map.MapCursor cursor : banner$render.getAndSet(null).cursors) {
             if (cursor.isVisible()) {
-                icons.add(new MapDecoration(MapDecoration.Type.byIcon(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), CraftChatMessage.fromStringOrNull(cursor.getCaption())));
+                icons.add(new MapDecoration(MapDecoration.byIcon(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), CraftChatMessage.fromStringOrNull(cursor.getCaption())));
             }
         }
         return icons;

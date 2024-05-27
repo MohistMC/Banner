@@ -33,6 +33,8 @@ public abstract class MixinEntityType<T extends Entity> implements InjectionEnti
     }
     @Shadow @Nullable public abstract T spawn(ServerLevel serverLevel, @Nullable ItemStack stack, @Nullable Player player, BlockPos pos, MobSpawnType spawnType, boolean shouldOffsetY, boolean shouldOffsetYMore);
 
+    @Shadow @Nullable public abstract T create(ServerLevel serverLevel, @Nullable Consumer<T> consumer, BlockPos blockPos, MobSpawnType mobSpawnType, boolean bl, boolean bl2);
+
     @Inject(method = "spawn(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/MobSpawnType;ZZ)Lnet/minecraft/world/entity/Entity;",
             at = @At(value = "HEAD"))
     private void banner$spawnReason(ServerLevel serverLevel, ItemStack stack, Player player, BlockPos pos, MobSpawnType spawnType, boolean shouldOffsetY, boolean shouldOffsetYMore, CallbackInfoReturnable<T> cir) {
@@ -42,18 +44,18 @@ public abstract class MixinEntityType<T extends Entity> implements InjectionEnti
         }
     }
 
-    @Inject(method = "spawn(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/nbt/CompoundTag;Ljava/util/function/Consumer;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/MobSpawnType;ZZ)Lnet/minecraft/world/entity/Entity;",
+    @Inject(method = "spawn(Lnet/minecraft/server/level/ServerLevel;Ljava/util/function/Consumer;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/MobSpawnType;ZZ)Lnet/minecraft/world/entity/Entity;",
             cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At("RETURN"),
             slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V")))
-    private void banner$returnIfSuccess(ServerLevel level, CompoundTag compound, Consumer<T> consumer, BlockPos pos, MobSpawnType spawnType, boolean shouldOffsetY, boolean shouldOffsetYMore, CallbackInfoReturnable<T> cir, T entity) {
+    private void banner$returnIfSuccess(ServerLevel serverLevel, Consumer<T> consumer, BlockPos blockPos, MobSpawnType mobSpawnType, boolean bl, boolean bl2, CallbackInfoReturnable<T> cir, Entity entity) {
         if (entity != null) {
-            cir.setReturnValue(entity.isRemoved() ? null : entity);
+            cir.setReturnValue(entity.isRemoved() ? null : (T) entity);
         }
     }
 
     @Override
     public @Nullable T spawn(ServerLevel worldserver, @Nullable CompoundTag nbttagcompound, @Nullable Consumer<T> consumer, BlockPos blockposition, MobSpawnType enummobspawn, boolean flag, boolean flag1, CreatureSpawnEvent.SpawnReason spawnReason) {
-        T t = this.create(worldserver, nbttagcompound, consumer, blockposition, enummobspawn, flag, flag1);
+        T t = this.create(worldserver, consumer, blockposition, enummobspawn, flag, flag1);
         if (t != null) {
             worldserver.pushAddEntityReason(spawnReason);
             worldserver.addFreshEntityWithPassengers(t);

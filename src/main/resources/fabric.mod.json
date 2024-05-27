@@ -114,7 +114,6 @@
       "net/minecraft/class_3324": ["com/mohistmc/banner/injection/server/players/InjectionPlayerList"],
       "net/minecraft/class_3309": ["com/mohistmc/banner/injection/server/players/InjectionBanListEntry"],
       "net/minecraft/class_3331": ["com/mohistmc/banner/injection/server/players/InjectionStoredUserList"],
-      "net/minecraft/class_1667": ["com/mohistmc/banner/injection/world/entity/projectile/InjectionArrow"],
       "net/minecraft/class_1668": ["com/mohistmc/banner/injection/world/entity/projectile/InjectionAbstractHurtingProjectile"],
       "net/minecraft/class_1676": ["com/mohistmc/banner/injection/world/entity/projectile/InjectionProjectile"],
       "net/minecraft/class_1678": ["com/mohistmc/banner/injection/world/entity/projectile/InjectionShulkerBullet"],

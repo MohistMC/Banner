@@ -165,6 +165,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     private boolean banner$initialized = false;
     private float pluginRainPosition;
     private float pluginRainPositionPrevious;
+    public CraftPlayer.TransferCookieConnection transferCookieConnection;
 
     public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
         super(level, blockPos, f, gameProfile);

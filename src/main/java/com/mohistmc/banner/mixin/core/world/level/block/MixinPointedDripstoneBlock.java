@@ -34,16 +34,6 @@ public class MixinPointedDripstoneBlock {
         }
     }
 
-    @Inject(method = "fallOn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;causeFallDamage(FFLnet/minecraft/world/damagesource/DamageSource;)Z"))
-    private void banner$blockDamage(Level level, BlockState p_154048_, BlockPos pos, Entity p_154050_, float p_154051_, CallbackInfo ci) {
-        CraftEventFactory.blockDamage = CraftBlock.at(level, pos);
-    }
-
-    @Inject(method = "fallOn", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/Entity;causeFallDamage(FFLnet/minecraft/world/damagesource/DamageSource;)Z"))
-    private void banner$blockDamageReset(Level level, BlockState p_154048_, BlockPos pos, Entity p_154050_, float p_154051_, CallbackInfo ci) {
-        CraftEventFactory.blockDamage = CraftBlock.at(level, pos);
-    }
-
     @Redirect(method = "createMergedTips", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/PointedDripstoneBlock;createDripstone(Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/block/state/properties/DripstoneThickness;)V"))
     private static void banner$changeBlock1(LevelAccessor level, BlockPos pos, Direction direction, DripstoneThickness thickness,
                                               BlockState p_154231_, LevelAccessor p_154232_, BlockPos source) {

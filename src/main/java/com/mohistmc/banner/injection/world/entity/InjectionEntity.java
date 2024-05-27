@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.RelativeMovement;
@@ -30,6 +31,9 @@ public interface InjectionEntity {
 
     default void setOrigin(@javax.annotation.Nonnull Location location) {
 
+    }
+
+    default void refreshEntityData(ServerPlayer to) {
     }
 
     @Nullable

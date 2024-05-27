@@ -27,7 +27,8 @@ accessible method net/minecraft/world/level/block/entity/BlockEntity$DataCompone
 accessible method net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplateManager loadFromResource (Lnet/minecraft/resources/ResourceLocation;)Ljava/util/Optional;
 accessible method net/minecraft/nbt/ListTag <init> (Ljava/util/List;B)V
 accessible method net/minecraft/world/level/block/state/BlockBehaviour onPlace (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)V
-
+accessible field net/minecraft/world/item/enchantment/ItemEnchantments showInTooltip Z
+accessible field net/minecraft/world/item/enchantment/ItemEnchantments$Mutable showInTooltip Z
 # 1.20.4
 accessible field net/minecraft/world/entity/ai/attributes/AttributeModifier name Ljava/lang/String;
 accessible field net/minecraft/world/level/block/entity/CrafterBlockEntity craftingTicksRemaining I
@@ -672,3 +673,7 @@ mutable field net/minecraft/server/players/PlayerList maxPlayers I
 accessible field net/minecraft/server/players/PlayerList maxPlayers I
 mutable field net/minecraft/world/level/chunk/LevelChunkSection states Lnet/minecraft/world/level/chunk/PalettedContainer;
 accessible field net/minecraft/world/level/chunk/LevelChunkSection states Lnet/minecraft/world/level/chunk/PalettedContainer;
+mutable field net/minecraft/world/item/trading/MerchantOffer xp I
+mutable field net/minecraft/world/item/trading/MerchantOffer rewardExp Z
+mutable field net/minecraft/world/item/trading/MerchantOffer priceMultiplier F
+mutable field net/minecraft/world/item/enchantment/ItemEnchantments$Mutable showInTooltip Z

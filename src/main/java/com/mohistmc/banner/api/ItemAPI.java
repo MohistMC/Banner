@@ -50,13 +50,14 @@ public class ItemAPI {
         return new ItemStack(material);
     }
 
+    /*
     public static CompoundTag getNbt(ItemStack itemStack) {
         return toNMSItem(itemStack).getTag() == null ? null : toNMSItem(itemStack).getTag();
     }
 
     public static String getNBTAsString(ItemStack itemStack) {
         return toNMSItem(itemStack).getTag() == null ? "null" : toNMSItem(itemStack).getTag().getAsString();
-    }
+    }*/
 
     public static String getNbtAsString(CompoundTag compoundTag) {
         return compoundTag == null ? "null" : compoundTag.getAsString();
@@ -102,9 +103,10 @@ public class ItemAPI {
         }
     }
 
+    /*
     public static String serializeNBT(ItemStack itemStack) {
         return getNbt(itemStack) == null ? null : serializeNbt(getNbt(itemStack));
-    }
+    }*/
 
     public static String serializeNbt(CompoundTag nbtTagCompound) {
         try {
@@ -144,7 +146,7 @@ public class ItemAPI {
     public static TextComponent show(ItemStack itemStack) {
         net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
         CompoundTag compound = new CompoundTag();
-        nmsItemStack.save(compound);
+        //nmsItemStack.save(compound);
         String json = compound.toString();
         BaseComponent[] hoverEventComponents = new BaseComponent[]{
                 new TextComponent(json)

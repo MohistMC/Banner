@@ -18,27 +18,15 @@ public abstract class MixinSynchedEntityData implements InjectionSynchedEntityDa
     @Shadow protected abstract <T> SynchedEntityData.DataItem<T> getItem(EntityDataAccessor<T> key);
 
     @Shadow private boolean isDirty;
-
-    @Shadow public abstract boolean isEmpty();
-
     @Shadow @Nullable public abstract List<SynchedEntityData.DataValue<?>> getNonDefaultValues();
 
     @Shadow @Final private Entity entity;
+
+    @Shadow public abstract boolean isDirty();
 
     @Override
     public <T> void markDirty(EntityDataAccessor<T> datawatcherobject) {
         this.getItem(datawatcherobject).setDirty(true);
         this.isDirty = true;
-    }
-
-    @Override
-    public void refresh(ServerPlayer to) {
-        if (!this.isEmpty()) {
-            List<SynchedEntityData.DataValue<?>> list = this.getNonDefaultValues();
-
-            if (list != null) {
-                to.connection.send(new ClientboundSetEntityDataPacket(this.entity.getId(), list));
-            }
-        }
     }
 }

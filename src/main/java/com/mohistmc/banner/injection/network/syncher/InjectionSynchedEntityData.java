@@ -7,7 +7,4 @@ public interface InjectionSynchedEntityData {
 
     default <T> void markDirty(EntityDataAccessor<T> datawatcherobject) {
     }
-
-    default void refresh(ServerPlayer to) {
-    }
 }

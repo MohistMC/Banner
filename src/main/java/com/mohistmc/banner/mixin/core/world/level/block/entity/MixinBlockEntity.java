@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.core.world.level.block.entity;
 
 import com.mohistmc.banner.injection.world.level.block.entity.InjectionBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -26,11 +27,11 @@ public abstract class MixinBlockEntity implements InjectionBlockEntity {
     private static final CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new CraftPersistentDataTypeRegistry();
     public CraftPersistentDataContainer persistentDataContainer;
 
-    @Inject(method = "load", at = @At("RETURN"))
-    public void banner$loadPersistent(CompoundTag compound, CallbackInfo ci) {
+    @Inject(method = "loadAdditional", at = @At("RETURN"))
+    public void banner$loadPersistent(CompoundTag compoundTag, HolderLookup.Provider provider, CallbackInfo ci) {
         this.persistentDataContainer = new CraftPersistentDataContainer(DATA_TYPE_REGISTRY);
 
-        CompoundTag persistentDataTag = compound.getCompound("PublicBukkitValues");
+        CompoundTag persistentDataTag = compoundTag.getCompound("PublicBukkitValues");
         if (persistentDataTag != null) {
             this.persistentDataContainer.putAll(persistentDataTag);
         }

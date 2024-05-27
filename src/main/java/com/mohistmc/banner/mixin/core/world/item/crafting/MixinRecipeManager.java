@@ -7,12 +7,18 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.injection.world.item.crafting.InjectionRecipeManager;
+import com.mojang.serialization.JsonOps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
+
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
@@ -29,17 +35,24 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
+// Banner TODO fix patch
 @Mixin(RecipeManager.class)
 public abstract class MixinRecipeManager implements InjectionRecipeManager {
     @Shadow private boolean hasErrors;
 
+    @Shadow @Final private static Logger LOGGER;
+    @Shadow private Map<ResourceLocation, RecipeHolder<?>> byName;
+
     @Shadow
-    protected static RecipeHolder<?> fromJson(ResourceLocation resourceLocation, JsonObject jsonObject) {
+    protected static RecipeHolder<?> fromJson(ResourceLocation resourceLocation, JsonObject jsonObject, HolderLookup.Provider provider) {
         return null;
     }
 
-    @Shadow @Final private static Logger LOGGER;
-    @Shadow private Map<ResourceLocation, RecipeHolder<?>> byName;
+    @Shadow @Final private HolderLookup.Provider registries;
+
+    @Shadow protected abstract <C extends Container, T extends Recipe<C>> Collection<RecipeHolder<T>> byType(RecipeType<T> recipeType);
+
+    /**
     public Map<RecipeType<?>, Object2ObjectLinkedOpenHashMap<ResourceLocation, RecipeHolder<?>>> recipesCB = ImmutableMap.of(); // CraftBukkit  // Mohist use obf name
 
 
@@ -49,6 +62,7 @@ public abstract class MixinRecipeManager implements InjectionRecipeManager {
      * @author wdog5
      * @reason bukkit current recipe
      */
+    /**
     @Overwrite
     protected void apply(Map<ResourceLocation, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
         this.hasErrors = false;
@@ -62,6 +76,7 @@ public abstract class MixinRecipeManager implements InjectionRecipeManager {
 
         Map<RecipeType<?>, ImmutableMap.Builder<ResourceLocation, RecipeHolder<?>>> map = Maps.newHashMap();
         ImmutableMap.Builder<ResourceLocation, RecipeHolder<?>> builder = ImmutableMap.builder();
+        RegistryOps<JsonElement> registryOps = this.registries.createSerializationContext(JsonOps.INSTANCE);
 
         Iterator var6 = pObject.entrySet().iterator();
 
@@ -70,8 +85,8 @@ public abstract class MixinRecipeManager implements InjectionRecipeManager {
             ResourceLocation resourceLocation = (ResourceLocation)entry.getKey();
 
             try {
-                RecipeHolder<?> recipe = fromJson(resourceLocation, GsonHelper.convertToJsonObject(entry.getValue(), "top element"));
-                map.computeIfAbsent(recipe.value().getType(), (p_44075_) -> {
+                Recipe<?> recipe = (Recipe)Recipe.CODEC.parse(registryOps, (JsonElement)entry.getValue()).getOrThrow(JsonParseException::new);
+                RecipeHolder<?> recipeHolder = new RecipeHolder(resourceLocation, recipe);                map.computeIfAbsent(recipe.value().getType(), (p_44075_) -> {
                     return ImmutableMap.builder();
                 }).put(resourceLocation, recipe);
 
@@ -79,8 +94,8 @@ public abstract class MixinRecipeManager implements InjectionRecipeManager {
                 (map1.computeIfAbsent(recipe.value().getType(), (recipes) -> {
                     return new Object2ObjectLinkedOpenHashMap<>();
                     // CraftBukkit end
-                })).put(resourceLocation, recipe.value());
-                builder.put(resourceLocation, recipe);
+                })).put(resourceLocation, recipe);
+                builder.put(resourceLocation, recipe.getType());
             } catch (IllegalArgumentException | JsonParseException jsonparseexception) {
                 LOGGER.error("Parsing error loading recipe {}", resourceLocation, jsonparseexception);
             }
@@ -100,6 +115,7 @@ public abstract class MixinRecipeManager implements InjectionRecipeManager {
      * @author wdog5
      * @reason bukkit current recipe
      */
+    /**
     @Overwrite
     public <C extends Container, T extends Recipe<C>> Optional<RecipeHolder<T>> getRecipeFor(RecipeType<T> recipeTypeIn, C inventoryIn, Level worldIn) {
         Optional<RecipeHolder<T>> optional = this.byType(recipeTypeIn).values().stream().filter((recipe) -> {
@@ -160,7 +176,7 @@ public abstract class MixinRecipeManager implements InjectionRecipeManager {
 
     @Override
     public void clearRecipes() {
-        this.recipes = Maps.newHashMap();
+        this.recipesCB = Maps.newHashMap();
         for (RecipeType<?> recipeType : BuiltInRegistries.RECIPE_TYPE) {
             this.recipes.put(recipeType, ImmutableMap.of());
         }
@@ -175,5 +191,5 @@ public abstract class MixinRecipeManager implements InjectionRecipeManager {
     @Override
     public Map<RecipeType<?>, Object2ObjectLinkedOpenHashMap<ResourceLocation, RecipeHolder<?>>> bridge$recipesCB() {
         return recipesCB;
-    }
+    }*/
 }

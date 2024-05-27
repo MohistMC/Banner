@@ -1,7 +1,7 @@
 package com.mohistmc.banner.mixin.core.world.level.block;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.level.Level;
@@ -60,8 +60,8 @@ public class MixinButtonBlock {
         }
     }
 
-    @Inject(method = "use", cancellable = true, at = @At(value = "HEAD"))
-    public void banner$blockRedstone1(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "useWithoutItem", cancellable = true, at = @At(value = "HEAD"))
+    public void banner$blockRedstone1(BlockState state, Level worldIn, BlockPos pos, Player player, BlockHitResult blockHitResult, CallbackInfoReturnable<InteractionResult> cir) {
         if (!state.getValue(POWERED)) {
             boolean powered = state.getValue(POWERED);
             Block block = CraftBlock.at(worldIn, pos);
@@ -72,7 +72,7 @@ public class MixinButtonBlock {
             Bukkit.getPluginManager().callEvent(event);
 
             if ((event.getNewCurrent() > 0) == (powered)) {
-                cir.setReturnValue(true);
+                cir.setReturnValue(InteractionResult.SUCCESS);
             }
         }
     }

@@ -12,9 +12,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+// Banner TODO fix patches
 @Mixin(ClientboundSystemChatPacket.class)
 public class MixinClientboundSystemChatPacket {
 
+    /*
     @ShadowConstructor
     public void banner$constructor(Component content, boolean overlay) {
         throw new RuntimeException();
@@ -22,13 +24,13 @@ public class MixinClientboundSystemChatPacket {
 
     @CreateConstructor
     public void banner$constructor(BaseComponent[] content, boolean overlay) {
-        banner$constructor(Component.Serializer.fromJson(ComponentSerializer.toString(content)), overlay);
+        banner$constructor(Component.Serializer.fromJson(ComponentSerializer.toString(content)));
     }
 
     @Inject(method = "<init>(Lnet/minecraft/network/chat/Component;Z)V", at = @At("RETURN"))
     private void banner$init(Component content, boolean overlay, CallbackInfo ci) {
         this.a = Component.Serializer.toJson(content);
-    }
+    }*/
 
     private String a;
 

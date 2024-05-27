@@ -1,6 +1,7 @@
 package org.bukkit.craftbukkit.inventory;
 
 import com.google.common.base.Preconditions;
+import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.arguments.item.ItemParser;
@@ -439,7 +440,7 @@ public final class CraftItemFactory implements ItemFactory {
     @Override
     public ItemStack createItemStack(String input) throws IllegalArgumentException {
         try {
-            ItemParser.ItemResult arg = new ItemParser(MinecraftServer.getDefaultRegistryAccess()).parse(new StringReader(input));
+            ItemParser.ItemResult arg = new ItemParser(BukkitExtraConstants.getDefaultRegistryAccess()).parse(new StringReader(input));
 
             Item item = arg.item().value();
             net.minecraft.world.item.ItemStack nmsItemStack = new net.minecraft.world.item.ItemStack(item);
@@ -499,6 +500,6 @@ public final class CraftItemFactory implements ItemFactory {
         Preconditions.checkArgument(!itemStack.getType().isAir(), "ItemStack must not be air");
         itemStack = CraftItemStack.asCraftCopy(itemStack);
         CraftItemStack craft = (CraftItemStack) itemStack;
-        return CraftItemStack.asCraftMirror(EnchantmentHelper.enchantItem(MinecraftServer.getServer().getWorldData().enabledFeatures(), source, craft.handle, level, allowTreasures));
+        return CraftItemStack.asCraftMirror(EnchantmentHelper.enchantItem(BukkitExtraConstants.getServer().getWorldData().enabledFeatures(), source, craft.handle, level, allowTreasures));
     }
 }
