@@ -46,11 +46,7 @@ public abstract class MixinAbstractHurtingProjectile extends Projectile implemen
         this.zPower = d2 / banner$d3 * 0.1D;
     }
 
-    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/AbstractHurtingProjectile;onHit(Lnet/minecraft/world/phys/HitResult;)V"))
-    private void banner$preOnHit(AbstractHurtingProjectile abstractHurtingProjectile, HitResult hitResult) {
-        this.preOnHit(hitResult);
-    }
-
+    /*
     @Inject(method = "tick", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/projectile/AbstractHurtingProjectile;onHit(Lnet/minecraft/world/phys/HitResult;)V"))
     private void banner$projectileHit(CallbackInfo ci, Entity entity, HitResult rayTraceResult) {
         if (this.isRemoved()) {
@@ -63,7 +59,7 @@ public abstract class MixinAbstractHurtingProjectile extends Projectile implemen
         if (CraftEventFactory.handleNonLivingEntityDamageEvent((AbstractHurtingProjectile) (Object) this, source, amount, false)) {
             cir.setReturnValue(false);
         }
-    }
+    }*/
 
     @Override
     public float bridge$bukkitYield() {

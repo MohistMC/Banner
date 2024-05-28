@@ -25,8 +25,9 @@ public abstract class MixinThrowableProjectile extends Projectile {
         this.banner$setProjectileSource((ProjectileSource) livingEntityIn.getBukkitEntity());
     }
 
+    /*
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/ThrowableProjectile;onHit(Lnet/minecraft/world/phys/HitResult;)V"))
     private void banner$projectileHit(ThrowableProjectile entity, HitResult result) {
         this.preOnHit(result);
-    }
+    }*/
 }

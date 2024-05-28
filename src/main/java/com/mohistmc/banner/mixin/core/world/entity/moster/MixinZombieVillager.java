@@ -23,7 +23,7 @@ public abstract class MixinZombieVillager extends Zombie {
         super(entityType, level);
     }
 
-    @Inject(method = "startConverting", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/ZombieVillager;removeEffect(Lnet/minecraft/world/effect/MobEffect;)Z"))
+    @Inject(method = "startConverting", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/ZombieVillager;removeEffect(Lnet/minecraft/core/Holder;)Z"))
     private void banner$convert1(UUID conversionStarterIn, int conversionTimeIn, CallbackInfo ci) {
         this.banner$setPersist(true);
         pushEffectCause(EntityPotionEffectEvent.Cause.CONVERSION);

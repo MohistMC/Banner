@@ -30,21 +30,21 @@ public abstract class MixinCat extends TamableAnimal {
         bannerPlayer.set(player);
     }
 
-    @WrapWithCondition(method = "mobInteract", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/Cat;tame(Lnet/minecraft/world/entity/player/Player;)V"))
+    @WrapWithCondition(method = "mobInteract", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/Cat;tryToTame(Lnet/minecraft/world/entity/player/Player;)V"))
     private boolean banner$tameEvent(Cat cat, Player player) {
         return !CraftEventFactory.callEntityTameEvent(this, player).isCancelled(); // CraftBukkit
     }
 
-    @WrapWithCondition(method = "mobInteract", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/Cat;setOrderedToSit(Z)V", ordinal = 1))
+    @WrapWithCondition(method = "mobInteract", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/Cat;setOrderedToSit(Z)V"))
     private boolean banner$tameEvent0(Cat cat, boolean value) {
         return !CraftEventFactory.callEntityTameEvent(this, bannerPlayer.get()).isCancelled(); // CraftBukkit
     }
 
+    /*
     @WrapWithCondition(method = "mobInteract", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/Level;broadcastEntityEvent(Lnet/minecraft/world/entity/Entity;B)V",
-            ordinal = 0))
+            target = "Lnet/minecraft/world/entity/animal/Cat;isOwnedBy(Lnet/minecraft/world/entity/LivingEntity;)Z"))
     private boolean banner$tameEvent1(Level level, Entity entity, byte state) {
         return !CraftEventFactory.callEntityTameEvent(this, bannerPlayer.get()).isCancelled(); // CraftBukkit
-    }
+    }*/
 
 }
