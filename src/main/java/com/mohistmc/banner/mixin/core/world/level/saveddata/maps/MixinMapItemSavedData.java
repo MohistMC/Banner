@@ -4,6 +4,8 @@ import com.mohistmc.banner.injection.world.level.saveddata.maps.InjectionMapItem
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
+
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -54,7 +56,7 @@ public class MixinMapItemSavedData implements InjectionMapItemSavedData {
     }
 
     @Inject(method = "save", at = @At("HEAD"))
-    public void banner$storeDimension(CompoundTag compound, CallbackInfoReturnable<CompoundTag> cir) {
+    public void banner$storeDimension(CompoundTag compoundTag, HolderLookup.Provider provider, CallbackInfoReturnable<CompoundTag> cir) {
         if (this.uniqueId == null) {
             for (org.bukkit.World world : this.server.getWorlds()) {
                 CraftWorld cWorld = (CraftWorld) world;
@@ -64,8 +66,8 @@ public class MixinMapItemSavedData implements InjectionMapItemSavedData {
             }
         }
         if (this.uniqueId != null) {
-            compound.putLong("UUIDLeast", this.uniqueId.getLeastSignificantBits());
-            compound.putLong("UUIDMost", this.uniqueId.getMostSignificantBits());
+            compoundTag.putLong("UUIDLeast", this.uniqueId.getLeastSignificantBits());
+            compoundTag.putLong("UUIDMost", this.uniqueId.getMostSignificantBits());
         }
     }
 

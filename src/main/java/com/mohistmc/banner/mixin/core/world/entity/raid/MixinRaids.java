@@ -23,6 +23,7 @@ public class MixinRaids {
 
     @Shadow @Final public Map<Integer, Raid> raidMap;
 
+    /*
     @Inject(method = "createOrExtendRaid", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/raid/Raid;absorbBadOmen(Lnet/minecraft/world/entity/player/Player;)V"))
     public void banner$raidTrigger(ServerPlayer playerEntity, CallbackInfoReturnable<Raid> cir,
                                      DimensionType dimensionType, BlockPos pos, BlockPos pos1, List<?> list, int i, Vec3 vec, Raid raid) {
@@ -31,6 +32,6 @@ public class MixinRaids {
             this.raidMap.remove(raid.getId(), raid);
             cir.setReturnValue(null);
         }
-    }
+    }*/
 
 }
