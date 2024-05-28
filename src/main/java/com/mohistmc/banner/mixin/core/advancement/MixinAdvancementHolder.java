@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.core.advancement;
 
 import com.mohistmc.banner.injection.advancements.InjectionAdvancementHolder;
 import net.minecraft.advancements.AdvancementHolder;
+import org.bukkit.advancement.Advancement;
 import org.bukkit.craftbukkit.advancement.CraftAdvancement;
 import org.spongepowered.asm.mixin.Mixin;
 
@@ -14,5 +15,10 @@ public class MixinAdvancementHolder implements InjectionAdvancementHolder {
     @Override
     public org.bukkit.advancement.Advancement bridge$bukkit() {
         return bukkit;
+    }
+
+    @Override
+    public Advancement toBukkit() {
+        return bridge$bukkit();
     }
 }
