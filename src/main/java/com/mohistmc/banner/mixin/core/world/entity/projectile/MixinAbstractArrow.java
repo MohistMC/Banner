@@ -1,10 +1,13 @@
 package com.mohistmc.banner.mixin.core.world.entity.projectile;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ProjectileDeflection;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
@@ -35,11 +38,10 @@ public abstract class MixinAbstractArrow extends Projectile {
         super(entityType, level);
     }
 
-    /*
     @Redirect(method = "tick", at = @At(value = "INVOKE", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/world/entity/projectile/AbstractArrow;hitTargetOrDeflectSelf(Lnet/minecraft/world/phys/HitResult;)Lnet/minecraft/world/entity/projectile/ProjectileDeflection;"))
-    private void banner$hitEvent(net.minecraft.world.entity.projectile.AbstractArrow abstractArrow, HitResult hitResult) {
-        this.preOnHit(hitResult);
-    }*/
+    private ProjectileDeflection banner$hitEvent(AbstractArrow abstractArrow, HitResult hitResult) {
+        return preHitTargetOrDeflectSelf(hitResult);
+    }
 
     @Redirect(method = "onHitEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(I)V"))
     private void banner$fireShot(Entity entity, int seconds, EntityHitResult result) {

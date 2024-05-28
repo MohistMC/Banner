@@ -71,6 +71,7 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.entity.EntityPoseChangeEvent;
+import org.bukkit.event.entity.EntityRemoveEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
@@ -195,6 +196,9 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
 
     @Shadow public abstract void gameEvent(Holder<GameEvent> holder, @Nullable Entity entity);
 
+    @Shadow public abstract void remove(Entity.RemovalReason removalReason);
+
+    @Shadow @Nullable private Entity.RemovalReason removalReason;
     private CraftEntity bukkitEntity;
     public final org.spigotmc.ActivationRange.ActivationType activationType =
             org.spigotmc.ActivationRange.initializeEntityActivationType((Entity) (Object) this);
@@ -975,5 +979,26 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         if (list != null) {
             to.connection.send(new ClientboundSetEntityDataPacket(this.getId(), list));
         }
+    }
+
+    @Override
+    public void discard(EntityRemoveEvent.Cause cause) {
+        this.remove(Entity.RemovalReason.DISCARDED, cause);
+    }
+
+    @Override
+    public void remove(Entity.RemovalReason entity_removalreason, EntityRemoveEvent.Cause cause) {
+        this.setRemoved(entity_removalreason, cause);
+    }
+
+    @Override
+    public void setRemoved(Entity.RemovalReason entity_removalreason, EntityRemoveEvent.Cause cause) {
+        CraftEventFactory.callEntityRemoveEvent(((Entity) (Object) this), cause);
+        this.setRemoved(removalReason);
+    }
+
+    @Inject(method = "setRemoved", at = @At("HEAD"))
+    private void banner$setRemoved(Entity.RemovalReason removalReason, CallbackInfo ci) {
+        CraftEventFactory.callEntityRemoveEvent(((Entity) (Object) this), null);
     }
 }

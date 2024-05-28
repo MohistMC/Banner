@@ -4,6 +4,7 @@ import com.mohistmc.banner.injection.world.entity.projectile.InjectionProjectile
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ProjectileDeflection;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -23,6 +24,8 @@ public abstract class MixinProjectile extends Entity implements InjectionProject
     }
 
     @Shadow protected abstract void onHit(HitResult result);
+
+    @Shadow protected abstract ProjectileDeflection hitTargetOrDeflectSelf(HitResult hitResult);
 
     private boolean hitCancelled = false;
 
@@ -49,11 +52,12 @@ public abstract class MixinProjectile extends Entity implements InjectionProject
     }
 
     @Override
-    public void preOnHit(HitResult movingobjectposition) {
-        org.bukkit.event.entity.ProjectileHitEvent event = CraftEventFactory.callProjectileHitEvent(((Projectile) (Object) this), movingobjectposition);
+    public ProjectileDeflection preHitTargetOrDeflectSelf(HitResult movingobjectposition) {
+        org.bukkit.event.entity.ProjectileHitEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callProjectileHitEvent(this, movingobjectposition);
         this.hitCancelled = event != null && event.isCancelled();
         if (movingobjectposition.getType() == HitResult.Type.BLOCK || !this.hitCancelled) {
-            this.onHit(movingobjectposition);
+            return this.hitTargetOrDeflectSelf(movingobjectposition);
         }
+        return ProjectileDeflection.NONE;
     }
 }

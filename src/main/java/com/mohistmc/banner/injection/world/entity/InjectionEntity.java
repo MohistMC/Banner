@@ -12,6 +12,7 @@ import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.event.CraftPortalEvent;
+import org.bukkit.event.entity.EntityRemoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.jetbrains.annotations.Nullable;
 
@@ -189,5 +190,14 @@ public interface InjectionEntity {
 
     default CraftPortalEvent callPortalEvent(Entity entity, ServerLevel exitWorldServer, Vec3 exitPosition, PlayerTeleportEvent.TeleportCause cause, int searchRadius, int creationRadius) {
         return null;
+    }
+
+    default void discard(EntityRemoveEvent.Cause cause) {
+    }
+
+    default void remove(Entity.RemovalReason entity_removalreason, EntityRemoveEvent.Cause cause) {
+    }
+
+    default void setRemoved(Entity.RemovalReason entity_removalreason, EntityRemoveEvent.Cause cause) {
     }
 }
