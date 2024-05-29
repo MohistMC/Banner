@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(value = ClipContext.class, priority = 1500)
+@Mixin(value = ClipContext.class, priority = 900)
 public class MixinClipContext {
 
     @Redirect(method = "<init>", at = @At(value = "INVOKE",
