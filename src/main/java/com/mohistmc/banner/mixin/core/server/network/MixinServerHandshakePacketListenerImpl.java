@@ -21,88 +21,63 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //TODO fixed
 @Mixin(ServerHandshakePacketListenerImpl.class)
 public abstract class MixinServerHandshakePacketListenerImpl implements ServerHandshakePacketListener {
 
-    private static final HashMap<InetAddress, Long> throttleTracker = new HashMap<>();
-    private static int throttleCounter = 0;
-
     @Shadow @Final private Connection connection;
     @Shadow @Final private MinecraftServer server;
-    @Shadow @Final private static Component IGNORE_STATUS_REASON;
+    // CraftBukkit start - add fields
+    private static final HashMap<InetAddress, Long> throttleTracker = new HashMap<InetAddress, Long>();
+    private static int throttleCounter = 0;
+    // CraftBukkit end
 
-    @Shadow protected abstract void beginLogin(ClientIntentionPacket clientIntentionPacket, boolean bl);
+    @Inject(method = "handleIntention", at = @At("HEAD"))
+    private void banner$setHostName(ClientIntentionPacket clientIntentionPacket, CallbackInfo ci) {
+        this.connection.banner$setHostName(clientIntentionPacket.hostName() + ":" + clientIntentionPacket.port()); // CraftBukkit  - set hostname
+    }
 
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    public void handleIntention(ClientIntentionPacket packet) {
-        this.connection.banner$setHostName(packet.hostName + ":" + packet.port); // CraftBukkit  - set hostname
-        switch (packet.intention()) {
-            case LOGIN -> {
-                this.beginLogin(packet, false);
-                // CraftBukkit start - Connection throttle
-                try {
-                    long currentTime = System.currentTimeMillis();
-                    long connectionThrottle = this.server.bridge$server().getConnectionThrottle();
-                    InetAddress address = ((java.net.InetSocketAddress) this.connection.getRemoteAddress()).getAddress();
+    @Inject(method = "beginLogin", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/network/protocol/handshake/ClientIntentionPacket;protocolVersion()I",
+            ordinal = 0))
+    private void banner$handleThrottle(ClientIntentionPacket clientIntentionPacket, boolean bl, CallbackInfo ci) {
+        // CraftBukkit start - Connection throttle
+        try {
+            long currentTime = System.currentTimeMillis();
+            long connectionThrottle = this.server.bridge$server().getConnectionThrottle();
+            InetAddress address = ((java.net.InetSocketAddress) this.connection.getRemoteAddress()).getAddress();
 
-                    synchronized (throttleTracker) {
-                        if (throttleTracker.containsKey(address) && !"127.0.0.1".equals(address.getHostAddress()) && currentTime - throttleTracker.get(address) < connectionThrottle) {
-                            throttleTracker.put(address, currentTime);
-                            MutableComponent chatmessage = Component.literal("Connection throttled! Please wait before reconnecting.");
-                            this.connection.send(new ClientboundLoginDisconnectPacket(chatmessage));
-                            this.connection.disconnect(chatmessage);
-                            return;
-                        }
+            synchronized (throttleTracker) {
+                if (throttleTracker.containsKey(address) && !"127.0.0.1".equals(address.getHostAddress()) && currentTime - throttleTracker.get(address) < connectionThrottle) {
+                    throttleTracker.put(address, currentTime);
+                    MutableComponent chatmessage = Component.literal("Connection throttled! Please wait before reconnecting.");
+                    this.connection.send(new ClientboundLoginDisconnectPacket(chatmessage));
+                    this.connection.disconnect(chatmessage);
+                    return;
+                }
 
-                        throttleTracker.put(address, currentTime);
-                        throttleCounter++;
-                        if (throttleCounter > 200) {
-                            throttleCounter = 0;
+                throttleTracker.put(address, currentTime);
+                throttleCounter++;
+                if (throttleCounter > 200) {
+                    throttleCounter = 0;
 
-                            // Cleanup stale entries
-                            java.util.Iterator iter = throttleTracker.entrySet().iterator();
-                            while (iter.hasNext()) {
-                                java.util.Map.Entry<InetAddress, Long> entry = (java.util.Map.Entry) iter.next();
-                                if (entry.getValue() > connectionThrottle) {
-                                    iter.remove();
-                                }
-                            }
+                    // Cleanup stale entries
+                    java.util.Iterator iter = throttleTracker.entrySet().iterator();
+                    while (iter.hasNext()) {
+                        java.util.Map.Entry<InetAddress, Long> entry = (java.util.Map.Entry) iter.next();
+                        if (entry.getValue() > connectionThrottle) {
+                            iter.remove();
                         }
                     }
-                } catch (Throwable t) {
-                    org.apache.logging.log4j.LogManager.getLogger().debug("Failed to check connection throttle", t);
-                }
-                // CraftBukkit end
-                if (packet.protocolVersion() != SharedConstants.getCurrentVersion().getProtocolVersion()) {
-                    MutableComponent component;
-                    if (packet.protocolVersion() < 754) {
-                        component = Component.translatable("multiplayer.disconnect.outdated_client", new Object[]{SharedConstants.getCurrentVersion().getName()});
-                    } else {
-                        component = Component.translatable("multiplayer.disconnect.incompatible", new Object[]{SharedConstants.getCurrentVersion().getName()});
-                    }
-
-                    this.connection.send(new ClientboundLoginDisconnectPacket(component));
-                    this.connection.disconnect(component);
-                } else {
-                    this.connection.setupInboundProtocol(LoginProtocols.SERVERBOUND, new ServerLoginPacketListenerImpl(this.server, this.connection, false));
                 }
             }
-            case STATUS -> {
-                ServerStatus serverStatus = this.server.getStatus();
-                if (this.server.repliesToStatus() && serverStatus != null) {
-                    this.connection.setupInboundProtocol(StatusProtocols.SERVERBOUND, new ServerStatusPacketListenerImpl(serverStatus, this.connection));
-                } else {
-                    this.connection.disconnect(IGNORE_STATUS_REASON);
-                }
-            }
-            default -> throw new UnsupportedOperationException("Invalid intention " + packet.intention());
+        } catch (Throwable t) {
+            org.apache.logging.log4j.LogManager.getLogger().debug("Failed to check connection throttle", t);
         }
-
+        // CraftBukkit end
     }
 }

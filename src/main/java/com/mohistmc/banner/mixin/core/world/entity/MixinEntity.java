@@ -219,6 +219,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     private org.bukkit.util.Vector origin;
     @javax.annotation.Nullable
     private UUID originWorld;
+    private transient EntityRemoveEvent.Cause banner$removeCause;
 
     @Override
     public void setOrigin(@NotNull Location location) {
@@ -349,7 +350,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         Bukkit.getPluginManager().callEvent(event);
     }
 
-    @Inject(method = "setRot", cancellable = true, at = @At(value = "HEAD"))
+    @Inject(method = "setRot", at = @At(value = "HEAD"))
     public void banner$infCheck(float yaw, float pitch, CallbackInfo ci) {
         // CraftBukkit start - yaw was sometimes set to NaN, so we need to set it back to 0
         if (Float.isNaN(yaw)) {
@@ -999,6 +1000,11 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
 
     @Inject(method = "setRemoved", at = @At("HEAD"))
     private void banner$setRemoved(Entity.RemovalReason removalReason, CallbackInfo ci) {
-        CraftEventFactory.callEntityRemoveEvent(((Entity) (Object) this), null);
+        CraftEventFactory.callEntityRemoveEvent(((Entity) (Object) this), banner$removeCause != null ? banner$removeCause : null);
+    }
+
+    @Override
+    public void pushRemoveCause(EntityRemoveEvent.Cause cause) {
+        this.banner$removeCause = cause;
     }
 }

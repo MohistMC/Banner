@@ -834,6 +834,10 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         this.heal(healAmount);
     }
 
+    @Override
+    public void pushHealReason(EntityRegainHealthEvent.RegainReason reason) {
+        banner$regainReason = reason;
+    }
 
     @Redirect(method = "heal", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setHealth(F)V"))
     public void banner$healEvent(LivingEntity livingEntity, float health) {
@@ -1010,6 +1014,11 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         if (banner$callArrowCountChange(count, false)) {
             ci.cancel();
         }
+    }
+
+    @Override
+    public void pushEffectCause(EntityPotionEffectEvent.Cause cause) {
+        this.banner$cause = cause;
     }
 
     @Inject(method = "collectEquipmentChanges", at = @At(value = "INVOKE",

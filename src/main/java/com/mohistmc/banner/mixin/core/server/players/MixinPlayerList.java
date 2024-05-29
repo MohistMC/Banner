@@ -171,12 +171,16 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     }
 
     @Inject(method = "placeNewPlayer", at = @At (value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerPlayer;setServerLevel(Lnet/minecraft/server/level/ServerLevel;)V"),
+            target = "Ljava/util/Optional;flatMap(Ljava/util/function/Function;)Ljava/util/Optional;"),
             locals = LocalCapture.CAPTURE_FAILHARD)
-    public void print(Connection connection, ServerPlayer serverPlayer, CommonListenerCookie commonListenerCookie, CallbackInfo ci, GameProfile gameProfile, GameProfileCache gameProfileCache, String string, Optional optional, ResourceKey resourceKey, ServerLevel serverLevel, ServerLevel serverLevel2) {
-        if ( ((CompoundTag)optional.get()) != null &&  ((CompoundTag)optional.get()).contains("bukkit")) {
-            CompoundTag bukkit =  ((CompoundTag)optional.get()).getCompound("bukkit");
-            PROFILE_NAMES.set(bukkit.contains("lastKnownName", 8) ? bukkit.getString("lastKnownName") : string);
+    public void banner$print(Connection connection, ServerPlayer serverPlayer, CommonListenerCookie commonListenerCookie, CallbackInfo ci, GameProfile gameProfile, GameProfileCache gameProfileCache, String string, Optional optional) {
+        // CraftBukkit start - Better rename detection
+        if (optional.isPresent()) {
+            CompoundTag nbttagcompound = (CompoundTag) optional.get();
+            if (nbttagcompound.contains("bukkit")) {
+                CompoundTag bukkit =  nbttagcompound.getCompound("bukkit");
+                PROFILE_NAMES.set(bukkit.contains("lastKnownName", 8) ? bukkit.getString("lastKnownName") : string);
+            }
         }
     }
 

@@ -200,4 +200,8 @@ public interface InjectionEntity {
 
     default void setRemoved(Entity.RemovalReason entity_removalreason, EntityRemoveEvent.Cause cause) {
     }
+
+    default void pushRemoveCause(EntityRemoveEvent.Cause cause) {
+
+    }
 }

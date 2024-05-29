@@ -648,7 +648,7 @@ public class CraftEventFactory {
             if (spawnReason != SpawnReason.CUSTOM) {
                 if (isAnimal && !world.getWorld().getAllowAnimals() || isMonster && !world.getWorld().getAllowMonsters() || isNpc && !world.getCraftServer().getServer().areNpcsEnabled()) {
                     entity.discard(); // Add Bukkit remove cause
-                    // Banner TODO
+                    entity.pushRemoveCause(null);
                     return false;
                 }
             }
@@ -687,14 +687,14 @@ public class CraftEventFactory {
             Entity vehicle = entity.getVehicle();
             if (vehicle != null) {
                 vehicle.discard(); // Add Bukkit remove cause
-                // Banner TODO
+                vehicle.pushRemoveCause(null);
             }
             for (Entity passenger : entity.getIndirectPassengers()) {
                 passenger.discard(); // Add Bukkit remove cause
-                // Banner TODO
+                vehicle.pushRemoveCause(null);
             }
             entity.discard(); // Add Bukkit remove cause
-            // Banner TODO
+            vehicle.pushRemoveCause(null);
             return false;
         }
 
@@ -708,7 +708,7 @@ public class CraftEventFactory {
                         if (!loopItem.isRemoved()) {
                             xp.value += loopItem.value;
                             loopItem.discard(); // Add Bukkit remove cause
-                            // Banner TODO
+                            loopItem.pushRemoveCause(null);
                         }
                     }
                 }
