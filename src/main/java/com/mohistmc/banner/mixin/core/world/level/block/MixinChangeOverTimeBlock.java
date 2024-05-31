@@ -2,26 +2,18 @@ package com.mohistmc.banner.mixin.core.world.level.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.ChangeOverTimeBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-
-import java.util.Optional;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ChangeOverTimeBlock.class)
 public interface MixinChangeOverTimeBlock<T extends Enum<T>> {
 
-    @Shadow Optional<BlockState> getNextState(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource);
-
-    default void changeOverTime(BlockState state, ServerLevel level, BlockPos pos, RandomSource randomSource) {
-        float f = 0.05688889F;
-        if (randomSource.nextFloat() < 0.05688889F) {
-            this.getNextState(state, level, pos, randomSource).ifPresent((p_153039_) -> {
-                CraftEventFactory.handleBlockFormEvent(level, pos, p_153039_);
-            });
-        }
+    @Redirect(method = "method_54763", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
+    private static boolean banner$callBlockFormEvent(ServerLevel instance, BlockPos blockPos, BlockState blockState) {
+        return CraftEventFactory.handleBlockFormEvent(instance, blockPos, blockState);
     }
 }

@@ -204,4 +204,8 @@ public interface InjectionEntity {
     default void pushRemoveCause(EntityRemoveEvent.Cause cause) {
 
     }
+
+    default void igniteForSeconds(int i, boolean callEvent) {
+
+    }
 }

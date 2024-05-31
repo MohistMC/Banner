@@ -8,9 +8,7 @@ import com.mohistmc.banner.bukkit.ProcessableEffect;
 import com.mohistmc.banner.injection.world.entity.InjectionLivingEntity;
 import io.izzel.arclight.mixin.Eject;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,6 +19,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.FloatTag;
@@ -33,6 +33,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.CombatTracker;
 import net.minecraft.world.damagesource.DamageSource;
@@ -256,10 +257,8 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         this.banner$FallState.set(state);
     }
 
-    // TODO
-    /*
     @Redirect(method = "checkFallDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;sendParticles(Lnet/minecraft/core/particles/ParticleOptions;DDDIDDDD)I"))
-    private <T extends ParticleOptions>  int banner$addCheckFall(ServerLevel instance,  T type, double posX, double posY, double posZ, int particleCount, double xOffset, double yOffset, double zOffset, double speed) {
+    private <T extends ParticleOptions>  int banner$addCheckFall(ServerLevel instance, T particleOptions, double d, double e, double f, int i, double g, double h, double j, double k) {
         // CraftBukkit start - visiblity api
         float banner$f = (float) Mth.ceil(this.fallDistance - 3.0F);
         double banner$d = Math.min((double)(0.2F + banner$f / 15.0F), 2.5);
@@ -270,7 +269,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
             return ((ServerLevel) this.level()).sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, banner$FallState.get()), this.getX(), this.getY(), this.getZ(), banner$i, 0.0D, 0.0D, 0.0D, 0.15000000596046448D);
         }
     }
-     */
+
 
     @Redirect(method = "onEquipItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isClientSide()Z"))
     private boolean banner$addSilentCheck(Level instance) {
@@ -651,7 +650,6 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
 
     @Override
     public boolean damageEntity0(DamageSource damagesource, float f) {
-        /*
         if (!this.isInvulnerableTo(damagesource)) {
             final boolean human = ((LivingEntity) (Object) this) instanceof Player;
             if (f <= 0) return banner$damageResult = true;
@@ -691,7 +689,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
                 @Override
                 public Double apply(Double f) {
                     if (!damagesource.is(DamageTypeTags.BYPASSES_EFFECTS) && hasEffect(MobEffects.DAMAGE_RESISTANCE) && !damagesource.is(DamageTypeTags.BYPASSES_RESISTANCE)) {
-                        int i = (this.getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier() + 1) * 5;
+                        int i = (((LivingEntity) (Object) this).getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier() + 1) * 5;
                         int j = 25 - i;
                         float f1 = f.floatValue() * (float) j;
                         return -(f - (f1 / 25.0F));
@@ -822,8 +820,6 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
             }
         }
         return banner$damageResult = false; // CraftBukkit
-         */
-        return true;
     }
 
     private transient EntityRegainHealthEvent.RegainReason banner$regainReason;

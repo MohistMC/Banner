@@ -220,6 +220,9 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @javax.annotation.Nullable
     private UUID originWorld;
     private transient EntityRemoveEvent.Cause banner$removeCause;
+    // Marks an entity, that it was removed by a plugin via Entity#remove
+    // Main use case currently is for SPIGOT-7487, preventing dropping of leash when leash is removed
+    public boolean pluginRemoved = false;
 
     @Override
     public void setOrigin(@NotNull Location location) {
@@ -275,7 +278,12 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         }
     }
 
+    @Override
+    public void igniteForSeconds(int i, boolean callEvent) {
+        setSecondsOnFire(i, callEvent);
+    }
 
+    @Deprecated
     @Override
     public void setSecondsOnFire(int i, boolean callEvent) {
         if (callEvent) {
@@ -1006,5 +1014,15 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Override
     public void pushRemoveCause(EntityRemoveEvent.Cause cause) {
         this.banner$removeCause = cause;
+    }
+
+    @Inject(method = "kill", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;remove(Lnet/minecraft/world/entity/Entity$RemovalReason;)V"))
+    private void banner$killReason(CallbackInfo ci) {
+        pushRemoveCause(EntityRemoveEvent.Cause.DEATH);
+    }
+
+    @Inject(method = "onBelowWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;discard()V"))
+    private void banner$pushOutOfWorldReason(CallbackInfo ci) {
+        pushRemoveCause(EntityRemoveEvent.Cause.OUT_OF_WORLD);
     }
 }
