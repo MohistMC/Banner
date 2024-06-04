@@ -77,6 +77,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.server.MapInitializeEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.event.world.GenericGameEvent;
@@ -380,6 +381,9 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     @Inject(method = "addEntity", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;addNewEntity(Lnet/minecraft/world/level/entity/EntityAccess;)Z"))
     private void banner$addEntityEvent(Entity entityIn, CallbackInfoReturnable<Boolean> cir) {
         CreatureSpawnEvent.SpawnReason reason = banner$reason.get() == null ? CreatureSpawnEvent.SpawnReason.DEFAULT : banner$reason.get();
+        if (!BannerConfig.spawnForChunk && (reason.equals(SpawnReason.NATURAL) || reason.equals(SpawnReason.CHUNK_GEN))) {
+            cir.setReturnValue(false);
+        }
         banner$reason.set(null);
         if (DistValidate.isValid((LevelAccessor) this) && !CraftEventFactory.doEntityAddEventCalling((ServerLevel) (Object) this, entityIn, reason)) {
             cir.setReturnValue(false);

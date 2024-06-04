@@ -83,8 +83,8 @@ public abstract class MixinNaturalSpawner {
      */
     @Overwrite
     public static void spawnForChunk(ServerLevel worldserver, LevelChunk chunk, NaturalSpawner.SpawnState spawnercreature_d, boolean flag, boolean flag1, boolean flag2) {
-        worldserver.getProfiler().push("spawner");
         if (!BannerConfig.spawnForChunk) return;
+        worldserver.getProfiler().push("spawner");
         MobCategory[] aenumcreaturetype = SPAWNING_CATEGORIES;
         int i = aenumcreaturetype.length;
 
@@ -114,12 +114,6 @@ public abstract class MixinNaturalSpawner {
             }
         }
         worldserver.getProfiler().pop();
-    }
-
-    @Inject(method = "spawnCategoryForPosition(Lnet/minecraft/world/entity/MobCategory;Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ChunkAccess;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/NaturalSpawner$SpawnPredicate;Lnet/minecraft/world/level/NaturalSpawner$AfterSpawnCallback;)V",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"))
-    private static void banner$naturalSpawn(MobCategory category, ServerLevel level, ChunkAccess chunk, BlockPos pos, NaturalSpawner.SpawnPredicate filter, NaturalSpawner.AfterSpawnCallback callback, CallbackInfo ci) {
-         level.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.NATURAL);
     }
 
     /**

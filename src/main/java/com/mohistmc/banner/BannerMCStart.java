@@ -39,9 +39,6 @@ public class BannerMCStart {
             System.setProperty("log4j.configurationFile", "log4j2_banner.xml");
         }
         if (BannerConfigUtil.CHECK_UPDATE()) UpdateUtils.versionCheck();
-        if (BannerConfigUtil.CHECK_LIBRARIES()) {
-            DefaultLibraries.run();
-        }
         DefaultLibraries.proposeFabricLibs();
         CustomLibraries.loadCustomLibs();
         if (!EulaUtil.hasAcceptedEULA()) {
