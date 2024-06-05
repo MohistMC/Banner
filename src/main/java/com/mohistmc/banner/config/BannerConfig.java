@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -143,6 +144,9 @@ public class BannerConfig {
     public static boolean spawnForChunk;
     public static boolean NoRaining;
 
+    public static boolean networkmanager_debug;
+    public static List<String> networkmanager_intercept;
+
     public static String motd() {
         return ColorsAPI.of(motdFirstLine) + "\n" + ColorsAPI.of(motdSecondLine);
     }
@@ -172,5 +176,8 @@ public class BannerConfig {
         velocityEnabled = getBoolean("proxies.velocity.enabled", false);
         velocitySecret = getString("proxies.velocity.secret", "");
         NoRaining = getBoolean("event.NoRaining", false);
+
+        networkmanager_debug = getBoolean("networkmanager.debug", false);
+        networkmanager_intercept = getList("networkmanager.intercept", Collections.emptyList());
     }
 }

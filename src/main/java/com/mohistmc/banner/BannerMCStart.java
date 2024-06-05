@@ -4,10 +4,12 @@ import com.mohistmc.banner.config.BannerConfigUtil;
 import com.mohistmc.banner.libraries.CustomLibraries;
 import com.mohistmc.banner.libraries.DefaultLibraries;
 import com.mohistmc.banner.network.download.UpdateUtils;
+import com.mohistmc.banner.plugins.BannerProxySelector;
 import com.mohistmc.banner.util.EulaUtil;
 import com.mohistmc.banner.util.I18n;
 import com.mohistmc.i18n.i18n;
 import io.izzel.arclight.mixin.injector.EjectorInfo;
+import java.net.ProxySelector;
 import java.util.Scanner;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
@@ -46,6 +48,7 @@ public class BannerMCStart {
             while (!"true".equals(new Scanner(System.in).next()));
             EulaUtil.writeInfos();
         }
+        ProxySelector.setDefault(new BannerProxySelector(ProxySelector.getDefault()));
     }
 
     public static String getVersion() {
