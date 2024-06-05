@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.storage;
 
+import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.injection.world.level.storage.InjectionPrimaryLevelData;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
@@ -74,7 +75,9 @@ public abstract class MixinPrimaryLevelData implements InjectionPrimaryLevelData
         if (this.raining == isRaining) {
             return;
         }
-
+        if (BannerConfig.NoRaining && isRaining){
+            ci.cancel();
+        }
         World world = Bukkit.getWorld(this.getLevelName());
         if (world != null) {
             WeatherChangeEvent event = new WeatherChangeEvent(world, isRaining);

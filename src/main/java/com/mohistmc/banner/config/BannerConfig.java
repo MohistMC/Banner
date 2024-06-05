@@ -141,6 +141,7 @@ public class BannerConfig {
     public static String velocitySecret;
     public static double WatchDogTimeOut;
     public static boolean spawnForChunk;
+    public static boolean NoRaining;
 
     public static String motd() {
         return ColorsAPI.of(motdFirstLine) + "\n" + ColorsAPI.of(motdSecondLine);
@@ -170,5 +171,6 @@ public class BannerConfig {
         motdSecondLine = getString("motd.secondline", "");
         velocityEnabled = getBoolean("proxies.velocity.enabled", false);
         velocitySecret = getString("proxies.velocity.secret", "");
+        NoRaining = getBoolean("event.NoRaining", false);
     }
 }
