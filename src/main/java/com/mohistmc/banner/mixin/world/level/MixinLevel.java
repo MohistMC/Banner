@@ -28,9 +28,15 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.FullChunkStatus;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Explosion.BlockInteraction;
+import net.minecraft.world.level.ExplosionDamageCalculator;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.Level.ExplosionInteraction;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
@@ -65,6 +71,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotWorldConfig;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -87,6 +94,8 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     @Shadow public abstract DimensionType dimensionType();
     @Shadow public abstract LevelChunk getChunkAt(BlockPos pos);
     @Shadow public abstract boolean isDebug();
+    @Shadow protected abstract Explosion.BlockInteraction getDestroyType(GameRules.Key<GameRules.BooleanValue> gameRule);
+    @Shadow public abstract GameRules getGameRules();
     // @formatter:on
 
     @Shadow public abstract void setBlocksDirty(BlockPos blockPos, BlockState oldState, BlockState newState);
@@ -100,6 +109,9 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     @Shadow @Nullable public abstract MinecraftServer getServer();
 
     @Shadow @Final private ResourceKey<Level> dimension;
+
+    @Shadow public abstract boolean removeBlock(BlockPos pos, boolean isMoving);
+
     @Unique
     private CraftWorld world;
     @Unique
@@ -344,6 +356,31 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             }
             // CraftBukkit end
         }
+    }
+
+    /**
+     * @author Mgazul
+     * @reason Banner
+     */
+    @Overwrite
+    public Explosion explode(@Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, ExplosionInteraction explosionInteraction, boolean spawnParticles) {
+        Explosion.BlockInteraction var10000;
+        switch (explosionInteraction) {
+            case NONE -> var10000 = BlockInteraction.KEEP;
+            case BLOCK -> var10000 = this.getDestroyType(GameRules.RULE_BLOCK_EXPLOSION_DROP_DECAY);
+            case MOB -> var10000 = this.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) ? this.getDestroyType(GameRules.RULE_MOB_EXPLOSION_DROP_DECAY) : BlockInteraction.KEEP;
+            case TNT -> var10000 = this.getDestroyType(GameRules.RULE_TNT_EXPLOSION_DROP_DECAY);
+            default -> throw new IncompatibleClassChangeError();
+        }
+
+        Explosion.BlockInteraction blockInteraction = var10000;
+        Explosion explosion = new Explosion((Level) (Object) this, source, damageSource, damageCalculator, x, y, z, radius, fire, blockInteraction);
+        if (explosion.bridge$wasCanceled()) {
+            return explosion;
+        }
+        explosion.explode();
+        explosion.finalizeExplosion(spawnParticles);
+        return explosion;
     }
 
     @Override
