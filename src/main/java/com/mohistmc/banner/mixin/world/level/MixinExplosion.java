@@ -1,9 +1,12 @@
 package com.mohistmc.banner.mixin.world.level;
 
 import com.google.common.collect.Sets;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.injection.world.level.InjectionExplosion;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +25,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.ProtectionEnchantment;
@@ -95,37 +99,33 @@ public abstract class MixinExplosion implements InjectionExplosion {
      */
     @Overwrite
     public void explode() {
-        if (wasCanceled) {
-            return;
-        }
-        if (this.radius < 0.1F) {
+        if (wasCanceled || this.radius < 0.1F) {
             return;
         }
         this.level.gameEvent(this.source, GameEvent.EXPLODE, new Vec3(this.x, this.y, this.z));
         Set<BlockPos> set = Sets.newHashSet();
         int i = 16;
 
-        for (int j = 0; j < 16; ++j) {
-            for (int k = 0; k < 16; ++k) {
-                for (int l = 0; l < 16; ++l) {
+        for(int j = 0; j < i; ++j) {
+            for(int k = 0; k < i; ++k) {
+                for(int l = 0; l < i; ++l) {
                     if (j == 0 || j == 15 || k == 0 || k == 15 || l == 0 || l == 15) {
-                        double d0 = ((float) j / 15.0F * 2.0F - 1.0F);
-                        double d1 = ((float) k / 15.0F * 2.0F - 1.0F);
-                        double d2 = ((float) l / 15.0F * 2.0F - 1.0F);
+                        double d0 = (double)((float)j / 15.0F * 2.0F - 1.0F);
+                        double d1 = (double)((float)k / 15.0F * 2.0F - 1.0F);
+                        double d2 = (double)((float)l / 15.0F * 2.0F - 1.0F);
                         double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
-                        d0 = d0 / d3;
-                        d1 = d1 / d3;
-                        d2 = d2 / d3;
+                        d0 /= d3;
+                        d1 /= d3;
+                        d2 /= d3;
                         float f = this.radius * (0.7F + this.level.random.nextFloat() * 0.6F);
                         double d4 = this.x;
                         double d6 = this.y;
                         double d8 = this.z;
 
-                        for (float f1 = 0.3F; f > 0.0F; f -= 0.22500001F) {
+                        for(float f1 = 0.3F; f > 0.0F; f -= 0.22500001F) {
                             BlockPos blockpos = BlockPos.containing(d4, d6, d8);
                             BlockState blockstate = this.level.getBlockState(blockpos);
                             FluidState fluidstate = this.level.getFluidState(blockpos);
-
                             if (!this.level.isInWorldBounds(blockpos)) {
                                 break;
                             }
@@ -139,39 +139,42 @@ public abstract class MixinExplosion implements InjectionExplosion {
                                 set.add(blockpos);
                             }
 
-                            d4 += d0 * (double) 0.3F;
-                            d6 += d1 * (double) 0.3F;
-                            d8 += d2 * (double) 0.3F;
+                            d4 += d0 * (double)0.3F;
+                            d6 += d1 * (double)0.3F;
+                            d8 += d2 * (double)0.3F;
                         }
                     }
                 }
             }
         }
 
-        this.toBlow.addAll(set);
-        float f3 = this.radius * 2.0F;
-        int k1 = Mth.floor(this.x - (double) f3 - 1.0D);
-        int l1 = Mth.floor(this.x + (double) f3 + 1.0D);
-        int i2 = Mth.floor(this.y - (double) f3 - 1.0D);
-        int i1 = Mth.floor(this.y + (double) f3 + 1.0D);
-        int j2 = Mth.floor(this.z - (double) f3 - 1.0D);
-        int j1 = Mth.floor(this.z + (double) f3 + 1.0D);
-        List<Entity> list = this.level.getEntities(this.source, new AABB(k1, i2, j2, l1, i1, j1));
-        Vec3 vec3d = new Vec3(this.x, this.y, this.z);
+        int M = 202468; //  Banner - fix mixin
 
-        for (Entity entity : list) {
+        this.toBlow.addAll(set);
+        float f2 = this.radius * 2.0F;
+        int k1 = Mth.floor(this.x - (double)f2 - 1.0D);
+        int l1 = Mth.floor(this.x + (double)f2 + 1.0D);
+        int i2 = Mth.floor(this.y - (double)f2 - 1.0D);
+        int i1 = Mth.floor(this.y + (double)f2 + 1.0D);
+        int j2 = Mth.floor(this.z - (double)f2 - 1.0D);
+        int j1 = Mth.floor(this.z + (double)f2 + 1.0D);
+        List<Entity> list = this.level.getEntities(this.source, new AABB((double)k1, (double)i2, (double)j2, (double)l1, (double)i1, (double)j1));
+        Vec3 vec3 = new Vec3(this.x, this.y, this.z);
+
+        for(int k2 = 0; k2 < list.size(); ++k2) {
+            Entity entity = list.get(k2);
             if (!entity.ignoreExplosion()) {
-                double d12 = Math.sqrt(entity.distanceToSqr(vec3d)) / f3;
+                double d12 = Math.sqrt(entity.distanceToSqr(vec3)) / (double)f2;
                 if (d12 <= 1.0D) {
                     double d5 = entity.getX() - this.x;
-                    double d7 = entity.getEyeY() - this.y;
+                    double d7 = (entity instanceof PrimedTnt ? entity.getY() : entity.getEyeY()) - this.y;
                     double d9 = entity.getZ() - this.z;
                     double d13 = Math.sqrt(d5 * d5 + d7 * d7 + d9 * d9);
                     if (d13 != 0.0D) {
-                        d5 = d5 / d13;
-                        d7 = d7 / d13;
-                        d9 = d9 / d13;
-                        double d14 = Explosion.getSeenPercent(vec3d, entity);
+                        d5 /= d13;
+                        d7 /= d13;
+                        d9 /= d13;
+                        double d14 = (double)getSeenPercent(vec3, entity);
                         double d10 = (1.0D - d12) * d14;
 
                         if (entity instanceof EnderDragonPart) {
@@ -185,23 +188,23 @@ public abstract class MixinExplosion implements InjectionExplosion {
                             for (EnderDragonPart entityComplexPart : ((EnderDragon) entity).subEntities) {
                                 // Calculate damage separately for each EntityComplexPart
                                 double d7part;
-                                if (list.contains(entityComplexPart) && (d7part = Math.sqrt(entityComplexPart.distanceToSqr(vec3d)) / f3) <= 1.0D) {
-                                    double d13part = (1.0D - d7part) * getSeenPercent(vec3d, entityComplexPart);
-                                    entityComplexPart.hurt(this.getDamageSource(), (float) ((int) ((d13part * d13part + d13part) / 2.0D * 7.0D * (double) f3 + 1.0D)));
+                                if (list.contains(entityComplexPart) && (d7part = Math.sqrt(entityComplexPart.distanceToSqr(vec3)) / f2) <= 1.0D) {
+                                    double d13part = (1.0D - d7part) * getSeenPercent(vec3, entityComplexPart);
+                                    entityComplexPart.hurt(this.getDamageSource(), (float) ((int) ((d13part * d13part + d13part) / 2.0D * 7.0D * (double) f2 + 1.0D)));
                                 }
                             }
                         } else {
-                            entity.hurt(this.getDamageSource(), (float) ((int) ((d10 * d10 + d10) / 2.0D * 7.0D * (double) f3 + 1.0D)));
+                            entity.hurt(this.getDamageSource(), (float) ((int) ((d10 * d10 + d10) / 2.0D * 7.0D * (double) f2 + 1.0D)));
                         }
 
                         CraftEventFactory.entityDamage = null;
                         if (entity.bridge$lastDamageCancelled()) {
                             continue;
                         }
-
                         double d11;
-                        if (entity instanceof LivingEntity livingEntity) {
-                            d11 = ProtectionEnchantment.getExplosionKnockbackAfterDampener(livingEntity, d10);
+                        if (entity instanceof LivingEntity) {
+                            LivingEntity livingentity = (LivingEntity)entity;
+                            d11 = ProtectionEnchantment.getExplosionKnockbackAfterDampener(livingentity, d10);
                         } else {
                             d11 = d10;
                         }
@@ -209,12 +212,12 @@ public abstract class MixinExplosion implements InjectionExplosion {
                         d5 *= d11;
                         d7 *= d11;
                         d9 *= d11;
-                        Vec3 vec3d1 = new Vec3(d5, d7, d9);
-
-                        entity.setDeltaMovement(entity.getDeltaMovement().add(vec3d1));
-                        if (entity instanceof Player playerentity) {
-                            if (!playerentity.isSpectator() && (!playerentity.isCreative() || !playerentity.getAbilities().flying)) {
-                                this.hitPlayers.put(playerentity, vec3d1);
+                        Vec3 vec31 = new Vec3(d5, d7, d9);
+                        entity.setDeltaMovement(entity.getDeltaMovement().add(vec31));
+                        if (entity instanceof Player) {
+                            Player player = (Player)entity;
+                            if (!player.isSpectator() && (!player.isCreative() || !player.getAbilities().flying)) {
+                                this.hitPlayers.put(player, vec31);
                             }
                         }
                     }
@@ -295,7 +298,10 @@ public abstract class MixinExplosion implements InjectionExplosion {
             }
             // CraftBukkit end
 
-            for (BlockPos blockpos : this.toBlow) {
+            ObjectListIterator var5 = this.toBlow.iterator();
+
+            while(var5.hasNext()) {
+                BlockPos blockpos = (BlockPos)var5.next();
                 BlockState blockstate = this.level.getBlockState(blockpos);
                 Block block = blockstate.getBlock();
 
@@ -303,8 +309,8 @@ public abstract class MixinExplosion implements InjectionExplosion {
                 if (block instanceof TntBlock) {
                     Entity sourceEntity = source == null ? null : source;
                     BlockPos sourceBlock = sourceEntity == null ? BlockPos.containing(this.x, this.y, this.z) : null;
+                    CraftEventFactory.finalizeExplosion = true; // Banner
                     if (!CraftEventFactory.callTNTPrimeEvent(this.level, blockpos, TNTPrimeEvent.PrimeCause.EXPLOSION, sourceEntity, sourceBlock)) {
-                        this.level.sendBlockUpdated(blockpos, Blocks.AIR.defaultBlockState(), blockstate, 3); // Update the block on the client
                         continue;
                     }
                 }
@@ -326,8 +332,8 @@ public abstract class MixinExplosion implements InjectionExplosion {
 
                     }
 
+                    this.level.setBlock(blockpos, Blocks.AIR.defaultBlockState(), 3);
                     block.wasExploded(this.level, blockpos, ((Explosion) (Object) this));
-                    this.level.setBlock(blockpos, Blocks.AIR.defaultBlockState(), 3); // Update the block on the client
                     this.level.getProfiler().pop();
                 }
             }

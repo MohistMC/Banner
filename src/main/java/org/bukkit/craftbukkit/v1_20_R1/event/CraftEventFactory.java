@@ -51,6 +51,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -1885,14 +1886,19 @@ public class CraftEventFactory {
         return event;
     }
 
+    public static boolean finalizeExplosion = false;
     public static boolean callTNTPrimeEvent(Level world, BlockPos pos, TNTPrimeEvent.PrimeCause cause, Entity causingEntity, BlockPos causePosition) {
         org.bukkit.entity.Entity bukkitEntity = (causingEntity == null) ? null : causingEntity.getBukkitEntity();
         org.bukkit.block.Block bukkitBlock = (causePosition == null) ? null : CraftBlock.at(world, causePosition);
-
+        net.minecraft.world.level.block.state.BlockState blockstate = world.getBlockState(pos);
         TNTPrimeEvent event = new TNTPrimeEvent(CraftBlock.at(world, pos), cause, bukkitEntity, bukkitBlock);
         Bukkit.getPluginManager().callEvent(event);
-
-        return !event.isCancelled();
+        boolean c = event.isCancelled();
+        if (c) {
+            world.sendBlockUpdated(pos, Blocks.AIR.defaultBlockState(), blockstate, 3); // Update the block on the client
+            finalizeExplosion = false;
+        }
+        return !c;
     }
 
     public static PlayerRecipeBookClickEvent callRecipeBookClickEvent(ServerPlayer player, Recipe recipe, boolean shiftClick) {
