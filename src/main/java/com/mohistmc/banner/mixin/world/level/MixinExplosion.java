@@ -95,6 +95,9 @@ public abstract class MixinExplosion implements InjectionExplosion {
      */
     @Overwrite
     public void explode() {
+        if (wasCanceled) {
+            return;
+        }
         if (this.radius < 0.1F) {
             return;
         }
@@ -227,6 +230,9 @@ public abstract class MixinExplosion implements InjectionExplosion {
      */
     @Overwrite
     public void finalizeExplosion(boolean spawnParticles) {
+        if (wasCanceled) {
+            return;
+        }
         if (this.level.isClientSide) {
             this.level.playLocalSound(this.x, this.y, this.z, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0F, (1.0F + (this.level.random.nextFloat() - this.level.random.nextFloat()) * 0.2F) * 0.7F, false);
         }
