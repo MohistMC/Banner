@@ -43,7 +43,7 @@ public abstract class MixinThrownPotion extends ThrowableItemProjectile {
     }
 
     @Redirect(method = "onHit", at = @At(value = "INVOKE", remap = false, ordinal = 1, target = "Ljava/util/List;isEmpty()Z"))
-    private boolean banner$callEvent(List list) {
+    private boolean banner$callEvent(List<MobEffectInstance> list) {
         return false;
     }
 

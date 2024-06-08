@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
+import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.bukkit.entity.MohistModsAbstractHorse;
 import com.mohistmc.banner.bukkit.entity.MohistModsAnimals;
 import com.mohistmc.banner.bukkit.entity.MohistModsChestHorse;
@@ -14,6 +15,7 @@ import com.mohistmc.banner.bukkit.entity.MohistModsSkeleton;
 import com.mohistmc.banner.bukkit.entity.MohistModsTameableEntity;
 import com.mohistmc.banner.bukkit.entity.MohistModsThrowableEntity;
 import com.mohistmc.banner.bukkit.entity.MohistModsThrowableProjectile;
+import com.mohistmc.banner.config.BannerConfig;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -350,8 +352,13 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
             else if (entity instanceof Display.ItemDisplay) { return new CraftItemDisplay(server, (Display.ItemDisplay) entity); }
             else if (entity instanceof Display.TextDisplay) { return new CraftTextDisplay(server, (Display.TextDisplay) entity); }
             else { return new CraftDisplay(server, (Display) entity); }
+        } else {
+            return new MohistModsEntity(server, entity);
         }
-        return new MohistModsEntity(server, entity);
+        if (BannerConfig.debug) {
+            BannerMCStart.LOGGER.error("CraftEntity Debug: {}", entity.toString());
+        }
+        return new CraftLivingEntity(server, (LivingEntity) entity); // Banner TODO
     }
 
     @Override
