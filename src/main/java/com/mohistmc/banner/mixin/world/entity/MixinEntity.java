@@ -6,6 +6,7 @@ import com.mohistmc.banner.injection.world.entity.InjectionEntity;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.BlockUtil;
 import net.minecraft.commands.CommandSource;
@@ -95,6 +96,8 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(Entity.class)
 public abstract class MixinEntity implements Nameable, EntityAccess, CommandSource, InjectionEntity {
 
+    @Shadow @Final
+    protected static AtomicInteger ENTITY_COUNTER;
     @Shadow
     private Level level;
     @Shadow @Final public static int TOTAL_AIR_SUPPLY;
@@ -982,5 +985,10 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Override
     public void banner$setBukkitEntity(CraftEntity bukkitEntity) {
         this.bukkitEntity = bukkitEntity;
+    }
+
+    @Unique
+    private static int nextEntityId() {
+        return ENTITY_COUNTER.incrementAndGet();
     }
 }
