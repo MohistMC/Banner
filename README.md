@@ -14,8 +14,9 @@
 </div>
 
 | Version | Support     | Stability | Mod compatibility | Plugin compatibility |
-|---------|-------------|-----------|-------------------|----------------------|
-| 1.20.x  | Active      | Good      | Good              | Good                 |
+|---------|-------------|-----------|-------------------|----------------------| 
+| 1.20.6  | Active      | Poor      | Poor              | Poor                 |
+| 1.20.1  | Active      | Good      | Good              | Good                 |
 | 1.19.4  | End Of Life | Poor      | Poor              | Poor                 |
 
 ## Notice
