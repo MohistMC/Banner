@@ -556,8 +556,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
             ByteArrayInputStream buf = new ByteArrayInputStream(Base64.getDecoder().decode(internal));
             try {
                 CompoundTag unhandledTag = NbtIo.readCompressed(buf, NbtAccounter.unlimitedHeap());
-                // Banner TODO fix
-                // this.unhandledTags.copy(DataComponentPatch.CODEC.parse(BukkitExtraConstants.getDefaultRegistryAccess().createSerializationContext(NbtOps.INSTANCE), unhandledTag).result().get());
+                this.unhandledTags.build().copy(DataComponentPatch.CODEC.parse(BukkitExtraConstants.getDefaultRegistryAccess().createSerializationContext(NbtOps.INSTANCE), unhandledTag).result().get());
             } catch (IOException ex) {
                 Logger.getLogger(CraftMetaItem.class.getName()).log(Level.SEVERE, null, ex);
             }

@@ -38,6 +38,8 @@ accessible method net/minecraft/world/level/block/entity/ConduitBlockEntity getD
 accessible field net/minecraft/world/item/armortrim/ArmorTrim showInTooltip Z
 accessible field net/minecraft/world/item/crafting/RecipeManager byType Lcom/google/common/collect/Multimap;
 accessible method net/minecraft/world/entity/animal/Wolf setCollarColor (Lnet/minecraft/world/item/DyeColor;)V
+accessible field net/minecraft/core/component/DataComponentPatch map Lit/unimi/dsi/fastutil/objects/Reference2ObjectMap;
+accessible field net/minecraft/core/component/DataComponentPatch$Builder map Lit/unimi/dsi/fastutil/objects/Reference2ObjectMap;
 
 # 1.20.4
 accessible field net/minecraft/world/entity/ai/attributes/AttributeModifier name Ljava/lang/String;

@@ -8,6 +8,9 @@ import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import com.mohistmc.banner.bukkit.entity.MohistModsChestHorse;
+import com.mohistmc.banner.bukkit.entity.MohistModsTameableEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -16,6 +19,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerPlayerConnection;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
 import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.projectile.AbstractArrow;
@@ -95,6 +100,16 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
 
         if (entityTypeData != null) {
             return (CraftEntity) entityTypeData.convertFunction().apply(server, entity);
+        }
+
+        boolean flag;
+        if (entity instanceof TamableAnimal) {
+            flag = !(entity instanceof net.minecraft.world.entity.animal.Wolf)
+                    && !(entity instanceof net.minecraft.world.entity.animal.Cat)
+                    && !(entity instanceof net.minecraft.world.entity.animal.Parrot);
+            if (flag) {
+                return new MohistModsTameableEntity( server, ( TamableAnimal ) entity);
+            }
         }
 
         throw new AssertionError("Unknown entity " + (entity == null ? null : entity.getClass()));
