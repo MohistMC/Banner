@@ -1,6 +1,5 @@
 package org.bukkit.craftbukkit.v1_20_R1.command;
 
-import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -55,7 +54,7 @@ public class ColouredConsoleSender extends CraftConsoleCommandSender {
     @Override
     public void sendMessage(String message) {
         // support jansi passthrough VM option when jansi doesn't detect an ANSI supported terminal
-        if (jansiPassthrough || TerminalConsoleAppender.isAnsiSupported()) {
+        if (jansiPassthrough) {
             if (!conversationTracker.isConversingModaly()) {
                 String result = convertRGBColors(message);
                 for (ChatColor color : colors) {

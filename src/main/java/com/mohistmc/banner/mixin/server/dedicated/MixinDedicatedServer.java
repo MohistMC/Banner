@@ -21,7 +21,6 @@ import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.rcon.RconConsoleSource;
 import net.minecraft.world.level.storage.LevelStorageSource;
-import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.bukkit.Bukkit;
@@ -149,11 +148,6 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
 
     @Inject(method = "onServerExit", at = @At("RETURN"))
     public void banner$exitNow(CallbackInfo ci) {
-        try {
-            TerminalConsoleAppender.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         Thread exitThread = new Thread(this::banner$exit, "Exit Thread");
         exitThread.setDaemon(true);
         exitThread.start();

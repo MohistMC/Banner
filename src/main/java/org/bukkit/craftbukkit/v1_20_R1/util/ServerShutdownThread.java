@@ -22,7 +22,7 @@ public class ServerShutdownThread extends Thread {
             server.close();
         } finally {
             try {
-                net.minecrell.terminalconsole.TerminalConsoleAppender.close();
+                // net.minecrell.terminalconsole.TerminalConsoleAppender.close();
             } catch (Exception e) {
             }
         }

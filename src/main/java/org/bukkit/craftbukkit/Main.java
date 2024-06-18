@@ -3,7 +3,6 @@ package org.bukkit.craftbukkit;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.util.PathConverter;
-import net.minecrell.terminalconsole.TerminalConsoleAppender;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 
 import java.io.File;
@@ -180,14 +179,12 @@ public class Main extends OptionParser {
             }
 
             if (options.has("nojline")) {
-                System.setProperty(TerminalConsoleAppender.JLINE_OVERRIDE_PROPERTY, "false");
                 useJline = false;
             }
 
             if (options.has("noconsole")) {
                 useConsole = false;
                 useJline = false;
-                System.setProperty(TerminalConsoleAppender.JLINE_OVERRIDE_PROPERTY, "false");
             }
         }
     }
