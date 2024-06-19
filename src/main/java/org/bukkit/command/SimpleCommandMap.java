@@ -8,17 +8,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-
-import com.mohistmc.banner.command.DumpCommand;
-import com.mohistmc.banner.command.GetPluginListCommand;
-import com.mohistmc.banner.command.ModListCommand;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.command.defaults.HelpCommand;
 import org.bukkit.command.defaults.PluginsCommand;
 import org.bukkit.command.defaults.ReloadCommand;
+import org.bukkit.command.defaults.TimingsCommand;
 import org.bukkit.command.defaults.VersionCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -38,10 +36,7 @@ public class SimpleCommandMap implements CommandMap {
         register("bukkit", new VersionCommand("version"));
         register("bukkit", new ReloadCommand("reload"));
         register("bukkit", new PluginsCommand("plugins"));
-        register("banner", new ModListCommand("fabricmods"));
-        register("banner", new DumpCommand("dump"));
-        register("banner", new com.mohistmc.banner.command.PluginCommand("plugin"));
-        register("banner", new GetPluginListCommand("getpluginlist"));
+        register("bukkit", new TimingsCommand("timings"));
     }
 
     public void setFallbackCommands() {
@@ -73,8 +68,8 @@ public class SimpleCommandMap implements CommandMap {
      */
     @Override
     public boolean register(@NotNull String label, @NotNull String fallbackPrefix, @NotNull Command command) {
-        label = label.toLowerCase(java.util.Locale.ENGLISH).trim();
-        fallbackPrefix = fallbackPrefix.toLowerCase(java.util.Locale.ENGLISH).trim();
+        label = label.toLowerCase(Locale.ROOT).trim();
+        fallbackPrefix = fallbackPrefix.toLowerCase(Locale.ROOT).trim();
         boolean registered = register(label, command, false, fallbackPrefix);
 
         Iterator<String> iterator = command.getAliases().iterator();
@@ -142,7 +137,7 @@ public class SimpleCommandMap implements CommandMap {
             return false;
         }
 
-        String sentCommandLabel = args[0].toLowerCase(java.util.Locale.ENGLISH);
+        String sentCommandLabel = args[0].toLowerCase(Locale.ROOT);
         Command target = getCommand(sentCommandLabel);
 
         if (target == null) {
@@ -150,11 +145,15 @@ public class SimpleCommandMap implements CommandMap {
         }
 
         try {
+            target.timings.startTiming(); // Spigot
             // Note: we don't return the result of target.execute as thats success / failure, we return handled (true) or not handled (false)
             target.execute(sender, sentCommandLabel, Arrays.copyOfRange(args, 1, args.length));
+            target.timings.stopTiming(); // Spigot
         } catch (CommandException ex) {
+            target.timings.stopTiming(); // Spigot
             throw ex;
         } catch (Throwable ex) {
+            target.timings.stopTiming(); // Spigot
             throw new CommandException("Unhandled exception executing '" + commandLine + "' in " + target, ex);
         }
 
@@ -174,7 +173,7 @@ public class SimpleCommandMap implements CommandMap {
     @Override
     @Nullable
     public Command getCommand(@NotNull String name) {
-        Command target = knownCommands.get(name.toLowerCase(java.util.Locale.ENGLISH));
+        Command target = knownCommands.get(name.toLowerCase(Locale.ROOT));
         return target;
     }
 
@@ -278,16 +277,10 @@ public class SimpleCommandMap implements CommandMap {
 
             // We register these as commands so they have absolute priority.
             if (targets.size() > 0) {
-                knownCommands.put(alias.toLowerCase(java.util.Locale.ENGLISH), new FormattedCommandAlias(alias.toLowerCase(java.util.Locale.ENGLISH), targets.toArray(new String[targets.size()])));
+                knownCommands.put(alias.toLowerCase(Locale.ROOT), new FormattedCommandAlias(alias.toLowerCase(Locale.ROOT), targets.toArray(new String[targets.size()])));
             } else {
-                knownCommands.remove(alias.toLowerCase(java.util.Locale.ENGLISH));
+                knownCommands.remove(alias.toLowerCase(Locale.ROOT));
             }
         }
     }
-
-    // Banner start - add methods to support plugin manager
-    public Map<String, Command> getKnownCommands() {
-        return knownCommands;
-    }
-    // Banner - end
 }

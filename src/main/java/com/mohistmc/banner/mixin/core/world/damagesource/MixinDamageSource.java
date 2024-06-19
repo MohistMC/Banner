@@ -6,6 +6,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
+import org.bukkit.block.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,6 +34,8 @@ public class MixinDamageSource implements InjectionDamageSource {
     @Shadow
     @Final
     private Vec3 damageSourcePosition;
+    @Nullable
+    private org.bukkit.block.BlockState directBlockState; // The block state of the block relevant to this damage source
 
     @Override
     public boolean isSweep() {
@@ -131,9 +134,26 @@ public class MixinDamageSource implements InjectionDamageSource {
     public DamageSource cloneInstance() {
         DamageSource damageSource = new DamageSource(this.type, this.directEntity, this.causingEntity, this.damageSourcePosition);
         this.directBlock = this.getDirectBlock();
+        this.directBlockState = this.getDirectBlockState();
         this.withSweep = this.isSweep();
         this.poison = this.isPoison();
         this.melting = this.isMelting();
         return damageSource;
+    }
+
+    @Override
+    public DamageSource directBlockState(org.bukkit.block.BlockState blockState) {
+        if (blockState == null) {
+            return ((DamageSource) (Object) this);
+        }
+        // Cloning the instance lets us return unique instances of DamageSource without affecting constants defined in DamageSources
+        DamageSource damageSource = this.cloneInstance();
+        this.directBlockState = blockState;
+        return damageSource;
+    }
+
+    @Override
+    public BlockState getDirectBlockState() {
+        return this.directBlockState;
     }
 }

@@ -57,6 +57,7 @@ import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.structure.StructureManager;
 import org.bukkit.util.CachedServerIcon;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -95,7 +96,7 @@ public final class Bukkit {
         }
 
         Bukkit.server = server;
-        server.getLogger().info("This server is running " + getName() + " version " + getVersion() + " (Implementing API version " + getBukkitVersion()  + ")");
+        server.getLogger().info("This server is running " + getName() + " version " + getVersion() + " (Implementing API version " + getBukkitVersion() + ")");
     }
 
     /**
@@ -864,6 +865,7 @@ public final class Bukkit {
      */
     public static void reload() {
         server.reload();
+        org.spigotmc.CustomTimingsHandler.reload(); // Spigot
     }
 
     /**
@@ -1004,6 +1006,7 @@ public final class Bukkit {
     public static ItemCraftResult craftItemResult(@NotNull ItemStack[] craftingMatrix, @NotNull World world, @NotNull Player player) {
         return server.craftItemResult(craftingMatrix, world, player);
     }
+
     /**
      * Get the crafted item using the list of {@link ItemStack} provided.
      *
@@ -1025,6 +1028,7 @@ public final class Bukkit {
     public static ItemCraftResult craftItemResult(@NotNull ItemStack[] craftingMatrix, @NotNull World world) {
         return server.craftItemResult(craftingMatrix, world);
     }
+
 
     /**
      * Get the crafted item using the list of {@link ItemStack} provided.
@@ -1693,6 +1697,17 @@ public final class Bukkit {
     }
 
     /**
+     * Gets the server links which will be sent to clients
+     *
+     * @return the server's links
+     */
+    @NotNull
+    @ApiStatus.Experimental
+    public static ServerLinks getServerLinks() {
+        return server.getServerLinks();
+    }
+
+    /**
      * Gets the default message that is displayed when the server is stopped.
      *
      * @return the shutdown message
@@ -1943,16 +1958,6 @@ public final class Bukkit {
     @Nullable
     public static Entity getEntity(@NotNull UUID uuid) {
         return server.getEntity(uuid);
-    }
-
-    // Paper start
-    /**
-     * Gets the current server TPS
-     * @return current server TPS (1m, 5m, 15m in Paper-Server)
-     */
-    @NotNull
-    public static double[] getTPS() {
-        return new double[0];
     }
 
     /**

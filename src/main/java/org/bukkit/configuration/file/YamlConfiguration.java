@@ -1,20 +1,6 @@
 package org.bukkit.configuration.file;
 
 import com.google.common.base.Preconditions;
-import com.mohistmc.org.yaml.snakeyaml.DumperOptions;
-import com.mohistmc.org.yaml.snakeyaml.LoaderOptions;
-import com.mohistmc.org.yaml.snakeyaml.Yaml;
-import com.mohistmc.org.yaml.snakeyaml.comments.CommentLine;
-import com.mohistmc.org.yaml.snakeyaml.comments.CommentType;
-import com.mohistmc.org.yaml.snakeyaml.error.YAMLException;
-import com.mohistmc.org.yaml.snakeyaml.nodes.AnchorNode;
-import com.mohistmc.org.yaml.snakeyaml.nodes.MappingNode;
-import com.mohistmc.org.yaml.snakeyaml.nodes.Node;
-import com.mohistmc.org.yaml.snakeyaml.nodes.NodeTuple;
-import com.mohistmc.org.yaml.snakeyaml.nodes.ScalarNode;
-import com.mohistmc.org.yaml.snakeyaml.nodes.SequenceNode;
-import com.mohistmc.org.yaml.snakeyaml.nodes.Tag;
-import com.mohistmc.org.yaml.snakeyaml.reader.UnicodeReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -33,6 +19,20 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.jetbrains.annotations.NotNull;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.comments.CommentLine;
+import org.yaml.snakeyaml.comments.CommentType;
+import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.nodes.AnchorNode;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.SequenceNode;
+import org.yaml.snakeyaml.nodes.Tag;
+import org.yaml.snakeyaml.reader.UnicodeReader;
 
 /**
  * An implementation of {@link Configuration} which saves all files in Yaml.
@@ -56,7 +56,6 @@ public class YamlConfiguration extends FileConfiguration {
     private final Yaml yaml;
 
     public YamlConfiguration() {
-
         yamlDumperOptions = new DumperOptions();
         yamlDumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         yamlLoaderOptions = new LoaderOptions();

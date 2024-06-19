@@ -82,12 +82,16 @@ public interface UnsafeValues {
      */
     boolean removeAdvancement(NamespacedKey key);
 
+    @Deprecated(since = "1.21", forRemoval = true)
     Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(Material material, EquipmentSlot slot);
 
+    @Deprecated(since = "1.21", forRemoval = true)
     CreativeCategory getCreativeCategory(Material material);
 
+    @Deprecated(since = "1.21", forRemoval = true)
     String getBlockTranslationKey(Material material);
 
+    @Deprecated(since = "1.21", forRemoval = true)
     String getItemTranslationKey(Material material);
 
     String getTranslationKey(EntityType entityType);
@@ -105,6 +109,8 @@ public interface UnsafeValues {
      * @param key of the potion type
      * @return an internal potion data
      */
+    @ApiStatus.Internal
+    @Deprecated(since = "1.20.2", forRemoval = true)
     PotionType.InternalPotionData getInternalPotionData(NamespacedKey key);
 
     @ApiStatus.Internal
@@ -120,4 +126,10 @@ public interface UnsafeValues {
     @ApiStatus.Internal
     @NotNull
     DamageSource.Builder createDamageSourceBuilder(@NotNull DamageType damageType);
+
+    @ApiStatus.Internal
+    String get(Class<?> aClass, String value);
+
+    @ApiStatus.Internal
+    <B extends Keyed> B get(Registry<B> registry, NamespacedKey key);
 }

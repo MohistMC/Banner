@@ -24,7 +24,9 @@ import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
 import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -217,7 +219,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
         if (location.getWorld() != null && !location.getWorld().equals(this.getWorld())) {
             // Prevent teleportation to an other world during world generation
             Preconditions.checkState(!this.entity.bridge$generation(), "Cannot teleport entity to an other world during world generation");
-            this.entity.teleportTo(((CraftWorld) location.getWorld()).getHandle(), CraftLocation.toVec3D(location));
+            entity.teleportTo(((CraftWorld) location.getWorld()).getHandle(), CraftLocation.toVec3D(location));
             return true;
         }
 
@@ -568,17 +570,6 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
         return this.getHandle().isCustomNameVisible();
     }
 
-    // Paper start
-    @Override
-    public void setSneaking(boolean sneak) {
-        this.getHandle().setShiftKeyDown(sneak);
-    }
-
-    @Override
-    public boolean isSneaking() {
-        return this.getHandle().isShiftKeyDown();
-    }
-    // Paper end
     @Override
     public void setVisibleByDefault(boolean visible) {
         if (this.getHandle().bridge$visibleByDefault() != visible) {
@@ -882,7 +873,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
             return;
         }
 
-        entityTracker.broadcast(this.getHandle().getAddEntityPacket());
+        entityTracker.broadcast(this.getHandle().getAddEntityPacket(entityTracker.serverEntity));
     }
 
     private static PermissibleBase getPermissibleBase() {

@@ -3,9 +3,12 @@ package org.bukkit.inventory;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.Translatable;
 import org.bukkit.Utility;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -80,8 +83,15 @@ public class ItemStack implements Cloneable, ConfigurationSerializable, Translat
      * @deprecated this method uses an ambiguous data byte object
      */
     @Deprecated
-    public ItemStack(@NotNull final Material type, final int amount, final short damage, @Nullable final Byte data) {
+    public ItemStack(@NotNull Material type, final int amount, final short damage, @Nullable final Byte data) {
         Preconditions.checkArgument(type != null, "Material cannot be null");
+        if (type.isLegacy()) {
+            if (type.getMaxDurability() > 0) {
+                type = Bukkit.getUnsafe().fromLegacy(new MaterialData(type, data == null ? 0 : data), true);
+            } else {
+                type = Bukkit.getUnsafe().fromLegacy(new MaterialData(type, data == null ? (byte) damage : data), true);
+            }
+        }
         this.type = type;
         this.amount = amount;
         if (damage != 0) {
@@ -530,7 +540,11 @@ public class ItemStack implements Cloneable, ConfigurationSerializable, Translat
                 Map<?, ?> map = (Map<?, ?>) raw;
 
                 for (Map.Entry<?, ?> entry : map.entrySet()) {
-                    Enchantment enchantment = Enchantment.getByName(entry.getKey().toString());
+                    String stringKey = entry.getKey().toString();
+                    stringKey = Bukkit.getUnsafe().get(Enchantment.class, stringKey);
+                    NamespacedKey key = NamespacedKey.fromString(stringKey.toLowerCase(Locale.ROOT));
+
+                    Enchantment enchantment = Bukkit.getUnsafe().get(Registry.ENCHANTMENT, key);
 
                     if ((enchantment != null) && (entry.getValue() instanceof Integer)) {
                         result.addUnsafeEnchantment(enchantment, (Integer) entry.getValue());
@@ -599,11 +613,6 @@ public class ItemStack implements Cloneable, ConfigurationSerializable, Translat
             return false;
         }
         this.meta = Bukkit.getItemFactory().asMetaFor(itemMeta, material);
-
-        Material newType = Bukkit.getItemFactory().updateMaterial(meta, material);
-        if (this.type != newType) {
-            this.type = newType;
-        }
 
         if (this.meta == itemMeta) {
             this.meta = itemMeta.clone();

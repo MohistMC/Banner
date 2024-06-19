@@ -2,13 +2,11 @@ package org.bukkit.entity;
 
 import com.google.common.base.Preconditions;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.Keyed;
 import org.bukkit.Location;
-import org.bukkit.MinecraftExperimental;
-import org.bukkit.MinecraftExperimental.Requires;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Translatable;
 import org.bukkit.World;
@@ -21,7 +19,6 @@ import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.entity.minecart.StorageMinecart;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +32,7 @@ public enum EntityType implements Keyed, Translatable {
      * Spawn with {@link World#dropItem(Location, ItemStack)} or {@link
      * World#dropItemNaturally(Location, ItemStack)}
      */
-    ITEM("item", Item.class, 1, false),
+    ITEM("item", Item.class, 1),
     /**
      * An experience orb.
      */
@@ -95,7 +92,7 @@ public enum EntityType implements Keyed, Translatable {
     /**
      * A flying splash potion.
      */
-    POTION("potion", ThrownPotion.class, 16, false),
+    POTION("potion", ThrownPotion.class, 16),
     /**
      * A flying experience bottle.
      */
@@ -115,11 +112,11 @@ public enum EntityType implements Keyed, Translatable {
     /**
      * A block that is going to or is about to fall.
      */
-    FALLING_BLOCK("falling_block", FallingBlock.class, 21, false),
+    FALLING_BLOCK("falling_block", FallingBlock.class, 21),
     /**
      * Internal representation of a Firework once it has been launched.
      */
-    FIREWORK_ROCKET("firework_rocket", Firework.class, 22, false),
+    FIREWORK_ROCKET("firework_rocket", Firework.class, 22),
     /**
      * @see Husk
      */
@@ -288,21 +285,11 @@ public enum EntityType implements Keyed, Translatable {
     ITEM_DISPLAY("item_display", ItemDisplay.class, -1),
     SNIFFER("sniffer", Sniffer.class, -1),
     TEXT_DISPLAY("text_display", TextDisplay.class, -1),
-    @MinecraftExperimental(Requires.UPDATE_1_21)
-    @ApiStatus.Experimental
     BREEZE("breeze", Breeze.class, -1),
-    @MinecraftExperimental(Requires.UPDATE_1_21)
-    @ApiStatus.Experimental
     WIND_CHARGE("wind_charge", WindCharge.class, -1),
-    @MinecraftExperimental(Requires.UPDATE_1_21)
-    @ApiStatus.Experimental
     BREEZE_WIND_CHARGE("breeze_wind_charge", BreezeWindCharge.class, -1),
     ARMADILLO("armadillo", Armadillo.class, -1),
-    @MinecraftExperimental(Requires.UPDATE_1_21)
-    @ApiStatus.Experimental
     BOGGED("bogged", Bogged.class, -1),
-    @MinecraftExperimental(Requires.UPDATE_1_21)
-    @ApiStatus.Experimental
     OMINOUS_ITEM_SPAWNER("ominous_item_spawner", OminousItemSpawner.class, -1),
     /**
      * A fishing line and bobber.
@@ -313,7 +300,7 @@ public enum EntityType implements Keyed, Translatable {
      * <p>
      * Spawn with {@link World#strikeLightning(Location)}.
      */
-    LIGHTNING_BOLT("lightning_bolt", LightningStrike.class, -1, false),
+    LIGHTNING_BOLT("lightning_bolt", LightningStrike.class, -1),
     PLAYER("player", Player.class, -1, false),
     /**
      * An unknown entity without an Entity Class
@@ -324,15 +311,15 @@ public enum EntityType implements Keyed, Translatable {
     private final Class<? extends Entity> clazz;
     private final short typeId;
     private final boolean independent, living;
-    public NamespacedKey key;
+    private final NamespacedKey key;
 
-    public static final Map<String, EntityType> NAME_MAP = new HashMap<String, EntityType>();
-    public static final Map<Short, EntityType> ID_MAP = new HashMap<Short, EntityType>();
+    private static final Map<String, EntityType> NAME_MAP = new HashMap<String, EntityType>();
+    private static final Map<Short, EntityType> ID_MAP = new HashMap<Short, EntityType>();
 
     static {
         for (EntityType type : values()) {
             if (type.name != null) {
-                NAME_MAP.put(type.name.toLowerCase(java.util.Locale.ENGLISH), type);
+                NAME_MAP.put(type.name.toLowerCase(Locale.ROOT), type);
             }
             if (type.typeId > 0) {
                 ID_MAP.put(type.typeId, type);
@@ -362,7 +349,7 @@ public enum EntityType implements Keyed, Translatable {
     @Deprecated
     @Nullable
     public String getName() {
-        return name == null ? name() : name; // Mohist
+        return name;
     }
 
     @NotNull
@@ -403,7 +390,7 @@ public enum EntityType implements Keyed, Translatable {
         if (name == null) {
             return null;
         }
-        return Objects.requireNonNullElse(NAME_MAP.get(name.toLowerCase(java.util.Locale.ENGLISH)), EntityType.UNKNOWN);
+        return NAME_MAP.get(name.toLowerCase(Locale.ROOT));
     }
 
     /**

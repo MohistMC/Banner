@@ -185,7 +185,7 @@ public final class CraftItemStack extends ItemStack {
             list = ItemEnchantments.EMPTY;
         }
         ItemEnchantments.Mutable listCopy = new ItemEnchantments.Mutable(list);
-        listCopy.set(CraftEnchantment.bukkitToMinecraft(ench), level);
+        listCopy.set(CraftEnchantment.bukkitToMinecraftHolder(ench), level);
         this.handle.set(DataComponents.ENCHANTMENTS, listCopy.toImmutable());
     }
 
@@ -208,7 +208,7 @@ public final class CraftItemStack extends ItemStack {
         if (this.handle == null) {
             return 0;
         }
-        return EnchantmentHelper.getItemEnchantmentLevel(CraftEnchantment.bukkitToMinecraft(ench), this.handle);
+        return EnchantmentHelper.getItemEnchantmentLevel(CraftEnchantment.bukkitToMinecraftHolder(ench), this.handle);
     }
 
     @Override
@@ -231,7 +231,7 @@ public final class CraftItemStack extends ItemStack {
         }
 
         ItemEnchantments.Mutable listCopy = new ItemEnchantments.Mutable(list);
-        listCopy.set(CraftEnchantment.bukkitToMinecraft(ench), -1); // Negative to remove
+        listCopy.set(CraftEnchantment.bukkitToMinecraftHolder(ench), -1); // Negative to remove
         this.handle.set(DataComponents.ENCHANTMENTS, listCopy.toImmutable());
 
         return level;
@@ -619,18 +619,12 @@ public final class CraftItemStack extends ItemStack {
             item.applyComponents(DataComponentPatch.EMPTY);
             return true;
         }
-        if (!CraftItemFactory.instance().isApplicable(itemMeta, CraftItemStack.getType(item))) {
+        if (!CraftItemFactory.instance().isApplicable(itemMeta, getType(item))) {
             return false;
         }
 
-        itemMeta = CraftItemFactory.instance().asMetaFor(itemMeta, CraftItemStack.getType(item));
+        itemMeta = CraftItemFactory.instance().asMetaFor(itemMeta, getType(item));
         if (itemMeta == null) return true;
-
-        Item oldItem = item.getItem();
-        Item newItem = CraftItemType.bukkitToMinecraft(CraftItemFactory.instance().updateMaterial(itemMeta, CraftItemType.minecraftToBukkit(oldItem)));
-        if (oldItem != newItem) {
-            item.setItem(newItem);
-        }
 
         if (!((CraftMetaItem) itemMeta).isEmpty()) {
             CraftMetaItem.Applicator tag = new CraftMetaItem.Applicator();

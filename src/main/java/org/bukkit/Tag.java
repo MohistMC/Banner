@@ -59,6 +59,10 @@ public interface Tag<T extends Keyed> extends Keyed {
      */
     Tag<Material> WOODEN_DOORS = Bukkit.getTag(REGISTRY_BLOCKS, NamespacedKey.minecraft("wooden_doors"), Material.class);
     /**
+     * Vanilla block tag representing all doors which can be opened by mobs.
+     */
+    Tag<Material> MOB_INTERACTABLE_DOORS = Bukkit.getTag(REGISTRY_BLOCKS, NamespacedKey.minecraft("mob_interactable_doors"), Material.class);
+    /**
      * Vanilla block tag representing all wooden stairs.
      */
     Tag<Material> WOODEN_STAIRS = Bukkit.getTag(REGISTRY_BLOCKS, NamespacedKey.minecraft("wooden_stairs"), Material.class);
@@ -772,6 +776,10 @@ public interface Tag<T extends Keyed> extends Keyed {
      */
     Tag<Material> DOES_NOT_BLOCK_HOPPERS = Bukkit.getTag(REGISTRY_BLOCKS, NamespacedKey.minecraft("does_not_block_hoppers"), Material.class);
     /**
+     * Vanilla block tag representing all blocks that resemble air.
+     */
+    Tag<Material> AIR = Bukkit.getTag(REGISTRY_BLOCKS, NamespacedKey.minecraft("air"), Material.class);
+    /**
      * Key for the built in item registry.
      */
     String REGISTRY_ITEMS = "items";
@@ -934,10 +942,6 @@ public interface Tag<T extends Keyed> extends Keyed {
      */
     Tag<Material> ITEMS_FISHES = Bukkit.getTag(REGISTRY_ITEMS, NamespacedKey.minecraft("fishes"), Material.class);
     /**
-     * Vanilla item tag representing all music disc items.
-     */
-    Tag<Material> ITEMS_MUSIC_DISCS = Bukkit.getTag(REGISTRY_ITEMS, NamespacedKey.minecraft("music_discs"), Material.class);
-    /**
      * Vanilla item tag representing all music disc items dropped by creepers.
      */
     Tag<Material> ITEMS_CREEPER_DROP_MUSIC_DISCS = Bukkit.getTag(REGISTRY_ITEMS, NamespacedKey.minecraft("creeper_drop_music_discs"), Material.class);
@@ -1047,13 +1051,18 @@ public interface Tag<T extends Keyed> extends Keyed {
      */
     Tag<Material> ITEMS_SHOVELS = Bukkit.getTag(REGISTRY_ITEMS, NamespacedKey.minecraft("shovels"), Material.class);
     /**
-     * Vanilla item tag representing all tools.
-     */
-    Tag<Material> ITEMS_TOOLS = Bukkit.getTag(REGISTRY_ITEMS, NamespacedKey.minecraft("tools"), Material.class);
-    /**
      * Vanilla item tag representing all items which break decorated pots.
      */
     Tag<Material> ITEMS_BREAKS_DECORATED_POTS = Bukkit.getTag(REGISTRY_ITEMS, NamespacedKey.minecraft("breaks_decorated_pots"), Material.class);
+    /**
+     * Vanilla item tag representing all tools.
+     *
+     * @deprecated removed in Minecraft 1.20.5. Do not use. Will be removed at a later date. Until then,
+     * this constant now acts as a reference to {@link #ITEMS_BREAKS_DECORATED_POTS} which largely shares
+     * the same contents of the old "minecraft:tools" tag.
+     */
+    @Deprecated(forRemoval = true)
+    Tag<Material> ITEMS_TOOLS = ITEMS_BREAKS_DECORATED_POTS;
     /**
      * Vanilla item tag representing all seeds planteable by villagers.
      */

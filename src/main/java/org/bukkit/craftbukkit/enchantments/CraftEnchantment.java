@@ -1,14 +1,19 @@
 package org.bukkit.craftbukkit.enchantments;
 
+import com.google.common.base.Preconditions;
+import java.util.Locale;
+
+import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.item.enchantment.BindingCurseEnchantment;
-import net.minecraft.world.item.enchantment.VanishingCurseEnchantment;
+import net.minecraft.tags.EnchantmentTags;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.craftbukkit.CraftRegistry;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.legacy.FieldRename;
+import org.bukkit.craftbukkit.util.ApiVersion;
 import org.bukkit.craftbukkit.util.Handleable;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -22,41 +27,64 @@ public class CraftEnchantment extends Enchantment implements Handleable<net.mine
     }
 
     public static Enchantment minecraftHolderToBukkit(Holder<net.minecraft.world.item.enchantment.Enchantment> minecraft) {
-        return CraftEnchantment.minecraftToBukkit(minecraft.value());
+        return minecraftToBukkit(minecraft.value());
     }
 
     public static net.minecraft.world.item.enchantment.Enchantment bukkitToMinecraft(Enchantment bukkit) {
         return CraftRegistry.bukkitToMinecraft(bukkit);
     }
 
+    public static Holder<net.minecraft.world.item.enchantment.Enchantment> bukkitToMinecraftHolder(Enchantment bukkit) {
+        return CraftRegistry.bukkitToMinecraftHolder(bukkit, Registries.ENCHANTMENT);
+    }
+
+    public static String bukkitToString(Enchantment bukkit) {
+        Preconditions.checkArgument(bukkit != null);
+
+        return bukkit.getKey().toString();
+    }
+
+    public static Enchantment stringToBukkit(String string) {
+        Preconditions.checkArgument(string != null);
+
+        // We currently do not have any version-dependent remapping, so we can use current version
+        // First convert from when only the names where saved
+        string = FieldRename.convertEnchantmentName(ApiVersion.CURRENT, string);
+        string = string.toLowerCase(Locale.ROOT);
+        NamespacedKey key = NamespacedKey.fromString(string);
+
+        // Now also convert from when keys where saved
+        return CraftRegistry.get(Registry.ENCHANTMENT, key, ApiVersion.CURRENT);
+    }
+
     private final NamespacedKey key;
-    private final net.minecraft.world.item.enchantment.Enchantment handle;
+    private final Holder<net.minecraft.world.item.enchantment.Enchantment> handle;
     private final int id;
 
     public CraftEnchantment(NamespacedKey key, net.minecraft.world.item.enchantment.Enchantment handle) {
         this.key = key;
-        this.handle = handle;
-        this.id = BuiltInRegistries.ENCHANTMENT.getId(handle);
+        this.handle = CraftRegistry.getMinecraftRegistry(Registries.ENCHANTMENT).wrapAsHolder(handle);
+        this.id = CraftRegistry.getMinecraftRegistry(Registries.ENCHANTMENT).getId(handle);
     }
 
     @Override
     public net.minecraft.world.item.enchantment.Enchantment getHandle() {
-        return this.handle;
+        return handle.value();
     }
 
     @Override
     public NamespacedKey getKey() {
-        return this.key;
+        return key;
     }
 
     @Override
     public int getMaxLevel() {
-        return this.handle.getMaxLevel();
+        return getHandle().getMaxLevel();
     }
 
     @Override
     public int getStartLevel() {
-        return this.handle.getMinLevel();
+        return getHandle().getMinLevel();
     }
 
     @Override
@@ -66,23 +94,23 @@ public class CraftEnchantment extends Enchantment implements Handleable<net.mine
 
     @Override
     public boolean isTreasure() {
-        return this.handle.isTreasureOnly();
+        return !handle.is(EnchantmentTags.IN_ENCHANTING_TABLE);
     }
 
     @Override
     public boolean isCursed() {
-        return this.handle instanceof BindingCurseEnchantment || this.handle instanceof VanishingCurseEnchantment;
+        return handle.is(EnchantmentTags.CURSE);
     }
 
     @Override
     public boolean canEnchantItem(ItemStack item) {
-        return this.handle.canEnchant(CraftItemStack.asNMSCopy(item));
+        return getHandle().canEnchant(CraftItemStack.asNMSCopy(item));
     }
 
     @Override
     public String getName() {
         // PAIL: migration paths
-        return switch (this.id) {
+        return switch (id) {
             case 0 -> "PROTECTION_ENVIRONMENTAL";
             case 1 -> "PROTECTION_FIRE";
             case 2 -> "PROTECTION_FALL";
@@ -125,7 +153,7 @@ public class CraftEnchantment extends Enchantment implements Handleable<net.mine
             case 39 -> "WIND_BURST";
             case 40 -> "MENDING";
             case 41 -> "VANISHING_CURSE";
-            default -> this.getKey().toString();
+            default -> getKey().toString();
         };
     }
 
@@ -138,12 +166,12 @@ public class CraftEnchantment extends Enchantment implements Handleable<net.mine
             return false;
         }
         CraftEnchantment ench = (CraftEnchantment) other;
-        return !this.handle.isCompatibleWith(ench.getHandle());
+        return !net.minecraft.world.item.enchantment.Enchantment.areCompatible(handle, ench.handle);
     }
 
     @Override
     public String getTranslationKey() {
-        return this.handle.getDescriptionId();
+        return Util.makeDescriptionId("enchantment", handle.unwrapKey().get().location());
     }
 
     @Override
@@ -156,16 +184,16 @@ public class CraftEnchantment extends Enchantment implements Handleable<net.mine
             return false;
         }
 
-        return this.getKey().equals(((Enchantment) other).getKey());
+        return getKey().equals(((Enchantment) other).getKey());
     }
 
     @Override
     public int hashCode() {
-        return this.getKey().hashCode();
+        return getKey().hashCode();
     }
 
     @Override
     public String toString() {
-        return "CraftEnchantment[" + this.getKey() + "]";
+        return "CraftEnchantment[" + getKey() + "]";
     }
 }

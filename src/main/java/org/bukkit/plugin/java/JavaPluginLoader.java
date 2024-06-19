@@ -44,7 +44,7 @@ import org.bukkit.plugin.UnknownDependencyException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.CustomTimingsHandler; // Spigot
-import com.mohistmc.org.yaml.snakeyaml .error.YAMLException;
+import org.yaml.snakeyaml.error.YAMLException;
 
 /**
  * Represents a Java plugin loader, allowing plugins in the form of .jar
@@ -68,7 +68,7 @@ public final class JavaPluginLoader implements PluginLoader {
 
         LibraryLoader libraryLoader = null;
         try {
-            libraryLoader = new LibraryLoader();
+            libraryLoader = new LibraryLoader(server.getLogger());
         } catch (NoClassDefFoundError ex) {
             // Provided depends were not added back
             server.getLogger().warning("Could not initialize LibraryLoader (missing dependencies?)");

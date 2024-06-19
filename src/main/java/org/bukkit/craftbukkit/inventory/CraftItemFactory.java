@@ -5,16 +5,21 @@ import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.arguments.item.ItemParser;
-import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.craftbukkit.CraftRegistry;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftEntityType;
@@ -25,6 +30,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemFactory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.Optional;
 
 public final class CraftItemFactory implements ItemFactory {
     static final Color DEFAULT_LEATHER_COLOR = Color.fromRGB(0xA06540);
@@ -445,7 +452,7 @@ public final class CraftItemFactory implements ItemFactory {
             Item item = arg.item().value();
             net.minecraft.world.item.ItemStack nmsItemStack = new net.minecraft.world.item.ItemStack(item);
 
-            DataComponentMap nbt = arg.components();
+            DataComponentPatch nbt = arg.components();
             if (nbt != null) {
                 nmsItemStack.applyComponents(nbt);
             }
@@ -456,10 +463,11 @@ public final class CraftItemFactory implements ItemFactory {
         }
     }
 
+    /*
     @Override
     public Material updateMaterial(ItemMeta meta, Material material) throws IllegalArgumentException {
         return ((CraftMetaItem) meta).updateMaterial(material);
-    }
+    }*/
 
     @Override
     public Material getSpawnEgg(EntityType type) {
@@ -500,6 +508,8 @@ public final class CraftItemFactory implements ItemFactory {
         Preconditions.checkArgument(!itemStack.getType().isAir(), "ItemStack must not be air");
         itemStack = CraftItemStack.asCraftCopy(itemStack);
         CraftItemStack craft = (CraftItemStack) itemStack;
-        return CraftItemStack.asCraftMirror(EnchantmentHelper.enchantItem(BukkitExtraConstants.getServer().getWorldData().enabledFeatures(), source, craft.handle, level, allowTreasures));
+        RegistryAccess registry = CraftRegistry.getMinecraftRegistry();
+        Optional<HolderSet.Named<Enchantment>> optional = (allowTreasures) ? Optional.empty() : registry.registryOrThrow(Registries.ENCHANTMENT).getTag(EnchantmentTags.IN_ENCHANTING_TABLE);
+        return CraftItemStack.asCraftMirror(EnchantmentHelper.enchantItem(source, craft.handle, level, registry, optional));
     }
 }

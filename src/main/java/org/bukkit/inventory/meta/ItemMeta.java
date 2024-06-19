@@ -10,9 +10,12 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFactory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemRarity;
 import org.bukkit.inventory.meta.components.FoodComponent;
+import org.bukkit.inventory.meta.components.JukeboxPlayableComponent;
+import org.bukkit.inventory.meta.components.ToolComponent;
 import org.bukkit.inventory.meta.tags.CustomItemTagContainer;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.jetbrains.annotations.ApiStatus;
@@ -405,6 +408,11 @@ public interface ItemMeta extends Cloneable, ConfigurationSerializable, Persiste
 
     /**
      * Gets the food set on this item, or creates an empty food instance.
+     * <p>
+     * The returned component is a snapshot of its current state and does not
+     * reflect a live view of what is on an item. After changing any value on
+     * this component, it must be set with {@link #setFood(FoodComponent)} to
+     * apply the changes.
      *
      * @return food
      */
@@ -417,6 +425,61 @@ public interface ItemMeta extends Cloneable, ConfigurationSerializable, Persiste
      * @param food new food
      */
     void setFood(@Nullable FoodComponent food);
+
+    /**
+     * Checks if the tool is set.
+     *
+     * @return if a tool is set
+     */
+    boolean hasTool();
+
+    /**
+     * Gets the tool set on this item, or creates an empty tool instance.
+     * <p>
+     * The returned component is a snapshot of its current state and does not
+     * reflect a live view of what is on an item. After changing any value on
+     * this component, it must be set with {@link #setTool(ToolComponent)} to
+     * apply the changes.
+     *
+     * @return tool
+     */
+    @NotNull
+    ToolComponent getTool();
+
+    /**
+     * Sets the item tool.
+     *
+     * @param tool new tool
+     */
+    void setTool(@Nullable ToolComponent tool);
+
+    /**
+     * Checks if the jukebox playable is set.
+     *
+     * @return if a jukebox playable is set
+     */
+    boolean hasJukeboxPlayable();
+
+    /**
+     * Gets the jukebox playable component set on this item.
+     * <p>
+     * The returned component is a snapshot of its current state and does not
+     * reflect a live view of what is on an item. After changing any value on
+     * this component, it must be set with
+     * {@link #setJukeboxPlayable(org.bukkit.inventory.meta.components.JukeboxComponent)}
+     * to apply the changes.
+     *
+     * @return component
+     */
+    @Nullable
+    JukeboxPlayableComponent getJukeboxPlayable();
+
+    /**
+     * Sets the item tool.
+     *
+     * @param jukeboxPlayable new component
+     */
+    void setJukeboxPlayable(@Nullable JukeboxPlayableComponent jukeboxPlayable);
 
     /**
      * Checks for the existence of any AttributeModifiers.
@@ -532,21 +595,60 @@ public interface ItemMeta extends Cloneable, ConfigurationSerializable, Persiste
      * @throws NullPointerException if the Attribute is null
      * @throws NullPointerException if the AttributeModifier is null
      *
-     * @see AttributeModifier#getUniqueId()
+     * @see AttributeModifier#getKey()
      */
     boolean removeAttributeModifier(@NotNull Attribute attribute, @NotNull AttributeModifier modifier);
 
     /**
-     * Get this ItemMeta as an NBT string.
+     * Get this ItemMeta as an NBT string. If this ItemMeta does not have any
+     * NBT, then {@code "{}"} will be returned.
      * <p>
-     * This string should not be relied upon as a serializable value. If
-     * serialization is desired, the {@link ConfigurationSerializable} API
-     * should be used instead.
+     * This string should <strong>NEVER</strong> be relied upon as a serializable value. If
+     * serialization is desired, the {@link ConfigurationSerializable} API should be used
+     * instead.
      *
      * @return the NBT string
      */
     @NotNull
     String getAsString();
+
+    /**
+     * Get this ItemMeta as a component-compliant string. If this ItemMeta does
+     * not contain any components, then {@code "[]"} will be returned.
+     * <p>
+     * The result of this method should yield a string representing the components
+     * altered by this ItemMeta instance. When passed to {@link ItemFactory#createItemStack(String)}
+     * with a prepended item type, it will create an ItemStack that has an ItemMeta
+     * matching this ItemMeta instance exactly. Note that this method returns <strong>
+     * ONLY</strong> the components and cannot be passed to createItemStack() alone.
+     * An example may look something like this:
+     * <pre>
+     * ItemStack itemStack = // ... an item stack obtained from somewhere
+     * ItemMeta itemMeta = itemStack.getItemMeta();
+     *
+     * String components = itemMeta.getAsComponentString(); // example: "[minecraft:damage=53]"
+     * String itemTypeKey = itemStack.getType().getKey().toString(); // example: "minecraft:diamond_sword"
+     * String itemAsString = itemTypeKey + components; // results in: "minecraft:diamond_sword[minecraft:damage=53]"
+     *
+     * ItemStack recreatedItemStack = Bukkit.getItemFactory().createItemStack(itemAsString);
+     * assert itemStack.isSimilar(recreatedItemStack); // Should be true*
+     * </pre>
+     * <p>
+     * *Components not represented or explicitly overridden by this ItemMeta instance
+     * will not be included in the resulting string and therefore may result in ItemStacks
+     * that do not match <em>exactly</em>. For example, if {@link #setDisplayName(String)}
+     * is not set, then the custom name component will not be included. Or if this ItemMeta
+     * is a PotionMeta, it will not include any components related to lodestone compasses,
+     * banners, or books, etc., only components modifiable by a PotionMeta instance.
+     * <p>
+     * This string should <strong>NEVER</strong> be relied upon as a serializable value. If
+     * serialization is desired, the {@link ConfigurationSerializable} API should be used
+     * instead.
+     *
+     * @return the component-compliant string
+     */
+    @NotNull
+    String getAsComponentString();
 
     /**
      * Returns a public custom tag container capable of storing tags on the

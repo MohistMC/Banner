@@ -64,4 +64,12 @@ public interface InjectionDamageSource {
     default DamageSource cloneInstance() {
         return null;
     }
+
+    default org.bukkit.block.BlockState getDirectBlockState() {
+        return null;
+    }
+
+    default DamageSource directBlockState(org.bukkit.block.BlockState blockState) {
+        return null;
+    }
 }

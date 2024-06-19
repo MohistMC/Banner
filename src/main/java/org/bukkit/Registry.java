@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -12,6 +13,7 @@ import java.util.stream.StreamSupport;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Biome;
+import org.bukkit.block.BlockType;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.damage.DamageType;
@@ -24,6 +26,7 @@ import org.bukkit.entity.Wolf;
 import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.generator.structure.Structure;
 import org.bukkit.generator.structure.StructureType;
+import org.bukkit.inventory.ItemType;
 import org.bukkit.inventory.meta.trim.TrimMaterial;
 import org.bukkit.inventory.meta.trim.TrimPattern;
 import org.bukkit.loot.LootTables;
@@ -93,6 +96,14 @@ public interface Registry<T extends Keyed> extends Iterable<T> {
      */
     Registry<Biome> BIOME = new SimpleRegistry<>(Biome.class);
     /**
+     * Server block types.
+     *
+     * @see BlockType
+     * @apiNote BlockType is not ready for public usage yet
+     */
+    @ApiStatus.Internal
+    Registry<BlockType> BLOCK = Objects.requireNonNull(Bukkit.getRegistry(BlockType.class), "No registry present for BlockType. This is a bug.");
+    /**
      * Custom boss bars.
      *
      * @see Bukkit#getBossBar(org.bukkit.NamespacedKey)
@@ -142,6 +153,14 @@ public interface Registry<T extends Keyed> extends Iterable<T> {
      * @see MusicInstrument
      */
     Registry<MusicInstrument> INSTRUMENT = Objects.requireNonNull(Bukkit.getRegistry(MusicInstrument.class), "No registry present for MusicInstrument. This is a bug.");
+    /**
+     * Server item types.
+     *
+     * @see ItemType
+     * @apiNote ItemType is not ready for public usage yet
+     */
+    @ApiStatus.Internal
+    Registry<ItemType> ITEM = Objects.requireNonNull(Bukkit.getRegistry(ItemType.class), "No registry present for ItemType. This is a bug.");
     /**
      * Default server loot tables.
      *
@@ -217,6 +236,13 @@ public interface Registry<T extends Keyed> extends Iterable<T> {
      */
     @ApiStatus.Experimental
     Registry<DamageType> DAMAGE_TYPE = Objects.requireNonNull(Bukkit.getRegistry(DamageType.class), "No registry present for DamageType. This is a bug.");
+    /**
+     * Jukebox songs.
+     *
+     * @see JukeboxSong
+     */
+    @ApiStatus.Experimental
+    Registry<JukeboxSong> JUKEBOX_SONG = Objects.requireNonNull(Bukkit.getRegistry(JukeboxSong.class), "No registry present for JukeboxSong. This is a bug.");
     /**
      * Villager profession.
      *
@@ -315,13 +341,14 @@ public interface Registry<T extends Keyed> extends Iterable<T> {
     default T match(@NotNull String input) {
         Preconditions.checkArgument(input != null, "input must not be null");
 
-        String filtered = input.toLowerCase().replaceAll("\\s+", "_");
+        String filtered = input.toLowerCase(Locale.ROOT).replaceAll("\\s+", "_");
         NamespacedKey namespacedKey = NamespacedKey.fromString(filtered);
         return (namespacedKey != null) ? get(namespacedKey) : null;
     }
 
     static final class SimpleRegistry<T extends Enum<T> & Keyed> implements Registry<T> {
 
+        private final Class<T> type;
         private final Map<NamespacedKey, T> map;
 
         protected SimpleRegistry(@NotNull Class<T> type) {
@@ -338,6 +365,7 @@ public interface Registry<T extends Keyed> extends Iterable<T> {
             }
 
             map = builder.build();
+            this.type = type;
         }
 
         @Nullable
@@ -356,6 +384,12 @@ public interface Registry<T extends Keyed> extends Iterable<T> {
         @Override
         public Iterator<T> iterator() {
             return map.values().iterator();
+        }
+
+        @ApiStatus.Internal
+        @Deprecated(since = "1.20.6", forRemoval = true)
+        public Class<T> getType() {
+            return this.type;
         }
     }
 }
