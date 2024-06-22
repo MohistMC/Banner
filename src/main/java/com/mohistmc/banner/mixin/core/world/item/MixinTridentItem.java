@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.core.world.item;
 
 import java.util.function.Consumer;
+
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -36,7 +38,7 @@ public class MixinTridentItem {
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
             locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
-    public void banner$addEntity(ItemStack stack, Level level, LivingEntity livingEntity, int timeCharged, CallbackInfo ci, Player player, int i, int j, ThrownTrident thrownTrident) {
+    public void banner$addEntity(ItemStack itemStack, Level level, LivingEntity livingEntity, int i, CallbackInfo ci, Player player, int j, float f, Holder holder, ThrownTrident thrownTrident) {
         // CraftBukkit start
         if (!level.addFreshEntity(thrownTrident)) {
             if (player instanceof ServerPlayer) {
@@ -44,27 +46,27 @@ public class MixinTridentItem {
             }
             ci.cancel();
         }
-        stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(livingEntity.getUsedItemHand()));
-        ((ThrownTrident) thrownTrident).pickupItemStack = stack.copy();// SPIGOT-4511 update since damage call moved
+        itemStack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(livingEntity.getUsedItemHand()));
+        ((ThrownTrident) thrownTrident).pickupItemStack = itemStack.copy();// SPIGOT-4511 update since damage call moved
         // CraftBukkkit end
     }
 
+    // Banner TODO fixme
+    /*
     @Inject(method = "releaseUsing", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/entity/player/Player;awardStat(Lnet/minecraft/stats/Stat;)V"),
             locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$hurtAndBreak(ItemStack stack, Level level, LivingEntity livingEntity,
-                                     int timeCharged, CallbackInfo ci,
-                                     Player player, int i, int j) {
+    private void banner$hurtAndBreak(ItemStack itemStack, Level level, LivingEntity livingEntity, int i, CallbackInfo ci, Player player) {
         // CraftBukkit start
         if (i >= 10) {
-            if (j <= 0 || player.isInWaterOrRain()) {
-                if (!level.isClientSide && j != 0) {
-                    stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(livingEntity.getUsedItemHand()));
+            if (f <= 0 || player.isInWaterOrRain()) {
+                if (!level.isClientSide && f != 0) {
+                    itemStack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(livingEntity.getUsedItemHand()));
                     // CraftBukkkit end
                 }
             }
         }
-    }
+    }*/
 
     @Inject(method = "releaseUsing", at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/world/entity/player/Player;getYRot()F"))
     public void banner$riptide(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft, CallbackInfo ci) {
