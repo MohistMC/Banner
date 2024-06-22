@@ -12,6 +12,7 @@ import org.bukkit.Registry;
 import org.bukkit.craftbukkit.CraftRegistry;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.legacy.FieldRename;
+import org.bukkit.craftbukkit.util.ApiVersion;
 import org.bukkit.craftbukkit.util.Handleable;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;

@@ -4,6 +4,7 @@ import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.injection.server.network.InjectionServerCommonPacketListenerImpl;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.Connection;
+import net.minecraft.network.DisconnectionDetails;
 import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -51,14 +52,13 @@ public abstract class MixinServerCommonPacketListenerImpl implements InjectionSe
     protected MinecraftServer server;
 
     @Shadow
-    public abstract void onDisconnect(Component p_300550_);
-
-    @Shadow
     public abstract void send(Packet<?> p_300558_);
 
     @Shadow
     protected abstract boolean isSingleplayerOwner();
     // @formatter:on
+
+    @Shadow public abstract void onDisconnect(DisconnectionDetails disconnectionDetails);
 
     protected ServerPlayer player;
     protected CraftServer cserver;
@@ -142,13 +142,16 @@ public abstract class MixinServerCommonPacketListenerImpl implements InjectionSe
         BukkitSnapshotCaptures.captureQuitMessage(event.getLeaveMessage());
         Component textComponent = CraftChatMessage.fromString(event.getReason(), true)[0];
         this.connection.send(new ClientboundDisconnectPacket(textComponent), PacketSendListener.thenRun(() -> this.connection.disconnect(textComponent)));
-        this.onDisconnect(textComponent);
+        if (this.isSingleplayerOwner()) {
+            LOGGER.info("Stopping singleplayer server as player logged out");
+            this.server.halt(false);
+        }
         this.connection.setReadOnly();
         this.server.executeBlocking(this.connection::handleDisconnection);
     }
 
     @Inject(method = "onDisconnect", cancellable = true, at = @At("HEAD"))
-    private void banner$returnIfProcessed(Component reason, CallbackInfo ci) {
+    private void banner$returnIfProcessed(DisconnectionDetails disconnectionDetails, CallbackInfo ci) {
         if (processedDisconnect) {
             ci.cancel();
         } else {
@@ -168,8 +171,8 @@ public abstract class MixinServerCommonPacketListenerImpl implements InjectionSe
     }
 
 
-    private static final ResourceLocation CUSTOM_REGISTER = new ResourceLocation("register");
-    private static final ResourceLocation CUSTOM_UNREGISTER = new ResourceLocation("unregister");
+    private static final ResourceLocation CUSTOM_REGISTER = ResourceLocation.parse("register");
+    private static final ResourceLocation CUSTOM_UNREGISTER = ResourceLocation.parse("unregister");
 
     @Inject(method = "handleCustomPayload", at = @At("HEAD"))
     private void banner$customPayload(ServerboundCustomPayloadPacket serverboundcustompayloadpacket, CallbackInfo ci) {

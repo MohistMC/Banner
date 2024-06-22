@@ -49,7 +49,7 @@ public abstract class MixinEnderMan extends Monster {
         } else {
             this.targetChangeTime = this.tickCount;
             this.entityData.set(DATA_CREEPY, true);
-            if (!modifiableattributeinstance.hasModifier(SPEED_MODIFIER_ATTACKING)) {
+            if (!modifiableattributeinstance.hasModifier(SPEED_MODIFIER_ATTACKING.id())) {
                 modifiableattributeinstance.addTransientModifier(SPEED_MODIFIER_ATTACKING);
             }
         }

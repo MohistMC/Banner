@@ -50,6 +50,7 @@ import net.minecraft.world.food.FoodData;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.HorseInventoryMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
@@ -58,6 +59,7 @@ import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.ScoreAccess;
@@ -261,7 +263,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             if (this.respawnDimension != null) {
                 world = this.server.getLevel(this.respawnDimension);
                 if (world != null && this.getRespawnPosition() != null) {
-                    position = ServerPlayer.findRespawnPositionAndUseSpawnBlock((ServerLevel) world, this.getRespawnPosition(), this.getRespawnAngle(), false, false).orElse(null);
+                    position = ServerPlayer.findRespawnAndUseSpawnBlock((ServerLevel) world, this.getRespawnPosition(), this.getRespawnAngle(), false, false).map(ServerPlayer.RespawnPosAngle::position).orElse(null);
                 }
             }
             if (world == null || position == null) {
@@ -643,7 +645,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         this.connection.pushTeleportCause(PlayerTeleportEvent.TeleportCause.SPECTATE);
     }
 
-    // Banner TODO - fix
+    // TODO fix me
     /*
     @Inject(method = "trackChunk",
             at = @At(value = "INVOKE",
@@ -759,7 +761,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     private void banner$menuEvent(AbstractHorse abstractHorse, Container container, CallbackInfo ci) {
         // CraftBukkit start - Inventory open hook
         this.nextContainerCounterInt();
-        AbstractContainerMenu banner$container = new HorseInventoryMenu(this.containerCounter, this.getInventory(), container, abstractHorse);
+        AbstractContainerMenu banner$container = new HorseInventoryMenu(this.containerCounter, this.getInventory(), container, abstractHorse, abstractHorse.getInventoryColumns());
         banner$horseMenu.set((HorseInventoryMenu) banner$container);
         banner$container.setTitle(abstractHorse.getDisplayName());
         banner$container = CraftEventFactory.callInventoryOpenEvent(((ServerPlayer) (Object) this), banner$container);
@@ -773,7 +775,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     private void banner$cancelNext(ServerPlayer instance) {}
 
     @Redirect(method = "openHorseInventory", at = @At(value = "NEW", args = "class=net/minecraft/world/inventory/HorseInventoryMenu"))
-    private HorseInventoryMenu banner$resetHorseMenu(int i, Inventory inventory, Container container, AbstractHorse abstractHorse) {
+    private HorseInventoryMenu banner$resetHorseMenu(int i, Inventory inventory, Container container, AbstractHorse abstractHorse, int j) {
         return banner$horseMenu.get();
     }
 
@@ -806,7 +808,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
         if (!keepInventory) {
             for (ItemStack item : this.getInventory().getContents()) {
-                if (!item.isEmpty() && !EnchantmentHelper.hasVanishingCurse(item)) {
+                if (!item.isEmpty() && !EnchantmentHelper.has(item, EnchantmentEffectComponents.PREVENT_EQUIPMENT_DROP)) {
                     loot.add(CraftItemStack.asCraftMirror(item));
                 }
             }
@@ -822,7 +824,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         String deathmessage = defaultMessage.getString();
         banner$deathMsg.set(deathmessage);
         keepLevel = keepInventory; // SPIGOT-2222: pre-set keepLevel
-        org.bukkit.event.entity.PlayerDeathEvent event = CraftEventFactory.callPlayerDeathEvent(((ServerPlayer) (Object) this), loot, deathmessage, keepInventory);
+        org.bukkit.event.entity.PlayerDeathEvent event = CraftEventFactory.callPlayerDeathEvent(((ServerPlayer) (Object) this), damageSource, loot, deathmessage, keepInventory);
         banner$deathEvent.set(event);
 
         // SPIGOT-943 - only call if they have an inventory open
@@ -860,7 +862,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             target = "Lnet/minecraft/server/level/ServerPlayer;isSpectator()Z"))
     private void banner$checkEventDrop(DamageSource damageSource, CallbackInfo ci) {
         // SPIGOT-5478 must be called manually now
-        this.dropExperience();
+        this.dropExperience(damageSource.getEntity());
         // we clean the player's inventory after the EntityDeathEvent is called so plugins can get the exact state of the inventory.
         if (!banner$deathEvent.get().getKeepInventory()) {
             this.getInventory().clearContent();
@@ -869,8 +871,8 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Redirect(method = "die",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerPlayer;dropAllDeathLoot(Lnet/minecraft/world/damagesource/DamageSource;)V"))
-    private void banner$cancelDrop(ServerPlayer instance, DamageSource damageSource) {
+            target = "Lnet/minecraft/server/level/ServerPlayer;dropAllDeathLoot(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;)V"))
+    private void banner$cancelDrop(ServerPlayer instance, ServerLevel serverLevel, DamageSource damageSource) {
     }
 
     @Redirect(method = "die", at = @At(value = "INVOKE",
@@ -887,7 +889,8 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Override
     public Entity changeDimension(ServerLevel worldserver, PlayerTeleportEvent.TeleportCause cause) {
         banner$changeDimensionCause.set(cause);
-        return changeDimension(worldserver);
+        DimensionTransition dimensionTransition = this.portalProcess.getPortalDestination(worldserver, this);
+        return changeDimension(dimensionTransition);
     }
 
     @Inject(method = "teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDLjava/util/Set;FF)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;teleport(DDDFFLjava/util/Set;)V"))
@@ -978,8 +981,10 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         return new CraftPortalEvent(event);
     }
 
+    // Banner TODO fix mixins
     @Override
     public Optional<BlockUtil.FoundRectangle> getExitPortal(ServerLevel worldserver, BlockPos blockposition, boolean flag, WorldBorder worldborder, int searchRadius, boolean canCreatePortal, int createRadius) {
+        /*
         Optional<BlockUtil.FoundRectangle> optional = super.getExitPortal(worldserver, blockposition, flag, worldborder);
         if (optional.isPresent() || !canCreatePortal) {
             return optional;
@@ -989,12 +994,15 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         if (!optional1.isPresent()) {
             //  LOGGER.error("Unable to create a portal, likely target out of worldborder");
         }
-        return optional1;
+        return optional1;*/
+        return Optional.empty();
     }
 
     private transient BlockStateListPopulator banner$populator;
 
 
+    // Banner TODO fix patches
+    /**
     @Inject(method = "createEndPlatform", at = @At("HEAD"))
     private void banner$playerCreatePortalBegin(ServerLevel level, BlockPos pos, CallbackInfo ci) {
         banner$populator = new BlockStateListPopulator(level);
@@ -1014,7 +1022,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         if (!portalEvent.isCancelled()) {
             blockList.updateList();
         }
-    }
+    }*/
 
     @Override
     public Component bridge$listName() {

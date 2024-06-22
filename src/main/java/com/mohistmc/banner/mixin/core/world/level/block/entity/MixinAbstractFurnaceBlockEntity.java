@@ -83,7 +83,7 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
     private static boolean banner$setBurnTime(AbstractFurnaceBlockEntity furnace, CallbackInfo ci) {
         ItemStack itemStack = furnace.getItem(1);
         CraftItemStack fuel = CraftItemStack.asCraftMirror(itemStack);
-        FurnaceBurnEvent furnaceBurnEvent = new FurnaceBurnEvent(CraftBlock.at(furnace.level, furnace.getBlockPos()), fuel, furnace.getBurnDuration(itemStack));
+        FurnaceBurnEvent furnaceBurnEvent = new FurnaceBurnEvent(CraftBlock.at(furnace.getLevel(), furnace.getBlockPos()), fuel, furnace.getBurnDuration(itemStack));
         Bukkit.getPluginManager().callEvent(furnaceBurnEvent);
 
         if (furnaceBurnEvent.isCancelled()) {

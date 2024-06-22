@@ -311,10 +311,10 @@ public enum EntityType implements Keyed, Translatable {
     private final Class<? extends Entity> clazz;
     private final short typeId;
     private final boolean independent, living;
-    private final NamespacedKey key;
+    public NamespacedKey key;
 
-    private static final Map<String, EntityType> NAME_MAP = new HashMap<String, EntityType>();
-    private static final Map<Short, EntityType> ID_MAP = new HashMap<Short, EntityType>();
+    public static final Map<String, EntityType> NAME_MAP = new HashMap<String, EntityType>();
+    public static final Map<Short, EntityType> ID_MAP = new HashMap<Short, EntityType>();
 
     static {
         for (EntityType type : values()) {

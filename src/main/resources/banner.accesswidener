@@ -594,3 +594,57 @@ accessible method net/minecraft/server/dedicated/DedicatedServerProperties$World
 accessible method net/minecraft/server/level/ServerLevel getEntities ()Lnet/minecraft/world/level/entity/LevelEntityGetter;
 accessible method net/minecraft/world/level/GameRules$Value deserialize (Ljava/lang/String;)V
 accessible method net/minecraft/server/level/PlayerRespawnLogic getOverworldRespawnPos (Lnet/minecraft/server/level/ServerLevel;II)Lnet/minecraft/core/BlockPos;
+accessible method net/minecraft/server/commands/TeleportCommand$LookAt perform (Lnet/minecraft/commands/CommandSourceStack;Lnet/minecraft/world/entity/Entity;)V
+accessible class net/minecraft/server/level/ServerChunkCache$MainThreadExecutor
+accessible class net/minecraft/world/entity/animal/horse/TraderLlama$TraderLlamaDefendWanderingTraderGoal
+accessible class net/minecraft/world/entity/monster/SpellcasterIllager$SpellcasterUseSpellGoal
+accessible field net/minecraft/world/level/storage/DerivedLevelData wrapped Lnet/minecraft/world/level/storage/ServerLevelData;
+accessible method net/minecraft/server/level/Ticket <init> (Lnet/minecraft/server/level/TicketType;ILjava/lang/Object;)V
+accessible method net/minecraft/server/level/Ticket setCreatedTick (J)V
+accessible method net/minecraft/server/level/ChunkTracker update (JIZ)V
+accessible method net/minecraft/server/level/ChunkMap getUpdatingChunkIfPresent (J)Lnet/minecraft/server/level/ChunkHolder;
+accessible method net/minecraft/server/level/DistanceManager purgeStaleTickets ()V
+accessible method net/minecraft/server/level/ChunkMap tick (Ljava/util/function/BooleanSupplier;)V
+accessible method net/minecraft/server/level/ServerChunkCache runDistanceManagerUpdates ()Z
+accessible method net/minecraft/server/MinecraftServer$TimeProfiler <init> (JI)V
+accessible class net/minecraft/world/entity/raid/Raid$RaidStatus
+accessible class net/minecraft/world/entity/monster/Slime$SlimeMoveControl
+accessible method net/minecraft/world/entity/player/Player isImmobile ()Z
+accessible class net/minecraft/network/protocol/game/ClientboundAddEntityPacket
+accessible class net/minecraft/world/level/entity/PersistentEntitySectionManager$ChunkLoadStatus
+accessible field net/minecraft/world/level/block/SculkSpreader$ChargeCursor charge I
+accessible field net/minecraft/world/level/block/SculkSpreader$ChargeCursor pos Lnet/minecraft/core/BlockPos;
+accessible method net/minecraft/world/level/block/ComposterBlock empty (Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+accessible class net/minecraft/world/level/border/WorldBorder$BorderExtent
+accessible method net/minecraft/world/entity/animal/sniffer/Sniffer canDig ()Z
+accessible method net/minecraft/world/entity/animal/horse/Llama setStrength (I)V
+accessible method net/minecraft/world/level/block/DropperBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)V
+accessible method net/minecraft/world/level/block/entity/ConduitBlockEntity updateDestroyTarget (Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Ljava/util/List;Lnet/minecraft/world/level/block/entity/ConduitBlockEntity;)V
+accessible field net/minecraft/world/level/NaturalSpawner MAGIC_NUMBER I
+accessible method net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity isLit ()Z
+accessible method net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity getBurnDuration (Lnet/minecraft/world/item/ItemStack;)I
+accessible method net/minecraft/world/level/block/state/BlockBehaviour onPlace (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)V
+accessible field net/minecraft/world/inventory/LoomMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
+accessible field net/minecraft/world/inventory/GrindstoneMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
+accessible field net/minecraft/world/inventory/EnchantmentMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
+accessible field net/minecraft/world/inventory/CartographyTableMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
+accessible method net/minecraft/world/inventory/Slot onSwapCraft (I)V
+accessible field net/minecraft/world/entity/Entity boardingCooldown I
+accessible field net/minecraft/world/entity/animal/Turtle layEggCounter I
+accessible method net/minecraft/world/entity/animal/Turtle setHasEgg (Z)V
+accessible method net/minecraft/world/entity/animal/Turtle setLayingEgg (Z)V
+accessible method net/minecraft/world/entity/animal/Fox addTrustedUUID (Ljava/util/UUID;)V
+accessible method net/minecraft/server/players/BanListEntry hasExpired ()Z
+accessible class net/minecraft/world/level/block/entity/BeehiveBlockEntity$BeeData
+accessible method net/minecraft/world/level/block/entity/BeehiveBlockEntity$BeeData toOccupant ()Lnet/minecraft/world/level/block/entity/BeehiveBlockEntity$Occupant;
+accessible class net/minecraft/world/level/block/entity/BlockEntity$DataComponentInput
+accessible method net/minecraft/world/level/block/entity/BlockEntity$DataComponentInput getOrDefault (Lnet/minecraft/core/component/DataComponentType;Ljava/lang/Object;)Ljava/lang/Object;
+accessible class net/minecraft/world/entity/animal/Bee$BeePollinateGoal
+accessible class net/minecraft/server/network/ServerGamePacketListenerImpl$EntityInteraction
+accessible class net/minecraft/server/commands/LootCommand$Callback
+accessible class net/minecraft/server/level/DistanceManager$ChunkTicketTracker
+accessible method net/minecraft/world/entity/animal/Bee$BeePollinateGoal stopPollinating ()V
+accessible field net/minecraft/world/level/levelgen/structure/templatesystem/StructurePlaceSettings palette I
+accessible field net/minecraft/world/level/levelgen/structure/StructurePiece SHAPE_CHECK_BLOCKS Ljava/util/Set;
+accessible field org/bukkit/craftbukkit/inventory/CraftMetaItem$Applicator builder Lnet/minecraft/core/component/DataComponentPatch$Builder;
+accessible field net/minecraft/world/inventory/StonecutterMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;

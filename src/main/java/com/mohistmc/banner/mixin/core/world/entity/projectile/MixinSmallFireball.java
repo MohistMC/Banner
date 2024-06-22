@@ -10,6 +10,7 @@ import net.minecraft.world.entity.projectile.SmallFireball;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
@@ -27,21 +28,21 @@ public abstract class MixinSmallFireball extends Fireball {
         super(entityType, level);
     }
 
-    @Inject(method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;DDD)V", at = @At("RETURN"))
-    private void banner$init(Level worldIn, LivingEntity shooter, double accelX, double accelY, double accelZ, CallbackInfo ci) {
+    @Inject(method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/phys/Vec3;)V", at = @At("RETURN"))
+    private void banner$init(Level level, LivingEntity livingEntity, Vec3 vec3, CallbackInfo ci) {
         if (this.getOwner() != null && this.getOwner() instanceof Mob) {
             this.banner$setIsIncendiary(this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING));
         }
     }
 
-    @Redirect(method = "onHitEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(I)V"))
-    private void banner$entityCombust(Entity entity, int seconds) {
+    @Redirect(method = "onHitEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(F)V"))
+    private void banner$entityCombust(Entity entity, float seconds) {
         if (this.bridge$isIncendiary()) {
             EntityCombustByEntityEvent event = new EntityCombustByEntityEvent(this.getBukkitEntity(), entity.getBukkitEntity(), seconds);
             Bukkit.getPluginManager().callEvent(event);
 
             if (!event.isCancelled()) {
-                 entity.banner$setSecondsOnFire(event.getDuration(), false);
+                 entity.banner$setSecondsOnFire((int) event.getDuration(), false);
             }
         }
     }

@@ -353,7 +353,6 @@
     "world.item.MixinMinecartItem",
     "world.item.MixinPlayerHeadItem",
     "world.item.MixinPotionItem",
-    "world.item.MixinRecordItem",
     "world.item.MixinSignItem",
     "world.item.MixinSnowballItem",
     "world.item.MixinSpawnEggItem",
@@ -374,8 +373,6 @@
     "world.item.crafting.MixinSmithingTrimRecipe",
     "world.item.crafting.MixinSmokingRecipe",
     "world.item.crafting.MixinStonecutterRecipe",
-    "world.item.enchantment.MixinDamageEnchantment",
-    "world.item.enchantment.MixinFrostWalkerEnchantment",
     "world.item.trading.MixinMerchant",
     "world.item.trading.MixinMerchantOffer",
     "world.level.MixinClipContext",
@@ -545,7 +542,6 @@
     "world.level.material.MixinFlowingFluid",
     "world.level.material.MixinLavaFluid",
     "world.level.portal.MixinPortalForcer",
-    "world.level.portal.MixinPortalInfo",
     "world.level.redstone.MixinNeighborUpdater",
     "world.level.saveddata.maps.MixinMapItemSavedData",
     "world.level.saveddata.maps.MixinMapItemSavedData_HoldingPlayer",
@@ -558,9 +554,7 @@
     "world.level.storage.MixinPlayerDataStorage",
     "world.level.storage.MixinPrimaryLevelData",
     "world.level.storage.loot.MixinLootTable",
-    "world.level.storage.loot.functions.MixinLootingEnchantFunction",
     "world.level.storage.loot.parameters.LootParametersMixin",
     "world.level.storage.loot.predicates.MixinExplosionCondition",
-    "world.level.storage.loot.predicates.MixinRandomChanceWithLootingCondition"
   ]
 }

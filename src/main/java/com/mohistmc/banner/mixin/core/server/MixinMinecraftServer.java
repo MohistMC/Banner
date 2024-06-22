@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.Proxy;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -32,10 +33,7 @@ import jline.console.ConsoleReader;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
-import net.minecraft.CrashReport;
-import net.minecraft.ReportedException;
-import net.minecraft.SystemReport;
-import net.minecraft.Util;
+import net.minecraft.*;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.LayeredRegistryAccess;
@@ -169,9 +167,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     }
 
     @Shadow public abstract SystemReport fillSystemReport(SystemReport systemReport);
-
-    @Shadow public abstract File getServerDirectory();
-
     @Shadow public abstract void onServerCrash(CrashReport report);
 
     @Shadow private boolean stopped;
@@ -198,9 +193,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow private boolean debugCommandProfilerDelayStart;
     @Shadow @Nullable private MinecraftServer.TimeProfiler debugCommandProfiler;
     @Shadow @Final private LayeredRegistryAccess<RegistryLayer> registries;
-
-    @Shadow public abstract boolean isNetherEnabled();
-
     @Shadow public abstract boolean isDemo();
 
     @Shadow @Final public ChunkProgressListenerFactory progressListenerFactory;
@@ -229,6 +221,9 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow @Final private static long OVERLOADED_THRESHOLD_NANOS;
     @Shadow @Final private static long OVERLOADED_WARNING_INTERVAL_NANOS;
     @Shadow private float smoothedTickTimeMillis;
+
+    @Shadow public abstract Path getServerDirectory();
+
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
     public CraftServer server;
@@ -346,9 +341,9 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             LOGGER.error("Encountered an unexpected exception", var46);
             CrashReport crashReport = constructOrExtractCrashReport(var46);
             this.fillSystemReport(crashReport.getSystemReport());
-            File file = new File(new File(this.getServerDirectory(), "crash-reports"), "crash-" + Util.getFilenameFormattedDateTime() + "-server.txt");
-            if (crashReport.saveToFile(file)) {
-                LOGGER.error("This crash report has been saved to: {}", file.getAbsolutePath());
+            Path path = this.getServerDirectory().resolve("crash-reports").resolve("crash-" + Util.getFilenameFormattedDateTime() + "-server.txt");
+            if (crashReport.saveToFile(path, ReportType.CRASH)) {
+                LOGGER.error("This crash report has been saved to: {}", path.toAbsolutePath());
             } else {
                 LOGGER.error("We were unable to save this crash report to disk.");
             }
@@ -404,7 +399,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         if (!BannerConfig.skipOtherWorldPreparing) {
             for (ServerLevel worldserver : ((MinecraftServer)(Object)this).getAllLevels()) {
                 if (worldserver != overworld()) {
-                    if (banner$isNether(worldserver) && isNetherEnabled()) {
+                    if (banner$isNether(worldserver) && Bukkit.getAllowNether()) {
                         banner$prepareWorld(worldserver);
                     }else if (banner$isEnd(worldserver) && this.server.getAllowEnd()) {
                         banner$prepareWorld(worldserver);

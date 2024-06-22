@@ -156,8 +156,9 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         this.banner$setGenerator(gen);
         this.banner$setEnvironment(env);
         this.banner$setBiomeProvider(biomeProvider);
+        Holder<DimensionType> banner$gen = levelStem.type();
         if (gen != null) {
-            this.chunkSource.chunkMap.generator = new CustomChunkGenerator((ServerLevel) (Object) this, this.chunkSource.getGenerator(), gen);
+            banner$gen.value() = new CustomChunkGenerator((ServerLevel) (Object) this, this.chunkSource.getGenerator(), gen);
         }
         getWorld();
     }
@@ -496,40 +497,6 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     private BlockPos banner$resetTickingBlock(BlockPos pos) {
         BukkitSnapshotCaptures.resetTickingBlock();
         return pos;
-    }
-
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    @Overwrite
-    public static void makeObsidianPlatform(ServerLevel world) {
-        BlockPos blockpos = END_SPAWN_POINT;
-        int i = blockpos.getX();
-        int j = blockpos.getY() - 2;
-        int k = blockpos.getZ();
-        BlockStateListPopulator blockList = new BlockStateListPopulator(world);
-        BlockPos.betweenClosed(i - 2, j + 1, k - 2, i + 2, j + 3, k + 2).forEach((pos) -> {
-            blockList.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
-        });
-        BlockPos.betweenClosed(i - 2, j, k - 2, i + 2, j, k + 2).forEach((pos) -> {
-            blockList.setBlock(pos, Blocks.OBSIDIAN.defaultBlockState(), 3);
-        });
-        if (!DistValidate.isValid(world)) {
-            blockList.updateList();
-            BukkitSnapshotCaptures.getEndPortalEntity();
-            return;
-        }
-        CraftWorld bworld = world.getWorld();
-        boolean spawnPortal = BukkitSnapshotCaptures.getEndPortalSpawn();
-        Entity entity = BukkitSnapshotCaptures.getEndPortalEntity();
-        PortalCreateEvent portalEvent = new PortalCreateEvent((List) blockList.getList(), bworld, entity == null ? null : entity.getBukkitEntity(), PortalCreateEvent.CreateReason.END_PLATFORM);
-        portalEvent.setCancelled(!spawnPortal);
-        Bukkit.getPluginManager().callEvent(portalEvent);
-        if (!portalEvent.isCancelled()) {
-            blockList.updateList();
-        }
     }
 
     @ModifyVariable(method = "tickChunk", ordinal = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;randomTick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/util/RandomSource;)V"))

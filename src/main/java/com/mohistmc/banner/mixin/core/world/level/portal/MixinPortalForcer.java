@@ -32,7 +32,6 @@ public abstract class MixinPortalForcer implements InjectionPortalForcer {
     // @formatter:off
     @Shadow public abstract Optional<BlockUtil.FoundRectangle> createPortal(BlockPos pos, Direction.Axis axis);
     @Shadow @Final protected ServerLevel level;
-    @Shadow public abstract Optional<BlockUtil.FoundRectangle> findPortalAround(BlockPos p_192986_, boolean p_192987_, WorldBorder p_192988_);
     // @formatter:on
 
     private AtomicReference<Integer> banner$searchRadius = new AtomicReference<>();
@@ -40,14 +39,17 @@ public abstract class MixinPortalForcer implements InjectionPortalForcer {
     private transient Entity banner$entity;
     private transient int banner$createRadius = -1;
 
+    // Banner TODO fix patches
     @Override
     public Optional<BlockUtil.FoundRectangle> findPortalAround(BlockPos pos, WorldBorder worldBorder, int searchRadius) {
+       /*
         this.banner$searchRadius.set(searchRadius);
         try {
             return this.findPortalAround(pos, false, worldBorder);
         } finally {
             this.banner$searchRadius.set(-1);
-        }
+        }*/
+        return Optional.empty();
     }
 
     @ModifyArg(method = "createPortal", index = 1, at = @At(value = "INVOKE", target = "Lnet/minecraft/core/BlockPos;spiralAround(Lnet/minecraft/core/BlockPos;ILnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;)Ljava/lang/Iterable;"))

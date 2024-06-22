@@ -21,16 +21,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+// Banner TODO fix
 @Mixin(ExperienceOrb.class)
 public abstract class MixinExperienceOrb {
 
     @Shadow private Player followingPlayer;
-
-    @Shadow protected abstract int durabilityToXp(int durability);
-
     @Shadow public int value;
-
-    @Shadow protected abstract int xpToDurability(int xp);
 
     private transient Player banner$lastPlayer;
 
@@ -69,6 +65,7 @@ public abstract class MixinExperienceOrb {
      * @author wdog5
      * @reason
      */
+    /*
     @Overwrite
     private int repairPlayerItems(Player player, int i) {
         Map.Entry<EquipmentSlot, ItemStack> entry = EnchantmentHelper.getRandomItemWith(Enchantments.MENDING, player, ItemStack::isDamaged);
@@ -92,7 +89,7 @@ public abstract class MixinExperienceOrb {
         } else {
             return i;
         }
-    }
+    }*/
 
     @Inject(method = "getExperienceValue", cancellable = true, at = @At("HEAD"))
     private static void banner$higherLevelSplit(int expValue, CallbackInfoReturnable<Integer> cir) {

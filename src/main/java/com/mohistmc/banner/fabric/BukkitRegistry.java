@@ -246,6 +246,7 @@ public class BukkitRegistry {
     }
 
     private static void loadArts() {
+        /*
         int i = Art.values().length;
         var registry = BuiltInRegistries.PAINTING_VARIANT;
         for (var entry : registry) {
@@ -262,7 +263,7 @@ public class BukkitRegistry {
                 BannerServer.LOGGER.debug("Registered mod PaintingType as Art {}", art);
                 i++;
             }
-        }
+        }*/
     }
 
     public static void loadParticles() {

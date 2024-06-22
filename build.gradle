@@ -127,9 +127,9 @@ java {
 	targetCompatibility = JavaVersion.VERSION_21
 }
 
-compileJava {
-	options.compilerArgs << '-XDignore.symbol.file' << '-XDenableSunApiLintControl'
+tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
+	options.compilerArgs << '-Xlint:-dep-ann' << '-Xlint:-removal' << '-Xdiags:verbose'
 }
 
 jar {

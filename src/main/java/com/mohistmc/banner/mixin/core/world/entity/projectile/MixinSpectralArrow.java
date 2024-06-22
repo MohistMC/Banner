@@ -15,8 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(SpectralArrow.class)
 public abstract class MixinSpectralArrow extends AbstractArrow {
 
-    protected MixinSpectralArrow(EntityType<? extends AbstractArrow> entityType, Level level, ItemStack itemStack) {
-        super(entityType, level, itemStack);
+    protected MixinSpectralArrow(EntityType<? extends AbstractArrow> entityType, Level level) {
+        super(entityType, level);
     }
 
     @Inject(method = "doPostHurtEffects", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z"))
