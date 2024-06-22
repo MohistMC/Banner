@@ -9,6 +9,7 @@ import net.minecraft.world.entity.projectile.LargeFireball;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,8 +30,8 @@ public abstract class MixinLargeFireball extends Fireball {
         this.banner$setIsIncendiary(level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING));
     }
 
-    @Inject(method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;DDDI)V", at = @At("RETURN"))
-    private void banner$init(Level level, LivingEntity livingEntity, double d, double e, double f, int i, CallbackInfo ci) {
+    @Inject(method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/phys/Vec3;I)V", at = @At("RETURN"))
+    private void banner$init(Level level, LivingEntity livingEntity, Vec3 vec3, int i, CallbackInfo ci) {
         this.banner$setIsIncendiary(level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING));
     }
 

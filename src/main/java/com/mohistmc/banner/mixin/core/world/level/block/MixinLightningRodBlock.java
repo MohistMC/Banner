@@ -35,10 +35,12 @@ public class MixinLightningRodBlock {
         }
     }
 
-    @Redirect(method = "onProjectileHit", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    // Banner TODO fixme
+    /*
+    @Redirect(method = "onLightningStrike", at = @At(value = "INVOKE", target = "ad"))
     private boolean banner$strikeReason(Level level, Entity entity) {
         if (!DistValidate.isValid(level)) return level.addFreshEntity(entity);
         ((ServerLevel) level).strikeLightning((LightningBolt) entity, LightningStrikeEvent.Cause.TRIDENT);
         return true;
-    }
+    }*/
 }

@@ -135,7 +135,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         this.generator = gen;
         this.environment = env;
         this.biomeProvider = biomeProvider;
-        getWorld();
+        banner$initWorld(null);
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
@@ -203,44 +203,6 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
 
     @Override
     public CraftWorld getWorld() {
-        if (this.world == null) {
-            Optional<Field> delegate = WrappedWorlds.getDelegate(this.getClass());
-            if (delegate.isPresent()) {
-                try {
-                    return ((Level) delegate.get().get(this)).getWorld();
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            if (environment == null) {
-                environment = BukkitRegistry.environment.getOrDefault(getTypeKey(), World.Environment.CUSTOM);
-            }
-            if (generator == null) {
-                generator = getCraftServer().getGenerator(((ServerLevelData) this.getLevelData()).getLevelName());
-                if (generator != null && (Object) this instanceof ServerLevel serverWorld) {
-                    org.bukkit.generator.WorldInfo worldInfo = new CraftWorldInfo((ServerLevelData) getLevelData(),
-                            ((ServerLevel) (Object) this).bridge$convertable(), environment, this.dimensionType());
-                    if (biomeProvider == null && generator != null) {
-                        biomeProvider = generator.getDefaultBiomeProvider(worldInfo);
-                    }
-                    var generator = serverWorld.getChunkSource().getGenerator();
-                    if (biomeProvider != null) {
-                        BiomeSource biomeSource = new CustomWorldChunkManager(worldInfo, biomeProvider, serverWorld.registryAccess().registryOrThrow(Registries.BIOME));
-                        if (generator instanceof NoiseBasedChunkGenerator cga) {
-                            generator = new NoiseBasedChunkGenerator(biomeSource, cga.settings);
-                        } else if (generator instanceof FlatLevelSource cpf) {
-                            var flatLevelSource = new FlatLevelSource(cpf.settings());
-                            flatLevelSource.banner$setBiomeSource(biomeSource);
-                            generator = flatLevelSource;
-                        }
-                    }
-                    serverWorld.getChunkSource().chunkMap.generator =
-                            new CustomChunkGenerator(serverWorld, generator, this.generator);
-                }
-            }
-            this.world = new CraftWorld((ServerLevel) (Object) this, generator, biomeProvider, environment);
-            getCraftServer().addWorld(this.world);
-        }
         return this.world;
     }
 
@@ -622,5 +584,50 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
         this.preventPoiUpdated = preventPoiUpdated;
     }
 
+    @Override
+    public CraftWorld banner$initWorld(@Nullable LevelStem levelStem) {
+        var newStem = levelStem;
+        if (this.world == null) {
+            Optional<Field> delegate = WrappedWorlds.getDelegate(this.getClass());
+            if (delegate.isPresent()) {
+                try {
+                    return ((Level) delegate.get().get(this)).getWorld();
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (environment == null) {
+                environment = BukkitRegistry.environment.getOrDefault(getTypeKey(), World.Environment.CUSTOM);
+            }
+            if (generator == null) {
+                generator = getCraftServer().getGenerator(((ServerLevelData) this.getLevelData()).getLevelName());
+                if (generator != null && (Object) this instanceof ServerLevel serverWorld) {
+                    org.bukkit.generator.WorldInfo worldInfo = new CraftWorldInfo((ServerLevelData) getLevelData(),
+                            ((ServerLevel) (Object) this).bridge$convertable(), environment, this.dimensionType());
+                    if (biomeProvider == null && generator != null) {
+                        biomeProvider = generator.getDefaultBiomeProvider(worldInfo);
+                    }
+                    var generator = serverWorld.getChunkSource().getGenerator();
+                    if (biomeProvider != null) {
+                        BiomeSource biomeSource = new CustomWorldChunkManager(worldInfo, biomeProvider, serverWorld.registryAccess().registryOrThrow(Registries.BIOME));
+                        if (generator instanceof NoiseBasedChunkGenerator cga) {
+                            generator = new NoiseBasedChunkGenerator(biomeSource, cga.settings);
+                        } else if (generator instanceof FlatLevelSource cpf) {
+                            var flatLevelSource = new FlatLevelSource(cpf.settings());
+                            flatLevelSource.banner$setBiomeSource(biomeSource);
+                            generator = flatLevelSource;
+                        }
+                    }
+                    if (((Level) (Object) this) instanceof ServerLevel) {
+                        var banner$gen = newStem.generator();
+                        banner$gen = new CustomChunkGenerator(serverWorld, generator, this.generator);
+                    }
+                }
+            }
+            this.world = new CraftWorld((ServerLevel) (Object) this, generator, biomeProvider, environment);
+            getCraftServer().addWorld(this.world);
+        }
+        return this.world;
+    }
 }
 

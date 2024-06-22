@@ -179,7 +179,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
 
     static final class Applicator {
 
-        private final DataComponentPatch.Builder builder = DataComponentPatch.builder();
+        public final DataComponentPatch.Builder builder = DataComponentPatch.builder();
 
         <T> Applicator put(ItemMetaKeyType<T> key, T value) {
             this.builder.set(key.TYPE, value);

@@ -28,17 +28,10 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.RelativeMovement;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.ProtectionEnchantment;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -47,6 +40,7 @@ import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
@@ -106,8 +100,6 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Shadow public abstract double getX();
 
     @Shadow public abstract double getZ();
-
-    @Shadow protected abstract void handleNetherPortal();
     @Shadow protected abstract SoundEvent getSwimSound();
 
     @Shadow protected abstract SoundEvent getSwimSplashSound();
@@ -159,9 +151,6 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
 
     @Shadow protected abstract ListTag newDoubleList(double... ds);
     @Shadow public abstract boolean teleportTo(ServerLevel level, double x, double y, double z, Set<RelativeMovement> relativeMovements, float yRot, float xRot);
-
-    @Shadow protected BlockPos portalEntrancePos;
-
     @Shadow public abstract Level level();
 
     @Shadow protected abstract Vec3 getRelativePortalPosition(Direction.Axis axis, BlockUtil.FoundRectangle portal);
@@ -183,22 +172,26 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Shadow public abstract void moveTo(double x, double y, double z, float yRot, float xRot);
 
     @Shadow public abstract void positionRider(Entity passenger);
-
-    @Shadow @Nullable public abstract Entity changeDimension(ServerLevel destination);
-
     @Shadow public abstract boolean getSharedFlag(int p_20292_);
-
-    @Shadow public abstract void setRemainingFireTicks(int remainingFireTicks);
-
     @Shadow private AABB bb;
-
-    @Shadow public abstract void igniteForSeconds(int i);
 
     @Shadow public abstract void gameEvent(Holder<GameEvent> holder, @Nullable Entity entity);
 
     @Shadow public abstract void remove(Entity.RemovalReason removalReason);
 
     @Shadow @Nullable private Entity.RemovalReason removalReason;
+
+    @Shadow public abstract void igniteForSeconds(float f);
+
+    @Shadow protected abstract void handlePortal();
+
+    @Shadow public abstract void setRemainingFireTicks(int i);
+
+    @Shadow public abstract void igniteForTicks(int i);
+
+    @Shadow @Nullable public abstract Entity changeDimension(DimensionTransition dimensionTransition);
+
+    @Shadow @Nullable public PortalProcessor portalProcess;
     private CraftEntity bukkitEntity;
     public final org.spigotmc.ActivationRange.ActivationType activationType =
             org.spigotmc.ActivationRange.initializeEntityActivationType((Entity) (Object) this);
@@ -274,18 +267,12 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     public void postTick() {
         // No clean way to break out of ticking once the entity has been copied to a new world, so instead we move the portalling later in the tick cycle
         if (!(((Entity) (Object) this) instanceof ServerPlayer)) {
-            this.handleNetherPortal();
+            this.handlePortal();
         }
     }
 
     @Override
-    public void igniteForSeconds(int i, boolean callEvent) {
-        setSecondsOnFire(i, callEvent);
-    }
-
-    @Deprecated
-    @Override
-    public void setSecondsOnFire(int i, boolean callEvent) {
+    public void igniteForSeconds(float i, boolean callEvent) {
         if (callEvent) {
             EntityCombustEvent event = new EntityCombustEvent(this.getBukkitEntity(), i);
             this.level.getCraftServer().getPluginManager().callEvent(event);
@@ -299,12 +286,12 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     }
 
     @Inject(method = "igniteForSeconds", at = @At("HEAD"))
-    private void banner$setSecondsOnFire(int seconds, CallbackInfo ci) {
-        setSecondsOnFire(seconds, true);
+    private void banner$setSecondsOnFire(float f, CallbackInfo ci) {
+        igniteForSeconds(f, true);
     }
 
     @Override
-    public void banner$setSecondsOnFire(int i, boolean callEvent) {
+    public void banner$setSecondsOnFire(float i, boolean callEvent) {
         if (callEvent) {
             EntityCombustEvent event = new EntityCombustEvent(this.getBukkitEntity(), i);
             this.level.getCraftServer().getPluginManager().callEvent(event);
@@ -314,13 +301,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
             }
             i = event.getDuration();
         }
-        int secs = i * 20;
-        if (((Entity) (Object) this) instanceof LivingEntity) {
-            secs = ProtectionEnchantment.getFireAfterDampener((LivingEntity) (Object) this, secs);
-        }
-        if (this.remainingFireTicks < secs) {
-            this.setRemainingFireTicks(secs);
-        }
+        this.igniteForTicks(Mth.floor(i * 20.0F));
     }
 
     @Override
@@ -388,9 +369,9 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         // CraftBukkit end
     }
 
-    @Redirect(method = "baseTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;handleNetherPortal()V"))
+    @Redirect(method = "baseTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;handlePortal()V"))
     public void banner$baseTick$moveToPostTick(Entity entity) {
-        if ((Object) this instanceof ServerPlayer) this.handleNetherPortal();// CraftBukkit - // Moved up to postTick
+        if ((Object) this instanceof ServerPlayer) this.handlePortal();// CraftBukkit - // Moved up to postTick
     }
 
     @Redirect(method = "updateFluidHeightAndDoFluidPushing", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/material/FluidState;getFlow(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/phys/Vec3;"))
@@ -410,8 +391,8 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         return ret;
     }
 
-    @Redirect(method = "lavaHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(I)V"))
-    public void banner$setOnFireFromLava$bukkitEvent(Entity entity, int seconds) {
+    @Redirect(method = "lavaHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(F)V"))
+    public void banner$setOnFireFromLava$bukkitEvent(Entity instance, float f) {
         var damager = (lastLavaContact == null) ? null : CraftBlock.at(level, lastLavaContact);
         if ((Object) this instanceof LivingEntity && remainingFireTicks <= 0) {
             var damagee = this.getBukkitEntity();
@@ -689,8 +670,8 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         // CraftBukkit end
     }
 
-    @Redirect(method = "thunderHit", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(I)V"))
-    public void banner$onStruckByLightning$EntityCombustByEntityEvent0(Entity entity, int seconds) {
+    @Redirect(method = "thunderHit", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(F)V"))
+    public void banner$onStruckByLightning$EntityCombustByEntityEvent0(Entity entity, float f) {
         final org.bukkit.entity.Entity thisBukkitEntity = this.getBukkitEntity();
         final org.bukkit.entity.Entity stormBukkitEntity = entity.getBukkitEntity();
         final PluginManager pluginManager = Bukkit.getPluginManager();
@@ -767,7 +748,8 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Override
     public Entity teleportTo(ServerLevel worldserver, Vec3 location) {
         banner$location.set(location);
-        return changeDimension(worldserver);
+        DimensionTransition dimensionTransition = this.portalProcess.getPortalDestination(worldserver, ((Entity) (Object) this));
+        return changeDimension(dimensionTransition);
     }
 
     @Override

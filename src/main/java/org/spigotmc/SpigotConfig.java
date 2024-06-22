@@ -248,7 +248,7 @@ public class SpigotConfig
             {
                 try
                 {
-                    ResourceLocation key = new ResourceLocation( name );
+                    ResourceLocation key = ResourceLocation.parse( name );
                     if ( BuiltInRegistries.CUSTOM_STAT.get( key ) == null )
                     {
                         Bukkit.getLogger().log(Level.WARNING, "Ignoring non existent stats.forced-stats " + name);

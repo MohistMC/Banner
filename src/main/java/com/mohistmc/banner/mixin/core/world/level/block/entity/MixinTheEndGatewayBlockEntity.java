@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.core.world.level.block.entity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -19,6 +20,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(TheEndGatewayBlockEntity.class)
@@ -33,8 +35,10 @@ public abstract class MixinTheEndGatewayBlockEntity extends TheEndPortalBlockEnt
     }
 
 
-    @Inject(method = "teleportEntity", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;setPortalCooldown()V"))
-    private static void banner$portal(Level level, BlockPos pos, BlockState state, Entity entityIn, TheEndGatewayBlockEntity blockEntity, CallbackInfo ci, BlockPos dest, Entity entity3) {
+    // Banner TODO fixme
+    /*
+    @Inject(method = "findOrCreateValidTeleportPos", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/TheEndGatewayBlockEntity;findValidSpawnInChunk(Lnet/minecraft/world/level/chunk/LevelChunk;)Lnet/minecraft/core/BlockPos;"))
+    private static void banner$portal(ServerLevel level, BlockPos blockPos, CallbackInfoReturnable<BlockPos> cir, BlockPos dest, Entity entityIn) {
         if (entityIn instanceof ServerPlayer) {
             CraftPlayer player = ((ServerPlayer) entityIn).getBukkitEntity();
             Location location = CraftLocation.toBukkit(dest, level.getWorld()).add(0.5D, 0.5D, 0.5D);
@@ -53,5 +57,5 @@ public abstract class MixinTheEndGatewayBlockEntity extends TheEndPortalBlockEnt
             triggerCooldown(level, pos, state, blockEntity);
             ci.cancel();
         }
-    }
+    }*/
 }

@@ -216,7 +216,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
             this.equipEventAndSound(slot, this.inventory.items.set(this.inventory.selected, stack), stack, silent);
         } else if (slot == EquipmentSlot.OFFHAND) {
             this.equipEventAndSound(slot, this.inventory.offhand.set(0, stack), stack, silent);
-        } else if (slot.getType() == EquipmentSlot.Type.ARMOR) {
+        } else if (slot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR) {
             this.equipEventAndSound(slot, this.inventory.armor.set(slot.getIndex(), stack), stack, silent);
         }
     }

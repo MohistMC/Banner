@@ -6,10 +6,12 @@ import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CampfireCookingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -33,12 +35,12 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(CampfireBlockEntity.class)
 public abstract class MixinCampfireBlockEntity extends BlockEntity {
-
-    @Shadow @Final private RecipeManager.CachedCheck<Container, CampfireCookingRecipe> quickCheck;
     @Shadow
     public abstract Optional<CampfireCookingRecipe> getCookableRecipe(ItemStack p_59052_);
 
     @Shadow @Final public int[] cookingTime;
+
+    @Shadow @Final private RecipeManager.CachedCheck<SingleRecipeInput, CampfireCookingRecipe> quickCheck;
 
     public MixinCampfireBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
@@ -66,11 +68,11 @@ public abstract class MixinCampfireBlockEntity extends BlockEntity {
                 flag = true;
 
                 if (tileentitycampfire.cookingProgress[i] >= tileentitycampfire.cookingTime[i]) {
-                    Container inventorysubcontainer = new SimpleContainer(itemstack);
-                    recipe = ((MixinCampfireBlockEntity) (Object) tileentitycampfire).quickCheck.getRecipeFor( inventorysubcontainer, world);
+                    SingleRecipeInput singleRecipeInput = new SingleRecipeInput(itemstack);
+                    recipe = ((MixinCampfireBlockEntity) (Object) tileentitycampfire).quickCheck.getRecipeFor( singleRecipeInput, world);
                     ItemStack itemStack2 = recipe.map((recipecampfire) -> {
                         // Paper end
-                        return recipecampfire.value().assemble(inventorysubcontainer, world.registryAccess());
+                        return recipecampfire.value().assemble(singleRecipeInput, world.registryAccess());
                     }).orElse(itemstack);
 
                     if (itemStack2.isItemEnabled(world.enabledFeatures())) {
@@ -105,8 +107,8 @@ public abstract class MixinCampfireBlockEntity extends BlockEntity {
 
     @Inject(method = "placeFood", locals = LocalCapture.CAPTURE_FAILHARD,
             at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/block/entity/CampfireBlockEntity;cookingProgress:[I"))
-    private void banner$cookStart(Entity p_238285_, ItemStack stack, int p_238287_, CallbackInfoReturnable<Boolean> cir, int i) {
-        var event = new CampfireStartEvent(CraftBlock.at(this.level, this.worldPosition), CraftItemStack.asCraftMirror(stack), (CampfireRecipe) ((RecipeHolder) (Object) getCookableRecipe(stack).get()).toBukkitRecipe());
+    private void banner$cookStart(LivingEntity livingEntity, ItemStack itemStack, int i, CallbackInfoReturnable<Boolean> cir, int j, ItemStack itemStack2) {
+        var event = new CampfireStartEvent(CraftBlock.at(this.level, this.worldPosition), CraftItemStack.asCraftMirror(itemStack), (CampfireRecipe) ((RecipeHolder) (Object) getCookableRecipe(itemStack).get()).toBukkitRecipe());
         Bukkit.getPluginManager().callEvent(event);
         this.cookingTime[i] = event.getTotalCookTime();
     }

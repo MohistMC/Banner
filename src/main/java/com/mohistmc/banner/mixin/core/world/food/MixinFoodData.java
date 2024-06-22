@@ -68,17 +68,20 @@ public abstract class MixinFoodData implements InjectionFoodData {
         // Banner end
     }
 
+    // Banner TODO fixme
+    /*
     @Inject(method = "eat(IF)V", at = @At("TAIL"))
     private void banner$sendUpdate(int foodLevelModifier, float saturationLevelModifier, CallbackInfo ci) {
         ((ServerPlayer) entityhuman).getBukkitEntity().sendHealthUpdate(); // Banner
     }
 
-    @Inject(method = "eat(Lnet/minecraft/world/item/ItemStack;)V", at = @At("HEAD"))
-    private void banner$setFoodInformation(ItemStack itemStack, CallbackInfo ci) {
+    @Inject(method = "eat(IF)V", at = @At("HEAD"))
+    private void banner$setFoodInformation(FoodProperties foodProperties, CallbackInfo ci) {
         this.banner$foodStack = itemStack;
     }
+    */
 
-    @Redirect(method = "eat(Lnet/minecraft/world/item/ItemStack;)V",
+    @Redirect(method = "eat(Lnet/minecraft/world/food/FoodProperties;)V",
             at = @At(value = "INVOKE",target = "Lnet/minecraft/world/food/FoodData;add(IF)V"))
     private void banner$foodLevelChange(FoodData instance, int i, float f) {
         int oldFoodLevel = foodLevel;

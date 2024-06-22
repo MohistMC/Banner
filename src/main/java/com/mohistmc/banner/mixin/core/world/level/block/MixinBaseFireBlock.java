@@ -17,13 +17,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(BaseFireBlock.class)
 public class MixinBaseFireBlock {
 
-    @Redirect(method = "entityInside", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(I)V"))
-    private void banner$onFire(Entity instance, int seconds, BlockState state, Level level, BlockPos pos) {
-        var event = new EntityCombustByBlockEvent(CraftBlock.at(level, pos), instance.getBukkitEntity(), seconds);
+    @Redirect(method = "entityInside", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(F)V"))
+    private void banner$onFire(Entity entity, float f) {
+        var event = new EntityCombustByBlockEvent(CraftBlock.at(entity.level(), entity.getOnPos()), entity.getBukkitEntity(), f);
         Bukkit.getPluginManager().callEvent(event);
 
         if (!event.isCancelled()) {
-            instance.banner$setSecondsOnFire(event.getDuration(), false);
+            entity.banner$setSecondsOnFire(event.getDuration(), false);
         }
     }
 

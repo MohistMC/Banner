@@ -8,6 +8,7 @@ import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,12 +19,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+// Banner TODO fixme
 @Mixin(AbstractHurtingProjectile.class)
 public abstract class MixinAbstractHurtingProjectile extends Projectile implements InjectionAbstractHurtingProjectile {
 
-    @Shadow public double xPower;
-    @Shadow public double yPower;
-    @Shadow public double zPower;
+    @Shadow public abstract void assignDirectionalMovement(Vec3 vec3, double d);
+
     public float bukkitYield = 1; // CraftBukkit
     public boolean isIncendiary = true; // CraftBukkit
 
@@ -40,10 +41,8 @@ public abstract class MixinAbstractHurtingProjectile extends Projectile implemen
     @Override
     public void setDirection(double d0, double d1, double d2) {
         double banner$d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
-
-        this.xPower = d0 / banner$d3 * 0.1D;
-        this.yPower = d1 / banner$d3 * 0.1D;
-        this.zPower = d2 / banner$d3 * 0.1D;
+        Vec3 vec = new Vec3(d0 / banner$d3 * 0.1D, d1 / banner$d3 * 0.1D, 2 / banner$d3 * 0.1D);
+        this.assignDirectionalMovement(vec, banner$d3);
     }
 
     /*

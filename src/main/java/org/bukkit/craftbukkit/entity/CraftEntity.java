@@ -876,6 +876,22 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
         entityTracker.broadcast(this.getHandle().getAddEntityPacket(entityTracker.serverEntity));
     }
 
+    public void update(ServerPlayer player) {
+        if (!getHandle().isAlive()) {
+            return;
+        }
+
+        ServerLevel world = ((CraftWorld) getWorld()).getHandle();
+        ChunkMap.TrackedEntity entityTracker = world.getChunkSource().chunkMap.entityMap.get(getEntityId());
+
+        if (entityTracker == null) {
+            return;
+        }
+
+        player.connection.send(getHandle().getAddEntityPacket(entityTracker.serverEntity));
+    }
+
+
     private static PermissibleBase getPermissibleBase() {
         if (CraftEntity.perm == null) {
             CraftEntity.perm = new PermissibleBase(new ServerOperator() {

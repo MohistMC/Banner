@@ -139,7 +139,7 @@ public abstract class MixinEnderDragon extends Mob {
 
     // TODO FIXME: exp patch for end dragon
     @Override
-    public int getExpReward() {
+    protected int getBaseExperienceReward() {
         // CraftBukkit - Moved from #tickDeath method
         boolean flag = this.level().getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT);
         short short0 = 500;

@@ -3,7 +3,7 @@
   "minVersion": "0.8",
   "plugin": "com.mohistmc.banner.mixin.BannerMixinPlugin",
   "package": "com.mohistmc.banner.mixin.core",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
   "overwrites": {
     "conformVisibility": true
   },
@@ -158,7 +158,6 @@
     "world.entity.ai.goal.MixinSkeletonTrapGoal",
     "world.entity.ai.goal.MixinTemptGoal",
     "world.entity.ai.goal.target.MixinDefendVillageTargetGoal",
-    "world.entity.ai.goal.target.MixinFollowOwnerGoal",
     "world.entity.ai.goal.target.MixinHurtByTargetGoal",
     "world.entity.ai.goal.target.MixinNearestAttackableTargetGoal",
     "world.entity.ai.goal.target.MixinOwnerHurtByTargetGoal",
@@ -209,11 +208,10 @@
     "world.entity.boss.enderdragon.phases.MixinEnderDragonPhaseManager",
     "world.entity.boss.wither.MixinWitherBoss",
     "world.entity.decoration.MixinArmorStand",
-    "world.entity.decoration.MixinHangingEntity",
+    "world.entity.decoration.MixinBlockAttachedEntity",
     "world.entity.decoration.MixinItemFrame",
     "world.entity.decoration.MixinLeashFenceKnotEntity",
     "world.entity.item.MixinFallingBlockEntity",
-    "world.entity.item.MixinHangingEntity",
     "world.entity.item.MixinItemEntity",
     "world.entity.item.MixinPrimedTnt",
     "world.entity.moster.MixinAbstractSkeleton",
@@ -555,6 +553,6 @@
     "world.level.storage.MixinPrimaryLevelData",
     "world.level.storage.loot.MixinLootTable",
     "world.level.storage.loot.parameters.LootParametersMixin",
-    "world.level.storage.loot.predicates.MixinExplosionCondition",
+    "world.level.storage.loot.predicates.MixinExplosionCondition"
   ]
 }

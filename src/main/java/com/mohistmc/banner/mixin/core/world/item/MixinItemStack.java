@@ -37,13 +37,12 @@ import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.item.SignItem;
 import net.minecraft.world.item.SolidBucketItem;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.item.enchantment.DigDurabilityEnchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
@@ -75,11 +74,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemStack.class)
 public abstract class MixinItemStack implements InjectionItemStack {
@@ -115,11 +109,30 @@ public abstract class MixinItemStack implements InjectionItemStack {
 
     @Shadow public abstract void applyComponents(DataComponentPatch dataComponentPatch);
 
-    @Inject(method = "method_56097", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;shrink(I)V"))
-    private <T extends LivingEntity> void banner$itemBreak(LivingEntity livingEntity, EquipmentSlot equipmentSlot, CallbackInfo ci) {
-        if (this.count == 1 && livingEntity instanceof Player) {
-            CraftEventFactory.callPlayerItemBreakEvent(((Player) livingEntity), (ItemStack) (Object) this);
+    /**
+     * @author wdog5
+     * @reason functionality replaced
+     * TODO inline this with injects
+     */
+    @Overwrite
+    public void hurtAndBreak(int i, LivingEntity livingEntity, EquipmentSlot equipmentSlot) {
+        Level var5 = livingEntity.level();
+        if (var5 instanceof ServerLevel serverLevel) {
+            ServerPlayer var10003;
+            if (livingEntity instanceof ServerPlayer serverPlayer) {
+                var10003 = serverPlayer;
+            } else {
+                var10003 = null;
+            }
+
+            this.hurtAndBreak(i, serverLevel, var10003, (item) -> {
+                if (this.count == 1 && livingEntity instanceof Player) {
+                    CraftEventFactory.callPlayerItemBreakEvent(((Player) livingEntity), (ItemStack) (Object) this);
+                }
+                livingEntity.onEquippedItemBroken(item, equipmentSlot);
+            });
         }
+
     }
 
     @SuppressWarnings("all")
@@ -135,50 +148,44 @@ public abstract class MixinItemStack implements InjectionItemStack {
      * TODO inline this with injects
      */
     @Overwrite
-    public void hurtAndBreak(int i, RandomSource randomSource, @Nullable ServerPlayer serverPlayer, Runnable runnable) {
+    public void hurtAndBreak(int i, ServerLevel serverLevel, @Nullable ServerPlayer serverPlayer, Consumer<Item> consumer) {
         if (this.isDamageableItem()) {
-            int j;
-            if (i > 0) {
-                j = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, ((ItemStack) (Object) this));
-                int k = 0;
+            if (serverPlayer == null || !serverPlayer.hasInfiniteMaterials()) {
+                if (i > 0) {
+                    i = EnchantmentHelper.processDurabilityChange(serverLevel, ((ItemStack) (Object) this), i);
+                    // CraftBukkit start
+                    if (serverPlayer != null) {
+                        PlayerItemDamageEvent event = new PlayerItemDamageEvent(serverPlayer.getBukkitEntity(), CraftItemStack.asCraftMirror(((ItemStack) (Object) this)), i);
+                        event.getPlayer().getServer().getPluginManager().callEvent(event);
 
-                for(int l = 0; j > 0 && l < i; ++l) {
-                    if (DigDurabilityEnchantment.shouldIgnoreDurabilityDrop(((ItemStack) (Object) this), j, randomSource)) {
-                        ++k;
+                        if (i != event.getDamage() || event.isCancelled()) {
+                            event.getPlayer().updateInventory();
+                        }
+                        if (event.isCancelled()) {
+                            return;
+                        }
+
+                        i = event.getDamage();
                     }
-                }
-
-                i -= k;
-                // CraftBukkit start
-                if (serverPlayer != null) {
-                    PlayerItemDamageEvent event = new PlayerItemDamageEvent(serverPlayer.getBukkitEntity(), CraftItemStack.asCraftMirror(((ItemStack) (Object) this)), i);
-                    event.getPlayer().getServer().getPluginManager().callEvent(event);
-
-                    if (i != event.getDamage() || event.isCancelled()) {
-                        event.getPlayer().updateInventory();
-                    }
-                    if (event.isCancelled()) {
+                    // CraftBukkit end
+                    if (i <= 0) {
                         return;
                     }
-
-                    i = event.getDamage();
                 }
-                // CraftBukkit end
-                if (i <= 0) {
-                    return;
+
+                if (serverPlayer != null && i != 0) {
+                    CriteriaTriggers.ITEM_DURABILITY_CHANGED.trigger(serverPlayer, ((ItemStack) (Object) this), this.getDamageValue() + i);
                 }
-            }
 
-            if (serverPlayer != null && i != 0) {
-                CriteriaTriggers.ITEM_DURABILITY_CHANGED.trigger(serverPlayer, ((ItemStack) (Object) this), this.getDamageValue() + i);
-            }
+                int j = this.getDamageValue() + i;
+                this.setDamageValue(j);
+                if (j >= this.getMaxDamage()) {
+                    Item item = this.getItem();
+                    this.shrink(1);
+                    consumer.accept(item);
+                }
 
-            j = this.getDamageValue() + i;
-            this.setDamageValue(j);
-            if (j >= this.getMaxDamage()) {
-                runnable.run();
             }
-
         }
     }
 
@@ -300,27 +307,6 @@ public abstract class MixinItemStack implements InjectionItemStack {
                         }
 
                         world.notifyAndUpdatePhysics(newblockposition, null, oldBlock, block, world.getBlockState(newblockposition), updateFlag, 512); // send null chunk as chunk.k() returns false by this point
-                    }
-
-                    // Special case juke boxes as they update their tile entity. Copied from ItemRecord.
-                    // PAIL: checkme on updates.
-                    if (this.item instanceof RecordItem) {
-                        BlockEntity tileentity = world.getBlockEntity(blockPos);
-
-                        if (tileentity instanceof JukeboxBlockEntity tileentityjukebox) {
-
-                            // There can only be one
-                            ItemStack record = this.copy();
-                            if (!record.isEmpty()) {
-                                record.setCount(1);
-                            }
-
-                            tileentityjukebox.setTheItem(record);
-                            world.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(player, world.getBlockState(blockPos)));
-                        }
-
-                        this.shrink(1);
-                        player.awardStat(Stats.PLAY_RECORD);
                     }
 
                     if (this.item == Items.WITHER_SKELETON_SKULL) { // Special case skulls to allow wither spawns to be cancelled

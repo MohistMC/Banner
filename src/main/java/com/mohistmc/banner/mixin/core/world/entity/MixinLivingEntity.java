@@ -126,8 +126,6 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
 
     @Shadow public abstract boolean shouldDropExperience();
 
-    @Shadow public abstract int getExperienceReward();
-
     @Shadow public abstract boolean removeAllEffects();
 
     @Shadow public abstract ItemStack getItemBySlot(EquipmentSlot slot);
@@ -220,6 +218,8 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
     @Shadow @Nullable public abstract AttributeInstance getAttribute(Holder<Attribute> holder);
 
     @Shadow public abstract boolean hasEffect(Holder<MobEffect> holder);
+
+    @Shadow public abstract int getExperienceReward(ServerLevel serverLevel, @Nullable Entity entity);
 
     public MixinLivingEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -466,9 +466,9 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
     }
 
     @Override
-    public int getExpReward() {
-        if (this.level() instanceof ServerLevel && !this.wasExperienceConsumed() && (this.isAlwaysExperienceDropper() || this.lastHurtByPlayerTime > 0 && this.shouldDropExperience() && this.level().getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT))) {
-            int exp = this.getExperienceReward();
+    public int getExpReward(@Nullable Entity entity) {
+        if (this.level() instanceof ServerLevel serverLevel && !this.wasExperienceConsumed() && (this.isAlwaysExperienceDropper() || this.lastHurtByPlayerTime > 0 && this.shouldDropExperience() && this.level().getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT))) {
+            int exp = this.getExperienceReward(serverLevel, entity);
             return exp;
         } else {
             return 0;
@@ -1017,19 +1017,19 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         this.banner$cause = cause;
     }
 
+    // Banner TODO fixme
+    /**
     @Inject(method = "collectEquipmentChanges", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/LivingEntity;equipmentHasChanged(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z",
-            shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$fireArmorChangeEvent(CallbackInfoReturnable<Map<EquipmentSlot, ItemStack>> cir, Map map,
-                                             EquipmentSlot[] var2, int var3, int var4, EquipmentSlot equipmentSlot,
-                                             ItemStack itemStack, ItemStack itemStack2) {
+            target = "Lnet/minecraft/world/entity/LivingEntity;equipmentHasChanged(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"
+    ), locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$fireArmorChangeEvent(CallbackInfoReturnable<Map<EquipmentSlot, ItemStack>> cir) {
         // Paper start - PlayerArmorChangeEvent
         if (((LivingEntity) (Object) this) instanceof ServerPlayer && equipmentSlot.getType() == EquipmentSlot.Type.ARMOR) {
             final org.bukkit.inventory.ItemStack oldItem = CraftItemStack.asBukkitCopy(itemStack);
             final org.bukkit.inventory.ItemStack newItem = CraftItemStack.asBukkitCopy(itemStack2);
             new PlayerArmorChangeEvent((org.bukkit.entity.Player)this.getBukkitEntity(), PlayerArmorChangeEvent.SlotType.valueOf(equipmentSlot.name()), oldItem, newItem).callEvent();
         }
-    }
+    }*/
 
     @Override
     public final void setArrowCount(int count, boolean reset) {

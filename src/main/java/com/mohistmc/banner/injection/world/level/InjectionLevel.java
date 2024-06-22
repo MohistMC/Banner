@@ -140,4 +140,8 @@ public interface InjectionLevel {
 
     default void banner$setBannerConfig(BannerWorldConfig bannerWorldConfig) {
     }
+
+    default CraftWorld banner$initWorld(LevelStem levelStem) {
+        return null;
+    }
 }

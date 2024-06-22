@@ -57,9 +57,6 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
     @Shadow protected abstract float getEquipmentDropChance(EquipmentSlot slot);
 
     @Shadow protected abstract void setItemSlotAndDropWhenKilled(EquipmentSlot slot, ItemStack stack);
-
-    @Shadow @Nullable public abstract Entity getLeashHolder();
-
     @Shadow @Nullable public abstract <T extends Mob> T convertTo(EntityType<T> entityType, boolean bl);
 
     public boolean aware = true; // CraftBukkit
@@ -208,7 +205,9 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
         }
     }
 
-    @Inject(method = "interact", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Mob;dropLeash(ZZ)V"))
+    // Banner TODO fixme
+    /*
+    @Inject(method = "interact", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Mob;checkAndHandleImportantInteractions(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
     private void banner$unleash(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
         if (CraftEventFactory.callPlayerUnleashEntityEvent((Mob) (Object) this, player, hand).isCancelled()) {
             ((ServerPlayer) player).connection.send(new ClientboundSetEntityLinkPacket((Mob) (Object) this, this.getLeashHolder()));
@@ -248,17 +247,18 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
     @Inject(method = "restoreLeashFromSave", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Mob;spawnAtLocation(Lnet/minecraft/world/level/ItemLike;)Lnet/minecraft/world/entity/item/ItemEntity;"))
     private void banner$leashRestorePre(CallbackInfo ci) {
         this.banner$setForceDrops(true);
-    }
+    }*/
 
     @Inject(method = "startRiding", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Mob;dropLeash(ZZ)V"))
     private void banner$unleashRide(Entity entityIn, boolean force, CallbackInfoReturnable<Boolean> cir) {
         Bukkit.getPluginManager().callEvent(new EntityUnleashEvent(this.getBukkitEntity(), EntityUnleashEvent.UnleashReason.UNKNOWN));
     }
 
+    /*
     @Inject(method = "removeAfterChangingDimensions", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Mob;dropLeash(ZZ)V"))
     private void banner$unleashDead(CallbackInfo ci) {
         Bukkit.getPluginManager().callEvent(new EntityUnleashEvent(this.getBukkitEntity(), EntityUnleashEvent.UnleashReason.UNKNOWN));
-    }
+    }*/
 
     /*
     @Eject(method = "convertTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
@@ -279,14 +279,15 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
         this.banner$transform = null;
     }
 
-    @Redirect(method = "doHurtTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(I)V"))
+    /*
+    @Redirect(method = "doHurtTarget", at = @At(value = "INVOKE", target = "ig"))
     public void banner$attackCombust(Entity entity, int seconds) {
         EntityCombustByEntityEvent combustEvent = new EntityCombustByEntityEvent(this.getBukkitEntity(), entity.getBukkitEntity(), seconds);
         org.bukkit.Bukkit.getPluginManager().callEvent(combustEvent);
         if (!combustEvent.isCancelled()) {
             entity.banner$setSecondsOnFire(combustEvent.getDuration(), false);
         }
-    }
+    }*/
 
     @Mixin(Mob.class)
     public abstract static class PaperSpawnAffect extends LivingEntity {

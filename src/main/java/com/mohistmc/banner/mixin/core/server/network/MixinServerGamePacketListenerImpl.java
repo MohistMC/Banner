@@ -25,6 +25,7 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.network.Connection;
+import net.minecraft.network.DisconnectionDetails;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.LastSeenMessages;
@@ -160,9 +161,6 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     @Shadow
     @Final
     private FutureChain chatMessageChain;
-
-    @Shadow
-    public abstract void onDisconnect(Component reason);
 
     @Shadow
     private static boolean containsInvalidValues(double x, double y, double z, float yRot, float xRot) {
@@ -778,8 +776,10 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
                                 this.player.absMoveTo(d0, d1, d2, f, f1);
                                 this.clientIsFloating = d7 >= -0.03125D && !flag1 && this.player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR && !this.server.isFlightAllowed() && !this.player.getAbilities().mayfly && !this.player.hasEffect(MobEffects.LEVITATION) && !this.player.isFallFlying() && !this.player.isAutoSpinAttack() && this.noBlocksAround(this.player);
                                 this.player.serverLevel().getChunkSource().move(this.player);
+                                Vec3 vec3 = new Vec3(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5);
+                                this.player.setOnGroundWithMovement(packetplayinflying.isOnGround(), vec3);
                                 this.player.doCheckFallDamage(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5, packetplayinflying.isOnGround());
-                                this.player.setOnGroundWithKnownMovement(packetplayinflying.isOnGround(), new Vec3(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5));
+                                this.player.setKnownMovement(vec3);
                                 if (flag) {
                                     this.player.resetFallDistance();
                                 }
@@ -938,7 +938,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     }
 
     @Inject(method = "onDisconnect", cancellable = true, at = @At("HEAD"))
-    private void banner$returnIfProcessed(Component reason, CallbackInfo ci) {
+    private void banner$returnIfProcessed(DisconnectionDetails disconnectionDetails, CallbackInfo ci) {
         if (processedDisconnect) {
             ci.cancel();
         } else {
@@ -1561,7 +1561,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/inventory/RecipeBookMenu;handlePlacement(ZLnet/minecraft/world/item/crafting/RecipeHolder;Lnet/minecraft/server/level/ServerPlayer;)V"))
     private <C extends Container> void banner$recipeClickEvent0(RecipeBookMenu instance, boolean bl, RecipeHolder<?> recipeHolder, ServerPlayer serverPlayer) {
-      ((RecipeBookMenu<?>) this.player.containerMenu).handlePlacement(banner$recipeClickEvent.get().isShiftClick(), recipeHolder, this.player);
+        ((RecipeBookMenu)this.player.containerMenu).handlePlacement(banner$recipeClickEvent.get().isShiftClick(), recipeHolder, this.player);
     }
 
     @Inject(method = "updateSignText", cancellable = true, at = @At("HEAD"))

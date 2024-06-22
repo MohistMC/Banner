@@ -60,11 +60,9 @@ public abstract class MixinBlock extends BlockBehaviour implements InjectionBloc
     }
 
     protected int tryDropExperience(ServerLevel worldserver, BlockPos blockposition, ItemStack itemstack, IntProvider intprovider) {
-        if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, itemstack) == 0) {
-            int i = intprovider.sample(worldserver.random);
-            if (i > 0) {
-                return i;
-            }
+        int i = EnchantmentHelper.processBlockExperience(worldserver, itemstack, intprovider.sample(worldserver.getRandom()));
+        if (i > 0) {
+            return i;
         }
         return 0;
     }

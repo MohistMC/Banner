@@ -59,7 +59,7 @@ public abstract class MixinServerGamePacketListenerImpl_1 {
 
             // Entity in bucket - SPIGOT-4048 and SPIGOT-6859a
             if ((val$target instanceof Bucketable && val$target instanceof LivingEntity && origItem != null && origItem.asItem() == Items.WATER_BUCKET) && (event.isCancelled() || field_28963.player.getInventory().getSelected() == null || field_28963.player.getInventory().getSelected().getItem() != origItem)) {
-                field_28963.send(new ClientboundAddEntityPacket(val$target));
+                val$target.getBukkitEntity().update(field_28963.player);
                 field_28963.player.containerMenu.sendAllDataToRemote();
             }
 

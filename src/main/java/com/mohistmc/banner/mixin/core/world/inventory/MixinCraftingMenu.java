@@ -14,6 +14,7 @@ import net.minecraft.world.inventory.RecipeBookMenu;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RepairItemRecipe;
@@ -34,7 +35,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(CraftingMenu.class)
-public abstract class MixinCraftingMenu extends RecipeBookMenu<CraftingContainer> {
+public abstract class MixinCraftingMenu extends RecipeBookMenu<CraftingInput, CraftingRecipe> {
 
     // @formatter:off
     @Mutable @Shadow @Final private CraftingContainer craftSlots;
@@ -52,7 +53,7 @@ public abstract class MixinCraftingMenu extends RecipeBookMenu<CraftingContainer
 
     @Inject(method = "stillValid", cancellable = true, at = @At("HEAD"))
     public void banner$unreachable(Player playerIn, CallbackInfoReturnable<Boolean> cir) {
-        if (!bridge$checkReachable()) cir.setReturnValue(true);
+        if (!this.bridge$checkReachable()) cir.setReturnValue(true);
     }
 
     @Inject(method = "slotsChanged", at = @At("HEAD"))

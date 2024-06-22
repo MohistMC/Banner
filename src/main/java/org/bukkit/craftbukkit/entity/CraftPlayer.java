@@ -1050,7 +1050,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
             entity.connection.teleport(to);
         } else {
             // The respawn reason should never be used if the passed location is non null.
-            this.server.getHandle().respawn(entity, toWorld, true, to, true, null);
+            this.server.getHandle().respawn(entity, toWorld, true, to, true, Entity.RemovalReason.CHANGED_DIMENSION, null);
         }
         return true;
     }
@@ -2337,7 +2337,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         {
             if ( CraftPlayer.this.getHealth() <= 0 && CraftPlayer.this.isOnline() )
             {
-                CraftPlayer.this.server.getServer().getPlayerList().respawn( CraftPlayer.this.getHandle(), false, org.bukkit.event.player.PlayerRespawnEvent.RespawnReason.PLUGIN );
+                server.getServer().getPlayerList().respawn( getHandle(), false, Entity.RemovalReason.KILLED, org.bukkit.event.player.PlayerRespawnEvent.RespawnReason.PLUGIN );
             }
         }
 

@@ -39,7 +39,7 @@ public interface MixinBucketable {
             itemstack1 = CraftItemStack.asNMSCopy(event.getEntityBucket());
             if (event.isCancelled()) {
                 player.containerMenu.sendAllDataToRemote(); // We need to update inventory to resync client's bucket
-                ((ServerPlayer) player).connection.send(new ClientboundAddEntityPacket(entity)); // We need to play out these packets as the client assumes the fish is gone
+                livingEntity.getBukkitEntity().update((ServerPlayer) player); // We need to play out these packets as the client assumes the fish is gone
                 livingEntity.refreshEntityData((ServerPlayer) player); // Need to send data such as the display name to client
                 return Optional.of(InteractionResult.FAIL);
             }

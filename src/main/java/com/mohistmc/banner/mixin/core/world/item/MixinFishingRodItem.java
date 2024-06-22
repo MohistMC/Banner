@@ -26,10 +26,12 @@ public class MixinFishingRodItem extends Item{
         super(properties);
     }
 
+    // Banner TODO fixme
     /**
      * @author Mgazul
      * @reason
      */
+    /*
     @Overwrite
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
         ItemStack itemstack = player.getItemInHand(interactionHand);
@@ -43,7 +45,7 @@ public class MixinFishingRodItem extends Item{
             player.gameEvent(GameEvent.ITEM_INTERACT_FINISH);
         } else {
             if (!level.isClientSide) {
-                int k = EnchantmentHelper.getFishingSpeedBonus(itemstack);
+                int k = EnchantmentHelper.getFishingTimeReduction(itemstack);
                 int j = EnchantmentHelper.getFishingLuckBonus(itemstack);
                 // CraftBukkit start
                 FishingHook entityfishinghook = new FishingHook(player, level, j, k);
@@ -64,5 +66,5 @@ public class MixinFishingRodItem extends Item{
         }
 
         return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
-    }
+    }*/
 }

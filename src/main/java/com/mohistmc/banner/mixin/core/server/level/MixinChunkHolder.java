@@ -6,11 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ChunkHolder;
-import net.minecraft.server.level.ChunkLevel;
-import net.minecraft.server.level.ChunkMap;
-import net.minecraft.server.level.ChunkResult;
-import net.minecraft.server.level.FullChunkStatus;
+import net.minecraft.server.level.*;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -25,31 +21,31 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 // TODO fix inject method
 @Mixin(ChunkHolder.class)
-public abstract class MixinChunkHolder implements InjectionChunkHolder {
+public abstract class MixinChunkHolder extends GenerationChunkHolder implements InjectionChunkHolder {
 
 
     // @formatter:off
     @Shadow public int oldTicketLevel;
     @Shadow @Final private ShortSet[] changedBlocksPerSection;
     @Shadow private int ticketLevel;
-    @Shadow @Final ChunkPos pos;
     // @formatter:on
 
-    @Shadow public abstract CompletableFuture<ChunkResult<ChunkAccess>> getFutureIfPresentUnchecked(ChunkStatus chunkStatus);
+    public MixinChunkHolder(ChunkPos chunkPos) {
+        super(chunkPos);
+    }
+
+    @Shadow public abstract CompletableFuture<ChunkResult<LevelChunk>> getFullChunkFuture();
 
     @Override
     public LevelChunk getFullChunkNow() {
-        if (!ChunkLevel.fullStatus(this.oldTicketLevel).isOrAfter(FullChunkStatus.FULL)) {
-            return null; // note: using oldTicketLevel for isLoaded checks
-        }
+        // Note: We use the oldTicketLevel for isLoaded checks.
+        if (!ChunkLevel.fullStatus(this.oldTicketLevel).isOrAfter(FullChunkStatus.FULL)) return null;
         return this.getFullChunkNowUnchecked();
     }
 
     @Override
     public LevelChunk getFullChunkNowUnchecked() {
-        CompletableFuture<ChunkResult<ChunkAccess>> statusFuture = this.getFutureIfPresentUnchecked(ChunkStatus.FULL);
-        ChunkResult<ChunkAccess> either = statusFuture.getNow(null);
-        return (either == null) ? null : (LevelChunk) either.orElse(null);
+        return (LevelChunk) this.getChunkIfPresentUnchecked(ChunkStatus.FULL);
     }
 
     @Inject(method = "blockChanged", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD,
@@ -67,7 +63,7 @@ public abstract class MixinChunkHolder implements InjectionChunkHolder {
         // CraftBukkit start
         // ChunkUnloadEvent: Called before the chunk is unloaded: isChunkLoaded is still true and chunk can still be modified by plugins.
         if (ChunkLevel.fullStatus(this.oldTicketLevel).isOrAfter(FullChunkStatus.FULL) && !ChunkLevel.fullStatus(this.ticketLevel).isOrAfter(FullChunkStatus.FULL)) {
-            this.getFutureIfPresentUnchecked(ChunkStatus.FULL).thenAccept((either) -> {
+            this.getFullChunkFuture().thenAccept((either) -> {
                 LevelChunk chunk = (LevelChunk)either.orElse(null);
                 if (chunk != null) {
                     chunkMap.bridge$callbackExecutor().execute(() -> {
@@ -95,7 +91,7 @@ public abstract class MixinChunkHolder implements InjectionChunkHolder {
         // CraftBukkit start
         // ChunkLoadEvent: Called after the chunk is loaded: isChunkLoaded returns true and chunk is ready to be modified by plugins.
         if (!ChunkLevel.fullStatus(this.oldTicketLevel).isOrAfter(FullChunkStatus.FULL) && ChunkLevel.fullStatus(this.ticketLevel).isOrAfter(FullChunkStatus.FULL)) {
-            this.getFutureIfPresentUnchecked(ChunkStatus.FULL).thenAccept((either) -> {
+            this.getFullChunkFuture().thenAccept((either) -> {
                 LevelChunk chunk = (LevelChunk)either.orElse(null);
                 if (chunk != null) {
                     chunkMap.bridge$callbackExecutor().execute(() -> {

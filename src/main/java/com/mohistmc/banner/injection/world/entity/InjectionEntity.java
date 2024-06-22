@@ -126,10 +126,7 @@ public interface InjectionEntity {
     default void postTick() {
     }
 
-    default void setSecondsOnFire(int i, boolean callEvent) {
-    }
-
-    default void banner$setSecondsOnFire(int i, boolean callEvent) {
+    default void banner$setSecondsOnFire(float i, boolean callEvent) {
 
     }
 
@@ -205,7 +202,7 @@ public interface InjectionEntity {
 
     }
 
-    default void igniteForSeconds(int i, boolean callEvent) {
+    default void igniteForSeconds(float i, boolean callEvent) {
 
     }
 }

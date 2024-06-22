@@ -18,7 +18,7 @@ public abstract class MixinPathfinderMob extends Mob {
         super(entityType, level);
     }
 
-    @Inject(method = "tickLeash", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/PathfinderMob;dropLeash(ZZ)V"))
+    @Inject(method = "handleLeashAtDistance", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/PathfinderMob;dropLeash(ZZ)V"))
     private void banner$unleashDistance(CallbackInfo ci) {
         Bukkit.getPluginManager().callEvent(new EntityUnleashEvent(this.getBukkitEntity(), EntityUnleashEvent.UnleashReason.DISTANCE));
     }

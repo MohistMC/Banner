@@ -23,13 +23,13 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.ProtectionEnchantment;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level;
@@ -228,7 +228,7 @@ public abstract class MixinExplosion implements InjectionExplosion {
                         if (entity instanceof LivingEntity) {
                             LivingEntity entityliving = (LivingEntity) entity;
 
-                            d14 = ProtectionEnchantment.getExplosionKnockbackAfterDampener(entityliving, d13);
+                            d14 = d13 * (1.0 - entityliving.getAttributeValue(Attributes.EXPLOSION_KNOCKBACK_RESISTANCE));
                         } else {
                             d14 = d13;
                         }

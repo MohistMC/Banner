@@ -3,8 +3,11 @@ package com.mohistmc.banner.mixin.core.world.entity.decoration;
 import com.mohistmc.banner.injection.world.entity.decoration.InjectionArmorStand;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageSources;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -28,6 +31,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+// Banner TODO fixme
 @Mixin(ArmorStand.class)
 public abstract class MixinArmorStand extends LivingEntity implements InjectionArmorStand {
 
@@ -57,7 +61,7 @@ public abstract class MixinArmorStand extends LivingEntity implements InjectionA
             case HAND:
                 this.onEquipItem(slot, (ItemStack)this.handItems.set(slot.getIndex(), stack), stack, silent);
                 break;
-            case ARMOR:
+            case HUMANOID_ARMOR:
                 this.onEquipItem(slot, (ItemStack)this.armorItems.set(slot.getIndex(), stack), stack, silent);
         }
     }
@@ -114,12 +118,12 @@ public abstract class MixinArmorStand extends LivingEntity implements InjectionA
     }
 
     @Inject(method = "causeDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/ArmorStand;kill()V"))
-    private void banner$deathEvent2(DamageSource damageSource, float amount, CallbackInfo ci) {
+    private void banner$deathEvent2(ServerLevel serverLevel, DamageSource damageSource, float f, CallbackInfo ci) {
         banner$callEntityDeath();
     }
 
-    @Redirect(method = "brokenByAnything", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/ArmorStand;dropAllDeathLoot(Lnet/minecraft/world/damagesource/DamageSource;)V"))
-    private void banner$dropLater(net.minecraft.world.entity.decoration.ArmorStand entity, DamageSource damageSourceIn) {
+    @Redirect(method = "brokenByAnything", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/ArmorStand;dropAllDeathLoot(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;)V"))
+    private void banner$dropLater(ArmorStand instance, ServerLevel serverLevel, DamageSource damageSource) {
     }
 
     @Redirect(method = "brokenByAnything", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;popResource(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;)V"))
@@ -128,8 +132,8 @@ public abstract class MixinArmorStand extends LivingEntity implements InjectionA
     }
 
     @Inject(method = "brokenByAnything", at = @At("RETURN"))
-    private void banner$spawnLast(DamageSource source, CallbackInfo ci) {
-        this.dropAllDeathLoot(source);
+    private void banner$spawnLast(ServerLevel serverLevel, DamageSource damageSource, CallbackInfo ci) {
+        this.dropAllDeathLoot(serverLevel, damageSource);
     }
 
     @Inject(method = "kill", at = @At("HEAD"))
@@ -144,7 +148,7 @@ public abstract class MixinArmorStand extends LivingEntity implements InjectionA
     }
 
     private void banner$callEntityDeath() {
-        CraftEventFactory.callEntityDeathEvent((net.minecraft.world.entity.decoration.ArmorStand) (Object) this, this.bridge$drops());// CraftBukkit - call event
+        CraftEventFactory.callEntityDeathEvent((net.minecraft.world.entity.decoration.ArmorStand) (Object) this, this.damageSources().genericKill(), this.bridge$drops());// CraftBukkit - call event
     }
 
     // Paper start

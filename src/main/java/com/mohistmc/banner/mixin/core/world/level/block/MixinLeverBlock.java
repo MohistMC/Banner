@@ -25,7 +25,7 @@ public class MixinLeverBlock {
 
     @Shadow @Final public static BooleanProperty POWERED;
 
-    @Inject(method = "useWithoutItem", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/LeverBlock;pull(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;"))
+    @Inject(method = "useWithoutItem", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/LeverBlock;pull(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;)V"))
     public void banner$blockRedstone(BlockState state, Level worldIn, BlockPos pos, Player player, BlockHitResult blockHitResult, CallbackInfoReturnable<InteractionResult> cir) {
         boolean flag = state.getValue(POWERED);
         Block block = CraftBlock.at(worldIn, pos);

@@ -1,4 +1,4 @@
-package com.mohistmc.banner.mixin.core.world.entity.item;
+package com.mohistmc.banner.mixin.core.world.entity.decoration;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -7,7 +7,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.entity.decoration.HangingEntity;
+import net.minecraft.world.entity.decoration.BlockAttachedEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -17,24 +17,27 @@ import org.bukkit.entity.Hanging;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(HangingEntity.class)
-public abstract class MixinHangingEntity extends Entity{
+@Mixin(BlockAttachedEntity.class)
+public abstract class MixinBlockAttachedEntity extends Entity {
 
-    // @formatter:off
-    @Shadow public BlockPos pos;
-
-    public MixinHangingEntity(EntityType<?> entityType, Level level) {
+    public MixinBlockAttachedEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }
-    // @formatter:on
 
-    @Inject(method = "tick", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/HangingEntity;discard()V"))
+    @ModifyConstant(method = "tick", constant = @Constant(intValue = 100))
+    private int banner$modifyTick(int constant) {
+        return this.level().bridge$spigotConfig().hangingTickFrequency;
+    }
+
+
+    @Inject(method = "tick", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/BlockAttachedEntity;discard()V"))
     private void banner$hangingBreak(CallbackInfo ci) {
         BlockState material = this.level().getBlockState(new BlockPos(this.blockPosition()));
         HangingBreakEvent.RemoveCause cause;
@@ -50,9 +53,9 @@ public abstract class MixinHangingEntity extends Entity{
         }
     }
 
-    @Inject(method = "hurt", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/HangingEntity;kill()V"))
+    @Inject(method = "hurt", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/BlockAttachedEntity;kill()V"))
     private void banner$hangingBreakByAttack(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        Entity damager = (source.isIndirect()) ? source.getEntity() : source.getDirectEntity();
+        Entity damager = (source.isDirect()) ? source.getEntity() : source.getDirectEntity();
         HangingBreakEvent event;
         if (damager != null) {
             event = new HangingBreakByEntityEvent((Hanging) this.getBukkitEntity(), damager.getBukkitEntity(), source.is(DamageTypeTags.IS_EXPLOSION) ? HangingBreakEvent.RemoveCause.EXPLOSION : HangingBreakEvent.RemoveCause.ENTITY);
@@ -65,7 +68,7 @@ public abstract class MixinHangingEntity extends Entity{
         }
     }
 
-    @Inject(method = "move", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/HangingEntity;kill()V"))
+    @Inject(method = "move", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/BlockAttachedEntity;kill()V"))
     private void banner$hangingBreakByMove(MoverType typeIn, Vec3 pos, CallbackInfo ci) {
         if (this.isRemoved()) {
             ci.cancel();

@@ -70,10 +70,12 @@ public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Cle
         return new Location(level.getWorld(), worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
     }
 
+    // Banner TODO fixme
+    /*
     @Redirect(method = "setRecordWithoutPlaying", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;updateNeighborsAt(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;)V"))
     private void banner$levelNullCheck(Level instance, BlockPos p_46673_, Block p_46674_) {
         if (instance != null) {
             instance.updateNeighborsAt(p_46673_, p_46674_);
         }
-    }
+    }*/
 }

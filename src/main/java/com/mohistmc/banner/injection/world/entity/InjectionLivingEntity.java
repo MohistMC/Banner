@@ -127,7 +127,7 @@ public interface InjectionLivingEntity extends InjectionEntity {
     default void heal(float f, EntityRegainHealthEvent.RegainReason regainReason) {
     }
 
-    default int getExpReward() {
+    default int getExpReward(@Nullable Entity entity) {
         return 0;
     }
 

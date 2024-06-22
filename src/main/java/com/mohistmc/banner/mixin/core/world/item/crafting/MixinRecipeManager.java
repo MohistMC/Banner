@@ -49,9 +49,6 @@ public abstract class MixinRecipeManager implements InjectionRecipeManager {
     }
 
     @Shadow @Final private HolderLookup.Provider registries;
-
-    @Shadow protected abstract <C extends Container, T extends Recipe<C>> Collection<RecipeHolder<T>> byType(RecipeType<T> recipeType);
-
     /**
     public Map<RecipeType<?>, Object2ObjectLinkedOpenHashMap<ResourceLocation, RecipeHolder<?>>> recipesCB = ImmutableMap.of(); // CraftBukkit  // Mohist use obf name
 

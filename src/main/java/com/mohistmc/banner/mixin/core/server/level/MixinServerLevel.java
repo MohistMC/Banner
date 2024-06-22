@@ -10,10 +10,15 @@ import com.mohistmc.banner.bukkit.DistValidate;
 import com.mohistmc.banner.bukkit.LevelPersistentData;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.fabric.BannerDerivedWorldInfo;
+import com.mohistmc.banner.fabric.BukkitRegistry;
 import com.mohistmc.banner.fabric.WorldSymlink;
+import com.mohistmc.banner.fabric.WrappedWorlds;
 import com.mohistmc.banner.injection.server.level.InjectionServerLevel;
 import com.mohistmc.banner.injection.world.level.storage.InjectionLevelStorageAccess;
+
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -44,6 +49,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -53,6 +59,8 @@ import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.levelgen.FlatLevelSource;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.level.storage.DerivedLevelData;
@@ -65,12 +73,15 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.ticks.LevelTicks;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBlockState;
 import org.bukkit.craftbukkit.block.CraftBlockStates;
 import org.bukkit.craftbukkit.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
+import org.bukkit.craftbukkit.generator.CraftWorldInfo;
 import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.generator.CustomWorldChunkManager;
 import org.bukkit.craftbukkit.util.BlockStateListPopulator;
 import org.bukkit.craftbukkit.util.CraftNamespacedKey;
 import org.bukkit.craftbukkit.util.WorldUUID;
@@ -156,11 +167,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         this.banner$setGenerator(gen);
         this.banner$setEnvironment(env);
         this.banner$setBiomeProvider(biomeProvider);
-        Holder<DimensionType> banner$gen = levelStem.type();
-        if (gen != null) {
-            banner$gen.value() = new CustomChunkGenerator((ServerLevel) (Object) this, this.chunkSource.getGenerator(), gen);
-        }
-        getWorld();
+        banner$initWorld(levelStem);
     }
 
     @Inject(method = "<init>", at = @At(value = "RETURN"))
