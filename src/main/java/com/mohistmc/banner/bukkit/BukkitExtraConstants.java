@@ -56,7 +56,7 @@ public class BukkitExtraConstants {
     public static boolean dispenser_eventFired = false; // CraftBukkit
     public static final TicketType<org.bukkit.plugin.Plugin> PLUGIN_TICKET =
             TicketType.create("plugin_ticket", Comparator.comparing(plugin -> plugin.getClass().getName())); // CraftBukkit
-    public static final LootContextParam<Integer> LOOTING_MOD = new LootContextParam<>(new ResourceLocation("bukkit:looting_mod")); // CraftBukkit
+    public static final LootContextParam<Integer> LOOTING_MOD = new LootContextParam<>(ResourceLocation.parse("bukkit:looting_mod")); // CraftBukkit
     public static final TicketType<Unit> PLUGIN = TicketType.create("plugin", (a, b) -> 0); // CraftBukkit
     private static final DSL.TypeReference PDC_TYPE = () -> "bukkit_pdc";
     public static final DataFixTypes BUKKIT_PDC = MohistDynamEnum.addEnum(DataFixTypes.class, "BUKKIT_PDC", List.of(DSL.TypeReference.class), List.of(PDC_TYPE));

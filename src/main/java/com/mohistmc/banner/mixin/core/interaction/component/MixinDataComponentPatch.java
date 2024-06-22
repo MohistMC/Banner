@@ -31,6 +31,11 @@ public class MixinDataComponentPatch implements InjectionDataComponentPatch {
     }
 
     @Override
+    public boolean isSet(DataComponentType<?> type) {
+        return false;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;

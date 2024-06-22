@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -64,14 +63,11 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.server.WorldLoader;
 import net.minecraft.server.bossevents.CustomBossEvent;
-import net.minecraft.server.commands.ReloadCommand;
 import net.minecraft.server.dedicated.DedicatedPlayerList;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.dedicated.DedicatedServerProperties;
-import net.minecraft.server.dedicated.DedicatedServerSettings;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.level.TicketType;
 import net.minecraft.server.players.IpBanListEntry;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.server.players.ServerOpListEntry;
@@ -116,24 +112,9 @@ import net.minecraft.world.level.storage.PlayerDataStorage;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraft.world.level.validation.ContentValidationException;
 import net.minecraft.world.phys.Vec3;
-import org.bukkit.BanList;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Keyed;
-import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Registry;
-import org.bukkit.Server;
-import org.bukkit.ServerTickManager;
-import org.bukkit.StructureType;
-import org.bukkit.UnsafeValues;
+import org.bukkit.*;
 import org.bukkit.Warning.WarningState;
-import org.bukkit.World;
 import org.bukkit.World.Environment;
-import org.bukkit.WorldBorder;
-import org.bukkit.WorldCreator;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
@@ -197,15 +178,7 @@ import org.bukkit.craftbukkit.tag.CraftBlockTag;
 import org.bukkit.craftbukkit.tag.CraftEntityTag;
 import org.bukkit.craftbukkit.tag.CraftFluidTag;
 import org.bukkit.craftbukkit.tag.CraftItemTag;
-import org.bukkit.craftbukkit.util.ApiVersion;
-import org.bukkit.craftbukkit.util.CraftChatMessage;
-import org.bukkit.craftbukkit.util.CraftIconCache;
-import org.bukkit.craftbukkit.util.CraftLocation;
-import org.bukkit.craftbukkit.util.CraftMagicNumbers;
-import org.bukkit.craftbukkit.util.CraftNamespacedKey;
-import org.bukkit.craftbukkit.util.CraftSpawnCategory;
-import org.bukkit.craftbukkit.util.DatFileFilter;
-import org.bukkit.craftbukkit.util.Versioning;
+import org.bukkit.craftbukkit.util.*;
 import org.bukkit.craftbukkit.util.permissions.CraftDefaultPermissions;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -213,7 +186,6 @@ import org.bukkit.entity.SpawnCategory;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerChatTabCompleteEvent;
 import org.bukkit.event.server.BroadcastMessageEvent;
-import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.event.server.TabCompleteEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
@@ -255,7 +227,6 @@ import org.bukkit.plugin.java.JavaPluginLoader;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.plugin.messaging.StandardMessenger;
 import org.bukkit.profile.PlayerProfile;
-import org.bukkit.scheduler.BukkitWorker;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.structure.StructureManager;
 import org.bukkit.util.StringUtil;
@@ -297,6 +268,7 @@ public final class CraftServer implements Server {
     public CraftScoreboardManager scoreboardManager;
     public CraftDataPackManager dataPackManager;
     private CraftServerTickManager serverTickManager;
+    private CraftServerLinks serverLinks;
     public boolean playerCommandState;
     private boolean printSaveWarning;
     private CraftIconCache icon;
@@ -325,6 +297,7 @@ public final class CraftServer implements Server {
         this.structureManager = new CraftStructureManager(console.getStructureManager(), console.registryAccess());
         this.dataPackManager = new CraftDataPackManager(this.getServer().getPackRepository());
         this.serverTickManager = new CraftServerTickManager(console.tickRateManager());
+        this.serverLinks = new CraftServerLinks(console);
 
         Bukkit.setServer(this);
 
@@ -698,7 +671,7 @@ public final class CraftServer implements Server {
 
     @Override
     public boolean getAllowNether() {
-        return this.getServer().isNetherEnabled();
+        return this.getProperties().allowNether;
     }
 
     @Override
@@ -1127,7 +1100,7 @@ public final class CraftServer implements Server {
         } else if (name.equals(levelName + "_the_end")) {
             worldKey = net.minecraft.world.level.Level.END;
         } else {
-            worldKey = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(name.toLowerCase(java.util.Locale.ENGLISH)));
+            worldKey = ResourceKey.create(Registries.DIMENSION, ResourceLocation.withDefaultNamespace(name.toLowerCase(java.util.Locale.ENGLISH)));
         }
 
         // If set to not keep spawn in memory (changed from default) then adjust rule accordingly
@@ -1376,7 +1349,7 @@ public final class CraftServer implements Server {
         if (recipe.isPresent()) {
             RecipeHolder<CraftingRecipe> recipeCrafting = recipe.get();
             if (craftResult.setRecipeUsed(craftWorld.getHandle(), craftPlayer.getHandle(), recipeCrafting)) {
-                itemstack = recipeCrafting.value().assemble(inventoryCrafting, craftWorld.getHandle().registryAccess());
+                itemstack = recipeCrafting.value().assemble(inventoryCrafting.asCraftInput(), craftWorld.getHandle().registryAccess());
             }
         }
 
@@ -1406,7 +1379,7 @@ public final class CraftServer implements Server {
         net.minecraft.world.item.ItemStack itemStack = net.minecraft.world.item.ItemStack.EMPTY;
 
         if (recipe.isPresent()) {
-            itemStack = recipe.get().value().assemble(inventoryCrafting, craftWorld.getHandle().registryAccess());
+            itemStack = recipe.get().value().assemble(inventoryCrafting.asCraftInput(), craftWorld.getHandle().registryAccess());
         }
 
         return this.createItemCraftResult(CraftItemStack.asBukkitCopy(itemStack), inventoryCrafting, craftWorld.getHandle());
@@ -1414,7 +1387,7 @@ public final class CraftServer implements Server {
 
     private CraftItemCraftResult createItemCraftResult(ItemStack itemStack, CraftingContainer inventoryCrafting, ServerLevel worldServer) {
         CraftItemCraftResult craftItemResult = new CraftItemCraftResult(itemStack);
-        NonNullList<net.minecraft.world.item.ItemStack> remainingItems = this.getServer().getRecipeManager().getRemainingItemsFor(RecipeType.CRAFTING, inventoryCrafting, worldServer);
+        NonNullList<net.minecraft.world.item.ItemStack> remainingItems = this.getServer().getRecipeManager().getRemainingItemsFor(RecipeType.CRAFTING, inventoryCrafting.asCraftInput(), worldServer);
 
         // Set the resulting matrix items and overflow items
         for (int i = 0; i < remainingItems.size(); ++i) {
@@ -1454,7 +1427,7 @@ public final class CraftServer implements Server {
             inventoryCrafting.setItem(i, CraftItemStack.asNMSCopy(craftingMatrix[i]));
         }
 
-        return this.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, inventoryCrafting, world.getHandle());
+        return this.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, inventoryCrafting.asCraftInput(), world.getHandle());
     }
 
     @Override
@@ -2055,6 +2028,11 @@ public final class CraftServer implements Server {
     @Override
     public void setMotd(String motd) {
         this.console.setMotd(motd);
+    }
+
+    @Override
+    public ServerLinks getServerLinks() {
+        return this.serverLinks;
     }
 
     @Override

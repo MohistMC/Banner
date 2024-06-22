@@ -5,6 +5,7 @@ import com.google.common.base.Predicates;
 import com.mojang.serialization.Codec;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.locks.LockSupport;
 import java.util.function.BooleanSupplier;
@@ -46,10 +47,12 @@ import org.bukkit.craftbukkit.block.CraftBiome;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.generator.structure.GeneratedStructure;
 import org.bukkit.generator.structure.Structure;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 public class CraftChunk implements Chunk {
     private final ServerLevel worldServer;
@@ -191,7 +194,7 @@ public class CraftChunk implements Chunk {
     @Override
     public boolean isGenerated() {
         ChunkAccess chunk = this.getHandle(ChunkStatus.EMPTY);
-        return chunk.getStatus().isOrAfter(ChunkStatus.FULL);
+        return chunk.getPersistedStatus().isOrAfter(ChunkStatus.FULL);
     }
 
     @Override
@@ -371,6 +374,11 @@ public class CraftChunk implements Chunk {
     @Override
     public Collection<GeneratedStructure> getStructures(Structure structure) {
         return this.getCraftWorld().getStructures(this.getX(), this.getZ(), structure);
+    }
+
+    @Override
+    public @NotNull Collection<Player> getPlayersSeeingChunk() {
+        return getWorld().getPlayersSeeingChunk(this);
     }
 
     @Override

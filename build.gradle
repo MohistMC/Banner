@@ -127,9 +127,9 @@ java {
 	targetCompatibility = JavaVersion.VERSION_21
 }
 
-tasks.withType(JavaCompile).configureEach {
+compileJava {
+	options.compilerArgs << '-XDignore.symbol.file' << '-XDenableSunApiLintControl'
 	options.encoding = 'UTF-8'
-	options.compilerArgs << '-Xlint:-dep-ann' << '-Xlint:-removal'
 }
 
 jar {
@@ -144,17 +144,6 @@ jar {
 				'Implementation-Version': version,
 				'Implementation-Vendor' : 'MohistMC'
 		)
-	}
-}
-
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
-		}
-	}
-	repositories {
-
 	}
 }
 

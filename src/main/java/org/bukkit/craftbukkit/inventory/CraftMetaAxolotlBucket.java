@@ -16,11 +16,13 @@ import org.bukkit.inventory.meta.AxolotlBucketMeta;
 @DelegateDeserialization(SerializableMeta.class)
 public class CraftMetaAxolotlBucket extends CraftMetaItem implements AxolotlBucketMeta {
 
-    static final ItemMetaKey VARIANT = new ItemMetaKey("axolotl-variant");
-    static final ItemMetaKeyType<CustomData> ENTITY_TAG = new ItemMetaKeyType<>(DataComponents.BUCKET_ENTITY_DATA, "entity-tag");
+    static final ItemMetaKey VARIANT = new ItemMetaKey("Variant", "axolotl-variant");
+    static final ItemMetaKeyType<CustomData> ENTITY_TAG = new ItemMetaKeyType<>(DataComponents.ENTITY_DATA, "entity-tag");
+    static final ItemMetaKeyType<CustomData> BUCKET_ENTITY_TAG = new ItemMetaKeyType<>(DataComponents.BUCKET_ENTITY_DATA, "bucket-entity-tag");
 
     private Integer variant;
     private CompoundTag entityTag;
+    private CompoundTag bucketEntityTag;
 
     CraftMetaAxolotlBucket(CraftMetaItem meta) {
         super(meta);
@@ -32,16 +34,24 @@ public class CraftMetaAxolotlBucket extends CraftMetaItem implements AxolotlBuck
         CraftMetaAxolotlBucket bucket = (CraftMetaAxolotlBucket) meta;
         this.variant = bucket.variant;
         this.entityTag = bucket.entityTag;
+        this.bucketEntityTag = bucket.bucketEntityTag;
     }
 
     CraftMetaAxolotlBucket(DataComponentPatch tag) {
         super(tag);
 
-        getOrEmpty(tag, CraftMetaAxolotlBucket.ENTITY_TAG).ifPresent((nbt) -> {
-            this.entityTag = nbt.copyTag();
+        getOrEmpty(tag, ENTITY_TAG).ifPresent((nbt) -> {
+            entityTag = nbt.copyTag();
 
-            if (this.entityTag.contains("Variant", CraftMagicNumbers.NBT.TAG_INT)) {
-                this.variant = this.entityTag.getInt("Variant");
+            if (entityTag.contains(VARIANT.NBT, CraftMagicNumbers.NBT.TAG_INT)) {
+                this.variant = entityTag.getInt(VARIANT.NBT);
+            }
+        });
+        getOrEmpty(tag, BUCKET_ENTITY_TAG).ifPresent((nbt) -> {
+            bucketEntityTag = nbt.copyTag();
+
+            if (bucketEntityTag.contains(VARIANT.NBT, CraftMagicNumbers.NBT.TAG_INT)) {
+                this.variant = bucketEntityTag.getInt(VARIANT.NBT);
             }
         });
     }
@@ -49,7 +59,7 @@ public class CraftMetaAxolotlBucket extends CraftMetaItem implements AxolotlBuck
     CraftMetaAxolotlBucket(Map<String, Object> map) {
         super(map);
 
-        Integer variant = SerializableMeta.getObject(Integer.class, map, CraftMetaAxolotlBucket.VARIANT.BUKKIT, true);
+        Integer variant = SerializableMeta.getObject(Integer.class, map, VARIANT.BUKKIT, true);
         if (variant != null) {
             this.variant = variant;
         }
@@ -59,15 +69,21 @@ public class CraftMetaAxolotlBucket extends CraftMetaItem implements AxolotlBuck
     void deserializeInternal(CompoundTag tag, Object context) {
         super.deserializeInternal(tag, context);
 
-        if (tag.contains(CraftMetaAxolotlBucket.ENTITY_TAG.NBT)) {
-            this.entityTag = tag.getCompound(CraftMetaAxolotlBucket.ENTITY_TAG.NBT);
+        if (tag.contains(ENTITY_TAG.NBT)) {
+            entityTag = tag.getCompound(ENTITY_TAG.NBT);
+        }
+        if (tag.contains(BUCKET_ENTITY_TAG.NBT)) {
+            bucketEntityTag = tag.getCompound(BUCKET_ENTITY_TAG.NBT);
         }
     }
 
     @Override
     void serializeInternal(Map<String, Tag> internalTags) {
-        if (this.entityTag != null && !this.entityTag.isEmpty()) {
-            internalTags.put(CraftMetaAxolotlBucket.ENTITY_TAG.NBT, this.entityTag);
+        if (entityTag != null && !entityTag.isEmpty()) {
+            internalTags.put(ENTITY_TAG.NBT, entityTag);
+        }
+        if (bucketEntityTag != null && !bucketEntityTag.isEmpty()) {
+            internalTags.put(BUCKET_ENTITY_TAG.NBT, bucketEntityTag);
         }
     }
 
@@ -75,15 +91,20 @@ public class CraftMetaAxolotlBucket extends CraftMetaItem implements AxolotlBuck
     void applyToItem(CraftMetaItem.Applicator tag) {
         super.applyToItem(tag);
 
-        if (this.hasVariant()) {
-            if (this.entityTag == null) {
-                this.entityTag = new CompoundTag();
-            }
-            this.entityTag.putInt("Variant", this.variant);
+        if (entityTag != null) {
+            tag.put(ENTITY_TAG, CustomData.of(entityTag));
         }
 
-        if (this.entityTag != null) {
-            tag.put(CraftMetaAxolotlBucket.ENTITY_TAG, CustomData.of(this.entityTag));
+        CompoundTag bucketEntityTag = (this.bucketEntityTag != null) ? this.bucketEntityTag.copy() : null;
+        if (hasVariant()) {
+            if (bucketEntityTag == null) {
+                bucketEntityTag = new CompoundTag();
+            }
+            bucketEntityTag.putInt(VARIANT.NBT, variant);
+        }
+
+        if (bucketEntityTag != null) {
+            tag.put(BUCKET_ENTITY_TAG, CustomData.of(bucketEntityTag));
         }
     }
 
@@ -94,16 +115,16 @@ public class CraftMetaAxolotlBucket extends CraftMetaItem implements AxolotlBuck
 
     @Override
     boolean isEmpty() {
-        return super.isEmpty() && this.isBucketEmpty();
+        return super.isEmpty() && isBucketEmpty();
     }
 
     boolean isBucketEmpty() {
-        return !(this.hasVariant() || this.entityTag != null);
+        return !(hasVariant() || entityTag != null || bucketEntityTag != null);
     }
 
     @Override
     public Axolotl.Variant getVariant() {
-        return Axolotl.Variant.values()[this.variant];
+        return Axolotl.Variant.values()[variant];
     }
 
     @Override
@@ -116,7 +137,7 @@ public class CraftMetaAxolotlBucket extends CraftMetaItem implements AxolotlBuck
 
     @Override
     public boolean hasVariant() {
-        return this.variant != null;
+        return variant != null;
     }
 
     @Override
@@ -127,15 +148,16 @@ public class CraftMetaAxolotlBucket extends CraftMetaItem implements AxolotlBuck
         if (meta instanceof CraftMetaAxolotlBucket) {
             CraftMetaAxolotlBucket that = (CraftMetaAxolotlBucket) meta;
 
-            return (this.hasVariant() ? that.hasVariant() && this.variant.equals(that.variant) : !that.hasVariant())
-                    && (this.entityTag != null ? that.entityTag != null && this.entityTag.equals(that.entityTag) : that.entityTag == null);
+            return (hasVariant() ? that.hasVariant() && this.variant.equals(that.variant) : !that.hasVariant())
+                    && (entityTag != null ? that.entityTag != null && this.entityTag.equals(that.entityTag) : that.entityTag == null)
+                    && (bucketEntityTag != null ? that.bucketEntityTag != null && this.bucketEntityTag.equals(that.bucketEntityTag) : that.bucketEntityTag == null);
         }
         return true;
     }
 
     @Override
     boolean notUncommon(CraftMetaItem meta) {
-        return super.notUncommon(meta) && (meta instanceof CraftMetaAxolotlBucket || this.isBucketEmpty());
+        return super.notUncommon(meta) && (meta instanceof CraftMetaAxolotlBucket || isBucketEmpty());
     }
 
     @Override
@@ -143,11 +165,14 @@ public class CraftMetaAxolotlBucket extends CraftMetaItem implements AxolotlBuck
         final int original;
         int hash = original = super.applyHash();
 
-        if (this.hasVariant()) {
-            hash = 61 * hash + this.variant;
+        if (hasVariant()) {
+            hash = 61 * hash + variant;
         }
-        if (this.entityTag != null) {
-            hash = 61 * hash + this.entityTag.hashCode();
+        if (entityTag != null) {
+            hash = 61 * hash + entityTag.hashCode();
+        }
+        if (bucketEntityTag != null) {
+            hash = 61 * hash + bucketEntityTag.hashCode();
         }
 
         return original != hash ? CraftMetaAxolotlBucket.class.hashCode() ^ hash : hash;
@@ -157,8 +182,11 @@ public class CraftMetaAxolotlBucket extends CraftMetaItem implements AxolotlBuck
     public CraftMetaAxolotlBucket clone() {
         CraftMetaAxolotlBucket clone = (CraftMetaAxolotlBucket) super.clone();
 
-        if (this.entityTag != null) {
-            clone.entityTag = this.entityTag.copy();
+        if (entityTag != null) {
+            clone.entityTag = entityTag.copy();
+        }
+        if (bucketEntityTag != null) {
+            clone.bucketEntityTag = bucketEntityTag.copy();
         }
 
         return clone;
@@ -168,8 +196,8 @@ public class CraftMetaAxolotlBucket extends CraftMetaItem implements AxolotlBuck
     ImmutableMap.Builder<String, Object> serialize(ImmutableMap.Builder<String, Object> builder) {
         super.serialize(builder);
 
-        if (this.hasVariant()) {
-            builder.put(CraftMetaAxolotlBucket.VARIANT.BUKKIT, this.variant);
+        if (hasVariant()) {
+            builder.put(VARIANT.BUKKIT, variant);
         }
 
         return builder;

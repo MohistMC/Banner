@@ -58,7 +58,6 @@ import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.WorldBorder;
-import net.minecraft.world.level.portal.PortalInfo;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.ScoreAccess;
@@ -134,9 +133,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Shadow public abstract void teleportTo(ServerLevel newLevel, double x, double y, double z, float yaw, float pitch);
 
     @Shadow public abstract void setCamera(@Nullable Entity entityToSpectate);
-
-    @Shadow @Nullable protected abstract PortalInfo findDimensionEntryPoint(ServerLevel destination);
-
     @Shadow public abstract void resetFallDistance();
 
     @Shadow public abstract boolean canHarmPlayer(Player other);
@@ -693,9 +689,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         // Paper end
     }
 
-    public PortalInfo banner$findDimensionEntryPoint(ServerLevel destination) {
-        return findDimensionEntryPoint(destination);
-    }
     @Override
     public CraftPlayer getBukkitEntity() {
         return (CraftPlayer)super.getBukkitEntity();

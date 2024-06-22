@@ -14,4 +14,8 @@ public interface InjectionDataComponentPatch {
     default boolean isEmpty() {
         return false;
     }
+
+    default boolean isSet(DataComponentType<?> type) {
+        return false;
+    }
 }

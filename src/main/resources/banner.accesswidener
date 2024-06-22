@@ -586,3 +586,11 @@ accessible field net/minecraft/world/level/block/state/StateHolder PROPERTY_ENTR
 accessible method net/minecraft/world/entity/decoration/ItemFrame setDirection (Lnet/minecraft/core/Direction;)V
 accessible field net/minecraft/server/network/ServerCommonPacketListenerImpl connection Lnet/minecraft/network/Connection;
 accessible method net/minecraft/world/damagesource/DamageSource <init> (Lnet/minecraft/core/Holder;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;)V
+accessible method net/minecraft/server/commands/ReloadCommand discoverNewPacks (Lnet/minecraft/server/packs/repository/PackRepository;Lnet/minecraft/world/level/storage/WorldData;Ljava/util/Collection;)Ljava/util/Collection;
+accessible field net/minecraft/core/component/DataComponentPatch$Builder map Lit/unimi/dsi/fastutil/objects/Reference2ObjectMap;
+accessible field net/minecraft/core/component/DataComponentPatch map Lit/unimi/dsi/fastutil/objects/Reference2ObjectMap;
+accessible method net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplateManager readStructure (Ljava/io/InputStream;)Lnet/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplate;
+accessible method net/minecraft/server/dedicated/DedicatedServerProperties$WorldDimensionData <init> (Lcom/google/gson/JsonObject;Ljava/lang/String;)V
+accessible method net/minecraft/server/level/ServerLevel getEntities ()Lnet/minecraft/world/level/entity/LevelEntityGetter;
+accessible method net/minecraft/world/level/GameRules$Value deserialize (Ljava/lang/String;)V
+accessible method net/minecraft/server/level/PlayerRespawnLogic getOverworldRespawnPos (Lnet/minecraft/server/level/ServerLevel;II)Lnet/minecraft/core/BlockPos;

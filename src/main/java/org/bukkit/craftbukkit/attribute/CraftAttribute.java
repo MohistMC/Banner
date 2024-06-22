@@ -51,4 +51,10 @@ public class CraftAttribute {
         throw new IllegalArgumentException("No Reference holder found for " + bukkit
                 + ", this can happen if a plugin creates its own sound effect with out properly registering it.");
     }
+
+    public static String bukkitToString(Attribute bukkit) {
+        Preconditions.checkArgument(bukkit != null);
+
+        return bukkit.getKey().toString();
+    }
 }

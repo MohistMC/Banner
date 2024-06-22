@@ -41,8 +41,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.LevelResource;
 import org.bukkit.Bukkit;
 import org.bukkit.FeatureFlag;
+import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.UnsafeValues;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.attribute.Attribute;
@@ -58,10 +60,12 @@ import org.bukkit.craftbukkit.damage.CraftDamageEffect;
 import org.bukkit.craftbukkit.damage.CraftDamageSourceBuilder;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.legacy.CraftLegacy;
+import org.bukkit.craftbukkit.legacy.FieldRename;
 import org.bukkit.craftbukkit.potion.CraftPotionType;
 import org.bukkit.damage.DamageEffect;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.CreativeCategory;
 import org.bukkit.inventory.EquipmentSlot;
@@ -225,7 +229,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
      * @return string
      */
     public String getMappingsVersion() {
-        return "ad1a88fd7eaf2277f2507bf34d7b994c";
+        return "229d7afc75b70a6c388337687ac4da1f";
     }
 
     @Override
@@ -313,17 +317,11 @@ public final class CraftMagicNumbers implements UnsafeValues {
     }
 
     public static boolean isLegacy(PluginDescriptionFile pdf) {
-        return pdf.getAPIVersion() == null;
+        return false;
     }
 
     @Override
     public byte[] processClass(PluginDescriptionFile pdf, String path, byte[] clazz) {
-        try {
-            clazz = Commodore.convert(clazz, pdf.getName(), ApiVersion.getOrCreateVersion(pdf.getAPIVersion()));
-        } catch (Exception ex) {
-            Bukkit.getLogger().log(Level.SEVERE, "Fatal error trying to convert " + pdf.getFullName() + ":" + path, ex);
-        }
-
         return clazz;
     }
 
@@ -397,6 +395,21 @@ public final class CraftMagicNumbers implements UnsafeValues {
     @Override
     public DamageSource.Builder createDamageSourceBuilder(DamageType damageType) {
         return new CraftDamageSourceBuilder(damageType);
+    }
+
+    @Override
+    public String get(Class<?> aClass, String s) {
+        if (aClass == Enchantment.class) {
+            // We currently do not have any version-dependent remapping, so we can use current version
+            return FieldRename.convertEnchantmentName(ApiVersion.CURRENT, s);
+        }
+        return s;
+    }
+
+    @Override
+    public <B extends Keyed> B get(Registry<B> registry, NamespacedKey namespacedKey) {
+        // We currently do not have any version-dependent remapping, so we can use current version
+        return CraftRegistry.get(registry, namespacedKey, ApiVersion.CURRENT);
     }
 
     /**
