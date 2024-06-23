@@ -30,8 +30,8 @@ public abstract class MixinHorseInventoryMenu extends AbstractContainerMenu{
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    public void banner$init(int id, Inventory playerInventory, Container horseInventory, AbstractHorse horse, CallbackInfo ci) {
-        this.playerInventory = playerInventory;
+    public void banner$init(int i, Inventory inventory, Container container, AbstractHorse abstractHorse, int j, CallbackInfo ci) {
+        this.playerInventory = inventory;
     }
 
     @Override

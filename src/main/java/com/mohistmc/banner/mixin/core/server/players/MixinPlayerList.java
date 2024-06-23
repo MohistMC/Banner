@@ -567,8 +567,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         }
 
         int i = flag ? 1 : 0;
-        ServerLevel worldserver1 = entityplayer1.serverLevel();
-        LevelData worlddata = worldserver1.getLevelData();
 
         entityplayer1.connection.send(new ClientboundRespawnPacket(entityplayer1.createCommonSpawnInfo(worldserver1), (byte) i));
         entityplayer1.connection.teleport(CraftLocation.toBukkit(entityplayer1.position(), worldserver1.getWorld(), entityplayer1.getYRot(), entityplayer1.getXRot())); // CraftBukkit
@@ -806,5 +804,13 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             target = "Lnet/minecraft/server/level/ServerLevel;getWorldBorder()Lnet/minecraft/world/level/border/WorldBorder;"))
     private WorldBorder banner$useBukkitWorldBorder(ServerLevel instance) {
         return banner$worldBorderPlayer.get().level().getWorldBorder();
+    }
+
+    @Inject(method = "removeAll", at = @At("HEAD"), cancellable = true)
+    private void banner$removeSafety(CallbackInfo ci) {
+        for (ServerPlayer player : this.players) {
+            player.connection.disconnect(CraftChatMessage.fromStringOrEmpty(this.server.bridge$server().getShutdownMessage())); // CraftBukkit - add custom shutdown message
+        }
+        ci.cancel();
     }
 }
