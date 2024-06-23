@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.6-SNAPSHOT'
+	id 'fabric-loom' version '1.7-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -100,7 +100,7 @@ dependencies {
 	annotationProcessor 'com.github.wdog5:mixin-tools:1.0.1'
 
 	// mappings remapper
-	implementation(include("net.fabricmc:mapping-io:0.3.0"))
+	implementation(include("net.fabricmc:mapping-io:0.6.1"))
 
 	// mohist lib
 	implementation(include("com.mohistmc:librariesvault:1.20.2"))
