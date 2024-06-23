@@ -10,6 +10,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import com.mohistmc.banner.command.DumpCommand;
+import com.mohistmc.banner.command.GetPluginListCommand;
+import com.mohistmc.banner.command.ModListCommand;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.command.defaults.BukkitCommand;
@@ -37,6 +41,9 @@ public class SimpleCommandMap implements CommandMap {
         register("bukkit", new ReloadCommand("reload"));
         register("bukkit", new PluginsCommand("plugins"));
         register("bukkit", new TimingsCommand("timings"));
+        register("banner", new ModListCommand("mods"));
+        register("banner", new DumpCommand("dump"));
+        register("banner", new GetPluginListCommand("pluginlist"));
     }
 
     public void setFallbackCommands() {
