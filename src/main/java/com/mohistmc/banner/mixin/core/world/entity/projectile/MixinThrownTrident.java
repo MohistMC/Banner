@@ -13,10 +13,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(ThrownTrident.class)
 public class MixinThrownTrident {
 
-    @Redirect(method = "onHitEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    // Banner TODO fixme
+    /*
+    @Redirect(method = "onHitEntity", at = @At(value = "INVOKE", target = "addFreshEntity"))
     private boolean banner$lightning(Level world, Entity entityIn) {
         ((ServerLevel) world).strikeLightning((LightningBolt) entityIn, LightningStrikeEvent.Cause.TRIDENT);
         return true;
-    }
+    }*/
 
 }

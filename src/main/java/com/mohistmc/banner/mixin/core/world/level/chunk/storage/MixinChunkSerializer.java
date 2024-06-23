@@ -16,13 +16,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ChunkSerializer.class)
 public class MixinChunkSerializer {
 
+    // Banner TODO fixme
     @Redirect(method = "read", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/ChunkAccess;setLightCorrect(Z)V"))
-    private static void banner$loadPersistent(ChunkAccess instance, boolean correct, ServerLevel level, PoiManager poiManager, ChunkPos pos, CompoundTag tag) {
+    private static void banner$loadPersistent(ChunkAccess instance, boolean bl) {
+      /*
         net.minecraft.nbt.Tag persistentBase = tag.get("ChunkBukkitValues");
         if (persistentBase instanceof CompoundTag) {
             ((CraftPersistentDataContainer) (instance).bridge$persistentDataContainer()).putAll((CompoundTag) persistentBase);
         }
-        instance.setLightCorrect(correct);
+        instance.setLightCorrect(correct);*/
     }
 
     @Inject(method = "write", at = @At("RETURN"))

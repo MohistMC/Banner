@@ -203,6 +203,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
 
     @Override
     public CraftWorld getWorld() {
+        banner$initWorld(null);
         return this.world;
     }
 

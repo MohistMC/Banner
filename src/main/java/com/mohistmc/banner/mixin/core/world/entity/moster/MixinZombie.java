@@ -64,8 +64,8 @@ public abstract class MixinZombie extends Monster {
         }
     }
 
-    @Redirect(method = "doHurtTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(I)V"))
-    private void banner$entityCombust(Entity entity, int seconds) {
+    @Redirect(method = "doHurtTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(F)V"))
+    private void banner$entityCombust(Entity entity, float seconds) {
         EntityCombustByEntityEvent event = new EntityCombustByEntityEvent(this.getBukkitEntity(),  entity.getBukkitEntity(), seconds);
         Bukkit.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {

@@ -46,6 +46,8 @@ public abstract class MixinZombieVillager extends Zombie {
         return t;
     }
 
+    // Banner TODO fixme
+    /*
     @Inject(method = "finishConversion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/ZombieVillager;spawnAtLocation(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/entity/item/ItemEntity;"))
     private void banner$dropPre(ServerLevel world, CallbackInfo ci) {
         this.banner$setForceDrops(true);
@@ -54,5 +56,5 @@ public abstract class MixinZombieVillager extends Zombie {
     @Inject(method = "finishConversion", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/monster/ZombieVillager;spawnAtLocation(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/entity/item/ItemEntity;"))
     private void banner$dropPost(ServerLevel world, CallbackInfo ci) {
         this.banner$setForceDrops(false);
-    }
+    }*/
 }
