@@ -114,6 +114,14 @@ loom {
 	}
 }
 
+loom.runs.configureEach {
+	vmArgs([
+			"-enableassertions",
+			"-Dmixin.debug.verify=true",
+			"-Dmixin.debug.countInjections=true"
+	])
+}
+
 processResources {
 	inputs.property "version", project.version
 
