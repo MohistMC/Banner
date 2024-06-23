@@ -68,7 +68,7 @@ public class IntermediaryMappingProvider extends AbstractMappingProvider {
             try (InputStream fileInput = Files.newInputStream(this.path);
                  GZIPInputStream gzipInput = new GZIPInputStream(fileInput);
                  Reader reader = new InputStreamReader(gzipInput)) {
-                MappingReader.read(reader, MappingFormat.TINY_2, mappings);
+                MappingReader.read(reader, MappingFormat.TINY_2_FILE, mappings);
             } catch (IOException exception) {
                 throw new RuntimeException(exception);
             }

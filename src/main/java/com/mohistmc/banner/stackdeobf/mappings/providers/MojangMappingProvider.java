@@ -136,7 +136,7 @@ public class MojangMappingProvider extends AbstractMappingProvider {
                 try (InputStream fileInput = Files.newInputStream(this.path);
                      GZIPInputStream gzipInput = new GZIPInputStream(fileInput);
                      Reader reader = new InputStreamReader(gzipInput)) {
-                    MappingReader.read(reader, MappingFormat.PROGUARD, rawMappings);
+                    MappingReader.read(reader, MappingFormat.PROGUARD_FILE, rawMappings);
                 }
 
                 rawMappings.setSrcNamespace("named");

@@ -2,10 +2,12 @@ package com.mohistmc.banner.stackdeobf.mappings;
 
 // Created by booky10 in StackDeobfuscator (15:08 23.03.23)
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import net.fabricmc.mappingio.MappedElementKind;
 import net.fabricmc.mappingio.MappingVisitor;
+import org.jetbrains.annotations.Nullable;
 
 public class MappingCacheVisitor implements MappingVisitor {
 
@@ -49,7 +51,7 @@ public class MappingCacheVisitor implements MappingVisitor {
     }
 
     @Override
-    public boolean visitMethodVar(int lvtRowIndex, int lvIndex, int startOpIdx, String srcName) {
+    public boolean visitMethodVar(int lvtRowIndex, int lvIndex, int startOpIdx, int endOpIdx, @Nullable String srcName) throws IOException {
         return true;
     }
 
