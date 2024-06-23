@@ -513,12 +513,14 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         entityplayer.stopRiding(); // CraftBukkit
         this.players.remove(entityplayer);
         entityplayer.serverLevel().removePlayerImmediately(entityplayer, entity_removalreason);
-        /* CraftBukkit start
+        // CraftBukkit start
+        // Banner Start - remain origin code
         DimensionTransition dimensiontransition = entityplayer.findRespawnPositionAndUseSpawnBlock(flag, DimensionTransition.DO_NOTHING);
-        WorldServer worldserver = dimensiontransition.newLevel();
-        EntityPlayer entityplayer1 = new EntityPlayer(this.server, worldserver, entityplayer.getGameProfile(), entityplayer.clientInformation());
-        // */
-        ServerPlayer entityplayer1 = entityplayer;
+        ServerLevel worldserver = dimensiontransition.newLevel();
+        ServerPlayer entityplayer1 = new ServerPlayer(this.server, worldserver, entityplayer.getGameProfile(), entityplayer.clientInformation());
+        // Banner end
+        //
+        //ServerPlayer entityplayer1 = entityplayer;
         Level fromWorld = entityplayer.level();
         entityplayer.wonGame = false;
         // CraftBukkit end
@@ -528,11 +530,11 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         entityplayer1.setId(entityplayer.getId());
         entityplayer1.setMainArm(entityplayer.getMainArm());
         // CraftBukkit - not required, just copies old location into reused entity
-        /*
+        // Banner Start - remain origin code
         if (!dimensiontransition.missingRespawnBlock()) {
             entityplayer1.copyRespawnPosition(entityplayer);
         }
-         */
+        // Banner end
         // CraftBukkit end
 
         Iterator iterator = entityplayer.getTags().iterator();
@@ -544,7 +546,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         }
 
         // CraftBukkit start - fire PlayerRespawnEvent
-        DimensionTransition dimensiontransition;
+        // DimensionTransition dimensiontransition;
         if (banner$loc == null) {
             dimensiontransition = entityplayer.findRespawnPositionAndUseSpawnBlock(flag, DimensionTransition.DO_NOTHING);
 
@@ -552,7 +554,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         } else {
             dimensiontransition = new DimensionTransition(((CraftWorld) banner$loc.getWorld()).getHandle(), CraftLocation.toVec3D(banner$loc), Vec3.ZERO, banner$loc.getYaw(), banner$loc.getPitch(), DimensionTransition.DO_NOTHING);
         }
-        ServerLevel worldserver = dimensiontransition.newLevel();
         entityplayer1.spawnIn(worldserver);
         entityplayer1.unsetRemoved();
         entityplayer1.setShiftKeyDown(false);

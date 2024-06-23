@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+
+import com.mohistmc.banner.BannerMCStart;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -186,36 +188,8 @@ public class VersionCommand extends BukkitCommand {
     }
 
     private void obtainVersion() {
-        String version = Bukkit.getVersion();
-        if (version == null) version = "Custom";
-        String[] parts = version.substring(0, version.indexOf(' ')).split("-");
-        if (parts.length == 4) {
-            int cbVersions = getDistance("craftbukkit", parts[3]);
-            int spigotVersions = getDistance("spigot", parts[2]);
-            if (cbVersions == -1 || spigotVersions == -1) {
-                setVersionMessage("Error obtaining version information");
-            } else {
-                if (cbVersions == 0 && spigotVersions == 0) {
-                    setVersionMessage("You are running the latest version");
-                } else {
-                    setVersionMessage("You are " + (cbVersions + spigotVersions) + " version(s) behind");
-                }
-            }
+        setVersionMessage("You are running the version of" + BannerMCStart.getVersion());
 
-        } else if (parts.length == 3) {
-            int cbVersions = getDistance("craftbukkit", parts[2]);
-            if (cbVersions == -1) {
-                setVersionMessage("Error obtaining version information");
-            } else {
-                if (cbVersions == 0) {
-                    setVersionMessage("You are running the latest version");
-                } else {
-                    setVersionMessage("You are " + cbVersions + " version(s) behind");
-                }
-            }
-        } else {
-            setVersionMessage("Unknown version, custom build?");
-        }
     }
 
     private void setVersionMessage(@NotNull String msg) {
