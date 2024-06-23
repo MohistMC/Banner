@@ -91,6 +91,7 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
         return this.handle.getLevel();
     }
 
+    // Banner TODO fixme
     /*
     @Override
     public void addFreshEntityWithPassengers(Entity arg0, CreatureSpawnEvent.SpawnReason arg1) {

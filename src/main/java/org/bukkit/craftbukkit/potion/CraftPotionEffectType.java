@@ -115,7 +115,7 @@ public class CraftPotionEffectType extends PotionEffectType implements Handleabl
 
     @Override
     public PotionEffectTypeCategory getCategory() {
-        return CraftPotionEffectTypeCategory.minecraftToBukkit(handle.getCategory());
+        return CraftPotionEffectTypeCategory.minecraftToBukkit(this.handle.getCategory());
     }
 
     @Override

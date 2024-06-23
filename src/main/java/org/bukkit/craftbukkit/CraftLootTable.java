@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -189,4 +187,11 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
         org.bukkit.loot.LootTable table = (org.bukkit.loot.LootTable) obj;
         return table.getKey().equals(this.getKey());
     }
+
+    // Paper start - satisfy equals/hashCode contract
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(key);
+    }
+    // Paper end
 }

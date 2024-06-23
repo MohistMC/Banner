@@ -68,7 +68,7 @@ public final class CraftLegacy {
     }
 
     public static MaterialData toLegacyData(Material material) {
-        return toLegacyData(material, false);
+        return CraftLegacy.toLegacyData(material, false);
     }
 
     public static MaterialData toLegacyData(Material material, boolean itemPriority) {
@@ -77,7 +77,7 @@ public final class CraftLegacy {
 
         if (itemPriority) {
             Item item = CraftMagicNumbers.getItem(material);
-            mappedData = itemToMaterial.get(item);
+            mappedData = CraftLegacy.itemToMaterial.get(item);
         }
 
         if (mappedData == null && material.isBlock()) {

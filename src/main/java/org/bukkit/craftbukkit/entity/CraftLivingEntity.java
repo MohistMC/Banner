@@ -73,6 +73,7 @@ import org.bukkit.entity.WindCharge;
 import org.bukkit.entity.WitherSkull;
 import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
+import org.bukkit.event.entity.EntityRemoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -107,6 +108,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
         // during world generation, we don't want to run logic for dropping items and xp
         if (this.getHandle().bridge$generation() && health == 0) {
             this.getHandle().discard(); // Add Bukkit remove cause
+            this.getHandle().pushRemoveCause(null);
             return;
         }
 

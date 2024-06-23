@@ -4,8 +4,6 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import net.minecraft.core.BlockPos;
@@ -50,124 +48,6 @@ public class CraftMetaBlockState extends CraftMetaItem implements BlockStateMeta
             Material.BLACK_SHULKER_BOX
     );
 
-    private static final Set<Material> BLOCK_STATE_MATERIALS = Sets.newHashSet(
-            Material.FURNACE,
-            Material.CHEST,
-            Material.TRAPPED_CHEST,
-            Material.JUKEBOX,
-            Material.DISPENSER,
-            Material.DROPPER,
-            Material.ACACIA_HANGING_SIGN,
-            Material.ACACIA_SIGN,
-            Material.ACACIA_WALL_HANGING_SIGN,
-            Material.ACACIA_WALL_SIGN,
-            Material.BAMBOO_HANGING_SIGN,
-            Material.BAMBOO_SIGN,
-            Material.BAMBOO_WALL_HANGING_SIGN,
-            Material.BAMBOO_WALL_SIGN,
-            Material.BIRCH_HANGING_SIGN,
-            Material.BIRCH_SIGN,
-            Material.BIRCH_WALL_HANGING_SIGN,
-            Material.BIRCH_WALL_SIGN,
-            Material.CHERRY_HANGING_SIGN,
-            Material.CHERRY_SIGN,
-            Material.CHERRY_WALL_HANGING_SIGN,
-            Material.CHERRY_WALL_SIGN,
-            Material.CRIMSON_HANGING_SIGN,
-            Material.CRIMSON_SIGN,
-            Material.CRIMSON_WALL_HANGING_SIGN,
-            Material.CRIMSON_WALL_SIGN,
-            Material.DARK_OAK_HANGING_SIGN,
-            Material.DARK_OAK_SIGN,
-            Material.DARK_OAK_WALL_HANGING_SIGN,
-            Material.DARK_OAK_WALL_SIGN,
-            Material.JUNGLE_HANGING_SIGN,
-            Material.JUNGLE_SIGN,
-            Material.JUNGLE_WALL_HANGING_SIGN,
-            Material.JUNGLE_WALL_SIGN,
-            Material.MANGROVE_HANGING_SIGN,
-            Material.MANGROVE_SIGN,
-            Material.MANGROVE_WALL_HANGING_SIGN,
-            Material.MANGROVE_WALL_SIGN,
-            Material.OAK_HANGING_SIGN,
-            Material.OAK_SIGN,
-            Material.OAK_WALL_HANGING_SIGN,
-            Material.OAK_WALL_SIGN,
-            Material.SPRUCE_HANGING_SIGN,
-            Material.SPRUCE_SIGN,
-            Material.SPRUCE_WALL_HANGING_SIGN,
-            Material.SPRUCE_WALL_SIGN,
-            Material.WARPED_HANGING_SIGN,
-            Material.WARPED_SIGN,
-            Material.WARPED_WALL_HANGING_SIGN,
-            Material.WARPED_WALL_SIGN,
-            Material.SPAWNER,
-            Material.BREWING_STAND,
-            Material.ENCHANTING_TABLE,
-            Material.COMMAND_BLOCK,
-            Material.REPEATING_COMMAND_BLOCK,
-            Material.CHAIN_COMMAND_BLOCK,
-            Material.BEACON,
-            Material.DAYLIGHT_DETECTOR,
-            Material.HOPPER,
-            Material.COMPARATOR,
-            Material.SHIELD,
-            Material.STRUCTURE_BLOCK,
-            Material.ENDER_CHEST,
-            Material.BARREL,
-            Material.BELL,
-            Material.BLAST_FURNACE,
-            Material.CAMPFIRE,
-            Material.SOUL_CAMPFIRE,
-            Material.JIGSAW,
-            Material.LECTERN,
-            Material.SMOKER,
-            Material.BEEHIVE,
-            Material.BEE_NEST,
-            Material.SCULK_CATALYST,
-            Material.SCULK_SHRIEKER,
-            Material.CALIBRATED_SCULK_SENSOR,
-            Material.SCULK_SENSOR,
-            Material.CHISELED_BOOKSHELF,
-            Material.DECORATED_POT,
-            Material.SUSPICIOUS_SAND,
-            Material.SUSPICIOUS_GRAVEL,
-            Material.TRIAL_SPAWNER,
-            Material.CRAFTER,
-            Material.VAULT
-    );
-
-    private static final class TrackedDataComponentMap implements DataComponentMap {
-
-        private final Set<DataComponentType<?>> seen = new HashSet<>();
-        private final DataComponentMap handle;
-
-        public TrackedDataComponentMap(DataComponentMap map) {
-            this.handle = map;
-        }
-
-        @Override
-        public <T> T get(DataComponentType<? extends T> type) {
-            this.seen.add(type);
-            return this.handle.get(type);
-        }
-
-        @Override
-        public Set<DataComponentType<?>> keySet() {
-            return this.handle.keySet();
-        }
-
-        @Override
-        public Iterator<TypedDataComponent<?>> iterator() {
-            return this.handle.iterator();
-        }
-    }
-
-    static {
-        // Add shulker boxes to the list of block state materials too
-        BLOCK_STATE_MATERIALS.addAll(SHULKER_BOX_MATERIALS);
-    }
-
     @ItemMetaKey.Specific(ItemMetaKey.Specific.To.NBT)
     static final ItemMetaKeyType<CustomData> BLOCK_ENTITY_TAG = new ItemMetaKeyType<>(DataComponents.BLOCK_ENTITY_DATA, "BlockEntityTag");
 
@@ -198,20 +78,23 @@ public class CraftMetaBlockState extends CraftMetaItem implements BlockStateMeta
         });
 
         if (!tag.isEmpty()) {
-            if (this.blockEntityTag == null) {
-                this.blockEntityTag = CraftMetaBlockState.getBlockState(material, null);
+            CraftBlockEntityState<?> blockEntityTag = this.blockEntityTag;
+            if (blockEntityTag == null) {
+                blockEntityTag = CraftMetaBlockState.getBlockState(material, null);
             }
 
             // Convert to map
             PatchedDataComponentMap map = new PatchedDataComponentMap(DataComponentMap.EMPTY);
             map.applyPatch(tag);
-            // Setup tracking
-            TrackedDataComponentMap track = new TrackedDataComponentMap(map);
             // Apply
-            this.blockEntityTag.applyComponents(track, tag);
+            Set<DataComponentType<?>> applied = blockEntityTag.applyComponents(map, tag);
             // Mark applied components as handled
-            for (DataComponentType<?> seen : track.seen) {
-                this.unhandledTags.remove(seen);
+            for (DataComponentType<?> seen : applied) {
+                this.unhandledTags.build().clear(seen);
+            }
+            // Only set blockEntityTag if something was applied
+            if (!applied.isEmpty()) {
+                this.blockEntityTag = blockEntityTag;
             }
         }
     }
@@ -237,7 +120,7 @@ public class CraftMetaBlockState extends CraftMetaItem implements BlockStateMeta
             tag.put(CraftMetaBlockState.BLOCK_ENTITY_TAG, CustomData.of(this.blockEntityTag.getSnapshotNBTWithoutComponents()));
 
             for (TypedDataComponent<?> component : this.blockEntityTag.collectComponents()) {
-                tag.builder.set(component);
+                tag.putIfAbsent(component);
             }
         }
     }
@@ -296,11 +179,6 @@ public class CraftMetaBlockState extends CraftMetaItem implements BlockStateMeta
     @Override
     boolean isEmpty() {
         return super.isEmpty() && this.blockEntityTag == null;
-    }
-
-    @Override
-    boolean applicableTo(Material type) {
-        return CraftMetaBlockState.BLOCK_STATE_MATERIALS.contains(type);
     }
 
     @Override

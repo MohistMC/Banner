@@ -17,7 +17,7 @@ public class CraftJukeboxSong implements JukeboxSong, Handleable<net.minecraft.w
     }
 
     public static JukeboxSong minecraftHolderToBukkit(Holder<net.minecraft.world.item.JukeboxSong> minecraft) {
-        return minecraftToBukkit(minecraft.value());
+        return CraftJukeboxSong.minecraftToBukkit(minecraft.value());
     }
 
     public static net.minecraft.world.item.JukeboxSong bukkitToMinecraft(JukeboxSong bukkit) {
@@ -29,7 +29,7 @@ public class CraftJukeboxSong implements JukeboxSong, Handleable<net.minecraft.w
 
         net.minecraft.core.Registry<net.minecraft.world.item.JukeboxSong> registry = CraftRegistry.getMinecraftRegistry(Registries.JUKEBOX_SONG);
 
-        if (registry.wrapAsHolder(bukkitToMinecraft(bukkit)) instanceof Holder.Reference<net.minecraft.world.item.JukeboxSong> holder) {
+        if (registry.wrapAsHolder(CraftJukeboxSong.bukkitToMinecraft(bukkit)) instanceof Holder.Reference<net.minecraft.world.item.JukeboxSong> holder) {
             return holder;
         }
 
@@ -47,18 +47,18 @@ public class CraftJukeboxSong implements JukeboxSong, Handleable<net.minecraft.w
 
     @Override
     public net.minecraft.world.item.JukeboxSong getHandle() {
-        return handle;
+        return this.handle;
     }
 
     @Override
     @NotNull
     public NamespacedKey getKey() {
-        return key;
+        return this.key;
     }
 
     @NotNull
     @Override
     public String getTranslationKey() {
-        return ((TranslatableContents) handle.description().getContents()).getKey();
+        return ((TranslatableContents) this.handle.description().getContents()).getKey();
     }
 }

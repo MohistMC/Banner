@@ -36,6 +36,8 @@ public class MixinDamageSource implements InjectionDamageSource {
     private Vec3 damageSourcePosition;
     @Nullable
     private org.bukkit.block.BlockState directBlockState; // The block state of the block relevant to this damage source
+    private Entity customEntityDamager = null; // This field is a helper for when direct entity damage is not set by vanilla
+    private Entity customCausingEntityDamager = null; // This field is a helper for when causing entity damage is not set by vanilla
 
     @Override
     public boolean isSweep() {
@@ -155,5 +157,39 @@ public class MixinDamageSource implements InjectionDamageSource {
     @Override
     public BlockState getDirectBlockState() {
         return this.directBlockState;
+    }
+
+    @Override
+    public Entity getDamager() {
+        return (this.customEntityDamager != null) ? this.customEntityDamager : this.directEntity;
+    }
+
+    @Override
+    public Entity getCausingDamager() {
+        return (this.customCausingEntityDamager != null) ? this.customCausingEntityDamager : this.causingEntity;
+    }
+
+    @Override
+    public DamageSource customEntityDamager(Entity entity) {
+        // This method is not intended for change the causing entity if is already set
+        // also is only necessary if the entity passed is not the direct entity or different from the current causingEntity
+        if (this.customEntityDamager != null || this.directEntity == entity || this.causingEntity == entity) {
+            return ((DamageSource) (Object) this);
+        }
+        DamageSource damageSource = this.cloneInstance();
+        this.customEntityDamager = entity;
+        return damageSource;
+    }
+
+    @Override
+    public DamageSource customCausingEntityDamager(Entity entity) {
+        // This method is not intended for change the causing entity if is already set
+        // also is only necessary if the entity passed is not the direct entity or different from the current causingEntity
+        if (this.customCausingEntityDamager != null || this.directEntity == entity || this.causingEntity == entity) {
+            return ((DamageSource) (Object) this);
+        }
+        DamageSource damageSource = this.cloneInstance();
+        this.customCausingEntityDamager = entity;
+        return damageSource;
     }
 }

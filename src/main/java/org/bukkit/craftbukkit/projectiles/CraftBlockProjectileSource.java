@@ -107,13 +107,11 @@ public class CraftBlockProjectileSource implements BlockProjectileSource {
             } else if (WitherSkull.class.isAssignableFrom(projectile)) {
                 launch = EntityType.WITHER_SKULL.create(world);
                 launch.setPos(d0, d1, d2);
-                double d6 = Math.sqrt(d3 * d3 + d4 * d4 + d5 * d5);
 
                 ((AbstractHurtingProjectile) launch).assignDirectionalMovement(new Vec3(d3, d4, d5), 0.1D);
             } else {
                 launch = EntityType.FIREBALL.create(world);
                 launch.setPos(d0, d1, d2);
-                double d6 = Math.sqrt(d3 * d3 + d4 * d4 + d5 * d5);
 
                 ((AbstractHurtingProjectile) launch).assignDirectionalMovement(new Vec3(d3, d4, d5), 0.1D);
             }

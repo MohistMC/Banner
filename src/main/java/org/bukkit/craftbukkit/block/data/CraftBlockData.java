@@ -26,7 +26,11 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SoundGroup;
-import org.bukkit.block.*;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.BlockSupport;
+import org.bukkit.block.BlockType;
+import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
@@ -561,7 +565,7 @@ public class CraftBlockData implements BlockData {
             blockData = block.defaultBlockState();
         }
 
-        CraftBlockData craft = fromData(blockData);
+        CraftBlockData craft = CraftBlockData.fromData(blockData);
         craft.parsedStates = parsed;
         return craft;
     }

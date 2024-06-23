@@ -103,7 +103,8 @@ public class CraftConduit extends CraftBlockEntityState<ConduitBlockEntity> impl
             conduit.destroyTargetUUID = target.getUniqueId();
         }
 
-        ConduitBlockEntity.updateDestroyTarget(conduit.getLevel(), this.getPosition(), this.data, conduit.effectBlocks, conduit); // Banner TODO
+        // Banner TODO fixme
+        ConduitBlockEntity.updateDestroyTarget(conduit.getLevel(), this.getPosition(), this.data, conduit.effectBlocks, conduit/*, *false*/);
         return true;
     }
 

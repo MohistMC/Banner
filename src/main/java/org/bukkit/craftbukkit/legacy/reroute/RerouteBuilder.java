@@ -40,7 +40,7 @@ public class RerouteBuilder {
                 continue;
             }
 
-            RerouteMethodData rerouteMethodData = buildFromMethod(method);
+            RerouteMethodData rerouteMethodData = RerouteBuilder.buildFromMethod(method);
             result.put(rerouteMethodData.source(), rerouteMethodData);
         }
 

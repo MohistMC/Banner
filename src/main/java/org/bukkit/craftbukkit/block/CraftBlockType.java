@@ -68,14 +68,14 @@ public class CraftBlockType<B extends BlockData> implements BlockType.Typed<B>, 
     private static boolean isInteractable(Block block) {
         Class<?> clazz = block.getClass();
 
-        boolean hasMethod = hasMethod(clazz, "useWithoutItem", BlockState.class, net.minecraft.world.level.Level.class, BlockPos.class, Player.class, BlockHitResult.class)
-                || hasMethod(clazz, "useItemOn", net.minecraft.world.item.ItemStack.class, BlockState.class, net.minecraft.world.level.Level.class, BlockPos.class, Player.class, InteractionHand.class, BlockHitResult.class);
+        boolean hasMethod = CraftBlockType.hasMethod(clazz, "useWithoutItem", BlockState.class, net.minecraft.world.level.Level.class, BlockPos.class, Player.class, BlockHitResult.class)
+                || CraftBlockType.hasMethod(clazz, "useItemOn", net.minecraft.world.item.ItemStack.class, BlockState.class, net.minecraft.world.level.Level.class, BlockPos.class, Player.class, InteractionHand.class, BlockHitResult.class);
 
         if (!hasMethod && clazz.getSuperclass() != BlockBehaviour.class) {
             clazz = clazz.getSuperclass();
 
-            hasMethod = hasMethod(clazz, "useWithoutItem", BlockState.class, net.minecraft.world.level.Level.class, BlockPos.class, Player.class, BlockHitResult.class)
-                    || hasMethod(clazz, "useItemOn", net.minecraft.world.item.ItemStack.class, BlockState.class, net.minecraft.world.level.Level.class, BlockPos.class, Player.class, InteractionHand.class, BlockHitResult.class);
+            hasMethod = CraftBlockType.hasMethod(clazz, "useWithoutItem", BlockState.class, net.minecraft.world.level.Level.class, BlockPos.class, Player.class, BlockHitResult.class)
+                    || CraftBlockType.hasMethod(clazz, "useItemOn", net.minecraft.world.item.ItemStack.class, BlockState.class, net.minecraft.world.level.Level.class, BlockPos.class, Player.class, InteractionHand.class, BlockHitResult.class);
         }
 
         return hasMethod;
@@ -85,12 +85,12 @@ public class CraftBlockType<B extends BlockData> implements BlockType.Typed<B>, 
         this.key = key;
         this.block = block;
         this.blockDataClass = (Class<B>) CraftBlockData.fromData(block.defaultBlockState()).getClass().getInterfaces()[0];
-        this.interactable = isInteractable(block);
+        this.interactable = CraftBlockType.isInteractable(block);
     }
 
     @Override
     public Block getHandle() {
-        return block;
+        return this.block;
     }
 
     @NotNull
@@ -113,7 +113,7 @@ public class CraftBlockType<B extends BlockData> implements BlockType.Typed<B>, 
             return true;
         }
 
-        return block.asItem() != Items.AIR;
+        return this.block.asItem() != Items.AIR;
     }
 
     @NotNull
@@ -123,24 +123,24 @@ public class CraftBlockType<B extends BlockData> implements BlockType.Typed<B>, 
             return ItemType.AIR;
         }
 
-        Item item = block.asItem();
-        Preconditions.checkArgument(item != Items.AIR, "The block type %s has no corresponding item type", getKey());
+        Item item = this.block.asItem();
+        Preconditions.checkArgument(item != Items.AIR, "The block type %s has no corresponding item type", this.getKey());
         return CraftItemType.minecraftToBukkitNew(item);
     }
 
     @Override
     public Class<B> getBlockDataClass() {
-        return blockDataClass;
+        return this.blockDataClass;
     }
 
     @Override
     public B createBlockData() {
-        return createBlockData((String) null);
+        return this.createBlockData((String) null);
     }
 
     @Override
     public B createBlockData(Consumer<? super B> consumer) {
-        B data = createBlockData();
+        B data = this.createBlockData();
 
         if (consumer != null) {
             consumer.accept(data);
@@ -156,69 +156,69 @@ public class CraftBlockType<B extends BlockData> implements BlockType.Typed<B>, 
 
     @Override
     public boolean isSolid() {
-        return block.defaultBlockState().blocksMotion();
+        return this.block.defaultBlockState().blocksMotion();
     }
 
     @Override
     public boolean isAir() {
-        return block.defaultBlockState().isAir();
+        return this.block.defaultBlockState().isAir();
     }
 
     @Override
     public boolean isEnabledByFeature(@NotNull World world) {
         Preconditions.checkNotNull(world, "World cannot be null");
-        return getHandle().isEnabled(((CraftWorld) world).getHandle().enabledFeatures());
+        return this.getHandle().isEnabled(((CraftWorld) world).getHandle().enabledFeatures());
     }
 
     @Override
     public boolean isFlammable() {
-        return block.defaultBlockState().ignitedByLava();
+        return this.block.defaultBlockState().ignitedByLava();
     }
 
     @Override
     public boolean isBurnable() {
-        return ((FireBlock) Blocks.FIRE).igniteOdds.getOrDefault(block, 0) > 0;
+        return ((FireBlock) Blocks.FIRE).igniteOdds.getOrDefault(this.block, 0) > 0;
     }
 
     @Override
     public boolean isOccluding() {
-        return block.defaultBlockState().isRedstoneConductor(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+        return this.block.defaultBlockState().isRedstoneConductor(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
     }
 
     @Override
     public boolean hasGravity() {
-        return block instanceof FallingBlock;
+        return this.block instanceof FallingBlock;
     }
 
     @Override
     public boolean isInteractable() {
-        return interactable;
+        return this.interactable;
     }
 
     @Override
     public float getHardness() {
-        return block.defaultBlockState().destroySpeed;
+        return this.block.defaultBlockState().destroySpeed;
     }
 
     @Override
     public float getBlastResistance() {
-        return block.getExplosionResistance();
+        return this.block.getExplosionResistance();
     }
 
     @Override
     public float getSlipperiness() {
-        return block.getFriction();
+        return this.block.getFriction();
     }
 
     @NotNull
     @Override
     public String getTranslationKey() {
-        return block.getDescriptionId();
+        return this.block.getDescriptionId();
     }
 
     @Override
     public NamespacedKey getKey() {
-        return key;
+        return this.key;
     }
 
     @Override

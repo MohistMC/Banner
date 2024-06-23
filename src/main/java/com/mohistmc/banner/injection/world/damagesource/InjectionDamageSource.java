@@ -72,4 +72,20 @@ public interface InjectionDamageSource {
     default DamageSource directBlockState(org.bukkit.block.BlockState blockState) {
         return null;
     }
+
+    default Entity getDamager() {
+        return null;
+    }
+
+    default Entity getCausingDamager() {
+        return null;
+    }
+
+    default DamageSource customEntityDamager(Entity entity) {
+        return null;
+    }
+
+    default DamageSource customCausingEntityDamager(Entity entity) {
+        return null;
+    }
 }

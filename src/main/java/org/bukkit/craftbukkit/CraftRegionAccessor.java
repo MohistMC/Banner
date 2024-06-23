@@ -242,6 +242,9 @@ public abstract class CraftRegionAccessor implements RegionAccessor {
                 gen = TreeFeatures.DARK_OAK;
                 break;
             case MEGA_REDWOOD:
+                gen = TreeFeatures.MEGA_SPRUCE;
+                break;
+            case MEGA_PINE:
                 gen = TreeFeatures.MEGA_PINE;
                 break;
             case TALL_BIRCH:
@@ -413,7 +416,7 @@ public abstract class CraftRegionAccessor implements RegionAccessor {
         Preconditions.checkArgument(!entity.isInWorld(), "Entity has already been added to a world");
         net.minecraft.world.entity.Entity nmsEntity = ((CraftEntity) entity).getHandle();
         if (nmsEntity.level() != this.getHandle().getLevel()) {
-            nmsEntity = nmsEntity.changeDimension(new DimensionTransition(getHandle().getLevel(), nmsEntity, DimensionTransition.DO_NOTHING));
+            nmsEntity = nmsEntity.changeDimension(new DimensionTransition(this.getHandle().getLevel(), nmsEntity, DimensionTransition.DO_NOTHING));
         }
 
         this.addEntityWithPassengers(nmsEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);

@@ -4,12 +4,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.JukeboxBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
-import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Jukebox;
-import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.inventory.CraftInventoryJukebox;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.inventory.CraftItemType;
@@ -85,11 +83,9 @@ public class CraftJukebox extends CraftBlockEntityState<JukeboxBlockEntity> impl
         ItemStack nms = CraftItemStack.asNMSCopy(record);
 
         JukeboxBlockEntity snapshot = this.getSnapshot();
+        // Banner TODO fixme
+        snapshot.setSongItemWithoutPlaying(nms/*, snapshot.getSongPlayer().getTicksSinceSongStarted()*/);
 
-
-        /* Banner TODO fix
-        snapshot.setSongItemWithoutPlaying(nms, snapshot.getSongPlayer().getTicksSinceSongStarted());
-        */
         this.data = this.data.setValue(JukeboxBlock.HAS_RECORD, !nms.isEmpty());
     }
 
@@ -129,7 +125,6 @@ public class CraftJukebox extends CraftBlockEntityState<JukeboxBlockEntity> impl
         }
 
         jukebox.getSongPlayer().stop(tileEntity.getLevel(), tileEntity.getBlockState());
-        this.getWorld().playEffect(this.getLocation(), Effect.IRON_DOOR_CLOSE, 0); // TODO: Fix this enum constant. This stops jukeboxes
     }
 
     @Override

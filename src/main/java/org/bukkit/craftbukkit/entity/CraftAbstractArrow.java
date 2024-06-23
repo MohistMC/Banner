@@ -9,7 +9,6 @@ import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
-import org.jetbrains.annotations.NotNull;
 
 public class CraftAbstractArrow extends AbstractProjectile implements AbstractArrow {
 
@@ -17,8 +16,6 @@ public class CraftAbstractArrow extends AbstractProjectile implements AbstractAr
         super(server, entity);
     }
 
-
-    // Banner TODO
     @Override
     public void setKnockbackStrength(int knockbackStrength) {
     }
@@ -27,7 +24,6 @@ public class CraftAbstractArrow extends AbstractProjectile implements AbstractAr
     public int getKnockbackStrength() {
         return 0;
     }
-    // Banner TODO
 
     @Override
     public double getDamage() {
@@ -118,7 +114,6 @@ public class CraftAbstractArrow extends AbstractProjectile implements AbstractAr
 
     @Override
     public void setShotFromCrossbow(boolean shotFromCrossbow) {
-       // this.getHandle().setShotFromCrossbow(shotFromCrossbow); // Banner TODO
     }
 
     @Override
@@ -135,14 +130,14 @@ public class CraftAbstractArrow extends AbstractProjectile implements AbstractAr
 
     @Override
     public ItemStack getWeapon() {
-        return CraftItemStack.asBukkitCopy(getHandle().getWeaponItem());
+        return CraftItemStack.asBukkitCopy(this.getHandle().getWeaponItem());
     }
 
     @Override
     public void setWeapon(ItemStack item) {
         Preconditions.checkArgument(item != null, "ItemStack cannot be null");
 
-        getHandle().firedFromWeapon = CraftItemStack.asNMSCopy(item);
+        this.getHandle().firedFromWeapon = CraftItemStack.asNMSCopy(item);
     }
 
     @Override

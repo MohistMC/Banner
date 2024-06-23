@@ -47,9 +47,9 @@ public class CraftPotionUtil {
 
         PotionType type;
         if (data.isUpgraded()) {
-            type = upgradeable.get(data.getType());
+            type = CraftPotionUtil.upgradeable.get(data.getType());
         } else if (data.isExtended()) {
-            type = extendable.get(data.getType());
+            type = CraftPotionUtil.extendable.get(data.getType());
         } else {
             type = data.getType();
         }
@@ -64,11 +64,11 @@ public class CraftPotionUtil {
         }
 
         PotionType potionType;
-        potionType = extendable.inverse().get(type);
+        potionType = CraftPotionUtil.extendable.inverse().get(type);
         if (potionType != null) {
             return new PotionData(potionType, true, false);
         }
-        potionType = upgradeable.inverse().get(type);
+        potionType = CraftPotionUtil.upgradeable.inverse().get(type);
         if (potionType != null) {
             return new PotionData(potionType, false, true);
         }

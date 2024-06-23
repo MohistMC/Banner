@@ -109,6 +109,11 @@ public abstract class MixinItemStack implements InjectionItemStack {
 
     @Shadow public abstract void applyComponents(DataComponentPatch dataComponentPatch);
 
+    @Override
+    public void restorePatch(DataComponentPatch empty) {
+        InjectionItemStack.super.restorePatch(empty);
+    }
+
     /**
      * @author wdog5
      * @reason functionality replaced
