@@ -17,90 +17,98 @@ import org.bukkit.craftbukkit.CraftServer;
 public interface InjectionMinecraftServer {
 
     default void bridge$drainQueuedTasks() {
-
+        throw new IllegalStateException("Not implemented");
     }
 
     default Commands bridge$getVanillaCommands() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default java.util.concurrent.ExecutorService bridge$chatExecutor() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void bridge$queuedProcess(Runnable runnable) {
-
+        throw new IllegalStateException("Not implemented");
     }
 
     default java.util.Queue<Runnable> bridge$processQueue() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setProcessQueue(java.util.Queue<Runnable> processQueue) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default WorldLoader.DataLoadContext bridge$worldLoader() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default CraftServer bridge$server() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setServer(CraftServer server) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default OptionSet bridge$options() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default ConsoleCommandSender bridge$console() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setConsole(ConsoleCommandSender console) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setRemoteConsole(RemoteConsoleCommandSender remoteConsole) {
-
+        throw new IllegalStateException("Not implemented");
     }
 
     default ConsoleReader bridge$reader() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean bridge$forceTicks() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean isDebugging() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean hasStopped() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void initWorld(ServerLevel serverWorld, ServerLevelData worldInfo, WorldData saveData, WorldOptions worldOptions) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default void prepareLevels(ChunkProgressListener listener, ServerLevel serverWorld) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default void addLevel(ServerLevel level) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default void removeLevel(ServerLevel level) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default void executeModerately() {
+        throw new IllegalStateException("Not implemented");
     }
 
     default double[] getTPS() {
-        return new double[0];
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setRconConsoleSource(RconConsoleSource source) {
-
+        throw new IllegalStateException("Not implemented");
     }
 }

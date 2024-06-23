@@ -5,6 +5,6 @@ import net.minecraft.world.item.Item;
 public interface InjectionThrowableItemProjectile {
 
     default Item getDefaultItemPublic() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

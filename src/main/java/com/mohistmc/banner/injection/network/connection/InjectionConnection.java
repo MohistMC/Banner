@@ -5,14 +5,14 @@ import java.net.SocketAddress;
 public interface InjectionConnection {
 
     default String bridge$hostname() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setHostName(String hostName) {
-
+        throw new IllegalStateException("Not implemented");
     }
 
     default SocketAddress getRawAddress() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

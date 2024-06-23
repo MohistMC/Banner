@@ -5,10 +5,10 @@ import net.minecraft.world.damagesource.DamageSource;
 public interface InjectionDamageSources {
 
     default DamageSource bridge$melting() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default DamageSource bridge$poison() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

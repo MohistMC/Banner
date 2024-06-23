@@ -8,10 +8,10 @@ import org.jetbrains.annotations.Nullable;
 public interface InjectionEntityGetter {
 
     default @Nullable Player findNearbyPlayer(Entity entity, double maxDistance, @Nullable Predicate<Entity> predicate) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean hasNearbyAlivePlayerThatAffectsSpawning(double x, double y, double z, double range) {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 }

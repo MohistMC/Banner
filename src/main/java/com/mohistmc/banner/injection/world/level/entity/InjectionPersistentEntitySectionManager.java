@@ -9,17 +9,18 @@ import net.minecraft.world.level.ChunkPos;
 public interface InjectionPersistentEntitySectionManager {
 
     default List<Entity> getEntities(ChunkPos chunkCoordIntPair) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean isPending(long pair) {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean storeChunkSections(long i, Consumer consumer, boolean callEvent) {
-        return callEvent;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void close(boolean save) throws IOException {
+        throw new IllegalStateException("Not implemented");
     }
 }

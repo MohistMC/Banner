@@ -6,6 +6,6 @@ import net.minecraft.world.level.dimension.LevelStem;
 public interface InjectionDerivedLevelData {
 
     default void setDimType(ResourceKey<LevelStem> typeKey) {
-
+        throw new IllegalStateException("Not implemented");
     }
 }

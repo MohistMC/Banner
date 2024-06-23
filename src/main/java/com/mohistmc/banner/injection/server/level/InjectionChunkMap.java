@@ -5,6 +5,6 @@ import com.mohistmc.banner.bukkit.BukkitCallbackExecutor;
 public interface InjectionChunkMap {
 
     default BukkitCallbackExecutor bridge$callbackExecutor() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

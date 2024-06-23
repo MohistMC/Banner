@@ -6,20 +6,22 @@ import org.bukkit.craftbukkit.map.CraftMapView;
 public interface InjectionMapItemSavedData {
 
     default CraftMapView bridge$mapView() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default UUID bridge$uniqueId() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setUniqueId(UUID uuid) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default String bridge$id() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setId(String id) {
+        throw new IllegalStateException("Not implemented");
     }
 }

@@ -5,6 +5,6 @@ import net.minecraft.commands.CommandSourceStack;
 public interface InjectionCommandSource {
 
     default org.bukkit.command.CommandSender banner$getBukkitSender(CommandSourceStack wrapper) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

@@ -15,9 +15,11 @@ public interface InjectionContainer {
     }
 
     default void onOpen(CraftHumanEntity who) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default void onClose(CraftHumanEntity who) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default java.util.List<org.bukkit.entity.HumanEntity> getViewers() {
@@ -25,27 +27,30 @@ public interface InjectionContainer {
     }
 
     default org.bukkit.inventory.InventoryHolder getOwner() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void setOwner(org.bukkit.inventory.InventoryHolder owner) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default void setMaxStackSize(int size) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default org.bukkit.Location getLocation() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default RecipeHolder<?> getCurrentRecipe() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void setCurrentRecipe(RecipeHolder<?> recipe) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default InventoryView getBukkitView() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

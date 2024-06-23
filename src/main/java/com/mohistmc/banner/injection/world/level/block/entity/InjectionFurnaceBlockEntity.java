@@ -15,31 +15,34 @@ import org.bukkit.entity.HumanEntity;
 public interface InjectionFurnaceBlockEntity {
 
     default List<ItemStack> getContents() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void onOpen(CraftHumanEntity who) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default void onClose(CraftHumanEntity who) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default Object2IntOpenHashMap<ResourceLocation> getRecipesUsed() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default List<HumanEntity> getViewers() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void setMaxStackSize(int size) {
-
+        throw new IllegalStateException("Not implemented");
     }
 
     default void awardUsedRecipesAndPopExperience(ServerPlayer entityplayer, ItemStack itemstack, int amount) { // CraftBukkit
+        throw new IllegalStateException("Not implemented");
     }
 
     default List<Recipe<?>> getRecipesToAwardAndPopExperience(ServerLevel worldserver, Vec3 vec3d, BlockPos blockposition, ServerPlayer entityplayer, ItemStack itemstack, int amount) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

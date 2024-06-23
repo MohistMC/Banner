@@ -6,9 +6,10 @@ import net.minecraft.commands.arguments.selector.EntitySelector;
 public interface InjectionEntitySelectorParser {
 
     default EntitySelector parse(boolean overridePermissions) throws CommandSyntaxException {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void parseSelector(boolean overridePermissions) throws CommandSyntaxException {
+        throw new IllegalStateException("Not implemented");
     }
 }

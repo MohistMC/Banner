@@ -16,56 +16,59 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public interface InjectionPlayer extends InjectionLivingEntity {
 
     default boolean bridge$affectsSpawning() {
-        return true;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setAffectsSpawning(boolean affectsSpawning) {
-
+        throw new IllegalStateException("Not implemented");
     }
 
     @Override
     default CraftHumanEntity getBukkitEntity() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void pushExhaustReason(EntityExhaustionEvent.ExhaustionReason reason) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default ItemEntity drop(ItemStack itemstack, boolean flag, boolean flag1, boolean callEvent) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default Either<Player.BedSleepingProblem, Unit> startSleepInBed(BlockPos blockposition, boolean force) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void causeFoodExhaustion(float f, EntityExhaustionEvent.ExhaustionReason reason) {
-
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean spawnEntityFromShoulder(CompoundTag nbttagcompound) { // CraftBukkit void->boolean
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean bridge$fauxSleeping() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setFauxSleeping(boolean fauxSleeping) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default int bridge$oldLevel() {
-        return 0;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setOldLevel(int oldLevel) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default Player forceSleepInBed(boolean force) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default AtomicBoolean bridge$startSleepInBed_force() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

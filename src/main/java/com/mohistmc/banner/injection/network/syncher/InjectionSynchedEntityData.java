@@ -6,5 +6,6 @@ import net.minecraft.server.level.ServerPlayer;
 public interface InjectionSynchedEntityData {
 
     default <T> void markDirty(EntityDataAccessor<T> datawatcherobject) {
+        throw new IllegalStateException("Not implemented");
     }
 }

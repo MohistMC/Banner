@@ -6,10 +6,10 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 public interface InjectionServerLevelAccessor {
 
     default boolean addAllEntities(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean addFreshEntityWithPassengers(Entity entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason reason) {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 }

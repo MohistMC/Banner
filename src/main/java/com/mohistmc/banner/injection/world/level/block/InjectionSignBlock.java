@@ -7,10 +7,10 @@ import org.bukkit.event.player.PlayerSignOpenEvent;
 public interface InjectionSignBlock {
 
     default void pushOpenSignCause(PlayerSignOpenEvent.Cause cause) {
-
+        throw new IllegalStateException("Not implemented");
     }
 
     default void openTextEdit(Player player, SignBlockEntity signEntity, boolean isFrontText, PlayerSignOpenEvent.Cause cause) {
-
+        throw new IllegalStateException("Not implemented");
     }
 }

@@ -3,16 +3,18 @@ package com.mohistmc.banner.injection.world.entity;
 public interface InjectionPrimedTnt {
 
     default float bridge$yield() {
-        return 0;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setYield(float yield) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean bridge$isIncendiary() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setIsIncendiary(boolean isIncendiary) {
+        throw new IllegalStateException("Not implemented");
     }
 }

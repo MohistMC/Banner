@@ -6,10 +6,10 @@ import net.minecraft.world.item.Item;
 public interface InjectionPiglin {
 
     default Set<Item> bridge$allowedBarterItems() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default Set<Item> bridge$interestItems() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

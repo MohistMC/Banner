@@ -14,53 +14,54 @@ import org.bukkit.event.weather.LightningStrikeEvent;
 public interface InjectionServerLevel extends InjectionLevel {
 
     default boolean addEntitySerialized(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default  <T extends ParticleOptions> int sendParticles(T type, double posX, double posY, double posZ, int particleCount, double xOffset, double yOffset, double zOffset, double speed, boolean force) {
-        return particleCount;
+        throw new IllegalStateException("Not implemented");
     }
 
     default LevelStorageSource.LevelStorageAccess bridge$convertable() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default UUID bridge$uuid() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default LevelChunk getChunkIfLoaded(int x, int z) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean addWithUUID(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void addDuringTeleport(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean tryAddFreshEntityWithPassengers(Entity entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason reason) {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean strikeLightning(Entity entitylightning) {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean strikeLightning(Entity entitylightning, LightningStrikeEvent.Cause cause) {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default  <T extends ParticleOptions> int sendParticles(ServerPlayer sender, T t0, double d0, double d1, double d2, int i, double d3, double d4, double d5, double d6, boolean force) {
-        return i;
+        throw new IllegalStateException("Not implemented");
     }
 
     default PrimaryLevelData bridge$serverLevelDataCB() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean canAddFreshEntity() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 }

@@ -5,30 +5,34 @@ import net.minecraft.world.entity.player.Player;
 public interface InjectionFoodData {
 
     default int bridge$saturatedRegenRate() {
-        return 0;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setSaturatedRegenRate(int saturatedRegenRate) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default int bridge$unsaturatedRegenRate() {
-        return 0;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setUnsaturatedRegenRate(int unsaturatedRegenRate) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default int bridge$starvationRate() {
-        return 0;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setStarvationRate(int starvationRate) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default Player getEntityhuman() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void setEntityhuman(Player entityhuman) {
+        throw new IllegalStateException("Not implemented");
     }
 }

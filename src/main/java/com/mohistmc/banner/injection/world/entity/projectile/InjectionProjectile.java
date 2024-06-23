@@ -6,14 +6,14 @@ import net.minecraft.world.phys.HitResult;
 public interface InjectionProjectile {
 
     default boolean hitCancelled() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setHitCancelled(boolean cancelled) {
-
+        throw new IllegalStateException("Not implemented");
     }
 
     default ProjectileDeflection preHitTargetOrDeflectSelf(HitResult movingobjectposition) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

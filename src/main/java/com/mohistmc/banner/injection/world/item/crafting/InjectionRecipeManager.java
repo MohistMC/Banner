@@ -10,16 +10,18 @@ import java.util.Map;
 public interface InjectionRecipeManager {
 
     default Map<RecipeType<?>, Object2ObjectLinkedOpenHashMap<ResourceLocation, RecipeHolder<?>>> bridge$recipesCB() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void addRecipe(RecipeHolder<?> irecipe) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean removeRecipe(ResourceLocation mcKey) {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void clearRecipes() {
+        throw new IllegalStateException("Not implemented");
     }
 }

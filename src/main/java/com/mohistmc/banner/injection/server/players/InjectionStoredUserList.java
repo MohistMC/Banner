@@ -7,6 +7,6 @@ public interface InjectionStoredUserList<K, V extends StoredUserEntry<K>> {
 
 
    default Collection<V> getValues() {
-       return null;
+       throw new IllegalStateException("Not implemented");
    }
 }

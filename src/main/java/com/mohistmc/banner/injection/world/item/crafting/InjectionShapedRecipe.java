@@ -5,7 +5,7 @@ import org.bukkit.NamespacedKey;
 public interface InjectionShapedRecipe {
 
     default org.bukkit.inventory.ShapedRecipe toBukkitRecipe(NamespacedKey id) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
 }

@@ -6,9 +6,10 @@ import net.minecraft.world.level.dimension.LevelStem;
 public interface InjectionLevelStorageAccess {
 
     default ResourceKey<LevelStem> bridge$getTypeKey() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void bridge$setDimType(ResourceKey<LevelStem> typeKey) {
+        throw new IllegalStateException("Not implemented");
     }
 }

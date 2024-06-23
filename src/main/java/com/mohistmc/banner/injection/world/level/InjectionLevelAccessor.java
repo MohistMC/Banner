@@ -4,9 +4,10 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 
 public interface InjectionLevelAccessor {
     default net.minecraft.server.level.ServerLevel getMinecraftWorld() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void pushAddEntityReason(CreatureSpawnEvent.SpawnReason reason) {
+        throw new IllegalStateException("Not implemented");
     }
 }

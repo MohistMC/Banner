@@ -5,10 +5,10 @@ import net.minecraft.world.level.chunk.LevelChunk;
 public interface InjectionChunkHolder {
 
     default LevelChunk getFullChunkNow() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default LevelChunk getFullChunkNowUnchecked() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

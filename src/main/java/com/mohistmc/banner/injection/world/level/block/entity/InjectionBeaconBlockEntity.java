@@ -5,10 +5,10 @@ import org.bukkit.potion.PotionEffect;
 public interface InjectionBeaconBlockEntity {
 
     default PotionEffect getPrimaryEffect() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default PotionEffect getSecondaryEffect() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

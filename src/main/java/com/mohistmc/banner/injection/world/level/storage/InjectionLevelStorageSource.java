@@ -9,6 +9,6 @@ import net.minecraft.world.level.validation.ContentValidationException;
 public interface InjectionLevelStorageSource {
 
     default LevelStorageSource.LevelStorageAccess validateAndCreateAccess(String string, ResourceKey<LevelStem> dimensionType) throws IOException, ContentValidationException { // CraftBukkit
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

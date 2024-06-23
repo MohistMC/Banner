@@ -7,20 +7,22 @@ import net.minecraft.world.level.block.state.BlockState;
 public interface InjectionLevelChunk {
 
     default org.bukkit.Chunk getBukkitChunk() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default ServerLevel banner$r() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving, boolean doPlace) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void loadCallback() {
+        throw new IllegalStateException("Not implemented");
     }
 
     default void unloadCallback() {
+        throw new IllegalStateException("Not implemented");
     }
 }

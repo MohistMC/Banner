@@ -8,14 +8,14 @@ import org.bukkit.craftbukkit.persistence.DirtyCraftPersistentDataContainer;
 public interface InjectionChunkAccess {
 
     default DirtyCraftPersistentDataContainer bridge$persistentDataContainer() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void setBiome(int i, int j, int k, Holder<Biome> biome) {
-
+        throw new IllegalStateException("Not implemented");
     }
 
     default Registry<Biome> bridge$biomeRegistry() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

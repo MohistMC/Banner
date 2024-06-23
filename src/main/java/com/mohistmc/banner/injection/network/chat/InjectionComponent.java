@@ -6,6 +6,6 @@ import net.minecraft.network.chat.Component;
 public interface InjectionComponent {
 
     default Stream<Component> bridge$stream() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

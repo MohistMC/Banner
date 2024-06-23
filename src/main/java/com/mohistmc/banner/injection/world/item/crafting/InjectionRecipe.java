@@ -6,6 +6,6 @@ import org.bukkit.inventory.Recipe;
 public interface InjectionRecipe {
 
     default Recipe toBukkitRecipe(NamespacedKey id) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

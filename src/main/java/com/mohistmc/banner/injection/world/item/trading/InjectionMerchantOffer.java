@@ -5,7 +5,7 @@ import org.bukkit.craftbukkit.inventory.CraftMerchantRecipe;
 public interface InjectionMerchantOffer {
 
     default CraftMerchantRecipe asBukkit() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
 }

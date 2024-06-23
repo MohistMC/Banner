@@ -5,19 +5,22 @@ import net.minecraft.server.level.ServerPlayer;
 public interface InjectionServerCommonPacketListenerImpl {
 
     default void disconnect(String s) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean bridge$processedDisconnect() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean banner$isDisconnected() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setPlayer(ServerPlayer player) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setProcessedDisconnect(boolean processedDisconnect) {
+        throw new IllegalStateException("Not implemented");
     }
 }

@@ -5,32 +5,34 @@ import org.bukkit.util.Vector;
 public interface InjectionAbstractMinecart {
 
     default double bridge$maxSpeed() {
-        return 0;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setMaxSpeed(double maxSpeed) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean bridge$slowWhenEmpty() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setSlowWhenEmpty(boolean slowWhenEmpty) {
-
+        throw new IllegalStateException("Not implemented");
     }
 
     default Vector getFlyingVelocityMod() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void setFlyingVelocityMod(Vector flying) {
-
+        throw new IllegalStateException("Not implemented");
     }
 
     default Vector getDerailedVelocityMod() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void setDerailedVelocityMod(Vector derailed) {
+        throw new IllegalStateException("Not implemented");
     }
 }

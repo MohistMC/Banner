@@ -7,25 +7,26 @@ import net.minecraft.world.item.ItemStack;
 public interface InjectionServerPlayerGameMode {
 
     default boolean bridge$isFiredInteract() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void bridge$setFiredInteract(boolean firedInteract) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean bridge$getInteractResult() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default BlockPos bridge$getinteractPosition() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default InteractionHand bridge$getinteractHand() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default ItemStack bridge$getinteractItemStack() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

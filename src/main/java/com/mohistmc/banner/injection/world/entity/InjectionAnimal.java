@@ -5,6 +5,6 @@ import net.minecraft.world.item.ItemStack;
 public interface InjectionAnimal {
 
     default ItemStack getBreedItem() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

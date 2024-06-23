@@ -5,6 +5,6 @@ import org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer;
 public interface InjectionStructureTemplate {
 
     default CraftPersistentDataContainer bridge$persistentDataContainer() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

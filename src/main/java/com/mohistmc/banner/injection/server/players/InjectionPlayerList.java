@@ -16,35 +16,38 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 public interface InjectionPlayerList {
 
     default CraftServer getCraftServer() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default ServerPlayer respawn(ServerPlayer entityplayer, boolean flag, Entity.RemovalReason entity_removalreason, PlayerRespawnEvent.RespawnReason reason) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default ServerPlayer respawn(ServerPlayer entityplayer, ServerLevel worldserver, boolean flag, Location location, boolean avoidSuffocation, Entity.RemovalReason entity_removalreason, PlayerRespawnEvent.RespawnReason reason) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void broadcastAll(Packet<?> packet, Player entityhuman) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default void broadcastAll(Packet<?> packet, Level world) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default void broadcastMessage(Component[] iChatBaseComponents) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default ServerStatsCounter getPlayerStats(ServerPlayer entityhuman) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default ServerStatsCounter getPlayerStats(UUID uuid, String displayName) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default String bridge$quiltMsg() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

@@ -10,16 +10,18 @@ public interface InjectionItemStack {
 
     @Deprecated
     default void setItem(Item item) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default PatchedDataComponentMap getComponentsClone() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void setComponentsClone(@Nullable PatchedDataComponentMap patchedDataComponentMap) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default void restorePatch(DataComponentPatch empty) {
-
+        throw new IllegalStateException("Not implemented");
     }
 }

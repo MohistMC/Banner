@@ -8,6 +8,6 @@ import net.minecraft.world.level.block.state.BlockState;
 public interface InjectionChestBlock {
 
     default MenuProvider getMenuProvider(BlockState iblockdata, Level world, BlockPos blockposition, boolean ignoreObstructions) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

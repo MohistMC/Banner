@@ -8,32 +8,35 @@ import org.bukkit.entity.HumanEntity;
 public interface InjectionInventory {
 
     default List<ItemStack> getContents() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default List<ItemStack> getArmorContents() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void onOpen(CraftHumanEntity who) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default void onClose(CraftHumanEntity who) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default List<HumanEntity> getViewers() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default org.bukkit.inventory.InventoryHolder getOwner(){
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void setMaxStackSize(int size) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default int canHold(ItemStack itemstack) {
-        return 0;
+        throw new IllegalStateException("Not implemented");
     }
 
 }

@@ -5,9 +5,10 @@ import net.minecraft.world.level.Level;
 public interface InjectionWorldBorder {
 
     default Level bridge$world() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setWorld(Level world) {
+        throw new IllegalStateException("Not implemented");
     }
 }

@@ -6,6 +6,6 @@ import net.minecraft.world.level.ChunkPos;
 public interface InjectionRegionFileStorage {
 
     default boolean chunkExists(ChunkPos pos) throws IOException {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 }

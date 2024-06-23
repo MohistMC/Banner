@@ -12,15 +12,15 @@ import java.util.Set;
 public interface InjectionBlockEntity {
 
     default CraftPersistentDataContainer bridge$persistentDataContainer() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default InventoryHolder bridge$getOwner() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void setPatterns(BannerPatternLayers bannerPatternLayers) {
-
+        throw new IllegalStateException("Not implemented");
     }
 
     default Set<DataComponentType<?>> applyComponentsSet(DataComponentMap datacomponentmap, DataComponentPatch datacomponentpatch) {

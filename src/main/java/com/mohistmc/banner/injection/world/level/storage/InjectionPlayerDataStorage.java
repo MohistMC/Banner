@@ -8,11 +8,11 @@ import net.minecraft.nbt.CompoundTag;
 public interface InjectionPlayerDataStorage {
 
     default CompoundTag getPlayerData(String s) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default File getPlayerDir() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default Optional<CompoundTag> load(String name, String s1, String s) { // name, uuid, extension
@@ -24,5 +24,6 @@ public interface InjectionPlayerDataStorage {
     }
 
     default void backup(String name, String s1, String s) {
+        throw new IllegalStateException("Not implemented");
     }
 }

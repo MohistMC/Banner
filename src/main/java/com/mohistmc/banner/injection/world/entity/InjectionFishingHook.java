@@ -3,56 +3,74 @@ package com.mohistmc.banner.injection.world.entity;
 public interface InjectionFishingHook {
 
     default int bridge$minLureTime() {
-        return 0;
+        throw new IllegalStateException("Not implemented");
     }
 
-    default void banner$setMinLureTime(int minLureTime) {}
+    default void banner$setMinLureTime(int minLureTime) {
+        throw new IllegalStateException("Not implemented");
+    }
 
     default int bridge$maxLureTime() {
-        return 0;
+        throw new IllegalStateException("Not implemented");
     }
 
-    default void banner$setMaxLureTime(int maxLureTime) {}
+    default void banner$setMaxLureTime(int maxLureTime) {
+        throw new IllegalStateException("Not implemented");
+    }
 
     default float bridge$minLureAngle() {
-        return 0;
+        throw new IllegalStateException("Not implemented");
     }
 
-    default void banner$setMinLureAnglee(float minLureAngle) {}
+    default void banner$setMinLureAnglee(float minLureAngle) {
+        throw new IllegalStateException("Not implemented");
+    }
 
     default float bridge$maxLureAngle() {
-        return 0;
+        throw new IllegalStateException("Not implemented");
     }
 
-    default void banner$setMaxLureAnglee(float maxLureAngle) {}
+    default void banner$setMaxLureAnglee(float maxLureAngle) {
+        throw new IllegalStateException("Not implemented");
+    }
 
     default boolean bridge$rainInfluenced() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
-    default void banner$setRainInfluenced(boolean rainInfluenced) {}
+    default void banner$setRainInfluenced(boolean rainInfluenced) {
+        throw new IllegalStateException("Not implemented");
+    }
 
     default boolean bridge$skyInfluenced() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
-    default void banner$setSkyInfluenced(boolean skyInfluenced) {}
+    default void banner$setSkyInfluenced(boolean skyInfluenced) {
+        throw new IllegalStateException("Not implemented");
+    }
 
     default int bridge$minWaitTime() {
-        return 0;
+        throw new IllegalStateException("Not implemented");
     }
 
-    default void banner$setMinWaitTime(int minWaitTime) {}
+    default void banner$setMinWaitTime(int minWaitTime) {
+        throw new IllegalStateException("Not implemented");
+    }
 
     default int bridge$maxWaitTime() {
-        return 0;
+        throw new IllegalStateException("Not implemented");
     }
 
-    default void banner$setMaxWaitTime(int minWaitTime) {}
+    default void banner$setMaxWaitTime(int minWaitTime) {
+        throw new IllegalStateException("Not implemented");
+    }
 
     default boolean bridge$applyLure() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
-    default void banner$setApplyLure(boolean applyLure) {}
+    default void banner$setApplyLure(boolean applyLure) {
+        throw new IllegalStateException("Not implemented");
+    }
 }

@@ -19,129 +19,142 @@ import org.spigotmc.SpigotWorldConfig;
 public interface InjectionLevel {
 
     default boolean bridge$preventPoiUpdated() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setPreventPoiUpdated(boolean preventPoiUpdated) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default org.bukkit.generator.BiomeProvider bridge$biomeProvider() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setBiomeProvider(org.bukkit.generator.BiomeProvider biomeProvider) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default org.bukkit.World.Environment bridge$environment() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setEnvironment(org.bukkit.World.Environment environment) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default org.bukkit.generator.ChunkGenerator bridge$generator() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setGenerator(org.bukkit.generator.ChunkGenerator generator) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean bridge$pvpMode() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setPvpMode(boolean pvpMode) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean bridge$captureBlockStates() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setCaptureBlockStates(boolean captureState) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean bridge$captureTreeGeneration() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setCaptureTreeGeneration(boolean treeGeneration) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default Map<BlockPos, CapturedBlockState> bridge$capturedBlockStates() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default Map<BlockPos, BlockEntity> bridge$capturedTileEntities() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setCapturedTileEntities(Map<BlockPos, BlockEntity> tileEntities) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setCapturedBlockStates(Map<BlockPos, CapturedBlockState> capturedBlockStates) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default List<ItemEntity> bridge$captureDrops() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setCaptureDrops(List<ItemEntity> captureDrops) {
-
+        throw new IllegalStateException("Not implemented");
     }
 
     default it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap<SpawnCategory> bridge$ticksPerSpawnCategory() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean bridge$populating() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setPopulating(boolean populating) {
-
+        throw new IllegalStateException("Not implemented");
     }
 
     default boolean bridge$keepSpawnInMemory() {
-        return false;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setKeepSpawnInMemory(boolean keepSpawnInMemory) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default ResourceKey<LevelStem> getTypeKey(){
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default CraftWorld getWorld() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default CraftServer getCraftServer() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void notifyAndUpdatePhysics(BlockPos blockposition, LevelChunk chunk, BlockState oldBlock, BlockState newBlock, BlockState actualBlock, int i, int j) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default BlockEntity getBlockEntity(BlockPos blockposition, boolean validate) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default SpigotWorldConfig bridge$spigotConfig() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setSpigotConfig(SpigotWorldConfig spigotWorldConfig) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default BannerWorldConfig bridge$bannerConfig() {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
     default void banner$setBannerConfig(BannerWorldConfig bannerWorldConfig) {
+        throw new IllegalStateException("Not implemented");
     }
 
     default CraftWorld banner$initWorld(LevelStem levelStem) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }
