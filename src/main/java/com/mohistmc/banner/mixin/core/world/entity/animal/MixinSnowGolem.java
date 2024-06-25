@@ -26,7 +26,7 @@ public abstract class MixinSnowGolem extends AbstractGolem {
 
     @Redirect(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/damagesource/DamageSources;onFire()Lnet/minecraft/world/damagesource/DamageSource;"))
     private DamageSource banner$useMelting(DamageSources instance) {
-        return instance.bridge$melting();
+        return instance.melting();
     }
 
     @Redirect(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))

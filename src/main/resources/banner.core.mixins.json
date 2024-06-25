@@ -105,6 +105,7 @@
     "server.players.MixinUserWhiteList",
     "server.rcon.MixinRconConsoleSource",
     "server.rcon.thread.MixinRconClient",
+    "stats.MixinServerRecipeBook",
     "stats.MixinStatsCounter",
     "util.MixinSpawnUtil",
     "util.MixinThreadingDetector",

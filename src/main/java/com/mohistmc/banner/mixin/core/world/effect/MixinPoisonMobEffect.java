@@ -11,6 +11,6 @@ public class MixinPoisonMobEffect {
 
     @Redirect(method = "applyEffectTick", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/world/damagesource/DamageSources;magic()Lnet/minecraft/world/damagesource/DamageSource;"))
     private DamageSource banner$redirectPoison(DamageSources instance) {
-        return instance.bridge$poison();
+        return instance.poison();
     }
 }

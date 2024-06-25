@@ -26,6 +26,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(FoodData.class)
 public abstract class MixinFoodData implements InjectionFoodData {
@@ -68,18 +69,17 @@ public abstract class MixinFoodData implements InjectionFoodData {
         // Banner end
     }
 
-    // Banner TODO fixme
-    /*
-    @Inject(method = "eat(IF)V", at = @At("TAIL"))
-    private void banner$sendUpdate(int foodLevelModifier, float saturationLevelModifier, CallbackInfo ci) {
-        ((ServerPlayer) entityhuman).getBukkitEntity().sendHealthUpdate(); // Banner
-    }
+    @Override
+    public void eat(ItemStack itemstack, FoodProperties foodinfo) {
+        int oldFoodLevel = foodLevel;
 
-    @Inject(method = "eat(IF)V", at = @At("HEAD"))
-    private void banner$setFoodInformation(FoodProperties foodProperties, CallbackInfo ci) {
-        this.banner$foodStack = itemStack;
+        FoodLevelChangeEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callFoodLevelChangeEvent(entityhuman, foodinfo.nutrition() + oldFoodLevel, itemstack);
+
+        if (!event.isCancelled()) {
+            this.add(event.getFoodLevel() - oldFoodLevel, foodinfo.saturation());
+        }
+        ((ServerPlayer) entityhuman).getBukkitEntity().sendHealthUpdate();
     }
-    */
 
     @Redirect(method = "eat(Lnet/minecraft/world/food/FoodProperties;)V",
             at = @At(value = "INVOKE",target = "Lnet/minecraft/world/food/FoodData;add(IF)V"))
