@@ -77,6 +77,11 @@ public abstract class MixinWorldBorder implements InjectionWorldBorder {
         // Paper end
     }
 
+    @Inject(method = "addListener", at = @At("HEAD"), cancellable = true)
+    private void banner$checkContain(BorderChangeListener borderChangeListener, CallbackInfo ci) {
+        if (listeners.contains(borderChangeListener)) ci.cancel(); // CraftBukkit
+    }
+
     @Override
     public void banner$setWorld(Level world) {
         this.world = world;

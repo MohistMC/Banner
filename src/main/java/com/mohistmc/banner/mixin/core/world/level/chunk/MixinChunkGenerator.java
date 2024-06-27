@@ -1,9 +1,7 @@
 package com.mohistmc.banner.mixin.core.world.level.chunk;
 
 import com.mohistmc.banner.injection.world.level.chunk.InjectionChunkGenerator;
-import java.util.Objects;
 import java.util.function.Predicate;
-import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.SectionPos;
@@ -11,29 +9,28 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
-import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.generator.CraftLimitedRegion;
-import org.bukkit.craftbukkit.generator.structure.CraftStructure;
 import org.bukkit.craftbukkit.util.RandomSourceWrapper;
 import org.bukkit.generator.BlockPopulator;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ChunkGenerator.class)
 public abstract class MixinChunkGenerator implements InjectionChunkGenerator {
@@ -53,30 +50,16 @@ public abstract class MixinChunkGenerator implements InjectionChunkGenerator {
         this.addDecorations(level, chunkAccess, manager);
     }
 
-    /**
-     * @author wdog5
-     * @reason bukkit
-     */
-    @Overwrite
-    private boolean tryGenerateStructure(StructureSet.StructureSelectionEntry structureSelectionEntry, StructureManager structureManager, RegistryAccess registryAccess, RandomState random, StructureTemplateManager structureTemplateManager, long seed, ChunkAccess chunk, ChunkPos chunkPos, SectionPos sectionPos) {
-        Structure structure = (Structure)structureSelectionEntry.structure().value();
-        int i = fetchReferences(structureManager, chunk, sectionPos, structure);
-        HolderSet<Biome> holderSet = structure.biomes();
-        Objects.requireNonNull(holderSet);
-        Predicate<Holder<Biome>> predicate = holderSet::contains;
-        StructureStart structureStart = structure.generate(registryAccess, ((ChunkGenerator) (Object) this), this.biomeSource, random, structureTemplateManager, seed, chunkPos, i, chunk, predicate);
-        if (structureStart.isValid()) {
-            structureManager.setStartForStructure(sectionPos, structure, structureStart, chunk);
-            var box = structureStart.getBoundingBox();
-            var event = new org.bukkit.event.world.AsyncStructureSpawnEvent((((LevelAccessor) structureManager.level).getMinecraftWorld()).getWorld(), CraftStructure.minecraftToBukkit(structure), new org.bukkit.util.BoundingBox(box.minX(), box.minY(), box.minZ(), box.maxX(), box.maxY(), box.maxZ()), chunkPos.x, chunkPos.z);
-            Bukkit.getPluginManager().callEvent(event);
-            if (event.isCancelled()) {
-                return true;
-            }
-            return true;
-        } else {
-            return false;
+    @Inject(method = "tryGenerateStructure", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/StructureManager;setStartForStructure(Lnet/minecraft/core/SectionPos;Lnet/minecraft/world/level/levelgen/structure/Structure;Lnet/minecraft/world/level/levelgen/structure/StructureStart;Lnet/minecraft/world/level/chunk/StructureAccess;)V"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    private void banner$fireEvent(StructureSet.StructureSelectionEntry structureSelectionEntry, StructureManager structureManager, RegistryAccess registryAccess, RandomState randomState, StructureTemplateManager structureTemplateManager, long l, ChunkAccess chunkAccess, ChunkPos chunkPos, SectionPos sectionPos0, CallbackInfoReturnable<Boolean> cir, SectionPos sectionPos1, Structure structure, int i, HolderSet holderSet, Predicate predicate, StructureStart structureStart) {
+        // CraftBukkit start
+        BoundingBox box = structureStart.getBoundingBox();
+        org.bukkit.event.world.AsyncStructureSpawnEvent event = new org.bukkit.event.world.AsyncStructureSpawnEvent(structureManager.level.getMinecraftWorld().getWorld(), org.bukkit.craftbukkit.generator.structure.CraftStructure.minecraftToBukkit(structure), new org.bukkit.util.BoundingBox(box.minX(), box.minY(), box.minZ(), box.maxX(), box.maxY(), box.maxZ()), chunkPos.x, chunkPos.z);
+        org.bukkit.Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            cir.setReturnValue(true);
         }
+        // CraftBukkit end
     }
 
     @Override

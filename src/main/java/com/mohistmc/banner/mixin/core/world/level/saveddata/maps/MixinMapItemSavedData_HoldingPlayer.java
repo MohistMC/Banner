@@ -10,6 +10,7 @@ import net.minecraft.world.level.saveddata.maps.MapDecoration;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.map.CraftMapCursor;
 import org.bukkit.craftbukkit.map.RenderData;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.spongepowered.asm.mixin.Final;
@@ -55,16 +56,15 @@ public abstract class MixinMapItemSavedData_HoldingPlayer {
         field_132.colors = banner$colors;
     }
 
-    /*
     @Redirect(method = "nextUpdatePacket", at = @At(value = "INVOKE", target = "Ljava/util/Map;values()Ljava/util/Collection;"))
     private Collection<MapDecoration> banner$resetCollections(Map instance) {
         // CraftBukkit start
         for (org.bukkit.map.MapCursor cursor : banner$render.getAndSet(null).cursors) {
             if (cursor.isVisible()) {
-                icons.add(new MapDecoration(MapDecoration.byIcon(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), CraftChatMessage.fromStringOrNull(cursor.getCaption())));
+                icons.add(new MapDecoration(CraftMapCursor.CraftType.bukkitToMinecraftHolder(cursor.getType()), cursor.getX(), cursor.getY(), cursor.getDirection(), CraftChatMessage.fromStringOrOptional(cursor.getCaption())));
             }
         }
         return icons;
         // CraftBukkit end
-    }*/
+    }
 }
