@@ -370,7 +370,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
 
     // Banner start - fix compat with frozen lib
     boolean cancelledBlock = false;
-    PlayerInteractEvent event = null;
+    PlayerInteractEvent event;
     // Banner end
 
     /**

@@ -538,6 +538,7 @@
     "world.level.levelgen.structure.MixinStructureStart",
     "world.level.levelgen.structure.MixinSwampHutPiece",
     "world.level.levelgen.structure.structures.MixinDesertPyramidStructure",
+    "world.level.levelgen.structure.structures.MixinStructurePiece",
     "world.level.levelgen.structure.templatesystem.MixinStructurePlaceSettings",
     "world.level.levelgen.structure.templatesystem.MixinStructureTemplate",
     "world.level.levelgen.structure.templatesystem.MixinStructureTemplateManager",
