@@ -426,6 +426,14 @@ public final class CraftChatMessage {
         return component;
     }
 
+    public static Component fromStringOrEmpty(String message) {
+        return CraftChatMessage.fromStringOrEmpty(message, false);
+    }
+
+    public static Component fromStringOrEmpty(String message, boolean keepNewlines) {
+        return CraftChatMessage.fromString(message, keepNewlines)[0];
+    }
+
     private CraftChatMessage() {
     }
 }

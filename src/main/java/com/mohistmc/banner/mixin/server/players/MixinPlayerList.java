@@ -477,6 +477,14 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         return null;
     }
 
+    @Inject(method = "removeAll", at = @At("HEAD"), cancellable = true)
+    private void banner$removeSafety(CallbackInfo ci) {
+        for (ServerPlayer player : this.players) {
+            player.connection.disconnect(CraftChatMessage.fromStringOrEmpty(this.server.bridge$server().getShutdownMessage())); // CraftBukkit - add custom shutdown message
+        }
+        ci.cancel();
+    }
+
     @Inject(method = "getPlayerForLogin", at = @At("HEAD"), cancellable = true)
     private void banner$getPlayerForLogin(GameProfile pProfile, CallbackInfoReturnable<ServerPlayer> ci) {
         ServerPlayer entity1 = entity.getAndSet(null);
@@ -591,7 +599,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
                 } else if (blockposition != null) {
                     entityplayer1.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.NO_RESPAWN_BLOCK_AVAILABLE, 0.0F));
                     entityplayer1.pushChangeSpawnCause(PlayerSpawnChangeEvent.Cause.RESET);
-                    entityplayer1.setRespawnPosition(null, null, 0f, false, false);
+                    entityplayer1.setRespawnPosition(worldserver1.dimension(), blockposition, f, flag1, false);
                 }
             }
 
