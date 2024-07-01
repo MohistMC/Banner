@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.item.crafting;
 
+import com.mohistmc.banner.bukkit.inventory.recipe.BannerModdedRecipe;
 import com.mohistmc.banner.bukkit.inventory.recipe.BannerShapelessRecipe;
 import com.mohistmc.banner.injection.world.item.crafting.InjectionShapelessRecipe;
 import net.minecraft.core.NonNullList;
@@ -28,9 +29,9 @@ public abstract class MixinShapelessRecipe implements CraftingRecipe, InjectionS
 
     @Override
     // CraftBukkit start
-    public org.bukkit.inventory.ShapelessRecipe toBukkitRecipe() {
+    public org.bukkit.inventory.Recipe toBukkitRecipe() {
         if (this.result.isEmpty()) {
-            return new BannerShapelessRecipe(((ShapelessRecipe) (Object) this));
+            return new BannerModdedRecipe(((ShapelessRecipe) (Object) this));
         }
         CraftItemStack result = CraftItemStack.asCraftMirror(this.result);
         CraftShapelessRecipe recipe = new CraftShapelessRecipe(result, ((ShapelessRecipe) (Object) this));

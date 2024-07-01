@@ -43,7 +43,7 @@ public abstract class MixinShapedRecipe implements CraftingRecipe, InjectionShap
 
     @Override
     // CraftBukkit start
-    public org.bukkit.inventory.ShapedRecipe toBukkitRecipe() {
+    public org.bukkit.inventory.Recipe toBukkitRecipe() {
         if (this.getWidth() < 1 || this.getWidth() > 3 || this.getHeight() < 1 || this.getHeight() > 3 || this.result.isEmpty()) {
             return new BannerShapedRecipe(((ShapedRecipe) (Object) this));
         }
