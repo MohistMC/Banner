@@ -146,6 +146,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.SmithingInventory;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import org.spigotmc.AsyncCatcher;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -1130,13 +1131,15 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         String command = "/" + packet.command();
         LOGGER.info(this.player.getScoreboardName() + " issued server command: " + command);
 
-        PlayerCommandPreprocessEvent event = new PlayerCommandPreprocessEvent(getCraftPlayer(), command, new LazyPlayerSet(server));
-        this.cserver.getPluginManager().callEvent(event);
+        if (!AsyncCatcher.catchAsync()) {
+            PlayerCommandPreprocessEvent event = new PlayerCommandPreprocessEvent(getCraftPlayer(), command, new LazyPlayerSet(server));
+            this.cserver.getPluginManager().callEvent(event);
 
-        if (event.isCancelled()) {
-            return;
+            if (event.isCancelled()) {
+                return;
+            }
+            command = event.getMessage().substring(1);
         }
-        command = event.getMessage().substring(1);
 
         ParseResults<CommandSourceStack> parseresults = this.parseCommand(command);
 
