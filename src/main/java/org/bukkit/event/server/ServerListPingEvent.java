@@ -185,7 +185,7 @@ public class ServerListPingEvent extends ServerEvent implements Iterable<Player>
      */
     @NotNull
     @Override
-    public Iterator<Player> iterator() throws UnsupportedOperationException {
+    public Iterator<Player> iterator() {
         return new Iterator<>() {
 
             @Override
