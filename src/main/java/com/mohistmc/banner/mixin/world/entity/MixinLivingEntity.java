@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -31,6 +32,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.CombatTracker;
 import net.minecraft.world.damagesource.DamageSource;
@@ -41,14 +44,17 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.WalkAnimationState;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Equipable;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -64,6 +70,7 @@ import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.jetbrains.annotations.Nullable;
@@ -84,105 +91,83 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(LivingEntity.class)
 public abstract class MixinLivingEntity extends Entity implements InjectionLivingEntity {
 
-    @Shadow @Final public static EntityDataAccessor<Float> DATA_HEALTH_ID;
-
-    @Shadow public abstract double getAttributeValue(Attribute attribute);
-
-    @Shadow @Final private AttributeMap attributes;
-
-    @Shadow public abstract SoundEvent getEatingSound(net.minecraft.world.item.ItemStack stack);
-
-    @Shadow protected abstract SoundEvent getDrinkingSound(net.minecraft.world.item.ItemStack stack);
-
-    @Shadow protected abstract SoundEvent getFallDamageSound(int height);
-
-    @Shadow @Nullable protected abstract SoundEvent getDeathSound();
-
-    @Shadow public abstract void onEquipItem(EquipmentSlot equipmentSlot, ItemStack itemStack, ItemStack itemStack2);
-
-    @Shadow @Nullable public abstract AttributeInstance getAttribute(Attribute attribute);
-
-    @Shadow @Final public Map<MobEffect, MobEffectInstance> activeEffects;
-
-    @Shadow protected abstract void onEffectUpdated(MobEffectInstance effectInstance, boolean forced, @Nullable Entity entity);
-
-    @Shadow protected abstract void onEffectRemoved(MobEffectInstance effectInstance);
-
-    @Shadow public boolean effectsDirty;
-
-    @Shadow protected abstract void updateInvisibilityStatus();
-
-    @Shadow @Final private static EntityDataAccessor<Integer> DATA_EFFECT_COLOR_ID;
-
-    @Shadow @Final private static EntityDataAccessor<Boolean> DATA_EFFECT_AMBIENCE_ID;
-
-    @Shadow public abstract boolean canBeAffected(MobEffectInstance effectInstance);
-
-    @Shadow protected abstract void onEffectAdded(MobEffectInstance instance, @Nullable Entity entity);
-
-    @Shadow @Nullable public abstract MobEffectInstance removeEffectNoUpdate(@Nullable MobEffect effect);
-
-    @Shadow public abstract boolean wasExperienceConsumed();
-
-    @Shadow protected abstract boolean isAlwaysExperienceDropper();
-
-    @Shadow protected int lastHurtByPlayerTime;
-
-    @Shadow public abstract boolean shouldDropExperience();
-
-    @Shadow public abstract int getExperienceReward();
-
-    @Shadow public abstract boolean removeAllEffects();
-
-    @Shadow public abstract ItemStack getItemBySlot(EquipmentSlot slot);
-
-    @Shadow public abstract boolean isDamageSourceBlocked(DamageSource damageSource);
-
-    @Shadow @Nullable public abstract MobEffectInstance getEffect(MobEffect effect);
-
-    @Shadow public abstract boolean hasEffect(MobEffect effect);
-
-    @Shadow protected abstract float getDamageAfterArmorAbsorb(DamageSource damageSource, float damageAmount);
-
-    @Shadow protected abstract float getDamageAfterMagicAbsorb(DamageSource damageSource, float damageAmount);
-
-    @Shadow public abstract float getAbsorptionAmount();
-
-    @Shadow public abstract void hurtHelmet(DamageSource damageSource, float damageAmount);
-
-    @Shadow public abstract void hurtArmor(DamageSource damageSource, float damageAmount);
-
-    @Shadow public abstract void hurtCurrentlyUsedShield(float damageAmount);
-
-    @Shadow protected abstract void blockUsingShield(LivingEntity attacker);
-
-    @Shadow public abstract void setAbsorptionAmount(float absorptionAmount);
-
-    @Shadow public abstract float getHealth();
-
-    @Shadow public abstract CombatTracker getCombatTracker();
-
-    @Shadow public abstract void setHealth(float health);
-
-    @Shadow public abstract void heal(float healAmount);
-
-    @Shadow public abstract boolean removeEffect(MobEffect effect);
-
-    @Shadow public abstract boolean onClimbable();
-
-    @Shadow public abstract InteractionHand getUsedItemHand();
-
-    @Shadow @Final public static EntityDataAccessor<Integer> DATA_ARROW_COUNT_ID;
-
-    @Shadow public abstract int getArrowCount();
-
-    @Shadow protected abstract boolean doesEmitEquipEvent(EquipmentSlot slot);
-
     @Shadow @Final private static Logger LOGGER;
-
-    @Shadow public abstract void indicateDamage(double d, double e);
-
-    @Shadow public abstract ItemStack eat(Level level, ItemStack food);
+    @Shadow public abstract void heal(float healAmount);
+    @Shadow public abstract float getHealth();
+    @Shadow public abstract void setHealth(float health);
+    @Shadow public abstract float getYHeadRot();
+    @Shadow protected int lastHurtByPlayerTime;
+    @Shadow public abstract boolean shouldDropExperience();
+    @Shadow protected abstract boolean isAlwaysExperienceDropper();
+    @Shadow public net.minecraft.world.entity.player.Player lastHurtByPlayer;
+    @Shadow protected boolean dead;
+    @Shadow public abstract AttributeInstance getAttribute(Attribute attribute);
+    @Shadow public boolean effectsDirty;
+    @Shadow public abstract boolean removeEffect(MobEffect effectIn);
+    @Shadow public abstract boolean removeAllEffects();
+    @Shadow @Final public static EntityDataAccessor<Float> DATA_HEALTH_ID;
+    @Shadow public abstract boolean hasEffect(MobEffect potionIn);
+    @Shadow public abstract boolean isSleeping();
+    @Shadow public abstract void stopSleeping();
+    @Shadow protected int noActionTime;
+    @Shadow public abstract net.minecraft.world.item.ItemStack getItemBySlot(EquipmentSlot slotIn);
+    @Shadow public abstract boolean isDamageSourceBlocked(DamageSource damageSourceIn);
+    @Shadow public abstract void hurtCurrentlyUsedShield(float damage);
+    @Shadow protected abstract void blockUsingShield(LivingEntity entityIn);
+    @Shadow public float lastHurt;
+    @Shadow public int hurtDuration;
+    @Shadow public int hurtTime;
+    @Shadow public abstract void setLastHurtByMob(@Nullable LivingEntity livingBase);
+    @Shadow @Nullable protected abstract SoundEvent getDeathSound();
+    @Shadow protected abstract float getSoundVolume();
+    @Shadow public abstract float getVoicePitch();
+    @Shadow public abstract void die(DamageSource cause);
+    @Shadow protected abstract void playHurtSound(DamageSource source);
+    @Shadow private DamageSource lastDamageSource;
+    @Shadow private long lastDamageStamp;
+    @Shadow protected abstract float getDamageAfterArmorAbsorb(DamageSource source, float damage);
+    @Shadow public abstract net.minecraft.world.item.ItemStack getItemInHand(InteractionHand hand);
+    @Shadow @Nullable public abstract MobEffectInstance getEffect(MobEffect potionIn);
+    @Shadow protected abstract float getDamageAfterMagicAbsorb(DamageSource source, float damage);
+    @Shadow public abstract float getAbsorptionAmount();
+    @Shadow public abstract void setAbsorptionAmount(float amount);
+    @Shadow public abstract CombatTracker getCombatTracker();
+    @Shadow @Final private AttributeMap attributes;
+    @Shadow public abstract boolean onClimbable();
+    @Shadow public abstract void take(Entity entityIn, int quantity);
+    @Shadow public abstract void setSprinting(boolean sprinting);
+    @Shadow public abstract void setItemInHand(InteractionHand hand, ItemStack stack);
+    @Shadow public abstract RandomSource getRandom();
+    @Shadow @Final private static EntityDataAccessor<Integer> DATA_EFFECT_COLOR_ID;
+    @Shadow @Final private static EntityDataAccessor<Boolean> DATA_EFFECT_AMBIENCE_ID;
+    @Shadow @Final public Map<MobEffect, MobEffectInstance> activeEffects;
+    @Shadow protected abstract void onEffectRemoved(MobEffectInstance effect);
+    @Shadow protected abstract void updateInvisibilityStatus();
+    @Shadow public abstract boolean canBeAffected(MobEffectInstance potioneffectIn);
+    @Shadow @Nullable public abstract MobEffectInstance removeEffectNoUpdate(@Nullable MobEffect potioneffectin);
+    @Shadow public abstract double getAttributeValue(Attribute attribute);
+    @Shadow public abstract void hurtArmor(DamageSource damageSource, float damage);
+    @Shadow public abstract boolean isDeadOrDying();
+    @Shadow public abstract int getArrowCount();
+    @Shadow @Final public static EntityDataAccessor<Integer> DATA_ARROW_COUNT_ID;
+    @Shadow public abstract void setItemSlot(EquipmentSlot slotIn, ItemStack stack);
+    @Shadow protected abstract void onEffectUpdated(MobEffectInstance p_147192_, boolean p_147193_, @org.jetbrains.annotations.Nullable Entity p_147194_);
+    @Shadow protected abstract void onEffectAdded(MobEffectInstance p_147190_, @org.jetbrains.annotations.Nullable Entity p_147191_);
+    @Shadow public abstract void knockback(double p_147241_, double p_147242_, double p_147243_);
+    @Shadow public abstract void hurtHelmet(DamageSource p_147213_, float p_147214_);
+    @Shadow protected abstract boolean doesEmitEquipEvent(EquipmentSlot p_217035_);
+    @Shadow public abstract boolean wasExperienceConsumed();
+    @Shadow public abstract int getExperienceReward();
+    @Shadow protected abstract SoundEvent getFallDamageSound(int p_21313_);
+    @Shadow protected abstract SoundEvent getDrinkingSound(ItemStack p_21174_);
+    @Shadow public abstract SoundEvent getEatingSound(ItemStack p_21202_);
+    @Shadow public abstract InteractionHand getUsedItemHand();
+    @Shadow @Final public WalkAnimationState walkAnimation;
+    @Shadow public abstract void indicateDamage(double p_270514_, double p_270826_);
+    @Shadow protected abstract void actuallyHurt(DamageSource p_21240_, float p_21241_);
+    @Shadow @Final public abstract boolean addEffect(MobEffectInstance effectInstance);
+    @Shadow public abstract void onEquipItem(EquipmentSlot equipmentSlot, ItemStack itemStack, ItemStack itemStack2);
+    @Shadow public int invulnerableDuration;
 
     public MixinLivingEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -214,6 +199,8 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     private AtomicBoolean banner$silent = new AtomicBoolean(false);
     @Unique
     private transient EntityPotionEffectEvent.Cause banner$cause;
+    @Unique
+    public AtomicInteger invulnerableDurationAtom = new AtomicInteger(20);
 
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setHealth(F)V"))
     private void banner$muteHealth(LivingEntity entity, float health) {
@@ -460,6 +447,239 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         return !this.isRemoved() && this.entityData.get(DATA_HEALTH_ID) > 0.0F;
     }
 
+    /**
+     * @author wdog5
+     * @reason
+     */
+    @Overwrite
+    public boolean hurt(DamageSource source, float amount) {
+        if (this.isInvulnerableTo(source)) {
+            return false;
+        } else if (this.level().isClientSide) {
+            return false;
+        } else if (this.isRemoved() || this.dead || this.getHealth() <= 0.0F) { // CraftBukkit - Don't allow entities that got set to dead/killed elsewhere to get damaged and die
+            return false;
+        } else if (this.isDeadOrDying()) {
+            return false;
+        } else if (source.is(DamageTypeTags.IS_FIRE) && this.hasEffect(MobEffects.FIRE_RESISTANCE)) {
+            return false;
+        } else {
+            if (this.isSleeping() && !this.level().isClientSide) {
+                this.stopSleeping();
+            }
+
+            this.noActionTime = 0;
+            float f = amount;
+            boolean bl = false;
+            float g = 0.0F;
+            if (amount > 0.0F && this.isDamageSourceBlocked(source)) {
+                this.hurtCurrentlyUsedShield(amount);
+                g = amount;
+                amount = 0.0F;
+                if (!source.is(DamageTypeTags.IS_PROJECTILE)) {
+                    Entity entity = source.getDirectEntity();
+                    if (entity instanceof LivingEntity) {
+                        LivingEntity livingEntity = (LivingEntity)entity;
+                        this.blockUsingShield(livingEntity);
+                    }
+                }
+
+                bl = true;
+            }
+
+            if (source.is(DamageTypeTags.IS_FREEZING) && this.getType().is(EntityTypeTags.FREEZE_HURTS_EXTRA_TYPES)) {
+                amount *= 5.0F;
+            }
+
+            this.walkAnimation.setSpeed(1.5F);
+            boolean bl2 = true;
+            if ((float)this.invulnerableTime > (float) this.invulnerableDuration / 2.0F && !source.is(DamageTypeTags.BYPASSES_COOLDOWN)) {
+                if (amount <= this.lastHurt) {
+                    return false;
+                }
+                // CraftBukkit start
+                this.actuallyHurt(source, amount - this.lastHurt);
+                if (!this.canDamage()) {
+                    return false;
+                }
+                // CraftBukkit end
+                this.lastHurt = amount;
+                bl2 = false;
+            } else {
+                // CraftBukkit start
+                this.actuallyHurt(source, amount);
+                if (!this.canDamage()) {
+                    return false;
+                }
+                // CraftBukkit end
+                this.lastHurt = amount;
+                if (this.invulnerableDuration == invulnerableDurationAtom.get()) {
+                    this.invulnerableTime = 20; // CraftBukkit - restore use of maxNoDamageTicks
+                } else {
+                    this.invulnerableTime = this.invulnerableDuration;
+                }
+                // CraftBukkit end
+                this.hurtDuration = 10;
+                this.hurtTime = this.hurtDuration;
+            }
+
+            if (false && source.is(DamageTypeTags.DAMAGES_HELMET) && !this.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
+                this.hurtHelmet(source, amount);
+                amount *= 0.75F;
+            }
+
+            Entity entity2 = source.getEntity();
+            if (entity2 != null) {
+                if (entity2 instanceof LivingEntity) {
+                    LivingEntity livingEntity2 = (LivingEntity)entity2;
+                    if (!source.is(DamageTypeTags.NO_ANGER)) {
+                        this.setLastHurtByMob(livingEntity2);
+                    }
+                }
+
+                if (entity2 instanceof Player) {
+                    Player player = (Player)entity2;
+                    this.lastHurtByPlayerTime = 100;
+                    this.lastHurtByPlayer = player;
+                } else if (entity2 instanceof Wolf) {
+                    Wolf wolf = (Wolf)entity2;
+                    if (wolf.isTame()) {
+                        this.lastHurtByPlayerTime = 100;
+                        LivingEntity var11 = wolf.getOwner();
+                        if (var11 instanceof Player) {
+                            Player player2 = (Player)var11;
+                            this.lastHurtByPlayer = player2;
+                        } else {
+                            this.lastHurtByPlayer = null;
+                        }
+                    }
+                }
+            }
+
+            if (bl2) {
+                if (bl) {
+                    this.level().broadcastEntityEvent(this, (byte)29);
+                } else {
+                    this.level().broadcastDamageEvent(this, source);
+                }
+
+                if (!source.is(DamageTypeTags.NO_IMPACT) && (!bl || amount > 0.0F)) {
+                    this.markHurt();
+                }
+
+                if (entity2 != null && !source.is(DamageTypeTags.IS_EXPLOSION)) {
+                    double d = entity2.getX() - this.getX();
+
+                    double e;
+                    for(e = entity2.getZ() - this.getZ(); d * d + e * e < 1.0E-4; e = (Math.random() - Math.random()) * 0.01) {
+                        d = (Math.random() - Math.random()) * 0.01;
+                    }
+
+                    this.knockback(0.4000000059604645, d, e);
+                    if (!bl) {
+                        this.indicateDamage(d, e);
+                    }
+                }
+            }
+
+            if (this.isDeadOrDying()) {
+                if (!this.checkTotemDeathProtection(source)) {
+                    SoundEvent soundEvent = this.getDeathSound();
+                    if (bl2 && soundEvent != null) {
+                        this.playSound(soundEvent, this.getSoundVolume(), this.getVoicePitch());
+                    }
+
+                    this.die(source);
+                }
+            } else if (bl2) {
+                this.playHurtSound(source);
+            }
+
+            boolean bl3 = !bl || amount > 0.0F;
+            if (bl3) {
+                this.lastDamageSource = source;
+                this.lastDamageStamp = this.level().getGameTime();
+            }
+
+            if ((Object) this instanceof ServerPlayer) {
+                CriteriaTriggers.ENTITY_HURT_PLAYER.trigger((ServerPlayer) (Object) this, source, f, amount, bl);
+                if (g > 0.0F && g < 3.4028235E37F) {
+                    ((ServerPlayer) (Object) this).awardStat(Stats.DAMAGE_BLOCKED_BY_SHIELD, Math.round(g * 10.0F));
+                }
+            }
+
+            if (entity2 instanceof ServerPlayer) {
+                CriteriaTriggers.PLAYER_HURT_ENTITY.trigger((ServerPlayer)entity2, this, source, f, amount, bl);
+            }
+
+            return bl3;
+        }
+    }
+
+    /**
+     * @author wdog5
+     * @reason
+     */
+    @Overwrite
+    private boolean checkTotemDeathProtection(DamageSource damageSourceIn) {
+        if (damageSourceIn.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+            return false;
+        } else {
+            net.minecraft.world.item.ItemStack itemstack = null;
+            net.minecraft.world.item.ItemStack itemstack1 = ItemStack.EMPTY;
+            org.bukkit.inventory.EquipmentSlot bukkitHand = null;
+            InteractionHand[] var4 = InteractionHand.values();
+            int var5 = var4.length;
+
+            for(int var6 = 0; var6 < var5; ++var6) {
+                InteractionHand interactionHand = var4[var6];
+                ItemStack itemStack2 = this.getItemInHand(interactionHand);
+                if (itemStack2.is(Items.TOTEM_OF_UNDYING)) {
+                    bukkitHand = CraftEquipmentSlot.getHand(interactionHand);
+                    itemstack = itemStack2.copy();
+                    break;
+                }
+            }
+
+            EntityResurrectEvent event = new EntityResurrectEvent((org.bukkit.entity.LivingEntity) this.getBukkitEntity(), bukkitHand);
+            event.setCancelled(itemstack == null);
+            Bukkit.getPluginManager().callEvent(event);
+
+            if (!event.isCancelled()) {
+                if (!itemstack1.isEmpty()) {
+                    itemstack1.shrink(1);
+                }
+                if (itemstack != null && (Object) this instanceof ServerPlayer serverplayerentity) {
+                    serverplayerentity.awardStat(Stats.ITEM_USED.get(Items.TOTEM_OF_UNDYING));
+                    CriteriaTriggers.USED_TOTEM.trigger(serverplayerentity, itemstack);
+                }
+
+                this.setHealth(1.0F);
+                pushEffectCause(EntityPotionEffectEvent.Cause.TOTEM);
+                this.removeAllEffects();
+                pushEffectCause(EntityPotionEffectEvent.Cause.TOTEM);
+                this.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 900, 1));
+                pushEffectCause(EntityPotionEffectEvent.Cause.TOTEM);
+                this.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 100, 1));
+                pushEffectCause(EntityPotionEffectEvent.Cause.TOTEM);
+                this.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 800, 1));
+                this.level().broadcastEntityEvent((Entity) (Object) this, (byte) 35);
+            }
+            return !event.isCancelled();
+        }
+    }
+
+    @Inject(method = "actuallyHurt", cancellable = true, at = @At("HEAD"))
+    public void banner$redirectDamageEntity(DamageSource damageSrc, float damageAmount, CallbackInfo ci) {
+        damageEntity0(damageSrc, damageAmount);
+        ci.cancel();
+    }
+
+    public AtomicBoolean canDamage = new AtomicBoolean(true);
+    public boolean canDamage() {
+        return canDamage.getAndSet(true);
+    }
+
     @Override
     public boolean damageEntity0(DamageSource damagesource, float f) {
         if (!this.isInvulnerableTo(damagesource)) {
@@ -533,6 +753,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
                 ((Player) damagesource.getEntity()).resetAttackStrengthTicker(); // Moved from EntityHuman in order to make the cooldown reset get called after the damage event is fired
             }
             if (event.isCancelled()) {
+                this.canDamage.set(false);
                 return false;
             }
 
@@ -606,7 +827,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
                     this.setAbsorptionAmount(this.getAbsorptionAmount() - f);
                 }
                 this.gameEvent(GameEvent.ENTITY_DAMAGE);
-
+                this.canDamage.set(true);
                 return true;
             } else {
                 // Duplicate triggers if blocking
@@ -622,7 +843,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
                     if (damagesource.getEntity() instanceof ServerPlayer) {
                         CriteriaTriggers.PLAYER_HURT_ENTITY.trigger((ServerPlayer) damagesource.getEntity(), this, damagesource, f, originalDamage, true);
                     }
-
+                    this.canDamage.set(false);
                     return false;
                 } else {
                     return originalDamage > 0;
@@ -630,6 +851,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
                 // CraftBukkit end
             }
         }
+        this.canDamage.set(false);
         return false; // CraftBukkit
     }
 

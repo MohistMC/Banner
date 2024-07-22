@@ -252,6 +252,11 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
         ci.cancel();
     }
 
+    @Override
+    public boolean damageEntity0(DamageSource damagesource, float f) { // void -> boolean
+        return super.damageEntity0(damagesource, f);
+    }
+
     @Inject(method = "stopSleepInBed", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/player/Player;sleepCounter:I"))
     private void banner$wakeup(boolean flag, boolean flag1, CallbackInfo ci) {
         BlockPos blockPos = this.getSleepingPos().orElse(null);
