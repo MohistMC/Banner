@@ -63,4 +63,8 @@ public interface InjectionServerGamePacketListenerImpl {
     default void pushTeleportCause(PlayerTeleportEvent.TeleportCause cause) {
 
     }
+
+    default void detectRateSpam(String s) {
+
+    }
 }

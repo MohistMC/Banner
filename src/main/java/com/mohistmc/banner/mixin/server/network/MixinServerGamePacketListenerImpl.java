@@ -1311,7 +1311,26 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         }
         this.server.getPlayerList().banner$chat(false);
         this.server.getPlayerList().broadcastChatMessage(playerchatmessage, this.player, ChatType.bind(ChatType.CHAT, this.player));
-        this.detectRateSpam();
+        this.detectRateSpam(s);
+    }
+
+    @Override
+    public void detectRateSpam(String s) {
+        boolean counted = true;
+        for ( String exclude : org.spigotmc.SpigotConfig.spamExclusions )
+        {
+            if ( exclude != null && s.startsWith( exclude ) )
+            {
+                counted = false;
+                break;
+            }
+        }
+        // Spigot end
+        this.chatSpamTickCount += 20;
+        if (counted && this.chatSpamTickCount > 200 && !this.server.getPlayerList().isOp(this.player.getGameProfile())) {
+            this.disconnect(Component.translatable("disconnect.spam"));
+        }
+
     }
 
     @Override
