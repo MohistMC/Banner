@@ -457,7 +457,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
             return false;
         } else if (this.level().isClientSide) {
             return false;
-        } else if (this.isRemoved() || this.dead || this.getHealth() <= 0.0F) { // CraftBukkit - Don't allow entities that got set to dead/killed elsewhere to get damaged and die
+        } else if (this.isRemoved() || this.dead || this.getHealth() <= 0.0D) { // CraftBukkit - Don't allow entities that got set to dead/killed elsewhere to get damaged and die
             return false;
         } else if (this.isDeadOrDying()) {
             return false;
