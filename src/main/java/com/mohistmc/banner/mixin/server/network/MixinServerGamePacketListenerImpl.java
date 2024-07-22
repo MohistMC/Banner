@@ -4,9 +4,11 @@ import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.injection.server.network.InjectionServerGamePacketListenerImpl;
 import com.mojang.brigadier.ParseResults;
+import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +18,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 import net.minecraft.ChatFormatting;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.commands.CommandSigningContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -34,12 +38,15 @@ import net.minecraft.network.chat.SignableCommand;
 import net.minecraft.network.chat.SignedMessageChain;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketUtils;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.network.protocol.game.ClientboundDisconnectPacket;
 import net.minecraft.network.protocol.game.ClientboundMoveVehiclePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
 import net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket;
 import net.minecraft.network.protocol.game.ClientboundSetDefaultSpawnPositionPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.network.protocol.game.ServerboundAcceptTeleportationPacket;
@@ -79,12 +86,19 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.StringUtil;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.RelativeMovement;
+import net.minecraft.world.entity.animal.Bucketable;
+import net.minecraft.world.entity.animal.allay.Allay;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.ChatVisiblity;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MerchantMenu;
 import net.minecraft.world.inventory.RecipeBookMenu;
@@ -131,6 +145,8 @@ import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -142,6 +158,7 @@ import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.inventory.CraftingInventory;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.SmithingInventory;
 import org.jetbrains.annotations.Nullable;
@@ -1323,19 +1340,126 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         }
     }
 
-    @Inject(method = "handleInteract",
-            at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerPlayer;serverLevel()Lnet/minecraft/server/level/ServerLevel;",
-            ordinal = 1), cancellable = true)
-    private void banner$checkInteract(ServerboundInteractPacket packet, CallbackInfo ci) {
-        if (this.player.isImmobile()) ci.cancel(); // CraftBukkit
+    /**
+     * @author wdog5
+     * @reason
+     */
+    @Overwrite
+    public void handleInteract(ServerboundInteractPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, (ServerGamePacketListenerImpl) (Object) this, this.player.serverLevel());
+        if (this.player.isImmobile()) return; // CraftBukkit
+        final ServerLevel serverLevel = this.player.serverLevel();
+        final Entity entity = packet.getTarget(serverLevel);
+        if (entity == player && !player.isSpectator()) {
+            disconnect("Cannot interact with self!");
+            return;
+        }
+        this.player.resetLastActionTime();
+        this.player.setShiftKeyDown(packet.isUsingSecondaryAction());
+        if (entity != null) {
+            if (!serverLevel.getWorldBorder().isWithinBounds(entity.blockPosition())) {
+                return;
+            }
+            class Handler implements ServerboundInteractPacket.Handler {
+
+                private void performInteraction(InteractionHand hand, ServerGamePacketListenerImpl.EntityInteraction interaction, PlayerInteractEntityEvent event) { // CraftBukkit
+                    var stack = player.getItemInHand(hand);
+
+                    if (stack.isItemEnabled(serverLevel.enabledFeatures())) {
+                        ItemStack itemstack = stack.copy();
+                        // CraftBukkit start
+                        ItemStack itemInHand = player.getItemInHand(hand);
+                        boolean triggerLeashUpdate = itemInHand != null && itemInHand.getItem() == Items.LEAD && entity instanceof Mob;
+                        Item origItem = player.getInventory().getSelected() == null ? null : player.getInventory().getSelected().getItem();
+                        System.out.println("performInteraction");
+                        cserver.getPluginManager().callEvent(event);
+
+                        // Fish bucket - SPIGOT-4048
+                        if ((entity instanceof Bucketable && entity instanceof LivingEntity && origItem != null && origItem.asItem() == Items.WATER_BUCKET) && (event.isCancelled() || player.getInventory().getSelected() == null || player.getInventory().getSelected().getItem() != origItem)) {
+                            send(new ClientboundAddEntityPacket((LivingEntity) entity));
+                            player.containerMenu.sendAllDataToRemote();
+                        }
+
+                        if (triggerLeashUpdate && (event.isCancelled() || player.getInventory().getSelected() == null || player.getInventory().getSelected().getItem() != origItem)) {
+                            // Refresh the current leash state
+                            send(new ClientboundSetEntityLinkPacket(entity, ((Mob) entity).getLeashHolder()));
+                        }
+
+                        if (event.isCancelled() || player.getInventory().getSelected() == null || player.getInventory().getSelected().getItem() != origItem) {
+                            // Refresh the current entity metadata
+                            entity.getEntityData().refresh(player);
+                            if (entity instanceof Allay) {
+                                send(new ClientboundSetEquipmentPacket(entity.getId(), Arrays.stream(net.minecraft.world.entity.EquipmentSlot.values()).map((slot) -> Pair.of(slot, ((LivingEntity) entity).getItemBySlot(slot).copy())).collect(Collectors.toList())));
+                                player.containerMenu.sendAllDataToRemote();
+                            }
+                        }
+
+                        if (event.isCancelled()) {
+                            return;
+                        }
+                        // CraftBukkit end
+
+                        InteractionResult enuminteractionresult = interaction.run(player, entity, hand);
+
+                        // CraftBukkit start
+                        if (!itemInHand.isEmpty() && itemInHand.getCount() <= -1) {
+                            player.containerMenu.sendAllDataToRemote();
+                        }
+                        // CraftBukkit end
+
+                        if (enuminteractionresult.consumesAction()) {
+                            CriteriaTriggers.PLAYER_INTERACTED_WITH_ENTITY.trigger(player, itemstack, entity);
+                            if (enuminteractionresult.shouldSwing()) {
+                                player.swing(hand, true);
+                            }
+                        }
+                    }
+
+                }
+
+                @Override
+                public void onInteraction(InteractionHand hand) {
+                    this.performInteraction(hand, net.minecraft.world.entity.player.Player::interactOn,
+                            new PlayerInteractEntityEvent(getCraftPlayer(), entity.getBukkitEntity(),
+                                    (hand == InteractionHand.OFF_HAND) ? EquipmentSlot.OFF_HAND : EquipmentSlot.HAND));
+                }
+
+                @Override
+                public void onInteraction(InteractionHand hand, Vec3 vec) {
+                    this.performInteraction(hand, (player, e, h) -> {
+                                return e.interactAt(player, vec, h);
+                            },
+                            new PlayerInteractAtEntityEvent(getCraftPlayer(), entity.getBukkitEntity(),
+                                    new org.bukkit.util.Vector(vec.x, vec.y, vec.z), (hand == InteractionHand.OFF_HAND) ? EquipmentSlot.OFF_HAND : EquipmentSlot.HAND));
+                }
+
+                @Override
+                public void onAttack() {
+                    if (!(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrb) && !(entity instanceof AbstractArrow) && (entity != player || player.isSpectator())) {
+                        ItemStack itemStack = player.getMainHandItem();
+                        if (itemStack.isItemEnabled(serverLevel.enabledFeatures())) {
+                            player.attack(entity);
+                            // CraftBukkit start
+                            if (!itemStack.isEmpty() && itemStack.getCount() <= -1) {
+                                player.containerMenu.sendAllDataToRemote();
+                            }
+                            // CraftBukkit end
+                        }
+                    } else {
+                        disconnect(Component.translatable("multiplayer.disconnect.invalid_entity_attacked"));
+                        LOGGER.warn("Player {} tried to attack an invalid entity", player.getName().getString());
+                    }
+                }
+            }
+            packet.dispatch(new Handler());
+        }
     }
 
     @Inject(method = "handleContainerClose", cancellable = true,
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;doCloseContainer()V"))
     private void banner$invClose(ServerboundContainerClosePacket packetIn, CallbackInfo ci) {
         if (this.player.isImmobile()) ci.cancel(); // CraftBukkit
-      CraftEventFactory.handleInventoryCloseEvent(this.player);
+        CraftEventFactory.handleInventoryCloseEvent(this.player);
     }
 
     /**
