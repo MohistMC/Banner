@@ -310,11 +310,13 @@ public class BukkitRegistry {
             if (isMods(resourceLocation)) {
                 int typeId = entityType.hashCode();
                 EntityType bukkitType = MohistDynamEnum.addEnum(EntityType.class, entityType, List.of(String.class, Class.class, Integer.TYPE, Boolean.TYPE), List.of(entityType.toLowerCase(), Entity.class, typeId, false));
-                bukkitType.key = key;
-                EntityType.NAME_MAP.put(entityType.toLowerCase(), bukkitType);
-                EntityType.ID_MAP.put((short) typeId, bukkitType);
-                ServerAPI.entityTypeMap.put(entity, entityType);
-                BannerServer.LOGGER.debug("Registered {} as entity {}", entityType, bukkitType);
+                if (bukkitType != null) {
+                    bukkitType.key = key;
+                    EntityType.NAME_MAP.put(entityType.toLowerCase(), bukkitType);
+                    EntityType.ID_MAP.put((short) typeId, bukkitType);
+                    ServerAPI.entityTypeMap.put(entity, entityType);
+                    BannerServer.LOGGER.debug("Registered {} as entity {}", entityType, bukkitType);
+                }
             } else {
                 ServerAPI.entityTypeMap.put(entity, normalizeName(resourceLocation.getPath()));
             }
