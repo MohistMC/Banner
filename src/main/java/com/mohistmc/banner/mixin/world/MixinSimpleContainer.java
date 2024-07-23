@@ -42,14 +42,6 @@ public abstract class MixinSimpleContainer implements Container, StackedContents
         this.bukkitOwner = owner;
     }
 
-    @Unique
-    public void banner$constructor(SimpleContainer original) {
-        this.banner$constructor(this.size);
-        for (int slot = 0; slot < this.size; slot++) {
-            this.items.set(slot, original.items.get(slot).copy());
-        }
-    }
-
     @Override
     public List<ItemStack> getContents() {
         return this.items;
