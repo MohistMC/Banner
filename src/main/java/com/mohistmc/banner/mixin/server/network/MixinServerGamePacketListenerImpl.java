@@ -181,6 +181,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(ServerGamePacketListenerImpl.class)
 public abstract class MixinServerGamePacketListenerImpl implements InjectionServerGamePacketListenerImpl {
 
+    @Shadow @Final public static double MAX_INTERACTION_DISTANCE;
     @Shadow public ServerPlayer player;
     @Mutable
     @Shadow @Final private FutureChain chatMessageChain;
@@ -1379,6 +1380,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
             if (!serverLevel.getWorldBorder().isWithinBounds(entity.blockPosition())) {
                 return;
             }
+            AABB aABB = entity.getBoundingBox();
             class Handler implements ServerboundInteractPacket.Handler {
 
                 private void performInteraction(InteractionHand hand, ServerGamePacketListenerImpl.EntityInteraction interaction, PlayerInteractEntityEvent event) { // CraftBukkit
@@ -1470,7 +1472,9 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                     }
                 }
             }
-            packet.dispatch(new Handler());
+            if (aABB.distanceToSqr(this.player.getEyePosition()) < MAX_INTERACTION_DISTANCE) {
+                packet.dispatch(new Handler());
+            }
         }
     }
 
