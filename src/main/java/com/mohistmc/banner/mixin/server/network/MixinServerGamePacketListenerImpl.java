@@ -1392,7 +1392,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                         ItemStack itemInHand = player.getItemInHand(hand);
                         boolean triggerLeashUpdate = itemInHand != null && itemInHand.getItem() == Items.LEAD && entity instanceof Mob;
                         Item origItem = player.getInventory().getSelected() == null ? null : player.getInventory().getSelected().getItem();
-                        System.out.println("performInteraction");
                         cserver.getPluginManager().callEvent(event);
 
                         // Fish bucket - SPIGOT-4048
