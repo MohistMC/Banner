@@ -364,6 +364,7 @@
     "world.item.enchantment.MixinFrostWalkerEnchantment",
     "world.item.trading.MixinMerchant",
     "world.item.trading.MixinMerchantOffer",
+    "world.level.MixinClipContext",
     "world.level.MixinEntityGetter",
     "world.level.MixinExplosion",
     "world.level.MixinLevel",
