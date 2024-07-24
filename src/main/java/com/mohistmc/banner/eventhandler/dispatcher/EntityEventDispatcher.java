@@ -1,9 +1,12 @@
 package com.mohistmc.banner.eventhandler.dispatcher;
 
+import java.util.ArrayList;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.minecraft.core.PositionImpl;
 import net.minecraft.world.level.dimension.LevelStem;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
@@ -33,6 +36,10 @@ public class EntityEventDispatcher {
             PlayerChangedWorldEvent changeEvent = new PlayerChangedWorldEvent(player.getBukkitEntity(), origin.getWorld());
             player.level().getCraftServer().getPluginManager().callEvent(changeEvent);
             // CraftBukkit end
+        });
+
+        ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
+            CraftEventFactory.callEntityDeathEvent(entity, new ArrayList<>()); // TODO add drops
         });
     }
 }
