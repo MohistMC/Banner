@@ -80,6 +80,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.FilteredText;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.network.ServerGamePacketListenerImpl.EntityInteraction;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.FutureChain;
 import net.minecraft.util.Mth;
@@ -1383,7 +1384,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
             AABB aABB = entity.getBoundingBox();
             class Handler implements ServerboundInteractPacket.Handler {
 
-                private void performInteraction(InteractionHand hand, ServerGamePacketListenerImpl.EntityInteraction interaction, PlayerInteractEntityEvent event) { // CraftBukkit
+                private void performInteraction(InteractionHand hand, EntityInteraction interaction, PlayerInteractEntityEvent event) { // CraftBukkit
                     var stack = player.getItemInHand(hand);
 
                     if (stack.isItemEnabled(serverLevel.enabledFeatures())) {
@@ -1392,7 +1393,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                         ItemStack itemInHand = player.getItemInHand(hand);
                         boolean triggerLeashUpdate = itemInHand != null && itemInHand.getItem() == Items.LEAD && entity instanceof Mob;
                         Item origItem = player.getInventory().getSelected() == null ? null : player.getInventory().getSelected().getItem();
-                        cserver.getPluginManager().callEvent(event);
+                        Bukkit.getPluginManager().callEvent(event);
 
                         // Fish bucket - SPIGOT-4048
                         if ((entity instanceof Bucketable && entity instanceof LivingEntity && origItem != null && origItem.asItem() == Items.WATER_BUCKET) && (event.isCancelled() || player.getInventory().getSelected() == null || player.getInventory().getSelected().getItem() != origItem)) {
@@ -1446,11 +1447,9 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
 
                 @Override
                 public void onInteraction(InteractionHand hand, Vec3 vec) {
-                    this.performInteraction(hand, (player, e, h) -> {
-                                return e.interactAt(player, vec, h);
-                            },
-                            new PlayerInteractAtEntityEvent(getCraftPlayer(), entity.getBukkitEntity(),
-                                    new org.bukkit.util.Vector(vec.x, vec.y, vec.z), (hand == InteractionHand.OFF_HAND) ? EquipmentSlot.OFF_HAND : EquipmentSlot.HAND));
+                    this.performInteraction(hand, (serverPlayer, entityx, interactionHand) -> {
+                        return entityx.interactAt(serverPlayer, vec, interactionHand);
+                    }, new PlayerInteractAtEntityEvent(getCraftPlayer(), entity.getBukkitEntity(), new org.bukkit.util.Vector(vec.x, vec.y, vec.z), (hand == InteractionHand.OFF_HAND) ? EquipmentSlot.OFF_HAND : EquipmentSlot.HAND));
                 }
 
                 @Override
