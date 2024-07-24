@@ -19,6 +19,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -633,10 +634,10 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
 
             for(int var6 = 0; var6 < var5; ++var6) {
                 InteractionHand interactionHand = var4[var6];
-                ItemStack itemStack2 = this.getItemInHand(interactionHand);
-                if (itemStack2.is(Items.TOTEM_OF_UNDYING)) {
+                itemstack1 = this.getItemInHand(interactionHand);
+                if (itemstack1.is(Items.TOTEM_OF_UNDYING)) {
+                    itemstack = itemstack1.copy();
                     bukkitHand = CraftEquipmentSlot.getHand(interactionHand);
-                    itemstack = itemStack2.copy();
                     break;
                 }
             }
