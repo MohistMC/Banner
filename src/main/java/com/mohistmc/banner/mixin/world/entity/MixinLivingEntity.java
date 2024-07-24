@@ -169,6 +169,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
     @Shadow @Final public abstract boolean addEffect(MobEffectInstance effectInstance);
     @Shadow public abstract void onEquipItem(EquipmentSlot equipmentSlot, ItemStack itemStack, ItemStack itemStack2);
     @Shadow public int invulnerableDuration;
+    @Shadow protected abstract void updateGlowingStatus();
 
     public MixinLivingEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -329,6 +330,7 @@ public abstract class MixinLivingEntity extends Entity implements InjectionLivin
         if (this.effectsDirty) {
             if (!this.level().isClientSide) {
                 this.updateInvisibilityStatus();
+                this.updateGlowingStatus();
             }
 
             this.effectsDirty = false;
