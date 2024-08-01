@@ -215,7 +215,8 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         Location loc = ev.getSpawnLocation();
         ServerLevel world = ((CraftWorld) loc.getWorld()).getHandle();
 
-        player.setServerLevel(world);
+        player.spawnIn(world);
+        player.gameMode.setLevel((ServerLevel) player.level());
         player.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         return world;
     }
