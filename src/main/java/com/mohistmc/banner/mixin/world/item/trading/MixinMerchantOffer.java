@@ -34,6 +34,11 @@ public abstract class MixinMerchantOffer implements InjectionMerchantOffer {
     }
 
     @Override
+    public void bukkit(CraftMerchantRecipe bukkit) {
+        this.bukkitHandle = bukkit;
+    }
+
+    @Override
     public CraftMerchantRecipe asBukkit() {
         return (bukkitHandle == null) ? bukkitHandle = new CraftMerchantRecipe(((MerchantOffer) (Object) this)) : bukkitHandle;
     }

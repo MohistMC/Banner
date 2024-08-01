@@ -8,4 +8,7 @@ public interface InjectionMerchantOffer {
         return null;
     }
 
+    default void bukkit(CraftMerchantRecipe bukkit) {
+
+    }
 }
