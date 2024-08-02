@@ -5,7 +5,6 @@ import com.mohistmc.banner.Metrics;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.util.I18n;
 import com.mojang.datafixers.DataFixer;
-import java.io.IOException;
 import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.List;

@@ -3,7 +3,6 @@ package com.mohistmc.banner.mixin.world.entity;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.injection.world.entity.InjectionMob;
 import com.mohistmc.banner.paper.PaperExtraConstants;
-import io.izzel.arclight.mixin.Eject;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket;
 import net.minecraft.server.level.ServerPlayer;

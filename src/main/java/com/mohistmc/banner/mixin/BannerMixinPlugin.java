@@ -156,7 +156,7 @@ public class BannerMixinPlugin implements IMixinConfigPlugin {
             return !FabricLoader.getInstance().isModLoaded("openpartiesandclaims");
         }
         if (mixinClassName.equals("com.mohistmc.banner.mixin.world.level.MixinClipContext")) {
-            return !FabricLoader.getInstance().isModLoaded("crafttweaker") || !FabricLoader.getInstance().isModLoaded("create");
+            return !FabricLoader.getInstance().isModLoaded("crafttweaker");
         }
         return true;
     }

@@ -1,8 +1,6 @@
 package com.mohistmc.banner.mixin.world.level;
 
 import com.google.common.collect.Sets;
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
-import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.injection.world.level.InjectionExplosion;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
