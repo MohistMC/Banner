@@ -102,11 +102,10 @@ public abstract class MixinExplosion implements InjectionExplosion {
         }
         this.level.gameEvent(this.source, GameEvent.EXPLODE, new Vec3(this.x, this.y, this.z));
         Set<BlockPos> set = Sets.newHashSet();
-        int i = 16;
 
-        for(int j = 0; j < i; ++j) {
-            for(int k = 0; k < i; ++k) {
-                for(int l = 0; l < i; ++l) {
+        for(int j = 0; j < 16; ++j) {
+            for(int k = 0; k < 16; ++k) {
+                for(int l = 0; l < 16; ++l) {
                     if (j == 0 || j == 15 || k == 0 || k == 15 || l == 0 || l == 15) {
                         double d0 = (double)((float)j / 15.0F * 2.0F - 1.0F);
                         double d1 = (double)((float)k / 15.0F * 2.0F - 1.0F);
