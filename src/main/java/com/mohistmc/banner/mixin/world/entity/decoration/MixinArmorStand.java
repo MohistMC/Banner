@@ -124,11 +124,6 @@ public abstract class MixinArmorStand extends LivingEntity implements InjectionA
     private void banner$dropLater(net.minecraft.world.entity.decoration.ArmorStand entity, DamageSource damageSourceIn) {
     }
 
-    @Redirect(method = "brokenByAnything", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;popResource(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/ItemStack;)V"))
-    private void banner$captureDropsDeath(Level worldIn, BlockPos pos, ItemStack stack) {
-        banner$addDrops(worldIn, stack);
-    }
-
     @Inject(method = "brokenByAnything", at = @At("RETURN"))
     private void banner$spawnLast(DamageSource source, CallbackInfo ci) {
         this.dropAllDeathLoot(source);
@@ -137,13 +132,6 @@ public abstract class MixinArmorStand extends LivingEntity implements InjectionA
     @Inject(method = "kill", at = @At("HEAD"))
     private void banner$deathEvent(CallbackInfo ci) {
         banner$callEntityDeath();
-    }
-
-    @Unique
-    private void banner$addDrops(Level worldIn, ItemStack stack) {
-        if (!worldIn.isClientSide && !stack.isEmpty() && worldIn.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) { // Banner - prevents item dupe
-            this.bridge$drops().add(CraftItemStack.asBukkitCopy(stack));
-        }
     }
 
     @Unique
