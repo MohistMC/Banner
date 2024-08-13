@@ -36,6 +36,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundChangeDifficultyPacket;
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
 import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
+import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
@@ -48,6 +49,7 @@ import net.minecraft.network.protocol.game.ClientboundSetChunkCacheRadiusPacket;
 import net.minecraft.network.protocol.game.ClientboundSetDefaultSpawnPositionPacket;
 import net.minecraft.network.protocol.game.ClientboundSetExperiencePacket;
 import net.minecraft.network.protocol.game.ClientboundSetSimulationDistancePacket;
+import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
 import net.minecraft.resources.ResourceKey;
@@ -146,8 +148,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     public int maxPlayers;
 
     @Shadow public abstract boolean canBypassPlayerLimit(GameProfile profile);
-
-    @Shadow public abstract void sendLevelInfo(ServerPlayer player, ServerLevel level);
 
     @Shadow public abstract void sendPlayerPermissionLevel(ServerPlayer player);
 
@@ -275,7 +275,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent(bukkitPlayer, banner$joinMsg.get());
         cserver.getPluginManager().callEvent(playerJoinEvent);
 
-        if (!player.connection.isAcceptingMessages()) {
+        if (!player.connection.connection.isConnected()) {
             ci.cancel();
         }
         banner$joinMsg.set(playerJoinEvent.getJoinMessage());
@@ -775,7 +775,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     public ServerStatsCounter getPlayerStats(UUID uuid, String displayName) {
         ServerStatsCounter serverstatisticmanager;
         ServerPlayer entityhuman = this.getPlayer(uuid);
-        ServerStatsCounter serverStatisticsManager = serverstatisticmanager = entityhuman == null ? null : entityhuman.getStats();
+        serverstatisticmanager = entityhuman == null ? null : entityhuman.getStats();
         if (serverstatisticmanager == null) {
             File file2;
             File file = this.server.getWorldPath(LevelResource.PLAYER_STATS_DIR).toFile();
@@ -795,7 +795,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     @Overwrite
     public PlayerAdvancements getPlayerAdvancements(ServerPlayer player) {
         UUID uUID = player.getUUID();
-        PlayerAdvancements playerAdvancements = (PlayerAdvancements)player.getAdvancements();// CraftBukkit
+        PlayerAdvancements playerAdvancements = player.getAdvancements();// CraftBukkit
         if (playerAdvancements == null) {
             Path path = this.server.getWorldPath(LevelResource.PLAYER_ADVANCEMENTS_DIR).resolve("" + uUID + ".json");
             playerAdvancements = new PlayerAdvancements(this.server.getFixerUpper(), ((PlayerList) (Object) this), this.server.getAdvancements(), path, player);
@@ -847,46 +847,23 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         });
     }
 
-    @Redirect(method = "sendLevelInfo",
-            at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
-                    ordinal = 3))
-    private void banner$cancelSendPacket0(ServerGamePacketListenerImpl instance, Packet<?> packet) { }
+    /**
+     * @author wdog5
+     * @reason functionally replaced
+     */
+    @Overwrite
+    public void sendLevelInfo(ServerPlayer p_11230_, ServerLevel p_11231_) {
+        WorldBorder worldborder = p_11230_.level().getWorldBorder();
+        p_11230_.connection.send(new ClientboundInitializeBorderPacket(worldborder));
+        p_11230_.connection.send(new ClientboundSetTimePacket(p_11231_.getGameTime(), p_11231_.getDayTime(), p_11231_.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT)));
+        p_11230_.connection.send(new ClientboundSetDefaultSpawnPositionPacket(p_11231_.getSharedSpawnPos(), p_11231_.getSharedSpawnAngle()));
+        if (p_11231_.isRaining()) {
+            // CraftBukkit start - handle player weather
+            p_11230_.setPlayerWeather(org.bukkit.WeatherType.DOWNFALL, false);
+            p_11230_.updateWeather(-p_11231_.rainLevel, p_11231_.rainLevel, -p_11231_.thunderLevel, p_11231_.thunderLevel);
+            // CraftBukkit end
+        }
 
-    @Redirect(method = "sendLevelInfo",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
-                    ordinal = 4))
-    private void banner$cancelSendPacket1(ServerGamePacketListenerImpl instance, Packet<?> packet) { }
-
-    @Redirect(method = "sendLevelInfo",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
-                    ordinal = 5))
-    private void banner$cancelSendPacket2(ServerGamePacketListenerImpl instance, Packet<?> packet) { }
-
-    @Inject(method = "sendLevelInfo",
-            at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
-            ordinal = 3))
-    private void banner$setWeatherType(ServerPlayer player, ServerLevel level, CallbackInfo ci) {
-        // CraftBukkit start - handle player weather
-        player.setPlayerWeather(org.bukkit.WeatherType.DOWNFALL, false);
-        player.updateWeather(-level.rainLevel, level.rainLevel, -level.thunderLevel, level.thunderLevel);
-    }
-
-    @Unique
-    private AtomicReference<ServerPlayer> banner$worldBorderPlayer = new AtomicReference<>();
-
-    @Inject(method = "sendLevelInfo", at = @At("HEAD"))
-    private void banner$getWorldBorderPlayer(ServerPlayer player, ServerLevel level, CallbackInfo ci) {
-        banner$worldBorderPlayer.set(player);
-    }
-
-    @Redirect(method = "sendLevelInfo", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerLevel;getWorldBorder()Lnet/minecraft/world/level/border/WorldBorder;"))
-    private WorldBorder banner$useBukkitWorldBorder(ServerLevel instance) {
-        return banner$worldBorderPlayer.get().level().getWorldBorder();
     }
 
     @Inject(method = "broadcastChatMessage(Lnet/minecraft/network/chat/PlayerChatMessage;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/network/chat/ChatType$Bound;)V", at = @At("HEAD"), cancellable = true)
