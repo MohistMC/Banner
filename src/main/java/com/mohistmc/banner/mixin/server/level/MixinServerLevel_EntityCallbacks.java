@@ -17,11 +17,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(targets = "net/minecraft/server/level/ServerLevel$EntityCallbacks")
 public class MixinServerLevel_EntityCallbacks {
 
-    @Shadow(aliases = {"field_26936"}) private ServerLevel outerThis;
+    @Shadow(aliases = {"f_143351_", "this$0"})
+    private ServerLevel outerThis;
 
     @Inject(method = "onTrackingStart(Lnet/minecraft/world/entity/Entity;)V", at = @At("RETURN"))
     private void banner$valid(Entity entity, CallbackInfo ci) {
-         entity.banner$setValid(true);
+        entity.banner$setValid(true);
         // Paper start - Set origin location when the entity is being added to the world
         if (entity.getOriginVector() == null) {
             entity.setOrigin(entity.getBukkitEntity().getLocation());
@@ -36,7 +37,7 @@ public class MixinServerLevel_EntityCallbacks {
     @Inject(method = "onTrackingStart(Lnet/minecraft/world/entity/Entity;)V", at = @At("TAIL"))
     private void banner$entityAdd(Entity entity, CallbackInfo ci) {
         new com.destroystokyo.paper.event.entity.EntityAddToWorldEvent(entity.getBukkitEntity()).callEvent(); // Paper - fire while valid
-   }
+    }
 
     @Inject(method = "onTrackingEnd(Lnet/minecraft/world/entity/Entity;)V", at = @At("TAIL"))
     private void banner$entityCleanup(Entity entity, CallbackInfo ci) {
@@ -46,7 +47,7 @@ public class MixinServerLevel_EntityCallbacks {
                 for (Object o : worldData.cache.values()) {
                     if (o instanceof MapItemSavedData map) {
                         map.carriedByPlayers.remove(player);
-                         map.carriedBy.removeIf(holdingPlayer -> holdingPlayer.player == entity);
+                        map.carriedBy.removeIf(holdingPlayer -> holdingPlayer.player == entity);
                     }
                 }
             }
@@ -64,7 +65,7 @@ public class MixinServerLevel_EntityCallbacks {
         entity.banner$setValid(false);
         if (!(entity instanceof ServerPlayer)) {
             for (var player : outerThis.players()) {
-                ((ServerPlayer) player).getBukkitEntity().onEntityRemove(entity);
+                player.getBukkitEntity().onEntityRemove(entity);
             }
         }
     }

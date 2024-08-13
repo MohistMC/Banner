@@ -173,8 +173,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/server/players/PlayerList;bans:Lnet/minecraft/server/players/UserBanList;"))
     public void banner$init(MinecraftServer minecraftServer, LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess, PlayerDataStorage playerDataStorage, int i, CallbackInfo ci) {
         this.players = new CopyOnWriteArrayList<>();
-        minecraftServer.banner$setServer(this.cserver =
-                new CraftServer((DedicatedServer) minecraftServer, ((PlayerList) (Object) this)));
+        minecraftServer.banner$setServer(this.cserver = new CraftServer((DedicatedServer) minecraftServer, ((PlayerList) (Object) this)));
         BannerServer.LOGGER.info(I18n.as("registry.begin"));
         BukkitRegistry.registerAll((DedicatedServer) minecraftServer);
         minecraftServer.banner$setConsole(ColouredConsoleSender.getInstance());
@@ -307,19 +306,11 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         player.getEntityData().refresh(player); // CraftBukkit - BungeeCord#2321, send complete data to self on spawn
     }
 
-    @Unique
-    private static AtomicReference<ServerLevel> banner$level = new AtomicReference<>();
-
-    @WrapWithCondition(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
-    private boolean banner$wrapAddNewPlayer(ServerLevel instance, ServerPlayer player) {
-        banner$level.set(instance);
-        return player.level() == instance && !instance.players().contains(player);
-    }
-
-    @WrapWithCondition(method = "placeNewPlayer", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/bossevents/CustomBossEvents;onPlayerConnect(Lnet/minecraft/server/level/ServerPlayer;)V"))
-    private boolean banner$wrapAddNewPlayer0(CustomBossEvents instance, ServerPlayer player) {
-        return player.level() == banner$level.get() && !banner$level.get().players().contains(player);
+    @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
+    private void banner$addNewPlayer(ServerLevel instance, ServerPlayer player) {
+        if (player.level() == instance && !instance.players().contains(player)) {
+            instance.addNewPlayer(player);
+        }
     }
 
     @ModifyVariable(method = "placeNewPlayer", ordinal = 1, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
@@ -786,24 +777,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             serverstatisticmanager = new ServerStatsCounter(this.server, file1);
         }
         return serverstatisticmanager;
-    }
-
-    /**
-     * @author wdog5
-     * @reason functionally replaced
-     */
-    @Overwrite
-    public PlayerAdvancements getPlayerAdvancements(ServerPlayer player) {
-        UUID uUID = player.getUUID();
-        PlayerAdvancements playerAdvancements = player.getAdvancements();// CraftBukkit
-        if (playerAdvancements == null) {
-            Path path = this.server.getWorldPath(LevelResource.PLAYER_ADVANCEMENTS_DIR).resolve("" + uUID + ".json");
-            playerAdvancements = new PlayerAdvancements(this.server.getFixerUpper(), ((PlayerList) (Object) this), this.server.getAdvancements(), path, player);
-            // this.advancements.put(uUID, playerAdvancements);
-        }
-
-        playerAdvancements.setPlayer(player);
-        return playerAdvancements;
     }
 
     /**

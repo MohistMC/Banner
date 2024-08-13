@@ -266,7 +266,7 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
         Bukkit.getPluginManager().callEvent(new EntityUnleashEvent(this.getBukkitEntity(), EntityUnleashEvent.UnleashReason.UNKNOWN));
     }
 
-    @Inject(method = "convertTo", at = @At(value = "INVOKE", shift = Shift.BEFORE, target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    @Inject(method = "convertTo", at = @At(value = "INVOKE", shift = Shift.BEFORE, target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"), cancellable = true)
     private void banner$copySpawn(EntityType<?> entityType, boolean transferInventory, CallbackInfoReturnable<?> cir) {
         EntityTransformEvent.TransformReason transformReason = banner$transform == null ? EntityTransformEvent.TransformReason.UNKNOWN : banner$transform;
         banner$transform = null;
