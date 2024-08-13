@@ -153,6 +153,55 @@ public class CraftWorld extends CraftRegionAccessor implements World {
     private final Object2IntOpenHashMap<SpawnCategory> spawnCategoryLimit = new Object2IntOpenHashMap<>();
     private final CraftPersistentDataContainer persistentDataContainer = new CraftPersistentDataContainer(DATA_TYPE_REGISTRY);
 
+    // Paper start - Provide fast information methods
+    @Override
+    public int getEntityCount() {
+        int ret = 0;
+        for (net.minecraft.world.entity.Entity entity : world.getEntities().getAll()) {
+            if (entity.isChunkLoaded()) {
+                ++ret;
+            }
+        }
+        return ret;
+    }
+
+    @Override
+    public int getTileEntityCount() {
+        // We don't use the full world tile entity list, so we must iterate chunks
+        int size = 0;
+        for (ChunkHolder playerchunk : world.getChunkSource().chunkMap.getChunks()) {
+            net.minecraft.world.level.chunk.LevelChunk chunk = playerchunk.getTickingChunk();
+            if (chunk == null) {
+                continue;
+            }
+            size += chunk.blockEntities.size();
+        }
+        return size;
+    }
+
+    @Override
+    public int getTickableTileEntityCount() {
+        return world.blockEntityTickers.size();
+    }
+
+    @Override
+    public int getChunkCount() {
+        int ret = 0;
+
+        for (ChunkHolder chunkHolder : world.getChunkSource().chunkMap.getChunks()) {
+            if (chunkHolder.getTickingChunk() != null) {
+                ++ret;
+            }
+        }
+
+        return ret;
+    }
+
+    @Override
+    public int getPlayerCount() {
+        return world.players().size();
+    }
+
     private static final Random rand = new Random();
 
     public CraftWorld(ServerLevel world, ChunkGenerator gen, BiomeProvider biomeProvider,  Environment env) {

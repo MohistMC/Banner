@@ -646,3 +646,5 @@ mutable field net/minecraft/server/players/PlayerList maxPlayers I
 accessible field net/minecraft/server/players/PlayerList maxPlayers I
 mutable field net/minecraft/world/level/chunk/LevelChunkSection states Lnet/minecraft/world/level/chunk/PalettedContainer;
 accessible field net/minecraft/world/level/chunk/LevelChunkSection states Lnet/minecraft/world/level/chunk/PalettedContainer;
+accessible field net/minecraft/world/level/Level blockEntityTickers Ljava/util/List;
+accessible method net/minecraft/server/level/ChunkMap getChunks ()Ljava/lang/Iterable;
