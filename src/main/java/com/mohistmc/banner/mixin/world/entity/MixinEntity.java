@@ -795,7 +795,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Inject(method = "restoreFrom", at = @At("HEAD"))
     private void banner$forwardHandle(Entity entityIn, CallbackInfo ci) {
          entityIn.getBukkitEntity().setHandle((Entity) (Object) this);
-         this.bukkitEntity =  entityIn.getBukkitEntity();
+         this.bukkitEntity = entityIn.getBukkitEntity();
         if (entityIn instanceof Mob) {
             ((Mob) entityIn).dropLeash(true, false);
         }
