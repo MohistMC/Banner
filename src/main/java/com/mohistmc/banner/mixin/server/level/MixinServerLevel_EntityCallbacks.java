@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(targets = "net/minecraft/server/level/ServerLevel$EntityCallbacks")
 public class MixinServerLevel_EntityCallbacks {
 
-    @Shadow(aliases = {"f_143351_", "this$0"})
+    @Shadow(aliases = {"field_26936"})
     private ServerLevel outerThis;
 
     @Inject(method = "onTrackingStart(Lnet/minecraft/world/entity/Entity;)V", at = @At("RETURN"))
