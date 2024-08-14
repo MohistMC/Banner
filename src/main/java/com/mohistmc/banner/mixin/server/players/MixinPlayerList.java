@@ -306,11 +306,19 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         player.getEntityData().refresh(player); // CraftBukkit - BungeeCord#2321, send complete data to self on spawn
     }
 
-    @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
-    private void banner$addNewPlayer(ServerLevel instance, ServerPlayer player) {
-        if (player.level() == instance && !instance.players().contains(player)) {
-            instance.addNewPlayer(player);
-        }
+    @Unique
+    private static AtomicReference<ServerLevel> banner$level = new AtomicReference<>();
+
+    @WrapWithCondition(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
+    private boolean banner$wrapAddNewPlayer(ServerLevel instance, ServerPlayer player) {
+        banner$level.set(instance);
+        return player.level() == instance && !instance.players().contains(player);
+    }
+
+    @WrapWithCondition(method = "placeNewPlayer", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/bossevents/CustomBossEvents;onPlayerConnect(Lnet/minecraft/server/level/ServerPlayer;)V"))
+    private boolean banner$wrapAddNewPlayer0(CustomBossEvents instance, ServerPlayer player) {
+        return player.level() == banner$level.get() && !banner$level.get().players().contains(player);
     }
 
     @ModifyVariable(method = "placeNewPlayer", ordinal = 1, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
