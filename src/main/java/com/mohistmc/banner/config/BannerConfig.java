@@ -145,7 +145,7 @@ public class BannerConfig {
     private static void banner() {
         check_update = getBoolean("banner.check_update", false);
         check_libraries = getBoolean("banner.check_libraries", true);
-        libraries_downloadsource = getString("banner.libraries_downloadsource", DownloadSource.defaultSource.name());
+        libraries_downloadsource = getString("banner.libraries_downloadsource", DownloadSource.MOHIST.name());
         lang = getString("banner.lang", "xx_XX");
         showLogo = getBoolean("banner.show_logo", true);
         stackdeobf = getBoolean("banner.stackdeobf", true);

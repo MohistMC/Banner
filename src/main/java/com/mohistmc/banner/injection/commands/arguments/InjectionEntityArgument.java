@@ -6,7 +6,7 @@ import net.minecraft.commands.arguments.selector.EntitySelector;
 
 public interface InjectionEntityArgument {
 
-    default EntitySelector parse(StringReader stringreader, boolean overridePermissions) throws CommandSyntaxException {
+    default EntitySelector parse(StringReader stringReader, boolean bl, boolean overridePermissions) throws CommandSyntaxException {
         throw new IllegalStateException("Not implemented");
     }
 }

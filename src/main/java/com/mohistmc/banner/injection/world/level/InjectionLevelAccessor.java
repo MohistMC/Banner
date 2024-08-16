@@ -8,6 +8,5 @@ public interface InjectionLevelAccessor {
     }
 
     default void pushAddEntityReason(CreatureSpawnEvent.SpawnReason reason) {
-        throw new IllegalStateException("Not implemented");
     }
 }

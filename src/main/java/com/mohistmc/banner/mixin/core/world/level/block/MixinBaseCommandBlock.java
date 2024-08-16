@@ -19,8 +19,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(BaseCommandBlock.class)
 public abstract class MixinBaseCommandBlock {
 
-    @Shadow @Nullable private Component customName;
-
     @Redirect(method = "performCommand", at = @At(value = "INVOKE", target = "Lnet/minecraft/commands/Commands;performPrefixedCommand(Lnet/minecraft/commands/CommandSourceStack;Ljava/lang/String;)V"))
     private void banner$serverCommand(Commands commands, CommandSourceStack sender, String command) {
         Joiner joiner = Joiner.on(" ");
@@ -52,12 +50,5 @@ public abstract class MixinBaseCommandBlock {
         }
 
         commands.performPrefixedCommand(sender, joiner.join(args));
-    }
-
-    @Inject(method = "setCustomName", at = @At("RETURN"))
-    public void banner$setName(Component nameIn, CallbackInfo ci) {
-        if (this.customName == null) {
-            this.customName = Component.literal("@");
-        }
     }
 }
