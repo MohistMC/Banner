@@ -1,12 +1,12 @@
 <div align="center">
 <img src="src/main/resources/assets/banner/logo.png">
-  <h1>Mohist Banner 1.20.x</h1>
+  <h1>Mohist Banner 1.21.1</h1>
 
 ### The Bukkit/Spigot/Paper API implementation for Fabric
 ### This project has nothing to do with cardboard and uses a completely different development structure
-[![](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.codemc.io%2Fjob%2FMohistMC%2Fjob%2FBanner-1.20&label=Jenkins&logo=jenkins&logoColor=%23ffffff)](https://ci.codemc.io/job/MohistMC/job/Banner-1.20)
+[![](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.codemc.io%2Fjob%2FMohistMC%2Fjob%2FBanner-1.21.1&label=Jenkins&logo=jenkins&logoColor=%23ffffff)](https://ci.codemc.io/job/MohistMC/job/Banner-1.21.1)
 [![](https://img.shields.io/github/stars/MohistMC/Banner.svg?label=Stars&logo=github)](https://github.com/MohistMC/Banner/stargazers)
-[![](https://img.shields.io/badge/jdk-17.0.5+8-brightgreen.svg?colorB=469C00&logo=java)](https://adoptium.net/temurin/releases/?version=17)
+[![](https://img.shields.io/badge/JDK-21.0.3-brightgreen.svg?colorB=469C00&logo=java)](https://www.azul.com/downloads/?version=java-21-lts#zulu)
 [![](https://img.shields.io/badge/Gradle-8.1.1-brightgreen.svg?colorB=469C00&logo=gradle)](https://docs.gradle.org/7.5.1/release-notes.html)
 [![](https://img.shields.io/discord/311256119005937665.svg?color=%237289da&label=Discord&logo=discord&logoColor=%237289da)](https://discord.gg/mohistmc)
 
@@ -15,7 +15,7 @@
 
 | Version | Support     | Stability | Mod compatibility | Plugin compatibility |
 |---------|-------------|-----------|-------------------|----------------------| 
-| 1.20.6  | Active      | Poor      | Poor              | Poor                 |
+| 1.21.1  | Active      | Poor      | Poor              | Poor                 |
 | 1.20.1  | Active      | Good      | Good              | Good                 |
 | 1.19.4  | End Of Life | Poor      | Poor              | Poor                 |
 
@@ -24,7 +24,7 @@
 - Fabric API uses mixins to change minecraft indirectly
 - Banner also use mixins to hook Bukkit api as a fabric mod
 - There's a little breaking changes
-- This version of Banner 1.20.x,supports MC version 1.20 to 1.20.1
+- This version of Banner 1.20.1,supports MC version 1.21.1
 
 ## Tips
 - If you want to try a different Fabric + Bukkit hybrid server, you can try CardBoard

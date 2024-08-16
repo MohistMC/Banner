@@ -6,10 +6,10 @@ name: Build And Publish to Modrinth
 on : [push, pull_request]
 
 env:
-  MINECRAFT_VERSION: 1.21
-  VERSION: 1.21-snapshot
+  MINECRAFT_VERSION: 1.21.1
+  VERSION: 1.21.1-snapshot
   MODRINTH_TOKEN: ${{ secrets.PUBLISH_MODRINTH_TOKEN }}
-  RELEASE_NAME: banner-1.21
+  RELEASE_NAME: banner-1.21.1
 
 jobs:
   build:
@@ -38,16 +38,3 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build
-
-      - name: Publish to ModRinth
-        uses: Kir-Antipov/mc-publish@v3.3.0
-        with:
-          modrinth-id: 7ntInrAy
-          modrinth-token: "${{env.MODRINTH_TOKEN}}"
-          name: "${{env.RELEASE_NAME}}"
-          version: "${{env.VERSION}}"
-          version-type: release
-
-          loaders: fabric
-          game-versions: '1.21'
-          java: "21"
