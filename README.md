@@ -7,7 +7,7 @@
 [![](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.codemc.io%2Fjob%2FMohistMC%2Fjob%2FBanner-1.21.1&label=Jenkins&logo=jenkins&logoColor=%23ffffff)](https://ci.codemc.io/job/MohistMC/job/Banner-1.21.1)
 [![](https://img.shields.io/github/stars/MohistMC/Banner.svg?label=Stars&logo=github)](https://github.com/MohistMC/Banner/stargazers)
 [![](https://img.shields.io/badge/JDK-21.0.3-brightgreen.svg?colorB=469C00&logo=java)](https://www.azul.com/downloads/?version=java-21-lts#zulu)
-[![](https://img.shields.io/badge/Gradle-8.1.1-brightgreen.svg?colorB=469C00&logo=gradle)](https://docs.gradle.org/7.5.1/release-notes.html)
+[![](https://img.shields.io/badge/Gradle-8.8-brightgreen.svg?colorB=469C00&logo=gradle)](https://docs.gradle.org/8.8/release-notes.html)
 [![](https://img.shields.io/discord/311256119005937665.svg?color=%237289da&label=Discord&logo=discord&logoColor=%237289da)](https://discord.gg/mohistmc)
 
 [![]()](https://bstats.org/plugin/server-implementation/Mohist/6762)

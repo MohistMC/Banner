@@ -14,7 +14,7 @@ libraries/org/apache/maven/resolver/maven-resolver-transport-http/1.7.3/maven-re
 libraries/org/apache/maven/resolver/maven-resolver-util/1.7.3/maven-resolver-util-1.7.3.jar|016477b1a29cebc7c47b0894128837fe|171424
 libraries/org/eclipse/sisu/org.eclipse.sisu.inject/0.3.5/org.eclipse.sisu.inject-0.3.5.jar|1b296b0ddd911ed3750b3df93b395cd5|379348
 libraries/io/izzel/tools/1.3.0/tools-1.3.0.jar|440242a418ab84713632b0026144eea4|98520
-libraries/org/xerial/sqlite-jdbc/3.42.0.0/sqlite-jdbc-3.42.0.0.jar|6a46db3a6f38043ffb7e6782708cd401|13030515
+libraries/org/xerial/sqlite-jdbc/3.46.0.0/sqlite-jdbc-3.46.0.0.jar|e711fe45b2095575aa7fc25866549e61|13615436
 libraries/org/fusesource/jansi/jansi/1.18/jansi-1.18.jar|6ee32de8880da9f02552474f60ab6fbd|287352
 libraries/org/jline/jline-reader/3.21.0/jline-reader-3.21.0.jar|3fd7c434561cbdd6e3d76b9d83d30393|171621
 libraries/org/jline/jline-terminal/3.21.0/jline-terminal-3.21.0.jar|e3f8f0f98178d4a95a66b154d157ecf8|228777
@@ -23,7 +23,7 @@ libraries/org/checkerframework/checker-qual/2.0.0/checker-qual-2.0.0.jar|94fe1af
 libraries/org/apache/logging/log4j/log4j-iostreams/2.20.0/log4j-iostreams-2.20.0.jar|d612855f572573a409bb59957c7c24c8|48552
 libraries/net/minecrell/terminalconsoleappender/1.4.0/terminalconsoleappender-1.4.0.jar|6508e35ad178825278fbd3d1ff82d2cc|26102
 libraries/com/googlecode/json-simple/json-simple/1.1.1/json-simple-1.1.1.jar|5cc2c478d73e8454b4c369cee66c5bc7|23931
-libraries/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar|801b67e18f23e4e9ec392812a1c108d4|2481560
+libraries/com/mysql/mysql-connector-j/8.4.0/mysql-connector-j-8.4.0.jar|2607d710106276083d26e6a1505948d7|2533399
 libraries/net/md-5/bungeecord-chat/1.16-R0.4/bungeecord-chat-1.16-R0.4.jar|bf6464395a0951675c3bca47d3e1a13a|148961
 libraries/net/md-5/SpecialSource/1.11.2/SpecialSource-1.11.2.jar|adcca168c7f61188d6bf90c809d6eef1|89094
 libraries/jline/jline/2.14.6/jline-2.14.6.jar|480423551649bc6980b43f09e4717272|268780
