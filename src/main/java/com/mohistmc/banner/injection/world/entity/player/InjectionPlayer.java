@@ -29,7 +29,6 @@ public interface InjectionPlayer extends InjectionLivingEntity {
     }
 
     default void pushExhaustReason(EntityExhaustionEvent.ExhaustionReason reason) {
-        throw new IllegalStateException("Not implemented");
     }
 
     default ItemEntity drop(ItemStack itemstack, boolean flag, boolean flag1, boolean callEvent) {
@@ -41,7 +40,6 @@ public interface InjectionPlayer extends InjectionLivingEntity {
     }
 
     default void causeFoodExhaustion(float f, EntityExhaustionEvent.ExhaustionReason reason) {
-        throw new IllegalStateException("Not implemented");
     }
 
     default boolean spawnEntityFromShoulder(CompoundTag nbttagcompound) { // CraftBukkit void->boolean

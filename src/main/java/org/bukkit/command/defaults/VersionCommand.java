@@ -42,41 +42,7 @@ public class VersionCommand extends BukkitCommand {
     public boolean execute(@NotNull CommandSender sender, @NotNull String currentAlias, @NotNull String[] args) {
         if (!testPermission(sender)) return true;
 
-        if (args.length == 0) {
-            sender.sendMessage("This server is running " + Bukkit.getName() + " version " + Bukkit.getVersion() + " (Implementing API version " + Bukkit.getBukkitVersion() + ")");
-            sendVersion(sender);
-        } else {
-            StringBuilder name = new StringBuilder();
-
-            for (String arg : args) {
-                if (name.length() > 0) {
-                    name.append(' ');
-                }
-
-                name.append(arg);
-            }
-
-            String pluginName = name.toString();
-            Plugin exactPlugin = Bukkit.getPluginManager().getPlugin(pluginName);
-            if (exactPlugin != null) {
-                describeToSender(exactPlugin, sender);
-                return true;
-            }
-
-            boolean found = false;
-            pluginName = pluginName.toLowerCase(Locale.ROOT);
-            for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-                if (plugin.getName().toLowerCase(Locale.ROOT).contains(pluginName)) {
-                    describeToSender(plugin, sender);
-                    found = true;
-                }
-            }
-
-            if (!found) {
-                sender.sendMessage("This server is not running any plugin by that name.");
-                sender.sendMessage("Use /plugins to get a list of plugins.");
-            }
-        }
+        sender.sendMessage("This server is running " + Bukkit.getName() + " version " + Bukkit.getVersion() + " (Implementing API version " + Bukkit.getBukkitVersion() + ")");
         return true;
     }
 
