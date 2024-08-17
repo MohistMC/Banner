@@ -299,7 +299,7 @@ public enum EntityType implements Keyed, Translatable {
     /**
      * An unknown entity without an Entity Class
      */
-    UNKNOWN(null, null, -1, false);
+    UNKNOWN("unknown", null, -1, false);
 
     private final String name;
     private final Class<? extends Entity> clazz;
