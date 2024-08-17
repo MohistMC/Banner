@@ -37,7 +37,9 @@
   "custom": {
     "loom:injected_interfaces": {
       "net/minecraft/class_1282": ["com/mohistmc/banner/injection/world/damagesource/InjectionDamageSource"],
+      "net/minecraft/class_1281": ["com/mohistmc/banner/injection/world/damagesource/InjectionCombatEntry"],
       "net/minecraft/class_8109": ["com/mohistmc/banner/injection/world/damagesource/InjectionDamageSources"],
+      "net/minecraft/class_1283": ["com/mohistmc/banner/injection/world/damagesource/InjectionCombatTracker"],
       "net/minecraft/server/MinecraftServer": ["com/mohistmc/banner/injection/server/InjectionMinecraftServer"],
       "net/minecraft/class_1297": ["com/mohistmc/banner/injection/world/entity/InjectionEntity"],
       "net/minecraft/class_1429": ["com/mohistmc/banner/injection/world/entity/InjectionAnimal"],

@@ -117,6 +117,8 @@
     "world.MixinContainer",
     "world.MixinLockCode",
     "world.MixinSimpleContainer",
+    "world.damagesource.MixinCombatEntry",
+    "world.damagesource.MixinCombatTracker",
     "world.damagesource.MixinDamageSource",
     "world.damagesource.MixinDamageSources",
     "world.effect.MixinHealOrHarmMobEffect",

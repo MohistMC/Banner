@@ -2,6 +2,8 @@ package com.mohistmc.banner.injection.world.damagesource;
 
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.state.BlockState;
+import org.bukkit.block.Block;
 
 public interface InjectionDamageSource {
 
@@ -29,39 +31,39 @@ public interface InjectionDamageSource {
         throw new IllegalStateException("Not implemented");
     }
 
-    default boolean bridge$sweep() {
+    default Entity getDamager() {
         throw new IllegalStateException("Not implemented");
     }
 
-    default boolean bridge$melting() {
+    default DamageSource customEntityDamager(Entity entity) {
         throw new IllegalStateException("Not implemented");
     }
 
-    default boolean bridge$poison() {
+    default Entity getCausingDamager() {
         throw new IllegalStateException("Not implemented");
     }
 
-    default Entity getCausingEntity() {
+    default DamageSource banner$setCustomCausingEntity(Entity entity) {
         throw new IllegalStateException("Not implemented");
     }
 
-    default DamageSource customCausingEntity(Entity entity) {
+    default DamageSource customCausingEntityDamager(Entity entity) {
         throw new IllegalStateException("Not implemented");
     }
 
-    default org.bukkit.block.Block getDirectBlock() {
+    default DamageSource banner$setCustomCausingEntityDamager(Entity entity) {
         throw new IllegalStateException("Not implemented");
     }
 
-    default DamageSource directBlock(net.minecraft.world.level.Level world, net.minecraft.core.BlockPos blockPosition) {
+    default Block getDirectBlock() {
         throw new IllegalStateException("Not implemented");
     }
 
-    default DamageSource directBlock(org.bukkit.block.Block block) {
+    default DamageSource directBlock(Block block) {
         throw new IllegalStateException("Not implemented");
     }
 
-    default DamageSource cloneInstance() {
+    default DamageSource banner$setDirectBlock(Block block) {
         throw new IllegalStateException("Not implemented");
     }
 
@@ -73,19 +75,23 @@ public interface InjectionDamageSource {
         throw new IllegalStateException("Not implemented");
     }
 
-    default Entity getDamager() {
+    default DamageSource banner$setDirectBlockState(org.bukkit.block.BlockState block) {
         throw new IllegalStateException("Not implemented");
     }
 
-    default Entity getCausingDamager() {
+    default DamageSource cloneInstance() {
         throw new IllegalStateException("Not implemented");
     }
 
-    default DamageSource customEntityDamager(Entity entity) {
+    default Entity getCausingEntity() {
         throw new IllegalStateException("Not implemented");
     }
 
-    default DamageSource customCausingEntityDamager(Entity entity) {
+    default DamageSource customCausingEntity(Entity entity) {
+        throw new IllegalStateException("Not implemented");
+    }
+
+    default DamageSource directBlock(net.minecraft.world.level.Level world, net.minecraft.core.BlockPos blockPosition) {
         throw new IllegalStateException("Not implemented");
     }
 }

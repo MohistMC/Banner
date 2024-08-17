@@ -6,6 +6,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -74,23 +75,6 @@ public class MixinDamageSource implements InjectionDamageSource {
 
     // CraftBukkit end
 
-    // Banner start
-    @Override
-    public boolean bridge$sweep() {
-        return withSweep;
-    }
-
-    @Override
-    public boolean bridge$melting() {
-        return melting;
-    }
-
-    @Override
-    public boolean bridge$poison() {
-        return poison;
-    }
-    // Banner end
-
     @Override
     public Entity getCausingEntity() {
         return (this.customCausingEntity != null) ? this.customCausingEntity : this.causingEntity;
@@ -135,8 +119,9 @@ public class MixinDamageSource implements InjectionDamageSource {
     @Override
     public DamageSource cloneInstance() {
         DamageSource damageSource = new DamageSource(this.type, this.directEntity, this.causingEntity, this.damageSourcePosition);
-        this.directBlock = this.getDirectBlock();
-        this.directBlockState = this.getDirectBlockState();
+        damageSource.banner$setDirectBlock(this.getDirectBlock());
+        damageSource.banner$setDirectBlockState(this.getDirectBlockState());
+        damageSource.banner$setCustomCausingEntity(this.customEntityDamager);
         this.withSweep = this.isSweep();
         this.poison = this.isPoison();
         this.melting = this.isMelting();
@@ -191,5 +176,29 @@ public class MixinDamageSource implements InjectionDamageSource {
         DamageSource damageSource = this.cloneInstance();
         this.customCausingEntityDamager = entity;
         return damageSource;
+    }
+
+    @Override
+    public DamageSource banner$setCustomCausingEntity(Entity entity) {
+        this.customEntityDamager = entity;
+        return (DamageSource) (Object) this;
+    }
+
+    @Override
+    public DamageSource banner$setCustomCausingEntityDamager(Entity entity) {
+        this.customCausingEntityDamager = entity;
+        return (DamageSource) (Object) this;
+    }
+
+    @Override
+    public DamageSource banner$setDirectBlock(Block block) {
+        this.directBlock = block;
+        return (DamageSource) (Object) this;
+    }
+
+    @Override
+    public DamageSource banner$setDirectBlockState(BlockState block) {
+        this.directBlockState = block;
+        return (DamageSource) (Object) this;
     }
 }
