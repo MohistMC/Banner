@@ -660,3 +660,11 @@ accessible field net/minecraft/world/item/enchantment/ItemEnchantments$Mutable s
 mutable field net/minecraft/world/item/enchantment/ItemEnchantments$Mutable showInTooltip Z
 accessible field net/minecraft/server/players/PlayerList maxPlayers I
 mutable field net/minecraft/server/players/PlayerList maxPlayers I
+accessible field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner targetCooldownLength I
+mutable field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner targetCooldownLength I
+accessible field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner normalConfig Lnet/minecraft/world/level/block/entity/trialspawner/TrialSpawnerConfig;
+mutable field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner normalConfig Lnet/minecraft/world/level/block/entity/trialspawner/TrialSpawnerConfig;
+accessible field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner requiredPlayerRange I
+mutable field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner requiredPlayerRange I
+accessible field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner ominousConfig Lnet/minecraft/world/level/block/entity/trialspawner/TrialSpawnerConfig;
+mutable field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner ominousConfig Lnet/minecraft/world/level/block/entity/trialspawner/TrialSpawnerConfig;
