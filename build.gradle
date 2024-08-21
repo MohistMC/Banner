@@ -96,8 +96,8 @@ dependencies {
 	implementation(include("org.apache.logging.log4j:log4j-iostreams:2.20.0"))
 
 	//class modify
-	modImplementation(include("com.github.wdog5:mixin-tools:1.0.1"))
-	annotationProcessor 'com.github.wdog5:mixin-tools:1.0.1'
+	implementation(include("io.izzel.arclight:mixin-tools:1.2.4")) { transitive = false }
+	annotationProcessor("io.izzel.arclight:mixin-tools:1.2.4") { transitive = false }
 
 	// mappings remapper
 	implementation(include("net.fabricmc:mapping-io:0.6.1"))
