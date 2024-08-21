@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.core.world.level.material;
 
 import com.mohistmc.banner.bukkit.DistValidate;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
@@ -53,14 +55,16 @@ public abstract class MixinFlowingFluid {
         }
     }
 
-    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
-    private boolean banner$fluidLevelChange(Level world, BlockPos pos, BlockState newState, int flags) {
-        if (!DistValidate.isValid(world)) return world.setBlock(pos, newState, flags);
-        FluidLevelChangeEvent event = CraftEventFactory.callFluidLevelChangeEvent(world, pos, newState);
-        if (event.isCancelled()) {
-            return false;
-        } else {
-            return world.setBlock(pos, ((CraftBlockData) event.getNewData()).getState(), flags);
+    @Decorate(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
+    private boolean arclight$fluidLevelChange(Level world, BlockPos pos, BlockState newState, int flags) throws Throwable {
+        if (DistValidate.isValid(world)) {
+            FluidLevelChangeEvent event = CraftEventFactory.callFluidLevelChangeEvent(world, pos, newState);
+            if (event.isCancelled()) {
+                return (boolean) DecorationOps.cancel().invoke();
+            } else {
+                newState = ((CraftBlockData) event.getNewData()).getState();
+            }
         }
+        return (boolean) DecorationOps.callsite().invoke(world, pos, newState, flags);
     }
 }

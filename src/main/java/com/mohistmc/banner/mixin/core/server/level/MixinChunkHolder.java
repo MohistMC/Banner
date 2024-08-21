@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.*;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
@@ -36,6 +37,8 @@ public abstract class MixinChunkHolder extends GenerationChunkHolder implements 
 
     @Shadow public abstract CompletableFuture<ChunkResult<LevelChunk>> getFullChunkFuture();
 
+    @Shadow @Final private LevelHeightAccessor levelHeightAccessor;
+
     @Override
     public LevelChunk getFullChunkNow() {
         // Note: We use the oldTicketLevel for isLoaded checks.
@@ -48,9 +51,10 @@ public abstract class MixinChunkHolder extends GenerationChunkHolder implements 
         return (LevelChunk) this.getChunkIfPresentUnchecked(ChunkStatus.FULL);
     }
 
-    @Inject(method = "blockChanged", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD,
+    @Inject(method = "blockChanged", cancellable = true,
             at = @At(value = "FIELD", ordinal = 0, target = "Lnet/minecraft/server/level/ChunkHolder;changedBlocksPerSection:[Lit/unimi/dsi/fastutil/shorts/ShortSet;"))
-    private void banner$outOfBound(BlockPos pos, CallbackInfo ci, LevelChunk chunk, int i) {
+    private void banner$outOfBound(BlockPos pos, CallbackInfo ci) {
+        int i = this.levelHeightAccessor.getSectionIndex(pos.getY());
         if (i < 0 || i >= this.changedBlocksPerSection.length) {
             ci.cancel();
         }

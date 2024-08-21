@@ -8,4 +8,8 @@ public interface InjectionSynchedEntityData {
     default <T> void markDirty(EntityDataAccessor<T> datawatcherobject) {
         throw new IllegalStateException("Not implemented");
     }
+
+    default void refresh(ServerPlayer player) {
+        throw new IllegalStateException("Not implemented");
+    }
 }
