@@ -27,6 +27,7 @@
     "commands.arguments.selector.MixinEntitySelector",
     "commands.arguments.selector.MixinEntitySelectorParser",
     "interaction.cauldron.MixinCauldronInteraction",
+    "interaction.component.DataComponentPatch_BuilderMixin",
     "interaction.component.MixinDataComponentPatch",
     "interaction.dispenser.MixinBoatDispenseItemBehavior",
     "interaction.dispenser.MixinDefaultDispenseItemBehavior",

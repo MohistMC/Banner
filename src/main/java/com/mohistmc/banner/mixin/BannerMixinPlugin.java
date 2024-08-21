@@ -8,9 +8,12 @@ import com.mohistmc.banner.asm.TransformAccessProcessor;
 import com.mohistmc.banner.stackdeobf.util.CompatUtil;
 import java.util.List;
 import java.util.Set;
+
+import io.izzel.arclight.mixin.MixinTools;
 import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.MixinEnvironment;
+import org.spongepowered.asm.mixin.connect.IMixinConnector;
 import org.spongepowered.asm.mixin.extensibility.IEnvironmentTokenProvider;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -28,6 +31,7 @@ public class BannerMixinPlugin implements IMixinConfigPlugin, IEnvironmentTokenP
 
     @Override
     public void onLoad(String mixinPackage) {
+        MixinTools.setup();
         MixinEnvironment.getCurrentEnvironment().registerTokenProvider(this);
         try {
             BannerMCStart.run();

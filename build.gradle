@@ -61,10 +61,7 @@ dependencies {
 			"fabric-biome-api-v1"
 	]
 
-	// Add each module as a dependency
-	apiModules.forEach {
-		modImplementation(fabricApi.module(it, "${project.fabric_version}"))
-	}
+	modImplementation "net.fabricmc.fabric-api:fabric-api:$project.fabric_version"
 
 	compileOnly "org.jetbrains:annotations:21.0.1"
 
