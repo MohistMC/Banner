@@ -45,6 +45,20 @@ public abstract class MixinPlayerDataStorage implements InjectionPlayerDataStora
         if (org.spigotmc.SpigotConfig.disablePlayerDataSaving) ci.cancel(); // Spigot
     }
 
+    @Inject(method = "load(Lnet/minecraft/world/entity/player/Player;Ljava/lang/String;)Ljava/util/Optional;", at = @At("RETURN"))
+    private void banner$lastSeenTime(Player player, String string, CallbackInfoReturnable<Optional<CompoundTag>> cir) {
+        cir.getReturnValue().ifPresent((tag) -> {
+            if (player instanceof ServerPlayer) {
+                CraftPlayer craftPlayer = ((ServerPlayer) player).getBukkitEntity();
+                // Only update first played if it is older than the one we have
+                long modified = new File(this.playerDir, player.getUUID() + ".dat").lastModified();
+                if (modified < craftPlayer.getFirstPlayed()) {
+                    craftPlayer.setFirstPlayed(modified);
+                }
+            }
+        });
+    }
+
     @Override
     public void backup(String name, String s1, String s) { // name, uuid, extension
         Path path = this.playerDir.toPath();

@@ -556,6 +556,7 @@
     "world.level.storage.MixinLevelStorageSource",
     "world.level.storage.MixinPlayerDataStorage",
     "world.level.storage.MixinPrimaryLevelData",
+    "world.level.storage.loot.MixinLootDataType",
     "world.level.storage.loot.MixinLootTable",
     "world.level.storage.loot.parameters.LootParametersMixin",
     "world.level.storage.loot.predicates.MixinExplosionCondition"
