@@ -1,11 +1,18 @@
 package com.mohistmc.banner.mixin.core.world.entity;
 
 import java.util.Map;
+import java.util.Optional;
+
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Local;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantedItemInUse;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import org.bukkit.craftbukkit.entity.CraftLivingEntity;
@@ -61,35 +68,23 @@ public abstract class MixinExperienceOrb {
         player.giveExperiencePoints(CraftEventFactory.callPlayerExpChangeEvent(player, amount).getAmount());
     }
 
-    /**
-     * @author wdog5
-     * @reason
-     */
-    /*
-    @Overwrite
-    private int repairPlayerItems(Player player, int i) {
-        Map.Entry<EquipmentSlot, ItemStack> entry = EnchantmentHelper.getRandomItemWith(Enchantments.MENDING, player, ItemStack::isDamaged);
-
-        if (entry != null) {
-            ItemStack itemstack = entry.getValue();
-            int j = Math.min(this.xpToDurability(i), itemstack.getDamageValue());
-            // CraftBukkit start
-            org.bukkit.event.player.PlayerItemMendEvent event = CraftEventFactory.callPlayerItemMendEvent(player, (ExperienceOrb) (Object) this, itemstack, entry.getKey(), j);
-            j = event.getRepairAmount();
-            if (event.isCancelled()) {
-                return i;
-            }
-            // CraftBukkit end
-
-            itemstack.setDamageValue(itemstack.getDamageValue() - j);
-            int k = i - this.durabilityToXp(j);
-            this.value = k;
-
-            return k > 0 ? this.repairPlayerItems(player, k) : 0;
-        } else {
-            return i;
+    @Decorate(method = "repairPlayerItems", inject = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;setDamageValue(I)V"))
+    private void banner$itemMend(ServerPlayer serverPlayer, int i, @Local(ordinal = -1) ItemStack itemstack,
+                                   @Local(ordinal = -1) Optional<EnchantedItemInUse> optional, @Local(ordinal = -1) int k) throws Throwable {
+        org.bukkit.event.player.PlayerItemMendEvent event = CraftEventFactory.callPlayerItemMendEvent(serverPlayer, (ExperienceOrb) (Object) this, itemstack, optional.get().inSlot(), k);
+        k = event.getRepairAmount();
+        if (event.isCancelled()) {
+            DecorationOps.cancel().invoke(i);
+            return;
         }
-    }*/
+        DecorationOps.blackhole().invoke(k);
+    }
+
+    @Decorate(method = "repairPlayerItems", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ExperienceOrb;repairPlayerItems(Lnet/minecraft/server/level/ServerPlayer;I)I"))
+    private int banner$updateXp(ExperienceOrb instance, ServerPlayer serverPlayer, int i) throws Throwable {
+        this.value = i;
+        return (int) DecorationOps.callsite().invoke(instance, serverPlayer, i);
+    }
 
     @Inject(method = "getExperienceValue", cancellable = true, at = @At("HEAD"))
     private static void banner$higherLevelSplit(int expValue, CallbackInfoReturnable<Integer> cir) {

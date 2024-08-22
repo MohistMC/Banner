@@ -137,6 +137,7 @@
     "world.entity.MixinExperienceOrb",
     "world.entity.MixinInteraction",
     "world.entity.MixinItemBasedSteering",
+    "world.entity.MixinLeashable",
     "world.entity.MixinLightningBolt",
     "world.entity.MixinLivingEntity",
     "world.entity.MixinMob",

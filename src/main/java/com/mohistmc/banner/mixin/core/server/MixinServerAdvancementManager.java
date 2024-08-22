@@ -3,6 +3,7 @@ package com.mohistmc.banner.mixin.core.server;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.JsonParseException;
@@ -18,11 +19,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.ServerAdvancementManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
+import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerAdvancementManager.class)
 public abstract class MixinServerAdvancementManager {
@@ -37,6 +42,11 @@ public abstract class MixinServerAdvancementManager {
     @Shadow protected abstract void validate(ResourceLocation resourceLocation, Advancement advancement);
 
     @Shadow @Final private HolderLookup.Provider registries;
+
+    @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At(value = "FIELD", shift = At.Shift.AFTER, opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/server/ServerAdvancementManager;advancements:Ljava/util/Map;"))
+    private void banner$buildMutable(Map<ResourceLocation, JsonElement> map, ResourceManager resourceManager, ProfilerFiller profilerFiller, CallbackInfo ci) {
+        this.advancements = new HashMap<>(this.advancements);
+    }
 
     /**
      * @author wdog5

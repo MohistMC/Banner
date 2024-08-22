@@ -41,11 +41,10 @@ public abstract class MixinStopAttackingIfTargetInvalid {
                         if (event.isCancelled()) {
                             return false;
                         }
-                        if (event.getTarget() == null) {
-                            memoryAccessor.erase();
+                        if (event.getTarget() != null) {
+                            livingentity.getBrain().setMemory(MemoryModuleType.ATTACK_TARGET, ((CraftLivingEntity) event.getTarget()).getHandle());
                             return true;
                         }
-                        livingentity = ((CraftLivingEntity) event.getTarget()).getHandle();
                         // CraftBukkit end
                         onStopAttacking.accept(mob, livingentity);
                         memoryAccessor.erase();

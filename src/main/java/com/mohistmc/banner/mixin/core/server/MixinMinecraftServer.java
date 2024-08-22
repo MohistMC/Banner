@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.core.server;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.api.color.ColorsAPI;
 import com.mohistmc.banner.asm.annotation.TransformAccess;
@@ -11,12 +12,16 @@ import com.mohistmc.banner.fabric.BukkitRegistry;
 import com.mohistmc.banner.injection.server.InjectionMinecraftServer;
 import com.mohistmc.banner.util.I18n;
 import com.mojang.datafixers.DataFixer;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Local;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.Proxy;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BooleanSupplier;
 import java.util.logging.Level;
@@ -32,6 +37,7 @@ import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.ChatDecorator;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 import net.minecraft.network.protocol.status.ServerStatus;
 import net.minecraft.resources.ResourceKey;
@@ -77,12 +83,16 @@ import org.bukkit.craftbukkit.CraftRegistry;
 import org.bukkit.craftbukkit.Main;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.scoreboard.CraftScoreboardManager;
+import org.bukkit.craftbukkit.util.CraftChatMessage;
+import org.bukkit.craftbukkit.util.LazyPlayerSet;
+import org.bukkit.event.player.AsyncPlayerChatPreviewEvent;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.PluginLoadOrder;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
+import org.spigotmc.WatchdogThread;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -251,123 +261,41 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     private static final java.math.BigDecimal TPS_BASE = new java.math.BigDecimal(1E9).multiply(new java.math.BigDecimal(SAMPLE_INTERVAL));
     // Paper End
 
-    /**
-     * @author wdog5
-     * @reason bukkit
-     */
-    @Overwrite
-    protected void runServer() {
-        try {
-            if (!this.initServer()) {
-                throw new IllegalStateException("Failed to initialize server");
-            }
+    @Decorate(method = "runServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;buildServerStatus()Lnet/minecraft/network/protocol/status/ServerStatus;"))
+    private ServerStatus banner$initTickParam(MinecraftServer instance, @Local(allocate = "tickSection") long tickSection, @Local(allocate = "tickCount") long tickCount) throws Throwable {
+        var serverStatus = (ServerStatus) DecorationOps.callsite().invoke(instance);
+        Arrays.fill(recentTps, 20);
+        tickSection = Util.getMillis();
+        tickCount = 1;
+        DecorationOps.blackhole().invoke(tickSection, tickCount);
+        return serverStatus;
+    }
 
-            this.nextTickTimeNanos = Util.getNanos();
-            this.statusIcon = (ServerStatus.Favicon) this.loadStatusIcon().orElse(null); // CraftBukkit - decompile error
-            this.status = this.buildServerStatus();
-
-            // Spigot start
-            Arrays.fill( this.recentTps, 20 );
-            long tickSection = Util.getMillis(), tickCount = 1;
-            while (this.running) {
-                long i;
-
-                if (!this.isPaused() && this.tickRateManager.isSprinting() && this.tickRateManager.checkShouldSprintThisTick()) {
-                    i = 0L;
-                    this.nextTickTimeNanos = Util.getNanos();
-                    this.lastOverloadWarningNanos = this.nextTickTimeNanos;
-                } else {
-                    i = this.tickRateManager.nanosecondsPerTick();
-                    long j = Util.getNanos() - this.nextTickTimeNanos;
-
-                    if (j > OVERLOADED_THRESHOLD_NANOS + 20L * i && this.nextTickTimeNanos - this.lastOverloadWarningNanos >= OVERLOADED_WARNING_INTERVAL_NANOS + 100L * i) {
-                        long k = j / i;
-
-                        if (this.server.getWarnOnOverload()) // CraftBukkit
-                            MinecraftServer.LOGGER.warn("Can't keep up! Is the server overloaded? Running {}ms or {} ticks behind", j / TimeUtil.NANOSECONDS_PER_MILLISECOND, k);
-                        this.nextTickTimeNanos += k * i;
-                        this.lastOverloadWarningNanos = this.nextTickTimeNanos;
-                    }
-                }
-                // Spigot start
-                if ( tickCount++ % SAMPLE_INTERVAL == 0 )
-                {
-                    long curTime = Util.getMillis();
-                    double currentTps = 1E3 / ( curTime - tickSection ) * SAMPLE_INTERVAL;
-                    this.recentTps[0] = calcTps( this.recentTps[0], 0.92, currentTps ); // 1/exp(5sec/1min)
-                    this.recentTps[1] = calcTps( this.recentTps[1], 0.9835, currentTps ); // 1/exp(5sec/5min)
-                    this.recentTps[2] = calcTps( this.recentTps[2], 0.9945, currentTps ); // 1/exp(5sec/15min)
-                    tickSection = curTime;
-                }
-                // Spigot end
-
-                boolean flag = i == 0L;
-
-                if (this.debugCommandProfilerDelayStart) {
-                    this.debugCommandProfilerDelayStart = false;
-                    this.debugCommandProfiler = new MinecraftServer.TimeProfiler(Util.getNanos(), this.tickCount);
-                }
-
-                BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
-                this.nextTickTimeNanos += i;
-                this.startMetricsRecordingTick();
-                this.profiler.push("tick");
-                this.tickServer(flag ? () -> {
-                    return false;
-                } : this::haveTime);
-                this.profiler.popPush("nextTickWait");
-                this.mayHaveDelayedTasks = true;
-                this.delayedTasksMaxNextTickTimeNanos = Math.max(Util.getNanos() + i, this.nextTickTimeNanos);
-                this.startMeasuringTaskExecutionTime();
-                this.waitUntilNextTick();
-                this.finishMeasuringTaskExecutionTime();
-                if (flag) {
-                    this.tickRateManager.endTickWork();
-                }
-
-                this.profiler.pop();
-                this.logFullTickTime();
-                this.endMetricsRecordingTick();
-                this.isReady = true;
-                JvmProfiler.INSTANCE.onServerTick(this.smoothedTickTimeMillis);
-            }
-        } catch (Throwable throwable) {
-            MinecraftServer.LOGGER.error("Encountered an unexpected exception", throwable);
-            CrashReport crashreport = constructOrExtractCrashReport(throwable);
-
-            this.fillSystemReport(crashreport.getSystemReport());
-            Path path = this.getServerDirectory().resolve("crash-reports").resolve("crash-" + Util.getFilenameFormattedDateTime() + "-server.txt");
-
-            if (crashreport.saveToFile(path, ReportType.CRASH)) {
-                MinecraftServer.LOGGER.error("This crash report has been saved to: {}", path.toAbsolutePath());
-            } else {
-                MinecraftServer.LOGGER.error("We were unable to save this crash report to disk.");
-            }
-
-            this.onServerCrash(crashreport);
-        } finally {
-            try {
-                this.stopped = true;
-                this.stopServer();
-            } catch (Throwable throwable1) {
-                MinecraftServer.LOGGER.error("Exception stopping the server", throwable1);
-            } finally {
-                if (this.services.profileCache() != null) {
-                    this.services.profileCache().clearExecutor();
-                }
-
-                org.spigotmc.WatchdogThread.doStop(); // Spigot
-                // CraftBukkit start - Restore terminal to original settings
-                try {
-                    this.reader.getTerminal().restore();
-                } catch (Exception ignored) {
-                }
-                // CraftBukkit end
-                this.onServerExit();
-            }
-
+    @Decorate(method = "runServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;startMetricsRecordingTick()V"))
+    private void banner$updateTickParam(MinecraftServer instance, @Local(allocate = "tickSection") long tickSection, @Local(allocate = "tickCount") long tickCount) throws Throwable {
+        if (tickCount++ % SAMPLE_INTERVAL == 0) {
+            long curTime = Util.getMillis();
+            double currentTps = 1E3 / (curTime - tickSection) * SAMPLE_INTERVAL;
+            recentTps[0] = calcTps(recentTps[0], 0.92, currentTps); // 1/exp(5sec/1min)
+            recentTps[1] = calcTps(recentTps[1], 0.9835, currentTps); // 1/exp(5sec/5min)
+            recentTps[2] = calcTps(recentTps[2], 0.9945, currentTps); // 1/exp(5sec/15min)
+            tickSection = curTime;
         }
+        DecorationOps.blackhole().invoke(tickSection, tickCount);
+        currentTick = (int) (System.currentTimeMillis() / 50);
+        DecorationOps.callsite().invoke(instance);
+    }
 
+    @Decorate(method = "runServer", at = @At(value = "INVOKE", remap = false, target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V"))
+    private void banner$warnOnLoad(Logger instance, String s, Object o, Object o2) throws Throwable {
+        if (server.getWarnOnOverload()) {
+            DecorationOps.callsite().invoke(instance, s, o, o2);
+        }
+    }
+
+    @Inject(method = "runServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;onServerExit()V"))
+    private void banner$watchdogExit(CallbackInfo ci) {
+        WatchdogThread.doStop();
     }
 
     private static double calcTps(double avg, double exp, double tps) {
@@ -779,29 +707,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     // CraftBukkit start
     public final java.util.concurrent.ExecutorService chatExecutor = java.util.concurrent.Executors.newCachedThreadPool(
             new com.google.common.util.concurrent.ThreadFactoryBuilder().setDaemon(true).setNameFormat("Async Chat Thread - #%d").build());
-
-    // Banner - remove it
-    /*
-    @ModifyReturnValue(method = "getChatDecorator", at = @At("RETURN"))
-    private ChatDecorator banner$fireChatEvent(ChatDecorator decorator) {
-        return (entityplayer, ichatbasecomponent) -> {
-            // SPIGOT-7127: Console /say and similar
-            if (entityplayer == null) {
-                return CompletableFuture.completedFuture(ichatbasecomponent);
-            }
-
-            return CompletableFuture.supplyAsync(() -> {
-                AsyncPlayerChatPreviewEvent event = new AsyncPlayerChatPreviewEvent(true, entityplayer.getBukkitEntity(), CraftChatMessage.fromComponent(ichatbasecomponent), new LazyPlayerSet(((MinecraftServer) (Object) this)));
-                String originalFormat = event.getFormat(), originalMessage = event.getMessage();
-                this.server.getPluginManager().callEvent(event);
-
-                if (originalFormat.equals(event.getFormat()) && originalMessage.equals(event.getMessage()) && event.getPlayer().getName().equalsIgnoreCase(event.getPlayer().getDisplayName())) {
-                    return ichatbasecomponent;
-                }
-                return CraftChatMessage.fromStringOrNull(String.format(event.getFormat(), event.getPlayer().getDisplayName(), event.getMessage()));
-            }, chatExecutor);
-        };
-    }*/
 
     @Inject(method = "method_29440", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/server/packs/repository/PackRepository;setSelected(Ljava/util/Collection;)V"))

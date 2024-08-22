@@ -1,8 +1,10 @@
 package com.mohistmc.banner.mixin.core.network.connection;
 
 import com.mohistmc.banner.injection.network.connection.InjectionConnection;
+import com.mojang.authlib.properties.Property;
 import io.netty.channel.Channel;
 import java.net.SocketAddress;
+import java.util.UUID;
 
 import net.minecraft.network.Connection;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,4 +34,25 @@ public class MixinConnection implements InjectionConnection {
         return this.channel.remoteAddress();
     }
     // Spigot End
+
+    @Override
+    public UUID bridge$spoofedUUID() {
+        return spoofedUUID;
+    }
+
+    @Override
+    public void banner$setSpoofedUUID(UUID spoofedUUID) {
+        this.spoofedUUID = spoofedUUID;
+    }
+
+    @Override
+    public Property[] bridge$spoofedProfile() {
+        return spoofedProfile;
+    }
+
+    @Override
+    public void bridge$setSpoofedProfile(Property[] spoofedProfile) {
+        this.spoofedProfile = spoofedProfile;
+    }
+
 }

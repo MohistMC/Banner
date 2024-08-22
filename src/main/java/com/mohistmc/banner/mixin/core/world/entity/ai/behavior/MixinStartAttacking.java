@@ -3,6 +3,11 @@ package com.mohistmc.banner.mixin.core.world.entity.ai.behavior;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import com.mojang.datafixers.kinds.K1;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Local;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,23 +26,21 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(StartAttacking.class)
 public class MixinStartAttacking {
 
-    @Inject(method = "method_47123", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/ai/behavior/declarative/MemoryAccessor;set(Ljava/lang/Object;)V"),
-            locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
-    private static <E extends Mob> void banner$targetEvent(Predicate<E> predicate, Function<E, Optional<? extends LivingEntity>> function,
-                                           MemoryAccessor memoryAccessor, MemoryAccessor memoryAccessor2,
-                                           ServerLevel serverLevel, Mob mob, long l, CallbackInfoReturnable<Boolean> cir,
-                                           Optional optional, LivingEntity livingEntity) {
-        // CraftBukkit start
-        EntityTargetEvent event = CraftEventFactory.callEntityTargetLivingEvent(mob, livingEntity, (livingEntity instanceof ServerPlayer) ? EntityTargetEvent.TargetReason.CLOSEST_PLAYER : EntityTargetEvent.TargetReason.CLOSEST_ENTITY);
+    @SuppressWarnings({"unchecked", "MixinAnnotationTarget"})
+    @Decorate(method = "*", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/behavior/declarative/MemoryAccessor;set(Ljava/lang/Object;)V"))
+    private static <F extends K1, Value> void banner$targetEvent(MemoryAccessor<F, Value> instance, Value object, @Local(ordinal = -1) Mob mob) throws Throwable {
+        var newTarget = (LivingEntity) object;
+        EntityTargetEvent event = CraftEventFactory.callEntityTargetLivingEvent(mob, newTarget, (newTarget instanceof ServerPlayer) ? EntityTargetEvent.TargetReason.CLOSEST_PLAYER : EntityTargetEvent.TargetReason.CLOSEST_ENTITY);
         if (event.isCancelled()) {
-            cir.setReturnValue(false);
+            DecorationOps.cancel().invoke(false);
+            return;
         }
         if (event.getTarget() == null) {
-            memoryAccessor.erase();
-            cir.setReturnValue(true);
+            instance.erase();
+            DecorationOps.cancel().invoke(false);
+            return;
         }
-        livingEntity = ((CraftLivingEntity) event.getTarget()).getHandle();
-        // CraftBukkit end
+        object = (Value) ((CraftLivingEntity) event.getTarget()).getHandle();
+        DecorationOps.callsite().invoke(instance, object);
     }
 }
