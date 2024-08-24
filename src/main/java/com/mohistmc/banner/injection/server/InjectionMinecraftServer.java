@@ -3,6 +3,7 @@ package com.mohistmc.banner.injection.server;
 import jline.console.ConsoleReader;
 import joptsimple.OptionSet;
 import net.minecraft.commands.Commands;
+import net.minecraft.server.ServerLinks;
 import net.minecraft.server.WorldLoader;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.progress.ChunkProgressListener;
@@ -109,6 +110,10 @@ public interface InjectionMinecraftServer {
     }
 
     default void banner$setRconConsoleSource(RconConsoleSource source) {
+        throw new IllegalStateException("Not implemented");
+    }
+
+    default void setServerLinks(ServerLinks serverLinks) {
         throw new IllegalStateException("Not implemented");
     }
 }

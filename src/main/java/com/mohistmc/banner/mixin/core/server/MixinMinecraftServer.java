@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.core.server;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mohistmc.banner.api.color.ColorsAPI;
 import com.mohistmc.banner.asm.annotation.TransformAccess;
@@ -38,13 +39,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 import net.minecraft.network.protocol.status.ServerStatus;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.RegistryLayer;
-import net.minecraft.server.ServerTickRateManager;
-import net.minecraft.server.Services;
-import net.minecraft.server.TickTask;
-import net.minecraft.server.WorldLoader;
-import net.minecraft.server.WorldStem;
+import net.minecraft.server.*;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -196,6 +191,8 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow protected abstract void finishMeasuringTaskExecutionTime();
 
     @Shadow protected abstract void logFullTickTime();
+
+    @Shadow public abstract ServerLinks serverLinks();
 
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
@@ -793,5 +790,18 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     public double[] getTPS() {
         return new double[] {
         };
+    }
+
+    @Unique
+    private ServerLinks serverLinksVanilla = ServerLinks.EMPTY;
+
+    @Override
+    public void setServerLinks(ServerLinks serverLinks) {
+        this.serverLinksVanilla = serverLinks;
+    }
+
+    @ModifyReturnValue(method = "serverLinks", at = @At("RETURN"))
+    private ServerLinks banner$resetServerLinks(ServerLinks original) {
+        return serverLinksVanilla;
     }
 }
