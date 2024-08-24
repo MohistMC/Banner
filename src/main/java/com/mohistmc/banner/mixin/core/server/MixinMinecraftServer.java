@@ -286,12 +286,14 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         DecorationOps.callsite().invoke(instance);
     }
 
+    /* TODO by Mgazul
     @Decorate(method = "runServer", at = @At(value = "INVOKE", remap = false, target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V"))
     private void banner$warnOnLoad(Logger instance, String s, Object o, Object o2) throws Throwable {
         if (server.getWarnOnOverload()) {
             DecorationOps.callsite().invoke(instance, s, o, o2);
         }
     }
+    */
 
     @Inject(method = "runServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;onServerExit()V"))
     private void banner$watchdogExit(CallbackInfo ci) {
