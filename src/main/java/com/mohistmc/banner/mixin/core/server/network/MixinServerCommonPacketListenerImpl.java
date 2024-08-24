@@ -251,4 +251,9 @@ public abstract class MixinServerCommonPacketListenerImpl implements ServerCommo
     public void sendPacket(Packet<?> packet) {
         this.send(packet);
     }
+
+    @Override
+    public ServerPlayer bridge$player() {
+        return player;
+    }
 }
