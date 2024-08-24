@@ -50,4 +50,8 @@ public interface InjectionPlayerList {
     default String bridge$quiltMsg() {
         throw new IllegalStateException("Not implemented");
     }
+
+    default ServerPlayer player() {
+        throw new IllegalStateException("Not implemented");
+    }
 }
