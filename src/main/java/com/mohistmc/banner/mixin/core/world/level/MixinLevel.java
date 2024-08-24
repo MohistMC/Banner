@@ -4,6 +4,7 @@ import com.mohistmc.banner.asm.annotation.CreateConstructor;
 import com.mohistmc.banner.asm.annotation.ShadowConstructor;
 import com.mohistmc.banner.asm.annotation.TransformAccess;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.config.BannerWorldConfig;
 import com.mohistmc.banner.fabric.BukkitRegistry;
 import com.mohistmc.banner.fabric.WrappedWorlds;
@@ -55,6 +56,7 @@ import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CapturedBlockState;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.craftbukkit.generator.CraftWorldInfo;
 import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.generator.CustomWorldChunkManager;
@@ -220,6 +222,10 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
             }
             blockstate.setData(blockState);
             cir.setReturnValue(true);
+        }
+        Entity entityChangeBlock = BukkitSnapshotCaptures.getEntityChangeBlock();
+        if (entityChangeBlock != null && !CraftEventFactory.callEntityChangeBlockEvent(entityChangeBlock, blockPos, blockState)) {
+            cir.setReturnValue(false);
         }
         // CraftBukkit end
     }
