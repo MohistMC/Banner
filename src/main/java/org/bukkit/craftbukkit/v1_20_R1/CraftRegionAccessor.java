@@ -236,7 +236,7 @@ public abstract class CraftRegionAccessor implements RegionAccessor {
 
     @Override
     public BlockState getBlockState(int x, int y, int z) {
-        return CraftBlock.at(getHandle(), BlockPos.containing(x, y, z)).getState();
+        return CraftBlock.at(getHandle(), new BlockPos(x, y, z)).getState();
     }
 
     @Override
@@ -260,7 +260,7 @@ public abstract class CraftRegionAccessor implements RegionAccessor {
     }
 
     private net.minecraft.world.level.block.state.BlockState getData(int x, int y, int z) {
-        return getHandle().getBlockState(BlockPos.containing(x, y, z));
+        return getHandle().getBlockState(new BlockPos(x, y, z));
     }
 
     @Override
@@ -271,7 +271,7 @@ public abstract class CraftRegionAccessor implements RegionAccessor {
     @Override
     public void setBlockData(int x, int y, int z, BlockData blockData) {
         WorldGenLevel world = getHandle();
-        BlockPos pos = BlockPos.containing(x, y, z);
+        BlockPos pos = new BlockPos(x, y, z);
         net.minecraft.world.level.block.state.BlockState old = getHandle().getBlockState(pos);
 
         CraftBlock.setTypeAndData(world, pos, old, ((CraftBlockData) blockData).getState(), true);

@@ -216,7 +216,7 @@ public class CustomChunkGenerator extends InternalChunkGenerator {
                 net.minecraft.world.level.block.state.BlockState block = craftData.getTypeId(tx, ty, tz);
 
                 if (block.hasBlockEntity()) {
-                    BlockEntity tile = ((EntityBlock) block.getBlock()).newBlockEntity(BlockPos.containing((x << 4) + tx, ty, (z << 4) + tz), block);
+                    BlockEntity tile = ((EntityBlock) block.getBlock()).newBlockEntity(new BlockPos((x << 4) + tx, ty, (z << 4) + tz), block);
                     ichunkaccess.setBlockEntity(tile);
                 }
             }

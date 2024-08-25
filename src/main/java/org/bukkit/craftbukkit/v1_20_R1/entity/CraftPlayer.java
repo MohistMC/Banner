@@ -588,7 +588,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         Preconditions.checkArgument(block != null, "Block cannot be null");
         Preconditions.checkArgument(block.getWorld().equals(getWorld()), "Cannot break blocks across worlds");
 
-        return getHandle().gameMode.destroyBlock(BlockPos.containing(block.getX(), block.getY(), block.getZ()));
+        return getHandle().gameMode.destroyBlock(new BlockPos(block.getX(), block.getY(), block.getZ()));
     }
 
     @Override

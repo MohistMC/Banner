@@ -265,7 +265,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
             if (blockPos != null) {
                 bed = CraftBlock.at(this.level(), blockPos);
             } else {
-                bed =  this.level().getWorld().getBlockAt(player.getLocation());
+                bed = this.level().getWorld().getBlockAt(player.getLocation());
             }
             PlayerBedLeaveEvent event = new PlayerBedLeaveEvent(player, bed, true);
             Bukkit.getPluginManager().callEvent(event);
