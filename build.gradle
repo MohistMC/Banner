@@ -4,11 +4,11 @@ plugins {
 	id 'org.ajoberstar.grgit' version '5.2.0'
 }
 
-version = project.minecraft_version + "-" + ci_version()
+version = ci_version()
 group = project.maven_group
 
 base {
-	archivesName = project.archives_base_name
+	archivesName = project.archives_base_name + "-" + project.minecraft_version
 }
 
 repositories {

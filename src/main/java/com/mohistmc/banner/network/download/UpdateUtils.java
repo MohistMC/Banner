@@ -26,7 +26,6 @@ public class UpdateUtils {
     public static void versionCheck() {
         System.out.println(I18n.as("update.check"));
         System.out.println(I18n.as("update.stopcheck"));
-
         try {
             Json json = Json.read(URI.create("https://ci.codemc.io/job/MohistMC/job/Banner-1.20/lastSuccessfulBuild/api/json").toURL());
 

@@ -9,6 +9,7 @@ import com.mohistmc.banner.util.EulaUtil;
 import com.mohistmc.banner.util.I18n;
 import com.mohistmc.i18n.i18n;
 import io.izzel.arclight.mixin.injector.EjectorInfo;
+import java.lang.management.ManagementFactory;
 import java.net.ProxySelector;
 import java.util.Scanner;
 import net.fabricmc.loader.api.FabricLoader;
@@ -20,7 +21,6 @@ public class BannerMCStart {
 
     public static i18n I18N;
     public static final Logger LOGGER = LogManager.getLogger("BannerMC");
-    public static final float javaVersion = Float.parseFloat(System.getProperty("java.class.version"));
 
     public static void run() throws Exception {
         InjectionInfo.register(EjectorInfo.class);
@@ -35,7 +35,10 @@ public class BannerMCStart {
             LOGGER.info("|  _  {   / / | | | |\\   | | |\\   | |  __|  |  _  /  ");
             LOGGER.info("| |_| |  / /  | | | | \\  | | | \\  | | |___  | | \\ \\  ");
             LOGGER.info("|_____/ /_/   |_| |_|  \\_| |_|  \\_| |_____| |_|  \\_\\ ");
-            LOGGER.info(I18n.as("banner.launch.welcomemessage") + " - " + getVersion() + ", Java " + javaVersion);
+            LOGGER.info("{} - {}{}", I18n.as("banner.launch.welcomemessage"), getVersion(), ", Java(%s) %s PID: %s%n".formatted(
+                    System.getProperty("java.class.version"),
+                    System.getProperty("java.version"),
+                    ManagementFactory.getRuntimeMXBean().getName().split("@")[0]));
         }
         if (System.getProperty("log4j.configurationFile") == null) {
             System.setProperty("log4j.configurationFile", "log4j2_banner.xml");
