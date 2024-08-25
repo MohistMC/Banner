@@ -162,10 +162,6 @@ public interface InjectionServerPlayer extends InjectionPlayer {
         return null;
     }
 
-    default boolean teleportTo(ServerLevel worldserver, double d0, double d1, double d2, Set<RelativeMovement> set, float f, float f1, PlayerTeleportEvent.TeleportCause cause) {
-        return false;
-    }
-
     default void teleportTo(ServerLevel worldserver, double d0, double d1, double d2, float f, float f1, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause cause) {
     }
 

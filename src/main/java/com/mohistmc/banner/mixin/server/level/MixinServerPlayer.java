@@ -603,8 +603,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Redirect(method = "updateScoreForCriteria", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/scores/Scoreboard;forAllObjectives(Lnet/minecraft/world/scores/criteria/ObjectiveCriteria;Ljava/lang/String;Ljava/util/function/Consumer;)V"))
     private void banner$updateStats(Scoreboard instance, ObjectiveCriteria criteria, String scoreboardName, Consumer<Score> action) {
         // CraftBukkit - Use our scores instead
-        this.level().getCraftServer().getScoreboardManager().getScoreboardScores(criteria, this.getScoreboardName(),
-                action);
+        this.level().getCraftServer().getScoreboardManager().getScoreboardScores(criteria, this.getScoreboardName(), action);
     }
 
     @Inject(method = "resetSentInfo", at = @At("HEAD"))
