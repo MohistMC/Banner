@@ -369,7 +369,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     public void setRespawnPosition(ResourceKey<Level> resourceKey, @Nullable BlockPos blockPos, float x, boolean y, boolean z) {
         var cause = banner$spawnChangeCause == null ? PlayerSpawnChangeEvent.Cause.UNKNOWN : banner$spawnChangeCause;
         banner$spawnChangeCause = null;
-        var newWorld = this.server.getLevel(resourceKey);
+        var newWorld = this.server.getLevel(blockPos == null ? Level.OVERWORLD : resourceKey);
         Location newSpawn = (blockPos != null) ? CraftLocation.toBukkit(blockPos, newWorld.getWorld(), x, 0) : null;
 
         PlayerSpawnChangeEvent event = new PlayerSpawnChangeEvent(this.getBukkitEntity(), newSpawn, y, cause);
