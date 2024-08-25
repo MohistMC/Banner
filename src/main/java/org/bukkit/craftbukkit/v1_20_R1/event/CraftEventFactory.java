@@ -102,6 +102,7 @@ import org.bukkit.entity.Bat;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.entity.Explosive;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Fish;
 import org.bukkit.entity.HumanEntity;
@@ -157,6 +158,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageModifier;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityEnterLoveModeEvent;
 import org.bukkit.event.entity.EntityExhaustionEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
@@ -171,6 +173,7 @@ import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.entity.EntityToggleSwimEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FireworkExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.HorseJumpEvent;
@@ -1914,6 +1917,25 @@ public class CraftEventFactory {
 
         Bukkit.getPluginManager().callEvent(event);
 
+        return event;
+    }
+
+    public static boolean callEntityInteractEvent(Entity nmsEntity, Block block) {
+        EntityInteractEvent event = new EntityInteractEvent(nmsEntity.getBukkitEntity(), block);
+        Bukkit.getPluginManager().callEvent(event);
+
+        return !event.isCancelled();
+    }
+
+    public static ExplosionPrimeEvent callExplosionPrimeEvent(Explosive explosive) {
+        ExplosionPrimeEvent event = new ExplosionPrimeEvent(explosive);
+        Bukkit.getPluginManager().callEvent(event);
+        return event;
+    }
+
+    public static ExplosionPrimeEvent callExplosionPrimeEvent(Entity nmsEntity, float size, boolean fire) {
+        ExplosionPrimeEvent event = new ExplosionPrimeEvent(nmsEntity.getBukkitEntity(), size, fire);
+        Bukkit.getPluginManager().callEvent(event);
         return event;
     }
 }

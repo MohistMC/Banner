@@ -214,7 +214,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public Block getBlockAt(int x, int y, int z) {
-        return CraftBlock.at(world, BlockPos.containing(x, y, z));
+        return CraftBlock.at(world, new BlockPos(x, y, z));
     }
 
     @Override
@@ -235,7 +235,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
     public boolean setSpawnLocation(int x, int y, int z, float angle) {
         try {
             Location previousLocation = getSpawnLocation();
-            world.levelData.setSpawn(BlockPos.containing(x, y, z), angle);
+            world.levelData.setSpawn(new BlockPos(x, y, z), angle);
 
             // Notify anyone who's listening.
             SpawnChangeEvent event = new SpawnChangeEvent(this, previousLocation);
@@ -812,7 +812,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public void setBiome(int x, int y, int z, Holder<net.minecraft.world.level.biome.Biome> bb) {
-        BlockPos pos = BlockPos.containing(x, 0, z);
+        BlockPos pos = new BlockPos(x, 0, z);
         if (this.world.hasChunkAt(pos)) {
             net.minecraft.world.level.chunk.LevelChunk chunk = this.world.getChunkAt(pos);
 
@@ -831,7 +831,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public double getTemperature(int x, int y, int z) {
-        BlockPos pos = BlockPos.containing(x, y, z);
+        BlockPos pos = new BlockPos(x, y, z);
         return this.world.getNoiseBiome(x >> 2, y >> 2, z >> 2).value().getTemperature(pos);
     }
 

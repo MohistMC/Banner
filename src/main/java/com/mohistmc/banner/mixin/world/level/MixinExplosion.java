@@ -43,6 +43,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
@@ -80,6 +81,8 @@ public abstract class MixinExplosion implements InjectionExplosion {
     @Shadow @Nullable public abstract LivingEntity getIndirectSourceEntity();
     @Shadow public static float getSeenPercent(Vec3 p_46065_, Entity p_46066_) { return 0f; }
     // @formatter:on
+
+    @Shadow public abstract void clearToBlow();
 
     @Inject(method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/Entity;DDDFZLnet/minecraft/world/level/Explosion$BlockInteraction;)V",
             at = @At("RETURN"))
@@ -259,7 +262,7 @@ public abstract class MixinExplosion implements InjectionExplosion {
             List<org.bukkit.block.Block> blockList = new ObjectArrayList<>();
             for (int i1 = this.toBlow.size() - 1; i1 >= 0; i1--) {
                 BlockPos cpos = this.toBlow.get(i1);
-                org.bukkit.block.Block bblock = bworld.getBlockAt(cpos.getX(), cpos.getY(), cpos.getZ());
+                org.bukkit.block.Block bblock = CraftBlock.at(this.level, cpos);
                 if (!bblock.getType().isAir()) {
                     blockList.add(bblock);
                 }
