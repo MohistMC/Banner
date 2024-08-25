@@ -30,14 +30,14 @@ public class UpdateUtils {
         try {
             Json json = Json.read(URI.create("https://ci.codemc.io/job/MohistMC/job/Banner-1.20/lastSuccessfulBuild/api/json").toURL());
 
-            String jar_sha = BannerMCStart.getVersion();
-            String build_number = json.asString("number");
+            var jar_version = Integer.parseInt(BannerMCStart.getVersion());
+            var build_number = json.asInteger("number");
             String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(json.asLong("timestamp")));
 
-            if (jar_sha.equals(build_number))
-                System.out.println(I18n.as("update.latest", jar_sha, build_number));
-            else {
-                System.out.println(I18n.as("update.detect", build_number, jar_sha, time));
+            if (jar_version >= build_number) {
+                System.out.println(I18n.as("update.latest", jar_version, build_number));
+            } else {
+                System.out.println(I18n.as("update.detect", build_number, jar_version, time));
             }
         } catch (Throwable e) {
             System.out.println(I18n.as("check.update.noci"));
