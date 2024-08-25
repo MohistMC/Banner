@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        请使用[最新的构建版本](https://ci.codemc.io/job/MohistMC/job/Banner-1.20/)报告，你发现的问题很可能已经修复。
+        请使用[最新的构建版本](https://ci.codemc.io/job/MohistMC/job/Banner-1.20.1/)报告，你发现的问题很可能已经修复。
         
         在进行错误报告之前，请确保没有类似的现有的报告。
 

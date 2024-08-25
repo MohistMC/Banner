@@ -217,7 +217,7 @@ publishing {
 import groovy.json.JsonSlurper
 static String ci_version() {
 	try {
-		def data = new JsonSlurper().parseText(new URL("https://ci.codemc.io/job/MohistMC/job/Banner-1.20/api/json").getText("UTF-8"))
+		def data = new JsonSlurper().parseText(new URL("https://ci.codemc.io/job/MohistMC/job/Banner-1.20.1/api/json").getText("UTF-8"))
 		return data.builds["number"][0]
 	} catch (Exception ignored) {
 		return "1.20.1"
