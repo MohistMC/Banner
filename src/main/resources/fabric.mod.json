@@ -80,6 +80,7 @@
       "net/minecraft/class_7128": ["com/mohistmc/banner/injection/world/level/block/InjectionSculkSpreader"],
       "net/minecraft/class_1946": ["com/mohistmc/banner/injection/world/level/portal/InjectionPortalForcer"],
       "net/minecraft/class_2535": ["com/mohistmc/banner/injection/network/connection/InjectionConnection"],
+      "net/minecraft/class_8711": ["com/mohistmc/banner/injection/network/InjectionDiscardedPayload"],
       "net/minecraft/class_2945": ["com/mohistmc/banner/injection/network/syncher/InjectionSynchedEntityData"],
       "net/minecraft/class_5251": ["com/mohistmc/banner/injection/network/chat/InjectionTextColor"],
       "net/minecraft/class_9326": ["com/mohistmc/banner/injection/network/chat/InjectionDataComponentPatch"],

@@ -15,6 +15,7 @@ import net.minecraft.network.protocol.common.ClientboundDisconnectPacket;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ServerboundResourcePackPacket;
+import net.minecraft.network.protocol.common.custom.DiscardedPayload;
 import net.minecraft.network.protocol.cookie.ServerboundCookieResponsePacket;
 import net.minecraft.network.protocol.game.ClientboundSetDefaultSpawnPositionPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -221,6 +222,10 @@ public abstract class MixinServerCommonPacketListenerImpl implements ServerCommo
     }
 
     public FriendlyByteBuf bridge$getDiscardedData(ServerboundCustomPayloadPacket packet) {
+        var customPacketPayload = packet.payload();
+        if (customPacketPayload instanceof DiscardedPayload b && b.bridge$getData() != null) {
+            return new FriendlyByteBuf(b.bridge$getData());
+        }
         return null;
     }
 
