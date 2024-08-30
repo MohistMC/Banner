@@ -1,14 +1,7 @@
 package com.mohistmc.banner.mixin.core.world.entity.projectile;
 
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.projectile.ThrownTrident;
-import net.minecraft.world.level.Level;
-import org.bukkit.event.weather.LightningStrikeEvent;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ThrownTrident.class)
 public class MixinThrownTrident {

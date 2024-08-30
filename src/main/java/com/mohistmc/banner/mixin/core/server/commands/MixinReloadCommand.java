@@ -1,8 +1,7 @@
 package com.mohistmc.banner.mixin.core.server.commands;
 
-import java.util.Collection;
-
 import com.mohistmc.banner.asm.annotation.TransformAccess;
+import java.util.Collection;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.commands.ReloadCommand;
 import net.minecraft.server.packs.repository.PackRepository;

@@ -2,7 +2,6 @@ package com.mohistmc.banner.mixin.core.world.level.dimension.end;
 
 import com.mohistmc.banner.injection.world.level.dimension.end.InjectionEndDragonFight;
 import java.util.List;
-
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;

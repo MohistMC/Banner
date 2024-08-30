@@ -1,13 +1,12 @@
 package com.mohistmc.banner.mixin.core.server.network;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.util.HashMap;
-
 import com.destroystokyo.paper.proxy.VelocitySupport;
 import com.google.gson.Gson;
 import com.mojang.authlib.properties.Property;
 import com.mojang.util.UndashedUuid;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.util.HashMap;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.handshake.ClientIntentionPacket;

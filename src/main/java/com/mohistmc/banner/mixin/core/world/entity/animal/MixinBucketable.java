@@ -2,7 +2,6 @@ package com.mohistmc.banner.mixin.core.world.entity.animal;
 
 import java.util.Optional;
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;

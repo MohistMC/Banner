@@ -3,10 +3,8 @@ package com.mohistmc.banner.mixin.core.server.network;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
-
 import java.net.SocketAddress;
 import java.util.Locale;
-
 import net.minecraft.server.ServerInfo;
 import net.minecraft.server.network.LegacyQueryHandler;
 import org.bukkit.craftbukkit.event.CraftEventFactory;

@@ -2,13 +2,12 @@ package com.mohistmc.banner.mixin.core.server;
 
 import com.google.common.base.Charsets;
 import com.mohistmc.banner.BannerServer;
+import com.mojang.serialization.Dynamic;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.util.Arrays;
-
-import com.mojang.serialization.Dynamic;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;

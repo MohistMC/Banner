@@ -3,7 +3,6 @@ package com.mohistmc.banner.mixin.core.world.entity.item;
 import com.mohistmc.banner.asm.annotation.TransformAccess;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.FallingBlockEntity;

@@ -1,8 +1,7 @@
 package com.mohistmc.banner.mixin.core.server.level;
 
-import java.util.Comparator;
-
 import com.mohistmc.banner.asm.annotation.TransformAccess;
+import java.util.Comparator;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.util.Unit;
 import org.bukkit.plugin.Plugin;

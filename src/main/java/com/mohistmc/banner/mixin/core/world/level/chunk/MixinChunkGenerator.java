@@ -1,10 +1,8 @@
 package com.mohistmc.banner.mixin.core.world.level.chunk;
 
 import com.mohistmc.banner.injection.world.level.chunk.InjectionChunkGenerator;
-
 import java.util.Objects;
 import java.util.function.Predicate;
-
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryAccess;

@@ -111,7 +111,6 @@
     "stats.MixinServerRecipeBook",
     "stats.MixinStatsCounter",
     "util.MixinSpawnUtil",
-    "util.MixinThreadingDetector",
     "util.datafix.MixinDataFixers",
     "world.MixinBiomeModificationImpl",
     "world.MixinBlockGetter",

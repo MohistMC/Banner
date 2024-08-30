@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.core.world.level.storage;
 
 import com.mohistmc.banner.injection.world.level.storage.InjectionPlayerDataStorage;
+import com.mojang.datafixers.DataFixer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Files;
@@ -10,8 +11,6 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
-
-import com.mojang.datafixers.DataFixer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;

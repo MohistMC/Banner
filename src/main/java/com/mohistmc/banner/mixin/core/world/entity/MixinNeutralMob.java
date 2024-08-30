@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.core.world.entity;
 
 import com.mohistmc.banner.injection.world.entity.InjectionNeutralMob;
-
 import io.izzel.arclight.mixin.Decorate;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;

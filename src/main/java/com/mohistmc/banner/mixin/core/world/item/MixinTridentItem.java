@@ -1,7 +1,5 @@
 package com.mohistmc.banner.mixin.core.world.item;
 
-import java.util.function.Consumer;
-
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;

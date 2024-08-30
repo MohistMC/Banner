@@ -1,11 +1,6 @@
 package com.mohistmc.banner.mixin.core.server.players;
 
-import com.google.gson.JsonObject;
-import com.mohistmc.banner.asm.annotation.CreateConstructor;
-import com.mohistmc.banner.asm.annotation.ShadowConstructor;
 import com.mohistmc.banner.injection.server.players.InjectionBanListEntry;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import net.minecraft.server.players.BanListEntry;
 import net.minecraft.server.players.StoredUserEntry;

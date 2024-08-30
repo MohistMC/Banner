@@ -1,14 +1,8 @@
 package com.mohistmc.banner.mixin.core.world.item;
 
-import net.minecraft.Util;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.PlayerHeadItem;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerHeadItem.class)
 public abstract class MixinPlayerHeadItem extends Item {

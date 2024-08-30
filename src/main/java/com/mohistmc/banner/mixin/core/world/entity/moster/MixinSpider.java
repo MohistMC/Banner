@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.core.world.entity.moster;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;

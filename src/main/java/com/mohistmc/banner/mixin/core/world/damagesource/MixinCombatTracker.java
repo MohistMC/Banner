@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.core.world.damagesource;
 
 import com.mohistmc.banner.injection.world.damagesource.InjectionCombatTracker;
+import java.util.List;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.CombatEntry;
 import net.minecraft.world.damagesource.CombatTracker;
@@ -10,8 +11,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.List;
 
 @Mixin(CombatTracker.class)
 public class MixinCombatTracker implements InjectionCombatTracker {

@@ -2,7 +2,6 @@ package com.mohistmc.banner.mixin.core.world.entity.moster;
 
 import io.izzel.arclight.mixin.Eject;
 import java.util.UUID;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Zombie;

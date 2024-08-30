@@ -1,10 +1,9 @@
 package com.mohistmc.banner.mixin.core.world;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.mohistmc.banner.asm.annotation.CreateConstructor;
 import com.mohistmc.banner.asm.annotation.ShadowConstructor;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;

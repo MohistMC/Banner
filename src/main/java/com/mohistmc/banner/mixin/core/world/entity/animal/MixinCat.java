@@ -4,7 +4,6 @@ import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.Cat;

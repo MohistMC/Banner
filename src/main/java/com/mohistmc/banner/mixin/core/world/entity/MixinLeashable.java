@@ -1,12 +1,8 @@
 package com.mohistmc.banner.mixin.core.world.entity;
 
 import io.izzel.arclight.mixin.Decorate;
-import io.izzel.arclight.mixin.DecorationOps;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Leashable;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.level.ItemLike;
 import org.bukkit.Bukkit;
 import org.bukkit.event.entity.EntityUnleashEvent;
 import org.spongepowered.asm.mixin.Mixin;

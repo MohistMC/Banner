@@ -5,7 +5,6 @@ import com.mohistmc.banner.asm.CreateConstructorProcessor;
 import com.mohistmc.banner.asm.MixinProcessor;
 import com.mohistmc.banner.asm.RenameIntoProcessor;
 import com.mohistmc.banner.asm.TransformAccessProcessor;
-import com.mohistmc.banner.stackdeobf.util.CompatUtil;
 import java.util.List;
 import java.util.Set;
 
@@ -13,7 +12,6 @@ import io.izzel.arclight.mixin.MixinTools;
 import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.MixinEnvironment;
-import org.spongepowered.asm.mixin.connect.IMixinConnector;
 import org.spongepowered.asm.mixin.extensibility.IEnvironmentTokenProvider;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -69,10 +67,6 @@ public class BannerMixinPlugin implements IMixinConfigPlugin, IEnvironmentTokenP
         }
         if (mixinClassName.equals("com.mohistmc.banner.mixin.core.world.level.MixinClipContext")) {
             return !FabricLoader.getInstance().isModLoaded("create") && !FabricLoader.getInstance().isModLoaded("porting_lib");
-        }
-        if (mixinClassName.endsWith("ThreadingDetectorMixin")) {
-            // added in 1.18-pre7
-            return CompatUtil.WORLD_VERSION >= 2854;
         }
         return true;
     }
