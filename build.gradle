@@ -1,7 +1,6 @@
 plugins {
     id 'fabric-loom' version '1.7-SNAPSHOT'
     id 'maven-publish'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 version = project.minecraft_version + "-" + ci_version()
@@ -46,16 +45,11 @@ allprojects {
         }
         mavenCentral()
     }
-
-    dependencies {
-        implementation("com.mohistmc:i18n:0.6")
-        implementation('com.mohistmc:json:0.5')
-        implementation('com.mohistmc:tools:0.5.1')
-        implementation('com.mohistmc:dynamicenum:0.3.1')
-    }
 }
 
 dependencies {
+    implementation 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     mappings loom.layered() {
