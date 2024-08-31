@@ -1,8 +1,5 @@
 package com.mohistmc.banner;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.net.MalformedURLException;
@@ -17,8 +14,6 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class BannerMain {
-
-    public static final Logger LOGGER = LogManager.getLogger("BannerMC");
 
     public static void main(String[] args) throws Throwable {
         System.setProperty("fabric.skipMcProvider", "true");
