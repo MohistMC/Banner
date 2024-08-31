@@ -1,0 +1,2 @@
+libraries/commons-lang/commons-lang/2.6-mohist/commons-lang-2.6-mohist.jar|755f5cdb5de00d072215340e8370daff|280341
+libraries/net/md-5/bungeecord-chat/1.16-R0.4/bungeecord-chat-1.16-R0.4.jar|bf6464395a0951675c3bca47d3e1a13a|148961

@@ -1,6 +1,7 @@
 package com.mohistmc.banner.bukkit;
 
 import com.mohistmc.banner.BannerMCStart;
+import com.mohistmc.banner.util.I18n;
 import com.mohistmc.tools.ConnectionUtil;
 
 /**

@@ -55,8 +55,8 @@ chmod +x ./banner-launcher
 ```
 
 ## Usage
-- Just put it in the mods folder.
-- Because Banner is a mod!!!
+- Download Banner.
+- Launch with command java -jar banner-launcher-<version>.jar nogui. The nogui argument will disable the server control panel.
 
 ## Upstream Projects
 - [**Fabric Loader**](https://github.com/FabricMC/fabric-loader.git) - Mod load support.
