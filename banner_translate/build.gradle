@@ -1,0 +1,82 @@
+plugins {
+    id 'fabric-loom' version '1.7-SNAPSHOT'
+    id 'maven-publish'
+}
+
+version = project.minecraft_version + "-" + ci_version()
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name + "-translate"
+}
+
+dependencies {
+    implementation 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.layered() {
+        officialMojangMappings()
+    }
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+}
+
+moduleDependencies(project, [
+        "banner_server"
+])
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.WARN
+}
+
+loom.runs.configureEach {
+    vmArgs([
+            "-enableassertions",
+            "-Dmixin.debug.verify=true",
+            "-Dmixin.debug.countInjections=true"
+    ])
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-Xlint:-dep-ann' << '-Xlint:-removal' << '-Xdiags:verbose'
+}
+
+jar {
+    from("LICENSE")
+    manifest {
+        attributes(
+                'Specification-Title'   : 'Banner',
+                'Specification-Vendor'  : 'MohistMC',
+                'Specification-Version' : ci_version(),
+                'Implementation-Title'  : 'Banner',
+                'Implementation-Version': version,
+                'Implementation-Vendor' : 'MohistMC'
+        )
+    }
+}
+
+import groovy.json.JsonSlurper
+static String ci_version() {
+    try {
+        def data = new JsonSlurper().parseText(new URL("https://ci.codemc.io/job/MohistMC/job/Banner-1.21.1/api/json").getText("UTF-8"))
+        return data.builds["number"][0]
+    } catch (Exception ignored) {
+        return "1.21.1"
+    }
+}

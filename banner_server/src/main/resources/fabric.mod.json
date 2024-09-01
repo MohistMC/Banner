@@ -24,8 +24,7 @@
     ]
   },
   "mixins": [
-    "banner.core.mixins.json",
-    "banner.translate.mixins.json"
+    "banner.server.mixins.json"
   ],
 
   "depends": {

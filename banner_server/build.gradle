@@ -19,16 +19,6 @@ dependencies {
 	}
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	// Make a collection of all api modules we wish to use
-	Set<String> apiModules = [
-			"fabric-api-base",
-			"fabric-events-interaction-v0",
-			"fabric-entity-events-v1",
-			"fabric-lifecycle-events-v1",
-			"fabric-transitive-access-wideners-v1",
-			"fabric-biome-api-v1"
-	]
-
 	modImplementation "net.fabricmc.fabric-api:fabric-api:$project.fabric_version"
 
 	compileOnly "org.jetbrains:annotations:21.0.1"
@@ -68,6 +58,8 @@ dependencies {
 
 	// mohist lib
 	implementation(include("com.mohistmc:librariesvault:1.20.2"))
+
+	include(rootProject.project("banner_translate"))
 }
 
 loom {
