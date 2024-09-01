@@ -62,7 +62,10 @@ public final class CraftFoodComponent implements FoodComponent {
         result.put("saturation", this.getSaturation());
         result.put("can-always-eat", this.canAlwaysEat());
         result.put("eat-seconds", this.getEatSeconds());
-        result.put("using-converts-to", this.getUsingConvertsTo());
+        ItemStack usingConvertsTo = this.getUsingConvertsTo();
+        if (usingConvertsTo != null) {
+            result.put("using-converts-to", usingConvertsTo);
+        }
         result.put("effects", this.getEffects());
         return result;
     }
