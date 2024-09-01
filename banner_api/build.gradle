@@ -1,4 +1,4 @@
-archivesBaseName = project.archives_base_name + "-translate"
+archivesBaseName = project.archives_base_name + "-api"
 version = getSubprojectVersion(project)
 
 moduleDependencies(project, [

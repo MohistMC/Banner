@@ -90,6 +90,35 @@ allprojects {
         // mohist lib
         implementation("com.mohistmc:librariesvault:1.20.2")
     }
+
+    loom.runs.configureEach {
+        vmArgs([
+                "-enableassertions",
+                "-Dmixin.debug.verify=true",
+                "-Dmixin.debug.countInjections=true"
+        ])
+    }
+
+    processResources {
+        inputs.property "version", project.version
+
+        filesMatching("fabric.mod.json") {
+            expand "version": project.version
+        }
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.compilerArgs << '-Xlint:-dep-ann' << '-Xlint:-removal' << '-Xdiags:verbose'
+    }
 }
 
 def moduleDependencies(Project project, List<String> depNames) {
@@ -108,6 +137,10 @@ def moduleDependencies(Project project, List<String> depNames) {
             api(implementation(it))
         }
     }
+}
+
+def getSubprojectVersion(project) {
+    return project.minecraft_version + "-" + ci_version()
 }
 
 dependencies {

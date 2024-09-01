@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.mohistmc.banner.translate.mixin",
+  "package": "com.mohistmc.banner.api.mixin",
   "compatibilityLevel": "JAVA_21",
   "overwrites": {
     "conformVisibility": true
@@ -12,11 +12,7 @@
   },
   "mixinPriority": 400,
   "mixins": [
-    "MixinAdvancementTree",
-    "MixinBukkit",
-    "MixinDedicatedServer",
-    "MixinLoggerChunkProgressListener",
-    "MixinMinecraftServer",
-    "MixinServerConnectionListener",
+    "MixinLivingEntity",
+    "MixinServerLevel"
   ]
 }

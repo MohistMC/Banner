@@ -60,6 +60,7 @@ dependencies {
 	implementation(include("com.mohistmc:librariesvault:1.20.2"))
 
 	include(rootProject.project("banner_translate"))
+	include(rootProject.project("banner_api"))
 }
 
 loom {
