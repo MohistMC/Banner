@@ -4,6 +4,7 @@ import com.mohistmc.banner.config.BannerConfigUtil;
 import com.mohistmc.banner.util.EulaUtil;
 import com.mohistmc.banner.util.I18n;
 import com.mohistmc.i18n.i18n;
+import io.izzel.arclight.mixin.injector.DecoratorInfo;
 import io.izzel.arclight.mixin.injector.EjectorInfo;
 import java.util.Scanner;
 import net.fabricmc.loader.api.FabricLoader;
@@ -19,6 +20,7 @@ public class BannerMCStart {
 
     public static void run() throws Exception {
         InjectionInfo.register(EjectorInfo.class);
+        InjectionInfo.register(DecoratorInfo.class);
         BannerConfigUtil.copyBannerConfig();
         BannerConfigUtil.lang();
         BannerConfigUtil.i18n();
