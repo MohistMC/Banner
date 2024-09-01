@@ -12,9 +12,9 @@ public class MixinLivingEntity {
 
     @Inject(method = "heal",at=@At("HEAD"),cancellable = true)
     private void callLivingHealEvent(float amount, CallbackInfo ci) {
-        LivingHealEvent bedracketEvent = new LivingHealEvent((org.bukkit.entity.LivingEntity) ((LivingEntity) (Object) this).getBukkitEntity(), amount);
+        LivingHealEvent bannerEvent = new LivingHealEvent((org.bukkit.entity.LivingEntity) ((LivingEntity) (Object) this).getBukkitEntity(), amount);
 
-        amount = bedracketEvent.getAmount();
+        amount = bannerEvent.getAmount();
         if (amount <= 0) {
             ci.cancel();
         }
