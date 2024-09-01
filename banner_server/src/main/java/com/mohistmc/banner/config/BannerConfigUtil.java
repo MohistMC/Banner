@@ -1,7 +1,6 @@
 package com.mohistmc.banner.config;
 
 import com.mohistmc.banner.BannerMCStart;
-import com.mohistmc.banner.network.download.DownloadSource;
 import com.mohistmc.i18n.i18n;
 import java.io.File;
 import java.io.IOException;
@@ -39,15 +38,6 @@ public class BannerConfigUtil {
             save();
         }
         return yml.getBoolean(key, true);
-    }
-
-    public static String defaultSource() {
-        String key = "banner.libraries_downloadsource";
-        if (yml.get(key) == null) {
-            yml.set(key, DownloadSource.MOHIST.name());
-            save();
-        }
-        return yml.getString(key, DownloadSource.MOHIST.name());
     }
 
     public static boolean aBoolean(String key, boolean defaultReturn) {

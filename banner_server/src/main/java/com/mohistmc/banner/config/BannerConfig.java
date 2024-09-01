@@ -2,7 +2,6 @@ package com.mohistmc.banner.config;
 
 import com.google.common.base.Throwables;
 import com.mohistmc.banner.api.color.ColorsAPI;
-import com.mohistmc.banner.network.download.DownloadSource;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -122,7 +121,6 @@ public class BannerConfig {
     public static int max_enchantment_level;
     public static boolean check_update;
     public static boolean check_libraries;
-    public static String libraries_downloadsource;
     public static String lang;
     public static boolean showLogo;
     public static boolean stackdeobf;
@@ -145,7 +143,6 @@ public class BannerConfig {
     private static void banner() {
         check_update = getBoolean("banner.check_update", false);
         check_libraries = getBoolean("banner.check_libraries", true);
-        libraries_downloadsource = getString("banner.libraries_downloadsource", DownloadSource.MOHIST.name());
         lang = getString("banner.lang", "xx_XX");
         showLogo = getBoolean("banner.show_logo", true);
         stackdeobf = getBoolean("banner.stackdeobf", true);

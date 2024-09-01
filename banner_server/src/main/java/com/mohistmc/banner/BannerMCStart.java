@@ -1,8 +1,6 @@
 package com.mohistmc.banner;
 
 import com.mohistmc.banner.config.BannerConfigUtil;
-import com.mohistmc.banner.libraries.CustomLibraries;
-import com.mohistmc.banner.libraries.DefaultLibraries;
 import com.mohistmc.banner.util.EulaUtil;
 import com.mohistmc.banner.util.I18n;
 import com.mohistmc.i18n.i18n;
@@ -34,15 +32,6 @@ public class BannerMCStart {
             LOGGER.info("|_____/ /_/   |_| |_|  \\_| |_|  \\_| |_____| |_|  \\_\\ ");
             LOGGER.info(I18n.as("banner.launch.welcomemessage") + " - " + getVersion() + ", Java " + javaVersion);
         }
-        if (System.getProperty("log4j.configurationFile") == null) {
-            System.setProperty("log4j.configurationFile", "log4j2_banner.xml");
-        }
-        // if (BannerConfigUtil.CHECK_UPDATE()) UpdateUtils.versionCheck();
-        if (BannerConfigUtil.CHECK_LIBRARIES()) {
-            DefaultLibraries.run();
-        }
-        DefaultLibraries.proposeFabricLibs();
-        CustomLibraries.loadCustomLibs();
         if (!EulaUtil.hasAcceptedEULA()) {
             System.out.println(I18n.as("eula"));
             while (!"true".equals(new Scanner(System.in).next()));
