@@ -38,3 +38,8 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build
+      - name: Upload API LIB
+        uses: actions/upload-artifact@v2
+        with:
+          name: Banner API
+          path: ./banner_server/build/devlibs/*.jar
