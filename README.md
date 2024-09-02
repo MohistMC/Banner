@@ -47,14 +47,14 @@ so don't worried about the plugin files will be changed to unsafe
 
 ## Usage
 - Download Banner.
-- Launch with command java -jar banner-launcher-<version>.jar nogui. The nogui argument will disable the server control panel.
+- Launch with command java -jar banner-launcher-version.jar nogui. The nogui argument will disable the server control panel.
 
 ## Developer Support
 - Download the dev lib jar from GitHub actions.
 - Use Fabric Official Template [**Fabric Example Mod**](https://github.com/FabricMC/fabric-example-mod.git).
 - Using Mojang Official Mappings in your build.gradle
 - Create a directory called lib in your root dir.
-- Add dependencies of Banner, such as compileOnly(fileTree("lib/banner-<version>-dev.jar"))
+- Add dependencies of Banner, such as compileOnly(fileTree("lib/banner-version-dev.jar"))
 
 ## Upstream Projects
 - [**Fabric Loader**](https://github.com/FabricMC/fabric-loader.git) - Mod load support.
