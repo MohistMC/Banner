@@ -3,7 +3,7 @@ plugins {
 	id 'maven-publish'
 }
 
-version = project.minecraft_version + "-" + ci_version()
+version = getSubprojectVersion(project)
 group = project.maven_group
 
 base {
@@ -108,15 +108,5 @@ jar {
 				'Implementation-Version': version,
 				'Implementation-Vendor' : 'MohistMC'
 		)
-	}
-}
-
-import groovy.json.JsonSlurper
-static String ci_version() {
-	try {
-		def data = new JsonSlurper().parseText(new URL("https://ci.codemc.io/job/MohistMC/job/Banner-1.21.1/api/json").getText("UTF-8"))
-		return data.builds["number"][0]
-	} catch (Exception ignored) {
-		return "1.21.1"
 	}
 }
