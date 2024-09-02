@@ -11,4 +11,3 @@ rootProject.name = 'banner'
 
 include("banner_server")
 include("banner_translate")
-include("banner_api")
