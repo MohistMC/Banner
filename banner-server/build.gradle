@@ -21,17 +21,3 @@ moduleDependencies(project, [
 		"banner-api",
 		"banner-transitive-access-wideners"
 ])
-
-jar {
-	from("LICENSE")
-	manifest {
-		attributes(
-				'Specification-Title'   : 'Banner',
-				'Specification-Vendor'  : 'MohistMC',
-				'Specification-Version' : ci_version(),
-				'Implementation-Title'  : 'Banner',
-				'Implementation-Version': version,
-				'Implementation-Vendor' : 'MohistMC'
-		)
-	}
-}

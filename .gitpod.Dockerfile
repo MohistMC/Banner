@@ -11,9 +11,9 @@ USER gitpod
 #
 # More information: https://www.gitpod.io/docs/config-docker/
 
-# Install Java 8 and 16
+# Install Java 21
 RUN sudo apt-get -q update && \
-    sudo apt install -yq openjdk-8-jdk openjdk-17-jdk
+    sudo apt install -yq openjdk-8-jdk openjdk-21-jdk
 
 # This is so that you can use java 8 until such a time as you switch to java 16
-RUN sudo update-java-alternatives --set java-1.17.0-openjdk-amd64
+RUN sudo update-java-alternatives --set java-1.21.0-openjdk-amd64

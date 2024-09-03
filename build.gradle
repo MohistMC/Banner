@@ -124,6 +124,7 @@ allprojects {
     tasks.register('cleanBuild') {
         doFirst {
             project.file("build/libs").deleteDir()
+            project.file("build/devlibs").deleteDir()
         }
         dependsOn(tasks.build)
     }
