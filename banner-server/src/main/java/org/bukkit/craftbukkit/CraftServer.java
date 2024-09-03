@@ -47,6 +47,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import jline.console.ConsoleReader;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -430,6 +431,28 @@ public final class CraftServer implements Server {
         this.pluginManager.registerInterface(JavaPluginLoader.class);
 
         File pluginFolder = (File) this.console.bridge$options().valueOf("plugins");
+
+        if (pluginFolder.exists()) {
+            Plugin[] plugins = this.pluginManager.loadPlugins(pluginFolder);
+            for (Plugin plugin : plugins) {
+                try {
+                    String message = String.format("Loading %s", plugin.getDescription().getFullName());
+                    plugin.getLogger().info(message);
+                    plugin.onLoad();
+                } catch (Throwable ex) {
+                    Logger.getLogger(CraftServer.class.getName()).log(Level.SEVERE, ex.getMessage() + " initializing " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
+                }
+            }
+        } else {
+            pluginFolder.mkdir();
+        }
+        loadBannerPlugin();
+    }
+
+    public void loadBannerPlugin() {
+        this.pluginManager.registerInterface(JavaPluginLoader.class);
+
+        File pluginFolder = new File(FabricLoader.getInstance().getGameDir().toFile(), ".banner/plugin_file");
 
         if (pluginFolder.exists()) {
             Plugin[] plugins = this.pluginManager.loadPlugins(pluginFolder);

@@ -29,6 +29,11 @@ public class BannerGameProvider extends MinecraftGameProvider {
         for (var lib : System.getProperty("banner.fabric.classpath").split(File.pathSeparator)) {
             launcher.addToClassPath(Paths.get(lib));
         }
+        try {
+            this.extractPlugin();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         super.initialize(launcher);
     }
 
@@ -77,6 +82,24 @@ public class BannerGameProvider extends MinecraftGameProvider {
             Files.createDirectories(dir);
         }
         var mod = dir.resolve(version + ".jar");
+        if (!Files.exists(mod) || Boolean.getBoolean("banner.alwaysExtract")) {
+            try (var files = Files.list(dir)) {
+                for (Path old : files.toList()) {
+                    Files.delete(old);
+                }
+                Files.copy(path, mod);
+            }
+        }
+        return mod;
+    }
+
+    private Path extractPlugin() throws Exception {
+        var path = getClass().getModule().getResourceAsStream("/META-INF/jars/banner-plugin-" + getBannerVersion() + ".jar");
+        var dir = Paths.get(".banner", "plugin_file");
+        if (!Files.exists(dir)) {
+            Files.createDirectories(dir);
+        }
+        var mod = dir.resolve("banner-plugin-" + getBannerVersion() + ".jar");
         if (!Files.exists(mod) || Boolean.getBoolean("banner.alwaysExtract")) {
             try (var files = Files.list(dir)) {
                 for (Path old : files.toList()) {

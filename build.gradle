@@ -106,6 +106,10 @@ allprojects {
         filesMatching("fabric.mod.json") {
             expand "version": project.version
         }
+
+        filesMatching("plugin.yml") {
+            expand "version": project.version
+        }
     }
 
     java {
@@ -153,6 +157,7 @@ def getSubprojectVersion(project) {
 
 dependencies {
     include(project("banner-server"))
+    include(project("banner-plugin"))
 }
 
 tasks.withType(JavaCompile).configureEach {

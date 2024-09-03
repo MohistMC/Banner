@@ -1,4 +1,4 @@
-package com.mohistmc.banner.plugins;
+package com.mohistmc.banner.plugin;
 
 import com.mohistmc.banner.config.BannerConfig;
 import java.util.Arrays;
