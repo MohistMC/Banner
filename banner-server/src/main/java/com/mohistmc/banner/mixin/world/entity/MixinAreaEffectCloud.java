@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.Entity;
@@ -20,6 +19,7 @@ import org.bukkit.craftbukkit.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRemoveEvent;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,20 +30,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(AreaEffectCloud.class)
 public abstract class MixinAreaEffectCloud extends Entity implements TraceableEntity {
 
-    @Shadow public abstract boolean isWaiting();
-
-    @Shadow public abstract float getRadius();
-
-    @Shadow public abstract ParticleOptions getParticle();
-
-    @Shadow public abstract void setRadius(float f);
-
-    @Shadow @Final private Map<Entity, Integer> victims;
-
-
-    public MixinAreaEffectCloud(EntityType<?> entityType, Level level) {
-        super(entityType, level);
-    }
+    // @formatter:off
+    @Shadow @Final private Map<Entity, Integer> victims;public MixinAreaEffectCloud(EntityType<?> entityType, Level level) {
+    super(entityType, level);
+}
+    @Shadow @Nullable public abstract LivingEntity getOwner();
+    // @formatter:on
 
     @SuppressWarnings("unchecked")
     @Decorate(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getEntitiesOfClass(Ljava/lang/Class;Lnet/minecraft/world/phys/AABB;)Ljava/util/List;"))

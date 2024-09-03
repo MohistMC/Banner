@@ -8,6 +8,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.BlockUtil;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
@@ -17,6 +20,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
@@ -24,17 +28,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.entity.PortalProcessor;
-import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.RelativeMovement;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -375,43 +374,51 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         // CraftBukkit end
     }
 
-    @Redirect(method = "baseTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;handlePortal()V"))
-    public void banner$baseTick$moveToPostTick(Entity entity) {
-        if ((Object) this instanceof ServerPlayer) this.handlePortal();// CraftBukkit - // Moved up to postTick
+    @Decorate(method = "baseTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;handlePortal()V"))
+    private void banner$baseTick$moveToPostTick(Entity entity) throws Throwable {
+        if ((Object) this instanceof ServerPlayer) {
+            DecorationOps.callsite().invoke(entity);// CraftBukkit - // Moved up to postTick
+        }
     }
 
-    @Redirect(method = "updateFluidHeightAndDoFluidPushing", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/material/FluidState;getFlow(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/phys/Vec3;"))
-    private Vec3 banner$setLava(FluidState instance, BlockGetter level, BlockPos pos) {
+    @Decorate(method = "updateFluidHeightAndDoFluidPushing", require = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/material/FluidState;getFlow(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/phys/Vec3;"))
+    private Vec3 banner$setLava(FluidState instance, BlockGetter level, BlockPos pos) throws Throwable {
         if (instance.getType().is(FluidTags.LAVA)) {
             lastLavaContact = pos.immutable();
         }
-        return instance.getFlow(level, pos);
+        return (Vec3) DecorationOps.callsite().invoke(instance, level, pos);
     }
 
-    @Redirect(method = "baseTick", at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/world/entity/Entity;isInLava()Z"))
-    private boolean banner$resetLava(Entity instance) {
-        var ret = instance.isInLava();
+    @Decorate(method = "baseTick", at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/world/entity/Entity;isInLava()Z"))
+    private boolean banner$resetLava(Entity instance) throws Throwable {
+        var ret = (boolean) DecorationOps.callsite().invoke(instance);
         if (!ret) {
             this.lastLavaContact = null;
         }
         return ret;
     }
 
-    @Redirect(method = "lavaHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(F)V"))
-    public void banner$setOnFireFromLava$bukkitEvent(Entity instance, float f) {
-        var damager = (lastLavaContact == null) ? null : CraftBlock.at(level, lastLavaContact);
+    @Decorate(method = "lavaHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(F)V"))
+    public void banner$setOnFireFromLava$bukkitEvent(Entity instance, float f) throws Throwable {
         if ((Object) this instanceof LivingEntity && remainingFireTicks <= 0) {
+            var damager = (lastLavaContact == null) ? null : CraftBlock.at(level(), lastLavaContact);
             var damagee = this.getBukkitEntity();
             EntityCombustEvent combustEvent = new EntityCombustByBlockEvent(damager, damagee, 15);
             Bukkit.getPluginManager().callEvent(combustEvent);
 
-            if (!combustEvent.isCancelled()) {
-                this.igniteForSeconds(combustEvent.getDuration());
+            if (combustEvent.isCancelled()) {
+                return;
             }
-        } else {
-            // This will be called every single tick the entity is in lava, so don't throw an event
-            this.igniteForSeconds(15);
+            f = combustEvent.getDuration();
         }
+        DecorationOps.callsite().invoke(instance, f);
+    }
+
+    @Decorate(method = "lavaHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/damagesource/DamageSources;lava()Lnet/minecraft/world/damagesource/DamageSource;"))
+    private DamageSource banner$resetBlockDamage(DamageSources instance) throws Throwable {
+        var damager = (lastLavaContact == null) ? null : CraftBlock.at(level(), lastLavaContact);
+        var damageSource = (DamageSource) DecorationOps.callsite().invoke(instance);
+        return damageSource.directBlock(damager);
     }
 
     @ModifyArg(method = "move", index = 1, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;stepOn(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/Entity;)V"))
@@ -617,6 +624,16 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
             this.vehicle = entity;
         }
     }
+
+    @Inject(method = "interact", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Leashable;setLeashedTo(Lnet/minecraft/world/entity/Entity;Z)V"))
+    private void banner$leashEvent(Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
+        if (CraftEventFactory.callPlayerLeashEntityEvent((Entity) (Object) this, player, player, interactionHand).isCancelled()) {
+            //player.resendItemInHands(); // SPIGOT-7615: Resend to fix client desync with used item // Banner TODO Fixme
+            ((ServerPlayer) player).connection.send(new ClientboundSetEntityLinkPacket((Entity) (Object) this, ((Leashable) this).getLeashHolder()));
+            cir.setReturnValue(InteractionResult.PASS);
+        }
+    }
+
 
     @Override
     public boolean banner$removePassenger(Entity entity) {
