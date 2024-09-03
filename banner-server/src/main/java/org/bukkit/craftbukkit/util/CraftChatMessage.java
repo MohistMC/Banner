@@ -82,62 +82,62 @@ public final class CraftChatMessage {
                     this.appendNewComponent(index);
                 }
                 switch (groupId) {
-                case 1:
-                    char c = match.toLowerCase(Locale.ROOT).charAt(1);
-                    ChatFormatting format = CraftChatMessage.formatMap.get(c);
+                    case 1:
+                        char c = match.toLowerCase(Locale.ROOT).charAt(1);
+                        ChatFormatting format = CraftChatMessage.formatMap.get(c);
 
-                    if (c == 'x') {
-                        this.hex = new StringBuilder("#");
-                    } else if (this.hex != null) {
-                        this.hex.append(c);
+                        if (c == 'x') {
+                            this.hex = new StringBuilder("#");
+                        } else if (this.hex != null) {
+                            this.hex.append(c);
 
-                        if (this.hex.length() == 7) {
-                            this.modifier = StringMessage.RESET.withColor(TextColor.parseColor(this.hex.toString()).result().get());
-                            this.hex = null;
+                            if (this.hex.length() == 7) {
+                                this.modifier = StringMessage.RESET.withColor(TextColor.parseColor(this.hex.toString()).result().get());
+                                this.hex = null;
+                            }
+                        } else if (format.isFormat() && format != ChatFormatting.RESET) {
+                            switch (format) {
+                                case BOLD:
+                                    this.modifier = this.modifier.withBold(Boolean.TRUE);
+                                    break;
+                                case ITALIC:
+                                    this.modifier = this.modifier.withItalic(Boolean.TRUE);
+                                    break;
+                                case STRIKETHROUGH:
+                                    this.modifier = this.modifier.withStrikethrough(Boolean.TRUE);
+                                    break;
+                                case UNDERLINE:
+                                    this.modifier = this.modifier.withUnderlined(Boolean.TRUE);
+                                    break;
+                                case OBFUSCATED:
+                                    this.modifier = this.modifier.withObfuscated(Boolean.TRUE);
+                                    break;
+                                default:
+                                    throw new AssertionError("Unexpected message format");
+                            }
+                        } else { // Color resets formatting
+                            this.modifier = StringMessage.RESET.withColor(format);
                         }
-                    } else if (format.isFormat() && format != ChatFormatting.RESET) {
-                        switch (format) {
-                        case BOLD:
-                            this.modifier = this.modifier.withBold(Boolean.TRUE);
-                            break;
-                        case ITALIC:
-                            this.modifier = this.modifier.withItalic(Boolean.TRUE);
-                            break;
-                        case STRIKETHROUGH:
-                            this.modifier = this.modifier.withStrikethrough(Boolean.TRUE);
-                            break;
-                        case UNDERLINE:
-                            this.modifier = this.modifier.withUnderlined(Boolean.TRUE);
-                            break;
-                        case OBFUSCATED:
-                            this.modifier = this.modifier.withObfuscated(Boolean.TRUE);
-                            break;
-                        default:
-                            throw new AssertionError("Unexpected message format");
+                        needsAdd = true;
+                        break;
+                    case 2:
+                        if (plain) {
+                            this.appendNewComponent(matcher.end(groupId));
+                        } else {
+                            if (!(match.startsWith("http://") || match.startsWith("https://"))) {
+                                match = "http://" + match;
+                            }
+                            this.modifier = this.modifier.withClickEvent(new ClickEvent(Action.OPEN_URL, match));
+                            this.appendNewComponent(matcher.end(groupId));
+                            this.modifier = this.modifier.withClickEvent((ClickEvent) null);
                         }
-                    } else { // Color resets formatting
-                        this.modifier = StringMessage.RESET.withColor(format);
-                    }
-                    needsAdd = true;
-                    break;
-                case 2:
-                    if (plain) {
-                        this.appendNewComponent(matcher.end(groupId));
-                    } else {
-                        if (!(match.startsWith("http://") || match.startsWith("https://"))) {
-                            match = "http://" + match;
+                        break;
+                    case 3:
+                        if (needsAdd) {
+                            this.appendNewComponent(index);
                         }
-                        this.modifier = this.modifier.withClickEvent(new ClickEvent(Action.OPEN_URL, match));
-                        this.appendNewComponent(matcher.end(groupId));
-                        this.modifier = this.modifier.withClickEvent((ClickEvent) null);
-                    }
-                    break;
-                case 3:
-                    if (needsAdd) {
-                        this.appendNewComponent(index);
-                    }
-                    this.currentChatComponent = null;
-                    break;
+                        this.currentChatComponent = null;
+                        break;
                 }
                 this.currentIndex = matcher.end(groupId);
             }
@@ -233,51 +233,26 @@ public final class CraftChatMessage {
     }
 
     public static Component fromJSONOrString(String message, boolean nullable, boolean keepNewlines) {
+        return CraftChatMessage.fromJSONOrString(message, nullable, keepNewlines, Integer.MAX_VALUE, false);
+    }
+
+    public static Component fromJSONOrString(String message, boolean nullable, boolean keepNewlines, int maxLength, boolean checkJsonContentLength) {
         if (message == null) message = "";
         if (nullable && message.isEmpty()) return null;
-        Component component = CraftChatMessage.fromJSONOrNull(message);
-        if (component != null) {
-            return component;
-        } else {
-            return CraftChatMessage.fromString(message, keepNewlines)[0];
-        }
-    }
-
-    public static String fromJSONOrStringToJSON(String message) {
-        return CraftChatMessage.fromJSONOrStringToJSON(message, false);
-    }
-
-    public static String fromJSONOrStringToJSON(String message, boolean keepNewlines) {
-        return CraftChatMessage.fromJSONOrStringToJSON(message, false, keepNewlines, Integer.MAX_VALUE, false);
-    }
-
-    public static String fromJSONOrStringOrNullToJSON(String message) {
-        return CraftChatMessage.fromJSONOrStringOrNullToJSON(message, false);
-    }
-
-    public static String fromJSONOrStringOrNullToJSON(String message, boolean keepNewlines) {
-        return CraftChatMessage.fromJSONOrStringToJSON(message, true, keepNewlines, Integer.MAX_VALUE, false);
-    }
-
-    public static String fromJSONOrStringToJSON(String message, boolean nullable, boolean keepNewlines, int maxLength, boolean checkJsonContentLength) {
-        if (message == null) message = "";
-        if (nullable && message.isEmpty()) return null;
-        // If the input can be parsed as JSON, we use that:
         Component component = CraftChatMessage.fromJSONOrNull(message);
         if (component != null) {
             if (checkJsonContentLength) {
                 String content = CraftChatMessage.fromComponent(component);
                 String trimmedContent = CraftChatMessage.trimMessage(content, maxLength);
-                if (content != trimmedContent) { // identity comparison is fine here
+                if (content != trimmedContent) { // Identity comparison is fine here
                     // Note: The resulting text has all non-plain text features stripped.
-                    return CraftChatMessage.fromStringToJSON(trimmedContent, keepNewlines);
+                    return CraftChatMessage.fromString(trimmedContent, keepNewlines)[0];
                 }
             }
-            return message;
+            return component;
         } else {
-            // Else we interpret the input as legacy text:
             message = CraftChatMessage.trimMessage(message, maxLength);
-            return CraftChatMessage.fromStringToJSON(message, keepNewlines);
+            return CraftChatMessage.fromString(message, keepNewlines)[0];
         }
     }
 
@@ -287,25 +262,6 @@ public final class CraftChatMessage {
         } else {
             return message;
         }
-    }
-
-    public static String fromStringToJSON(String message) {
-        return CraftChatMessage.fromStringToJSON(message, false);
-    }
-
-    public static String fromStringToJSON(String message, boolean keepNewlines) {
-        Component component = CraftChatMessage.fromString(message, keepNewlines)[0];
-        return CraftChatMessage.toJSON(component);
-    }
-
-    public static String fromStringOrNullToJSON(String message) {
-        Component component = CraftChatMessage.fromStringOrNull(message);
-        return CraftChatMessage.toJSONOrNull(component);
-    }
-
-    public static String fromJSONComponent(String jsonMessage) {
-        Component component = CraftChatMessage.fromJSONOrNull(jsonMessage);
-        return CraftChatMessage.fromComponent(component);
     }
 
     public static String fromComponent(Component component) {

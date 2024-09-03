@@ -19,8 +19,8 @@ public class CraftPortalEvent {
         this.to = portalEvent.getTo();
         this.searchRadius = portalEvent.getSearchRadius();
         this.cancelled = portalEvent.isCancelled();
-        this.creationRadius = 0;
-        this.canCreatePortal = false;
+        this.creationRadius = portalEvent.getCreationRadius();
+        this.canCreatePortal = portalEvent.getCanCreatePortal();
     }
 
     public CraftPortalEvent(PlayerPortalEvent portalEvent) {

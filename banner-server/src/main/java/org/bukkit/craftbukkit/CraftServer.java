@@ -2,6 +2,7 @@ package org.bukkit.craftbukkit;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
@@ -277,6 +278,7 @@ public final class CraftServer implements Server {
     public boolean ignoreVanillaPermissions = false;
     private List<CraftPlayer> playerView;
     public int reloadCount;
+    public Set<String> activeCompatibilities = Collections.emptySet();
 
     static {
         ConfigurationSerialization.registerClass(CraftOfflinePlayer.class);
@@ -353,6 +355,7 @@ public final class CraftServer implements Server {
         BukkitExtraConstants.PLUGIN.timeout = this.configuration.getInt("chunk-gc.period-in-ticks");
         this.minimumAPI = ApiVersion.getOrCreateVersion(this.configuration.getString("settings.minimum-api"));
         this.loadIcon();
+        this.loadCompatibilities();
 
         // Set map color cache
         if (this.configuration.getBoolean("settings.use-map-color-cache")) {
@@ -377,6 +380,33 @@ public final class CraftServer implements Server {
             if (CraftSpawnCategory.isValidForLimits(spawnCategory)) {
                 this.spawnCategoryLimit.put(spawnCategory, this.configuration.getInt(CraftSpawnCategory.getConfigNameSpawnLimit(spawnCategory)));
             }
+        }
+    }
+
+    private void loadCompatibilities() {
+        ConfigurationSection compatibilities = this.configuration.getConfigurationSection("settings.compatibility");
+        if (compatibilities == null) {
+            this.activeCompatibilities = Collections.emptySet();
+            return;
+        }
+
+        this.activeCompatibilities = compatibilities
+                .getKeys(false)
+                .stream()
+                .filter(compatibilities::getBoolean)
+                .collect(Collectors.toSet());
+
+        if (!this.activeCompatibilities.isEmpty()) {
+            this.logger.info("Using following compatibilities: `" + Joiner.on("`, `").join(this.activeCompatibilities) + "`, this will affect performance and other plugins behavior.");
+            this.logger.info("Only use when necessary and prefer updating plugins if possible.");
+        }
+
+        if (this.activeCompatibilities.contains("enum-compatibility-mode")) {
+            this.getLogger().warning("Loading plugins in enum compatibility mode. This will affect plugin performance. Use only as a transition period or when absolutely necessary.");
+        } else if (System.getProperty("RemoveEnumBanner") == null) {
+            // TODO 2024-06-16: Remove in newer version
+            this.getLogger().info("*** This version of Spigot contains changes to some enums. If you notice that plugins no longer work after updating, please report this to the developers of those plugins first. ***");
+            this.getLogger().info("*** If you cannot update those plugins, you can try setting `settings.compatibility.enum-compatibility-mode` to `true` in `bukkit.yml`. ***");
         }
     }
 

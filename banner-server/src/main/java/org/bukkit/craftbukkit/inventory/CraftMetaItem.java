@@ -518,9 +518,16 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
         if (blockData != null) {
             Map<String, String> mapBlockData = new HashMap<>();
 
-            CompoundTag nbtBlockData = (CompoundTag) CraftNBTTagConfigSerializer.deserialize(blockData);
-            for (String key : nbtBlockData.getAllKeys()) {
-                mapBlockData.put(key, nbtBlockData.getString(key));
+            if (blockData instanceof Map) {
+                for (Entry<?, ?> entry : ((Map<?, ?>) blockData).entrySet()) {
+                    mapBlockData.put(entry.getKey().toString(), entry.getValue().toString());
+                }
+            } else {
+                // Legacy pre 1.20.5:
+                CompoundTag nbtBlockData = (CompoundTag) CraftNBTTagConfigSerializer.deserialize(blockData);
+                for (String key : nbtBlockData.getAllKeys()) {
+                    mapBlockData.put(key, nbtBlockData.getString(key));
+                }
             }
 
             this.blockData = mapBlockData;
@@ -1922,6 +1929,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
                         CraftMetaMap.MAP_COLOR.TYPE,
                         CraftMetaMap.MAP_ID.TYPE,
                         CraftMetaPotion.POTION_CONTENTS.TYPE,
+                        CraftMetaShield.BASE_COLOR.TYPE,
                         CraftMetaSkull.SKULL_PROFILE.TYPE,
                         CraftMetaSkull.NOTE_BLOCK_SOUND.TYPE,
                         CraftMetaSpawnEgg.ENTITY_TAG.TYPE,
@@ -1931,7 +1939,6 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
                         CraftMetaFirework.FIREWORKS.TYPE,
                         CraftMetaEnchantedBook.STORED_ENCHANTMENTS.TYPE,
                         CraftMetaCharge.EXPLOSION.TYPE,
-                        CraftMetaBlockState.BLOCK_ENTITY_TAG.TYPE,
                         CraftMetaKnowledgeBook.BOOK_RECIPES.TYPE,
                         CraftMetaTropicalFishBucket.ENTITY_TAG.TYPE,
                         CraftMetaTropicalFishBucket.BUCKET_ENTITY_TAG.TYPE,

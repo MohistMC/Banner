@@ -145,13 +145,6 @@ def getSubprojectVersion(project) {
 }
 
 dependencies {
-    implementation 'org.projectlombok:lombok:1.18.30'
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    mappings loom.layered() {
-        officialMojangMappings()
-    }
     include(project("banner-server"))
 }
 

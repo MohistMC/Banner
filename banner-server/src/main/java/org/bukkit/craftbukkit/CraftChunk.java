@@ -5,7 +5,6 @@ import com.google.common.base.Predicates;
 import com.mojang.serialization.Codec;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.locks.LockSupport;
 import java.util.function.BooleanSupplier;
@@ -52,7 +51,6 @@ import org.bukkit.generator.structure.GeneratedStructure;
 import org.bukkit.generator.structure.Structure;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
 
 public class CraftChunk implements Chunk {
     private final ServerLevel worldServer;
@@ -63,7 +61,7 @@ public class CraftChunk implements Chunk {
     private static final byte[] EMPTY_LIGHT = new byte[2048];
 
     public CraftChunk(net.minecraft.world.level.chunk.LevelChunk chunk) {
-        this.worldServer = (chunk.banner$r() == null ? null :chunk.banner$r());
+        this.worldServer = chunk.banner$r();
         this.x = chunk.getPos().x;
         this.z = chunk.getPos().z;
     }
@@ -318,6 +316,7 @@ public class CraftChunk implements Chunk {
 
             data.put("block_states", ChunkSerializer.BLOCK_STATE_CODEC.encodeStart(NbtOps.INSTANCE, cs[i].getStates()).getOrThrow());
             sectionBlockIDs[i] = ChunkSerializer.BLOCK_STATE_CODEC.parse(NbtOps.INSTANCE, data.getCompound("block_states")).getOrThrow(ChunkSerializer.ChunkReadException::new);
+            sectionEmpty[i] = cs[i].hasOnlyAir();
 
             LevelLightEngine lightengine = this.worldServer.getLightEngine();
             DataLayer skyLightArray = lightengine.getLayerListener(LightLayer.SKY).getDataLayerData(SectionPos.of(this.x, chunk.getSectionYFromSectionIndex(i), this.z)); // SPIGOT-7498: Convert section index
@@ -377,8 +376,8 @@ public class CraftChunk implements Chunk {
     }
 
     @Override
-    public @NotNull Collection<Player> getPlayersSeeingChunk() {
-        return getWorld().getPlayersSeeingChunk(this);
+    public Collection<Player> getPlayersSeeingChunk() {
+        return this.getWorld().getPlayersSeeingChunk(this);
     }
 
     @Override

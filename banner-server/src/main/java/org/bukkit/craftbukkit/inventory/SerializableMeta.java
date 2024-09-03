@@ -6,6 +6,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import org.bukkit.block.Banner;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -30,6 +32,7 @@ public final class SerializableMeta implements ConfigurationSerializable {
                 .put(CraftMetaColorableArmor.class, "COLORABLE_ARMOR")
                 .put(CraftMetaMap.class, "MAP")
                 .put(CraftMetaPotion.class, "POTION")
+                .put(CraftMetaShield.class, "SHIELD")
                 .put(CraftMetaSpawnEgg.class, "SPAWN_EGG")
                 .put(CraftMetaEnchantedBook.class, "ENCHANTED")
                 .put(CraftMetaFirework.class, "FIREWORK")
@@ -72,11 +75,16 @@ public final class SerializableMeta implements ConfigurationSerializable {
         }
 
         try {
-            return constructor.newInstance(map);
-        } catch (final InstantiationException e) {
-            throw new AssertionError(e);
-        } catch (final IllegalAccessException e) {
-            throw new AssertionError(e);
+            CraftMetaItem meta = constructor.newInstance(map);
+
+            // Convert Shield CraftMetaBlockState to CraftMetaShield
+            if (meta instanceof CraftMetaBlockState state && state.hasBlockState() && state.getBlockState() instanceof Banner) {
+                meta = new CraftMetaShield(meta);
+                meta.unhandledTags.build().clear(CraftMetaShield.BASE_COLOR.TYPE);
+            }
+            return meta;
+        } catch (final InstantiationException | IllegalAccessException e) {
+                throw new AssertionError(e);
         } catch (final InvocationTargetException e) {
             throw e.getCause();
         }
@@ -94,6 +102,11 @@ public final class SerializableMeta implements ConfigurationSerializable {
     public static boolean getBoolean(Map<?, ?> map, Object field) {
         Boolean value = SerializableMeta.getObject(Boolean.class, map, field, true);
         return value != null && value;
+    }
+
+    public static int getInteger(Map<?, ?> map, Object field) {
+        Integer value = SerializableMeta.getObject(Integer.class, map, field, true);
+        return value != null ? value : 0;
     }
 
     public static <T> T getObject(Class<T> clazz, Map<?, ?> map, Object field, boolean nullable) {

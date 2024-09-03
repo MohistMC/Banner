@@ -1,6 +1,7 @@
 package com.mohistmc.banner.bukkit.inventory.recipe;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.bukkit.NamespacedKey;
@@ -15,7 +16,7 @@ public class BannerModdedRecipe extends CraftComplexRecipe {
     private final Recipe<?> recipe;
 
     public BannerModdedRecipe(NamespacedKey id, Recipe<?> recipe) {
-        super(id, null);
+        super(id, (ItemStack) null, (CustomRecipe) recipe);
         this.recipe = recipe;
     }
 
