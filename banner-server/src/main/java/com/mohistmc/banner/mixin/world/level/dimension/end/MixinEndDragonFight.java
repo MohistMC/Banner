@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.dimension.end;
 
 import com.mohistmc.banner.injection.world.level.dimension.end.InjectionEndDragonFight;
-import java.util.List;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
@@ -13,6 +12,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.List;
 
 @Mixin(EndDragonFight.class)
 public class MixinEndDragonFight implements InjectionEndDragonFight {

@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.entity.animal.goat;
 
-import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -21,6 +20,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(Goat.class)
 public abstract class MixinGoat extends Animal {

@@ -1,12 +1,11 @@
 package org.bukkit.map;
 
 import com.google.common.base.Preconditions;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 /**
  * Represents the palette that map items use.

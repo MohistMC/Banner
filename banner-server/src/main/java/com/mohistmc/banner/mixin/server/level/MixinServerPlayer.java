@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.level;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.bukkit.DoubleChestInventory;
 import com.mohistmc.banner.injection.server.level.InjectionServerPlayer;
@@ -97,7 +98,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ServerPlayer.class)
 public abstract class MixinServerPlayer extends Player implements InjectionServerPlayer {
@@ -670,9 +670,9 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Inject(method = "setCamera",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/Entity;level()Lnet/minecraft/world/level/Level;"),
-            locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
-    private void banner$spectorEvent(Entity entityToSpectate, CallbackInfo ci, Entity entity) {
+                    target = "Lnet/minecraft/world/entity/Entity;level()Lnet/minecraft/world/level/Level;"),
+            cancellable = true)
+    private void banner$spectorEvent(Entity entityToSpectate, CallbackInfo ci, @Local(ordinal = 1) Entity entity) {
         // Paper start - Add PlayerStartSpectatingEntityEvent and PlayerStopSpectatingEntity Event
         if (this.camera == this) {
             com.destroystokyo.paper.event.player.PlayerStopSpectatingEntityEvent playerStopSpectatingEntityEvent = new com.destroystokyo.paper.event.player.PlayerStopSpectatingEntityEvent(this.getBukkitEntity(), entity.getBukkitEntity());

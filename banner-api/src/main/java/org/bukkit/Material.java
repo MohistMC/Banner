@@ -3,14 +3,6 @@ package org.bukkit;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import java.lang.reflect.Constructor;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.function.Consumer;
-
-import com.mohistmc.dynamicenum.MohistDynamEnum;
-import net.minecraft.resources.ResourceLocation;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
@@ -127,6 +119,11 @@ import org.bukkit.material.MaterialData;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.lang.reflect.Constructor;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * An enum of all material IDs accepted by the official server and client

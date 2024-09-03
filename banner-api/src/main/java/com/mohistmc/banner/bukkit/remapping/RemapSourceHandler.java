@@ -1,7 +1,6 @@
 package com.mohistmc.banner.bukkit.remapping;
 
 import com.google.common.io.ByteStreams;
-import java.lang.invoke.MethodHandles;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.impl.transformer.FabricTransformer;
 import org.objectweb.asm.ClassReader;
@@ -11,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;

@@ -1,8 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
 import com.google.common.collect.ImmutableList;
-import java.util.AbstractList;
-import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -25,6 +23,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.AbstractList;
+import java.util.List;
 
 @Mixin(PistonBaseBlock.class)
 public abstract class MixinPistonBaseBlock extends DirectionalBlock {

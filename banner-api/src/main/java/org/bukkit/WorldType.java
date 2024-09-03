@@ -1,10 +1,11 @@
 package org.bukkit;
 
 import com.google.common.collect.Maps;
-import java.util.Locale;
-import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Represents various types of worlds that may exist

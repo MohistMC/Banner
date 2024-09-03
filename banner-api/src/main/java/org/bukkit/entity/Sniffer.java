@@ -1,9 +1,10 @@
 package org.bukkit.entity;
 
-import java.util.Collection;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
 
 /**
  * Represents a Sniffer.

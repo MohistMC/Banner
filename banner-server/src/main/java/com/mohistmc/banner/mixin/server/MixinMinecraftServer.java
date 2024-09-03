@@ -16,30 +16,30 @@ import io.izzel.arclight.mixin.Decorate;
 import io.izzel.arclight.mixin.DecorationOps;
 import io.izzel.arclight.mixin.Local;
 import it.unimi.dsi.fastutil.longs.LongIterator;
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.net.Proxy;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.function.BooleanSupplier;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import jline.console.ConsoleReader;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
-import net.minecraft.*;
+import net.minecraft.CrashReport;
+import net.minecraft.ReportedException;
+import net.minecraft.SystemReport;
+import net.minecraft.Util;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.LayeredRegistryAccess;
-import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 import net.minecraft.network.protocol.status.ServerStatus;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.*;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.RegistryLayer;
+import net.minecraft.server.ServerLinks;
+import net.minecraft.server.ServerTickRateManager;
+import net.minecraft.server.Services;
+import net.minecraft.server.TickTask;
+import net.minecraft.server.WorldLoader;
+import net.minecraft.server.WorldStem;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -61,15 +61,14 @@ import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.storage.DerivedLevelData;
-import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WorldData;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.craftbukkit.CraftRegistry;
-import org.bukkit.craftbukkit.Main;
 import org.bukkit.craftbukkit.CraftServer;
+import org.bukkit.craftbukkit.Main;
 import org.bukkit.craftbukkit.scoreboard.CraftScoreboardManager;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.event.world.WorldInitEvent;
@@ -78,7 +77,12 @@ import org.bukkit.plugin.PluginLoadOrder;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spigotmc.WatchdogThread;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -86,7 +90,24 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.net.Proxy;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.function.BooleanSupplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 // Banner - TODO fix inject method
 @Mixin(MinecraftServer.class)
@@ -361,11 +382,9 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     }
 
     @Inject(method = "createLevels", at = @At(value = "INVOKE", remap = false,
-            target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 0),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$worldInit(ChunkProgressListener listener, CallbackInfo ci, ServerLevelData serverLevelData,
-                                    boolean bl, Registry registry, WorldOptions worldOptions, long l, long m,
-                                    List list, LevelStem levelStem, ServerLevel serverLevel) {
+            target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 0))
+    private void banner$worldInit(ChunkProgressListener listener, CallbackInfo ci,
+                                  @com.llamalad7.mixinextras.sugar.Local ServerLevel serverLevel) {
         banner$initLevel(serverLevel);
     }
 
@@ -384,16 +403,12 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Inject(method = "createLevels",
             at = @At(value = "INVOKE",
-                    target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 1),
-            locals = LocalCapture.CAPTURE_FAILHARD)
+                    target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 1)
+    )
     private void banner$initWorld(ChunkProgressListener chunkProgressListener, CallbackInfo ci,
-                                   ServerLevelData serverLevelData, boolean bl, Registry registry,
-                                   WorldOptions worldOptions, long l, long m, List list, LevelStem
-                                           levelStem, ServerLevel serverLevel, DimensionDataStorage
-                                           dimensionDataStorage, WorldBorder worldBorder,
-                                   RandomSequences randomSequences, Iterator var16, Map.Entry entry,
-                                   ResourceKey resourceKey, ResourceKey resourceKey2, DerivedLevelData derivedLevelData,
-                                   ServerLevel serverLevel2) {
+                                  @com.llamalad7.mixinextras.sugar.Local WorldOptions worldOptions,
+                                  @com.llamalad7.mixinextras.sugar.Local DerivedLevelData derivedLevelData,
+                                  @com.llamalad7.mixinextras.sugar.Local(ordinal = 1) ServerLevel serverLevel2) {
         banner$initLevel(serverLevel2);
         banner$initializedLevel(serverLevel2, derivedLevelData, worldData, worldOptions);
     }

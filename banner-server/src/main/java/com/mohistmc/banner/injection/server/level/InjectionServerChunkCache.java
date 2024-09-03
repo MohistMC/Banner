@@ -1,7 +1,8 @@
 package com.mohistmc.banner.injection.server.level;
 
-import java.io.IOException;
 import net.minecraft.world.level.chunk.LevelChunk;
+
+import java.io.IOException;
 
 public interface InjectionServerChunkCache {
 

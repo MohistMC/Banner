@@ -1,7 +1,5 @@
 package com.mohistmc.banner.mixin.world.entity.item;
 
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -25,6 +23,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mixin(ItemEntity.class)
 public abstract class MixinItemEntity extends Entity {

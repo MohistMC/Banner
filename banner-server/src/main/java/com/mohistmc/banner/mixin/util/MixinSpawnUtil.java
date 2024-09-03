@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.util;
 
-import java.util.Optional;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.SpawnUtil;
@@ -12,7 +12,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.Optional;
 
 @Mixin(SpawnUtil.class)
 public class MixinSpawnUtil {
@@ -22,8 +23,8 @@ public class MixinSpawnUtil {
         level.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.DEFAULT);
     }
 
-    @Inject(method = "trySpawnMob", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Mob;discard()V"), locals = LocalCapture.CAPTURE_FAILHARD)
-    private static <T extends Mob> void banner$addRemovalReason(EntityType<T> entityType, MobSpawnType mobSpawnType, ServerLevel serverLevel, BlockPos blockPos, int i, int j, int k, SpawnUtil.Strategy strategy, CallbackInfoReturnable<Optional<T>> cir, BlockPos.MutableBlockPos mutableBlockPos, int l, int m, int n, Mob mob) {
+    @Inject(method = "trySpawnMob", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Mob;discard()V"))
+    private static <T extends Mob> void banner$addRemovalReason(EntityType<T> entityType, MobSpawnType mobSpawnType, ServerLevel serverLevel, BlockPos blockPos, int i, int j, int k, SpawnUtil.Strategy strategy, CallbackInfoReturnable<Optional<T>> cir, @Local Mob mob) {
         mob.pushRemoveCause(null);
     }
 }

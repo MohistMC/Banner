@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.injection.world.entity.InjectionEntityType;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -20,7 +21,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(EntityType.class)
 public abstract class MixinEntityType<T extends Entity> implements InjectionEntityType<T> {
@@ -45,9 +45,9 @@ public abstract class MixinEntityType<T extends Entity> implements InjectionEnti
     }
 
     @Inject(method = "spawn(Lnet/minecraft/server/level/ServerLevel;Ljava/util/function/Consumer;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/MobSpawnType;ZZ)Lnet/minecraft/world/entity/Entity;",
-            cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At("RETURN"),
+            cancellable = true, at = @At("RETURN"),
             slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V")))
-    private void banner$returnIfSuccess(ServerLevel serverLevel, Consumer<T> consumer, BlockPos blockPos, MobSpawnType mobSpawnType, boolean bl, boolean bl2, CallbackInfoReturnable<T> cir, Entity entity) {
+    private void banner$returnIfSuccess(ServerLevel serverLevel, Consumer<T> consumer, BlockPos blockPos, MobSpawnType mobSpawnType, boolean bl, boolean bl2, CallbackInfoReturnable<T> cir, @Local Entity entity) {
         if (entity != null) {
             cir.setReturnValue(entity.isRemoved() ? null : (T) entity);
         }

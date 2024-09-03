@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.server.level;
 
 import com.google.common.collect.Lists;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.asm.annotation.CreateConstructor;
 import com.mohistmc.banner.asm.annotation.ShadowConstructor;
@@ -93,7 +94,6 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ServerLevel.class)
 public abstract class MixinServerLevel extends Level implements WorldGenLevel, InjectionServerLevel {
@@ -284,8 +284,8 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         return this.addFreshEntity(entity);
     }
 
-    @Inject(method = "tickPrecipitation", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", ordinal = 0, shift = At.Shift.BEFORE, target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
-    public void banner$snowForm0(BlockPos blockPos, CallbackInfo ci, BlockPos blockPos2, BlockPos blockPos3, Biome biome) {
+    @Inject(method = "tickPrecipitation", cancellable = true, at = @At(value = "INVOKE", ordinal = 0, shift = At.Shift.BEFORE, target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
+    public void banner$snowForm0(BlockPos blockPos, CallbackInfo ci, @Local(ordinal = 1) BlockPos blockPos2) {
 
         CraftBlockState craftBlockState = CraftBlockStates.getBlockState((ServerLevel) (Object) this, blockPos2, 3);
         craftBlockState.setData(Blocks.ICE.defaultBlockState());
@@ -298,8 +298,8 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         }
     }
 
-    @Inject(method = "tickPrecipitation", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", ordinal = 1, shift = At.Shift.BEFORE, target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
-    public void banner$snowForm1(BlockPos blockPos, CallbackInfo ci, BlockPos blockPos2, BlockPos blockPos3, Biome biome, int i, BlockState blockState, int j, BlockState blockState2) {
+    @Inject(method = "tickPrecipitation", cancellable = true, at = @At(value = "INVOKE", ordinal = 1, shift = At.Shift.BEFORE, target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
+    public void banner$snowForm1(BlockPos blockPos, CallbackInfo ci, @Local(ordinal = 1) BlockState blockState2) {
 
         CraftBlockState craftBlockState = CraftBlockStates.getBlockState((ServerLevel) (Object) this, blockPos, 3);
         craftBlockState.setData(blockState2);
@@ -312,8 +312,8 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         }
     }
 
-    @Inject(method = "tickPrecipitation", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", ordinal = 2, shift = At.Shift.BEFORE, target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
-    public void banner$snowForm2(BlockPos blockPos, CallbackInfo ci, BlockPos blockPos2, BlockPos blockPos3, Biome biome) {
+    @Inject(method = "tickPrecipitation", cancellable = true, at = @At(value = "INVOKE", ordinal = 2, shift = At.Shift.BEFORE, target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
+    public void banner$snowForm2(BlockPos blockPos, CallbackInfo ci) {
 
         CraftBlockState craftBlockState = CraftBlockStates.getBlockState((ServerLevel) (Object) this, blockPos, 3);
         craftBlockState.setData(Blocks.SNOW.defaultBlockState());

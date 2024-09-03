@@ -1,7 +1,5 @@
 package org.bukkit.command;
 
-import java.util.Set;
-import java.util.UUID;
 import org.apache.commons.lang3.NotImplementedException;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -11,6 +9,9 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * For when all you care about is just messaging

@@ -4,7 +4,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.bukkit.craftbukkit.CraftWorld;
-import org.jetbrains.annotations.NotNull;
 
 // Banner TODO fix
 public class LevelPersistentData extends SavedData {

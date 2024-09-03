@@ -1,7 +1,8 @@
 package org.bukkit.persistence;
 
-import java.util.List;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * The list persistent data represents a data type that is capable of storing a

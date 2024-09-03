@@ -1,11 +1,12 @@
 package org.bukkit.block.spawner;
 
 import com.google.common.base.Preconditions;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Represents a spawn rule that controls what conditions an entity from a

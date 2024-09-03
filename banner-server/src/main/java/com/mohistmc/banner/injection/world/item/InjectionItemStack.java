@@ -2,7 +2,6 @@ package com.mohistmc.banner.injection.world.item;
 
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.PatchedDataComponentMap;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.Nullable;
 

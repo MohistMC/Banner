@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.entity.boss.wither;
 
-import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.util.Mth;
@@ -23,6 +22,8 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+
+import java.util.List;
 
 @Mixin(WitherBoss.class)
 public abstract class MixinWitherBoss extends Monster {

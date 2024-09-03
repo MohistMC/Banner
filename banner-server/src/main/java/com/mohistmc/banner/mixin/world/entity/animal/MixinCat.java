@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.animal;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
-import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
@@ -14,6 +13,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(Cat.class)
 public abstract class MixinCat extends TamableAnimal {

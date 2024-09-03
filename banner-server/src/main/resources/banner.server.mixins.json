@@ -217,6 +217,7 @@
     "world.entity.decoration.MixinBlockAttachedEntity",
     "world.entity.decoration.MixinItemFrame",
     "world.entity.decoration.MixinLeashFenceKnotEntity",
+    "world.entity.frog.MixinTadpole",
     "world.entity.item.MixinFallingBlockEntity",
     "world.entity.item.MixinItemEntity",
     "world.entity.item.MixinPrimedTnt",

@@ -2,7 +2,6 @@ package com.mohistmc.banner.injection.world.damagesource;
 
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.block.Block;
 
 public interface InjectionDamageSource {

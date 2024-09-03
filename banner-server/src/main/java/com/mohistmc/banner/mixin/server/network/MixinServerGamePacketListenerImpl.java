@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.network;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.injection.server.network.InjectionServerGamePacketListenerImpl;
@@ -135,7 +136,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ServerGamePacketListenerImpl.class)
 public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommonPacketListenerImpl implements InjectionServerGamePacketListenerImpl {
@@ -507,8 +507,8 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         CraftEventFactory.callRecipeBookSettingsEvent(this.player, serverboundRecipeBookChangeSettingsPacket.getBookType(), serverboundRecipeBookChangeSettingsPacket.isOpen(), serverboundRecipeBookChangeSettingsPacket.isFiltering()); // CraftBukkit
     }
 
-    @Inject(method = "handleSelectTrade", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/MerchantMenu;setSelectionHint(I)V"))
-    private void banner$tradeSelect(ServerboundSelectTradePacket packet, CallbackInfo ci, int i, MerchantMenu merchantMenu) {
+    @Inject(method = "handleSelectTrade", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/MerchantMenu;setSelectionHint(I)V"))
+    private void banner$tradeSelect(ServerboundSelectTradePacket packet, CallbackInfo ci, @Local int i, @Local MerchantMenu merchantMenu) {
         var event = CraftEventFactory.callTradeSelectEvent(this.player, i, (MerchantMenu) merchantMenu);
         if (event.isCancelled()) {
             this.player.getBukkitEntity().updateInventory();
@@ -796,13 +796,9 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     private void banner$cancelHeldItem1(ServerPlayer instance, InteractionHand hand, ItemStack stack) {
     }
 
-    @Inject(method = "handlePlayerAction",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/level/ServerPlayer;stopUsingItem()V"),
-            locals = LocalCapture.CAPTURE_FAILSOFT)
+    @Inject(method = "handlePlayerAction", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;stopUsingItem()V"))
     private void banner$itemSwapEvent(ServerboundPlayerActionPacket packet, CallbackInfo ci,
-                                      BlockPos blockPos, ServerboundPlayerActionPacket.Action action,
-                                      ItemStack itemStack) {
+                                      @Local ItemStack itemStack) {
         // CraftBukkit start - inspiration taken from DispenserRegistry (See SpigotCraft#394)
         CraftItemStack mainHand = CraftItemStack.asCraftMirror(itemStack);
         CraftItemStack offHand = CraftItemStack.asCraftMirror(this.player.getItemInHand(InteractionHand.MAIN_HAND));
@@ -873,10 +869,9 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     }
 
     @Inject(method = "handleUseItem", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerPlayerGameMode;useItem(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$handleInteractEvent(ServerboundUseItemPacket packet, CallbackInfo ci, ServerLevel serverLevel,
-                                            InteractionHand interactionHand, ItemStack itemStack) {
+            target = "Lnet/minecraft/server/level/ServerPlayerGameMode;useItem(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
+    private void banner$handleInteractEvent(ServerboundUseItemPacket packet, CallbackInfo ci,
+                                            @Local InteractionHand interactionHand, @Local ItemStack itemStack) {
         // CraftBukkit start
         // Raytrace to look for 'rogue armswings'
         float f1 = this.player.getXRot();

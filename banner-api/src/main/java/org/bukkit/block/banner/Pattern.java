@@ -2,8 +2,6 @@ package org.bukkit.block.banner;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.NamespacedKey;
@@ -11,6 +9,9 @@ import org.bukkit.Registry;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 @SerializableAs("Pattern")
 public class Pattern implements ConfigurationSerializable {

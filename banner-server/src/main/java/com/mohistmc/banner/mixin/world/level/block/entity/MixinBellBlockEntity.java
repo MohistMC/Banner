@@ -1,7 +1,5 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
-import java.util.function.Consumer;
-import java.util.stream.Stream;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -10,6 +8,9 @@ import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 @Mixin(BellBlockEntity.class)
 public class MixinBellBlockEntity {

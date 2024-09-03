@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.server.level;
 
 import com.google.common.collect.Lists;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.asm.annotation.CreateConstructor;
 import com.mohistmc.banner.asm.annotation.ShadowConstructor;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
@@ -57,7 +58,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ServerEntity.class)
 public abstract class MixinServerEntity implements InjectionServerEntity {
@@ -318,8 +318,8 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
         }
     }
 
-    @Inject(method = "sendDirtyEntityData", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/server/level/ServerEntity;broadcastAndSend(Lnet/minecraft/network/protocol/Packet;)V"))
-    private void banner$sendScaledHealth(CallbackInfo ci, SynchedEntityData entitydatamanager, List<SynchedEntityData.DataValue<?>> list, Set<AttributeInstance> set) {
+    @Inject(method = "sendDirtyEntityData", at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/server/level/ServerEntity;broadcastAndSend(Lnet/minecraft/network/protocol/Packet;)V"))
+    private void banner$sendScaledHealth(CallbackInfo ci, @Local Set<AttributeInstance> set) {
         if (this.entity instanceof ServerPlayer player) {
             player.getBukkitEntity().injectScaledMaxHealth(set, false);
         }

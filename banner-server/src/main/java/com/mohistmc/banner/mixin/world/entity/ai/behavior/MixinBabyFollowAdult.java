@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.entity.ai.behavior;
 
-import java.util.function.Function;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.LivingEntity;
@@ -16,6 +15,8 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+
+import java.util.function.Function;
 
 @Mixin(BabyFollowAdult.class)
 public class MixinBabyFollowAdult {

@@ -1,5 +1,8 @@
 package com.mohistmc.banner.bukkit.remapping;
 
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Type;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
@@ -21,8 +24,6 @@ import java.security.SecureClassLoader;
 import java.util.Enumeration;
 import java.util.Objects;
 import java.util.StringJoiner;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.Type;
 
 /**
  * ReflectionHandler

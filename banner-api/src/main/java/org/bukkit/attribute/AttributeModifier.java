@@ -1,11 +1,6 @@
 package org.bukkit.attribute;
 
 import com.google.common.base.Preconditions;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -14,6 +9,12 @@ import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.util.NumberConversions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Concrete implementation of an attribute modifier.

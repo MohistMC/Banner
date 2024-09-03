@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.entity;
 
 import com.google.common.collect.ImmutableList;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.injection.world.entity.InjectionEntity;
 import java.util.List;
@@ -91,7 +92,6 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 // Banner - TODO fix patches
 @Mixin(Entity.class)
@@ -434,10 +434,8 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
 
     @Inject(method = "move", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/entity/Entity;onGround()Z",
-            ordinal = 1), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$move$blockCollide(MoverType type, Vec3 pos, CallbackInfo ci, Vec3 vec3,
-                                          double d, boolean bl, boolean bl2, BlockPos blockPos,
-                                          BlockState blockState, Block block) {
+            ordinal = 1))
+    private void banner$move$blockCollide(MoverType type, Vec3 pos, CallbackInfo ci, @Local(ordinal = 1) Vec3 vec3) {
         // CraftBukkit start
         if (horizontalCollision && getBukkitEntity() instanceof Vehicle) {
             Vehicle vehicle = (Vehicle) this.getBukkitEntity();
@@ -582,9 +580,9 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     }
 
     @Inject(method = "spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;",
-            cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD,
+            cancellable = true,
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
-    public void banner$entityDropItem(ItemStack stack, float offsetY, CallbackInfoReturnable<ItemEntity> cir, ItemEntity itemEntity) {
+    public void banner$entityDropItem(ItemStack stack, float offsetY, CallbackInfoReturnable<ItemEntity> cir, @Local ItemEntity itemEntity) {
         EntityDropItemEvent event = new EntityDropItemEvent(this.getBukkitEntity(), (org.bukkit.entity.Item) (itemEntity).getBukkitEntity());
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
@@ -592,7 +590,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         }
     }
 
-    @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", shift = At.Shift.BEFORE, target = "Lnet/minecraft/world/entity/Entity;setPose(Lnet/minecraft/world/entity/Pose;)V"))
+    @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z", cancellable = true, at = @At(value = "INVOKE", shift = At.Shift.BEFORE, target = "Lnet/minecraft/world/entity/Entity;setPose(Lnet/minecraft/world/entity/Pose;)V"))
     public void banner$startRiding(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> cir) {
         // CraftBukkit start
         if (vehicle.getBukkitEntity() instanceof Vehicle && this.getBukkitEntity() instanceof org.bukkit.entity.LivingEntity) {

@@ -10,7 +10,6 @@ import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
-import net.minecraft.world.level.block.entity.BannerBlockEntity;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import org.bukkit.event.block.CauldronLevelChangeEvent;
 import org.spongepowered.asm.mixin.Mixin;

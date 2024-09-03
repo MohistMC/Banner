@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.entity.npc;
 
-import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
@@ -25,6 +24,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(net.minecraft.world.entity.npc.Villager.class)
 public abstract class MixinVillager extends AbstractVillager {

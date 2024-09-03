@@ -2,9 +2,6 @@ package com.mohistmc.banner.bukkit.remapping;
 
 import com.google.common.collect.ImmutableMap;
 import com.mohistmc.banner.BannerMCStart;
-import java.net.URLClassLoader;
-import java.util.Collection;
-import java.util.Map;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.objectweb.asm.Opcodes;
@@ -22,6 +19,10 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
+
+import java.net.URLClassLoader;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * ClassLoaderAdapter

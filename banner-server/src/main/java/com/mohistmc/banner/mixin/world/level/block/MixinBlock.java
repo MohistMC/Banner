@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
 import com.mohistmc.banner.injection.world.level.block.InjectionBlock;
-import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.valueproviders.IntProvider;
@@ -21,6 +20,8 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.function.Supplier;
 
 @Mixin(Block.class)
 public abstract class MixinBlock extends BlockBehaviour implements InjectionBlock {

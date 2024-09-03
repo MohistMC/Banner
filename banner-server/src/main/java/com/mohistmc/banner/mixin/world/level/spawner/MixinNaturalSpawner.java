@@ -1,8 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.spawner;
 
 import com.mohistmc.banner.injection.world.level.spawner.InjectionSpawnState;
-import java.util.Objects;
-import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -30,6 +28,9 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+
+import java.util.Objects;
+import java.util.Optional;
 
 @Mixin(NaturalSpawner.class)
 public abstract class MixinNaturalSpawner {

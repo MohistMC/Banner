@@ -2,7 +2,6 @@ package com.mohistmc.banner.mixin.world.level.block;
 
 import com.mohistmc.banner.injection.world.level.block.InjectionFireBlock;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -29,6 +28,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(FireBlock.class)
 public abstract class MixinFireBlock implements InjectionFireBlock {

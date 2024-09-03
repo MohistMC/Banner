@@ -1,8 +1,6 @@
 package com.mohistmc.banner.mixin.stats;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.network.protocol.game.ClientboundRecipePacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -14,15 +12,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.Collection;
+import java.util.List;
 
 @Mixin(ServerRecipeBook.class)
 public class MixinServerRecipeBook {
 
     @Inject(method = "addRecipes",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/stats/ServerRecipeBook;add(Lnet/minecraft/resources/ResourceLocation;)V"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
-    private void banner$callRecipeEvent(Collection<RecipeHolder<?>> collection, ServerPlayer serverPlayer, CallbackInfoReturnable<Integer> cir, List list, int i, Iterator var5, RecipeHolder recipeHolder, ResourceLocation resourceLocation) {
+                    target = "Lnet/minecraft/stats/ServerRecipeBook;add(Lnet/minecraft/resources/ResourceLocation;)V"), cancellable = true)
+    private void banner$callRecipeEvent(Collection<RecipeHolder<?>> collection, ServerPlayer serverPlayer, CallbackInfoReturnable<Integer> cir, @Local ResourceLocation resourceLocation) {
         if (!CraftEventFactory.handlePlayerRecipeListUpdateEvent(serverPlayer, resourceLocation)) {
             cir.cancel();
         }

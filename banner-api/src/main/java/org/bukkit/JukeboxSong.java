@@ -1,8 +1,9 @@
 package org.bukkit;
 
-import java.util.Objects;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * Represents a song which may play in a Jukebox.

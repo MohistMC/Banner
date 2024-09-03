@@ -2,10 +2,11 @@ package org.bukkit;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
-import java.util.HashMap;
-import java.util.Locale;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Locale;
 
 /**
  * Represents the art on a painting

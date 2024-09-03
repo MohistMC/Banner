@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.entity.ai.behavior;
 
-import java.util.function.Predicate;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.behavior.GoToWantedItem;
@@ -16,6 +15,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.function.Predicate;
 
 @Mixin(GoToWantedItem.class)
 public class MixinGoToWantedItem {

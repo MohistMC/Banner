@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.level;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.injection.server.level.InjectionDistanceManager;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -19,7 +20,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 // TODO fix inject method
 @Mixin(DistanceManager.class)
@@ -36,8 +36,8 @@ public abstract class MixinDistanceManager implements InjectionDistanceManager {
 
     @Shadow private long ticketTickCounter;
 
-    @Inject(method = "removePlayer", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", remap = false, target = "Lit/unimi/dsi/fastutil/objects/ObjectSet;remove(Ljava/lang/Object;)Z"))
-    private void banner$remove(SectionPos p_140829_, ServerPlayer p_140830_, CallbackInfo ci, ChunkPos pos, long l, ObjectSet<?> set) {
+    @Inject(method = "removePlayer", cancellable = true, at = @At(value = "INVOKE", remap = false, target = "Lit/unimi/dsi/fastutil/objects/ObjectSet;remove(Ljava/lang/Object;)Z"))
+    private void banner$remove(SectionPos p_140829_, ServerPlayer p_140830_, CallbackInfo ci, @Local ObjectSet<?> set) {
         if (set == null) {
             ci.cancel();
         }

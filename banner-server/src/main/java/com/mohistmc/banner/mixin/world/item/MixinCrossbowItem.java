@@ -1,8 +1,9 @@
 package com.mohistmc.banner.mixin.world.item;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import net.minecraft.world.item.CrossbowItem;
 import org.spongepowered.asm.mixin.Mixin;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mixin(CrossbowItem.class)
 public class MixinCrossbowItem {

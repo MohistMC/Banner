@@ -1,7 +1,5 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
-import java.util.List;
-import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
@@ -15,6 +13,9 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+
+import java.util.List;
+import java.util.function.Predicate;
 
 @Mixin(DetectorRailBlock.class)
 public abstract class MixinDetectorRailBlock extends Block {

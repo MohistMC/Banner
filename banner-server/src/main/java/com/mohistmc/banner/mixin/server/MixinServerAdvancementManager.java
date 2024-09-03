@@ -2,10 +2,6 @@ package com.mohistmc.banner.mixin.server;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import com.google.gson.JsonParseException;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.advancements.Advancement;
@@ -28,6 +24,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Mixin(ServerAdvancementManager.class)
 public abstract class MixinServerAdvancementManager {

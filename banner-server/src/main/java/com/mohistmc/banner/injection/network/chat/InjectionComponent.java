@@ -1,7 +1,8 @@
 package com.mohistmc.banner.injection.network.chat;
 
-import java.util.stream.Stream;
 import net.minecraft.network.chat.Component;
+
+import java.util.stream.Stream;
 
 public interface InjectionComponent {
 

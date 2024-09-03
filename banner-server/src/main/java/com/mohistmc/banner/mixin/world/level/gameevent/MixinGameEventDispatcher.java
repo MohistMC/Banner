@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.gameevent;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
@@ -16,7 +17,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(GameEventDispatcher.class)
 public class MixinGameEventDispatcher {
@@ -24,9 +24,8 @@ public class MixinGameEventDispatcher {
     @Shadow @Final private ServerLevel level;
 
     @Inject(method = "post", cancellable = true, at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/core/SectionPos;blockToSectionCoord(I)I", ordinal = 0),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$gameEvent(Holder<GameEvent> holder, Vec3 vec3, GameEvent.Context context, CallbackInfo ci, int i, BlockPos blockPos) {
+            target = "Lnet/minecraft/core/SectionPos;blockToSectionCoord(I)I", ordinal = 0))
+    private void banner$gameEvent(Holder<GameEvent> holder, Vec3 vec3, GameEvent.Context context, CallbackInfo ci, @Local int i, @Local BlockPos blockPos) {
         // CraftBukkit start
         GenericGameEvent event = new GenericGameEvent(CraftGameEvent.minecraftToBukkit(holder.value()), CraftLocation.toBukkit(blockPos, level.getWorld()), (context.sourceEntity() == null) ? null : context.sourceEntity().getBukkitEntity(), i, !Bukkit.isPrimaryThread());
         level.getCraftServer().getPluginManager().callEvent(event);
