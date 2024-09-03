@@ -46,7 +46,8 @@
     "org.jline:jline-terminal:3.21.0":"047579f05a0002f9c561cb10dcf2f744976c49ac",
     "org.jline:jline-terminal-jansi:3.21.0":"27086834f4d9951f9c2c3b299782e114b56fcf51",
     "net.minecrell:terminalconsoleappender:1.4.0":"70375667b84cee16ca5fa66258f7f6bddca24869",
-    "org.apache.logging.log4j:log4j-iostreams:2.20.0":"db3dfe3e15df5e8574636a4c03e5db68188be99c"
+    "org.apache.logging.log4j:log4j-iostreams:2.20.0":"db3dfe3e15df5e8574636a4c03e5db68188be99c",
+    "net.fabricmc:mapping-io:0.6.1":"b0f2885e17e383777f02e74e4c9b5d3a3a0f21be"
   },
   "fabricExtra":{
     "net.minecrell:terminalconsoleappender:1.2.0":"96d02cd3b384ff015a8fef4223bcb4ccf1717c95",

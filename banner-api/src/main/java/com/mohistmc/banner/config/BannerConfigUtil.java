@@ -129,6 +129,7 @@ public class BannerConfigUtil {
         serverThread();
         motdFirstLine();
         motdSecondLine();
+        stackdeobf();
     }
 
 }

@@ -57,14 +57,13 @@ so don't worried about the plugin files will be changed to unsafe
 - Add dependencies of Banner, such as compileOnly(fileTree("lib/banner-version-dev.jar"))
 
 ## Upstream Projects
-- [**Fabric Loader**](https://github.com/FabricMC/fabric-loader.git) - Mod load support.
-- [**Fabric API**](https://github.com/FabricMC/fabric-loader.git) - Mod API support.
 - [**Bukkit**](https://hub.spigotmc.org/stash/scm/spigot/bukkit.git) - Plugin support.
 - [**CraftBukkit**](https://hub.spigotmc.org/stash/scm/spigot/craftbukkit.git) - Plugin support.
 - [**Spigot**](https://hub.spigotmc.org/stash/scm/spigot/spigot.git) - Plugin support.
 - [**Paper**](https://github.com/PaperMC/Paper.git) - Plugin support.
 - [**Arclight**](https://github.com/IzzelAliz/Arclight.git) - Some code.
 - [**Mohist**](https://github.com/MohistMC/Mohist.git) - Some code.
+- [**StackDeobfuscator**](https://github.com/booky10/StackDeobfuscator) - auto deobfuscate logger crash
 
 ## Special Thanks To:
 <a href="https://ci.codemc.io/"><img src="https://i.loli.net/2020/03/11/YNicj3PLkU5BZJT.png" width="172"></a>

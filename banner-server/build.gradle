@@ -60,6 +60,7 @@ dependencies {
 	include(rootProject.project("banner-api"))
 	include(rootProject.project("banner-translate"))
 	include(rootProject.project("banner-transitive-access-wideners"))
+	include(rootProject.project("banner-stackdeobf"))
 }
 
 moduleDependencies(project, [

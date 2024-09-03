@@ -42,4 +42,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Banner API
-          path: ./banner_server/build/devlibs/*.jar
+          path: ./banner-api/build/devlibs/*.jar

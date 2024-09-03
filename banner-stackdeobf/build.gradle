@@ -1,0 +1,10 @@
+archivesBaseName = project.archives_base_name + "-stackdeobf"
+version = getSubprojectVersion(project)
+
+moduleDependencies(project, [
+        "banner-api"
+])
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.WARN
+}
