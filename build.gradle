@@ -120,6 +120,13 @@ allprojects {
         options.encoding = 'UTF-8'
         options.compilerArgs << '-Xlint:-dep-ann' << '-Xlint:-removal' << '-Xdiags:verbose'
     }
+
+    tasks.register('cleanBuild') {
+        doFirst {
+            project.file("build/libs").deleteDir()
+        }
+        dependsOn(tasks.build)
+    }
 }
 
 def moduleDependencies(Project project, List<String> depNames) {
