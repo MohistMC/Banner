@@ -129,7 +129,9 @@ allprojects {
         doFirst {
             project.file("build/libs").deleteDir()
         }
-        dependsOn(tasks.build)
+        doFirst {
+            project.file("build/devlibs").deleteDir()
+        }
     }
 }
 
