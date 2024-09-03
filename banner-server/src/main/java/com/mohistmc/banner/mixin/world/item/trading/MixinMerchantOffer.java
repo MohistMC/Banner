@@ -3,6 +3,7 @@ package com.mohistmc.banner.mixin.world.item.trading;
 import com.mohistmc.banner.asm.annotation.CreateConstructor;
 import com.mohistmc.banner.asm.annotation.ShadowConstructor;
 import com.mohistmc.banner.injection.world.item.trading.InjectionMerchantOffer;
+import java.util.Optional;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
@@ -23,13 +24,13 @@ public abstract class MixinMerchantOffer implements InjectionMerchantOffer {
     private CraftMerchantRecipe bukkitHandle;
 
     @ShadowConstructor
-    public void banner$constructor(ItemStack buyingStackFirstIn, ItemStack buyingStackSecondIn, ItemStack sellingStackIn, int usesIn, int maxUsesIn, int givenEXPIn, float priceMultiplierIn, int demand) {
+    public void banner$constructor(ItemCost itemCost, Optional<ItemCost> optional, ItemStack itemStack, int i, int j, int k, float f, int l) {
         throw new RuntimeException();
     }
 
     @CreateConstructor
-    public void banner$constructor(ItemStack buyingStackFirstIn, ItemStack buyingStackSecondIn, ItemStack sellingStackIn, int usesIn, int maxUsesIn, int givenEXPIn, float priceMultiplierIn, int demand, CraftMerchantRecipe bukkit) {
-        banner$constructor(buyingStackFirstIn, buyingStackSecondIn, sellingStackIn, usesIn, maxUsesIn, givenEXPIn, priceMultiplierIn, demand);
+    public void banner$constructor(ItemCost itemCost, Optional<ItemCost> optional, ItemStack itemStack, int i, int j, int k, float f, int l, CraftMerchantRecipe bukkit) {
+        banner$constructor(itemCost, optional, itemStack, i, j, k, f, l);
         this.bukkitHandle = bukkit;
     }
 
