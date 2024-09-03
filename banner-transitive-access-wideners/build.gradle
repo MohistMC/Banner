@@ -1,0 +1,10 @@
+archivesBaseName = project.archives_base_name + "-transitive-access-wideners"
+version = getSubprojectVersion(project)
+
+loom {
+    accessWidenerPath = file('src/main/resources/banner-transitive-access-wideners.accesswidener')
+}
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.WARN
+}

@@ -1,0 +1,10 @@
+archivesBaseName = project.archives_base_name + "-api"
+version = getSubprojectVersion(project)
+
+moduleDependencies(project, [
+        "banner-transitive-access-wideners"
+])
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.WARN
+}

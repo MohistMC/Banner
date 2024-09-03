@@ -9,5 +9,7 @@ pluginManagement {
 
 rootProject.name = 'banner'
 
-include("banner_server")
-include("banner_translate")
+include("banner-server")
+include("banner-translate")
+include("banner-api")
+include("banner-transitive-access-wideners")

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "banner-transitive-access-wideners",
+  "name": "Banner Transitive Access Wideners",
+  "version": "${version}",
+  "environment": "server",
+  "license": "LGPL-v3.0",
+  "authors": [
+    "MohistMC Dev Team"
+  ],
+  "contact": {
+    "homepage": "https://github.com/MohistMC/Banner",
+    "sources": "https://github.com/MohistMC/Banner"
+  },
+  "depends": {
+    "fabricloader": "\u003e\u003d0.15.11"
+  },
+  "description": "Contains transitive access wideners that provide access to otherwise inaccessible Banner needed code.",
+  "accessWidener": "banner-transitive-access-wideners.accesswidener",
+  "custom": {
+    "fabric-api:module-lifecycle": "stable"
+  }
+}

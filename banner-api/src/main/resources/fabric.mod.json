@@ -1,11 +1,10 @@
 {
   "schemaVersion": 1,
-  "id": "banner-launcher",
-  "name": "Banner Launcher",
+  "id": "banner-api",
+  "name": "Banner API",
   "version": "${version}",
   "environment": "server",
   "license": "LGPL-v3.0",
-  "icon": "assets/banner/logo.png",
   "authors": [
     "MohistMC Dev Team"
   ],
@@ -17,7 +16,8 @@
     "fabricloader": ">=0.15.11",
     "java": ">=21",
     "fabric-api": "*",
+    "banner-transitive-access-wideners": "*",
     "minecraft": ">=1.21- <1.21.2-"
   },
-  "description": "The Launcher of Banner Server."
+  "description": "The API of Banner Server."
 }
