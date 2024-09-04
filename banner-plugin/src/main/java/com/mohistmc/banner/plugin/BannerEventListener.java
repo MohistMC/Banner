@@ -1,6 +1,7 @@
 package com.mohistmc.banner.plugin;
 
 import com.mohistmc.banner.api.event.EntityJoinWorldEvent;
+import com.mohistmc.banner.api.event.block.BlockDestroyEvent;
 import com.mohistmc.banner.config.BannerConfig;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.event.EventHandler;
@@ -22,5 +23,13 @@ public class BannerEventListener implements Listener {
     @EventHandler
     public static void onAnvilFix(PrepareAnvilEvent event) {
         EnchantmentFix.anvilListener(event);
+    }
+
+    @EventHandler
+    public static void onEntityBreakBlock(BlockDestroyEvent event) {
+        var entity = event.getEntity();
+        if (BannerConfig.banned_breakable_entities.contains(entity.getType().name())) {
+            event.setCancelled(true);
+        }
     }
 }

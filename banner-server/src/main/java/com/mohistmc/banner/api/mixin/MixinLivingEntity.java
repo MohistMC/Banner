@@ -15,7 +15,7 @@ public class MixinLivingEntity {
         LivingHealEvent bannerEvent = new LivingHealEvent((org.bukkit.entity.LivingEntity) ((LivingEntity) (Object) this).getBukkitEntity(), amount);
 
         amount = bannerEvent.getAmount();
-        if (amount <= 0) {
+        if (amount <= 0 || bannerEvent.isCancelled()) {
             ci.cancel();
         }
     }
