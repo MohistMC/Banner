@@ -1,71 +1,40 @@
 package com.mohistmc.banner.mixin.world.item;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.StandingAndWallBlockItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.event.block.BlockCanBuildEvent;
-import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(StandingAndWallBlockItem.class)
 public abstract class MixinStandingAndWallBlockItem extends BlockItem {
 
-    @Shadow @Final public Block wallBlock;
-
-    @Shadow @Final private Direction attachmentDirection;
 
     public MixinStandingAndWallBlockItem(Block block, Properties properties) {
         super(block, properties);
     }
 
-    @Shadow protected abstract boolean canPlace(LevelReader level, BlockState state, BlockPos pos);
+    @Inject(method = "getPlacementState", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/LevelReader;isUnobstructed(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Z"))
+    private void banner$blockCanPlace(BlockPlaceContext context, CallbackInfoReturnable<BlockState> cir, @Local(ordinal = 1) BlockState defaultReturn) {
+        if (defaultReturn != null) {
+            var result = context.getLevel().isUnobstructed(defaultReturn, context.getClickedPos(), CollisionContext.empty());
+            var player = (context.getPlayer() instanceof ServerPlayer serverPlayer) ? serverPlayer.getBukkitEntity() : null;
 
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    @Nullable
-    protected BlockState getPlacementState(BlockPlaceContext context) {
-        BlockState blockState = this.wallBlock.getStateForPlacement(context);
-        BlockState blockState2 = null;
-        LevelReader levelReader = context.getLevel();
-        BlockPos blockPos = context.getClickedPos();
-        Direction[] var6 = context.getNearestLookingDirections();
-        int var7 = var6.length;
+            var event = new BlockCanBuildEvent(CraftBlock.at(context.getLevel(), context.getClickedPos()), player, CraftBlockData.fromData(defaultReturn), result);
+            Bukkit.getPluginManager().callEvent(event);
 
-        for (Direction direction : var6) {
-            if (direction != this.attachmentDirection.getOpposite()) {
-                BlockState blockState3 = direction == this.attachmentDirection ? this.getBlock().getStateForPlacement(context) : blockState;
-                if (blockState3 != null && this.canPlace(levelReader, blockState3, blockPos)) {
-                    blockState2 = blockState3;
-                    break;
-                }
-            }
+            cir.setReturnValue(event.isBuildable() ? defaultReturn : null);
         }
-
-        // CraftBukkit start
-        if (blockState2 != null) {
-            boolean defaultReturn = levelReader.isUnobstructed(blockState2, blockPos, CollisionContext.empty());
-            org.bukkit.entity.Player player = (context.getPlayer() instanceof ServerPlayer) ? (org.bukkit.entity.Player) context.getPlayer().getBukkitEntity() : null;
-            BlockCanBuildEvent event = new BlockCanBuildEvent(CraftBlock.at(context.getLevel(), blockPos), player, CraftBlockData.fromData(blockState2), defaultReturn);
-            context.getLevel().getCraftServer().getPluginManager().callEvent(event);
-            return (event.isBuildable()) ? blockState2 : null;
-        } else {
-            return null;
-        }
-        // CraftBukkit end
     }
 }
