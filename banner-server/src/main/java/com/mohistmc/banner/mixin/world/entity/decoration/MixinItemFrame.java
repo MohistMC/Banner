@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.decoration;
 
+import com.mohistmc.banner.asm.annotation.TransformAccess;
 import com.mohistmc.banner.injection.world.entity.decoration.InjectionItemFrame;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,7 +15,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -57,26 +60,16 @@ public abstract class MixinItemFrame extends HangingEntity implements InjectionI
         }
     }
 
-    private static AABB calculateBoundingBox(Entity entity, BlockPos blockPosition, Direction direction, int width, int height) {
-        double d0 = 0.46875;
-        double locX = blockPosition.getX() + 0.5 - direction.getStepX() * 0.46875;
-        double locY = blockPosition.getY() + 0.5 - direction.getStepY() * 0.46875;
-        double locZ = blockPosition.getZ() + 0.5 - direction.getStepZ() * 0.46875;
-        if (entity != null) {
-            entity.setPosRaw(locX, locY, locZ);
-        }
-        double d2 = width;
-        double d3 = height;
-        double d4 = width;
-        Direction.Axis enumdirection_enumaxis = direction.getAxis();
-        switch (enumdirection_enumaxis) {
-            case X -> d2 = 1.0;
-            case Y -> d3 = 1.0;
-            case Z -> d4 = 1.0;
-        }
-        d2 /= 32.0;
-        d3 /= 32.0;
-        d4 /= 32.0;
-        return new AABB(locX - d2, locY - d3, locZ - d4, locX + d2, locY + d3, locZ + d4);
+    @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
+    private static AABB calculateBoundingBoxStatic(BlockPos blockposition, Direction enumdirection) {
+        // CraftBukkit end
+        float f = 0.46875F;
+        Vec3 vec3d = Vec3.atCenterOf(blockposition).relative(enumdirection, -0.46875D);
+        Direction.Axis enumdirection_enumaxis = enumdirection.getAxis();
+        double d0 = enumdirection_enumaxis == Direction.Axis.X ? 0.0625D : 0.75D;
+        double d1 = enumdirection_enumaxis == Direction.Axis.Y ? 0.0625D : 0.75D;
+        double d2 = enumdirection_enumaxis == Direction.Axis.Z ? 0.0625D : 0.75D;
+
+        return AABB.ofSize(vec3d, d0, d1, d2);
     }
 }

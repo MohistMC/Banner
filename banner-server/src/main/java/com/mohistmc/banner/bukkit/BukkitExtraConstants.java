@@ -1,22 +1,14 @@
 package com.mohistmc.banner.bukkit;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.commands.ReloadCommand;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.util.Unit;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.item.FallingBlockEntity;
-import net.minecraft.world.entity.monster.ZombieVillager;
-import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.context.UseOnContext;
@@ -25,9 +17,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.WorldData;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.phys.AABB;
-import org.bukkit.TreeType;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityTransformEvent;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -35,12 +24,10 @@ import java.util.List;
 
 public class BukkitExtraConstants {
 
-    public static TreeType treeType; // CraftBukkit
     public static BlockPos openSign; // CraftBukkit
     public static int bridge$autosavePeriod;
     public static java.util.Queue<Runnable> bridge$processQueue =
             new java.util.concurrent.ConcurrentLinkedQueue<>();
-    public static int currentTick = (int) (System.currentTimeMillis() / 50);
     public static final TicketType<org.bukkit.plugin.Plugin> PLUGIN_TICKET =
             TicketType.create("plugin_ticket", Comparator.comparing(plugin -> plugin.getClass().getName())); // CraftBukkit
     public static final LootContextParam<Integer> LOOTING_MOD = new LootContextParam<>(ResourceLocation.parse("bukkit:looting_mod")); // CraftBukkit
@@ -64,36 +51,6 @@ public class BukkitExtraConstants {
 
     public static double a(int i) {
         return i % 32 == 0 ? 0.5D : 0.0D;
-    }
-
-    public static AABB recalculateBoundingBox(Entity entity, BlockPos blockPosition, Direction direction, int width, int height) {
-        double d0 = blockPosition.getX() + 0.5;
-        double d2 = blockPosition.getY() + 0.5;
-        double d3 = blockPosition.getZ() + 0.5;
-        double d4 = 0.46875;
-        double d5 = a(width);
-        double d6 = a(height);
-        d0 -= direction.getStepX() * 0.46875;
-        d3 -= direction.getStepZ() * 0.46875;
-        d2 += d6;
-        Direction enumdirection = direction.getCounterClockWise();
-        d0 += d5 * enumdirection.getStepX();
-        d3 += d5 * enumdirection.getStepZ();
-        if (entity != null) {
-            entity.setPosRaw(d0, d2, d3);
-        }
-        double d7 = width;
-        double d8 = height;
-        double d9 = width;
-        if (direction.getAxis() == Direction.Axis.Z) {
-            d9 = 1.0;
-        } else {
-            d7 = 1.0;
-        }
-        d7 /= 32.0;
-        d8 /= 32.0;
-        d9 /= 32.0;
-        return new AABB(d0 - d7, d2 - d8, d3 - d9, d0 + d7, d2 + d8, d3 + d9);
     }
 
     public static InteractionResult applyBonemeal(UseOnContext context) {
@@ -146,45 +103,5 @@ public class BukkitExtraConstants {
         int i = list.size();
         int j = i / 7 * 16;
         return j;
-    }
-
-    public static AABB calculateBoundingBox(Entity entity, BlockPos blockPosition, Direction direction, int width, int height) {
-        double d0 = 0.46875;
-        double locX = blockPosition.getX() + 0.5 - direction.getStepX() * 0.46875;
-        double locY = blockPosition.getY() + 0.5 - direction.getStepY() * 0.46875;
-        double locZ = blockPosition.getZ() + 0.5 - direction.getStepZ() * 0.46875;
-        if (entity != null) {
-            entity.setPosRaw(locX, locY, locZ);
-        }
-        double d2 = width;
-        double d3 = height;
-        double d4 = width;
-        Direction.Axis enumdirection_enumaxis = direction.getAxis();
-        switch (enumdirection_enumaxis) {
-            case X -> d2 = 1.0;
-            case Y -> d3 = 1.0;
-            case Z -> d4 = 1.0;
-        }
-        d2 /= 32.0;
-        d3 /= 32.0;
-        d4 /= 32.0;
-        return new AABB(locX - d2, locY - d3, locZ - d4, locX + d2, locY + d3, locZ + d4);
-    }
-
-    public static ZombieVillager zombifyVillager(ServerLevel level, Villager villager, BlockPos blockPosition, boolean silent, CreatureSpawnEvent.SpawnReason spawnReason) {
-        villager.level().pushAddEntityReason(spawnReason);
-        villager.bridge$pushTransformReason(EntityTransformEvent.TransformReason.INFECTION);
-        ZombieVillager zombieVillager = villager.convertTo(EntityType.ZOMBIE_VILLAGER, false);
-        if (zombieVillager != null) {
-            zombieVillager.finalizeSpawn(level, level.getCurrentDifficultyAt(zombieVillager.blockPosition()), MobSpawnType.CONVERSION, new net.minecraft.world.entity.monster.Zombie.ZombieGroupData(false, true));
-            zombieVillager.setVillagerData(villager.getVillagerData());
-            zombieVillager.setGossips(villager.getGossips().store(NbtOps.INSTANCE));
-            zombieVillager.setTradeOffers(villager.getOffers().copy());
-            zombieVillager.setVillagerXp(villager.getVillagerXp());
-            if (!silent) {
-                level.levelEvent(null, 1026, blockPosition, 0);
-            }
-        }
-        return zombieVillager;
     }
 }

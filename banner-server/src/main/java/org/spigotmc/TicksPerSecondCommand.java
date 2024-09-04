@@ -1,8 +1,6 @@
 package org.spigotmc;
 
-import com.mohistmc.banner.BannerServer;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
-import net.minecraft.server.MinecraftServer;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -27,7 +25,7 @@ public class TicksPerSecondCommand extends Command
         }
 
         StringBuilder sb = new StringBuilder( ChatColor.GOLD + "TPS from last 1m, 5m, 15m: " );
-        for ( double tps : BannerServer.getServer().getTPS() )
+        for ( double tps : BukkitMethodHooks.getServer().getTPS() )
         {
             sb.append( this.format( tps ) );
             sb.append( ", " );

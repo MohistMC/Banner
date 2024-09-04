@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -476,8 +477,8 @@ public class CraftBlock implements Block {
         world.banner$setCaptureTreeGeneration(false);
 
         if (world.bridge$capturedBlockStates().size() > 0) {
-            TreeType treeType = BukkitExtraConstants.treeType;
-            BukkitExtraConstants.treeType = null;
+            TreeType treeType = BukkitFieldHooks.treeType();
+            BukkitFieldHooks.setTreeType(null);
             List<BlockState> blocks = new ArrayList<>(world.bridge$capturedBlockStates().values());
             world.bridge$capturedBlockStates().clear();
             StructureGrowEvent structureEvent = null;

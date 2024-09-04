@@ -587,6 +587,7 @@ transitive-accessible field net/minecraft/world/level/levelgen/structure/templat
 transitive-accessible field net/minecraft/world/level/levelgen/structure/StructurePiece SHAPE_CHECK_BLOCKS Ljava/util/Set;
 transitive-accessible field net/minecraft/world/inventory/StonecutterMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
 transitive-accessible field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner isOminous Z
+transitive-accessible method net/minecraft/world/entity/decoration/Painting offsetForPaintingSize (I)D
 
 # public -f fields
 transitive-accessible field net/minecraft/world/item/trading/MerchantOffer maxUses I

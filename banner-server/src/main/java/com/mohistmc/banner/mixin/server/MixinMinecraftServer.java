@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mohistmc.banner.api.color.ColorsAPI;
 import com.mohistmc.banner.asm.annotation.TransformAccess;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.config.BannerConfigUtil;
@@ -203,17 +204,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Mutable
     @Shadow @Final private static long OVERLOADED_THRESHOLD_NANOS;
     @Shadow @Final private static long OVERLOADED_WARNING_INTERVAL_NANOS;
-    @Shadow private float smoothedTickTimeMillis;
-
-    @Shadow public abstract Path getServerDirectory();
-
-    @Shadow protected abstract void startMeasuringTaskExecutionTime();
-
-    @Shadow protected abstract void finishMeasuringTaskExecutionTime();
-
-    @Shadow protected abstract void logFullTickTime();
-
-    @Shadow public abstract ServerLinks serverLinks();
 
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
@@ -659,7 +649,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Inject(method = "tickChildren", at = @At("HEAD"))
     private void banner$processStart(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-        BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50);
+        BukkitFieldHooks.setCurrentTick((int) (System.currentTimeMillis() / 50));
         server.getScheduler().mainThreadHeartbeat(this.tickCount);
         this.bridge$drainQueuedTasks();
     }

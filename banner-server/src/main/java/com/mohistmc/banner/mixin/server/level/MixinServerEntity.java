@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.asm.annotation.CreateConstructor;
 import com.mohistmc.banner.asm.annotation.ShadowConstructor;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import com.mohistmc.banner.injection.server.level.InjectionServerEntity;
 import com.mojang.datafixers.util.Pair;
 import java.util.ArrayList;
@@ -96,7 +97,7 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(ServerLevel serverWorld, Entity entity, int updateFrequency, boolean sendVelocityUpdates, Consumer<Packet<?>> packetConsumer, CallbackInfo ci) {
         trackedPlayers = new HashSet<>();
-        lastTick = BukkitExtraConstants.currentTick - 1;
+        lastTick = BukkitFieldHooks.currentTick() - 1;
         lastUpdate = lastPosUpdate = lastMapUpdate = -1;
     }
 
@@ -128,11 +129,11 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
 
             });
         }
-        int elapsedTicks = BukkitExtraConstants.currentTick - this.lastTick;
+        int elapsedTicks = BukkitFieldHooks.currentTick() - this.lastTick;
         if (elapsedTicks < 0) {
             elapsedTicks = 0;
         }
-        this.lastTick = BukkitExtraConstants.currentTick;
+        this.lastTick = BukkitFieldHooks.currentTick();
         if (this.entity instanceof ItemFrame itemFrame) {
             ItemStack itemstack = itemFrame.getItem();
             if (this.tickCount / 10 != this.lastMapUpdate && itemstack.getItem() instanceof MapItem) {

@@ -1,8 +1,7 @@
 package org.bukkit.craftbukkit.legacy;
 
 import com.google.common.base.Preconditions;
-import com.mohistmc.banner.BannerServer;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mojang.serialization.Dynamic;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,7 +16,6 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.Bootstrap;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.BlockStateData;
 import net.minecraft.util.datafix.fixes.ItemIdFix;
@@ -267,7 +265,7 @@ public final class CraftLegacy {
 
     static {
         System.err.println("Initializing Legacy Material Support. Unless you have legacy plugins and/or data this is a bug!");
-        if (BannerServer.getServer() != null && BannerServer.getServer().isDebugging()) {
+        if (BukkitMethodHooks.getServer() != null && BukkitMethodHooks.getServer().isDebugging()) {
             new Exception().printStackTrace();
         }
 

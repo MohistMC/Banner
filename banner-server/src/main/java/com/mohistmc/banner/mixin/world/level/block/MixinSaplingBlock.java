@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
+import com.mohistmc.banner.asm.annotation.TransformAccess;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -12,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.TreeType;
 import org.bukkit.craftbukkit.util.CraftLocation;
 import org.bukkit.event.world.StructureGrowEvent;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,8 +25,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(SaplingBlock.class)
 public class MixinSaplingBlock {
+
     @Shadow @Final protected TreeGrower treeGrower;
-    private static TreeType treeType = BukkitExtraConstants.treeType; // CraftBukkit
+    @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
+    private static TreeType treeType; // CraftBukkit
 
 
     @Redirect(method = "advanceTree", at = @At(value = "INVOKE",
@@ -45,8 +50,8 @@ public class MixinSaplingBlock {
             this.treeGrower.growTree(level, level.getChunkSource().getGenerator(), pos, state, random);
             level.banner$setCaptureTreeGeneration(false);
             if (!level.bridge$capturedBlockStates().isEmpty()) {
-                TreeType treeType = BukkitExtraConstants.treeType;
-                BukkitExtraConstants.treeType = null;
+                TreeType treeType = BukkitFieldHooks.treeType();
+                BukkitFieldHooks.setTreeType(null);
                 Location location = CraftLocation.toBukkit(pos, level.getWorld());
                 java.util.List<org.bukkit.block.BlockState> blocks = new java.util.ArrayList<>(level.bridge$capturedBlockStates().values());
                 level.bridge$capturedBlockStates().clear();

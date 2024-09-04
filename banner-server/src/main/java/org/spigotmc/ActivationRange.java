@@ -1,6 +1,7 @@
 package org.spigotmc;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
@@ -121,7 +122,7 @@ public class ActivationRange
 
         for ( Player player : world.players() )
         {
-            player.banner$setActivatedTick(BukkitExtraConstants.currentTick);
+            player.banner$setActivatedTick(BukkitFieldHooks.currentTick());
             if ( world.bridge$spigotConfig().ignoreSpectatorActivation && player.isSpectator() )
             {
                 continue;
@@ -145,16 +146,16 @@ public class ActivationRange
      */
     private static void activateEntity(Entity entity)
     {
-        if ( BukkitExtraConstants.currentTick > entity.bridge$activatedTick() )
+        if ( BukkitFieldHooks.currentTick() > entity.bridge$activatedTick() )
         {
             if ( entity.bridge$defaultActivationState() )
             {
-                entity.banner$setActivatedTick(BukkitExtraConstants.currentTick);
+                entity.banner$setActivatedTick(BukkitFieldHooks.currentTick());
                 return;
             }
             if ( entity.bridge$activationType().boundingBox.intersects( entity.getBoundingBox() ) )
             {
-                entity.banner$setActivatedTick(BukkitExtraConstants.currentTick);
+                entity.banner$setActivatedTick(BukkitFieldHooks.currentTick());
             }
         }
     }
@@ -237,18 +238,18 @@ public class ActivationRange
             return true;
         }
 
-        boolean isActive = entity.bridge$activatedTick() >= BukkitExtraConstants.currentTick || entity.bridge$defaultActivationState();
+        boolean isActive = entity.bridge$activatedTick() >= BukkitFieldHooks.currentTick() || entity.bridge$defaultActivationState();
 
         // Should this entity tick?
         if ( !isActive )
         {
-            if ( ( BukkitExtraConstants.currentTick - entity.bridge$activatedTick() - 1 ) % 20 == 0 )
+            if ( ( BukkitFieldHooks.currentTick() - entity.bridge$activatedTick() - 1 ) % 20 == 0 )
             {
                 // Check immunities every 20 ticks.
                 if ( ActivationRange.checkEntityImmunities( entity ) )
                 {
                     // Triggered some sort of immunity, give 20 full ticks before we check again.
-                    entity.banner$setActivatedTick(BukkitExtraConstants.currentTick + 20);
+                    entity.banner$setActivatedTick(BukkitFieldHooks.currentTick() + 20);
                 }
                 isActive = true;
             }

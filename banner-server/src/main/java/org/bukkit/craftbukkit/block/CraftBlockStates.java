@@ -9,12 +9,10 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import javax.annotation.Nullable;
 
-import com.mohistmc.banner.BannerServer;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BannerBlockEntity;
@@ -403,7 +401,7 @@ public final class CraftBlockStates {
 
     @Deprecated
     public static BlockState getBlockState(BlockPos blockPosition, Material material, @Nullable CompoundTag blockEntityTag) {
-        return CraftBlockStates.getBlockState(BannerServer.getDefaultRegistryAccess(), blockPosition, material, blockEntityTag);
+        return CraftBlockStates.getBlockState(BukkitMethodHooks.getDefaultRegistryAccess(), blockPosition, material, blockEntityTag);
     }
 
     public static BlockState getBlockState(LevelReader world, BlockPos blockPosition, Material material, @Nullable CompoundTag blockEntityTag) {
@@ -418,7 +416,7 @@ public final class CraftBlockStates {
 
     @Deprecated
     public static BlockState getBlockState(net.minecraft.world.level.block.state.BlockState blockData, @Nullable CompoundTag blockEntityTag) {
-        return CraftBlockStates.getBlockState(BannerServer.getDefaultRegistryAccess(), BlockPos.ZERO, blockData, blockEntityTag);
+        return CraftBlockStates.getBlockState(BukkitMethodHooks.getDefaultRegistryAccess(), BlockPos.ZERO, blockData, blockEntityTag);
     }
 
     public static BlockState getBlockState(LevelReader world, BlockPos blockPosition, net.minecraft.world.level.block.state.BlockState blockData, @Nullable CompoundTag blockEntityTag) {

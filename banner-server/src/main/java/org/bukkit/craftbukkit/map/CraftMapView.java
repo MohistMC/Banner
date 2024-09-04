@@ -7,10 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import com.mohistmc.banner.BannerServer;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.bukkit.Bukkit;
@@ -55,7 +53,7 @@ public final class CraftMapView implements MapView {
     @Override
     public World getWorld() {
         ResourceKey<net.minecraft.world.level.Level> dimension = this.worldMap.dimension;
-        ServerLevel world = BannerServer.getServer().getLevel(dimension);
+        ServerLevel world = BukkitMethodHooks.getServer().getLevel(dimension);
 
         if (world != null) {
             return world.getWorld();

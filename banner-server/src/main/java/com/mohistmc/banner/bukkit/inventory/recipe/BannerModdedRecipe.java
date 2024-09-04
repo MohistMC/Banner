@@ -1,7 +1,6 @@
 package com.mohistmc.banner.bukkit.inventory.recipe;
 
-import com.mohistmc.banner.BannerServer;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -23,11 +22,11 @@ public class BannerModdedRecipe extends CraftComplexRecipe {
 
     @Override
     public @NotNull ItemStack getResult() {
-        return CraftItemStack.asCraftMirror(new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.getKey()), this.recipe).value().getResultItem(BannerServer.getServer().registryAccess()));
+        return CraftItemStack.asCraftMirror(new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.getKey()), this.recipe).value().getResultItem(BukkitMethodHooks.getServer().registryAccess()));
     }
 
     @Override
     public void addToCraftingManager() {
-        BannerServer.getServer().getRecipeManager().addRecipe((new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.getKey()), this.recipe)));
+        BukkitMethodHooks.getServer().getRecipeManager().addRecipe((new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.getKey()), this.recipe)));
     }
 }

@@ -5,8 +5,7 @@ import com.google.common.collect.ImmutableMap.Builder;
 import java.util.Map;
 import java.util.Optional;
 
-import com.mohistmc.banner.BannerServer;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.component.DataComponentPatch;
@@ -14,7 +13,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.component.LodestoneTracker;
 import org.bukkit.Location;
@@ -124,7 +122,7 @@ public class CraftMetaCompass extends CraftMetaItem implements CompassMeta {
         if (this.lodestoneWorld == null) {
             return null;
         }
-        ServerLevel worldServer = BannerServer.getServer().getLevel(this.lodestoneWorld);
+        ServerLevel worldServer = BukkitMethodHooks.getServer().getLevel(this.lodestoneWorld);
         World world = worldServer != null ? worldServer.getWorld() : null;
         return new Location(world, this.lodestoneX, this.lodestoneY, this.lodestoneZ); // world may be null here, if the referenced world is not loaded
     }

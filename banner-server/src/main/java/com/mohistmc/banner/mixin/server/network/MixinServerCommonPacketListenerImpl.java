@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.server.network;
 
-import com.mohistmc.banner.BannerServer;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.injection.server.network.InjectionServerCommonPacketListenerImpl;
 import io.izzel.arclight.mixin.Decorate;
@@ -182,8 +181,8 @@ public abstract class MixinServerCommonPacketListenerImpl implements ServerCommo
             var buf = new byte[data.readableBytes()];
             data.readBytes(buf);
             data.readerIndex(readerIndex);
-            BannerServer.getServer().executeIfPossible(() -> {
-                if (BannerServer.getServer().hasStopped() || bridge$processedDisconnect()) {
+            BukkitMethodHooks.getServer().executeIfPossible(() -> {
+                if (BukkitMethodHooks.getServer().hasStopped() || bridge$processedDisconnect()) {
                     return;
                 }
                 if (this.connection.isConnected()) {

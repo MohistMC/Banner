@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.item;
 
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import com.mohistmc.banner.injection.world.item.InjectionItemStack;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -219,8 +220,8 @@ public abstract class MixinItemStack implements InjectionItemStack {
             if (interactionResult.consumesAction() && world.bridge$captureTreeGeneration() && !world.bridge$capturedBlockStates().isEmpty()) {
                 world.banner$setCaptureTreeGeneration(false);
                 Location location = CraftLocation.toBukkit(blockPos, world.getWorld());
-                TreeType treeType = BukkitExtraConstants.treeType;
-                BukkitExtraConstants.treeType = null;
+                TreeType treeType = BukkitFieldHooks.treeType();
+                BukkitFieldHooks.setTreeType(null);
                 List<CraftBlockState> blocks = new java.util.ArrayList<>(world.bridge$capturedBlockStates().values());
                 world.bridge$capturedBlockStates().clear();
                 StructureGrowEvent structureEvent = null;

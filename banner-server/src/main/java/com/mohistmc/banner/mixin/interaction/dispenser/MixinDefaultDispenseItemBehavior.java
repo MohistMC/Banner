@@ -2,8 +2,7 @@ package com.mohistmc.banner.mixin.interaction.dispenser;
 
 import com.mohistmc.banner.asm.annotation.CreateConstructor;
 import com.mohistmc.banner.asm.annotation.ShadowConstructor;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
-import com.mohistmc.banner.bukkit.DispenserBlockHooks;
+import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import net.minecraft.core.Direction;
 import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
@@ -72,7 +71,7 @@ public class MixinDefaultDispenseItemBehavior {
         CraftItemStack craftItem = CraftItemStack.asCraftMirror(stack);
 
         BlockDispenseEvent event = new BlockDispenseEvent(block, craftItem.clone(), CraftVector.toBukkit(banner$itemEntity.getDeltaMovement()));
-        if (!DispenserBlockHooks.isEventFired()) {
+        if (!BukkitFieldHooks.isEventFired()) {
             level.getCraftServer().getPluginManager().callEvent(event);
         }
 

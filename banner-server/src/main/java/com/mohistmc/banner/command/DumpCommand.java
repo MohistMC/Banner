@@ -1,7 +1,6 @@
 package com.mohistmc.banner.command;
 
-import com.mohistmc.banner.BannerServer;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mohistmc.banner.fabric.BukkitRegistry;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -132,7 +131,7 @@ public class DumpCommand extends BukkitCommand {
 
     private void dumpCBCommands(CommandSender sender, String mode) {
         StringBuilder sb = new StringBuilder();
-        for (Command per : Objects.requireNonNull(BannerServer.getServer()).bridge$server().getCommandMap().getCommands()) {
+        for (Command per : Objects.requireNonNull(BukkitMethodHooks.getServer()).bridge$server().getCommandMap().getCommands()) {
             // Do not print if there is no permission
             if (per.getPermission() == null) {
                 continue;
@@ -210,7 +209,7 @@ public class DumpCommand extends BukkitCommand {
 
     private void dumpAdvancements(CommandSender sender, String mode) {
         StringBuilder sb = new StringBuilder();
-        for (AdvancementHolder channel : BannerServer.getServer().getAdvancements().getAllAdvancements()) {
+        for (AdvancementHolder channel : BukkitMethodHooks.getServer().getAdvancements().getAllAdvancements()) {
             sb.append(channel.id()).append("\n");
         }
         dump(sender, "advancements", sb, mode);
