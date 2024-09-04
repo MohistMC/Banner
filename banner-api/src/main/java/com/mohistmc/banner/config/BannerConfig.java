@@ -142,6 +142,7 @@ public class BannerConfig {
     public static String velocitySecret;
     public static List<String> banned_entities;
     public static List<String> banned_breakable_entities;
+    public static boolean banned_tnt;
 
     private static void banner() {
         check_update = getBoolean("banner.check_update", false);
@@ -166,5 +167,6 @@ public class BannerConfig {
         motdFirstLine = ColorsAPI.of(getString("motd.secondline", ""));
         velocityEnabled = getBoolean("proxies.velocity.enabled", false);
         velocitySecret = getString("proxies.velocity.secret", "");
+        banned_tnt = getBoolean("tnt.banned_tnt", false);
     }
 }
