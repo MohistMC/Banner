@@ -29,6 +29,7 @@ public class BannerGameProvider extends MinecraftGameProvider {
         for (var lib : System.getProperty("banner.fabric.classpath").split(File.pathSeparator)) {
             launcher.addToClassPath(Paths.get(lib));
         }
+        loadCustomLibs(launcher);
         try {
             this.extractPlugin();
         } catch (Exception e) {
@@ -122,6 +123,18 @@ public class BannerGameProvider extends MinecraftGameProvider {
             return super.getRawGameVersion() + " Banner " + getBannerVersion();
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static void loadCustomLibs(FabricLauncher launcher) {
+        File file = new File("libraries/customize_libraries");
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+
+        for (File lib : file.listFiles((dir, name) -> name.endsWith(".jar"))) {
+            launcher.addToClassPath(Paths.get(lib.toURI()));
+            System.out.println(lib.getName() + " custom library loaded successfully.");
         }
     }
 }
