@@ -288,7 +288,7 @@ public class Metrics {
 
                 metrics.addCustomChart(new SingleLineChart("players", () -> Bukkit.getOnlinePlayers().size()));
                 metrics.addCustomChart(new SimplePie("online_mode", () -> Bukkit.getOnlineMode() ? "online" : "offline"));
-                metrics.addCustomChart(new SimplePie("banner_version", () -> "1.20.4"));
+                metrics.addCustomChart(new SimplePie("banner_version", () -> "1.21.1"));
                 metrics.addCustomChart(new SimplePie("bungeecord", () -> String.valueOf(SpigotConfig.bungee)));
 
                 metrics.addCustomChart(new DrilldownPie("java_version", () -> {
