@@ -93,6 +93,7 @@
     "server.level.MixinWorldGenRegion",
     "server.network.MixinLegacyQueryHandler",
     "server.network.MixinServerCommonPacketListenerImpl",
+    "server.network.MixinServerConfigurationPacketListenerImpl",
     "server.network.MixinServerConnectionListener",
     "server.network.MixinServerGamePacketListenerImpl",
     "server.network.MixinServerGamePacketListenerImpl_Handler",

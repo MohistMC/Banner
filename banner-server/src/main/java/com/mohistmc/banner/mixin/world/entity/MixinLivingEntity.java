@@ -649,8 +649,176 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
 
     @Override
     public boolean damageEntity0(DamageSource damagesource, float f) {
-        return true;
-        // Banner TODO fixme
+        if (!this.isInvulnerableTo(damagesource)) {
+            final boolean human = ((LivingEntity) (Object) this) instanceof Player;
+            if (f <= 0) return banner$damageResult = true;
+            float originalDamage = f;
+            Function<Double, Double> hardHat = new Function<>() {
+                @Override
+                public Double apply(Double f) {
+                    if (damagesource.is(DamageTypeTags.DAMAGES_HELMET) && !getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
+                        return -(f - (f * 0.75F));
+
+                    }
+                    return -0.0;
+                }
+            };
+            float hardHatModifier = hardHat.apply((double) f).floatValue();
+            f += hardHatModifier;
+
+            Function<Double, Double> blocking = new Function<>() {
+                @Override
+                public Double apply(Double f) {
+                    return -((isDamageSourceBlocked(damagesource)) ? f : 0.0);
+                }
+            };
+            float blockingModifier = blocking.apply((double) f).floatValue();
+            f += blockingModifier;
+
+            Function<Double, Double> armor = new Function<>() {
+                @Override
+                public Double apply(Double f) {
+                    return -(f - getDamageAfterArmorAbsorb(damagesource, f.floatValue()));
+                }
+            };
+            float armorModifier = armor.apply((double) f).floatValue();
+            f += armorModifier;
+
+            Function<Double, Double> resistance = new Function<>() {
+                @Override
+                public Double apply(Double f) {
+                    if (!damagesource.is(DamageTypeTags.BYPASSES_EFFECTS) && hasEffect(MobEffects.DAMAGE_RESISTANCE) && !damagesource.is(DamageTypeTags.BYPASSES_RESISTANCE)) {
+                        int i = (((LivingEntity) (Object) this).getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier() + 1) * 5;
+                        int j = 25 - i;
+                        float f1 = f.floatValue() * (float) j;
+                        return -(f - (f1 / 25.0F));
+                    }
+                    return -0.0;
+                }
+            };
+            float resistanceModifier = resistance.apply((double) f).floatValue();
+            f += resistanceModifier;
+
+            Function<Double, Double> magic = new Function<>() {
+                @Override
+                public Double apply(Double f) {
+                    return -(f - getDamageAfterMagicAbsorb(damagesource, f.floatValue()));
+                }
+            };
+            float magicModifier = magic.apply((double) f).floatValue();
+            f += magicModifier;
+
+            Function<Double, Double> absorption = new Function<>() {
+                @Override
+                public Double apply(Double f) {
+                    return -(Math.max(f - Math.max(f - getAbsorptionAmount(), 0.0F), 0.0F));
+                }
+            };
+            float absorptionModifier = absorption.apply((double) f).floatValue();
+
+            EntityDamageEvent event = CraftEventFactory.handleLivingEntityDamageEvent(this, damagesource, originalDamage, hardHatModifier, blockingModifier, armorModifier, resistanceModifier, magicModifier, absorptionModifier, null, blocking, armor, resistance, magic, absorption);
+            if (damagesource.getEntity() instanceof Player) {
+                ((Player) damagesource.getEntity()).resetAttackStrengthTicker(); // Moved from EntityHuman in order to make the cooldown reset get called after the damage event is fired
+            }
+            if (event.isCancelled()) {
+                return banner$damageResult = false;
+            }
+
+            f = (float) event.getFinalDamage();
+
+            // Resistance
+            if (event.getDamage(EntityDamageEvent.DamageModifier.RESISTANCE) < 0) {
+                float f3 = (float) -event.getDamage(EntityDamageEvent.DamageModifier.RESISTANCE);
+                if (f3 > 0.0F && f3 < 3.4028235E37F) {
+                    if (((LivingEntity) (Object) this) instanceof ServerPlayer) {
+                        ((ServerPlayer) (Object) this).awardStat(Stats.DAMAGE_RESISTED, Math.round(f3 * 10.0F));
+                    } else if (damagesource.getEntity() instanceof ServerPlayer) {
+                        ((ServerPlayer) damagesource.getEntity()).awardStat(Stats.DAMAGE_DEALT_RESISTED, Math.round(f3 * 10.0F));
+                    }
+                }
+            }
+
+            // Apply damage to helmet
+            if (damagesource.is(DamageTypeTags.DAMAGES_HELMET) && !this.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
+                this.hurtHelmet(damagesource, f);
+            }
+
+            // Apply damage to armor
+            if (!damagesource.is(DamageTypeTags.BYPASSES_ARMOR)) {
+                float armorDamage = (float) (event.getDamage() + event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) + event.getDamage(EntityDamageEvent.DamageModifier.HARD_HAT));
+                this.hurtArmor(damagesource, armorDamage);
+            }
+
+            // Apply blocking code // PAIL: steal from above
+            if (event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0) {
+                this.level().broadcastEntityEvent(this, (byte) 29); // SPIGOT-4635 - shield damage sound
+                this.hurtCurrentlyUsedShield((float) -event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING));
+                Entity entity = damagesource.getDirectEntity();
+
+                if (entity instanceof LivingEntity) {
+                    this.blockUsingShield((LivingEntity) entity);
+                }
+            }
+
+            absorptionModifier = (float) -event.getDamage(EntityDamageEvent.DamageModifier.ABSORPTION);
+            this.setAbsorptionAmount(Math.max(this.getAbsorptionAmount() - absorptionModifier, 0.0F));
+            float f2 = absorptionModifier;
+
+            if (f2 > 0.0F && f2 < 3.4028235E37F && ((LivingEntity) (Object) this) instanceof Player) {
+                ((Player) (Object) this).awardStat(Stats.DAMAGE_ABSORBED, Math.round(f2 * 10.0F));
+            }
+            if (f2 > 0.0F && f2 < 3.4028235E37F) {
+                Entity entity = damagesource.getEntity();
+
+                if (entity instanceof ServerPlayer entityplayer) {
+
+                    entityplayer.awardStat(Stats.DAMAGE_DEALT_ABSORBED, Math.round(f2 * 10.0F));
+                }
+            }
+
+            if (f > 0 || !human) {
+                if (human) {
+                    // PAIL: Be sure to drag all this code from the EntityHuman subclass each update.
+                    ((Player) (Object) this).causeFoodExhaustion(damagesource.getFoodExhaustion(), org.bukkit.event.entity.EntityExhaustionEvent.ExhaustionReason.DAMAGED); // CraftBukkit - EntityExhaustionEvent
+                    if (f < 3.4028235E37F) {
+                        ((Player) (Object) this).awardStat(Stats.DAMAGE_TAKEN, Math.round(f * 10.0F));
+                    }
+                }
+                // CraftBukkit end
+                float f3 = this.getHealth();
+
+                this.getCombatTracker().recordDamage(damagesource, f);
+                this.setHealth(f3 - f);
+                // CraftBukkit start
+                if (!human) {
+                    this.setAbsorptionAmount(this.getAbsorptionAmount() - f);
+                }
+                this.gameEvent(GameEvent.ENTITY_DAMAGE);
+
+                return banner$damageResult = true;
+            } else {
+                // Duplicate triggers if blocking
+                if (event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0) {
+                    if (((LivingEntity) (Object) this)instanceof ServerPlayer) {
+                        CriteriaTriggers.ENTITY_HURT_PLAYER.trigger(((ServerPlayer) (Object) this), damagesource, f, originalDamage, true);
+                        f2 = (float) -event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING);
+                        if (f2 > 0.0F && f2 < 3.4028235E37F) {
+                            ((ServerPlayer) (Object) this).awardStat(Stats.DAMAGE_BLOCKED_BY_SHIELD, Math.round(originalDamage * 10.0F));
+                        }
+                    }
+
+                    if (damagesource.getEntity() instanceof ServerPlayer) {
+                        CriteriaTriggers.PLAYER_HURT_ENTITY.trigger((ServerPlayer) damagesource.getEntity(), this, damagesource, f, originalDamage, true);
+                    }
+
+                    return banner$damageResult = false;
+                } else {
+                    return banner$damageResult = originalDamage > 0;
+                }
+                // CraftBukkit end
+            }
+        }
+        return banner$damageResult = false; // CraftBukkit
     }
 
     private transient EntityRegainHealthEvent.RegainReason banner$regainReason;

@@ -1003,6 +1003,32 @@ public class CraftEventFactory {
 
     private static final Function<? super Double, Double> ZERO = Functions.constant(-0.0);
 
+    // Banner start - remain for compat
+    public static EntityDamageEvent handleLivingEntityDamageEvent(Entity damagee, DamageSource source, double rawDamage, double hardHatModifier, double blockingModifier, double armorModifier, double resistanceModifier, double magicModifier, double absorptionModifier, Function<Double, Double> hardHat, Function<Double, Double> blocking, Function<Double, Double> armor, Function<Double, Double> resistance, Function<Double, Double> magic, Function<Double, Double> absorption) {
+        Map<DamageModifier, Double> modifiers = new EnumMap<>(DamageModifier.class);
+        Map<DamageModifier, Function<? super Double, Double>> modifierFunctions = new EnumMap<>(DamageModifier.class);
+        modifiers.put(DamageModifier.BASE, rawDamage);
+        modifierFunctions.put(DamageModifier.BASE, CraftEventFactory.ZERO);
+        if (source.is(DamageTypes.FALLING_BLOCK) || source.is(DamageTypes.FALLING_ANVIL)) {
+            modifiers.put(DamageModifier.HARD_HAT, hardHatModifier);
+            modifierFunctions.put(DamageModifier.HARD_HAT, hardHat);
+        }
+        if (damagee instanceof net.minecraft.world.entity.player.Player) {
+            modifiers.put(DamageModifier.BLOCKING, blockingModifier);
+            modifierFunctions.put(DamageModifier.BLOCKING, blocking);
+        }
+        modifiers.put(DamageModifier.ARMOR, armorModifier);
+        modifierFunctions.put(DamageModifier.ARMOR, armor);
+        modifiers.put(DamageModifier.RESISTANCE, resistanceModifier);
+        modifierFunctions.put(DamageModifier.RESISTANCE, resistance);
+        modifiers.put(DamageModifier.MAGIC, magicModifier);
+        modifierFunctions.put(DamageModifier.MAGIC, magic);
+        modifiers.put(DamageModifier.ABSORPTION, absorptionModifier);
+        modifierFunctions.put(DamageModifier.ABSORPTION, absorption);
+        return CraftEventFactory.handleEntityDamageEvent(damagee, source, modifiers, modifierFunctions);
+    }
+    // Banner end
+
     public static EntityDamageEvent handleLivingEntityDamageEvent(Entity damagee, DamageSource source, double rawDamage, double freezingModifier, double hardHatModifier, double blockingModifier, double armorModifier, double resistanceModifier, double magicModifier, double absorptionModifier, Function<Double, Double> freezing, Function<Double, Double> hardHat, Function<Double, Double> blocking, Function<Double, Double> armor, Function<Double, Double> resistance, Function<Double, Double> magic, Function<Double, Double> absorption) {
         Map<DamageModifier, Double> modifiers = new EnumMap<>(DamageModifier.class);
         Map<DamageModifier, Function<? super Double, Double>> modifierFunctions = new EnumMap<>(DamageModifier.class);
