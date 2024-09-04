@@ -5,11 +5,14 @@ package com.mohistmc.banner.stackdeobf.mappings.providers;
 import com.google.common.base.Preconditions;
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.util.I18n;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import net.fabricmc.loader.api.FabricLoader;
@@ -24,12 +27,8 @@ public abstract class AbstractMappingProvider {
     }
 
     private static Path getCacheDir() {
-        Path cacheDir;
-        if (System.getProperties().containsKey("stackdeobf.mappings-cache-dir")) {
-            cacheDir = Path.of(System.getProperty("stackdeobf.mappings-cache-dir"));
-        } else {
-            cacheDir = FabricLoader.getInstance().getGameDir().resolve("stackdeobf_mappings");
-        }
+        File file = new File(FabricLoader.getInstance().getGameDir().toFile(), ".banner/mappings");
+        Path cacheDir = file.toPath();
 
         if (Files.notExists(cacheDir)) {
             try {
