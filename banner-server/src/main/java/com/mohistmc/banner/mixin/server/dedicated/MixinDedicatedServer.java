@@ -173,11 +173,6 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         System.exit(0);
     }
 
-    @Inject(method = "showGui", at = @At("HEAD"), cancellable = true)
-    public void banner$cancelGui(CallbackInfo ci) {
-        ci.cancel();
-    }
-
     @Inject(method = "initServer", at = @At(value = "INVOKE",
             target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V",
             remap = false,

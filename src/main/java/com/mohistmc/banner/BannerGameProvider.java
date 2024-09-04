@@ -48,6 +48,7 @@ public class BannerGameProvider extends MinecraftGameProvider {
             path = old + File.pathSeparator + path;
         }
         arguments.put(Arguments.ADD_MODS, path);
+        arguments.addExtraArg("nogui");
         return arguments;
     }
 

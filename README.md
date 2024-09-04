@@ -47,7 +47,7 @@ so don't worried about the plugin files will be changed to unsafe
 
 ## Usage
 - Download Banner.
-- Launch with command java -jar banner-launcher-version.jar nogui. The nogui argument will disable the server control panel.
+- Launch with command java -jar banner-launcher-version.jar
 
 ## Developer Support
 - Download the dev lib jar from GitHub actions.
