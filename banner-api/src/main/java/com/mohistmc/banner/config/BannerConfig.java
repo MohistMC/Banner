@@ -140,6 +140,7 @@ public class BannerConfig {
 
     public static boolean velocityEnabled;
     public static String velocitySecret;
+    public static List<String> banned_entities;
 
     private static void banner() {
         check_update = getBoolean("banner.check_update", false);
@@ -156,6 +157,7 @@ public class BannerConfig {
         nospawnEntity = getList("entity.nospawn", Collections.emptyList());
         clear_item = getBoolean("entity.clear.item.enable", false);
         clear_item__whitelist = getList("entity.clear.item.whitelist", Collections.emptyList());
+        banned_entities = getList("entity.banned_entities", Collections.emptyList());
         clear_item__msg = getString("entity.clear.item.msg", "[Server] Cleaned up %size% drops");
         clear_item__time = getInt("entity.clear.item.time", 1800);
         motdFirstLine = ColorsAPI.of(getString("motd.firstline", "<RAINBOW1>A Minecraft Server</RAINBOW>"));
