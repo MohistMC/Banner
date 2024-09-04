@@ -55,8 +55,7 @@ public class BannerMixinPlugin implements IMixinConfigPlugin, IEnvironmentTokenP
             return false;
         }
         // Banner end
-        if (mixinClassName.equals("com.mohistmc.banner.mixin.core.world.entity.MixinMob$PaperSpawnAffect")
-                || mixinClassName.equals("com.mohistmc.banner.mixin.core.server.players.MixinPlayerList$LoadRecursive")) {
+        if (mixinClassName.equals("com.mohistmc.banner.mixin.core.world.entity.MixinMob$PaperSpawnAffect")) {
             return !FabricLoader.getInstance().isModLoaded("vmp");
         }
         if (mixinClassName.equals("com.mohistmc.banner.mixin.core.world.level.spawner.MixinNaturalSpawner")) {

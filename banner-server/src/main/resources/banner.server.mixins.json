@@ -103,7 +103,6 @@
     "server.players.MixinBanListEntry",
     "server.players.MixinOldUsersConverter_5",
     "server.players.MixinPlayerList",
-    "server.players.MixinPlayerList$LoadRecursive",
     "server.players.MixinSleepStatus",
     "server.players.MixinStoredUserList",
     "server.players.MixinUserWhiteList",

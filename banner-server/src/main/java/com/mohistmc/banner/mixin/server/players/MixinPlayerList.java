@@ -3,6 +3,7 @@ package com.mohistmc.banner.mixin.server.players;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.BannerMod;
+import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.bukkit.pluginfix.LuckPerms;
 import com.mohistmc.banner.fabric.BukkitRegistry;
 import com.mohistmc.banner.injection.server.players.InjectionPlayerList;
@@ -24,6 +25,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import io.izzel.arclight.mixin.Eject;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.LayeredRegistryAccess;
@@ -47,6 +50,7 @@ import net.minecraft.network.protocol.game.ClientboundSetDefaultSpawnPositionPac
 import net.minecraft.network.protocol.game.ClientboundSetExperiencePacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.RegistryLayer;
@@ -95,6 +99,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSpawnChangeEvent;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -192,21 +197,16 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         return name;
     }
 
-    @Inject(method = "placeNewPlayer",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/level/ServerLevel;getLevelData()Lnet/minecraft/world/level/storage/LevelData;"))
-    private void banner$callSpawnEvent(Connection connection, ServerPlayer serverPlayer, CommonListenerCookie commonListenerCookie, CallbackInfo ci, @Local(ordinal = 1) ServerLevel serverLevel2) {
-        // Spigot start - spawn location event
-        org.bukkit.entity.Player spawnPlayer = serverPlayer.getBukkitEntity();
-        org.spigotmc.event.player.PlayerSpawnLocationEvent ev = new org.spigotmc.event.player.PlayerSpawnLocationEvent(spawnPlayer, spawnPlayer.getLocation()); // Paper use our duplicate event
-        cserver.getPluginManager().callEvent(ev);
-
-        Location loc = ev.getSpawnLocation();
-        serverLevel2 = ((CraftWorld) loc.getWorld()).getHandle();
-
-        serverPlayer.spawnIn(serverLevel2);
-        serverPlayer.gameMode.setLevel((ServerLevel) serverPlayer.level());
-        serverPlayer.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+    @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))
+    private ServerLevel banner$spawnLocationEvent(MinecraftServer minecraftServer, ResourceKey<Level> dimension, Connection netManager, ServerPlayer playerIn) {
+        CraftPlayer player =  playerIn.getBukkitEntity();
+        PlayerSpawnLocationEvent event = new PlayerSpawnLocationEvent(player, player.getLocation());
+        cserver.getPluginManager().callEvent(event);
+        Location loc = event.getSpawnLocation();
+        ServerLevel world = ((CraftWorld) loc.getWorld()).getHandle();
+        playerIn.setServerLevel(world);
+        playerIn.absMoveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        return world;
     }
 
     @Redirect(method = "placeNewPlayer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/players/PlayerList;viewDistance:I"))
@@ -219,191 +219,59 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         return playerIn.serverLevel().bridge$spigotConfig().simulationDistance;
     }
 
-    @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V"))
-    private void banner$cancelMessage(PlayerList instance, Component message, boolean bypassHiddenChat) {
-    }
-
-    private AtomicReference<String> banner$joinMsg = new AtomicReference<>();
-
-    @Inject(method = "placeNewPlayer",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V")
-    )
-    private void banner$playerJoin(Connection connection, ServerPlayer serverPlayer, CommonListenerCookie commonListenerCookie, CallbackInfo ci, @Local MutableComponent mutableComponent) {
-        // CraftBukkit start
-        mutableComponent.withStyle(ChatFormatting.YELLOW);
-        String joinMessage = CraftChatMessage.fromComponent(mutableComponent);
-        banner$joinMsg.set(joinMessage);
-    }
-
-    @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/players/PlayerList;broadcastAll(Lnet/minecraft/network/protocol/Packet;)V"))
-    private void banner$cancelBroadcast(PlayerList instance, Packet<?> packet) {}
-
-    @Inject(method = "placeNewPlayer", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/players/PlayerList;sendLevelInfo(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/level/ServerLevel;)V"),
-            cancellable = true)
-    private void banner$joinEvent(Connection connection, ServerPlayer player, CommonListenerCookie commonListenerCookie, CallbackInfo ci) {
-        // CraftBukkit start
-        CraftPlayer bukkitPlayer = player.getBukkitEntity();
-
-        // Ensure that player inventory is populated with its viewer
-        player.containerMenu.transferTo(player.containerMenu, bukkitPlayer);
-
-        PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent(bukkitPlayer, banner$joinMsg.get());
-        cserver.getPluginManager().callEvent(playerJoinEvent);
-
-        if (!player.connection.isAcceptingMessages()) {
+    @Eject(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V"))
+    private void banner$playerJoin(PlayerList playerList, Component component, boolean flag, CallbackInfo ci, Connection netManager, ServerPlayer playerIn) {
+        PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent(playerIn.getBukkitEntity(), CraftChatMessage.fromComponent(component));
+        this.players.add(playerIn);
+        this.playersByUUID.put(playerIn.getUUID(), playerIn);
+        this.cserver.getPluginManager().callEvent(playerJoinEvent);
+        this.players.remove(playerIn);
+        if (!playerIn.connection.isAcceptingMessages()) {
             ci.cancel();
+            return;
         }
-
-        banner$joinMsg.set(playerJoinEvent.getJoinMessage());
-        if (banner$joinMsg.get() != null && !banner$joinMsg.get().isEmpty()) {
-            for (Component line : CraftChatMessage.fromString(banner$joinMsg.get())) {
-                server.getPlayerList().broadcastSystemMessage(line, false);
+        String joinMessage = playerJoinEvent.getJoinMessage();
+        if (joinMessage != null && joinMessage.length() > 0) {
+            for (Component line : CraftChatMessage.fromString(joinMessage)) {
+                this.server.getPlayerList().broadcastSystemMessage(line, flag);
             }
         }
-        // CraftBukkit end
-
-        // CraftBukkit start - sendAll above replaced with this loop
-        ClientboundPlayerInfoUpdatePacket packet = ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(player));
-
-        for (ServerPlayer serverPlayer : this.players) {
-            ServerPlayer entityplayer1 = (ServerPlayer) serverPlayer;
-
-            if (entityplayer1.getBukkitEntity().canSee(bukkitPlayer)) {
-                entityplayer1.connection.send(packet);
-            }
-
-            if (!bukkitPlayer.canSee(entityplayer1.getBukkitEntity())) {
-                continue;
-            }
-
-            player.connection.send(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(entityplayer1)));
-        }
-        player.banner$setSentListPacket(true);
-        // CraftBukkit end
-
-        player.refreshEntityData(player); // CraftBukkit - BungeeCord#2321, send complete data to self on spawn
     }
 
-    private static AtomicReference<ServerLevel> banner$level = new AtomicReference<>();
-
-    @WrapWithCondition(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
-    private boolean banner$wrapAddNewPlayer(ServerLevel instance, ServerPlayer player) {
-        banner$level.set(instance);
-        return player.level() == instance && !instance.players().contains(player);
-    }
-
-    @WrapWithCondition(method = "placeNewPlayer", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/bossevents/CustomBossEvents;onPlayerConnect(Lnet/minecraft/server/level/ServerPlayer;)V"))
-    private boolean banner$wrapAddNewPlayer0(CustomBossEvents instance, ServerPlayer player) {
-        return player.level() == banner$level.get() && !banner$level.get().players().contains(player);
+    @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
+    private void banner$addNewPlayer(ServerLevel instance, ServerPlayer player) {
+        if (player.level() == instance && !instance.players().contains(player)) {
+            instance.addNewPlayer(player);
+        }
     }
 
     @ModifyVariable(method = "placeNewPlayer", ordinal = 1, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
     private ServerLevel banner$handleWorldChanges(ServerLevel value, Connection connection, ServerPlayer player) {
-        return player.serverLevel();// CraftBukkit - Update in case join event changed it
+        return player.serverLevel();
     }
 
-
-    @Mixin(PlayerList.class)
-    public static class LoadRecursive {
-        @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE",
-                target = "Lnet/minecraft/world/entity/EntityType;loadEntityRecursive(Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/world/level/Level;Ljava/util/function/Function;)Lnet/minecraft/world/entity/Entity;"))
-        private Entity banner$loadRecursive(CompoundTag compound, Level level, Function<Entity, Entity> entityFunction) {
-            // CraftBukkit start
-            ServerLevel finalWorldServer = banner$level.get();
-            finalWorldServer = finalWorldServer == null ? ((ServerLevel) level) : finalWorldServer;
-            ServerLevel finalWorldServer1 = finalWorldServer;
-            return EntityType.loadEntityRecursive(compound.getCompound("Entity"), finalWorldServer, (entityx) -> {
-                return !finalWorldServer1.addWithUUID(entityx) ? null : entityx;
-            });
-        }
-
-    }
-
-    private final AtomicReference<ServerPlayer> banner$savePlayer = new AtomicReference<>();
-
-    @Inject(method = "save", at = @At("HEAD"), cancellable = true)
-    private void banner$setPlayerSaved(ServerPlayer player, CallbackInfo ci) {
-        if (!player.getBukkitEntity().isPersistent()) {
+    @Inject(method = "save", cancellable = true, at = @At("HEAD"))
+    private void banner$returnIfNotPersist(ServerPlayer playerIn, CallbackInfo ci) {
+        if (!playerIn.bridge$persist()) {
             ci.cancel();
         }
-        banner$savePlayer.set(player);
-    }
-
-    @Redirect(method = "save", at = @At(value = "INVOKE",
-            target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 0))
-    private Object banner$changeMap(Map instance, Object o) {
-        return banner$savePlayer.get().getStats();
-    }
-
-    @Redirect(method = "save", at = @At(value = "INVOKE",
-            target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 1))
-    private Object banner$changeMap0(Map instance, Object o) {
-        return banner$savePlayer.get().getAdvancements();
     }
 
     public String quitMsg;
 
-    /**
-     * @author wdog5
-     * @reason bukkit
-     */
-    @Overwrite
-    public void remove(ServerPlayer player) {
-        ServerLevel serverLevel = player.serverLevel();
-        player.awardStat(Stats.LEAVE_GAME);
-        // CraftBukkit start - Quitting must be before we do final save of data, in case plugins need to modify it
-        // See SPIGOT-5799, SPIGOT-6145
-        if (player.containerMenu != player.inventoryMenu) {
-            player.closeContainer();
+    @Inject(method = "remove", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;save(Lnet/minecraft/server/level/ServerPlayer;)V"))
+    private void banner$playerQuitPre(ServerPlayer playerIn, CallbackInfo ci) {
+        if (playerIn.inventoryMenu != playerIn.containerMenu) {
+             playerIn.getBukkitEntity().closeInventory();
         }
-
-        PlayerQuitEvent playerQuitEvent = new PlayerQuitEvent(player.getBukkitEntity(), player.bridge$kickLeaveMessage() != null ? player.bridge$kickLeaveMessage() : "\u00A7e" + player.getScoreboardName() + " left the game");
+        var quitMessage = BukkitSnapshotCaptures.getQuitMessage();
+        quitMsg = quitMessage;
+        PlayerQuitEvent playerQuitEvent = new PlayerQuitEvent(playerIn.getBukkitEntity(), quitMessage != null ? quitMessage : "\u00A7e" + playerIn.getScoreboardName() + " left the game");
         cserver.getPluginManager().callEvent(playerQuitEvent);
-        LuckPerms.perCache.remove(player.getBukkitEntity().getUniqueId());
-        player.getBukkitEntity().disconnect(playerQuitEvent.getQuitMessage());
-        player.doTick(); // SPIGOT-924
-        // CraftBukkit end
-        this.save(player);
-        if (player.isPassenger()) {
-            Entity entity = player.getRootVehicle();
-            if (entity.hasExactlyOnePlayerPassenger()) {
-                LOGGER.debug("Removing player mount");
-                player.stopRiding();
-                entity.getPassengersAndSelf().forEach((entityx) -> {
-                    entityx.setRemoved(Entity.RemovalReason.UNLOADED_WITH_PLAYER);
-                });
-            }
-        }
-
-        player.unRide();
-        serverLevel.removePlayerImmediately(player, Entity.RemovalReason.UNLOADED_WITH_PLAYER);
-        player.getAdvancements().stopListening();
-        this.players.remove(player);
-        this.server.getCustomBossEvents().onPlayerDisconnect(player);
-        UUID uUID = player.getUUID();
-        ServerPlayer serverPlayer = this.playersByUUID.get(uUID);
-        if (serverPlayer == player) {
-            this.playersByUUID.remove(uUID);
-            // this.stats.remove(uUID);
-            // this.advancements.remove(uUID);
-        }
-        // CraftBukkit start
-        ClientboundPlayerInfoRemovePacket packet = new ClientboundPlayerInfoRemovePacket(List.of(serverPlayer.getUUID()));
-        for (ServerPlayer entityplayer2 : players) {
-            if (entityplayer2.getBukkitEntity().canSee(player.getBukkitEntity())) {
-                entityplayer2.connection.send(packet);
-            } else {
-                entityplayer2.getBukkitEntity().onEntityRemove(player);
-            }
-        }
-        // This removes the scoreboard (and player reference) for the specific player in the manager
-        cserver.getScoreboardManager().removePlayer(player.getBukkitEntity());
-        // CraftBukkit end
-        this.quitMsg = playerQuitEvent.getQuitMessage();
+        playerIn.getBukkitEntity().disconnect(playerQuitEvent.getQuitMessage());
+        // playerIn.doTick();
+        BukkitSnapshotCaptures.captureQuitMessage(playerQuitEvent.getQuitMessage());
+        cserver.getScoreboardManager().removePlayer(playerIn.getBukkitEntity());
     }
 
     public String bridge$quiltMsg() {
