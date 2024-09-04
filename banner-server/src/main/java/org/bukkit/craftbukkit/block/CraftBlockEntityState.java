@@ -2,6 +2,7 @@ package org.bukkit.craftbukkit.block;
 
 import java.util.Set;
 
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponentMap;
@@ -50,7 +51,7 @@ public class CraftBlockEntityState<T extends BlockEntity> extends CraftBlockStat
 
     private RegistryAccess getRegistryAccess() {
         LevelAccessor worldHandle = this.getWorldHandle();
-        return (worldHandle != null) ? worldHandle.registryAccess() : BukkitExtraConstants.getDefaultRegistryAccess();
+        return (worldHandle != null) ? worldHandle.registryAccess() : BannerServer.getDefaultRegistryAccess();
     }
 
     private T createSnapshot(T tileEntity) {

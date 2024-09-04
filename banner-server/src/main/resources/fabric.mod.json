@@ -19,7 +19,7 @@
   "environment": "server",
   "entrypoints": {
     "server": [
-      "com.mohistmc.banner.BannerServer"
+      "com.mohistmc.banner.BannerMod"
     ]
   },
   "mixins": [

@@ -1,24 +1,19 @@
 package com.mohistmc.banner;
 
-import com.mohistmc.banner.eventhandler.BannerEventDispatcherRegistry;
-import net.fabricmc.api.DedicatedServerModInitializer;
-import net.fabricmc.loader.api.FabricLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.server.MinecraftServer;
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.CraftRegistry;
+import org.bukkit.craftbukkit.CraftServer;
 
-public class BannerServer implements DedicatedServerModInitializer {
+public class BannerServer {
 
-    public static final String MOD_ID = "banner";
-
-    public static final Logger LOGGER =
-            LoggerFactory.getLogger(MOD_ID);
-
-    @Override
-    public void onInitializeServer() {
-        BannerEventDispatcherRegistry.registerEventDispatchers();
+    @Deprecated
+    public static RegistryAccess getDefaultRegistryAccess() {
+        return CraftRegistry.getMinecraftRegistry();
     }
 
-    public static String getVersion() {
-        return FabricLoader.getInstance().getModContainer("banner").get().getMetadata().getVersion().getFriendlyString();
+    public static MinecraftServer getServer() {
+        return Bukkit.getServer() instanceof CraftServer ? ((CraftServer) Bukkit.getServer()).getServer() : null;
     }
 }

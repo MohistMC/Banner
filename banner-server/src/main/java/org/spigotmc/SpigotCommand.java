@@ -2,6 +2,7 @@ package org.spigotmc;
 
 import java.io.File;
 
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -31,7 +32,7 @@ public class SpigotCommand extends Command {
             Command.broadcastCommandMessage(sender, ChatColor.RED + "Please note that this command is not supported and may cause issues.");
             Command.broadcastCommandMessage(sender, ChatColor.RED + "If you encounter any issues please use the /stop command to restart your server.");
 
-            MinecraftServer console = BukkitExtraConstants.getServer();
+            MinecraftServer console = BannerServer.getServer();
             org.spigotmc.SpigotConfig.init((File) console.bridge$options().valueOf("spigot-settings"));
             for (ServerLevel world : console.getAllLevels()) {
                 world.bridge$spigotConfig().init();

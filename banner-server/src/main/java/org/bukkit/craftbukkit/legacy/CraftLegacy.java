@@ -1,6 +1,7 @@
 package org.bukkit.craftbukkit.legacy;
 
 import com.google.common.base.Preconditions;
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.serialization.Dynamic;
 import java.util.Arrays;
@@ -266,7 +267,7 @@ public final class CraftLegacy {
 
     static {
         System.err.println("Initializing Legacy Material Support. Unless you have legacy plugins and/or data this is a bug!");
-        if (BukkitExtraConstants.getServer() != null && BukkitExtraConstants.getServer().isDebugging()) {
+        if (BannerServer.getServer() != null && BannerServer.getServer().isDebugging()) {
             new Exception().printStackTrace();
         }
 

@@ -2,9 +2,11 @@ package com.mohistmc.banner;
 
 import com.mohistmc.banner.api.ServerAPI;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.thread.NamedThreadFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.plugin.Plugin;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -97,7 +99,7 @@ public class Metrics {
 
     private void startSubmitting() {
         METRICS.scheduleAtFixedRate(() -> {
-            if (BukkitExtraConstants.getServer().hasStopped()) {
+            if (BannerServer.getServer().hasStopped()) {
                 return;
             }
             submitData();
@@ -254,7 +256,7 @@ public class Metrics {
 
     public static class BannerMetrics {
         public static void startMetrics() {
-            File configFile = new File(new File((File) BukkitExtraConstants.getServer().bridge$options().valueOf("plugins"), "bStats"), "config.yml");
+            File configFile = new File(new File((File) BannerServer.getServer().bridge$options().valueOf("plugins"), "bStats"), "config.yml");
             YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
 
             if (!config.isSet("serverUuid")) {

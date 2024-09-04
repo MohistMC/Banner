@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.level;
 
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.util.thread.BlockableEventLoop;
@@ -34,7 +35,7 @@ public abstract class MixinServerChunkCache_MainThreadExecutor extends Blockable
             }
         } finally {
             outer.chunkMap.bridge$callbackExecutor().run();
-            BukkitExtraConstants.getServer().bridge$drainQueuedTasks();
+            BannerServer.getServer().bridge$drainQueuedTasks();
         }
     }
 }

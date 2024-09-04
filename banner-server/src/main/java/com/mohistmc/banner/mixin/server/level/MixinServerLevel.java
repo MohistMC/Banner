@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.server.level;
 
 import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mohistmc.banner.BannerMod;
 import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.asm.annotation.CreateConstructor;
 import com.mohistmc.banner.asm.annotation.ShadowConstructor;
@@ -44,7 +45,6 @@ import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -162,12 +162,12 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         if (typeKey != null) {
             this.typeKey = typeKey;
         } else {
-            var dimensions = BukkitExtraConstants.getServer().registryAccess().registryOrThrow(Registries.LEVEL_STEM);
+            var dimensions = BannerServer.getServer().registryAccess().registryOrThrow(Registries.LEVEL_STEM);
             var key = dimensions.getResourceKey(levelStem);
             if (key.isPresent()) {
                 this.typeKey = key.get();
             } else {
-                BannerServer.LOGGER.warn("Assign {} to unknown level stem {}", resourceKey.location(), levelStem);
+                BannerMod.LOGGER.warn("Assign {} to unknown level stem {}", resourceKey.location(), levelStem);
                 this.typeKey = ResourceKey.create(Registries.LEVEL_STEM, resourceKey.location());
             }
         }

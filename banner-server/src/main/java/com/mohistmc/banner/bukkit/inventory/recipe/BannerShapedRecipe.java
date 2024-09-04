@@ -1,5 +1,6 @@
 package com.mohistmc.banner.bukkit.inventory.recipe;
 
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.ShapedRecipe;
@@ -21,11 +22,11 @@ public class BannerShapedRecipe extends CraftShapedRecipe {
 
     @Override
     public @NotNull ItemStack getResult() {
-        return CraftItemStack.asCraftMirror(this.recipe.getResultItem(BukkitExtraConstants.getServer().registryAccess()));
+        return CraftItemStack.asCraftMirror(this.recipe.getResultItem(BannerServer.getServer().registryAccess()));
     }
 
     @Override
     public void addToCraftingManager() {
-        BukkitExtraConstants.getServer().getRecipeManager().addRecipe((new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.getKey()), this.recipe)));
+        BannerServer.getServer().getRecipeManager().addRecipe((new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.getKey()), this.recipe)));
     }
 }

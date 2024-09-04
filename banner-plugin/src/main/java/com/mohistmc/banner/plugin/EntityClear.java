@@ -1,6 +1,7 @@
 package com.mohistmc.banner.plugin;
 
 
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.config.BannerConfig;
 import net.minecraft.util.thread.NamedThreadFactory;
@@ -24,7 +25,7 @@ public class EntityClear {
 
     public static void start() {
         ENTITYCLEAR.scheduleAtFixedRate(() -> {
-            if (BukkitExtraConstants.getServer().hasStopped()) {
+            if (BannerServer.getServer().hasStopped()) {
                 return;
             }
             if (BannerConfig.clear_item) run();

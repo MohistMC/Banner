@@ -3,6 +3,7 @@ package org.bukkit.craftbukkit.inventory;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -13,7 +14,7 @@ public class RecipeIterator implements Iterator<Recipe> {
     private final Iterator<Map.Entry<RecipeType<?>, RecipeHolder<?>>> recipes;
 
     public RecipeIterator() {
-        this.recipes = BukkitExtraConstants.getServer().getRecipeManager().byType.entries().iterator();
+        this.recipes = BannerServer.getServer().getRecipeManager().byType.entries().iterator();
     }
 
     @Override

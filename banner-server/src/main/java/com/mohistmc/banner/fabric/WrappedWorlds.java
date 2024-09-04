@@ -1,6 +1,6 @@
 package com.mohistmc.banner.fabric;
 
-import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.BannerMod;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
@@ -22,7 +22,7 @@ public class WrappedWorlds {
             return getOrCreate(cl, key -> {
                 for (Field f : cl.getDeclaredFields()) {
                     if (Level.class.isAssignableFrom(f.getType())) {
-                        BannerServer.LOGGER.debug("{} delegates to field {}", cl, f.getName());
+                        BannerMod.LOGGER.debug("{} delegates to field {}", cl, f.getName());
                         f.setAccessible(true);
                         return f;
                     }
@@ -31,7 +31,7 @@ public class WrappedWorlds {
                 if (delegate.isPresent()) {
                     return delegate.get();
                 } else {
-                    BannerServer.LOGGER.debug("{} delegates to nothing", cl);
+                    BannerMod.LOGGER.debug("{} delegates to nothing", cl);
                     return null;
                 }
             });

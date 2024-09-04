@@ -2,6 +2,7 @@ package org.bukkit.craftbukkit.ban;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.authlib.GameProfile;
 import java.time.Duration;
@@ -162,10 +163,10 @@ public class CraftProfileBanList implements ProfileBanList {
     }
 
     static GameProfile getProfileByUUID(UUID uuid) {
-        return (BukkitExtraConstants.getServer() != null) ? BukkitExtraConstants.getServer().getProfileCache().get(uuid).orElse(null) : null;
+        return (BannerServer.getServer() != null) ? BannerServer.getServer().getProfileCache().get(uuid).orElse(null) : null;
     }
 
     static GameProfile getProfileByName(String name) {
-        return (BukkitExtraConstants.getServer() != null) ? BukkitExtraConstants.getServer().getProfileCache().get(name).orElse(null) : null;
+        return (BannerServer.getServer() != null) ? BannerServer.getServer().getProfileCache().get(name).orElse(null) : null;
     }
 }

@@ -2,6 +2,8 @@ package com.mohistmc.banner.mixin;
 
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.asm.CreateConstructorProcessor;
+import com.mohistmc.banner.asm.InlineFieldProcessor;
+import com.mohistmc.banner.asm.InlineMethodProcessor;
 import com.mohistmc.banner.asm.MixinProcessor;
 import com.mohistmc.banner.asm.RenameIntoProcessor;
 import com.mohistmc.banner.asm.TransformAccessProcessor;
@@ -24,7 +26,9 @@ public class BannerMixinPlugin implements IMixinConfigPlugin, IEnvironmentTokenP
     private final List<MixinProcessor> postProcessors = List.of(
             new RenameIntoProcessor(),
             new TransformAccessProcessor(),
-            new CreateConstructorProcessor()
+            new CreateConstructorProcessor(),
+            new InlineMethodProcessor(),
+            new InlineFieldProcessor()
     );
 
     @Override
@@ -92,6 +96,7 @@ public class BannerMixinPlugin implements IMixinConfigPlugin, IEnvironmentTokenP
         for (var processor : this.postProcessors) {
             processor.accept(targetClassName, targetClass, mixinInfo);
         }
+        MixinTools.onPostMixin(targetClass);
     }
 
     @Override

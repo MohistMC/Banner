@@ -2,7 +2,7 @@ package com.mohistmc.banner.mixin.server;
 
 import com.google.common.base.Charsets;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.BannerMod;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import net.minecraft.SharedConstants;
@@ -74,13 +74,13 @@ public abstract class MixinMain {
         File configFile = (File) optionSet.valueOf("bukkit-settings");
         YamlConfiguration configuration = YamlConfiguration.loadConfiguration(configFile);
         configuration.options().copyDefaults(true);
-        configuration.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(BannerServer.class.getClassLoader().getResourceAsStream("configurations/bukkit.yml"), Charsets.UTF_8)));
+        configuration.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(BannerMod.class.getClassLoader().getResourceAsStream("configurations/bukkit.yml"), Charsets.UTF_8)));
         configuration.save(configFile);
 
         File commandFile = (File) optionSet.valueOf("commands-settings");
         YamlConfiguration commandsConfiguration = YamlConfiguration.loadConfiguration(commandFile);
         commandsConfiguration.options().copyDefaults(true);
-        commandsConfiguration.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(BannerServer.class.getClassLoader().getResourceAsStream("configurations/commands.yml"), Charsets.UTF_8)));
+        commandsConfiguration.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(BannerMod.class.getClassLoader().getResourceAsStream("configurations/commands.yml"), Charsets.UTF_8)));
         commandsConfiguration.save(commandFile);
         // CraftBukkit end
     }

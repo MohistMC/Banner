@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.network;
 
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BannerServerListPingEvent;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.authlib.GameProfile;
@@ -24,7 +25,7 @@ public class MixinServerStatusPacketListenerImpl {
     @Redirect(method = "handleStatusRequest", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Connection;send(Lnet/minecraft/network/protocol/Packet;)V"))
     public void banner$handleServerPing(Connection networkManager, Packet<?> packetIn) {
         // CraftBukkit start
-        MinecraftServer server = BukkitExtraConstants.getServer();
+        MinecraftServer server = BannerServer.getServer();
 
         BannerServerListPingEvent event = new BannerServerListPingEvent(networkManager, server);
         server.bridge$server().getPluginManager().callEvent(event);

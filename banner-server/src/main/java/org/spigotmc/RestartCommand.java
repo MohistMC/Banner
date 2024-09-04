@@ -3,6 +3,7 @@ package org.spigotmc;
 import java.io.File;
 import java.util.List;
 
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,7 +27,7 @@ public class RestartCommand extends Command
     {
         if ( this.testPermission( sender ) )
         {
-            BukkitExtraConstants.getServer().bridge$processQueue().add(new Runnable()
+            BannerServer.getServer().bridge$processQueue().add(new Runnable()
             {
                 @Override
                 public void run()
@@ -57,7 +58,7 @@ public class RestartCommand extends Command
                 WatchdogThread.doStop();
 
                 // Kick all players
-                for ( ServerPlayer p : (List<ServerPlayer>) BukkitExtraConstants.getServer().getPlayerList().players )
+                for ( ServerPlayer p : (List<ServerPlayer>) BannerServer.getServer().getPlayerList().players )
                 {
                     p.connection.disconnect( CraftChatMessage.fromStringOrEmpty( SpigotConfig.restartMessage ) );
                 }
@@ -69,7 +70,7 @@ public class RestartCommand extends Command
                 {
                 }
                 // Close the socket so we can rebind with the new process
-                BukkitExtraConstants.getServer().getConnection().stop();
+                BannerServer.getServer().getConnection().stop();
 
                 // Give time for it to kick in
                 try
@@ -82,7 +83,7 @@ public class RestartCommand extends Command
                 // Actually shutdown
                 try
                 {
-                    BukkitExtraConstants.getServer().close();
+                    BannerServer.getServer().close();
                 } catch ( Throwable t )
                 {
                 }
@@ -119,7 +120,7 @@ public class RestartCommand extends Command
                 // Actually shutdown
                 try
                 {
-                    BukkitExtraConstants.getServer().close();
+                    BannerServer.getServer().close();
                 } catch ( Throwable t )
                 {
                 }

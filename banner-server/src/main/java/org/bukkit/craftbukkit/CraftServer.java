@@ -9,7 +9,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.mohistmc.banner.BannerMCStart;
-import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.BannerMod;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.StringReader;
@@ -935,7 +935,7 @@ public final class CraftServer implements Server {
 
     @Override
     public void reload() {
-        BannerServer.LOGGER.warn("For your server security, Bukkit reloading is not supported by Banner.");
+        BannerMod.LOGGER.warn("For your server security, Bukkit reloading is not supported by Banner.");
     }
 
     @Override

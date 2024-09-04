@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.server.dedicated;
 
-import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.BannerMod;
 import com.mohistmc.banner.Metrics;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.util.I18n;
@@ -47,7 +47,7 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
 
     @Inject(method = "initServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/dedicated/DedicatedServer;usesAuthentication()Z", ordinal = 1))
     private void banner$initServer(CallbackInfoReturnable<Boolean> cir) {
-        BannerServer.LOGGER.info(I18n.as("bukkit.plugin.loading.info"));
+        BannerMod.LOGGER.info(I18n.as("bukkit.plugin.loading.info"));
         // CraftBukkit start
         org.spigotmc.SpigotConfig.init((java.io.File) this.bridge$options().valueOf("spigot-settings"));
         BannerConfig.init((java.io.File) this.bridge$options().valueOf("banner-settings"));
@@ -167,8 +167,8 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
             }
         }
         if (!threads.isEmpty()) {
-            BannerServer.LOGGER.debug("Threads {} not shutting down", String.join(", ", threads));
-            BannerServer.LOGGER.info("{} threads not shutting down correctly, force exiting", threads.size());
+            BannerMod.LOGGER.debug("Threads {} not shutting down", String.join(", ", threads));
+            BannerMod.LOGGER.info("{} threads not shutting down correctly, force exiting", threads.size());
         }
         System.exit(0);
     }

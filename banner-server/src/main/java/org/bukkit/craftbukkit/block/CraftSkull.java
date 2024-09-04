@@ -1,6 +1,7 @@
 package org.bukkit.craftbukkit.block;
 
 import com.google.common.base.Preconditions;
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.Util;
@@ -64,7 +65,7 @@ public class CraftSkull extends CraftBlockEntityState<SkullBlockEntity> implemen
             return false;
         }
 
-        GameProfile profile = BukkitExtraConstants.getServer().getProfileCache().get(name).orElse(null);
+        GameProfile profile = BannerServer.getServer().getProfileCache().get(name).orElse(null);
         if (profile == null) {
             return false;
         }

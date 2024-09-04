@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.server.network;
 
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.injection.server.network.InjectionServerCommonPacketListenerImpl;
@@ -181,8 +182,8 @@ public abstract class MixinServerCommonPacketListenerImpl implements ServerCommo
             var buf = new byte[data.readableBytes()];
             data.readBytes(buf);
             data.readerIndex(readerIndex);
-            BukkitExtraConstants.getServer().executeIfPossible(() -> {
-                if (BukkitExtraConstants.getServer().hasStopped() || bridge$processedDisconnect()) {
+            BannerServer.getServer().executeIfPossible(() -> {
+                if (BannerServer.getServer().hasStopped() || bridge$processedDisconnect()) {
                     return;
                 }
                 if (this.connection.isConnected()) {

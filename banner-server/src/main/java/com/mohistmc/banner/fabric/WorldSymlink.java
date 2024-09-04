@@ -1,6 +1,6 @@
 package com.mohistmc.banner.fabric;
 
-import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.BannerMod;
 import com.mohistmc.banner.util.I18n;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import org.bukkit.Bukkit;
@@ -19,15 +19,15 @@ public class WorldSymlink {
         try {
             if (!Files.isSymbolicLink(source)) {
                 if (Files.exists(source)) {
-                    BannerServer.LOGGER.warn(I18n.as("symlink-file-exist"), source);
+                    BannerMod.LOGGER.warn(I18n.as("symlink-file-exist"), source);
                     return;
                 }
                 Files.createSymbolicLink(source, dest);
             }
         } catch (UnsupportedOperationException e) {
-            BannerServer.LOGGER.warn(I18n.as("error-symlink"), e);
+            BannerMod.LOGGER.warn(I18n.as("error-symlink"), e);
         } catch (IOException e) {
-            BannerServer.LOGGER.error("Error creating symlink", e);
+            BannerMod.LOGGER.error("Error creating symlink", e);
         }
     }
 }

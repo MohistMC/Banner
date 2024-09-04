@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity;
 
-import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.BannerMod;
 import com.mohistmc.banner.injection.world.entity.InjectionMob;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvent;
@@ -132,7 +132,7 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
                 reason = (this.getTarget().isAlive() ? EntityTargetEvent.TargetReason.FORGOT_TARGET : EntityTargetEvent.TargetReason.TARGET_DIED);
             }
             if (reason == EntityTargetEvent.TargetReason.UNKNOWN) {
-                BannerServer.LOGGER.warn("Unknown target reason setting {} target to {}", this, livingEntity);
+                BannerMod.LOGGER.warn("Unknown target reason setting {} target to {}", this, livingEntity);
             }
             CraftLivingEntity ctarget = null;
             if (livingEntity != null) {

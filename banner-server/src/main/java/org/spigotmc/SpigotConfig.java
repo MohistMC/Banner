@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import com.mohistmc.banner.BannerServer;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -81,7 +82,7 @@ public class SpigotConfig
     {
         for ( Map.Entry<String, Command> entry : SpigotConfig.commands.entrySet() )
         {
-            BukkitExtraConstants.getServer().bridge$server().getCommandMap().register( entry.getKey(), "Spigot", entry.getValue() );
+            BannerServer.getServer().bridge$server().getCommandMap().register( entry.getKey(), "Spigot", entry.getValue() );
         }
     }
 

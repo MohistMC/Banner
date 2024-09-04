@@ -3,7 +3,7 @@ package com.mohistmc.banner.fabric;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
-import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.BannerMod;
 import com.mohistmc.banner.api.ServerAPI;
 import com.mohistmc.banner.bukkit.MaterialHelper;
 import com.mohistmc.banner.util.I18n;
@@ -117,10 +117,10 @@ public class BukkitRegistry {
 
                 CraftMagicNumbers.ITEM_MATERIAL.put(item, material);
                 CraftMagicNumbers.MATERIAL_ITEM.put(material, item);
-                BannerServer.LOGGER.debug("Save-ITEM: " + material.name() + " - " + material.key);
+                BannerMod.LOGGER.debug("Save-ITEM: " + material.name() + " - " + material.key);
             }
         }
-        BannerServer.LOGGER.info(I18n.as("registry.item"), newTypes.size());
+        BannerMod.LOGGER.info(I18n.as("registry.item"), newTypes.size());
     }
 
     public static void loadBlocks() {
@@ -159,11 +159,11 @@ public class BukkitRegistry {
                             CraftBlockStates.register(material, CraftChest.class, CraftChest::new, ChestBlockEntity::new);
                         }
                     }
-                    BannerServer.LOGGER.debug("Registered {0} as block {1}" + material.name() + " - " + material.key);
+                    BannerMod.LOGGER.debug("Registered {0} as block {1}" + material.name() + " - " + material.key);
                 }
             }
         }
-        BannerServer.LOGGER.info(I18n.as("registry.block"), newTypes.size());
+        BannerMod.LOGGER.info(I18n.as("registry.block"), newTypes.size());
     }
 
     private static void loadFluids() {
@@ -173,7 +173,7 @@ public class BukkitRegistry {
             String name = normalizeName(resourceLocation.getPath());
             if (isMods(resourceLocation)) {
                 org.bukkit.Fluid fluid = MohistDynamEnum.addEnum(org.bukkit.Fluid.class, name);
-                BannerServer.LOGGER.debug("Registered Fluid as Fluid(Bukkit) {}", fluid.name());
+                BannerMod.LOGGER.debug("Registered Fluid as Fluid(Bukkit) {}", fluid.name());
             }
         }
     }
@@ -185,7 +185,7 @@ public class BukkitRegistry {
             } catch (Exception e) {
                 var name = category.name();
                 var bukkit = MohistDynamEnum.addEnum(org.bukkit.inventory.recipe.CookingBookCategory.class, name);
-                BannerServer.LOGGER.debug("Registered {} as cooking category {}", name, bukkit);
+                BannerMod.LOGGER.debug("Registered {} as cooking category {}", name, bukkit);
             }
         }
     }
@@ -195,7 +195,7 @@ public class BukkitRegistry {
         for (var id = EnderDragon.Phase.values().length; id < max; id++) {
             var name = "MOD_PHASE_" + id;
             var newPhase = MohistDynamEnum.addEnum(EnderDragon.Phase.class, name);
-            BannerServer.LOGGER.debug("Registered {} as ender dragon phase {}", name, newPhase);
+            BannerMod.LOGGER.debug("Registered {} as ender dragon phase {}", name, newPhase);
         }
     }
 
@@ -206,7 +206,7 @@ public class BukkitRegistry {
             } catch (Exception e) {
                 var name = category.name();
                 var spawnCategory = MohistDynamEnum.addEnum(SpawnCategory.class, name);
-                BannerServer.LOGGER.debug("Registered {} as spawn category {}", name, spawnCategory);
+                BannerMod.LOGGER.debug("Registered {} as spawn category {}", name, spawnCategory);
             }
         }
     }
@@ -219,7 +219,7 @@ public class BukkitRegistry {
             if (isMods(resourceLocation)) {
                 Statistic statistic = MohistDynamEnum.addEnum(Statistic.class, name);
                 statisticMap.put(statType, statistic);
-                BannerServer.LOGGER.debug("Registered mod StatType as Statistic(Bukkit) {}", statistic.name());
+                BannerMod.LOGGER.debug("Registered mod StatType as Statistic(Bukkit) {}", statistic.name());
             }
         }
     }
@@ -230,17 +230,17 @@ public class BukkitRegistry {
             if (pose.ordinal() > 14) {
                 org.bukkit.entity.Pose bukkit = MohistDynamEnum.addEnum(org.bukkit.entity.Pose.class, pose.name());
                 newTypes.add(bukkit);
-                BannerServer.LOGGER.debug("Registered mod Pose as Poses(Bukkit) {}", bukkit);
+                BannerMod.LOGGER.debug("Registered mod Pose as Poses(Bukkit) {}", bukkit);
             }
         }
-        BannerServer.LOGGER.info("Registered {} new Poses", newTypes.size());
+        BannerMod.LOGGER.info("Registered {} new Poses", newTypes.size());
     }
 
     private static void addPose() {
         for (Pose pose : Pose.values()) {
             if (pose.ordinal() > 14) {
                 org.bukkit.entity.Pose bukkit = MohistDynamEnum.addEnum(org.bukkit.entity.Pose.class, pose.name());
-                BannerServer.LOGGER.debug("Registered mod Pose as Pose(Bukkit) {}", bukkit);
+                BannerMod.LOGGER.debug("Registered mod Pose as Pose(Bukkit) {}", bukkit);
             }
         }
     }
@@ -277,7 +277,7 @@ public class BukkitRegistry {
                 if (particle != null) {
                     particle.key = namespacedKey;
                     particleMap.put(namespacedKey, particle);
-                    BannerServer.LOGGER.debug("Save-ParticleType:" + name + " - " + particle.name());
+                    BannerMod.LOGGER.debug("Save-ParticleType:" + name + " - " + particle.name());
                 }
             }
         }
@@ -293,7 +293,7 @@ public class BukkitRegistry {
                 map.add(biomeName);
                 org.bukkit.block.Biome biomeCB = MohistDynamEnum.addEnum(org.bukkit.block.Biome.class, biomeName);
                 biomeBiomeMap.put(biome, biomeCB);
-                BannerServer.LOGGER.debug("Save-BIOME:" + biomeCB.name() + " - " + biomeName);
+                BannerMod.LOGGER.debug("Save-BIOME:" + biomeCB.name() + " - " + biomeName);
             }
         }
     }
@@ -306,7 +306,7 @@ public class BukkitRegistry {
                 String name = normalizeName(resourceLocation.toString());
                 Villager.Profession vp = MohistDynamEnum.addEnum(Villager.Profession.class, name);
                 profession.put(vp, resourceLocation);
-                BannerServer.LOGGER.debug("Registered mod VillagerProfession as Profession {}", vp.name());
+                BannerMod.LOGGER.debug("Registered mod VillagerProfession as Profession {}", vp.name());
             }
         }
     }
@@ -323,7 +323,7 @@ public class BukkitRegistry {
                 environment1 = MohistDynamEnum.addEnum(World.Environment.class, name, List.of(Integer.TYPE), List.of(id));
                 environment.put(key, environment1);
                 environment0.put(environment1, key);
-                BannerServer.LOGGER.debug("Registered mod DimensionType as environment {}", environment1);
+                BannerMod.LOGGER.debug("Registered mod DimensionType as environment {}", environment1);
                 i++;
             }
         }
@@ -343,7 +343,7 @@ public class BukkitRegistry {
                 EntityType.NAME_MAP.put(entityType.toLowerCase(), bukkitType);
                 EntityType.ID_MAP.put((short) typeId, bukkitType);
                 ServerAPI.entityTypeMap.put(entity, entityType);
-                BannerServer.LOGGER.debug("Registered {} as entity {}", entityType, bukkitType);
+                BannerMod.LOGGER.debug("Registered {} as entity {}", entityType, bukkitType);
             } else {
                 ServerAPI.entityTypeMap.put(entity, normalizeName(resourceLocation.getPath()));
             }

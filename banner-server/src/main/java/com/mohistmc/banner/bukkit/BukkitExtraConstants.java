@@ -1,10 +1,7 @@
 package com.mohistmc.banner.bukkit;
 
-import com.mohistmc.dynamicenum.MohistDynamEnum;
-import com.mojang.datafixers.DSL;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -13,7 +10,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.util.Unit;
-import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -29,10 +25,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.WorldData;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.phys.AABB;
-import org.bukkit.Bukkit;
 import org.bukkit.TreeType;
-import org.bukkit.craftbukkit.CraftRegistry;
-import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
 
@@ -53,8 +46,6 @@ public class BukkitExtraConstants {
             TicketType.create("plugin_ticket", Comparator.comparing(plugin -> plugin.getClass().getName())); // CraftBukkit
     public static final LootContextParam<Integer> LOOTING_MOD = new LootContextParam<>(ResourceLocation.parse("bukkit:looting_mod")); // CraftBukkit
     public static final TicketType<Unit> PLUGIN = TicketType.create("plugin", (a, b) -> 0); // CraftBukkit
-    private static final DSL.TypeReference PDC_TYPE = () -> "bukkit_pdc";
-    public static final DataFixTypes BUKKIT_PDC = MohistDynamEnum.addEnum(DataFixTypes.class, "BUKKIT_PDC", List.of(DSL.TypeReference.class), List.of(PDC_TYPE));
 
     public static List getHumansInRange(Level world, BlockPos blockposition, int i) {
         {
@@ -140,10 +131,6 @@ public class BukkitExtraConstants {
         minecraftserver.reloadResources(collection1);
     }
 
-    public static MinecraftServer getServer() {
-        return Bukkit.getServer() instanceof CraftServer ? ((CraftServer) Bukkit.getServer()).getServer() : null;
-    }
-
     // Spigot start
     public static float range(float min, float value, float max) {
         if (value < min) {
@@ -155,12 +142,6 @@ public class BukkitExtraConstants {
         return value;
     }
     // Spigot end
-
-    @Deprecated
-    public static RegistryAccess getDefaultRegistryAccess() {
-        return CraftRegistry.getMinecraftRegistry();
-    }
-    // CraftBukkit end
 
     public static int getRange(List<BlockPos> list) {
         int i = list.size();

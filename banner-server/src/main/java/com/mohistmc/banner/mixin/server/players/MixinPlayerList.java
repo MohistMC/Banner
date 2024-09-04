@@ -2,7 +2,7 @@ package com.mohistmc.banner.mixin.server.players;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mohistmc.banner.BannerServer;
+import com.mohistmc.banner.BannerMod;
 import com.mohistmc.banner.bukkit.pluginfix.LuckPerms;
 import com.mohistmc.banner.fabric.BukkitRegistry;
 import com.mohistmc.banner.injection.server.players.InjectionPlayerList;
@@ -47,7 +47,6 @@ import net.minecraft.network.protocol.game.ClientboundSetDefaultSpawnPositionPac
 import net.minecraft.network.protocol.game.ClientboundSetExperiencePacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.RegistryLayer;
@@ -58,7 +57,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.server.players.GameProfileCache;
 import net.minecraft.server.players.IpBanList;
 import net.minecraft.server.players.IpBanListEntry;
 import net.minecraft.server.players.PlayerList;
@@ -164,7 +162,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         this.players = new CopyOnWriteArrayList<>();
         minecraftServer.banner$setServer(this.cserver =
                 new CraftServer((DedicatedServer) minecraftServer, ((PlayerList) (Object) this)));
-        BannerServer.LOGGER.info(I18n.as("registry.begin"));
+        BannerMod.LOGGER.info(I18n.as("registry.begin"));
         BukkitRegistry.registerAll((DedicatedServer) minecraftServer);
         minecraftServer.banner$setConsole(ColouredConsoleSender.getInstance());
     }
