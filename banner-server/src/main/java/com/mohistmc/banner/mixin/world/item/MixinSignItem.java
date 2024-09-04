@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.world.item;
 
 import com.mohistmc.banner.asm.annotation.TransformAccess;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinSignItem {
 
     @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
-    private static BlockPos openSign = BukkitExtraConstants.openSign; // CraftBukkit
+    private static BlockPos openSign; // CraftBukkit
 
     @Redirect(method = "updateCustomBlockEntityTag", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/block/SignBlock;openTextEdit(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/block/entity/SignBlockEntity;Z)V"))
@@ -34,7 +33,7 @@ public class MixinSignItem {
     private void banner$setOpenSign(BlockPos pos, Level level, Player player,
                                     ItemStack stack, BlockState state, CallbackInfoReturnable<Boolean> cir) {
         // CraftBukkit start - SPIGOT-4678
-        BukkitExtraConstants.openSign = pos;
+        openSign = pos;
         // CraftBukkit end
     }
 }

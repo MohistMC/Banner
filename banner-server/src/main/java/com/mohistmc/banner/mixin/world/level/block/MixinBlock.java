@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
+import com.mohistmc.banner.asm.annotation.TransformAccess;
 import com.mohistmc.banner.injection.world.level.block.InjectionBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -15,6 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.event.entity.EntityExhaustionEvent;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
@@ -72,4 +74,16 @@ public abstract class MixinBlock extends BlockBehaviour implements InjectionBloc
        player.pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.BLOCK_MINED);
     }
 
+    // Spigot start
+    @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
+    private static float range(float min, float value, float max) {
+        if (value < min) {
+            return min;
+        }
+        if (value > max) {
+            return max;
+        }
+        return value;
+    }
+    // Spigot end
 }

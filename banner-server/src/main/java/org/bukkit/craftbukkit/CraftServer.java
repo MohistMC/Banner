@@ -10,7 +10,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.BannerMod;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitFieldHooks;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -351,9 +352,9 @@ public final class CraftServer implements Server {
         this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");
         this.pluginManager.useTimings(this.configuration.getBoolean("settings.plugin-profiling"));
         this.overrideSpawnLimits();
-        BukkitExtraConstants.bridge$autosavePeriod = this.configuration.getInt("ticks-per.autosave");
+        console.banner$setAutosavePeriod(this.configuration.getInt("ticks-per.autosave"));
         this.warningState = WarningState.value(this.configuration.getString("settings.deprecated-verbose"));
-        BukkitExtraConstants.PLUGIN.timeout = this.configuration.getInt("chunk-gc.period-in-ticks");
+        BukkitFieldHooks.pluginTicket().timeout = this.configuration.getInt("chunk-gc.period-in-ticks");
         this.minimumAPI = ApiVersion.getOrCreateVersion(this.configuration.getString("settings.minimum-api"));
         this.loadIcon();
         this.loadCompatibilities();
@@ -940,7 +941,7 @@ public final class CraftServer implements Server {
 
     @Override
     public void reloadData() {
-        BukkitExtraConstants.reload(this.console);
+        BukkitMethodHooks.reload(this.console);
     }
 
     private void loadIcon() {
@@ -2192,7 +2193,7 @@ public final class CraftServer implements Server {
     }
 
     public void checkSaveState() {
-        if (this.playerCommandState || this.printSaveWarning || BukkitExtraConstants.bridge$autosavePeriod <= 0) {
+        if (this.playerCommandState || this.printSaveWarning || console.bridge$autosavePeriod() <= 0) {
             return;
         }
         this.printSaveWarning = true;

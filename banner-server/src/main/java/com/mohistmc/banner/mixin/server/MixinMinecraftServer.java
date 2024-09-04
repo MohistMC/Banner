@@ -4,7 +4,6 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mohistmc.banner.api.color.ColorsAPI;
 import com.mohistmc.banner.asm.annotation.TransformAccess;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.config.BannerConfig;
@@ -145,65 +144,12 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow @Final public Executor executor;
     @Shadow public abstract RegistryAccess.Frozen registryAccess();
 
-    @Shadow protected abstract boolean initServer() throws IOException;
-
-    @Shadow @Nullable private ServerStatus.Favicon statusIcon;
-
-    @Shadow protected abstract Optional<ServerStatus.Favicon> loadStatusIcon();
-
-    @Shadow @Nullable private ServerStatus status;
-
-    @Shadow protected abstract ServerStatus buildServerStatus();
-
-    @Shadow private volatile boolean running;
-
-    @Shadow
-    private static CrashReport constructOrExtractCrashReport(Throwable cause) {
-        return null;
-    }
-
-    @Shadow public abstract SystemReport fillSystemReport(SystemReport systemReport);
-    @Shadow public abstract void onServerCrash(CrashReport report);
-
-    @Shadow private boolean stopped;
-
-    @Shadow public abstract void stopServer();
-
-    @Shadow @Final protected Services services;
-
-    @Shadow public abstract void onServerExit();
-    @Shadow private volatile boolean isReady;
-
-    @Shadow protected abstract void endMetricsRecordingTick();
-
-    @Shadow private ProfilerFiller profiler;
-
-    @Shadow protected abstract void waitUntilNextTick();
-    @Shadow private boolean mayHaveDelayedTasks;
-
-    @Shadow public abstract void tickServer(BooleanSupplier hasTimeLeft);
-
-    @Shadow protected abstract boolean haveTime();
-
-    @Shadow protected abstract void startMetricsRecordingTick();
-    @Shadow private boolean debugCommandProfilerDelayStart;
-    @Shadow @Nullable private MinecraftServer.TimeProfiler debugCommandProfiler;
-    @Shadow @Final private LayeredRegistryAccess<RegistryLayer> registries;
-    @Shadow public abstract boolean isDemo();
-
     @Shadow @Final public ChunkProgressListenerFactory progressListenerFactory;
     @Shadow @Nullable public abstract ServerLevel getLevel(ResourceKey<net.minecraft.world.level.Level> dimension);
 
     @Shadow private long nextTickTimeNanos;
-    @Shadow private long lastOverloadWarningNanos;
-    @Shadow private long delayedTasksMaxNextTickTimeNanos;
-
-    @Shadow public abstract boolean isPaused();
-
-    @Shadow @Final private ServerTickRateManager tickRateManager;
     @Mutable
     @Shadow @Final private static long OVERLOADED_THRESHOLD_NANOS;
-    @Shadow @Final private static long OVERLOADED_WARNING_INTERVAL_NANOS;
 
     // CraftBukkit start
     public WorldLoader.DataLoadContext worldLoader;
@@ -213,8 +159,8 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     public ConsoleReader reader;
     @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
     private static int currentTick = (int) (System.currentTimeMillis() / 50);
-    public java.util.Queue<Runnable> processQueue = BukkitExtraConstants.bridge$processQueue;
-    public int autosavePeriod = BukkitExtraConstants.bridge$autosavePeriod;
+    public java.util.Queue<Runnable> processQueue = new java.util.concurrent.ConcurrentLinkedQueue<>();
+    public int autosavePeriod;
     private boolean forceTicks;
     public Commands vanillaCommandDispatcher;
     private boolean hasStopped = false;
@@ -808,5 +754,15 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @ModifyReturnValue(method = "serverLinks", at = @At("RETURN"))
     private ServerLinks banner$resetServerLinks(ServerLinks original) {
         return serverLinksVanilla;
+    }
+
+    @Override
+    public int bridge$autosavePeriod() {
+        return autosavePeriod;
+    }
+
+    @Override
+    public void banner$setAutosavePeriod(int autosavePeriod) {
+        this.autosavePeriod = autosavePeriod;
     }
 }

@@ -116,4 +116,12 @@ public interface InjectionMinecraftServer {
     default void setServerLinks(ServerLinks serverLinks) {
         throw new IllegalStateException("Not implemented");
     }
+
+    default int bridge$autosavePeriod() {
+        throw new IllegalStateException("Not implemented");
+    }
+
+    default void banner$setAutosavePeriod(int autosavePeriod) {
+        throw new IllegalStateException("Not implemented");
+    }
 }

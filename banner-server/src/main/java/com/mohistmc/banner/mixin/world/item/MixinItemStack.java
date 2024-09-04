@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.item;
 
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import com.mohistmc.banner.injection.world.item.InjectionItemStack;
 import net.minecraft.advancements.CriteriaTriggers;
@@ -246,7 +245,7 @@ public abstract class MixinItemStack implements InjectionItemStack {
                     }
                     player.awardStat(Stats.ITEM_USED.get(item)); // SPIGOT-7236 - award stat
                 }
-                BukkitExtraConstants.openSign = null; // SPIGOT-6758 - Reset on early return // Banner - cancel
+                BukkitFieldHooks.setOpenSign(null); // SPIGOT-6758 - Reset on early return // Banner - cancel
                 return interactionResult;
             }
             world.banner$setCaptureTreeGeneration(false);
@@ -277,7 +276,7 @@ public abstract class MixinItemStack implements InjectionItemStack {
                     for (Direction dir : Direction.values()) {
                         ((ServerPlayer) player).connection.send(new ClientboundBlockUpdatePacket(world, placedPos.relative(dir)));
                     }
-                    BukkitExtraConstants.openSign = null; // SPIGOT-6758 - Reset on early return // Banner - cancel
+                    BukkitFieldHooks.setOpenSign(null); // SPIGOT-6758 - Reset on early return // Banner - cancel
                 } else {
                     // Change the stack to its new contents if it hasn't been tampered with.
                     if (this.getCount() == oldCount && Objects.equals(this.components, oldData)) {
@@ -320,16 +319,16 @@ public abstract class MixinItemStack implements InjectionItemStack {
                     }
 
                     // SPIGOT-4678
-                    if (this.item instanceof SignItem && BukkitExtraConstants.openSign != null) {
+                    if (this.item instanceof SignItem && BukkitFieldHooks.openSign() != null) {
                         try {
-                            if (world.getBlockEntity(BukkitExtraConstants.openSign) instanceof SignBlockEntity tileentitysign) {
-                                if (world.getBlockState(BukkitExtraConstants.openSign).getBlock() instanceof SignBlock blocksign) {
+                            if (world.getBlockEntity(BukkitFieldHooks.openSign()) instanceof SignBlockEntity tileentitysign) {
+                                if (world.getBlockState(BukkitFieldHooks.openSign()).getBlock() instanceof SignBlock blocksign) {
                                     blocksign.pushOpenSignCause(PlayerSignOpenEvent.Cause.PLACE);
                                     blocksign.openTextEdit(player, tileentitysign, true);
                                 }
                             }
                         } finally {
-                            BukkitExtraConstants.openSign = null;
+                            BukkitFieldHooks.setOpenSign(null);
                         }
                     }
 

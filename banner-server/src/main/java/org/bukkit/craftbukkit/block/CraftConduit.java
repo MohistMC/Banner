@@ -3,7 +3,7 @@ package org.bukkit.craftbukkit.block;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.ConduitBlockEntity;
 import net.minecraft.world.phys.AABB;
@@ -75,7 +75,7 @@ public class CraftConduit extends CraftBlockEntityState<ConduitBlockEntity> impl
     public int getRange() {
         this.ensureNoWorldGeneration();
         ConduitBlockEntity conduit = (ConduitBlockEntity) this.getTileEntityFromWorld();
-        return (conduit != null) ? BukkitExtraConstants.getRange(conduit.effectBlocks) : 0;
+        return (conduit != null) ? BukkitMethodHooks.getRange(conduit.effectBlocks) : 0;
     }
 
     @Override

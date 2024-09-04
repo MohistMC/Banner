@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
 import com.mohistmc.banner.asm.annotation.TransformAccess;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
