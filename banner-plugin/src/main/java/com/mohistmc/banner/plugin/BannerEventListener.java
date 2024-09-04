@@ -6,6 +6,7 @@ import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityRemoveEvent;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
 
 public class BannerEventListener implements Listener {
 
@@ -16,5 +17,10 @@ public class BannerEventListener implements Listener {
             entity.remove();
             ((CraftEntity) entity).getHandle().pushRemoveCause(EntityRemoveEvent.Cause.PLUGIN);
         }
+    }
+
+    @EventHandler
+    public static void onAnvilFix(PrepareAnvilEvent event) {
+        EnchantmentFix.anvilListener(event);
     }
 }
