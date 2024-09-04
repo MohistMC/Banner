@@ -41,7 +41,6 @@ public class BukkitExtraConstants {
     public static java.util.Queue<Runnable> bridge$processQueue =
             new java.util.concurrent.ConcurrentLinkedQueue<>();
     public static int currentTick = (int) (System.currentTimeMillis() / 50);
-    public static boolean dispenser_eventFired = false; // CraftBukkit
     public static final TicketType<org.bukkit.plugin.Plugin> PLUGIN_TICKET =
             TicketType.create("plugin_ticket", Comparator.comparing(plugin -> plugin.getClass().getName())); // CraftBukkit
     public static final LootContextParam<Integer> LOOTING_MOD = new LootContextParam<>(ResourceLocation.parse("bukkit:looting_mod")); // CraftBukkit

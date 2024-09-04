@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
 import com.mohistmc.banner.asm.annotation.TransformAccess;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.DispenserBlock;
@@ -16,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinDispenserBlock {
 
     @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
-    private static boolean eventFired = BukkitExtraConstants.dispenser_eventFired; // CraftBukkit
+    private static boolean eventFired = false; // CraftBukkit
 
     @Inject(method = "dispenseFrom",
             at = @At(value = "INVOKE",
