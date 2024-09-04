@@ -95,7 +95,7 @@ public class BannerConfigUtil {
             yml.set(key, false);
             save();
         }
-        return yml.getBoolean(key, false);
+        return yml.getBoolean(key, true);
     }
 
     public static int serverThread() {
