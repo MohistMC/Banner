@@ -59,4 +59,12 @@ public interface InjectionServerGamePacketListenerImpl extends InjectionServerCo
     default void pushTeleportCause(PlayerTeleportEvent.TeleportCause cause) {
         throw new IllegalStateException("Not implemented");
     }
+
+    default void bridge$pushNoTeleportEvent() {
+        throw new IllegalStateException("Not implemented");
+    }
+
+    default boolean bridge$teleportCancelled() {
+        throw new IllegalStateException("Not implemented");
+    }
 }

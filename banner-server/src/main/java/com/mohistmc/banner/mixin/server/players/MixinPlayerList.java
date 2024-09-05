@@ -166,8 +166,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     private CraftServer cserver;
 
-    private static final AtomicReference<String> PROFILE_NAMES = new AtomicReference<>();
-
     @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/server/players/PlayerList;bans:Lnet/minecraft/server/players/UserBanList;"))
     public void banner$init(MinecraftServer minecraftServer, LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess, PlayerDataStorage playerDataStorage, int i, CallbackInfo ci) {
         this.players = new CopyOnWriteArrayList<>();
@@ -186,21 +184,9 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             CompoundTag nbttagcompound = (CompoundTag) optional.get();
             if (nbttagcompound.contains("bukkit")) {
                 CompoundTag bukkit =  nbttagcompound.getCompound("bukkit");
-                PROFILE_NAMES.set(bukkit.contains("lastKnownName", 8) ? bukkit.getString("lastKnownName") : string);
+                string = bukkit.contains("lastKnownName", 8) ? bukkit.getString("lastKnownName") : string;
             }
         }
-    }
-
-    @ModifyVariable(method = "placeNewPlayer", at = @At (value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerPlayer;setServerLevel(Lnet/minecraft/server/level/ServerLevel;)V"),
-            index = 6, ordinal = 0)
-    private String banner$renameDetection(String name) {
-        String val = PROFILE_NAMES.get();
-        if (val != null) {
-            PROFILE_NAMES.set(null);
-            return val;
-        }
-        return name;
     }
 
     @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))

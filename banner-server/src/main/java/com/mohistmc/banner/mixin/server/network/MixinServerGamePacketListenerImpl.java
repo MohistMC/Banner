@@ -6,16 +6,23 @@ import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.injection.server.network.InjectionServerGamePacketListenerImpl;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.ParseResults;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSigningContext;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.Connection;
 import net.minecraft.network.DisconnectionDetails;
 import net.minecraft.network.chat.ChatType;
@@ -23,6 +30,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.LastSeenMessages;
 import net.minecraft.network.chat.OutgoingChatMessage;
 import net.minecraft.network.chat.PlayerChatMessage;
+import net.minecraft.network.chat.SignableCommand;
 import net.minecraft.network.chat.SignedMessageChain;
 import net.minecraft.network.protocol.PacketUtils;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
@@ -32,6 +40,7 @@ import net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.network.protocol.game.ServerboundAcceptTeleportationPacket;
+import net.minecraft.network.protocol.game.ServerboundChatCommandSignedPacket;
 import net.minecraft.network.protocol.game.ServerboundChatPacket;
 import net.minecraft.network.protocol.game.ServerboundChatSessionUpdatePacket;
 import net.minecraft.network.protocol.game.ServerboundContainerButtonClickPacket;
@@ -48,6 +57,7 @@ import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
 import net.minecraft.network.protocol.game.ServerboundRecipeBookChangeSettingsPacket;
 import net.minecraft.network.protocol.game.ServerboundSelectTradePacket;
 import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
+import net.minecraft.network.protocol.game.ServerboundSetCreativeModeSlotPacket;
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
 import net.minecraft.network.protocol.game.ServerboundSwingPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
@@ -69,6 +79,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.entity.player.ChatVisiblity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MerchantMenu;
 import net.minecraft.world.inventory.RecipeBookMenu;
@@ -76,12 +87,14 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -105,6 +118,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.SmithItemEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -124,6 +138,7 @@ import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.SmithingInventory;
 import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -135,6 +150,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ServerGamePacketListenerImpl.class)
 public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommonPacketListenerImpl implements InjectionServerGamePacketListenerImpl {
@@ -256,15 +272,17 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
 
     @Shadow
     public abstract void teleport(double d, double e, double f, float g, float h);
+    @Shadow public abstract void teleport(double d, double e, double f, float g, float h, Set<RelativeMovement> set);
 
-    @Shadow
-    protected abstract void tryHandleChat(String string, Runnable runnable);
+    @Shadow protected abstract boolean updateAwaitingTeleport();
 
-    @Shadow
-    protected abstract GameProfile playerProfile();
+    @Shadow public abstract void sendDisguisedChatMessage(Component component, ChatType.Bound bound);
 
-    @Shadow
-    protected abstract Optional<LastSeenMessages> unpackAndApplyLastSeen(LastSeenMessages.Update update);
+    @Shadow protected abstract <S> Map<String, PlayerChatMessage> collectSignedArguments(ServerboundChatCommandSignedPacket serverboundChatCommandSignedPacket, SignableCommand<S> signableCommand, LastSeenMessages lastSeenMessages) throws SignedMessageChain.DecodeException;
+
+    @Shadow protected abstract Optional<LastSeenMessages> unpackAndApplyLastSeen(LastSeenMessages.Update update);
+
+    @Shadow protected abstract void tryHandleChat(String string, Runnable runnable);
 
     private static final int SURVIVAL_PLACE_DISTANCE_SQUARED = 6 * 6;
     private static final int CREATIVE_PLACE_DISTANCE_SQUARED = 7 * 7;
@@ -492,6 +510,79 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         }
     }
 
+    @Inject(method = "performSignedChatCommand", cancellable = true, at = @At("HEAD"))
+    private void banner$rejectIfDisconnectSigned(CallbackInfo ci) {
+        if (this.player.hasDisconnected()) {
+            ci.cancel();
+        }
+    }
+
+    @Decorate(method = "performUnsignedChatCommand", inject = true, at = @At("HEAD"))
+    private void banner$commandPreprocessEvent(String s) throws Throwable {
+        if (this.player.hasDisconnected()) {
+            DecorationOps.cancel().invoke();
+            return;
+        }
+        String command = "/" + s;
+        LOGGER.info(this.player.getScoreboardName() + " issued server command: " + command);
+
+        PlayerCommandPreprocessEvent event = new PlayerCommandPreprocessEvent(getCraftPlayer(), command, new LazyPlayerSet(server));
+        this.cserver.getPluginManager().callEvent(event);
+
+        if (event.isCancelled()) {
+            DecorationOps.cancel().invoke();
+            return;
+        }
+        s = event.getMessage().substring(1);
+        DecorationOps.blackhole().invoke(s);
+    }
+
+    /**
+     * @author wdog5
+     * @reason bukkit
+     */
+    @Overwrite
+    private void performSignedChatCommand(ServerboundChatCommandSignedPacket serverboundchatcommandsignedpacket, LastSeenMessages lastseenmessages) {
+        // CraftBukkit start
+        String command = "/" + serverboundchatcommandsignedpacket.command();
+        LOGGER.info(this.player.getScoreboardName() + " issued server command: " + command);
+
+        PlayerCommandPreprocessEvent event = new PlayerCommandPreprocessEvent(getCraftPlayer(), command, new LazyPlayerSet(server));
+        this.cserver.getPluginManager().callEvent(event);
+
+        if (event.isCancelled()) {
+            return;
+        }
+        command = event.getMessage().substring(1);
+
+        ParseResults<CommandSourceStack> parseresults = this.parseCommand(command);
+        // CraftBukkit end
+
+        Map map;
+
+        try {
+            map = (serverboundchatcommandsignedpacket.command().equals(command)) ? this.collectSignedArguments(serverboundchatcommandsignedpacket, SignableCommand.of(parseresults), lastseenmessages) : Collections.emptyMap(); // CraftBukkit
+        } catch (SignedMessageChain.DecodeException signedmessagechain_a) {
+            this.handleMessageDecodeFailure(signedmessagechain_a);
+            return;
+        }
+
+        CommandSigningContext.SignedArguments commandsigningcontext_a = new CommandSigningContext.SignedArguments(map);
+
+        parseresults = Commands.<CommandSourceStack>mapSource(parseresults, (commandlistenerwrapper) -> { // CraftBukkit - decompile error
+            return commandlistenerwrapper.withSigningContext(commandsigningcontext_a, this.chatMessageChain);
+        });
+        this.server.getCommands().performCommand(parseresults, command); // CraftBukkit
+    }
+
+    @Inject(method = "tryHandleChat", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;getChatVisibility()Lnet/minecraft/world/entity/player/ChatVisiblity;"))
+    private void banner$deadMenTellNoTales(String string, Runnable runnable, CallbackInfo ci) {
+        if (this.player.isRemoved()) {
+            this.send(new ClientboundSystemChatPacket(Component.translatable("chat.disabled.options").withStyle(ChatFormatting.RED), false));
+            ci.cancel();
+        }
+    }
+
     @Inject(method = "handleAcceptTeleportPacket", cancellable = true, at = @At(value = "FIELD", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;awaitingTeleport:I"))
     private void banner$confirm(ServerboundAcceptTeleportationPacket packetIn, CallbackInfo ci) {
         if (this.awaitingPositionFromClient == null) {
@@ -542,30 +633,35 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         }
     }
 
+    @Decorate(method = "signBook", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Inventory;setItem(ILnet/minecraft/world/item/ItemStack;)V"))
+    private void banner$editBookEvent(Inventory instance, int i, ItemStack stack, FilteredText text, List<FilteredText> list, int slot, @Local(ordinal = 0) ItemStack handStack) throws Throwable {
+        CraftEventFactory.handleEditBookEvent(player, i, handStack, stack);
+        DecorationOps.callsite().invoke(instance, i, handStack);
+    }
+
+    @Inject(method = "updateAwaitingTeleport", at = @At("RETURN"))
+    private void banner$setAllowedTicks(CallbackInfoReturnable<Boolean> cir) {
+        if (cir.getReturnValue()) {
+            this.allowedPlayerTicks = 20;
+        }
+    }
+
     /**
      * @author wdog5
      * @reason bukkit
      */
     @Overwrite
     public void handleMovePlayer(ServerboundMovePlayerPacket packetplayinflying) {
-        PacketUtils.ensureRunningOnSameThread(packetplayinflying, ((ServerGamePacketListenerImpl) (Object) this), this.player.serverLevel());
+        PacketUtils.ensureRunningOnSameThread(packetplayinflying, (ServerGamePacketListenerImpl) (Object) this, this.player.serverLevel());
         if (containsInvalidValues(packetplayinflying.getX(0.0D), packetplayinflying.getY(0.0D), packetplayinflying.getZ(0.0D), packetplayinflying.getYRot(0.0F), packetplayinflying.getXRot(0.0F))) {
             this.disconnect(Component.translatable("multiplayer.disconnect.invalid_player_movement"));
         } else {
             ServerLevel worldserver = this.player.serverLevel();
-
-            if (!this.player.wonGame && !this.player.isImmobile()) { // CraftBukkit
+            if (!this.player.wonGame && ! this.player.isImmobile()) {
                 if (this.tickCount == 0) {
                     this.resetPosition();
                 }
-
-                if (this.awaitingPositionFromClient != null) {
-                    if (this.tickCount - this.awaitingTeleportTime > 20) {
-                        this.awaitingTeleportTime = this.tickCount;
-                        this.teleport(this.awaitingPositionFromClient.x, this.awaitingPositionFromClient.y, this.awaitingPositionFromClient.z, this.player.getYRot(), this.player.getXRot());
-                    }
-                    this.allowedPlayerTicks = 20; // CraftBukkit
-                } else {
+                if (!this.updateAwaitingTeleport()) {
                     this.awaitingTeleportTime = this.tickCount;
                     double d0 = clampHorizontal(packetplayinflying.getX(this.player.getX()));
                     double d1 = clampVertical(packetplayinflying.getY(this.player.getY()));
@@ -588,179 +684,153 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
                         double d3 = this.player.getX();
                         double d4 = this.player.getY();
                         double d5 = this.player.getZ();
-                        double d6 = d0 - this.firstGoodX;
-                        double d7 = d1 - this.firstGoodY;
-                        double d8 = d2 - this.firstGoodZ;
-                        double d9 = this.player.getDeltaMovement().lengthSqr();
-                        double d10 = d6 * d6 + d7 * d7 + d8 * d8;
+                        double d6 = this.player.getY();
+                        double d7 = d0 - this.firstGoodX;
+                        double d8 = d1 - this.firstGoodY;
+                        double d9 = d2 - this.firstGoodZ;
+                        double d10 = this.player.getDeltaMovement().lengthSqr();
+                        double d11 = d7 * d7 + d8 * d8 + d9 * d9;
 
                         if (this.player.isSleeping()) {
-                            if (d10 > 1.0D) {
+                            if (d11 > 1.0D) {
                                 this.teleport(this.player.getX(), this.player.getY(), this.player.getZ(), f, f1);
                             }
 
                         } else {
-                            ++this.receivedMovePacketCount;
-                            int i = this.receivedMovePacketCount - this.knownMovePacketCount;
+                            boolean fallFlying = this.player.isFallFlying();
+                            if (worldserver.tickRateManager().runsNormally()) {
+                                ++this.receivedMovePacketCount;
+                                int i = this.receivedMovePacketCount - this.knownMovePacketCount;
 
-                            // CraftBukkit start - handle custom speeds and skipped ticks
-                            this.allowedPlayerTicks += (System.currentTimeMillis() / 50) - this.lastTick;
-                            this.allowedPlayerTicks = Math.max(this.allowedPlayerTicks, 1);
-                            this.lastTick = (int) (System.currentTimeMillis() / 50);
+                                // CraftBukkit start - handle custom speeds and skipped ticks
+                                this.allowedPlayerTicks += (System.currentTimeMillis() / 50) - this.lastTick;
+                                this.allowedPlayerTicks = Math.max(this.allowedPlayerTicks, 1);
+                                this.lastTick = (int) (System.currentTimeMillis() / 50);
 
-                            if (i > Math.max(this.allowedPlayerTicks, 5)) {
-                                LOGGER.debug("{} is sending move packets too frequently ({} packets since last tick)", this.player.getName().getString(), i);
-                                i = 1;
-                            }
+                                if (i > Math.max(this.allowedPlayerTicks, 5)) {
+                                    LOGGER.debug("{} is sending move packets too frequently ({} packets since last tick)", this.player.getName().getString(), i);
+                                    i = 1;
+                                }
 
-                            if (packetplayinflying.hasRot || d10 > 0) {
-                                allowedPlayerTicks -= 1;
-                            } else {
-                                allowedPlayerTicks = 20;
-                            }
-                            double speed;
-                            if (player.getAbilities().flying) {
-                                speed = player.getAbilities().flyingSpeed * 20f;
-                            } else {
-                                speed = player.getAbilities().walkingSpeed * 10f;
-                            }
+                                if (packetplayinflying.hasRot || d11 > 0) {
+                                    allowedPlayerTicks -= 1;
+                                } else {
+                                    allowedPlayerTicks = 20;
+                                }
+                                double speed;
+                                if (player.getAbilities().flying) {
+                                    speed = player.getAbilities().flyingSpeed * 20f;
+                                } else {
+                                    speed = player.getAbilities().walkingSpeed * 10f;
+                                }
 
-                            if (!this.player.isChangingDimension() && (!this.player.level().getGameRules().getBoolean(GameRules.RULE_DISABLE_ELYTRA_MOVEMENT_CHECK) || !this.player.isFallFlying())) {
-                                float f2 = this.player.isFallFlying() ? 300.0F : 100.0F;
+                                if (!this.player.isChangingDimension() && (!this.player.serverLevel().getGameRules().getBoolean(GameRules.RULE_DISABLE_ELYTRA_MOVEMENT_CHECK) || !this.player.isFallFlying())) {
+                                    float f2 = this.player.isFallFlying() ? 300.0F : 100.0F;
 
-                                if (d10 - d9 > Math.max(f2, Math.pow((double) (10.0F * (float) i * speed), 2)) && !this.isSingleplayerOwner()) {
-                                    // CraftBukkit end
-                                    LOGGER.warn("{} moved too quickly! {},{},{}", new Object[]{this.player.getName().getString(), d6, d7, d8});
-                                    this.teleport(this.player.getX(), this.player.getY(), this.player.getZ(), this.player.getYRot(), this.player.getXRot());
-                                    return;
+                                    if (d11 - d10 > Math.max(f2, Math.pow((double) (org.spigotmc.SpigotConfig.movedTooQuicklyMultiplier * (float) i * speed), 2)) && !this.isSingleplayerOwner()) {
+                                        // CraftBukkit end
+                                        LOGGER.warn("{} moved too quickly! {},{},{}", this.player.getName().getString(), d7, d8, d9);
+                                        this.teleport(this.player.getX(), this.player.getY(), this.player.getZ(), this.player.getYRot(), this.player.getXRot());
+                                        return;
+                                    }
                                 }
                             }
 
                             AABB axisalignedbb = this.player.getBoundingBox();
 
-                            d6 = d0 - this.lastGoodX;
-                            d7 = d1 - this.lastGoodY;
-                            d8 = d2 - this.lastGoodZ;
-                            boolean flag = d7 > 0.0D;
+                            d7 = d0 - this.lastGoodX;
+                            d8 = d1 - this.lastGoodY;
+                            d9 = d2 - this.lastGoodZ;
+                            boolean flag = d8 > 0.0D;
 
                             if (this.player.onGround() && !packetplayinflying.isOnGround() && flag) {
-                                // Paper start - Add player jump event
-                                Player player = this.getCraftPlayer();
-                                Location from = new Location(player.getWorld(), lastPosX, lastPosY, lastPosZ, lastYaw, lastPitch); // Get the Players previous Event location.
-                                Location to = player.getLocation().clone(); // Start off the To location as the Players current location.
-
-                                // If the packet contains movement information then we update the To location with the correct XYZ.
-                                if (packetplayinflying.hasPos) {
-                                    to.setX(packetplayinflying.x);
-                                    to.setY(packetplayinflying.y);
-                                    to.setZ(packetplayinflying.z);
-                                }
-
-                                // If the packet contains look information then we update the To location with the correct Yaw & Pitch.
-                                if (packetplayinflying.hasRot) {
-                                    to.setYaw(packetplayinflying.yRot);
-                                    to.setPitch(packetplayinflying.xRot);
-                                }
-
-                                com.destroystokyo.paper.event.player.PlayerJumpEvent event = new com.destroystokyo.paper.event.player.PlayerJumpEvent(player, from, to);
-
-                                if (event.callEvent()) {
-                                    this.player.jumpFromGround();
-                                } else {
-                                    from = event.getFrom();
-                                    this.internalTeleport(from.getX(), from.getY(), from.getZ(), from.getYaw(), from.getPitch(), Collections.emptySet());
-                                    return;
-                                }
-                                // Paper end
+                                this.player.jumpFromGround();
                             }
 
-                            boolean flag1 = this.player.verticalCollisionBelow;
+                            this.player.move(MoverType.PLAYER, new Vec3(d7, d8, d9));
+                            this.player.onGround = packetplayinflying.isOnGround();
+                            double d12 = d8;
 
-                            this.player.move(MoverType.PLAYER, new Vec3(d6, d7, d8));
-                            this.player.onGround = packetplayinflying.isOnGround(); // CraftBukkit - SPIGOT-5810, SPIGOT-5835, SPIGOT-6828: reset by this.player.move
-
-                            d6 = d0 - this.player.getX();
-                            d7 = d1 - this.player.getY();
-                            if (d7 > -0.5D || d7 < 0.5D) {
-                                d7 = 0.0D;
+                            d7 = d0 - this.player.getX();
+                            d8 = d1 - this.player.getY();
+                            if (d8 > -0.5D || d8 < 0.5D) {
+                                d8 = 0.0D;
                             }
 
-                            d8 = d2 - this.player.getZ();
-                            d10 = d6 * d6 + d7 * d7 + d8 * d8;
-                            boolean flag2 = false;
+                            d9 = d2 - this.player.getZ();
+                            d11 = d7 * d7 + d8 * d8 + d9 * d9;
+                            boolean flag1 = false;
 
-                            if (!this.player.isChangingDimension() && d10 > 0.0625D && !this.player.isSleeping() && !this.player.gameMode.isCreative() && this.player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR) {
-                                flag2 = true;
+                            if (!this.player.isChangingDimension() && d11 > org.spigotmc.SpigotConfig.movedWronglyThreshold && !this.player.isSleeping() && !this.player.gameMode.isCreative() && this.player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR) { // Spigot
+                                flag1 = true;
                                 LOGGER.warn("{} moved wrongly!", this.player.getName().getString());
                             }
 
-                            if (this.player.noPhysics || this.player.isSleeping() || (!flag2 || !worldserver.noCollision(this.player, axisalignedbb) && !this.isPlayerCollidingWithAnythingNew(worldserver, axisalignedbb, d0, d1, d2))) {
-
-                                // CraftBukkit start - fire PlayerMoveEvent
+                            if (!this.player.noPhysics && !this.player.isSleeping() && (flag1 && worldserver.noCollision(this.player, axisalignedbb) || this.isPlayerCollidingWithAnythingNew(worldserver, axisalignedbb, d0, d1, d2))) {
+                                this.bridge$pushNoTeleportEvent();
+                                this.teleport(d3, d4, d5, f, f1, Collections.emptySet()); // CraftBukkit - SPIGOT-1807: Don't call teleport event, when the client thinks the player is falling, because the chunks are not loaded on the client yet.
+                                this.player.doCheckFallDamage(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5, packetplayinflying.isOnGround());
+                            } else {
                                 // Reset to old location first
                                 this.player.absMoveTo(prevX, prevY, prevZ, prevYaw, prevPitch);
-
-                                Player player = this.getCraftPlayer();
-                                Location from = new Location(player.getWorld(), lastPosX, lastPosY, lastPosZ, lastYaw, lastPitch); // Get the Players previous Event location.
-                                Location to = player.getLocation().clone(); // Start off the To location as the Players current location.
-
-                                // If the packet contains movement information then we update the To location with the correct XYZ.
+                                CraftPlayer player = this.getCraftPlayer();
+                                if (!this.hasMoved) {
+                                    this.lastPosX = prevX;
+                                    this.lastPosY = prevY;
+                                    this.lastPosZ = prevZ;
+                                    this.lastYaw = prevYaw;
+                                    this.lastPitch = prevPitch;
+                                    this.hasMoved = true;
+                                }
+                                Location from = new Location(player.getWorld(), this.lastPosX, this.lastPosY, this.lastPosZ, this.lastYaw, this.lastPitch);
+                                Location to = player.getLocation().clone();
                                 if (packetplayinflying.hasPos) {
                                     to.setX(packetplayinflying.x);
                                     to.setY(packetplayinflying.y);
                                     to.setZ(packetplayinflying.z);
                                 }
-
-                                // If the packet contains look information then we update the To location with the correct Yaw & Pitch.
                                 if (packetplayinflying.hasRot) {
                                     to.setYaw(packetplayinflying.yRot);
                                     to.setPitch(packetplayinflying.xRot);
                                 }
-
-                                // Prevent 40 event-calls for less than a single pixel of movement >.>
-                                double delta = Math.pow(this.lastPosX - to.getX(), 2) + Math.pow(this.lastPosY - to.getY(), 2) + Math.pow(this.lastPosZ - to.getZ(), 2);
+                                double delta = Math.pow(this.lastPosX - to.getX(), 2.0) + Math.pow(this.lastPosY - to.getY(), 2.0) + Math.pow(this.lastPosZ - to.getZ(), 2.0);
                                 float deltaAngle = Math.abs(this.lastYaw - to.getYaw()) + Math.abs(this.lastPitch - to.getPitch());
-
-                                if ((delta > 1f / 256 || deltaAngle > 10f) && !this.player.isImmobile()) {
+                                if ((delta > 1f / 256 || deltaAngle > 10f) && ! this.player.isImmobile()) {
                                     this.lastPosX = to.getX();
                                     this.lastPosY = to.getY();
                                     this.lastPosZ = to.getZ();
                                     this.lastYaw = to.getYaw();
                                     this.lastPitch = to.getPitch();
-
-                                    // Skip the first time we do this
-                                    if (from.getX() != Double.MAX_VALUE) {
-                                        Location oldTo = to.clone();
-                                        PlayerMoveEvent event = new PlayerMoveEvent(player, from, to);
-                                        this.cserver.getPluginManager().callEvent(event);
-
-                                        // If the event is cancelled we move the player back to their old location.
-                                        if (event.isCancelled()) {
-                                            teleport(from);
-                                            return;
-                                        }
-
-                                        // If a Plugin has changed the To destination then we teleport the Player
-                                        // there to avoid any 'Moved wrongly' or 'Moved too quickly' errors.
-                                        // We only do this if the Event was not cancelled.
-                                        if (!oldTo.equals(event.getTo()) && !event.isCancelled()) {
-                                            this.player.getBukkitEntity().teleport(event.getTo(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-                                            return;
-                                        }
-
-                                        // Check to see if the Players Location has some how changed during the call of the event.
-                                        // This can happen due to a plugin teleporting the player instead of using .setTo()
-                                        if (!from.equals(this.getCraftPlayer().getLocation()) && this.justTeleported) {
-                                            this.justTeleported = false;
-                                            return;
-                                        }
+                                    Location oldTo = to.clone();
+                                    PlayerMoveEvent event = new PlayerMoveEvent(player, from, to);
+                                    this.cserver.getPluginManager().callEvent(event);
+                                    if (event.isCancelled()) {
+                                        this.teleport(from);
+                                        return;
+                                    }
+                                    if (!oldTo.equals(event.getTo()) && !event.isCancelled()) {
+                                        getCraftPlayer().teleport(event.getTo(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                                        return;
+                                    }
+                                    if (!from.equals(this.getCraftPlayer().getLocation()) && this.justTeleported) {
+                                        this.justTeleported = false;
+                                        return;
                                     }
                                 }
+
+                                this.player.absMoveTo(d0, d1, d2, f, f1); // Copied from above
+                                boolean autoSpinAttack = this.player.isAutoSpinAttack();
+                                this.clientIsFloating = d12 >= -0.03125D
+                                        && this.player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR
+                                        && !this.server.isFlightAllowed()
+                                        && !(this.player.getAbilities().mayfly)
+                                        && !this.player.hasEffect(MobEffects.LEVITATION)
+                                        && !fallFlying
+                                        && !autoSpinAttack
+                                        && this.noBlocksAround(this.player);
                                 // CraftBukkit end
-                                this.player.absMoveTo(d0, d1, d2, f, f1);
-                                this.clientIsFloating = d7 >= -0.03125D && !flag1 && this.player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR && !this.server.isFlightAllowed() && !this.player.getAbilities().mayfly && !this.player.hasEffect(MobEffects.LEVITATION) && !this.player.isFallFlying() && !this.player.isAutoSpinAttack() && this.noBlocksAround(this.player);
                                 this.player.serverLevel().getChunkSource().move(this.player);
-                                Vec3 vec3 = new Vec3(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5);
+                                var vec3 = new Vec3(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5);
                                 this.player.setOnGroundWithMovement(packetplayinflying.isOnGround(), vec3);
                                 this.player.doCheckFallDamage(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5, packetplayinflying.isOnGround());
                                 this.player.setKnownMovement(vec3);
@@ -768,13 +838,14 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
                                     this.player.resetFallDistance();
                                 }
 
+                                if (packetplayinflying.isOnGround() || this.player.hasLandedInLiquid() || this.player.onClimbable() || this.player.isSpectator() || fallFlying || autoSpinAttack) {
+                                    this.player.tryResetCurrentImpulseContext();
+                                }
+
                                 this.player.checkMovementStatistics(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5);
                                 this.lastGoodX = this.player.getX();
                                 this.lastGoodY = this.player.getY();
                                 this.lastGoodZ = this.player.getZ();
-                            } else {
-                                this.internalTeleport(d3, d4, d5, f, f1, Collections.emptySet()); // CraftBukkit - SPIGOT-1807: Don't call teleport event, when the client thinks the player is falling, because the chunks are not loaded on the client yet.
-                                this.player.doCheckFallDamage(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5, packetplayinflying.isOnGround());
                             }
                         }
                     }
@@ -938,6 +1009,14 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         }
     }
 
+    @Inject(method = "sendPlayerChatMessage", cancellable = true, at = @At("HEAD"))
+    private void banner$cantSee(PlayerChatMessage playerChatMessage, ChatType.Bound bound, CallbackInfo ci) {
+        if (!getCraftPlayer().canSee(playerChatMessage.link().sender())) {
+            sendDisguisedChatMessage(playerChatMessage.decoratedContent(), bound);
+            ci.cancel();
+        }
+    }
+
     @Inject(method = "handleAnimate",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/server/level/ServerPlayer;resetLastActionTime()V"),
@@ -981,33 +1060,27 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         // CraftBukkit end
     }
 
-    /**
-     * @author wdog5
-     * @reason bukkit
-     */
-    @Overwrite
-    public void handleSetCarriedItem(ServerboundSetCarriedItemPacket packet) {
-        PacketUtils.ensureRunningOnSameThread(packet, (ServerGamePacketListenerImpl) (Object) this, this.player.serverLevel());
+    @Inject(method = "handleSetCarriedItem", cancellable = true, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;Lnet/minecraft/server/level/ServerLevel;)V"))
+    private void banner$carriedItemBlocked(ServerboundSetCarriedItemPacket packet, CallbackInfo ci) {
         if (this.player.isImmobile()) {
-            return;
+            ci.cancel();
         }
-        if (packet.getSlot() >= 0 && packet.getSlot() < net.minecraft.world.entity.player.Inventory.getSelectionSize()) {
-            PlayerItemHeldEvent event = new PlayerItemHeldEvent(this.getCraftPlayer(), this.player.getInventory().selected, packet.getSlot());
-            this.cserver.getPluginManager().callEvent(event);
-            if (event.isCancelled()) {
-                this.send(new ClientboundSetCarriedItemPacket(this.player.getInventory().selected));
-                this.player.resetLastActionTime();
-                return;
-            }
-            if (this.player.getInventory().selected != packet.getSlot() && this.player.getUsedItemHand() == InteractionHand.MAIN_HAND) {
-                this.player.stopUsingItem();
-            }
-            this.player.getInventory().selected = packet.getSlot();
+    }
+
+    @Inject(method = "handleSetCarriedItem", cancellable = true, at = @At(value = "FIELD", ordinal = 0, target = "Lnet/minecraft/world/entity/player/Inventory;selected:I"))
+    private void banner$itemHeldEvent(ServerboundSetCarriedItemPacket packet, CallbackInfo ci) {
+        PlayerItemHeldEvent event = new PlayerItemHeldEvent(this.getCraftPlayer(), this.player.getInventory().selected, packet.getSlot());
+        this.cserver.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            this.send(new ClientboundSetCarriedItemPacket(this.player.getInventory().selected));
             this.player.resetLastActionTime();
-        } else {
-            LOGGER.warn("{} tried to set an invalid carried item", this.player.getName().getString());
-            this.disconnect("Invalid hotbar selection (Hacking?)");
+            ci.cancel();
         }
+    }
+
+    @Inject(method = "handleSetCarriedItem", at = @At(value = "INVOKE", shift = At.Shift.AFTER, remap = false, target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;)V"))
+    private void banner$kickOutOfBoundClick(ServerboundSetCarriedItemPacket serverboundSetCarriedItemPacket, CallbackInfo ci) {
+        this.disconnect("Invalid hotbar selection (Hacking?)");
     }
 
     // TODO ChatType.RAW
@@ -1536,6 +1609,71 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         }
     }
 
+    /**
+     * @author wdog5
+     * @reason bukkit
+     */
+    @Overwrite
+    public void handleSetCreativeModeSlot(final ServerboundSetCreativeModeSlotPacket packetplayinsetcreativeslot) {
+        PacketUtils.ensureRunningOnSameThread(packetplayinsetcreativeslot, (ServerGamePacketListenerImpl) (Object) this, this.player.serverLevel());
+        if (this.player.gameMode.isCreative()) {
+            final boolean flag = packetplayinsetcreativeslot.slotNum() < 0;
+            ItemStack itemstack = packetplayinsetcreativeslot.itemStack();
+            CustomData customdata = (CustomData) itemstack.getOrDefault(DataComponents.BLOCK_ENTITY_DATA, CustomData.EMPTY);
+
+            if (customdata.contains("x") && customdata.contains("y") && customdata.contains("z") && this.player.getBukkitEntity().hasPermission("minecraft.nbt.copy")) {
+                BlockPos blockpos = BlockEntity.getPosFromTag(customdata.getUnsafe());
+                if (this.player.level().isLoaded(blockpos)) {
+                    BlockEntity blockentity = this.player.level().getBlockEntity(blockpos);
+                    if (blockentity != null) {
+                        blockentity.saveToItem(itemstack, this.player.level().registryAccess());
+                    }
+                }
+            }
+            final boolean flag2 = packetplayinsetcreativeslot.slotNum() >= 1 && packetplayinsetcreativeslot.slotNum() <= 45;
+            boolean flag3 = itemstack.isEmpty() || (itemstack.getDamageValue() >= 0 && itemstack.getCount() <= 64 && !itemstack.isEmpty());
+            if (flag || (flag2 && !ItemStack.matches(this.player.inventoryMenu.getSlot(packetplayinsetcreativeslot.slotNum()).getItem(), packetplayinsetcreativeslot.itemStack()))) {
+                final InventoryView inventory =  this.player.inventoryMenu.getBukkitView();
+                final org.bukkit.inventory.ItemStack item = CraftItemStack.asBukkitCopy(packetplayinsetcreativeslot.itemStack());
+                InventoryType.SlotType type = InventoryType.SlotType.QUICKBAR;
+                if (flag) {
+                    type = InventoryType.SlotType.OUTSIDE;
+                } else if (packetplayinsetcreativeslot.slotNum() < 36) {
+                    if (packetplayinsetcreativeslot.slotNum() >= 5 && packetplayinsetcreativeslot.slotNum() < 9) {
+                        type = InventoryType.SlotType.ARMOR;
+                    } else {
+                        type = InventoryType.SlotType.CONTAINER;
+                    }
+                }
+                final InventoryCreativeEvent event = new InventoryCreativeEvent(inventory, type, flag ? -999 : packetplayinsetcreativeslot.slotNum(), item);
+                this.cserver.getPluginManager().callEvent(event);
+                itemstack = CraftItemStack.asNMSCopy(event.getCursor());
+                switch (event.getResult()) {
+                    case ALLOW: {
+                        flag3 = true;
+                        break;
+                    }
+                    case DEFAULT:
+                        break;
+                    case DENY: {
+                        if (packetplayinsetcreativeslot.slotNum() >= 0) {
+                            this.player.connection.send(new ClientboundContainerSetSlotPacket(this.player.inventoryMenu.containerId, this.player.inventoryMenu.incrementStateId(), packetplayinsetcreativeslot.slotNum(), this.player.inventoryMenu.getSlot(packetplayinsetcreativeslot.slotNum()).getItem()));
+                            this.player.connection.send(new ClientboundContainerSetSlotPacket(-1, this.player.inventoryMenu.incrementStateId(), -1, ItemStack.EMPTY));
+                        }
+                        return;
+                    }
+                }
+            }
+            if (flag2 && flag3) {
+                this.player.inventoryMenu.getSlot(packetplayinsetcreativeslot.slotNum()).setByPlayer(itemstack);
+                this.player.inventoryMenu.broadcastChanges();
+            } else if (flag && flag3 && this.dropSpamTickCount < 200) {
+                this.dropSpamTickCount += 20;
+                this.player.drop(itemstack, true);
+            }
+        }
+    }
+
     @Redirect(method = "method_17820",
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/inventory/RecipeBookMenu;handlePlacement(ZLnet/minecraft/world/item/crafting/RecipeHolder;Lnet/minecraft/server/level/ServerPlayer;)V"))
@@ -1570,10 +1708,51 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
 
     private transient PlayerTeleportEvent.TeleportCause banner$cause;
 
-    @Inject(method = "teleport(DDDFFLjava/util/Set;)V", at = @At("HEAD"), cancellable = true)
-    private void banner$bukkitLikeTp(double pX, double pY, double pZ, float pYaw, float pPitch, Set<RelativeMovement> set, CallbackInfo ci) {
-        this.teleport(pX, pY, pZ, pYaw, pPitch, PlayerTeleportEvent.TeleportCause.UNKNOWN);
-        ci.cancel();
+    private transient boolean banner$noTeleportEvent;
+    private transient boolean banner$teleportCancelled;
+
+    @Decorate(method = "teleport(DDDFFLjava/util/Set;)V", inject = true, at = @At("HEAD"))
+    private void banner$teleportEvent(double x, double y, double z, float yaw, float pitch, Set<RelativeMovement> relativeSet) throws Throwable {
+        PlayerTeleportEvent.TeleportCause cause = banner$cause == null ? PlayerTeleportEvent.TeleportCause.UNKNOWN : banner$cause;
+        banner$cause = null;
+        Player player = this.getCraftPlayer();
+        Location from = player.getLocation();
+        Location to = new Location(this.getCraftPlayer().getWorld(), x, y, z, yaw, pitch);
+        if (!banner$noTeleportEvent && !from.equals(to)) {
+            PlayerTeleportEvent event = new PlayerTeleportEvent(player, from.clone(), to.clone(), cause);
+            this.cserver.getPluginManager().callEvent(event);
+            if (event.isCancelled() || !to.equals(event.getTo())) {
+                relativeSet.clear();
+                to = (event.isCancelled() ? event.getFrom() : event.getTo());
+                x = to.getX();
+                y = to.getY();
+                z = to.getZ();
+                yaw = to.getYaw();
+                pitch = to.getPitch();
+            }
+            banner$teleportCancelled = event.isCancelled();
+        } else {
+            banner$teleportCancelled = false;
+        }
+        banner$noTeleportEvent = false;
+
+        if (Float.isNaN(yaw)) {
+            yaw = 0.0f;
+        }
+        if (Float.isNaN(pitch)) {
+            pitch = 0.0f;
+        }
+        this.justTeleported = true;
+        DecorationOps.blackhole().invoke(x, y, z, yaw, pitch);
+    }
+
+    @Inject(method = "teleport(DDDFFLjava/util/Set;)V", at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;awaitingTeleportTime:I"))
+    private void banner$storeLastPosition(double d, double e, double f, float yaw, float pitch, Set<RelativeMovement> set, CallbackInfo ci) {
+        this.lastPosX = this.awaitingPositionFromClient.x;
+        this.lastPosY = this.awaitingPositionFromClient.y;
+        this.lastPosZ = this.awaitingPositionFromClient.z;
+        this.lastYaw = yaw;
+        this.lastPitch = pitch;
     }
 
     @Override
@@ -1620,7 +1799,14 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
 
     @Override
     public void teleport(Location dest) {
-        this.internalTeleport(dest.getX(), dest.getY(), dest.getZ(), dest.getYaw(), dest.getPitch(), Collections.emptySet());
+        banner$noTeleportEvent = true;
+        this.teleport(dest.getX(), dest.getY(), dest.getZ(), dest.getYaw(), dest.getPitch(), Collections.emptySet());
+        banner$noTeleportEvent = false;
+    }
+
+    @Override
+    public void bridge$pushNoTeleportEvent() {
+        banner$noTeleportEvent = true;
     }
 
     @Inject(method = "teleport(DDDFF)V", at = @At("HEAD"))
@@ -1673,5 +1859,10 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     @Override
     public void pushTeleportCause(PlayerTeleportEvent.TeleportCause cause) {
         banner$cause = cause;
+    }
+
+    @Override
+    public boolean bridge$teleportCancelled() {
+        return banner$teleportCancelled;
     }
 }
