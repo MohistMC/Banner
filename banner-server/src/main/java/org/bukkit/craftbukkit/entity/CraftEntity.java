@@ -9,6 +9,23 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.mohistmc.banner.bukkit.entity.BannerModGolem;
+import com.mohistmc.banner.bukkit.entity.BannerModLivingEntity;
+import com.mohistmc.banner.bukkit.entity.BannerModMinecart;
+import com.mohistmc.banner.bukkit.entity.BannerModMinecartContainer;
+import com.mohistmc.banner.bukkit.entity.BannerModMob;
+import com.mohistmc.banner.bukkit.entity.BannerModVehicle;
+import com.mohistmc.banner.bukkit.entity.BannerModMonster;
+import com.mohistmc.banner.bukkit.entity.BannerModProjectile;
+import com.mohistmc.banner.bukkit.entity.BannerModRaider;
+import com.mohistmc.banner.bukkit.entity.BannerModSkeleton;
+import com.mohistmc.banner.bukkit.entity.BannerModChestedHorse;
+import com.mohistmc.banner.bukkit.entity.BannerModAnimals;
+import com.mohistmc.banner.bukkit.entity.BannerModEntity;
+import com.mohistmc.banner.bukkit.entity.BannerModHorse;
+import com.mohistmc.banner.bukkit.entity.BannerModTameableAnimal;
+import com.mohistmc.banner.bukkit.entity.BannerModThrowableProjectile;
+import com.mohistmc.banner.bukkit.entity.BannerModWindCharge;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -17,14 +34,26 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerPlayerConnection;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.animal.AbstractGolem;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.monster.AbstractSkeleton;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.windcharge.AbstractWindCharge;
+import net.minecraft.world.entity.raid.Raider;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.AbstractMinecartContainer;
+import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -48,7 +77,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Pose;
 import org.bukkit.entity.SpawnCategory;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityRemoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.permissions.PermissibleBase;
@@ -100,6 +128,31 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
 
         if (entityTypeData != null) {
             return (CraftEntity) entityTypeData.convertFunction().apply(server, entity);
+        }
+
+        CraftEntity modsEntity = null;
+        switch (entity) {
+            case AbstractSkeleton abstractSkeleton -> modsEntity = new BannerModSkeleton(server, abstractSkeleton);
+            case AbstractChestedHorse chestedHorse -> modsEntity = new BannerModChestedHorse(server, chestedHorse);
+            case AbstractHorse abstractHorse -> modsEntity = new BannerModHorse(server, abstractHorse);
+            case AbstractGolem abstractGolem -> modsEntity = new BannerModGolem(server, abstractGolem);
+            case AbstractMinecartContainer abstractMinecartContainer -> modsEntity = new BannerModMinecartContainer(server, abstractMinecartContainer);
+            case AbstractMinecart abstractMinecart -> modsEntity = new BannerModMinecart(server, abstractMinecart);
+            case AbstractWindCharge abstractWindCharge -> modsEntity = new BannerModWindCharge(server, abstractWindCharge);
+            case ThrowableItemProjectile throwableItemProjectile -> modsEntity = new BannerModThrowableProjectile(server, throwableItemProjectile);
+            case Projectile projectile -> modsEntity = new BannerModProjectile(server, projectile);
+            case Raider raider -> modsEntity = new BannerModRaider(server, raider);
+            case Monster monster -> modsEntity = new BannerModMonster(server, monster);
+            case TamableAnimal tamableAnimal -> modsEntity = new BannerModTameableAnimal(server, tamableAnimal);
+            case Animal animal -> modsEntity = new BannerModAnimals(server, animal);
+            case Mob mob -> modsEntity = new BannerModMob(server, mob);
+            case VehicleEntity vehicle -> modsEntity = new BannerModVehicle(server, vehicle);
+            case LivingEntity livingEntity -> modsEntity = new BannerModLivingEntity(server, livingEntity);
+            case Entity entity1 -> modsEntity = new BannerModEntity(server, entity1);
+        }
+
+        if (modsEntity != null) {
+            return modsEntity;
         }
 
         throw new AssertionError("Unknown entity " + (entity == null ? null : entity.getClass()));
