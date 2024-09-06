@@ -29,9 +29,12 @@ public class FabricBootstrap implements Consumer<FabricLauncher> {
     private void dirtyHacks() throws Exception {
         TypeAdapters.ENUM_FACTORY.create(null, TypeToken.get(Object.class));
         Field field = TypeAdapters.class.getDeclaredField("ENUM_FACTORY");
+        // Banner Start TODO fixme
+        /*
         Object base = Unsafe.staticFieldBase(field);
         long offset = Unsafe.staticFieldOffset(field);
-        Unsafe.putObjectVolatile(base, offset, new EnumTypeFactory());
+        Unsafe.putObjectVolatile(base, offset, new EnumTypeFactory());*/
+        // Banner end
         try (var in = getClass().getClassLoader().getResourceAsStream("com/mojang/brigadier/tree/CommandNode.class")) {
             var node = new ClassNode();
             new ClassReader(in).accept(node, 0);
