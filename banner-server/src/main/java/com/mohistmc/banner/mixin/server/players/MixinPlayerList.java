@@ -1,10 +1,8 @@
 package com.mohistmc.banner.mixin.server.players;
 
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.BannerMod;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
-import com.mohistmc.banner.bukkit.pluginfix.LuckPerms;
 import com.mohistmc.banner.fabric.BukkitRegistry;
 import com.mohistmc.banner.injection.server.players.InjectionPlayerList;
 import com.mohistmc.banner.util.Blackhole;
@@ -91,6 +89,7 @@ import net.minecraft.world.level.storage.PlayerDataStorage;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.command.ColouredConsoleSender;
@@ -147,22 +146,22 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     public int maxPlayers;
 
     @Shadow public abstract boolean canBypassPlayerLimit(GameProfile profile);
-
-    @Shadow public abstract void sendLevelInfo(ServerPlayer player, ServerLevel level);
-
-    @Shadow public abstract void sendPlayerPermissionLevel(ServerPlayer player);
-
     @Shadow public abstract void sendAllPlayerInfo(ServerPlayer player);
 
     @Shadow @Final public PlayerDataStorage playerIo;
-    @Shadow @Final private static Logger LOGGER;
     @Shadow protected abstract void save(ServerPlayer player);
 
     @Shadow @Final private Map<UUID, ServerStatsCounter> stats;
 
     @Shadow public abstract ServerPlayer getPlayerForLogin(GameProfile gameProfile, ClientInformation clientInformation);
 
+    @Shadow public abstract ServerPlayer respawn(ServerPlayer serverPlayer, boolean bl, Entity.RemovalReason removalReason);
+
     @Shadow public abstract void sendActivePlayerEffects(ServerPlayer serverPlayer);
+
+    @Shadow public abstract void sendLevelInfo(ServerPlayer serverPlayer, ServerLevel serverLevel);
+
+    @Shadow public abstract void sendPlayerPermissionLevel(ServerPlayer serverPlayer);
 
     private CraftServer cserver;
 
@@ -344,7 +343,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     public AtomicBoolean avoidSuffocation = new AtomicBoolean(true);
 
     @Inject(method = "respawn", at = @At("HEAD"))
-    private void arclight$stopRiding(ServerPlayer serverPlayer, boolean bl, Entity.RemovalReason removalReason, CallbackInfoReturnable<ServerPlayer> cir) {
+    private void banner$stopRiding(ServerPlayer serverPlayer, boolean bl, Entity.RemovalReason removalReason, CallbackInfoReturnable<ServerPlayer> cir) {
         serverPlayer.stopRiding();
     }
 
@@ -406,12 +405,96 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     }
 
     @Override
+    public ServerPlayer respawn(ServerPlayer playerIn, boolean flag, Entity.RemovalReason removalReason, PlayerRespawnEvent.RespawnReason respawnReason, Location location) {
+        if (true) { // TODO remove on next update
+            banner$respawnReason = respawnReason;
+            banner$loc = location;
+            return this.respawn(playerIn, flag, removalReason);
+        }
+        playerIn.stopRiding();
+        this.players.remove(playerIn);
+        playerIn.serverLevel().removePlayerImmediately(playerIn, removalReason);
+        //playerIn.revive();
+        World fromWorld =  playerIn.getBukkitEntity().getWorld();
+        playerIn.wonGame = false;
+        /*
+        playerIn.copyFrom(playerIn, flag);
+        playerIn.setEntityId(playerIn.getEntityId());
+        playerIn.setPrimaryHand(playerIn.getPrimaryHand());
+        for (String s : playerIn.getTags()) {
+            playerIn.addTag(s);
+        }
+        */
+        DimensionTransition dimensiontransition;
+        if (location == null) {
+            //playerIn.pushRespawnReason(respawnReason);
+            dimensiontransition = playerIn.findRespawnPositionAndUseSpawnBlock(flag, DimensionTransition.DO_NOTHING);
+            if (!flag) {
+                 playerIn.reset(); // SPIGOT-4785
+            }
+        } else {
+            dimensiontransition = new DimensionTransition(((CraftWorld) location.getWorld()).getHandle(), CraftLocation.toVec3D(location), Vec3.ZERO, location.getYaw(), location.getPitch(), DimensionTransition.DO_NOTHING);
+        }
+        // Spigot Start
+        if (dimensiontransition == null) {
+            return playerIn;
+        }
+        ServerLevel serverWorld = ((CraftWorld) location.getWorld()).getHandle();
+        playerIn.setServerLevel(serverWorld);
+        playerIn.unsetRemoved();
+        playerIn.setShiftKeyDown(false);
+        playerIn.moveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+        playerIn.connection.resetPosition();
+        if (dimensiontransition.missingRespawnBlock()) {
+            playerIn.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.NO_RESPAWN_BLOCK_AVAILABLE, 0.0F));
+            playerIn.pushChangeSpawnCause(PlayerSpawnChangeEvent.Cause.RESET);
+            playerIn.setRespawnPosition(null, null, 0f, false, false); // CraftBukkit - SPIGOT-5988: Clear respawn location when obstructed
+        }
+        LevelData worlddata = serverWorld.getLevelData();
+        playerIn.connection.send(new ClientboundRespawnPacket(playerIn.createCommonSpawnInfo(serverWorld), (byte) (flag ? 1 : 0)));
+        playerIn.connection.send(new ClientboundSetChunkCacheRadiusPacket(serverWorld.bridge$spigotConfig().viewDistance));
+        playerIn.connection.send(new ClientboundSetSimulationDistancePacket(serverWorld.bridge$spigotConfig().simulationDistance));
+        playerIn.connection.teleport(new Location(serverWorld.getWorld(), playerIn.getX(), playerIn.getY(), playerIn.getZ(), playerIn.getYRot(), playerIn.getXRot()));
+        playerIn.connection.send(new ClientboundSetDefaultSpawnPositionPacket(serverWorld.getSharedSpawnPos(), serverWorld.getSharedSpawnAngle()));
+        playerIn.connection.send(new ClientboundChangeDifficultyPacket(worlddata.getDifficulty(), worlddata.isDifficultyLocked()));
+        playerIn.connection.send(new ClientboundSetExperiencePacket(playerIn.experienceProgress, playerIn.totalExperience, playerIn.experienceLevel));
+        this.sendActivePlayerEffects(playerIn);
+        this.sendLevelInfo(playerIn, serverWorld);
+        this.sendPlayerPermissionLevel(playerIn);
+        if (!playerIn.connection.banner$isDisconnected()) {
+            serverWorld.addRespawnedPlayer(playerIn);
+            this.players.add(playerIn);
+            this.playersByUUID.put(playerIn.getUUID(), playerIn);
+        }
+        playerIn.setHealth(playerIn.getHealth());
+        if (!flag) {
+            BlockPos blockposition = BlockPos.containing(dimensiontransition.pos());
+            BlockState iblockdata = serverWorld.getBlockState(blockposition);
+
+            if (iblockdata.is(Blocks.RESPAWN_ANCHOR)) {
+                playerIn.connection.send(new ClientboundSoundPacket(SoundEvents.RESPAWN_ANCHOR_DEPLETE, SoundSource.BLOCKS, (double) blockposition.getX(), (double) blockposition.getY(), (double) blockposition.getZ(), 1.0F, 1.0F, serverWorld.getRandom().nextLong()));
+            }
+        }
+        this.sendAllPlayerInfo(playerIn);
+        playerIn.onUpdateAbilities();
+        playerIn.triggerDimensionChangeTriggers(((CraftWorld) fromWorld).getHandle());
+        if (fromWorld != location.getWorld()) {
+            PlayerChangedWorldEvent event = new PlayerChangedWorldEvent(playerIn.getBukkitEntity(), fromWorld);
+            Bukkit.getPluginManager().callEvent(event);
+        }
+        if (playerIn.connection.banner$isDisconnected()) {
+            this.save(playerIn);
+        }
+        return playerIn;
+    }
+
+    @Override
     public ServerPlayer respawn(ServerPlayer entityplayer, ServerLevel worldserver, boolean flag, Location location, boolean avoidSuffocation, Entity.RemovalReason entity_removalreason, PlayerRespawnEvent.RespawnReason reason) {
         this.banner$loc = location;
         this.banner$worldserver = worldserver;
         this.banner$respawnReason = reason;
         this.avoidSuffocation.set(avoidSuffocation);
-        return respawn(entityplayer, flag, null, reason);
+        return this.respawn(entityplayer, flag, entity_removalreason, reason, null);
     }
 
     @Override
