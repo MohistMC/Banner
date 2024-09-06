@@ -634,7 +634,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     }
 
     @Decorate(method = "signBook", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Inventory;setItem(ILnet/minecraft/world/item/ItemStack;)V"))
-    private void banner$editBookEvent(Inventory instance, int i, ItemStack stack, FilteredText text, List<FilteredText> list, int slot, @Local(ordinal = 0) ItemStack handStack) throws Throwable {
+    private void banner$editBookEvent(Inventory instance, int i, ItemStack stack, FilteredText text, List<FilteredText> list, int slot, @io.izzel.arclight.mixin.Local(ordinal = 0) ItemStack handStack) throws Throwable {
         CraftEventFactory.handleEditBookEvent(player, i, handStack, stack);
         DecorationOps.callsite().invoke(instance, i, handStack);
     }
