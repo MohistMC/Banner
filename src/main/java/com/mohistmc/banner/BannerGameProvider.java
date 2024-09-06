@@ -5,6 +5,7 @@ import net.fabricmc.loader.impl.launch.FabricLauncher;
 import net.fabricmc.loader.impl.util.Arguments;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,12 +30,14 @@ public class BannerGameProvider extends MinecraftGameProvider {
         for (var lib : System.getProperty("banner.fabric.classpath").split(File.pathSeparator)) {
             launcher.addToClassPath(Paths.get(lib));
         }
-        loadCustomLibs(launcher);
         try {
-            this.extractPlugin();
+            extractBootstrap();
+            extractPlugin();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        loadBootstrap(launcher);
+        loadCustomLibs(launcher);
         super.initialize(launcher);
     }
 
@@ -101,16 +104,34 @@ public class BannerGameProvider extends MinecraftGameProvider {
         if (!Files.exists(dir)) {
             Files.createDirectories(dir);
         }
-        var mod = dir.resolve("banner-plugin-" + getBannerVersion() + ".jar");
-        if (!Files.exists(mod) || Boolean.getBoolean("banner.alwaysExtract")) {
+        var plugin = dir.resolve("banner-plugin-" + getBannerVersion() + ".jar");
+        if (!Files.exists(plugin) || Boolean.getBoolean("banner.alwaysExtract")) {
             try (var files = Files.list(dir)) {
                 for (Path old : files.toList()) {
                     Files.delete(old);
                 }
-                Files.copy(path, mod);
+                Files.copy(path, plugin);
             }
         }
-        return mod;
+        return plugin;
+    }
+
+    private Path extractBootstrap() throws Exception {
+        var path = getClass().getModule().getResourceAsStream("/META-INF/jars/banner-bootstrap-" + getBannerVersion() + ".jar");
+        var dir = Paths.get(".banner", "bootstrap");
+        if (!Files.exists(dir)) {
+            Files.createDirectories(dir);
+        }
+        var bootstrap = dir.resolve("banner-bootstrap-" + getBannerVersion() + ".jar");
+        if (!Files.exists(bootstrap) || Boolean.getBoolean("banner.alwaysExtract")) {
+            try (var files = Files.list(dir)) {
+                for (Path old : files.toList()) {
+                    Files.delete(old);
+                }
+                Files.copy(path, bootstrap);
+            }
+        }
+        return bootstrap;
     }
 
     @Override
@@ -127,7 +148,7 @@ public class BannerGameProvider extends MinecraftGameProvider {
         }
     }
 
-    public static void loadCustomLibs(FabricLauncher launcher) {
+    private void loadCustomLibs(FabricLauncher launcher) {
         File file = new File("libraries/customize_libraries");
         if (!file.exists()) {
             file.mkdirs();
@@ -136,6 +157,15 @@ public class BannerGameProvider extends MinecraftGameProvider {
         for (File lib : file.listFiles((dir, name) -> name.endsWith(".jar"))) {
             launcher.addToClassPath(Paths.get(lib.toURI()));
             System.out.println(lib.getName() + " custom library loaded successfully.");
+        }
+    }
+
+    private void loadBootstrap(FabricLauncher launcher) {
+        try {
+            File bootstrap = new File(".banner", "bootstrap/" + "banner-bootstrap-" + getBannerVersion() + ".jar");
+            launcher.addToClassPath(Paths.get(bootstrap.toURI()));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

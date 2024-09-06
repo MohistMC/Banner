@@ -1,0 +1,6 @@
+archivesBaseName = project.archives_base_name + "-bootstrap"
+version = getSubprojectVersion(project)
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.WARN
+}

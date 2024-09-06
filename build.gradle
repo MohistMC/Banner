@@ -160,6 +160,7 @@ def getSubprojectVersion(project) {
 dependencies {
     include(project("banner-server"))
     include(project("banner-plugin"))
+    include(project("banner-bootstrap"))
 }
 
 tasks.withType(JavaCompile).configureEach {
