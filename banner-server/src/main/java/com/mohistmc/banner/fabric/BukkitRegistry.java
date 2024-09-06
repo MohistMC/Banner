@@ -33,6 +33,7 @@ import net.minecraft.world.level.block.entity.HangingSignBlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.TrappedChestBlockEntity;
 import net.minecraft.world.level.dimension.LevelStem;
+import org.bukkit.Art;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
@@ -52,8 +53,11 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.SpawnCategory;
 import org.bukkit.entity.Villager;
+import org.bukkit.potion.PotionType;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -93,7 +97,7 @@ public class BukkitRegistry {
         loadBiomes(console);
         loadPoses();
         addPose();
-        loadArts();
+        loadArts(console);
         loadStats();
         loadSpawnCategory();
         loadEndDragonPhase();
@@ -245,25 +249,22 @@ public class BukkitRegistry {
         }
     }
 
-    private static void loadArts() {
-        /*
+    private static void loadArts(DedicatedServer console) {
         int i = Art.values().length;
-        var registry = BuiltInRegistries.PAINTING_VARIANT;
+        var registry = console.registryAccess().registryOrThrow(Registries.PAINTING_VARIANT);
         for (var entry : registry) {
-            int width = entry.getWidth();
-            int height = entry.getHeight();
             ResourceLocation resourceLocation = registry.getKey(entry);
             if (!resourceLocation.getNamespace().equals(NamespacedKey.MINECRAFT)) {
                 String name = normalizeName(resourceLocation.toString());
                 String lookupName = resourceLocation.getPath().toLowerCase(Locale.ROOT);
                 int id = i - 1;
-                Art art = MohistDynamEnum.addEnum(Art.class, name, List.of(Integer.TYPE, Integer.TYPE, Integer.TYPE), List.of(id, width, height));
+                Art art = MohistDynamEnum.addEnum(Art.class, name, List.of(Integer.TYPE, Integer.TYPE, Integer.TYPE), List.of(id, entry.width(), entry.height()));
                 Art.BY_NAME.put(lookupName, art);
                 Art.BY_ID.put(id, art);
-                BannerServer.LOGGER.debug("Registered mod PaintingType as Art {}", art);
+                BannerMod.LOGGER.debug("Registered mod PaintingType as Art {}", art);
                 i++;
             }
-        }*/
+        }
     }
 
     public static void loadParticles() {
@@ -352,7 +353,7 @@ public class BukkitRegistry {
 
     private static void loadEnchantments() {
         /*
-        for (net.minecraft.world.item.enchantment.Enchantment enc : BuiltInRegistries.ENCHANTMENT) {
+        for (net.minecraft.world.item.enchantment.Enchantment enc : BuiltInRegistries) {
             try {
                 Enchantment.getByKey(new CraftEnchantment(enc));
             } catch (Exception e) {
@@ -364,31 +365,20 @@ public class BukkitRegistry {
     }
 
     private static void loadPotions() {
-        /*
-        for (MobEffect eff : BuiltInRegistries.MOB_EFFECT) {
-            try {
-                var location = BuiltInRegistries.MOB_EFFECT.getKey(eff);
-                String name = normalizeName(location.toString());
-                BannerPotionEffect effect = new BannerPotionEffect(eff, name);
-                PotionEffectType.registerPotionEffectType(effect);
-                BannerServer.LOGGER.debug("Registered {} as potion {}", location, effect);
-            } catch (Exception e) {
-                BannerServer.LOGGER.error("Failed to register potion type {}: {}", eff, e);
-            }
-        }
-        PotionEffectType.stopAcceptingRegistrations();
+        int typeId = PotionType.values().length;
+        List<PotionType> newTypes = new ArrayList<>();
         for (var potion : BuiltInRegistries.POTION) {
             var location = BuiltInRegistries.POTION.getKey(potion);
-            if (isMods(location) && CraftPotionUtil.toBukkit(location.toString()).getType() == PotionType.UNCRAFTABLE && potion != Potions.EMPTY) {
-                String name = normalizeName(location.toString());
-                MobEffectInstance effectInstance = potion.getEffects().isEmpty() ? null : potion.getEffects().get(0);
-                PotionType potionType = MohistDynamEnum.addEnum(PotionType.class, name, Arrays.asList(PotionEffectType.class, Boolean.TYPE, Boolean.TYPE), Arrays.asList(effectInstance == null ? null : PotionEffectType.getByKey(CraftNamespacedKey.fromMinecraft(BuiltInRegistries.MOB_EFFECT.getKey(effectInstance.getEffect()))), false, false));
-                if (potionType != null) {
-                    CraftPotionUtil.mods.put(potionType, location.toString());
-                    BannerServer.LOGGER.debug("Registered {} as potion type {}", location, potionType);
-                }
+            String name = normalizeName(location.toString());
+            try {
+                PotionType.valueOf(name);
+            } catch (Exception e) {
+                NamespacedKey namespacedKey = CraftNamespacedKey.fromMinecraft(location);
+                PotionType potionType = MohistDynamEnum.addEnum(PotionType.class, name, List.of(String.class), List.of(namespacedKey.toString()));
+                newTypes.add(potionType);
+                BannerMod.LOGGER.debug("Registered {} as potion type {}", location, potionType);
             }
-        }*/
+        }
     }
 
     public static String normalizeName(String name) {
