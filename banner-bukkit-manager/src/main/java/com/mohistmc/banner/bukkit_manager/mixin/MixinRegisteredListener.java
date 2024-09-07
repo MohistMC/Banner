@@ -1,4 +1,4 @@
-package com.mohistmc.banner.mixin.bukkit;
+package com.mohistmc.banner.bukkit_manager.mixin;
 
 import com.mohistmc.banner.fabric.FabricEventFactory;
 import org.bukkit.Bukkit;
@@ -13,8 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinRegisteredListener {
 
     @Inject(method = "callEvent", at = @At(value = "INVOKE",
-            target = "Lorg/bukkit/plugin/EventExecutor;execute(Lorg/bukkit/event/Listener;Lorg/bukkit/event/Event;)V"),
-            cancellable = true)
+            target = "Lorg/bukkit/plugin/EventExecutor;execute(Lorg/bukkit/event/Listener;Lorg/bukkit/event/Event;)V"))
     private void banner$hookEvent(Event event, CallbackInfo ci) {
         if (Bukkit.getServer() != null) {
             FabricEventFactory.HOOK_BUKKIT.invoker().hook(event);

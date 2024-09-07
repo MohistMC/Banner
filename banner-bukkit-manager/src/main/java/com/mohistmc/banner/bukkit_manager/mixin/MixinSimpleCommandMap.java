@@ -1,4 +1,4 @@
-package com.mohistmc.banner.mixin.bukkit;
+package com.mohistmc.banner.bukkit_manager.mixin;
 
 import com.mohistmc.banner.command.DumpCommand;
 import com.mohistmc.banner.command.GetPluginListCommand;
@@ -15,8 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = SimpleCommandMap.class,remap = false)
 public abstract class MixinSimpleCommandMap {
 
-    @Shadow
-    abstract boolean register(@NotNull String fallbackPrefix, @NotNull Command command);
+    @Shadow public abstract boolean register(@NotNull String fallbackPrefix, @NotNull Command command);
 
     @Inject(method = "setDefaultCommands()V", at = @At("RETURN"))
     private void banner$newCommand(CallbackInfo cir) {

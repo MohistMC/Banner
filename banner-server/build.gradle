@@ -15,6 +15,7 @@ dependencies {
 	include(rootProject.project("banner-translate"))
 	include(rootProject.project("banner-transitive-access-wideners"))
 	include(rootProject.project("banner-stackdeobf"))
+	include(rootProject.project("banner-bukkit-manager"))
 }
 
 moduleDependencies(project, [

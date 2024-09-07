@@ -1,13 +1,13 @@
-archivesBaseName = project.archives_base_name + "-translate"
+archivesBaseName = project.archives_base_name + "-bukkit-manager"
 version = getSubprojectVersion(project)
-
-moduleDependencies(project, [
-        "banner-server"
-])
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
 }
+
+moduleDependencies(project, [
+        "banner-server"
+])
 
 processResources {
     duplicatesStrategy = DuplicatesStrategy.WARN
