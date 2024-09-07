@@ -12,6 +12,7 @@
   },
   "mixinPriority": 400,
   "mixins": [
+    "MixinLevel",
     "MixinLevelWriter",
     "MixinLivingEntity",
     "MixinServerLevel"

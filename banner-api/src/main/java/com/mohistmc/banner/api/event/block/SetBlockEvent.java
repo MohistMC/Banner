@@ -1,23 +1,24 @@
 package com.mohistmc.banner.api.event.block;
 
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.BlockEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class BlockDestroyEvent extends BlockEvent implements Cancellable {
+public class SetBlockEvent extends BlockEvent implements Cancellable {
 
-    private boolean cancel = false;
     private static final HandlerList handlers = new HandlerList();
-    private final Entity entity;
+    private boolean cancel;
     private final Location location;
 
-    public BlockDestroyEvent(Location location, Entity entity) {
+    public SetBlockEvent(Location location) {
         super(location.getBlock());
         this.location = location;
-        this.entity = entity;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     @Override
@@ -35,16 +36,7 @@ public class BlockDestroyEvent extends BlockEvent implements Cancellable {
         return handlers;
     }
 
-    @NotNull
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
     public Location getLocation() {
         return location;
-    }
-
-    public Entity getEntity() {
-        return entity;
     }
 }
