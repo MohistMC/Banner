@@ -15,6 +15,7 @@
   "mixins": [
     "MixinCrashReport",
     "advancement.MixinAdvancementHolder",
+    "bukkit.MixinRegisteredListener",
     "bukkit.MixinSimpleCommandMap",
     "commands.MixinCommandDispatcher",
     "commands.MixinCommandNode",
