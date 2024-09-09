@@ -80,7 +80,7 @@ public class BukkitRegistry {
                     .put(World.Environment.THE_END, LevelStem.END)
                     .build());
 
-    public static Map<Villager.Profession, ResourceLocation> profession = new HashMap<>();
+    public static Map<ResourceKey<Registry<VillagerProfession>>, Villager.Profession> profession = new HashMap<>();
     public static Map<org.bukkit.attribute.Attribute, ResourceLocation> attributemap = new HashMap<>();
     public static Map<StatType<?>, Statistic> statisticMap = new HashMap<>();
     public static Map<net.minecraft.world.level.biome.Biome, Biome> biomeBiomeMap = new HashMap<>();
@@ -93,7 +93,7 @@ public class BukkitRegistry {
         loadPotions();
         loadEnchantments();
         loadEntities();
-        loadVillagerProfessions();
+        //loadVillagerProfessions();
         loadBiomes(console);
         loadPoses();
         addPose();
@@ -306,7 +306,7 @@ public class BukkitRegistry {
             if (isMods(resourceLocation)) {
                 String name = normalizeName(resourceLocation.toString());
                 Villager.Profession vp = MohistDynamEnum.addEnum(Villager.Profession.class, name);
-                profession.put(vp, resourceLocation);
+                profession.put(ResourceKey.createRegistryKey(resourceLocation), vp);
                 BannerMod.LOGGER.debug("Registered mod VillagerProfession as Profession {}", vp.name());
             }
         }
