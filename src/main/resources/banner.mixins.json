@@ -89,6 +89,7 @@
     "server.network.MixinLegacyQueryHandler",
     "server.network.MixinServerConnectionListener",
     "server.network.MixinServerGamePacketListenerImpl",
+    "server.network.MixinServerGamePacketListenerImpl_1",
     "server.network.MixinServerHandshakePacketListenerImpl",
     "server.network.MixinServerLoginPacketListenerImpl",
     "server.network.MixinServerStatusPacketListenerImpl",
