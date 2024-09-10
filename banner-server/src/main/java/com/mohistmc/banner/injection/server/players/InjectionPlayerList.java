@@ -52,10 +52,6 @@ public interface InjectionPlayerList {
         throw new IllegalStateException("Not implemented");
     }
 
-    default ServerPlayer player() {
-        throw new IllegalStateException("Not implemented");
-    }
-
     default ServerPlayer respawn(ServerPlayer playerIn, boolean flag, Entity.RemovalReason removalReason, PlayerRespawnEvent.RespawnReason respawnReason, Location location) {
         throw new IllegalStateException("Not implemented");
     }

@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.login.ServerLoginPacketListener;
 import net.minecraft.network.protocol.login.ServerboundLoginAcknowledgedPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
@@ -56,7 +57,7 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
     @Inject(method = "verifyLoginAndFinishConnectionSetup", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;canPlayerLogin(Ljava/net/SocketAddress;Lcom/mojang/authlib/GameProfile;)Lnet/minecraft/network/chat/Component;", shift = Shift.AFTER))
     private void banner$canLogin(GameProfile gameProfile, CallbackInfo ci, @Local PlayerList playerList) {
         if (this.player == null) {
-            this.player = playerList.player();
+            this.player = playerList.getPlayerForLogin(gameProfile, ClientInformation.createDefault());
         }
     }
 

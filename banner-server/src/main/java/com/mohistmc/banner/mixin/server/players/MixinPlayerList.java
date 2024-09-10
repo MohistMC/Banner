@@ -269,14 +269,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         return quitMsg;
     }
 
-    @Unique
-    public AtomicReference<ServerPlayer> entity = new AtomicReference<>(null);
-
-    @Override
-    public ServerPlayer player() {
-        return entity.get();
-    }
-
     /**
      * @author Mgazul
      * @reason bukkit
@@ -284,7 +276,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     @Overwrite
     public Component canPlayerLogin(SocketAddress socketaddress, GameProfile gameProfile) {
         ServerPlayer serverPlayer = getPlayerForLogin(gameProfile, ClientInformation.createDefault());
-        entity.set(serverPlayer);
         org.bukkit.entity.Player player = serverPlayer.getBukkitEntity();
         String hostname = ((java.net.InetSocketAddress) socketaddress).getHostName() + ":" + ((java.net.InetSocketAddress) socketaddress).getPort();
         PlayerLoginEvent event = new PlayerLoginEvent(player, hostname, ((java.net.InetSocketAddress) socketaddress).getAddress());
@@ -326,16 +317,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         // Banner end
         return null;
     }
-
-    @Inject(method = "getPlayerForLogin", at = @At("HEAD"), cancellable = true)
-    private void banner$getPlayerForLogin(GameProfile gameProfile,
-                                          ClientInformation clientInformation,
-                                          CallbackInfoReturnable<ServerPlayer> ci) {
-        if(entity.get() != null) {
-            ci.setReturnValue(entity.getAndSet(null));
-        }
-    }
-
 
     private Location banner$loc = null;
     private transient PlayerRespawnEvent.RespawnReason banner$respawnReason;
