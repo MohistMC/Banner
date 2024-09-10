@@ -80,6 +80,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.FilteredText;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.network.ServerGamePacketListenerImpl.EntityInteraction;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.FutureChain;
 import net.minecraft.util.Mth;
@@ -181,6 +182,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(ServerGamePacketListenerImpl.class)
 public abstract class MixinServerGamePacketListenerImpl implements InjectionServerGamePacketListenerImpl {
 
+    @Shadow @Final public static double MAX_INTERACTION_DISTANCE;
     @Shadow public ServerPlayer player;
     @Mutable
     @Shadow @Final private FutureChain chatMessageChain;
@@ -1346,6 +1348,121 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
             this.cserver.getPluginManager().callEvent(e2);
             if (e2.isCancelled()) {
                 ci.cancel();
+            }
+        }
+    }
+
+    /**
+     * @author wdog5
+     * @reason
+     */
+    @Overwrite
+    public void handleInteract(ServerboundInteractPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, (ServerGamePacketListenerImpl) (Object) this, this.player.serverLevel());
+        if (this.player.isImmobile()) return; // CraftBukkit
+        final ServerLevel serverLevel = this.player.serverLevel();
+        final Entity entity = packet.getTarget(serverLevel);
+        if (entity == player && !player.isSpectator()) {
+            disconnect("Cannot interact with self!");
+            return;
+        }
+        this.player.resetLastActionTime();
+        this.player.setShiftKeyDown(packet.isUsingSecondaryAction());
+        if (entity != null) {
+            if (!serverLevel.getWorldBorder().isWithinBounds(entity.blockPosition())) {
+                return;
+            }
+            AABB aABB = entity.getBoundingBox();
+            class Handler implements ServerboundInteractPacket.Handler {
+
+                private void performInteraction(InteractionHand hand, EntityInteraction interaction, PlayerInteractEntityEvent event) { // CraftBukkit
+                    var stack = player.getItemInHand(hand);
+
+                    if (stack.isItemEnabled(serverLevel.enabledFeatures())) {
+                        ItemStack itemstack = stack.copy();
+                        // CraftBukkit start
+                        ItemStack itemInHand = player.getItemInHand(hand);
+                        boolean triggerLeashUpdate = itemInHand != null && itemInHand.getItem() == Items.LEAD && entity instanceof Mob;
+                        Item origItem = player.getInventory().getSelected() == null ? null : player.getInventory().getSelected().getItem();
+                        Bukkit.getPluginManager().callEvent(event);
+
+                        // Fish bucket - SPIGOT-4048
+                        if ((entity instanceof Bucketable && entity instanceof LivingEntity && origItem != null && origItem.asItem() == Items.WATER_BUCKET) && (event.isCancelled() || player.getInventory().getSelected() == null || player.getInventory().getSelected().getItem() != origItem)) {
+                            send(new ClientboundAddEntityPacket((LivingEntity) entity));
+                            player.containerMenu.sendAllDataToRemote();
+                        }
+
+                        if (triggerLeashUpdate && (event.isCancelled() || player.getInventory().getSelected() == null || player.getInventory().getSelected().getItem() != origItem)) {
+                            // Refresh the current leash state
+                            send(new ClientboundSetEntityLinkPacket(entity, ((Mob) entity).getLeashHolder()));
+                        }
+
+                        if (event.isCancelled() || player.getInventory().getSelected() == null || player.getInventory().getSelected().getItem() != origItem) {
+                            // Refresh the current entity metadata
+                            entity.getEntityData().refresh(player);
+                            if (entity instanceof Allay) {
+                                send(new ClientboundSetEquipmentPacket(entity.getId(), Arrays.stream(net.minecraft.world.entity.EquipmentSlot.values()).map((slot) -> Pair.of(slot, ((LivingEntity) entity).getItemBySlot(slot).copy())).collect(Collectors.toList())));
+                                player.containerMenu.sendAllDataToRemote();
+                            }
+                        }
+
+                        if (event.isCancelled()) {
+                            return;
+                        }
+                        // CraftBukkit end
+
+                        InteractionResult enuminteractionresult = interaction.run(player, entity, hand);
+
+                        // CraftBukkit start
+                        if (!itemInHand.isEmpty() && itemInHand.getCount() <= -1) {
+                            player.containerMenu.sendAllDataToRemote();
+                        }
+                        // CraftBukkit end
+
+                        if (enuminteractionresult.consumesAction()) {
+                            CriteriaTriggers.PLAYER_INTERACTED_WITH_ENTITY.trigger(player, itemstack, entity);
+                            if (enuminteractionresult.shouldSwing()) {
+                                player.swing(hand, true);
+                            }
+                        }
+                    }
+
+                }
+
+                @Override
+                public void onInteraction(InteractionHand hand) {
+                    this.performInteraction(hand, net.minecraft.world.entity.player.Player::interactOn,
+                            new PlayerInteractEntityEvent(getCraftPlayer(), entity.getBukkitEntity(),
+                                    (hand == InteractionHand.OFF_HAND) ? EquipmentSlot.OFF_HAND : EquipmentSlot.HAND));
+                }
+
+                @Override
+                public void onInteraction(InteractionHand hand, Vec3 vec) {
+                    this.performInteraction(hand, (serverPlayer, entityx, interactionHand) -> {
+                        return entityx.interactAt(serverPlayer, vec, interactionHand);
+                    }, new PlayerInteractAtEntityEvent(getCraftPlayer(), entity.getBukkitEntity(), new org.bukkit.util.Vector(vec.x, vec.y, vec.z), (hand == InteractionHand.OFF_HAND) ? EquipmentSlot.OFF_HAND : EquipmentSlot.HAND));
+                }
+
+                @Override
+                public void onAttack() {
+                    if (!(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrb) && !(entity instanceof AbstractArrow) && (entity != player || player.isSpectator())) {
+                        ItemStack itemStack = player.getMainHandItem();
+                        if (itemStack.isItemEnabled(serverLevel.enabledFeatures())) {
+                            player.attack(entity);
+                            // CraftBukkit start
+                            if (!itemStack.isEmpty() && itemStack.getCount() <= -1) {
+                                player.containerMenu.sendAllDataToRemote();
+                            }
+                            // CraftBukkit end
+                        }
+                    } else {
+                        disconnect(Component.translatable("multiplayer.disconnect.invalid_entity_attacked"));
+                        LOGGER.warn("Player {} tried to attack an invalid entity", player.getName().getString());
+                    }
+                }
+            }
+            if (aABB.distanceToSqr(this.player.getEyePosition()) < MAX_INTERACTION_DISTANCE) {
+                packet.dispatch(new Handler());
             }
         }
     }
