@@ -17,11 +17,13 @@ public interface MixinLevelWriter {
 
     @Inject(method = "destroyBlock(Lnet/minecraft/core/BlockPos;ZLnet/minecraft/world/entity/Entity;)Z", at = @At("HEAD"), cancellable = true)
     private void banner$fireDestroyEvent(BlockPos blockPos, boolean bl, Entity entity, CallbackInfoReturnable<Boolean> cir) {
-        var bukkitEntity = entity.getBukkitEntity() == null ? CraftEntity.getEntity(BukkitMethodHooks.getServer().bridge$server(), entity) : entity.getBukkitEntity();
-        if (bukkitEntity != null) {
-            BlockDestroyEvent banner$event = new BlockDestroyEvent(CraftLocation.toBukkit(blockPos, entity.level()), bukkitEntity);
-            if (banner$event.isCancelled()) {
-                cir.setReturnValue(false);
+        if (entity != null) {
+            var bukkitEntity = entity.getBukkitEntity() == null ? CraftEntity.getEntity(BukkitMethodHooks.getServer().bridge$server(), entity) : entity.getBukkitEntity();
+            if (bukkitEntity != null) {
+                BlockDestroyEvent banner$event = new BlockDestroyEvent(CraftLocation.toBukkit(blockPos, entity.level()), bukkitEntity);
+                if (banner$event.isCancelled()) {
+                    cir.setReturnValue(false);
+                }
             }
         }
     }
