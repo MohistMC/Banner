@@ -89,7 +89,6 @@ public class WatchdogThread extends Thread
                     dumpThread( thread, log );
                 }
                 log.log( Level.SEVERE, "------------------------------" );
-                System.exit(0);
                 break;
             }
 
