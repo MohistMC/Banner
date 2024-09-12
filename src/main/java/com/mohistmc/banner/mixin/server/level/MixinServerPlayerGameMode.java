@@ -375,11 +375,6 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
     @Unique
     public ItemStack interactItemStack;
 
-    // Banner start - fix mixin compat with frozen lib
-    boolean cancelledBlock = false;
-    PlayerInteractEvent event;
-    // Banner end
-
     /**
      * @author wdog4
      * @reason
@@ -389,6 +384,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
         BlockPos blockPos = hitResult.getBlockPos();
         BlockState blockState = level.getBlockState(blockPos);
         InteractionResult enuminteractionresult = InteractionResult.PASS;
+        boolean cancelledBlock = false;
         if (!blockState.getBlock().isEnabled(level.enabledFeatures())) {
             return InteractionResult.FAIL;
         } else if (this.gameModeForPlayer == GameType.SPECTATOR) {
@@ -399,7 +395,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
             cancelledBlock = true;
         }
 
-        event = CraftEventFactory.callPlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, blockPos, hitResult.getDirection(), stack, cancelledBlock, hand, hitResult.getLocation());
+        PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, blockPos, hitResult.getDirection(), stack, cancelledBlock, hand, hitResult.getLocation());
         firedInteract = true;
         interactResult = event.useItemInHand() == Event.Result.DENY;
         interactPosition = blockPos.immutable();
