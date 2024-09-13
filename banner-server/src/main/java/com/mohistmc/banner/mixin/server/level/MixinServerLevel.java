@@ -2,8 +2,6 @@ package com.mohistmc.banner.mixin.server.level;
 
 import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.Share;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mohistmc.banner.BannerMod;
 import com.mohistmc.banner.asm.annotation.CreateConstructor;
 import com.mohistmc.banner.asm.annotation.ShadowConstructor;
@@ -466,21 +464,15 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         }
     }
 
-    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setDayTime(J)V"))
-    private void banner$timeSkip(BooleanSupplier booleanSupplier, CallbackInfo ci, @Local long l, @Share("bannerEvent") LocalRef<TimeSkipEvent> eventLocalRef) {
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setDayTime(J)V"), locals = LocalCapture.CAPTURE_FAILHARD)
+    private void banner$timeSkip(BooleanSupplier booleanSupplier, CallbackInfo ci, ProfilerFiller profilerFiller, TickRateManager tickRateManager, boolean bl, int i, long l) {
         l = this.levelData.getDayTime() + 24000L;
         TimeSkipEvent event = new TimeSkipEvent(this.getWorld(), TimeSkipEvent.SkipReason.NIGHT_SKIP, (l - l % 24000L) - this.getDayTime());
         getCraftServer().getPluginManager().callEvent(event);
-        eventLocalRef.set(event);
         banner$timeSkipCancelled.set(event.isCancelled());
-    }
-
-    @ModifyConstant(method = "tick", constant = @Constant(longValue = 24000L))
-    private long banner$setDayTime(long constant, @Share("bannerEvent") LocalRef<TimeSkipEvent> eventLocalRef) {
-        if (!eventLocalRef.get().isCancelled()) {
-            return eventLocalRef.get().getSkipAmount();
+        if (!event.isCancelled()) {
+            this.setDayTime(this.getDayTime() + event.getSkipAmount());
         }
-        return constant;
     }
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;wakeUpAllPlayers()V"))
