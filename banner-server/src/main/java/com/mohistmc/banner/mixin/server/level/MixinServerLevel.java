@@ -19,7 +19,6 @@ import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -40,7 +39,6 @@ import net.minecraft.util.ProgressListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.Container;
 import net.minecraft.world.RandomSequences;
-import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.Level;
@@ -95,7 +93,6 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ServerLevel.class)
 public abstract class MixinServerLevel extends Level implements WorldGenLevel, InjectionServerLevel {
@@ -127,8 +124,6 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     @Shadow public abstract ServerChunkCache getChunkSource();
 
     @Shadow protected abstract boolean addEntity(Entity entity);
-
-    @Shadow public abstract void setDayTime(long l);
 
     public LevelStorageSource.LevelStorageAccess convertable;
     public UUID uuid;
@@ -464,14 +459,13 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         }
     }
 
-    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setDayTime(J)V"), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$timeSkip(BooleanSupplier booleanSupplier, CallbackInfo ci, ProfilerFiller profilerFiller, TickRateManager tickRateManager, boolean bl, int i, long l) {
-        l = this.levelData.getDayTime() + 24000L;
-        TimeSkipEvent event = new TimeSkipEvent(this.getWorld(), TimeSkipEvent.SkipReason.NIGHT_SKIP, (l - l % 24000L) - this.getDayTime());
-        getCraftServer().getPluginManager().callEvent(event);
+    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setDayTime(J)V"))
+    private void banner$timeSkip(ServerLevel world, long time) {
+        TimeSkipEvent event = new TimeSkipEvent(this.getWorld(), TimeSkipEvent.SkipReason.NIGHT_SKIP, (time - time % 24000L) - this.getDayTime());
+        Bukkit.getPluginManager().callEvent(event);
         banner$timeSkipCancelled.set(event.isCancelled());
         if (!event.isCancelled()) {
-            this.setDayTime(this.getDayTime() + event.getSkipAmount());
+            world.setDayTime(this.getDayTime() + event.getSkipAmount());
         }
     }
 
