@@ -3,6 +3,7 @@ version = getSubprojectVersion(project)
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
+    compileOnly(fileTree("lib/banner-1.21.1-dev.jar"))
 }
 
 moduleDependencies(project, [

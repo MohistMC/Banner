@@ -12,6 +12,9 @@
   },
   "mixinPriority": 400,
   "mixins": [
+    "MixinBlockStateListPopulator",
+    "MixinDelegatedGeneratorAccess",
+    "MixinDummyGeneratorAccess",
     "MixinRegisteredListener",
     "MixinSimpleCommandMap"
   ]
