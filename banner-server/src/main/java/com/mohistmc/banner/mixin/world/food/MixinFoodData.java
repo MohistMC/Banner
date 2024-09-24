@@ -3,7 +3,9 @@ package com.mohistmc.banner.mixin.world.food;
 import com.mohistmc.banner.asm.annotation.CreateConstructor;
 import com.mohistmc.banner.asm.annotation.ShadowConstructor;
 import com.mohistmc.banner.injection.world.food.InjectionFoodData;
-import net.minecraft.core.component.DataComponents;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
+import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
@@ -20,7 +22,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -78,18 +79,22 @@ public abstract class MixinFoodData implements InjectionFoodData {
         ((ServerPlayer) entityhuman).getBukkitEntity().sendHealthUpdate();
     }
 
-    @Redirect(method = "eat(Lnet/minecraft/world/food/FoodProperties;)V",
-            at = @At(value = "INVOKE",target = "Lnet/minecraft/world/food/FoodData;add(IF)V"))
-    private void banner$foodLevelChange(FoodData instance, int i, float f) {
-        int oldFoodLevel = foodLevel;
-        FoodProperties foodInfo =  (FoodProperties)banner$foodStack.get(DataComponents.FOOD);
-        FoodLevelChangeEvent event = CraftEventFactory.callFoodLevelChangeEvent(entityhuman, foodInfo.nutrition() + oldFoodLevel, banner$foodStack);
+    private transient ItemStack banner$eatStack;
 
-        if (!event.isCancelled()) {
-            duplicateCall.set(true);
-            this.add(event.getFoodLevel() - oldFoodLevel, foodInfo.saturation());
+    @Decorate(method = "eat(Lnet/minecraft/world/food/FoodProperties;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/food/FoodData;add(IF)V"))
+    private void banner$foodLevelChange(FoodData foodStats, int foodLevelIn, float foodSaturationModifier, FoodProperties food) throws Throwable {
+        var stack = this.banner$eatStack;
+        this.banner$eatStack = null;
+        if (this.entityhuman != null && stack != null) {
+            int oldFoodLevel = this.foodLevel;
+            FoodLevelChangeEvent event = CraftEventFactory.callFoodLevelChangeEvent(this.entityhuman, foodLevel, stack);
+            if (event.isCancelled()) {
+                return;
+            }
+            foodLevelIn = event.getFoodLevel() - oldFoodLevel;
+            ((ServerPlayer) this.entityhuman).getBukkitEntity().sendHealthUpdate();
         }
-        // CraftBukkit end
+        DecorationOps.callsite().invoke(foodStats, foodLevelIn, foodSaturationModifier);
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE_ASSIGN", remap = false, target = "Ljava/lang/Math;max(II)I"))
@@ -98,12 +103,14 @@ public abstract class MixinFoodData implements InjectionFoodData {
             return;
         }
         FoodLevelChangeEvent event = CraftEventFactory.callFoodLevelChangeEvent(entityhuman, Math.max(this.lastFoodLevel - 1, 0));
-        duplicateCall.set(true);
+
         if (!event.isCancelled()) {
             this.foodLevel = event.getFoodLevel();
         } else {
             this.foodLevel = this.lastFoodLevel;
         }
+
+        ((ServerPlayer) entityhuman).connection.send(new ClientboundSetHealthPacket(((ServerPlayer) entityhuman).getBukkitEntity().getScaledHealth(), this.foodLevel, this.saturationLevel));
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;heal(F)V"))
@@ -168,5 +175,10 @@ public abstract class MixinFoodData implements InjectionFoodData {
     @Override
     public void banner$setStarvationRate(int starvationRate) {
         this.starvationRate = starvationRate;
+    }
+
+    @Override
+    public void pushEatStack(ItemStack stack) {
+        this.banner$eatStack = stack;
     }
 }

@@ -19,6 +19,7 @@ import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
@@ -74,6 +75,8 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
 
     @Shadow public abstract Either<Player.BedSleepingProblem, net.minecraft.util.Unit> startSleepInBed(BlockPos bedPos);
     @Shadow public abstract boolean blockActionRestricted(Level level, BlockPos pos, GameType gameMode);
+
+    @Shadow public abstract FoodData getFoodData();
 
     protected MixinPlayer(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
@@ -336,5 +339,10 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     @Override
     public AtomicBoolean bridge$startSleepInBed_force() {
         return startSleepInBed_force;
+    }
+
+    @Inject(method = "eat", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/food/FoodData;eat(Lnet/minecraft/world/food/FoodProperties;)V"))
+    private void banner$eatStack(Level level, ItemStack itemStack, FoodProperties foodProperties, CallbackInfoReturnable<ItemStack> cir) {
+        this.getFoodData().pushEatStack(itemStack);
     }
 }

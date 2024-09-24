@@ -41,4 +41,8 @@ public interface InjectionFoodData {
     default void eat(ItemStack itemstack, FoodProperties foodinfo) {
         throw new IllegalStateException("Not implemented");
     }
+
+    default void pushEatStack(ItemStack stack) {
+        throw new IllegalStateException("Not implemented");
+    }
 }
