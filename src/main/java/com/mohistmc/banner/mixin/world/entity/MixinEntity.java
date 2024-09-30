@@ -256,11 +256,6 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     }
 
     @Override
-    public void inactiveTick() {
-
-    }
-
-    @Override
     public CraftEntity getBukkitEntity() {
         if (bukkitEntity == null) {
             bukkitEntity = CraftEntity.getEntity(level.getCraftServer(), ((Entity) (Object) this));

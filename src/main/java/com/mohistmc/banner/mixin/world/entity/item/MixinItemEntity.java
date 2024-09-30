@@ -21,7 +21,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -35,6 +37,7 @@ public abstract class MixinItemEntity extends Entity {
     @Shadow public int pickupDelay;
     @Shadow public abstract ItemStack getItem();
     @Shadow public UUID target;
+    @Shadow public int age;
     // @formatter:on
 
     public MixinItemEntity(EntityType<?> entityType, Level level) {
@@ -150,10 +153,20 @@ public abstract class MixinItemEntity extends Entity {
         this.getEntityData().markDirty(DATA_ITEM);
     }
 
+    @Inject(method = "makeFakeItem", at = @At("RETURN"))
+    private void banner$makeFakeItem(CallbackInfo ci) {
+        this.age = this.level().bridge$spigotConfig().itemDespawnRate - 1; // Spigot
+    }
+
     @Redirect(method = "merge(Lnet/minecraft/world/entity/item/ItemEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/item/ItemEntity;setItem(Lnet/minecraft/world/item/ItemStack;)V"))
     private static void banner$setNonEmpty(ItemEntity itemEntity, ItemStack stack) {
         if (!stack.isEmpty()) {
             itemEntity.setItem(stack);
         }
+    }
+
+    @ModifyConstant(method = "tick", constant = @Constant(intValue = 6000))
+    private int modifyValue(int constant) {
+        return this.level().bridge$spigotConfig().itemDespawnRate; // 将6000改为5000
     }
 }

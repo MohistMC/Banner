@@ -140,10 +140,6 @@ public interface InjectionEntity {
         return null;
     }
 
-    default void inactiveTick() {
-
-    }
-
     default Entity teleportTo(ServerLevel worldserver, PositionImpl location) {
         return null;
     }
