@@ -36,6 +36,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
+import org.bukkit.inventory.CookingRecipe;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -64,6 +65,8 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
         return false;
     }
     // @formatter:on
+
+    @Shadow public abstract boolean isEmpty();
 
     @Unique
     public List<HumanEntity> transaction = new ArrayList<>();
@@ -159,8 +162,12 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
             // CraftBukkit start - fire FurnaceSmeltEvent
             CraftItemStack source = CraftItemStack.asCraftMirror(itemstack);
             org.bukkit.inventory.ItemStack result = CraftItemStack.asBukkitCopy(itemstack1);
-
-            FurnaceSmeltEvent furnaceSmeltEvent = new FurnaceSmeltEvent(CraftBlock.at(banner$level.get(), banner$pos.get()), source, result, (org.bukkit.inventory.CookingRecipe<?>) irecipe.toBukkitRecipe()); // Paper
+            FurnaceSmeltEvent furnaceSmeltEvent;
+            if (irecipe.toBukkitRecipe() instanceof CookingRecipe cookingRecipe) {
+                furnaceSmeltEvent = new FurnaceSmeltEvent(CraftBlock.at(banner$level.get(), banner$pos.get()), source, result, cookingRecipe); // Paper
+            } else {
+                furnaceSmeltEvent = new FurnaceSmeltEvent(CraftBlock.at(banner$level.get(), banner$pos.get()), source, result);
+            }
             banner$level.get().getCraftServer().getPluginManager().callEvent(furnaceSmeltEvent);
 
             if (furnaceSmeltEvent.isCancelled()) {
