@@ -11,7 +11,6 @@ import com.mohistmc.banner.BannerMCStart;
 import com.mohistmc.banner.api.ServerAPI;
 import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.config.BannerConfig;
-import com.mohistmc.banner.fabric.FabricHooks;
 import com.mohistmc.banner.plugins.BannerPlugin;
 import com.mohistmc.banner.util.I18n;
 import com.mojang.authlib.GameProfile;
@@ -23,8 +22,34 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.Lifecycle;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import javax.imageio.ImageIO;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
-import net.fabricmc.fabric.impl.biome.modification.BiomeModificationImpl;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.commands.CommandSourceStack;
@@ -237,34 +262,6 @@ import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public final class CraftServer implements Server {
     private final String serverName = "Banner";
@@ -1145,10 +1142,7 @@ public final class CraftServer implements Server {
 
         ServerLevel internal = new ServerLevel(console, console.executor, worldSession, worlddata, worldKey, worlddimension, getServer().progressListenerFactory.create(11),
                 worlddata.isDebugWorld(), j, creator.environment() == Environment.NORMAL ? list : ImmutableList.of(), true, console.overworld().getRandomSequences());
-        if (name.contains("/")) {
-            String[] strings = name.split("/");
-            name = strings[strings.length - 1];
-        }
+        name = name.contains("DIM") ? name : name.toLowerCase(java.util.Locale.ENGLISH);
         internal.banner$setGenerator(generator);
         internal.banner$setBiomeProvider(biomeProvider);
         if (!(worlds.containsKey(name.toLowerCase(java.util.Locale.ENGLISH)))) {
