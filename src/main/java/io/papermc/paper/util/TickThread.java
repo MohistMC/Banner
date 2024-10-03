@@ -1,11 +1,10 @@
 package io.papermc.paper.util;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import org.bukkit.Bukkit;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 public final class TickThread extends Thread {
 
