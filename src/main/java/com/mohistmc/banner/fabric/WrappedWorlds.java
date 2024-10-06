@@ -15,6 +15,7 @@ public class WrappedWorlds {
     private static final HashMap<Class<?>, Field> FIELD = new HashMap<>();
 
     public static Optional<Field> getDelegate(Class<?> cl) {
+        if (cl == null) return Optional.empty();
         if (cl.equals(ServerLevel.class)) {
             return Optional.empty();
         } else {
