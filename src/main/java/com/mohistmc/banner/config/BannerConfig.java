@@ -145,7 +145,7 @@ public class BannerConfig {
 
     public static boolean networkmanager_debug;
     public static List<String> networkmanager_intercept;
-    public static boolean mixinclipcontext = false;
+    public static boolean mixinclipcontext;
 
     public static String motd() {
         return ColorsAPI.of(motdFirstLine) + "\n" + ColorsAPI.of(motdSecondLine);

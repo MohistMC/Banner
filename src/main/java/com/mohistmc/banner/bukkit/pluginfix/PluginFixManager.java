@@ -19,11 +19,16 @@ public class PluginFixManager {
 
     public static byte[] injectPluginFix(String className, byte[] clazz) {
         if (className.endsWith("PaperLib")) {
-            return patch(clazz, PluginFixManager::removePaper);
+            return patch(clazz, node -> removePaper(node, "isPaper"));
         }
+        if (className.equals("io.lumine.mythic.bukkit.utils.version.ServerVersion")) {
+            return patch(clazz, node -> removePaper(node, "isPaperMM"));
+        }
+        /*
         if (className.equals("com.onarandombox.MultiverseCore.utils.WorldManager")) {
             return patch(clazz, MultiverseCore::fix);
         }
+         */
         Consumer<ClassNode> patcher = switch (className) {
             case "com.sk89q.worldedit.bukkit.BukkitAdapter" -> WorldEdit::handleBukkitAdapter;
             case "com.sk89q.worldedit.bukkit.adapter.Refraction" -> WorldEdit::handlePickName;
@@ -44,11 +49,11 @@ public class PluginFixManager {
         return writer.toByteArray();
     }
 
-    private static void removePaper(ClassNode node) {
+    private static void removePaper(ClassNode node, String method) {
         for (MethodNode methodNode : node.methods) {
             if (methodNode.name.equals("isPaper") && methodNode.desc.equals("()Z")) {
                 InsnList toInject = new InsnList();
-                toInject.add(new MethodInsnNode(Opcodes.INVOKESTATIC, Type.getInternalName(PluginFixManager.class), "isPaper", "()Z"));
+                toInject.add(new MethodInsnNode(Opcodes.INVOKESTATIC, Type.getInternalName(PluginFixManager.class), method, "()Z"));
                 toInject.add(new InsnNode(Opcodes.IRETURN));
                 methodNode.instructions = toInject;
             }
@@ -57,6 +62,10 @@ public class PluginFixManager {
 
     public static boolean isPaper() {
         return false;
+    }
+
+    public static boolean isPaperMM() {
+        return true;
     }
 
     private static void helloWorld(ClassNode node, String a, String b) {
