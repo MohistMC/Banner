@@ -209,6 +209,7 @@ public class BukkitRegistry {
             } catch (Exception e) {
                 var name = category.name();
                 var spawnCategory = MohistDynamEnum.addEnum(SpawnCategory.class, name);
+                spawnCategory.isMods = true;
                 BannerServer.LOGGER.debug("Registered {} as spawn category {}", name, spawnCategory);
             }
         }

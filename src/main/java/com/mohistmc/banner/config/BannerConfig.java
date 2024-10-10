@@ -145,7 +145,6 @@ public class BannerConfig {
 
     public static boolean networkmanager_debug;
     public static List<String> networkmanager_intercept;
-    public static boolean mixinclipcontext;
 
     public static String motd() {
         return ColorsAPI.of(motdFirstLine) + "\n" + ColorsAPI.of(motdSecondLine);
@@ -176,7 +175,6 @@ public class BannerConfig {
         velocityEnabled = getBoolean("proxies.velocity.enabled", false);
         velocitySecret = getString("proxies.velocity.secret", "");
         NoRaining = getBoolean("event.NoRaining", false);
-        mixinclipcontext = getBoolean("mixin.clipcontext", false);
 
         networkmanager_debug = getBoolean("networkmanager.debug", false);
         networkmanager_intercept = getList("networkmanager.intercept", Collections.emptyList());
