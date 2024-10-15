@@ -19,6 +19,7 @@ import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
@@ -431,10 +432,18 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
             boolean bl2 = player.isSecondaryUseActive() && bl;
             ItemStack itemStack = stack.copy();
             if (!bl2) {
-                enuminteractionresult = blockState.useWithoutItem(level, player, hitResult);
-                if (enuminteractionresult.consumesAction()) {
+                ItemInteractionResult result = blockState.useItemOn(player.getItemInHand(hand), level, player, hand, hitResult);
+                if (result.consumesAction()) {
                     CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger(player, blockPos, itemStack);
-                    return enuminteractionresult;
+                    return result.result();
+                }
+
+                if (result == ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION && hand == InteractionHand.MAIN_HAND) {
+                    enuminteractionresult = blockState.useWithoutItem(level, player, hitResult);
+                    if (enuminteractionresult.consumesAction()) {
+                        CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger(player, blockPos, itemStack);
+                        return enuminteractionresult;
+                    }
                 }
             }
 
