@@ -1639,7 +1639,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
                 }
             }
             final boolean flag2 = packetplayinsetcreativeslot.slotNum() >= 1 && packetplayinsetcreativeslot.slotNum() <= 45;
-            boolean flag3 = itemstack.isEmpty() || (itemstack.getDamageValue() >= 0 && itemstack.getCount() <= 64 && !itemstack.isEmpty());
+            boolean flag3 = itemstack.isEmpty() || itemstack.getCount() <= itemstack.getMaxStackSize();
             if (flag || (flag2 && !ItemStack.matches(this.player.inventoryMenu.getSlot(packetplayinsetcreativeslot.slotNum()).getItem(), packetplayinsetcreativeslot.itemStack()))) {
                 final InventoryView inventory =  this.player.inventoryMenu.getBukkitView();
                 final org.bukkit.inventory.ItemStack item = CraftItemStack.asBukkitCopy(packetplayinsetcreativeslot.itemStack());
