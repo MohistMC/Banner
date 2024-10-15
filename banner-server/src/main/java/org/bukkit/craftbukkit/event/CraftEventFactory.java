@@ -621,10 +621,10 @@ public class CraftEventFactory {
             }
             for (Entity passenger : entity.getIndirectPassengers()) {
                 passenger.discard(); // Add Bukkit remove cause
-                vehicle.pushRemoveCause(null);
+                passenger.pushRemoveCause(null);
             }
             entity.discard(); // Add Bukkit remove cause
-            vehicle.pushRemoveCause(null);
+            entity.pushRemoveCause(null);
             return false;
         }
 
