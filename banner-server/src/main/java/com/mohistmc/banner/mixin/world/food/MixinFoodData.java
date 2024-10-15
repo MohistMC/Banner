@@ -52,8 +52,6 @@ public abstract class MixinFoodData implements InjectionFoodData {
         this.entityhuman = entityhuman;
     }
 
-    private transient ItemStack banner$foodStack;
-
     private AtomicBoolean duplicateCall = new AtomicBoolean(false);
 
     @Inject(method = "eat(IF)V", at = @At("HEAD"), cancellable = true)

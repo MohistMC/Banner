@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.BaseEncoding;
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Pair;
+import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.shorts.ShortArraySet;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
 import java.io.ByteArrayOutputStream;
@@ -78,6 +79,7 @@ import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.network.protocol.game.ClientboundTabListPacket;
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket;
 import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
@@ -1786,10 +1788,10 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     }
 
     private void sendCustomPayload(ResourceLocation id, byte[] message) {
-        // Banner - TODO fix
-        /*
-        ClientboundCustomPayloadPacket packet = new ClientboundCustomPayloadPacket(new DiscardedPayload(id, Unpooled.wrappedBuffer(message)));
-        this.getHandle().connection.send(packet);*/
+        var payload = new DiscardedPayload(id);
+        payload.bridge$setData(Unpooled.wrappedBuffer(message));
+        ClientboundCustomPayloadPacket packet = new ClientboundCustomPayloadPacket(payload);
+        this.getHandle().connection.send(packet);
     }
 
     @Override
@@ -2394,13 +2396,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         @Override
         public void sendMessage(net.md_5.bungee.api.ChatMessageType position, UUID sender, BaseComponent... components) {
             if ( getHandle().connection == null ) return;
-            // Banner - TODO fix
-            /*
-            getHandle().connection.send(new
-                    net.minecraft.network.protocol.game.ClientboundSystemChatPacket(
-                    Component.Serializer.fromJson(ComponentSerializer.
-                            toString(components)),
-                    position == net.md_5.bungee.api.ChatMessageType.ACTION_BAR));*/
+            getHandle().connection.send(new ClientboundSystemChatPacket(
+                    Component.Serializer.fromJson(
+                            ComponentSerializer.toString(components), getHandle().level().registryAccess()
+                    ), position == net.md_5.bungee.api.ChatMessageType.ACTION_BAR
+            ));
         }
     };
 

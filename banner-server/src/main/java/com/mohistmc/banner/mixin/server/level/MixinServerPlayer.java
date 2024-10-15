@@ -978,6 +978,11 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         return new CraftPortalEvent(event);
     }
 
+    @Override
+    public WeatherType getPlayerWeather() {
+        return this.weather;
+    }
+
     // Banner TODO fix mixins
     @Override
     public Optional<BlockUtil.FoundRectangle> getExitPortal(ServerLevel worldserver, BlockPos blockposition, boolean flag, WorldBorder worldborder, int searchRadius, boolean canCreatePortal, int createRadius) {

@@ -66,6 +66,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.server.network.Filterable;
 import net.minecraft.server.network.FilteredText;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.players.PlayerList;
@@ -88,6 +89,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.WritableBookContent;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.GameRules;
@@ -283,6 +285,8 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     @Shadow protected abstract Optional<LastSeenMessages> unpackAndApplyLastSeen(LastSeenMessages.Update update);
 
     @Shadow protected abstract void tryHandleChat(String string, Runnable runnable);
+
+    @Shadow protected abstract Filterable<String> filterableFromOutgoing(FilteredText filteredText);
 
     private static final int SURVIVAL_PLACE_DISTANCE_SQUARED = 6 * 6;
     private static final int CREATIVE_PLACE_DISTANCE_SQUARED = 7 * 7;
@@ -628,8 +632,9 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         ItemStack old = this.player.getInventory().getItem(slot);
         if (old.is(Items.WRITABLE_BOOK)) {
             ItemStack itemstack = old.copy();
-            // this.updateBookContents(list, UnaryOperator.identity(), itemstack); // Banner TODO
-            CraftEventFactory.handleEditBookEvent(player, slot, old, itemstack);
+            List<Filterable<String>> list1 = list.stream().map(this::filterableFromOutgoing).toList();
+            itemstack.set(DataComponents.WRITABLE_BOOK_CONTENT, new WritableBookContent(list1));
+            this.player.getInventory().setItem(slot, CraftEventFactory.handleEditBookEvent(this.player, slot, old, itemstack)); // CraftBukkit // Paper - Don't ignore result (see other callsite for handleEditBookEvent)
         }
     }
 

@@ -32,7 +32,7 @@ public class MixinDataComponentPatch implements InjectionDataComponentPatch {
 
     @Override
     public boolean isSet(DataComponentType<?> type) {
-        return false;
+        return this.map.containsKey(type);
     }
 
     @Override

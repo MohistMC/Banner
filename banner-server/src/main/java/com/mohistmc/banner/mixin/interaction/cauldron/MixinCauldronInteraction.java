@@ -16,7 +16,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-// Banner TODO fix patches
 @Mixin(CauldronInteraction.class)
 public interface MixinCauldronInteraction {
 
@@ -30,7 +29,7 @@ public interface MixinCauldronInteraction {
             } else {
                 if (!level.isClientSide) {
                     // CraftBukkit start
-                    if (!BukkitCauldronHooks.changeLevel(level, blockPos, blockState, player, CauldronLevelChangeEvent.ChangeReason.SHULKER_WASH)) {
+                    if (!BukkitCauldronHooks.lowerFillLevel(blockState, level, blockPos, player, CauldronLevelChangeEvent.ChangeReason.SHULKER_WASH)) {
                         return ItemInteractionResult.sidedSuccess(level.isClientSide);
                     }
                     // CraftBukkit end
@@ -55,7 +54,7 @@ public interface MixinCauldronInteraction {
             } else {
                 if (!level.isClientSide) {
                     // CraftBukkit start
-                    if (!BukkitCauldronHooks.changeLevel(level, blockPos, blockState, player, CauldronLevelChangeEvent.ChangeReason.BANNER_WASH)) {
+                    if (!BukkitCauldronHooks.lowerFillLevel(blockState, level, blockPos, player, CauldronLevelChangeEvent.ChangeReason.SHULKER_WASH)) {
                         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
                     }
                     // CraftBukkit end

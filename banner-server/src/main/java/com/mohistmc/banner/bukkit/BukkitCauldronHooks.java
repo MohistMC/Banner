@@ -3,6 +3,8 @@ package com.mohistmc.banner.bukkit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.block.CraftBlock;
@@ -53,5 +55,11 @@ public class BukkitCauldronHooks {
             newState.update(true);
             return lastRet = true;
         }
+    }
+
+    public static boolean lowerFillLevel(BlockState iblockdata, Level world, BlockPos blockposition, Entity entity, CauldronLevelChangeEvent.ChangeReason reason) {
+        int i = iblockdata.getValue(LayeredCauldronBlock.LEVEL) - 1;
+        BlockState iblockdata1 = i == 0 ? Blocks.CAULDRON.defaultBlockState() : iblockdata.setValue(LayeredCauldronBlock.LEVEL, i);
+        return changeLevel(world, blockposition, iblockdata1, entity, reason);
     }
 }

@@ -306,6 +306,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
             if (event.isCancelled()) {
                 if (isSwordNoBreak) {
                     cir.setReturnValue(false);
+                    return;
                 }
                 // Let the client know the block still exists
                 this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, blockposition));

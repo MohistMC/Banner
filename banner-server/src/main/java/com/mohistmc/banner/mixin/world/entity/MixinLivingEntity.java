@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity;
 
+import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -7,15 +8,6 @@ import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.bukkit.ProcessableEffect;
 import com.mohistmc.banner.injection.world.entity.InjectionLivingEntity;
 import io.izzel.arclight.mixin.Eject;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -40,13 +32,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Attackable;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.TamableAnimal;
-import net.minecraft.world.entity.WalkAnimationState;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
@@ -70,11 +56,7 @@ import org.bukkit.craftbukkit.attribute.CraftAttributeMap;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityPotionEffectEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.EntityResurrectEvent;
-import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -87,6 +69,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(LivingEntity.class)
 public abstract class MixinLivingEntity extends Entity implements Attackable, InjectionLivingEntity {
@@ -103,7 +89,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
     @Shadow @Nullable protected abstract SoundEvent getDeathSound();
 
     @Shadow public abstract void onEquipItem(EquipmentSlot equipmentSlot, ItemStack itemStack, ItemStack itemStack2);
-    @Shadow @Final public Map<MobEffect, MobEffectInstance> activeEffects;
+    @Shadow @Final public Map<Holder<MobEffect>, MobEffectInstance> activeEffects;
 
     @Shadow protected abstract void onEffectUpdated(MobEffectInstance effectInstance, boolean forced, @Nullable Entity entity);
 
@@ -412,6 +398,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
             return false;
         } else {
             MobEffectInstance effectinstance = this.activeEffects.get(effectInstanceIn.getEffect());
+            boolean flag = false;
 
             boolean override = false;
             if (effectinstance != null) {
@@ -419,20 +406,24 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
             }
 
             EntityPotionEffectEvent event = CraftEventFactory.callEntityPotionEffectChangeEvent((LivingEntity) (Object) this, effectinstance, effectInstanceIn, cause, override);
+            override = event.isOverride();
             if (event.isCancelled()) {
                 return false;
             }
+
             if (effectinstance == null) {
-               // this.activeEffects.put(effectInstanceIn.getEffect(), effectInstanceIn); // Banner TODO
+                this.activeEffects.put(effectInstanceIn.getEffect(), effectInstanceIn);
                 this.onEffectAdded(effectInstanceIn, entity);
-                return true;
-            } else if (event.isOverride()) {
+                flag = true;
+                effectInstanceIn.onEffectAdded((LivingEntity) (Object) this);
+            } else if (override) {
                 effectinstance.update(effectInstanceIn);
                 this.onEffectUpdated(effectinstance, true, entity);
-                return true;
-            } else {
-                return false;
+                flag = true;
             }
+
+            effectInstanceIn.onEffectStarted((LivingEntity) (Object) this);
+            return flag;
         }
     }
 
@@ -857,7 +848,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
 
     @Redirect(method = "die",
             at = @At(value = "INVOKE",
-            target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V",
+                    target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V",
                     remap = false))
     private void banner$logNamedDeaths(Logger instance, String s, Object o1, Object o2) {
         if (org.spigotmc.SpigotConfig.logNamedDeaths) LOGGER.info("Named entity {} died: {}", ((LivingEntity) (Object) this), this.getCombatTracker().getDeathMessage().getString()); // Spigot
@@ -1016,19 +1007,17 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         this.banner$cause = cause;
     }
 
-    // Banner TODO fixme
-    /**
     @Inject(method = "collectEquipmentChanges", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/entity/LivingEntity;equipmentHasChanged(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"
-    ), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void banner$fireArmorChangeEvent(CallbackInfoReturnable<Map<EquipmentSlot, ItemStack>> cir) {
+    ))
+    private void banner$fireArmorChangeEvent(CallbackInfoReturnable<Map<EquipmentSlot, ItemStack>> cir, @Local EquipmentSlot equipmentSlot, @Local(ordinal = 0) ItemStack itemStack, @Local(ordinal = 1) ItemStack itemStack2) {
         // Paper start - PlayerArmorChangeEvent
-        if (((LivingEntity) (Object) this) instanceof ServerPlayer && equipmentSlot.getType() == EquipmentSlot.Type.ARMOR) {
+        if (((LivingEntity) (Object) this) instanceof ServerPlayer && equipmentSlot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR) {
             final org.bukkit.inventory.ItemStack oldItem = CraftItemStack.asBukkitCopy(itemStack);
             final org.bukkit.inventory.ItemStack newItem = CraftItemStack.asBukkitCopy(itemStack2);
             new PlayerArmorChangeEvent((org.bukkit.entity.Player)this.getBukkitEntity(), PlayerArmorChangeEvent.SlotType.valueOf(equipmentSlot.name()), oldItem, newItem).callEvent();
         }
-    }*/
+    }
 
     @Override
     public final void setArrowCount(int count, boolean reset) {
@@ -1163,7 +1152,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
 
     @Override
     public void banner$setBukkitPickUpLoot(boolean bukkitPickUpLoot) {
-       this.bukkitPickUpLoot = bukkitPickUpLoot;
+        this.bukkitPickUpLoot = bukkitPickUpLoot;
     }
 
     @Override
