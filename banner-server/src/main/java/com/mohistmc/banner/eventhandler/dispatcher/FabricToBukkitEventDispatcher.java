@@ -16,7 +16,7 @@ public class FabricToBukkitEventDispatcher {
                 var level = player.level();
                 var pos = ((CraftBlock) breakEvent.getBlock()).getPosition();
                 boolean result = PlayerBlockBreakEvents.BEFORE.invoker().beforeBlockBreak(level, player, pos, block.getBlockState(pos), block.getBlockEntity(pos));
-                breakEvent.setCancelled(result);
+                breakEvent.setCancelled(!result);
             }
         });
     }
