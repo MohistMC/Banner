@@ -340,6 +340,12 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             dimensiontransition = new DimensionTransition(((CraftWorld) location.getWorld()).getHandle(), CraftLocation.toVec3D(location), Vec3.ZERO, location.getYaw(), location.getPitch(), DimensionTransition.DO_NOTHING);
         }
         if (dimensiontransition == null) {
+            // Banner start - fix #321
+            instance.unsetRemoved();
+            instance.serverLevel().addRespawnedPlayer(instance);
+            this.players.add(instance);
+            // Banner end
+
             return (DimensionTransition) DecorationOps.cancel().invoke(instance);
         }
         return dimensiontransition;

@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.BaseEncoding;
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Pair;
-import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.shorts.ShortArraySet;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
 import java.io.ByteArrayOutputStream;
@@ -101,6 +100,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.border.BorderChangeListener;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.level.saveddata.maps.MapDecoration;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
@@ -1050,7 +1050,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
             entity.connection.teleport(to);
         } else {
             // The respawn reason should never be used if the passed location is non null.
-            this.server.getHandle().respawn(entity, toWorld, true, to, true, Entity.RemovalReason.CHANGED_DIMENSION, null);
+            // Banner - fix #321
+            this.getHandle().changeDimension(new DimensionTransition(toWorld, new Vec3(to.getX(), to.getY(), to.getZ()), Vec3.ZERO, to.getYaw(), to.getPitch(), DimensionTransition.DO_NOTHING));
         }
         return true;
     }
