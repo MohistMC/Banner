@@ -1,0 +1,21 @@
+archivesBaseName = project.archives_base_name + "-compat"
+version = getSubprojectVersion(project)
+
+repositories {
+    maven {
+        url = "https://maven.enginehub.org/repo/"
+    }
+}
+
+moduleDependencies(project, [
+        "banner-api",
+        "banner-server"
+])
+
+dependencies {
+    modCompileOnly("com.sk89q.worldedit:worldedit-fabric-mc1.21:7.3.6") { transitive = false }
+}
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.WARN
+}

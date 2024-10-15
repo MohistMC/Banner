@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.mohistmc.banner.compat.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "overwrites": {
+    "conformVisibility": true
+  },
+  "injectors": {
+    "maxShiftBy": 2,
+    "defaultRequire": 1
+  },
+  "mixinPriority": 400,
+  "mixins": [
+    "MixinFabricWorldEdit"
+  ]
+}
