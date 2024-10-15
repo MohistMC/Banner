@@ -1608,15 +1608,6 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         // Cast to keyed should be safe as the recipe will never be a MerchantRecipe.
     }
 
-    @Inject(method = "handleChatSessionUpdate",
-            at = @At("HEAD"),
-            cancellable = true)
-    private void banner$checkReturnOfSession(ServerboundChatSessionUpdatePacket packet, CallbackInfo ci) {
-        if (true) {
-            ci.cancel();
-        }
-    }
-
     /**
      * @author wdog5
      * @reason bukkit
