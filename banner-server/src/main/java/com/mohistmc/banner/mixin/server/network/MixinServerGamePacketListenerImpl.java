@@ -1007,9 +1007,16 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     @Inject(method = "onDisconnect", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/players/PlayerList;remove(Lnet/minecraft/server/level/ServerPlayer;)V"))
     private void banner$setQuitMsg(Component message, CallbackInfo ci) {
         String quitMessage = this.server.getPlayerList().bridge$quiltMsg();
+        // Banner start - avoid quilt msg NPE
+        if (quitMessage == null) {
+            quitMessage = BukkitSnapshotCaptures.getQuitMessage();
+        }
         if ((quitMessage != null) && (!quitMessage.isEmpty())) {
             this.server.getPlayerList().broadcastMessage(CraftChatMessage.fromString(quitMessage));
         }
+
+        BukkitSnapshotCaptures.getQuitMessage();
+        // Banner end
     }
 
     @Inject(method = "send(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketSendListener;)V", cancellable = true, at = @At("HEAD"))
