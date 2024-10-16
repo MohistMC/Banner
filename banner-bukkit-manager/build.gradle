@@ -1,0 +1,11 @@
+archivesBaseName = project.archives_base_name + "-bukkit-manager"
+version = getSubprojectVersion(project)
+
+dependencies {
+    compileOnly(rootProject.project("banner-api"))
+    compileOnly(rootProject.project("banner-server"))
+}
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.WARN
+}
