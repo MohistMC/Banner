@@ -37,6 +37,8 @@ public abstract class MixinItemEntity extends Entity {
     @Shadow public UUID target;
     // @formatter:on
 
+    @Shadow private int age;
+
     public MixinItemEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }
@@ -154,5 +156,10 @@ public abstract class MixinItemEntity extends Entity {
         if (!stack.isEmpty()) {
             itemEntity.setItem(stack);
         }
+    }
+
+    @Inject(method = "makeFakeItem", at = @At("RETURN"))
+    private void banner$makeFakeItem(CallbackInfo ci) {
+        this.age = this.level().bridge$spigotConfig().itemDespawnRate - 1; // Spigot
     }
 }

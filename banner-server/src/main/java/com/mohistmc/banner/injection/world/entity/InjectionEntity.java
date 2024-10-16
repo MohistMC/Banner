@@ -161,10 +161,6 @@ public interface InjectionEntity {
         throw new IllegalStateException("Not implemented");
     }
 
-    default void inactiveTick() {
-        throw new IllegalStateException("Not implemented");
-    }
-
     default Entity teleportTo(ServerLevel worldserver, Vec3 location) {
         throw new IllegalStateException("Not implemented");
     }
