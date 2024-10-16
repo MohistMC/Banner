@@ -26,13 +26,4 @@ public abstract class MixinParrot extends ShoulderRidingEntity {
         pushEffectCause(EntityPotionEffectEvent.Cause.FOOD);
     }
 
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    public boolean isPushable() {
-        return super.isPushable(); // CraftBukkit - collidable API
-    }
-
 }

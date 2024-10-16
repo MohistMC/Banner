@@ -950,15 +950,6 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         return !this.isRemoved() && this.collides;
     }
 
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    public boolean isPushable() {
-        return this.isAlive() && !this.onClimbable() && this.collides;
-    }
-
     @Eject(method = "completeUsingItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;finishUsingItem(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/item/ItemStack;"))
     private ItemStack banner$itemConsume(ItemStack itemStack, Level worldIn, LivingEntity
             entityLiving, CallbackInfo ci) {
