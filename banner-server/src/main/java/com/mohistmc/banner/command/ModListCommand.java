@@ -30,6 +30,7 @@ public class ModListCommand extends BukkitCommand {
 
                 if (name.startsWith("Fabric") && name.endsWith(")")) continue; // Don't list all modules of FAPI
                 if (name.startsWith("Banner") && !name.endsWith("Mod")) continue;// Don't list all modules of Banner
+                if (name.equals("Fabric Convention Tags")) continue;
                 if (name.startsWith("Fabric API Base")) name = "Fabric API";
                 if (name.startsWith("OpenJDK")) name = name.replace(" 64-Bit Server VM",""); // Shorten
                 if (name.startsWith("Minecraft")) continue;
