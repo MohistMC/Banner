@@ -50,6 +50,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.commands.CommandSourceStack;
@@ -432,6 +433,28 @@ public final class CraftServer implements Server {
             for (Plugin plugin : plugins) {
                 try {
                     String message = String.format(I18n.as("bukkit.plugin.loading"), plugin.getDescription().getFullName());
+                    plugin.getLogger().info(message);
+                    plugin.onLoad();
+                } catch (Throwable ex) {
+                    Logger.getLogger(CraftServer.class.getName()).log(Level.SEVERE, ex.getMessage() + " initializing " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
+                }
+            }
+        } else {
+            pluginFolder.mkdir();
+        }
+        loadBannerPlugin();
+    }
+
+    public void loadBannerPlugin() {
+        this.pluginManager.registerInterface(JavaPluginLoader.class);
+
+        File pluginFolder = new File(FabricLoader.getInstance().getGameDir().toFile(), ".banner/plugin_file");
+
+        if (pluginFolder.exists()) {
+            Plugin[] plugins = this.pluginManager.loadPlugins(pluginFolder);
+            for (Plugin plugin : plugins) {
+                try {
+                    String message = String.format("Loading %s", plugin.getDescription().getFullName());
                     plugin.getLogger().info(message);
                     plugin.onLoad();
                 } catch (Throwable ex) {
