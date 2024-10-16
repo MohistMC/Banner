@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.inventory;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.MerchantContainer;
@@ -9,6 +10,7 @@ import net.minecraft.world.inventory.MerchantMenu;
 import net.minecraft.world.item.trading.Merchant;
 import org.bukkit.craftbukkit.inventory.CraftInventoryMerchant;
 import org.bukkit.craftbukkit.inventory.CraftInventoryView;
+import org.bukkit.craftbukkit.inventory.view.CraftMerchantView;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,7 +27,7 @@ public abstract class MixinMerchantMenu extends AbstractContainerMenu {
     @Shadow @Final private MerchantContainer tradeContainer;
     // @formatter:on
 
-    private CraftInventoryView bukkitEntity = null;
+    private CraftMerchantView bukkitEntity = null;
     private Inventory playerInventory;
 
     protected MixinMerchantMenu(@Nullable MenuType<?> menuType, int i) {
@@ -45,9 +47,9 @@ public abstract class MixinMerchantMenu extends AbstractContainerMenu {
     }
 
     @Override
-    public CraftInventoryView getBukkitView() {
+    public CraftMerchantView getBukkitView() {
         if (bukkitEntity == null) {
-            bukkitEntity = new CraftInventoryView(this.playerInventory.player.getBukkitEntity(), new CraftInventoryMerchant(this.trader, this.tradeContainer), (AbstractContainerMenu) (Object) this);
+            bukkitEntity = new CraftMerchantView(this.playerInventory.player.getBukkitEntity(), new CraftInventoryMerchant(this.trader, this.tradeContainer), (MerchantMenu) (Object) this, trader);
         }
         return bukkitEntity;
     }

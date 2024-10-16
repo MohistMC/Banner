@@ -13,6 +13,7 @@ import net.minecraft.world.inventory.MenuType;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.inventory.CraftInventoryLectern;
 import org.bukkit.craftbukkit.inventory.CraftInventoryView;
+import org.bukkit.craftbukkit.inventory.view.CraftLecternView;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -26,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinLecternMenu extends AbstractContainerMenu implements InjectionLecternMenu {
 
     @Shadow @Final private Container lectern;
-    private CraftInventoryView bukkitEntity;
+    private CraftLecternView bukkitEntity;
     private Inventory playerInventory;
 
     protected MixinLecternMenu(@Nullable MenuType<?> menuType, int i) {
@@ -70,7 +71,7 @@ public abstract class MixinLecternMenu extends AbstractContainerMenu implements 
     }
 
     @Override
-    public CraftInventoryView getBukkitView() {
+    public CraftLecternView getBukkitView() {
         if (this.playerInventory == null) {
             return null;
         }
@@ -78,7 +79,7 @@ public abstract class MixinLecternMenu extends AbstractContainerMenu implements 
             return bukkitEntity;
         }
         CraftInventoryLectern inventory = new CraftInventoryLectern(this.lectern);
-        bukkitEntity = new CraftInventoryView(this.playerInventory.player.getBukkitEntity(), inventory, (AbstractContainerMenu) (Object) this);
+        bukkitEntity = new CraftLecternView(this.playerInventory.player.getBukkitEntity(), inventory, (LecternMenu) (Object) this);
         return bukkitEntity;
     }
 

@@ -8,7 +8,7 @@ import net.minecraft.world.inventory.BrewingStandMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.MenuType;
 import org.bukkit.craftbukkit.inventory.CraftInventoryBrewer;
-import org.bukkit.craftbukkit.inventory.CraftInventoryView;
+import org.bukkit.craftbukkit.inventory.view.CraftBrewingStandView;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinBrewingStandMenu extends AbstractContainerMenu {
 
     @Shadow @Final private Container brewingStand;
-    private CraftInventoryView bukkitEntity = null;
+    private CraftBrewingStandView bukkitEntity = null;
     private Inventory playerInventory;
 
     protected MixinBrewingStandMenu(@Nullable MenuType<?> menuType, int i) {
@@ -40,13 +40,13 @@ public abstract class MixinBrewingStandMenu extends AbstractContainerMenu {
     }
 
     @Override
-    public CraftInventoryView getBukkitView() {
+    public CraftBrewingStandView getBukkitView() {
         if (bukkitEntity != null) {
             return bukkitEntity;
         }
 
         CraftInventoryBrewer inventory = new CraftInventoryBrewer(this.brewingStand);
-        bukkitEntity = new CraftInventoryView(this.playerInventory.player.getBukkitEntity(), inventory, (AbstractContainerMenu) (Object) this);
+        bukkitEntity = new CraftBrewingStandView(this.playerInventory.player.getBukkitEntity(), inventory, (BrewingStandMenu) (Object) this);
         return bukkitEntity;
     }
 }

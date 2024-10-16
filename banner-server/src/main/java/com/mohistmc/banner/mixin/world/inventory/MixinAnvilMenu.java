@@ -22,6 +22,7 @@ import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.craftbukkit.inventory.CraftInventoryAnvil;
 import org.bukkit.craftbukkit.inventory.CraftInventoryView;
+import org.bukkit.craftbukkit.inventory.view.CraftAnvilView;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -41,7 +42,7 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu implements Injecti
     // CraftBukkit start
     private static final int DEFAULT_DENIED_COST = -1;
     public int maximumRepairCost = Math.min(Short.MAX_VALUE, Math.max(41, BannerConfig.maximumRepairCost));
-    private CraftInventoryView bukkitEntity;
+    private CraftAnvilView bukkitEntity;
     // CraftBukkit end
 
     public MixinAnvilMenu(@Nullable MenuType<?> menuType, int i, Inventory inventory, ContainerLevelAccess containerLevelAccess) {
@@ -165,13 +166,13 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu implements Injecti
 
     // CraftBukkit start
     @Override
-    public CraftInventoryView getBukkitView() {
+    public CraftAnvilView getBukkitView() {
         if (bukkitEntity != null) {
             return bukkitEntity;
         }
         CraftInventory inventory = new CraftInventoryAnvil(
                 access.getLocation(), this.inputSlots, this.resultSlots, ((AnvilMenu) (Object) this));
-        bukkitEntity = new CraftInventoryView(this.player.getBukkitEntity(), inventory, ((AnvilMenu) (Object) this));
+        bukkitEntity = new CraftAnvilView(this.player.getBukkitEntity(), inventory, ((AnvilMenu) (Object) this));
         return bukkitEntity;
     }
     // CraftBukkit end

@@ -13,8 +13,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import org.bukkit.craftbukkit.inventory.CraftInventoryFurnace;
-import org.bukkit.craftbukkit.inventory.CraftInventoryView;
-import org.bukkit.inventory.InventoryView;
+import org.bukkit.craftbukkit.inventory.view.CraftFurnaceView;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -27,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinAbstractFurnaceMenu extends RecipeBookMenu<SingleRecipeInput, AbstractCookingRecipe> {
 
     @Shadow @Final private Container container;
-    private CraftInventoryView bukkitEntity = null;
+    private CraftFurnaceView bukkitEntity = null;
     private Inventory player;
 
     public MixinAbstractFurnaceMenu(MenuType<?> menuType, int i) {
@@ -48,13 +47,13 @@ public abstract class MixinAbstractFurnaceMenu extends RecipeBookMenu<SingleReci
     }
 
     @Override
-    public InventoryView getBukkitView() {
+    public CraftFurnaceView getBukkitView() {
         if (bukkitEntity != null) {
             return bukkitEntity;
         }
 
         CraftInventoryFurnace inventory = new CraftInventoryFurnace((AbstractFurnaceBlockEntity) this.container);
-        bukkitEntity = new CraftInventoryView(this.player.player.getBukkitEntity(), inventory, this);
+        bukkitEntity = new CraftFurnaceView (this.player.player.getBukkitEntity(), inventory, (AbstractFurnaceMenu) (Object) this);
         return bukkitEntity;
     }
 }

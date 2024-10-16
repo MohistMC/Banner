@@ -11,6 +11,7 @@ import net.minecraft.world.inventory.MenuType;
 import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.craftbukkit.inventory.CraftInventoryBeacon;
 import org.bukkit.craftbukkit.inventory.CraftInventoryView;
+import org.bukkit.craftbukkit.inventory.view.CraftBeaconView;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,7 +32,7 @@ public abstract class MixinBeaconMenu extends AbstractContainerMenu {
     @Shadow @Final private Container beacon;
     // @formatter:on
 
-    private CraftInventoryView bukkitEntity;
+    private CraftBeaconView bukkitEntity;
     private Inventory playerInventory;
 
     @Inject(method = "<init>(ILnet/minecraft/world/Container;Lnet/minecraft/world/inventory/ContainerData;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V", at = @At("RETURN"))
@@ -45,13 +46,13 @@ public abstract class MixinBeaconMenu extends AbstractContainerMenu {
     }
 
     @Override
-    public CraftInventoryView getBukkitView() {
+    public CraftBeaconView getBukkitView() {
         if (bukkitEntity != null) {
             return bukkitEntity;
         }
 
         CraftInventory inventory = new CraftInventoryBeacon(this.beacon);
-        bukkitEntity = new CraftInventoryView(this.playerInventory.player.getBukkitEntity(), inventory, (AbstractContainerMenu) (Object) this);
+        bukkitEntity = new CraftBeaconView(this.playerInventory.player.getBukkitEntity(), inventory, (BeaconMenu) (Object) this);
         return bukkitEntity;
     }
 }

@@ -9,6 +9,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.ResultContainer;
 import org.bukkit.craftbukkit.inventory.CraftInventoryCrafter;
 import org.bukkit.craftbukkit.inventory.CraftInventoryView;
+import org.bukkit.craftbukkit.inventory.view.CraftCrafterView;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,20 +26,20 @@ public abstract class MixinCrafterMenu extends AbstractContainerMenu {
     @Shadow @Final private ResultContainer resultContainer;
     @Shadow @Final private Player player;
 
-    private CraftInventoryView bukkitEntity;
+    private CraftCrafterView bukkitEntity;
 
     protected MixinCrafterMenu(@Nullable MenuType<?> menuType, int i) {
         super(menuType, i);
     }
 
     @Override
-    public CraftInventoryView getBukkitView() {
+    public CraftCrafterView getBukkitView() {
         if (bukkitEntity != null) {
             return bukkitEntity;
         }
 
         CraftInventoryCrafter inventory = new CraftInventoryCrafter(this.container, this.resultContainer);
-        bukkitEntity = new CraftInventoryView((((ServerPlayer) this.player).getBukkitEntity()), inventory, (CrafterMenu) (Object) this);
+        bukkitEntity = new CraftCrafterView((((ServerPlayer) this.player).getBukkitEntity()), inventory, (CrafterMenu) (Object) this);
         return bukkitEntity;
     }
 
