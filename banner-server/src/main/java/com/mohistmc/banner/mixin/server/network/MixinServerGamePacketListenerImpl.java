@@ -1901,15 +1901,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
         // Cast to keyed should be safe as the recipe will never be a MerchantRecipe.
     }
 
-    @Inject(method = "handleChatSessionUpdate",
-            at = @At("HEAD"),
-            cancellable = true)
-    private void banner$checkReturnOfSession(ServerboundChatSessionUpdatePacket packet, CallbackInfo ci) {
-        if (true) {
-            ci.cancel();
-        }
-    }
-
     @Redirect(method = "method_17820",
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/inventory/RecipeBookMenu;handlePlacement(ZLnet/minecraft/world/item/crafting/Recipe;Lnet/minecraft/server/level/ServerPlayer;)V"))
