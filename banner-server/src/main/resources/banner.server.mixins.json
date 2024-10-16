@@ -407,6 +407,7 @@
     "world.level.block.MixinCaveVines",
     "world.level.block.MixinChangeOverTimeBlock",
     "world.level.block.MixinChestBlock",
+    "world.level.block.MixinChestBlock2_1",
     "world.level.block.MixinChorusFlowerBlock",
     "world.level.block.MixinCocoaBlock",
     "world.level.block.MixinCommandBlock",
