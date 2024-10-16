@@ -557,6 +557,17 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         // Banner end
 
         ServerPlayer entityplayer1 = playerIn;
+        boolean banner$flag =
+                optional_vanilla.isEmpty()
+                        || worldserver_vanilla == null
+                        || worldserver_vanilla_1 == null;
+        if (banner$flag) {
+            // Banner start - fix #321
+            entityplayer1.unsetRemoved();
+            entityplayer1.serverLevel().addRespawnedPlayer(entityplayer1);
+            this.players.add(entityplayer1);
+            // Banner end
+        }
         fromWorld = playerIn.getBukkitEntity().getWorld();
         playerIn.wonGame = false;
         // CraftBukkit end
