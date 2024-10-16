@@ -13,7 +13,7 @@
     "sources": "https://github.com/MohistMC/Banner"
   },
   "depends": {
-    "fabricloader": "\u003e\u003d0.15.11"
+    "fabricloader": "\u003e\u003d0.16.7"
   },
   "description": "Contains transitive access wideners that provide access to otherwise inaccessible Banner needed code.",
   "accessWidener": "banner-transitive-access-wideners.accesswidener",

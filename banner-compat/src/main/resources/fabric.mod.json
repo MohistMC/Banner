@@ -16,10 +16,7 @@
     "banner.banner-compat.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.15.11",
-    "java": ">=21",
-    "banner": "*",
-    "minecraft": ">=1.21- <1.21.2-"
+    "banner": "*"
   },
   "description": "The compat for Banner with other mods."
 }

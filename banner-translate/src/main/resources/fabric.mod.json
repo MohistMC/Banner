@@ -16,11 +16,7 @@
     "banner.translate.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.15.11",
-    "java": ">=21",
-    "fabric-api": "*",
-    "banner": "*",
-    "minecraft": ">=1.21- <1.21.2-"
+    "banner": "*"
   },
   "description": "The Translator of Banner Server."
 }

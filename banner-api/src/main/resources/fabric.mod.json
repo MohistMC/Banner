@@ -12,12 +12,5 @@
     "homepage": "https://github.com/MohistMC/Banner",
     "sources": "https://github.com/MohistMC/Banner"
   },
-  "depends": {
-    "fabricloader": ">=0.15.11",
-    "java": ">=21",
-    "fabric-api": "*",
-    "banner-transitive-access-wideners": "*",
-    "minecraft": ">=1.21- <1.21.2-"
-  },
   "description": "The API of Banner Server."
 }

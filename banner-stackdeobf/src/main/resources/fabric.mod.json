@@ -15,12 +15,5 @@
   "mixins": [
     "banner.stackdeobf.mixins.json"
   ],
-  "depends": {
-    "fabricloader": ">=0.15.11",
-    "java": ">=21",
-    "fabric-api": "*",
-    "banner-api": "*",
-    "minecraft": ">=1.21- <1.21.2-"
-  },
   "description": "Deobfuscates stacktraces to mojang mappings for Banner."
 }
