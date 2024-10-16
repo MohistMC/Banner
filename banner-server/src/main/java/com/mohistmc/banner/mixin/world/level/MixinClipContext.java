@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 public class MixinClipContext {
 
     @ModifyArgs(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/shapes/CollisionContext;of(Lnet/minecraft/world/entity/Entity;)Lnet/minecraft/world/phys/shapes/CollisionContext;"))
-    private void modifyArgs(Args args) {
+    private void banner$modifyArgs(Args args) {
         Entity entity = (Entity) args.get(0);
         if (entity == null) {
             args.set(0, CollisionContext.empty());
