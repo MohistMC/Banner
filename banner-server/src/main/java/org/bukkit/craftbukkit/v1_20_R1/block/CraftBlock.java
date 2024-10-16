@@ -1,8 +1,8 @@
 package org.bukkit.craftbukkit.v1_20_R1.block;
 
 import com.google.common.base.Preconditions;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.bukkit.BukkitFieldHooks;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mohistmc.banner.bukkit.CraftCustomContainer;
 import com.mohistmc.banner.fabric.BukkitRegistry;
 import net.minecraft.core.BlockPos;
@@ -519,7 +519,7 @@ public class CraftBlock implements Block {
 
         // SPIGOT-6895: Call StructureGrowEvent and BlockFertilizeEvent
         world.banner$setCaptureTreeGeneration(true);
-        InteractionResult result = BukkitExtraConstants.applyBonemeal(context);
+        InteractionResult result = BukkitMethodHooks.applyBonemeal(context);
         world.banner$setCaptureTreeGeneration(false);
 
         if (world.bridge$capturedBlockStates().size() > 0) {

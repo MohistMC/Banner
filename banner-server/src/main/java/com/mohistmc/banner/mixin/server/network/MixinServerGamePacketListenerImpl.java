@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.server.network;
 
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.injection.server.network.InjectionServerGamePacketListenerImpl;
 import com.mojang.brigadier.ParseResults;
@@ -52,7 +52,6 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.network.protocol.game.ServerboundAcceptTeleportationPacket;
 import net.minecraft.network.protocol.game.ServerboundChatCommandPacket;
 import net.minecraft.network.protocol.game.ServerboundChatPacket;
-import net.minecraft.network.protocol.game.ServerboundChatSessionUpdatePacket;
 import net.minecraft.network.protocol.game.ServerboundContainerButtonClickPacket;
 import net.minecraft.network.protocol.game.ServerboundContainerClickPacket;
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
@@ -553,13 +552,13 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     @Inject(method = "handleEditBook", at = @At("HEAD"), cancellable = true)
     private void banner$editBookSpam(ServerboundEditBookPacket packetIn, CallbackInfo ci) {
         if (this.lastBookTick == 0) {
-            this.lastBookTick = BukkitExtraConstants.currentTick - 20;
+            this.lastBookTick = BukkitFieldHooks.currentTick() - 20;
         }
-        if (this.lastBookTick + 20 > BukkitExtraConstants.currentTick) {
+        if (this.lastBookTick + 20 > BukkitFieldHooks.currentTick()) {
             this.disconnect("Book edited too quickly!");
             ci.cancel();
         }
-        this.lastBookTick = BukkitExtraConstants.currentTick;
+        this.lastBookTick = BukkitFieldHooks.currentTick();
     }
 
     /**

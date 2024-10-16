@@ -1,7 +1,7 @@
 package org.bukkit.craftbukkit.v1_20_R1.inventory;
 
 import com.google.common.base.Preconditions;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.bukkit.inventory.Recipe;
@@ -14,7 +14,7 @@ public class RecipeIterator implements Iterator<Recipe> {
     private Iterator<net.minecraft.world.item.crafting.Recipe<?>> current;
 
     public RecipeIterator() {
-        this.recipes = BukkitExtraConstants.getServer().getRecipeManager().recipes.entrySet().iterator();
+        this.recipes = BukkitMethodHooks.getServer().getRecipeManager().recipes.entrySet().iterator();
     }
 
     @Override

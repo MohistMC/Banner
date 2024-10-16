@@ -103,4 +103,8 @@ public interface InjectionMinecraftServer {
     default void banner$setRconConsoleSource(RconConsoleSource source) {
 
     }
+
+    default void banner$setAutosavePeriod(int autosavePeriod) {
+
+    }
 }

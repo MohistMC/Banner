@@ -2,7 +2,6 @@ package com.mohistmc.banner.mixin.server;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mohistmc.banner.asm.annotation.TransformAccess;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.config.BannerConfigUtil;
@@ -214,9 +213,8 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
     private static int currentTick = 0; // Paper - Further improve tick loop
     @Unique
-    public java.util.Queue<Runnable> processQueue = BukkitExtraConstants.bridge$processQueue;
-    @Unique
-    public int autosavePeriod = BukkitExtraConstants.bridge$autosavePeriod;
+    public java.util.Queue<Runnable> processQueue = new java.util.concurrent.ConcurrentLinkedQueue<>();
+    public int autosavePeriod;
     @Unique
     private boolean forceTicks;
     @Unique
@@ -308,7 +306,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                     this.debugCommandProfiler = new MinecraftServer.TimeProfiler(Util.getNanos(), this.tickCount);
                 }
 
-                BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
+                currentTick = (int) (System.currentTimeMillis() / 50); // CraftBukkit
                 this.nextTickTime += 50L;
                 this.startMetricsRecordingTick();
                 this.profiler.push("tick");
@@ -679,7 +677,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Inject(method = "tickChildren", at = @At("HEAD"))
     private void banner$processStart(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-        BukkitExtraConstants.currentTick = (int) (System.currentTimeMillis() / 50);
+        currentTick = (int) (System.currentTimeMillis() / 50);
         server.getScheduler().mainThreadHeartbeat(this.tickCount);
         this.bridge$drainQueuedTasks();
     }
@@ -849,7 +847,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         this.processQueue = processQueue;
     }
 
-
     @Override
     public Commands bridge$getVanillaCommands() {
         return this.vanillaCommandDispatcher;
@@ -868,5 +865,10 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Override
     public double[] getTPS() {
         return recentTps;
+    }
+
+    @Override
+    public void banner$setAutosavePeriod(int autosavePeriod) {
+        this.autosavePeriod = autosavePeriod;
     }
 }

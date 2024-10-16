@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.level;
 
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mohistmc.banner.config.BannerWorldConfig;
 import com.mohistmc.banner.fabric.BukkitRegistry;
 import com.mohistmc.banner.fabric.WrappedWorlds;
@@ -150,8 +150,8 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(WritableLevelData info, ResourceKey<Level> dimension, RegistryAccess registryAccess, Holder<DimensionType> dimType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdates, CallbackInfo ci) {
         if ((Object) this instanceof ServerLevel) {
-            this.banner$setSpigotConfig(new SpigotWorldConfig(BukkitExtraConstants.getServer().storageSource.getDimensionPath(dimension).getFileName().toFile().getName()));
-            this.banner$setBannerConfig(new BannerWorldConfig(BukkitExtraConstants.getServer().storageSource.getDimensionPath(dimension).getFileName().toFile().getName()));
+            this.banner$setSpigotConfig(new SpigotWorldConfig(BukkitMethodHooks.getServer().storageSource.getDimensionPath(dimension).getFileName().toFile().getName()));
+            this.banner$setBannerConfig(new BannerWorldConfig(BukkitMethodHooks.getServer().storageSource.getDimensionPath(dimension).getFileName().toFile().getName()));
         }
         for (SpawnCategory spawnCategory : SpawnCategory.values()) {
             if (CraftSpawnCategory.isValidForLimits(spawnCategory)) {

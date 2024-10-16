@@ -3,6 +3,7 @@ package com.mohistmc.banner.bukkit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.commands.ReloadCommand;
 import net.minecraft.server.level.ServerLevel;
@@ -12,6 +13,7 @@ import net.minecraft.world.entity.decoration.Painting;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.monster.ZombieVillager;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -19,6 +21,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 import net.minecraft.world.level.block.entity.ConduitBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.AABB;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
@@ -155,5 +159,17 @@ public class BukkitMethodHooks {
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static BlockState getBlockState(BlockState blockState, CompoundTag nbt) {
+        StateDefinition<Block, BlockState> statecontainer = blockState.getBlock().getStateDefinition();
+        for (String s : nbt.getAllKeys()) {
+            Property<?> iproperty = statecontainer.getProperty(s);
+            if (iproperty != null) {
+                String s1 = nbt.get(s).getAsString();
+                blockState = BlockItem.updateState(blockState, iproperty, s1);
+            }
+        }
+        return blockState;
     }
 }

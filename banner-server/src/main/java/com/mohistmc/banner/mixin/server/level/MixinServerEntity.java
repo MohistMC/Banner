@@ -1,7 +1,7 @@
 package com.mohistmc.banner.mixin.server.level;
 
 import com.google.common.collect.Lists;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import com.mohistmc.banner.injection.server.level.InjectionServerEntity;
 import com.mojang.datafixers.util.Pair;
 import java.util.Collection;
@@ -92,7 +92,7 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(ServerLevel serverWorld, Entity entity, int updateFrequency, boolean sendVelocityUpdates, Consumer<Packet<?>> packetConsumer, CallbackInfo ci) {
         trackedPlayers = new HashSet<>();
-        lastTick = BukkitExtraConstants.currentTick - 1;
+        lastTick = BukkitFieldHooks.currentTick() - 1;
         lastUpdate = lastPosUpdate = lastMapUpdate = -1;
     }
 

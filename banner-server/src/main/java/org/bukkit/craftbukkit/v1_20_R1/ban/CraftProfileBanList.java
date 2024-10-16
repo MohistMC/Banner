@@ -2,7 +2,7 @@ package org.bukkit.craftbukkit.v1_20_R1.ban;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.players.UserBanList;
 import net.minecraft.server.players.UserBanListEntry;
@@ -163,10 +163,10 @@ public class CraftProfileBanList implements ProfileBanList {
     }
 
     static GameProfile getProfileByUUID(UUID uuid) {
-        return (BukkitExtraConstants.getServer() != null) ? BukkitExtraConstants.getServer().getProfileCache().get(uuid).orElse(null) : null;
+        return (BukkitMethodHooks.getServer() != null) ? BukkitMethodHooks.getServer().getProfileCache().get(uuid).orElse(null) : null;
     }
 
     static GameProfile getProfileByName(String name) {
-        return (BukkitExtraConstants.getServer() != null) ? BukkitExtraConstants.getServer().getProfileCache().get(name).orElse(null) : null;
+        return (BukkitMethodHooks.getServer() != null) ? BukkitMethodHooks.getServer().getProfileCache().get(name).orElse(null) : null;
     }
 }

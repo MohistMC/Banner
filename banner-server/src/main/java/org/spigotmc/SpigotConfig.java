@@ -1,7 +1,7 @@
 package org.spigotmc;
 
 import com.google.common.base.Throwables;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mohistmc.banner.config.BannerConfig;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -81,7 +81,7 @@ public class SpigotConfig
     public static void registerCommands()
     {
         for ( Map.Entry<String, Command> entry : commands.entrySet() ) {
-            Objects.requireNonNull(BukkitExtraConstants.getServer()).bridge$server().getCommandMap().register(entry.getKey(), "Spigot", entry.getValue());
+            Objects.requireNonNull(BukkitMethodHooks.getServer()).bridge$server().getCommandMap().register(entry.getKey(), "Spigot", entry.getValue());
         }
     }
 

@@ -1,7 +1,7 @@
 package org.bukkit.craftbukkit.v1_20_R1.legacy;
 
 import com.google.common.base.Preconditions;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mohistmc.banner.fabric.BukkitRegistry;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.SharedConstants;
@@ -300,7 +300,7 @@ public final class CraftLegacy {
 
     static {
         System.err.println("Initializing Legacy Material Support. Unless you have legacy plugins and/or data this is a bug!");
-        if (BukkitExtraConstants.getServer() != null && BukkitExtraConstants.getServer().isDebugging()) {
+        if (BukkitMethodHooks.getServer() != null && BukkitMethodHooks.getServer().isDebugging()) {
             new Exception().printStackTrace();
         }
 

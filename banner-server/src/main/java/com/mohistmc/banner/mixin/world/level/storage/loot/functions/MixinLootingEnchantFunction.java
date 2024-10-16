@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.storage.loot.functions;
 
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -33,8 +33,8 @@ public abstract class MixinLootingEnchantFunction {
         if (entity instanceof LivingEntity) {
             int i = EnchantmentHelper.getMobLooting((LivingEntity)entity);
             // CraftBukkit start - use lootingModifier if set by plugin
-            if (context.hasParam(BukkitExtraConstants.LOOTING_MOD)) {
-                i = context.getParamOrNull(BukkitExtraConstants.LOOTING_MOD);
+            if (context.hasParam(BukkitFieldHooks.looting_mod())) {
+                i = context.getParamOrNull(BukkitFieldHooks.looting_mod());
             }
             // CraftBukkit end
             if (i <= 0) { // CraftBukkit - account for possible negative looting values from Bukkit

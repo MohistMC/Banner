@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.network.protocol;
 
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketUtils;
@@ -24,7 +24,7 @@ public class MixinPacketUtils {
     public static <T extends PacketListener> void ensureRunningOnSameThread(Packet<T> packet, T processor, BlockableEventLoop<?> executor) throws RunningOnDifferentThreadException {
         if (!executor.isSameThread()) {
             executor.executeIfPossible(() -> {
-                if (BukkitExtraConstants.getServer().hasStopped() || (processor instanceof ServerGamePacketListenerImpl && ((ServerGamePacketListenerImpl) processor).bridge$processedDisconnect())) return; // CraftBukkit, MC-142590
+                if (BukkitMethodHooks.getServer().hasStopped() || (processor instanceof ServerGamePacketListenerImpl && ((ServerGamePacketListenerImpl) processor).bridge$processedDisconnect())) return; // CraftBukkit, MC-142590
                 if (processor.isAcceptingMessages()) {
                     try {
                         packet.handle(processor);
@@ -42,7 +42,7 @@ public class MixinPacketUtils {
             });
             throw RunningOnDifferentThreadException.RUNNING_ON_DIFFERENT_THREAD;
             // CraftBukkit start - SPIGOT-5477, MC-142590
-        } else if (BukkitExtraConstants.getServer().hasStopped() || (processor instanceof ServerGamePacketListenerImpl && ((ServerGamePacketListenerImpl) processor).bridge$processedDisconnect())) {
+        } else if (BukkitMethodHooks.getServer().hasStopped() || (processor instanceof ServerGamePacketListenerImpl && ((ServerGamePacketListenerImpl) processor).bridge$processedDisconnect())) {
             throw RunningOnDifferentThreadException.RUNNING_ON_DIFFERENT_THREAD;
             // CraftBukkit end
         }

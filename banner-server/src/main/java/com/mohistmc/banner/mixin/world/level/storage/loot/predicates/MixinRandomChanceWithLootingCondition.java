@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.storage.loot.predicates;
 
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -33,8 +33,8 @@ public class MixinRandomChanceWithLootingCondition {
             i = EnchantmentHelper.getMobLooting((LivingEntity)entity);
         }
         // CraftBukkit start - only use lootingModifier if set by Bukkit
-        if (lootContext.hasParam(BukkitExtraConstants.LOOTING_MOD)) {
-            i = lootContext.getParamOrNull(BukkitExtraConstants.LOOTING_MOD);
+        if (lootContext.hasParam(BukkitFieldHooks.looting_mod())) {
+            i = lootContext.getParamOrNull(BukkitFieldHooks.looting_mod());
         }
         // CraftBukkit end
 

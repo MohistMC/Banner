@@ -11,7 +11,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
@@ -978,7 +978,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
     @Override
     public BlockData getBlockData(Material material) {
         net.minecraft.world.level.block.state.BlockState defaultData = CraftMagicNumbers.getBlock(material).defaultBlockState();
-        return CraftBlockData.fromData((hasBlockData()) ? BukkitExtraConstants.getBlockState(defaultData, blockData) : defaultData);
+        return CraftBlockData.fromData((hasBlockData()) ? BukkitMethodHooks.getBlockState(defaultData, blockData) : defaultData);
     }
 
     @Override

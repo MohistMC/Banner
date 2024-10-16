@@ -2,7 +2,7 @@ package org.bukkit.craftbukkit.v1_20_R1.inventory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap.Builder;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mojang.serialization.DataResult;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -131,7 +131,7 @@ public class CraftMetaCompass extends CraftMetaItem implements CompassMeta {
             return null;
         }
         Optional<ResourceKey<net.minecraft.world.level.Level>> key = net.minecraft.world.level.Level.RESOURCE_KEY_CODEC.parse(NbtOps.INSTANCE, lodestoneWorld).result();
-        ServerLevel worldServer = key.isPresent() ? BukkitExtraConstants.getServer().getLevel(key.get()) : null;
+        ServerLevel worldServer = key.isPresent() ? BukkitMethodHooks.getServer().getLevel(key.get()) : null;
         World world = worldServer != null ? worldServer.getWorld() : null;
         return new Location(world, lodestoneX, lodestoneY, lodestoneZ); // world may be null here, if the referenced world is not loaded
     }

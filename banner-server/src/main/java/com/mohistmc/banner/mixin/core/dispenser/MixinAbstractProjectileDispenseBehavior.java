@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.core.dispenser;
 
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
@@ -44,7 +44,7 @@ public abstract class MixinAbstractProjectileDispenseBehavior {
         CraftItemStack craftItem = CraftItemStack.asCraftMirror(itemstack1);
 
         BlockDispenseEvent event = new BlockDispenseEvent(block, craftItem.clone(), new org.bukkit.util.Vector((double) direction.getStepX(), (double) ((float) direction.getStepY() + 0.1F), (double) direction.getStepZ()));
-        if (!BukkitExtraConstants.dispenser_eventFired) {
+        if (!BukkitFieldHooks.isEventFired()) {
             level.getCraftServer().getPluginManager().callEvent(event);
         }
 

@@ -1,6 +1,5 @@
 package org.bukkit.craftbukkit.v1_20_R1.command;
 
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
 import jline.console.completer.Completer;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.util.Waitable;
@@ -31,7 +30,7 @@ public class ConsoleCommandCompleter implements Completer {
                 return tabEvent.isCancelled() ? Collections.EMPTY_LIST : tabEvent.getCompletions();
             }
         };
-        BukkitExtraConstants.bridge$processQueue.add(waitable);
+        server.getServer().bridge$processQueue().add(waitable);
         try {
             List<String> offers = waitable.get();
             if (offers == null) {

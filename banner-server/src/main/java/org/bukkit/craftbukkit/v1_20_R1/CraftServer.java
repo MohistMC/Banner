@@ -8,8 +8,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.mohistmc.banner.BannerMCStart;
-import com.mohistmc.banner.api.ServerAPI;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mohistmc.banner.util.I18n;
@@ -375,9 +374,9 @@ public final class CraftServer implements Server {
         ignoreVanillaPermissions = commandsConfiguration.getBoolean("ignore-vanilla-permissions");
         pluginManager.useTimings(configuration.getBoolean("settings.plugin-profiling"));
         overrideSpawnLimits();
-        BukkitExtraConstants.bridge$autosavePeriod = configuration.getInt("ticks-per.autosave");
+        console.banner$setAutosavePeriod(configuration.getInt("ticks-per.autosave"));
         warningState = WarningState.value(configuration.getString("settings.deprecated-verbose"));
-        BukkitExtraConstants.PLUGIN.timeout = configuration.getInt("chunk-gc.period-in-ticks");
+        BukkitFieldHooks.pluginTicket().timeout = configuration.getInt("chunk-gc.period-in-ticks");
         minimumAPI = configuration.getString("settings.minimum-api");
         loadIcon();
 
@@ -968,7 +967,7 @@ public final class CraftServer implements Server {
 
     @Override
     public void reloadData() {
-        BukkitExtraConstants.reload(console);
+        BukkitMethodHooks.reload(console);
     }
 
     private void loadIcon() {

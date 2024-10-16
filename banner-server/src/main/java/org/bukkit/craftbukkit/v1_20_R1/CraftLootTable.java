@@ -1,7 +1,7 @@
 package org.bukkit.craftbukkit.v1_20_R1;
 
 import com.google.common.base.Preconditions;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
@@ -106,7 +106,7 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
 
             // SPIGOT-5603 - Use LootContext#lootingModifier
             if (context.getLootingModifier() != LootContext.DEFAULT_LOOT_MODIFIER) {
-                setMaybe(builder, BukkitExtraConstants.LOOTING_MOD, context.getLootingModifier());
+                setMaybe(builder, BukkitFieldHooks.looting_mod(), context.getLootingModifier());
             }
         }
 
@@ -120,7 +120,7 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
                 nmsBuilder.optional(param);
             }
         }
-        nmsBuilder.optional(BukkitExtraConstants.LOOTING_MOD);
+        nmsBuilder.optional(BukkitFieldHooks.looting_mod());
 
         return builder.create(getHandle().getParamSet());
     }
@@ -150,8 +150,8 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
             contextBuilder.lootedEntity(info.getParamOrNull(LootContextParams.THIS_ENTITY).getBukkitEntity());
         }
 
-        if (info.hasParam(BukkitExtraConstants.LOOTING_MOD)) {
-            contextBuilder.lootingModifier(info.getParamOrNull(BukkitExtraConstants.LOOTING_MOD));
+        if (info.hasParam(BukkitFieldHooks.looting_mod())) {
+            contextBuilder.lootingModifier(info.getParamOrNull(BukkitFieldHooks.looting_mod()));
         }
 
         contextBuilder.luck(info.getLuck());

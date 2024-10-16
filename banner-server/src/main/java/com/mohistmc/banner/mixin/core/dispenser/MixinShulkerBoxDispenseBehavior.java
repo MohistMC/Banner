@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.core.dispenser;
 
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
@@ -30,7 +30,7 @@ public class MixinShulkerBoxDispenseBehavior {
         CraftItemStack craftItem = CraftItemStack.asCraftMirror(stack);
 
         BlockDispenseEvent event = new BlockDispenseEvent(bukkitBlock, craftItem.clone(), new org.bukkit.util.Vector(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
-        if (!BukkitExtraConstants.dispenser_eventFired) {
+        if (!BukkitFieldHooks.isEventFired()) {
             source.getLevel().getCraftServer().getPluginManager().callEvent(event);
         }
 

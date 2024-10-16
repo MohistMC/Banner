@@ -2,7 +2,7 @@ package com.mohistmc.banner.mixin.server.level;
 
 import com.google.common.collect.Lists;
 import com.mohistmc.banner.BannerMod;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.bukkit.DistValidate;
 import com.mohistmc.banner.bukkit.LevelPersistentData;
@@ -176,7 +176,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         if (typeKey != null) {
             this.typeKey = typeKey;
         } else {
-            var dimensions = BukkitExtraConstants.getServer().registryAccess().registryOrThrow(Registries.LEVEL_STEM);
+            var dimensions = BukkitMethodHooks.getServer().registryAccess().registryOrThrow(Registries.LEVEL_STEM);
             var key = dimensions.getResourceKey(levelStem);
             if (key.isPresent()) {
                 this.typeKey = key.get();
@@ -456,7 +456,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     @Overwrite
     @Nullable
     public MapItemSavedData getMapData(String mapName) {
-        return BukkitExtraConstants.getServer().overworld().getDataStorage().get((nbt) -> {
+        return BukkitMethodHooks.getServer().overworld().getDataStorage().get((nbt) -> {
             MapItemSavedData newMap = MapItemSavedData.load(nbt);
             newMap.banner$setId(mapName);
             MapInitializeEvent event = new MapInitializeEvent(newMap.bridge$mapView());

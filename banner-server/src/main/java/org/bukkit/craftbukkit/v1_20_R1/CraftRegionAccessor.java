@@ -2,7 +2,7 @@ package org.bukkit.craftbukkit.v1_20_R1;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
-import com.mohistmc.banner.bukkit.BukkitExtraConstants;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -891,8 +891,8 @@ public abstract class CraftRegionAccessor implements RegionAccessor {
                     if (nmsBlock.isSolid() || net.minecraft.world.level.block.DiodeBlock.isDiode(nmsBlock)) {
                         boolean taken = false;
                         AABB bb = (ItemFrame.class.isAssignableFrom(clazz))
-                                ? BukkitExtraConstants.recalculateBoundingBox(null, pos, CraftBlock.blockFaceToNotch(dir).getOpposite(), width, height)
-                                : BukkitExtraConstants.recalculateBoundingBox(null, pos, CraftBlock.blockFaceToNotch(dir).getOpposite(), width, height);
+                                ? BukkitMethodHooks.calculateBoundingBoxStaticItemFrame(pos, CraftBlock.blockFaceToNotch(dir).getOpposite())
+                                : BukkitMethodHooks.calculateBoundingBoxStaticPainting(pos, CraftBlock.blockFaceToNotch(dir).getOpposite(), width, height);
                         List<net.minecraft.world.entity.Entity> list = (List<net.minecraft.world.entity.Entity>) getHandle().getEntities(null, bb);
                         for (Iterator<net.minecraft.world.entity.Entity> it = list.iterator(); !taken && it.hasNext(); ) {
                             net.minecraft.world.entity.Entity e = it.next();
