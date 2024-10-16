@@ -1165,6 +1165,9 @@ public final class CraftServer implements Server {
         ServerLevel internal = new ServerLevel(console, console.executor, worldSession, worlddata, worldKey, worlddimension, getServer().progressListenerFactory.create(11),
                 worlddata.isDebugWorld(), j, creator.environment() == Environment.NORMAL ? list : ImmutableList.of(), true, console.overworld().getRandomSequences());
 
+        name = name.contains("DIM") ? name : name.toLowerCase(java.util.Locale.ENGLISH);
+        internal.banner$setGenerator(generator);
+        internal.banner$setBiomeProvider(biomeProvider);
         if (!(this.worlds.containsKey(name.toLowerCase(java.util.Locale.ENGLISH)))) {
             return null;
         }
