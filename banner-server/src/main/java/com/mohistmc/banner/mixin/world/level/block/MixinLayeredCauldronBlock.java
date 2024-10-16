@@ -1,7 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
+import com.llamalad7.mixinextras.sugar.Cancellable;
 import com.mohistmc.banner.bukkit.BukkitCauldronHooks;
-import io.izzel.arclight.mixin.Eject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -44,9 +44,9 @@ public class MixinLayeredCauldronBlock {
         return BukkitCauldronHooks.changeLevel(level, pos, state, null, CauldronLevelChangeEvent.ChangeReason.NATURAL_FILL);
     }
 
-    @Eject(method = "receiveStalactiteDrip", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
-    private boolean banner$drip(Level level, BlockPos pos, BlockState state, CallbackInfo ci, BlockState old) {
-        if (BukkitCauldronHooks.changeLevel(level, pos, state, null, CauldronLevelChangeEvent.ChangeReason.NATURAL_FILL)) {
+    @Redirect(method = "receiveStalactiteDrip", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
+    private boolean banner$drip(Level instance, BlockPos pos, BlockState state, BlockState old, @Cancellable CallbackInfo ci) {
+        if (BukkitCauldronHooks.changeLevel(instance, pos, state, null, CauldronLevelChangeEvent.ChangeReason.NATURAL_FILL)) {
             return true;
         } else {
             ci.cancel();

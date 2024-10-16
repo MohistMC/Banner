@@ -1,7 +1,7 @@
 package com.mohistmc.banner.mixin.world.entity.moster;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
-import io.izzel.arclight.mixin.Eject;
+import com.llamalad7.mixinextras.sugar.Cancellable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -74,8 +74,8 @@ public abstract class MixinZombie extends Monster {
         }
     }
 
-    @Eject(method = "killedEntity(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;convertTo(Lnet/minecraft/world/entity/EntityType;Z)Lnet/minecraft/world/entity/Mob;"))
-    private <T extends Mob> T banner$transform(Villager villagerEntity, EntityType<T> entityType, boolean flag, CallbackInfoReturnable<Boolean> cir) {
+    @Redirect(method = "killedEntity(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;convertTo(Lnet/minecraft/world/entity/EntityType;Z)Lnet/minecraft/world/entity/Mob;"))
+    private <T extends Mob> T banner$transform(Villager villagerEntity, EntityType<T> entityType, boolean flag, @Cancellable CallbackInfoReturnable<Boolean> cir) {
          villagerEntity.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.INFECTION);
          villagerEntity.bridge$pushTransformReason(EntityTransformEvent.TransformReason.INFECTION);
         T t = villagerEntity.convertTo(entityType, flag);

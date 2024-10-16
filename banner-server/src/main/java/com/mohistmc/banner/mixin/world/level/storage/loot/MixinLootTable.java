@@ -1,7 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.storage.loot;
 
+import com.llamalad7.mixinextras.sugar.Cancellable;
 import com.mohistmc.banner.injection.world.level.storage.loot.InjectionLootTable;
-import io.izzel.arclight.mixin.Eject;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import net.minecraft.world.Container;
@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LootTable.class)
@@ -24,8 +25,8 @@ public abstract class MixinLootTable implements InjectionLootTable {
     @Shadow protected abstract ObjectArrayList<ItemStack> getRandomItems(LootContext context);
     @Shadow public abstract void fill(Container container, LootParams params, long seed);
 
-    @Eject(method = "fill", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/loot/LootTable;getRandomItems(Lnet/minecraft/world/level/storage/loot/LootContext;)Lit/unimi/dsi/fastutil/objects/ObjectArrayList;"))
-    private ObjectArrayList<ItemStack> banner$nonPluginEvent(LootTable lootTable, LootContext context, CallbackInfo ci, Container inv) {
+    @Redirect(method = "fill", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/loot/LootTable;getRandomItems(Lnet/minecraft/world/level/storage/loot/LootContext;)Lit/unimi/dsi/fastutil/objects/ObjectArrayList;"))
+    private ObjectArrayList<ItemStack> banner$nonPluginEvent(LootTable instance, LootContext context, Container inv, @Cancellable CallbackInfo ci) {
         ObjectArrayList<ItemStack> list = this.getRandomItems(context);
         if (context.hasParam(LootContextParams.ORIGIN) && context.hasParam(LootContextParams.THIS_ENTITY)) {
             LootGenerateEvent event = CraftEventFactory.callLootGenerateEvent(inv, (LootTable) (Object) this, context, list, isPlugin.getAndSet(false));

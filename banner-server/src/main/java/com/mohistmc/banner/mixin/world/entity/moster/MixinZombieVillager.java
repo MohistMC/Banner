@@ -1,7 +1,7 @@
 package com.mohistmc.banner.mixin.world.entity.moster;
 
+import com.llamalad7.mixinextras.sugar.Cancellable;
 import com.mohistmc.banner.asm.annotation.TransformAccess;
-import io.izzel.arclight.mixin.Eject;
 import java.util.UUID;
 
 import net.minecraft.core.BlockPos;
@@ -21,6 +21,7 @@ import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(net.minecraft.world.entity.monster.ZombieVillager.class)
@@ -41,8 +42,8 @@ public abstract class MixinZombieVillager extends Zombie {
         pushEffectCause(EntityPotionEffectEvent.Cause.CONVERSION);
     }
 
-    @Eject(method = "finishConversion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/ZombieVillager;convertTo(Lnet/minecraft/world/entity/EntityType;Z)Lnet/minecraft/world/entity/Mob;"))
-    private <T extends Mob> T banner$cure(net.minecraft.world.entity.monster.ZombieVillager zombieVillagerEntity, EntityType<T> entityType, boolean flag, CallbackInfo ci) {
+    @Redirect(method = "finishConversion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/ZombieVillager;convertTo(Lnet/minecraft/world/entity/EntityType;Z)Lnet/minecraft/world/entity/Mob;"))
+    private <T extends Mob> T banner$cure(net.minecraft.world.entity.monster.ZombieVillager zombieVillagerEntity, EntityType<T> entityType, boolean flag, @Cancellable CallbackInfo ci) {
         T t = this.convertTo(entityType, flag, EntityTransformEvent.TransformReason.CURED, CreatureSpawnEvent.SpawnReason.CURED);
         if (t == null) {
             ((ZombieVillager) this.getBukkitEntity()).setConversionTime(-1);

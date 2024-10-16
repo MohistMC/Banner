@@ -1,7 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
+import com.llamalad7.mixinextras.sugar.Cancellable;
 import com.mohistmc.banner.injection.world.level.block.entity.InjectionAbstractFurnaceBlockEntity;
-import io.izzel.arclight.mixin.Eject;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,10 +85,10 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
         super(blockEntityType, blockPos, blockState);
     }
 
-    @Eject(method = "serverTick",
+    @Redirect(method = "serverTick",
             at = @At(value = "INVOKE", ordinal = 3,
             target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;isLit()Z"))
-    private static boolean banner$setBurnTime(AbstractFurnaceBlockEntity furnace, CallbackInfo ci) {
+    private static boolean banner$setBurnTime(AbstractFurnaceBlockEntity furnace, @Cancellable CallbackInfo ci) {
         ItemStack itemStack = furnace.getItem(1);
         CraftItemStack fuel = CraftItemStack.asCraftMirror(itemStack);
         FurnaceBurnEvent furnaceBurnEvent = new FurnaceBurnEvent(CraftBlock.at(furnace.level, furnace.getBlockPos()), fuel, furnace.getBurnDuration(itemStack));

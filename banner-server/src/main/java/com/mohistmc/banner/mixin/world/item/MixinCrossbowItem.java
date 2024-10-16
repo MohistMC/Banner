@@ -1,7 +1,7 @@
 package com.mohistmc.banner.mixin.world.item;
 
+import com.llamalad7.mixinextras.sugar.Cancellable;
 import com.mohistmc.banner.bukkit.DistValidate;
-import io.izzel.arclight.mixin.Eject;
 import java.util.concurrent.atomic.AtomicBoolean;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -41,10 +42,10 @@ public class MixinCrossbowItem {
         banner$capturedBoolean.set(event.getProjectile() == proj.getBukkitEntity());
     }
 
-    @Eject(method = "shootProjectile", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
-    private static boolean banner$addEntity(Level world, Entity entityIn, CallbackInfo ci, Level worldIn, LivingEntity shooter) {
+    @Redirect(method = "shootProjectile", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    private static boolean banner$addEntity(Level instance, Entity entity, Level worldIn, LivingEntity shooter, @Cancellable CallbackInfo ci) {
         if (banner$capturedBoolean.get()) {
-            if (!world.addFreshEntity(entityIn)) {
+            if (!instance.addFreshEntity(entity)) {
                 if (shooter instanceof ServerPlayer) {
                     ((ServerPlayer) shooter).getBukkitEntity().updateInventory();
                 }
