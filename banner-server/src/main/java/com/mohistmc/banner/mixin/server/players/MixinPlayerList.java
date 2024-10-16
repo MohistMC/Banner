@@ -52,12 +52,10 @@ import net.minecraft.network.protocol.game.ClientboundSetDefaultSpawnPositionPac
 import net.minecraft.network.protocol.game.ClientboundSetExperiencePacket;
 import net.minecraft.network.protocol.game.ClientboundSetSimulationDistancePacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
-import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.RegistryLayer;
-import net.minecraft.server.bossevents.CustomBossEvents;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
@@ -465,7 +463,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         this.sendAllPlayerInfo(playerIn);
         playerIn.onUpdateAbilities();
         playerIn.triggerDimensionChangeTriggers(((CraftWorld) fromWorld).getHandle());
-        if (fromWorld != location.getWorld()) {
+        if (fromWorld != playerIn.serverLevel()) {
             PlayerChangedWorldEvent event = new PlayerChangedWorldEvent(playerIn.getBukkitEntity(), fromWorld);
             Bukkit.getPluginManager().callEvent(event);
         }
