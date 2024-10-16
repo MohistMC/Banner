@@ -67,4 +67,8 @@ public interface InjectionServerGamePacketListenerImpl extends InjectionServerCo
     default boolean bridge$teleportCancelled() {
         throw new IllegalStateException("Not implemented");
     }
+
+    default void detectRateSpam(String s) {
+        throw new IllegalStateException("Not implemented");
+    }
 }

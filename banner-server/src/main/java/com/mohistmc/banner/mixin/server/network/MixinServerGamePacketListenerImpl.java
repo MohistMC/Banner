@@ -1223,7 +1223,23 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
             this.chat(s, playerchatmessage, true);
         }
         // this.server.getPlayerList().broadcastChatMessage(playerchatmessage, this.player, ChatMessageType.bind(ChatMessageType.CHAT, (Entity) this.player));
-        this.detectRateSpam();
+        this.detectRateSpam(s);
+    }
+
+    @Override
+    public void detectRateSpam(String s) {
+        boolean counted = true;
+        for (String exclude : org.spigotmc.SpigotConfig.spamExclusions) {
+            if (exclude != null && s.startsWith(exclude)) {
+                counted = false;
+                break;
+            }
+        }
+        // Spigot end
+        this.chatSpamTickCount += 20;
+        if (counted && this.chatSpamTickCount > 200 && !this.server.getPlayerList().isOp(this.player.getGameProfile())) {
+            this.disconnect(Component.translatable("disconnect.spam"));
+        }
     }
 
     @Inject(method = "handlePlayerCommand", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;resetLastActionTime()V"))
