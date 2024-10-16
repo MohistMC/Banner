@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "banner-stackdeobf",
+  "name": "Banner StackDeobfuscator",
+  "version": "${version}",
+  "environment": "server",
+  "license": "LGPL-v3.0",
+  "authors": [
+    "MohistMC Dev Team"
+  ],
+  "contact": {
+    "homepage": "https://github.com/MohistMC/Banner",
+    "sources": "https://github.com/MohistMC/Banner"
+  },
+  "mixins": [
+    "banner.stackdeobf.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "java": ">=17",
+    "fabric-api": "*",
+    "banner-api": "*",
+    "minecraft": ">=1.20.1"
+  },
+  "description": "Deobfuscates stacktraces to mojang mappings for Banner."
+}

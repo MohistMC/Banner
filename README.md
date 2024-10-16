@@ -44,18 +44,16 @@ It could be compilable and running, but the compatibility with plugins is poor.
 We do support using Spigot's net.minecraft.server classes. Classes and Fields will automatically remap to their intermediary counterparts in runtime, but it will not change plugins at all,
 so don't worried about the plugin files will be changed to unsafe
 
-## Installation (for Linux)
-- You'll need `wget` and `curl`
-```bash
-cd ./<your-server-folder>
-wget https://github.com/8Mi-Tech/Banner-Shell/raw/main/banner-launcher
-chmod +x ./banner-launcher
-./banner-launcher -i
-```
-
 ## Usage
-- Just put it in the mods folder.
-- Because Banner is a mod!!!
+- Download Banner.
+- Launch with command java -jar banner-launcher-version.jar
+
+## Developer Support
+- Download the dev lib jar from GitHub actions.
+- Use Fabric Official Template [**Fabric Example Mod**](https://github.com/FabricMC/fabric-example-mod.git).
+- Using Mojang Official Mappings in your build.gradle
+- Create a directory called lib in your root dir.
+- Add dependencies of Banner, such as compileOnly(fileTree("lib/banner-version-dev.jar"))
 
 ## Upstream Projects
 - [**Fabric Loader**](https://github.com/FabricMC/fabric-loader.git) - Mod load support.

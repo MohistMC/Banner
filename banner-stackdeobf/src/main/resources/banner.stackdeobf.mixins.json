@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "plugin": "com.mohistmc.banner.stackdeobf.mixin.BannerStackDeobfMixinPlugin",
+  "package": "com.mohistmc.banner.stackdeobf.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "overwrites": {
+    "conformVisibility": true
+  },
+  "injectors": {
+    "maxShiftBy": 2,
+    "defaultRequire": 1
+  },
+  "mixinPriority": 400,
+  "mixins": [
+    "MixinCrashReport",
+    "MixinCrashReportCategory"
+  ]
+}

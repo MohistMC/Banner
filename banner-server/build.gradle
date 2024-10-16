@@ -1,0 +1,22 @@
+plugins {
+	id 'fabric-loom' version '1.6-SNAPSHOT'
+	id 'maven-publish'
+}
+
+version = getSubprojectVersion(project)
+group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
+
+dependencies {
+	include(rootProject.project("banner-api"))
+	include(rootProject.project("banner-transitive-access-wideners"))
+	include(rootProject.project("banner-stackdeobf"))
+}
+
+moduleDependencies(project, [
+		"banner-api",
+		"banner-transitive-access-wideners"
+])

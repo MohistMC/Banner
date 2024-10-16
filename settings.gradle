@@ -8,3 +8,10 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+include("banner-server")
+include("banner-api")
+include("banner-transitive-access-wideners")
+include("banner-stackdeobf")
+include("banner-plugin")
+include("banner-bootstrap")

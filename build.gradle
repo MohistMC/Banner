@@ -1,192 +1,223 @@
 plugins {
 	id 'fabric-loom' version '1.6-SNAPSHOT'
 	id 'maven-publish'
-	id 'org.ajoberstar.grgit' version '5.2.0'
 }
 
-version = ci_version()
+version = project.minecraft_version + "-" + ci_version()
 group = project.maven_group
 
 base {
-	archivesName = project.archives_base_name + "-" + project.minecraft_version
+	archivesName = project.archives_base_name + "-launcher"
 }
 
-repositories {
-	maven {
-		name = 'spigot'
-		url = 'https://hub.spigotmc.org/nexus/content/groups/public/'
+allprojects {
+
+	apply plugin: "fabric-loom"
+
+	repositories {
+		maven {
+			name = 'spigot'
+			url = 'https://hub.spigotmc.org/nexus/content/groups/public/'
+		}
+		maven {
+			name = 'mohist'
+			url = 'https://maven.mohistmc.com/'
+		}
+		maven {
+			name = 'izzel'
+			url = 'https://maven.izzel.io/releases'
+		}
+		maven {
+			name = 'ParchmentMC'
+			url = 'https://maven.parchmentmc.org'
+		}
+		maven {
+			name = 'JitPack'
+			url = 'https://jitpack.io'
+		}
+		maven {
+			name = "Sponge"
+			url = 'https://repo.spongepowered.org/maven'
+		}
+		maven {
+			name = "Adventure"
+			url = 'https://jd.advntr.dev/'
+		}
+		mavenCentral()
 	}
-	maven {
-		name = 'mohist'
-		url = 'https://maven.mohistmc.com/'
+
+	dependencies {
+		implementation 'org.projectlombok:lombok:1.18.30'
+		annotationProcessor 'org.projectlombok:lombok:1.18.30'
+		minecraft "com.mojang:minecraft:${project.minecraft_version}"
+		mappings loom.layered() {
+			officialMojangMappings()
+			parchment("org.parchmentmc.data:parchment-1.20.1:2023.09.03@zip")
+		}
+		modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+		// Make a collection of all api modules we wish to use
+		Set<String> apiModules = [
+				"fabric-api-base",
+				"fabric-events-interaction-v0",
+				"fabric-entity-events-v1",
+				"fabric-lifecycle-events-v1",
+				"fabric-transitive-access-wideners-v1",
+				"fabric-biome-api-v1"
+		]
+
+		// Add each module as a dependency
+		apiModules.forEach {
+			modImplementation(fabricApi.module(it, "${project.fabric_version}"))
+		}
+
+		compileOnly "org.jetbrains:annotations:21.0.1"
+
+		// banner
+		implementation("org.yaml:snakeyaml:2.0")
+		implementation("com.mohistmc:i18n:0.6")
+		implementation('com.mohistmc:json:0.5')
+		implementation('com.mohistmc:tools:0.5.1')
+		implementation('com.mohistmc:dynamicenum:0.3')
+		implementation('javax.inject:javax.inject:1')
+		implementation("net.sf.jopt-simple:jopt-simple:5.0.4")
+
+		// craftbukkit
+		implementation("org.fusesource.jansi:jansi:1.18")
+		implementation("jline:jline:2.14.6")
+		implementation("com.googlecode.json-simple:json-simple:1.1.1")
+		implementation("org.xerial:sqlite-jdbc:3.42.0.0")
+		implementation("com.mysql:mysql-connector-j:8.0.33")
+		implementation("org.checkerframework:checker-qual:2.0.0")
+
+		implementation("net.md-5:SpecialSource:1.11.2")
+		implementation("commons-codec:commons-codec:1.16.0")
+
+		// spigot
+		implementation("net.md-5:bungeecord-chat:1.16-R0.4")
+		implementation("io.izzel:tools:1.3.0")
+
+		implementation "com.google.guava:failureaccess:1.0.1"
+		implementation "com.google.guava:guava:31.0.1-jre"
+		implementation "com.google.code.gson:gson:2.10"
+		implementation "com.mojang:authlib:3.17.30"
+		implementation "com.mojang:logging:1.1.1"
+		implementation("commons-lang:commons-lang:2.6-mohist")
+		implementation "org.slf4j:slf4j-api:2.0.6"
+
+		implementation "org.apache.logging.log4j:log4j-core:2.20.0"
+		implementation("org.apache.logging.log4j:log4j-iostreams:2.20.0")
+		implementation "org.apache.logging.log4j:log4j-api:2.20.0"
+		implementation "org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0"
+		implementation "org.apache.commons:commons-lang3:3.12.0"
+		implementation "net.sf.jopt-simple:jopt-simple:5.0.4"
+		implementation "net.java.dev.jna:jna-platform:5.13.0"
+		implementation "net.java.dev.jna:jna:5.13.0"
+		implementation "it.unimi.dsi:fastutil:8.5.12"
+		implementation "commons-io:commons-io:2.11.0"
+		implementation "com.mojang:javabridge:2.0.25"
+		implementation "com.mojang:datafixerupper:6.0.6"
+		implementation "com.mojang:brigadier:1.0.18"
+		implementation "com.github.oshi:oshi-core:6.4.0"
+
+		implementation "io.netty:netty-buffer:4.1.82.Final"
+		implementation "io.netty:netty-codec:4.1.82.Final"
+		implementation "io.netty:netty-common:4.1.82.Final"
+		implementation "io.netty:netty-handler:4.1.82.Final"
+		implementation "io.netty:netty-resolver:4.1.82.Final"
+		implementation "io.netty:netty-transport:4.1.82.Final"
+		implementation "io.netty:netty-transport-classes-epoll:4.1.82.Final"
+		implementation "io.netty:netty-transport-native-unix-common:4.1.82.Final"
+
+		//class modify
+		implementation("io.izzel.arclight:mixin-tools:1.2.4") { transitive = false }
+		annotationProcessor("io.izzel.arclight:mixin-tools:1.2.4") { transitive = false }
+
+		// mappings remapper
+		implementation("net.fabricmc:mapping-io:0.3.0")
 	}
-	maven {
-		name = 'izzel'
-		url = 'https://maven.izzel.io/releases'
+
+	loom.runs.configureEach {
+		vmArgs([
+				"-enableassertions",
+				"-Dmixin.debug.verify=true",
+				"-Dmixin.debug.countInjections=true"
+		])
 	}
-	maven {
-		name = 'ParchmentMC'
-		url = 'https://maven.parchmentmc.org'
+
+	processResources {
+		inputs.property "version", project.version
+
+		filesMatching("fabric.mod.json") {
+			expand "version": project.version
+		}
+
+		filesMatching("plugin.yml") {
+			expand "version": project.version
+		}
 	}
-	maven {
-		name = 'JitPack'
-		url = 'https://jitpack.io'
+
+	java {
+		toolchain {
+			languageVersion = JavaLanguageVersion.of(21)
+		}
+		sourceCompatibility = JavaVersion.VERSION_21
+		targetCompatibility = JavaVersion.VERSION_21
 	}
-	maven {
-		name = "Sponge"
-		url = 'https://repo.spongepowered.org/maven'
+
+	tasks.withType(JavaCompile).configureEach {
+		options.encoding = 'UTF-8'
+		options.compilerArgs << '-Xlint:-dep-ann' << '-Xlint:-removal' << '-Xdiags:verbose'
 	}
-	maven {
-		name = "Adventure"
-		url = 'https://jd.advntr.dev/'
+
+	tasks.register('cleanBuild') {
+		doFirst {
+			project.file("build/libs").deleteDir()
+		}
+		doFirst {
+			project.file("build/devlibs").deleteDir()
+		}
 	}
-	mavenCentral()
+}
+
+def moduleDependencies(Project project, List<String> depNames) {
+	def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: "namedElements") }
+
+	depNames.iterator().forEachRemaining {
+		Project dependProject = findProject(":$it")
+		project.loom {
+			interfaceInjection {
+				interfaceInjectionSourceSets.add(dependProject.sourceSets.main)
+			}
+		}
+	}
+	project.dependencies {
+		deps.each {
+			api(implementation(it))
+		}
+	}
+}
+
+def getSubprojectVersion(project) {
+	return project.minecraft_version + "-" + ci_version()
 }
 
 dependencies {
-	implementation 'org.projectlombok:lombok:1.18.30'
-	annotationProcessor 'org.projectlombok:lombok:1.18.30'
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.layered() {
-		officialMojangMappings()
-		parchment("org.parchmentmc.data:parchment-1.20.1:2023.09.03@zip")
-	}
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-	// Make a collection of all api modules we wish to use
-	Set<String> apiModules = [
-			"fabric-api-base",
-			"fabric-events-interaction-v0",
-			"fabric-entity-events-v1",
-			"fabric-lifecycle-events-v1",
-			"fabric-transitive-access-wideners-v1",
-			"fabric-biome-api-v1"
-	]
-
-	// Add each module as a dependency
-	apiModules.forEach {
-		modImplementation(fabricApi.module(it, "${project.fabric_version}"))
-	}
-
-	compileOnly "org.jetbrains:annotations:21.0.1"
-
-	// banner
-	implementation(include("org.yaml:snakeyaml:2.0"))
-	implementation(include("com.mohistmc:i18n:0.6"))
-	implementation(include('com.mohistmc:json:0.5'))
-	implementation(include('com.mohistmc:tools:0.5.1'))
-	implementation(include('com.mohistmc:dynamicenum:0.3'))
-	implementation(include('javax.inject:javax.inject:1'))
-	implementation(include("net.sf.jopt-simple:jopt-simple:5.0.4"))
-
-	// craftbukkit
-	implementation(include("org.fusesource.jansi:jansi:1.18"))
-	implementation(include("jline:jline:2.14.6"))
-	implementation(include("com.googlecode.json-simple:json-simple:1.1.1"))
-	implementation(include("org.xerial:sqlite-jdbc:3.42.0.0"))
-	implementation(include("com.mysql:mysql-connector-j:8.0.33"))
-	implementation(include("org.checkerframework:checker-qual:2.0.0"))
-
-	implementation(include("net.md-5:SpecialSource:1.11.2"))
-	implementation(include("commons-codec:commons-codec:1.16.0"))
-
-	// spigot
-	implementation(include("net.md-5:bungeecord-chat:1.16-R0.4"))
-	implementation(include("io.izzel:tools:1.3.0"))
-
-	implementation "com.google.guava:failureaccess:1.0.1"
-	implementation "com.google.guava:guava:31.0.1-jre"
-	implementation "com.google.code.gson:gson:2.10"
-	implementation "com.mojang:authlib:3.17.30"
-	implementation "com.mojang:logging:1.1.1"
-	implementation(include("commons-lang:commons-lang:2.6-mohist"))
-	implementation "org.slf4j:slf4j-api:2.0.6"
-
-	implementation "org.apache.logging.log4j:log4j-core:2.20.0"
-	implementation(include("org.apache.logging.log4j:log4j-iostreams:2.20.0"))
-	implementation "org.apache.logging.log4j:log4j-api:2.20.0"
-	implementation "org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0"
-	implementation "org.apache.commons:commons-lang3:3.12.0"
-	implementation "net.sf.jopt-simple:jopt-simple:5.0.4"
-	implementation "net.java.dev.jna:jna-platform:5.13.0"
-	implementation "net.java.dev.jna:jna:5.13.0"
-	implementation "it.unimi.dsi:fastutil:8.5.12"
-	implementation "commons-io:commons-io:2.11.0"
-	implementation "com.mojang:javabridge:2.0.25"
-	implementation "com.mojang:datafixerupper:6.0.6"
-	implementation "com.mojang:brigadier:1.0.18"
-	implementation "com.github.oshi:oshi-core:6.4.0"
-
-	implementation "io.netty:netty-buffer:4.1.82.Final"
-	implementation "io.netty:netty-codec:4.1.82.Final"
-	implementation "io.netty:netty-common:4.1.82.Final"
-	implementation "io.netty:netty-handler:4.1.82.Final"
-	implementation "io.netty:netty-resolver:4.1.82.Final"
-	implementation "io.netty:netty-transport:4.1.82.Final"
-	implementation "io.netty:netty-transport-classes-epoll:4.1.82.Final"
-	implementation "io.netty:netty-transport-native-unix-common:4.1.82.Final"
-
-	//class modify
-	modImplementation(include("com.github.wdog5:mixin-tools:1.0.1"))
-	annotationProcessor 'com.github.wdog5:mixin-tools:1.0.1'
-
-	// mappings remapper
-	implementation(include("net.fabricmc:mapping-io:0.3.0"))
-
-	// Kyori
-	implementation(include("net.kyori:adventure-platform-fabric:5.9.0"))
-	// Paper start
-	implementation(include("net.kyori:adventure-api:4.14.0"))
-	implementation(include("net.kyori:adventure-key:4.14.0"))
-	implementation(include("net.kyori:adventure-text-minimessage:4.14.0"))
-	implementation(include("net.kyori:adventure-text-serializer-gson:4.14.0"))
-	implementation(include("net.kyori:adventure-text-serializer-json:4.14.0"))
-	implementation(include("net.kyori:adventure-text-serializer-legacy:4.14.0"))
-	implementation(include("net.kyori:adventure-text-serializer-plain:4.14.0"))
-	implementation(include("net.kyori:adventure-text-serializer-ansi:4.14.0"))
-	implementation(include("net.kyori:adventure-text-logger-slf4j:4.14.0"))
-	implementation(include("net.kyori:ansi:1.0.3"))
-	implementation(include("net.kyori:examination-api:1.3.0"))
-	implementation(include("net.kyori:examination-string:1.3.0"))
-	// Paper end
-}
-
-loom {
-	accessWidenerPath = file("src/main/resources/banner.accesswidener")
-	log4jConfigs.from(file("src/main/resources/log4j2_banner.xml"))
-	serverOnlyMinecraftJar()
-}
-
-processResources {
-	inputs.property "version", project.version
-
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
-	}
-}
-
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
-}
-
-
-java {
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
+	include(project("banner-server"))
+	include(project("banner-plugin"))
+	include(project("banner-bootstrap"))
 }
 
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
-	options.compilerArgs << '-Xlint:-dep-ann' << '-Xlint:-removal'
+	options.compilerArgs << '-Xlint:-dep-ann' << '-Xlint:-removal' << '-Xdiags:verbose'
 }
 
 jar {
 	from("LICENSE")
 	manifest {
 		attributes(
-				'Main-Class': 'com.mohistmc.banner.BannerGUI',
+				'Main-Class': 'com.mohistmc.banner.BannerLauncher',
 				'Specification-Title'   : 'Banner',
 				'Specification-Vendor'  : 'MohistMC',
 				'Specification-Version' : ci_version(),
@@ -194,23 +225,6 @@ jar {
 				'Implementation-Version': version,
 				'Implementation-Vendor' : 'MohistMC'
 		)
-	}
-}
-
-tasks.register('cleanBuild') {
-	doFirst {
-		project.file("build/libs").deleteDir()
-	}
-}
-
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
-		}
-	}
-	repositories {
-
 	}
 }
 

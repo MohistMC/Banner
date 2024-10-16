@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "banner-bootstrap",
+  "name": "Banner Bootstrap",
+  "version": "${version}",
+  "environment": "server",
+  "license": "LGPL-v3.0",
+  "authors": [
+    "MohistMC Dev Team"
+  ],
+  "contact": {
+    "homepage": "https://github.com/MohistMC/Banner",
+    "sources": "https://github.com/MohistMC/Banner"
+  },
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "java": ">=17"
+  },
+  "description": "The Bootstrap of Banner Server."
+}
