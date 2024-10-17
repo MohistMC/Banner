@@ -24,6 +24,10 @@ allprojects {
             url = 'https://maven.mohistmc.com/'
         }
         maven {
+            name = 'mohist lib'
+            url = 'https://maven.mohistmc.com/libraries'
+        }
+        maven {
             name = 'izzel'
             url = 'https://maven.izzel.io/releases'
         }
@@ -161,6 +165,7 @@ dependencies {
     include(project("banner-server"))
     include(project("banner-plugin"))
     include(project("banner-bootstrap"))
+    include("net.minecraft:server:${project.minecraft_version}")
 }
 
 tasks.withType(JavaCompile).configureEach {
