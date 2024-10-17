@@ -337,6 +337,11 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         Bukkit.getPluginManager().callEvent(event);
     }
 
+    @Inject(method = "setPosRaw", at = @At("RETURN"))
+    private void banner$setPosRaw(double x, double y, double z, CallbackInfo ci) {
+        if (!this.level.isClientSide && !this.isRemoved()) this.level.getChunk((int) Math.floor(x) >> 4, (int) Math.floor(z) >> 4); // Banner - ensure target chunk is loaded.
+    }
+
     @Inject(method = "setRot", at = @At(value = "HEAD"))
     public void banner$infCheck(float yaw, float pitch, CallbackInfo ci) {
         // CraftBukkit start - yaw was sometimes set to NaN, so we need to set it back to 0
