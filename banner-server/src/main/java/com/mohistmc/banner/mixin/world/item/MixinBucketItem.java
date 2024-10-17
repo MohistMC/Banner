@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.world.item;
 
 import java.util.concurrent.atomic.AtomicReference;
+
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
@@ -53,13 +55,12 @@ public abstract class MixinBucketItem extends Item {
 
     @Inject(method = "use",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/block/BucketPickup;pickupBlock(Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/item/ItemStack;"),
-            locals = LocalCapture.CAPTURE_FAILHARD,
+                    target = "Lnet/minecraft/world/level/block/BucketPickup;pickupBlock(Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/item/ItemStack;"),
             cancellable = true)
     private void banner$use(Level level, Player player, InteractionHand usedHand,
                             CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir,
-                            ItemStack itemStack, BlockHitResult blockHitResult, BlockPos blockPos,
-                            Direction direction, BlockPos blockPos2, BlockState blockState, BucketPickup bucketPickup) {
+                            @Local ItemStack itemStack, @Local BlockHitResult blockHitResult, @Local(ordinal = 0) BlockPos blockPos,
+                            @Local BlockState blockState, @Local BucketPickup bucketPickup) {
         // CraftBukkit start
         ItemStack dummyFluid = bucketPickup.pickupBlock(DummyGeneratorAccess.INSTANCE, blockPos, blockState);
         if (dummyFluid.isEmpty()) cir.setReturnValue(InteractionResultHolder.fail(itemStack)); // Don't fire event if the bucket won't be filled.);
@@ -91,8 +92,9 @@ public abstract class MixinBucketItem extends Item {
             boolean flag1 = iblockdata.isAir() || flag || block instanceof LiquidBlockContainer && ((LiquidBlockContainer) block).canPlaceLiquid(world, blockposition, iblockdata, this.content);
 
             // CraftBukkit start
-            if (flag1 && entityhuman != null) {
-                PlayerBucketEmptyEvent event = CraftEventFactory.callPlayerBucketEmptyEvent((ServerLevel) world, entityhuman, blockposition, movingobjectpositionblock.getBlockPos(), movingobjectpositionblock.getDirection(), entityhuman.getItemInHand(entityhuman.getUsedItemHand()), entityhuman.getUsedItemHand());
+            var container = entityhuman.getItemInHand(entityhuman.getUsedItemHand());
+            if (flag1 && entityhuman != null && container != null) {
+                PlayerBucketEmptyEvent event = CraftEventFactory.callPlayerBucketEmptyEvent((ServerLevel) world, entityhuman, blockposition, movingobjectpositionblock.getBlockPos(), movingobjectpositionblock.getDirection(), container, entityhuman.getUsedItemHand());
                 if (event.isCancelled()) {
                     ((ServerPlayer) entityhuman).connection.send(new ClientboundBlockUpdatePacket(world, blockposition));
                     (((ServerPlayer) entityhuman)).getBukkitEntity().updateInventory();
