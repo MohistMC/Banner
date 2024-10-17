@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.server.level;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mohistmc.banner.injection.server.level.InjectionServerPlayerGameMode;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -283,17 +282,12 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
         return true && this.player.getMainHandItem().getItem().canAttackBlock(state, this.level, pos, this.player);
     }
 
-    @Inject(method = "destroyBlock", at = @At("RETURN"))
-    private void banner$clearDrops(BlockPos blockPos, CallbackInfoReturnable<Boolean> cir) {
-        this.level.banner$setCaptureDrops(null);
-    }
-
     @Inject(method = "destroyBlock",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/server/level/ServerLevel;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;"), cancellable = true)
-    private void banner$resetState(BlockPos pos, CallbackInfoReturnable<Boolean> cir, @Local LocalRef<BlockState> blockState) {
-        blockState.set(this.level.getBlockState(pos)); // CraftBukkit - update state from plugins
-        if (blockState.get().isAir()) cir.setReturnValue(false); // CraftBukkit - A plugin set block to air without cancelling
+    private void banner$resetState(BlockPos pos, CallbackInfoReturnable<Boolean> cir, @Local BlockState blockState) {
+        blockState = this.level.getBlockState(pos); // CraftBukkit - update state from plugins
+        if (blockState.isAir()) cir.setReturnValue(false); // CraftBukkit - A plugin set block to air without cancelling
     }
 
     // CraftBukkit start - whole method
