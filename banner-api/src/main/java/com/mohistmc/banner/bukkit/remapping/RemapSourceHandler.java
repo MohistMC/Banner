@@ -4,6 +4,8 @@ import com.google.common.io.ByteStreams;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.impl.transformer.FabricTransformer;
 import org.objectweb.asm.ClassReader;
+import org.spongepowered.asm.mixin.MixinEnvironment;
+import org.spongepowered.asm.mixin.transformer.IMixinTransformer;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
@@ -43,14 +45,16 @@ public class RemapSourceHandler extends URLStreamHandler {
             byte[] bytes = ByteStreams.toByteArray(url.openStream());
             String className = new ClassReader(bytes).getClassName();
             if (className.startsWith("net/minecraft/") || className.equals("com/mojang/brigadier/tree/CommandNode")) {
-                String handledName = className.replace('/', '.');
-                try {
-                    bytes = FabricTransformer.transform(false, EnvType.SERVER, handledName, bytes);
-                } catch (Throwable e) {
-                    throw new IOException(e);
-                }
+                bytes = fabricRemapClass(bytes);
             }
             this.array = Remapper.getResourceMapper().remapClassFile(bytes, GlobalClassRepo.INSTANCE);
+        }
+
+        public byte[] fabricRemapClass(byte[] cl) {
+            var name = new ClassReader(cl).getClassName();
+            var bytes = FabricTransformer.transform(false, EnvType.SERVER, name.replace('/', '.'), cl);
+            bytes = ((IMixinTransformer) MixinEnvironment.getCurrentEnvironment().getActiveTransformer()).transformClassBytes(name, name, bytes);
+            return bytes;
         }
 
         @Override
