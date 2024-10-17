@@ -16,7 +16,10 @@ public class Mirrors {
     };
 
     private static final String[] MOJANG_MIRROR = {
+            "https://arclight.hypertention.cn/",
+            "https://maven.fabricmc.net/",
             "https://mojmirror.hypertention.cn",
+            "https://maven.mohistmc.com/libraries/",
             "https://piston-meta.mojang.com"
     };
 
