@@ -271,11 +271,6 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
     @Unique
     private final AtomicReference<BlockBreakEvent> banner$event = new AtomicReference<>();
 
-    @Inject(method = "destroyBlock", at = @At("RETURN"))
-    private void banner$clearDrops(BlockPos blockPos, CallbackInfoReturnable<Boolean> cir) {
-        this.level.banner$setCaptureDrops(null);
-    }
-
     @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
     private void banner$fireBreakEvent(BlockPos blockposition, CallbackInfoReturnable<Boolean> cir) {
         BlockState iblockdata = this.level.getBlockState(blockposition);
