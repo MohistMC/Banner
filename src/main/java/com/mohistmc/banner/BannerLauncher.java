@@ -8,11 +8,11 @@ import java.util.Properties;
 
 public class BannerLauncher {
 
-    private static final int MIN_CLASS_VERSION = 65;
-    private static final int MIN_JAVA_VERSION = 21;
+    private static final int MIN_CLASS_VERSION = 61;
+    private static final int MIN_JAVA_VERSION = 17;
 
-    private static final int MAX_CLASS_VERSION = 66;
-    private static final int MAX_JAVA_VERSION = 22;
+    private static final int MAX_CLASS_VERSION = 67;
+    private static final int MAX_JAVA_VERSION = 23;
 
     public static void main(String[] args) throws Throwable {
         int javaVersion = (int) Float.parseFloat(System.getProperty("java.class.version"));
