@@ -132,7 +132,7 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
     }
 
     @Redirect(method = "catchingFish", at = @At(value = "INVOKE", ordinal = 2, target = "Lnet/minecraft/util/Mth;nextInt(Lnet/minecraft/util/RandomSource;II)I"))
-    private int bannert$lureTimeParam(RandomSource random, int p_216273_, int p_216274_) {
+    private int banner$lureTimeParam(RandomSource random, int p_216273_, int p_216274_) {
         return Mth.nextInt(random, this.minLureTime, this.maxLureTime);
     }
 
