@@ -50,8 +50,8 @@ public class BannerMixinPlugin implements IMixinConfigPlugin, IEnvironmentTokenP
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        // Banner start - compat for arclight
-         if (FabricLoader.getInstance().isModLoaded("arclight")) {
+        // Banner start - compat for arclight and cardboard
+         if (FabricLoader.getInstance().isModLoaded("arclight") || FabricLoader.getInstance().isModLoaded("cardboard")) {
             return false;
         }
         // Banner end
