@@ -49,7 +49,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerSynchronizer;
 import net.minecraft.world.inventory.HorseInventoryMenu;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -138,6 +140,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Shadow public abstract void setRespawnPosition(ResourceKey<Level> resourceKey, @Nullable BlockPos blockPos, float f, boolean bl, boolean bl2);
 
+    @Shadow @Final private ContainerSynchronizer containerSynchronizer;
     // CraftBukkit start
     public String displayName;
     public Component listName;
@@ -1124,6 +1127,14 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Override
     public void banner$setClientViewDistance(Integer clientViewDistance) {
         this.clientViewDistance = clientViewDistance;
+    }
+
+    @Override
+    public void resendItemInHands() {
+        containerMenu.findSlot(getInventory(), getInventory().selected).ifPresent(s -> {
+            containerSynchronizer.sendSlotChange(containerMenu, s, getMainHandItem());
+        });
+        containerSynchronizer.sendSlotChange(inventoryMenu, InventoryMenu.SHIELD_SLOT, getOffhandItem());
     }
 
     @Override
