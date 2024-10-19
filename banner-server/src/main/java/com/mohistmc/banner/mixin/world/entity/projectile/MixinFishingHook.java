@@ -3,6 +3,10 @@ package com.mohistmc.banner.mixin.world.entity.projectile;
 import com.mohistmc.banner.injection.world.entity.InjectionFishingHook;
 import java.util.Collections;
 import java.util.List;
+
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Local;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -37,7 +41,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(FishingHook.class)
 public abstract class MixinFishingHook extends Projectile implements InjectionFishingHook {
@@ -119,94 +125,62 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
         return Mth.nextInt(random, this.minLureTime, this.maxLureTime);
     }
 
+    @Inject(method = "retrieve", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/FishingHook;pullEntity(Lnet/minecraft/world/entity/Entity;)V"))
+    private void banner$catchEntity(ItemStack itemStack, CallbackInfoReturnable<Integer> cir) {
+        PlayerFishEvent fishEvent = new PlayerFishEvent(((ServerPlayer) this.getPlayerOwner()).getBukkitEntity(), this.hookedIn.getBukkitEntity(), (FishHook) this.getBukkitEntity(), PlayerFishEvent.State.CAUGHT_ENTITY);
+        Bukkit.getPluginManager().callEvent(fishEvent);
+        if (fishEvent.isCancelled()) {
+            cir.setReturnValue(0);
+        }
+    }
 
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    public int retrieve(ItemStack itemstack) {
-        Player entityhuman = this.getPlayerOwner();
+    @Decorate(method = "retrieve", inject = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/item/ItemEntity;setDeltaMovement(DDD)V"))
+    private void banner$catchFish(ItemStack stack, @Local(ordinal = -1) ItemEntity itementity, @Local(allocate = "expToDrop") int expToDrop) throws Throwable {
+        PlayerFishEvent playerFishEvent = new PlayerFishEvent(((ServerPlayer) this.getPlayerOwner()).getBukkitEntity(), itementity.getBukkitEntity(), (FishHook) this.getBukkitEntity(), PlayerFishEvent.State.CAUGHT_FISH);
+        playerFishEvent.setExpToDrop(this.random.nextInt(6) + 1);
+        Bukkit.getPluginManager().callEvent(playerFishEvent);
 
-        if (!this.level().isClientSide && entityhuman != null && !this.shouldStopFishing(entityhuman)) {
-            int i = 0;
+        if (playerFishEvent.isCancelled()) {
+            DecorationOps.cancel().invoke(0);
+            return;
+        }
+        expToDrop = playerFishEvent.getExpToDrop();
+        DecorationOps.blackhole().invoke(expToDrop);
+    }
 
-            if (this.hookedIn != null) {
-                // CraftBukkit start
-                PlayerFishEvent playerFishEvent = new PlayerFishEvent((org.bukkit.entity.Player) entityhuman.getBukkitEntity(), this.hookedIn.getBukkitEntity(), (FishHook) this.getBukkitEntity(), PlayerFishEvent.State.CAUGHT_ENTITY);
-                this.level().getCraftServer().getPluginManager().callEvent(playerFishEvent);
-
-                if (playerFishEvent.isCancelled()) {
-                    return 0;
-                }
-                // CraftBukkit end
-                this.pullEntity(this.hookedIn);
-                CriteriaTriggers.FISHING_ROD_HOOKED.trigger((ServerPlayer) entityhuman, itemstack, ((FishingHook) (Object) this), Collections.emptyList());
-                this.level().broadcastEntityEvent(this, (byte) 31);
-                i = this.hookedIn instanceof ItemEntity ? 3 : 5;
-            } else if (this.nibble > 0) {
-                LootParams lootparams = (new LootParams.Builder((ServerLevel) this.level())).withParameter(LootContextParams.ORIGIN, this.position()).withParameter(LootContextParams.TOOL, itemstack).withParameter(LootContextParams.THIS_ENTITY, this).withLuck((float) this.luck + entityhuman.getLuck()).create(LootContextParamSets.FISHING);
-                LootTable loottable = this.level().getServer().reloadableRegistries().getLootTable(BuiltInLootTables.FISHING);
-                List<ItemStack> list = loottable.getRandomItems(lootparams);
-
-                CriteriaTriggers.FISHING_ROD_HOOKED.trigger((ServerPlayer) entityhuman, itemstack, ((FishingHook) (Object) this), list);
-
-                for (ItemStack itemstack1 : list) {
-                    ItemEntity entityitem = new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), itemstack1);
-                    // CraftBukkit start
-                    PlayerFishEvent playerFishEvent = new PlayerFishEvent((org.bukkit.entity.Player) entityhuman.getBukkitEntity(), entityitem.getBukkitEntity(), (FishHook) this.getBukkitEntity(), PlayerFishEvent.State.CAUGHT_FISH);
-                    playerFishEvent.setExpToDrop(this.random.nextInt(6) + 1);
-                    this.level().getCraftServer().getPluginManager().callEvent(playerFishEvent);
-
-                    if (playerFishEvent.isCancelled()) {
-                        return 0;
-                    }
-                    // CraftBukkit end
-                    double d0 = entityhuman.getX() - this.getX();
-                    double d1 = entityhuman.getY() - this.getY();
-                    double d2 = entityhuman.getZ() - this.getZ();
-                    double d3 = 0.1D;
-
-                    entityitem.setDeltaMovement(d0 * 0.1D, d1 * 0.1D + Math.sqrt(Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2)) * 0.08D, d2 * 0.1D);
-                    this.level().addFreshEntity(entityitem);
-                    // CraftBukkit start - this.random.nextInt(6) + 1 -> playerFishEvent.getExpToDrop()
-                    if (playerFishEvent.getExpToDrop() > 0) {
-                        entityhuman.level().addFreshEntity(new ExperienceOrb(entityhuman.level(), entityhuman.getX(), entityhuman.getY() + 0.5D, entityhuman.getZ() + 0.5D, playerFishEvent.getExpToDrop()));
-                    }
-                    // CraftBukkit end
-                    if (itemstack1.is(ItemTags.FISHES)) {
-                        entityhuman.awardStat(Stats.FISH_CAUGHT, 1);
-                    }
-                }
-
-                i = 1;
+    @Decorate(method = "retrieve", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
+            slice = @Slice(from = @At(value = "NEW", target = "(Lnet/minecraft/world/level/Level;DDDI)Lnet/minecraft/world/entity/ExperienceOrb;")))
+    private boolean banner$spawnExpOrb(Level instance, Entity entity, ItemStack stack, @Local(allocate = "expToDrop") int expToDrop) throws Throwable {
+        if (entity instanceof ExperienceOrb orb) {
+            if (expToDrop <= 0) {
+                return false;
             }
+            orb.value = expToDrop;
+        }
+        return (boolean) DecorationOps.callsite().invoke(instance, entity);
+    }
 
-            if (this.onGround()) {
-                // CraftBukkit start
-                PlayerFishEvent playerFishEvent = new PlayerFishEvent((org.bukkit.entity.Player) entityhuman.getBukkitEntity(), null, (FishHook) this.getBukkitEntity(), PlayerFishEvent.State.IN_GROUND);
-                this.level().getCraftServer().getPluginManager().callEvent(playerFishEvent);
+    @Inject(method = "retrieve", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/FishingHook;onGround()Z"))
+    private void banner$onGround(ItemStack itemStack, CallbackInfoReturnable<Integer> cir) {
+        if (this.onGround()) {
+            PlayerFishEvent playerFishEvent = new PlayerFishEvent(((ServerPlayer) this.getPlayerOwner()).getBukkitEntity(), null, (FishHook) this.getBukkitEntity(), PlayerFishEvent.State.IN_GROUND);
+            Bukkit.getPluginManager().callEvent(playerFishEvent);
 
-                if (playerFishEvent.isCancelled()) {
-                    return 0;
-                }
-                // CraftBukkit end
-                i = 2;
+            if (playerFishEvent.isCancelled()) {
+                cir.setReturnValue(0);
             }
-            // CraftBukkit start
-            if (i == 0) {
-                PlayerFishEvent playerFishEvent = new PlayerFishEvent((org.bukkit.entity.Player) entityhuman.getBukkitEntity(), null, (FishHook) this.getBukkitEntity(), PlayerFishEvent.State.REEL_IN);
-                this.level().getCraftServer().getPluginManager().callEvent(playerFishEvent);
-                if (playerFishEvent.isCancelled()) {
-                    return 0;
-                }
-            }
-            // CraftBukkit end
+        }
+    }
 
-            this.discard();
-            return i;
-        } else {
-            return 0;
+    @Inject(method = "retrieve", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/FishingHook;discard()V"))
+    private void banner$reelIn(ItemStack itemStack, CallbackInfoReturnable<Integer> cir, @com.llamalad7.mixinextras.sugar.Local Player player, @com.llamalad7.mixinextras.sugar.Local int i) {
+        if (i == 0) {
+            PlayerFishEvent playerFishEvent = new PlayerFishEvent(((ServerPlayer) player).getBukkitEntity(), null, (FishHook) this.getBukkitEntity(), PlayerFishEvent.State.REEL_IN);
+            Bukkit.getPluginManager().callEvent(playerFishEvent);
+            if (playerFishEvent.isCancelled()) {
+                cir.setReturnValue(0);
+                return;
+            }
         }
     }
 
