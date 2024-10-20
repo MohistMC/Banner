@@ -559,7 +559,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
 
     @Decorate(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isDamageSourceBlocked(Lnet/minecraft/world/damagesource/DamageSource;)Z"))
     private boolean banner$cancelShieldBlock(LivingEntity instance, DamageSource damageSource,
-                                               @Local(ordinal = -1) boolean blocked) throws Throwable {
+                                               @io.izzel.arclight.mixin.Local(ordinal = -1) boolean blocked) throws Throwable {
         return (entityDamageResult == null || !entityDamageResult.blockingCancelled()) && (boolean) DecorationOps.callsite().invoke(instance, damageSource);
     }
 
