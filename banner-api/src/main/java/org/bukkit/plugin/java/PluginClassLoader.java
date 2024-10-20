@@ -6,7 +6,6 @@ import com.google.common.io.Files;
 import com.mohistmc.banner.bukkit.remapping.ClassLoaderRemapper;
 import com.mohistmc.banner.bukkit.remapping.GlobalClassRepo;
 import com.mohistmc.banner.bukkit.remapping.Remapper;
-import net.fabricmc.loader.api.FabricLoader;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.SimplePluginManager;
@@ -185,8 +184,8 @@ final class PluginClassLoader extends URLClassLoader {
                 classBytes = loader.server.getUnsafe().processClass(description, path, classBytes);
                 classBytes = this.getRemapper().remapClassFile(classBytes, GlobalClassRepo.INSTANCE);
 
-                // BluSpring: Dump loaded classes, for me to figure out what's going wrong with any files.
-                if (FabricLoader.getInstance().isDevelopmentEnvironment() || System.getProperty("banner.dumpLoadedClasses", "false").equals("true")) {
+                // Banner: Allow dumping of loaded classes, to help figure out what's going wrong with any files.
+                if (System.getProperty("banner.dumpLoadedClasses", "false").equals("true")) {
                     try {
                         var file = new File(".banner/loaded/" + name.replace(".", "/") + ".class");
 
