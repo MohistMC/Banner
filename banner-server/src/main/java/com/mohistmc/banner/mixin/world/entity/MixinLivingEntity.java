@@ -823,6 +823,12 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         return this.removeAllEffects();
     }
 
+
+    // Banner start - throw out for Mod Mixins
+    net.minecraft.world.item.ItemStack banner$itemstack = null;
+    net.minecraft.world.item.ItemStack banner$itemstack1 = ItemStack.EMPTY;
+    // Banner end
+
     /**
      * @author wdog5
      * @reason
@@ -832,31 +838,33 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         if (damageSourceIn.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             return false;
         } else {
-            net.minecraft.world.item.ItemStack itemstack = null;
-
-            net.minecraft.world.item.ItemStack itemstack1 = ItemStack.EMPTY;
             org.bukkit.inventory.EquipmentSlot bukkitHand = null;
             for (InteractionHand hand : InteractionHand.values()) {
-                itemstack1 = this.getItemInHand(hand);
-                if (itemstack1.is(Items.TOTEM_OF_UNDYING)) {
-                    itemstack = itemstack1.copy();
+                banner$itemstack1 = this.getItemInHand(hand);
+                if (banner$itemstack1.is(Items.TOTEM_OF_UNDYING)) {
+                    banner$itemstack = banner$itemstack1.copy();
                     bukkitHand = CraftEquipmentSlot.getHand(hand);
+                    // Banner start - remain for Mods Mixin(Not any function)
+                    if (bukkitHand.equals("NULL")) {
+                        banner$itemstack1.shrink(1);
+                    }
+                    // Banner end
                     // itemstack1.shrink(1);
                     break;
                 }
             }
 
             EntityResurrectEvent event = new EntityResurrectEvent((org.bukkit.entity.LivingEntity) this.getBukkitEntity(), bukkitHand);
-            event.setCancelled(itemstack == null);
+            event.setCancelled(banner$itemstack == null);
             Bukkit.getPluginManager().callEvent(event);
 
             if (!event.isCancelled()) {
-                if (!itemstack1.isEmpty()) {
-                    itemstack1.shrink(1);
+                if (!banner$itemstack1.isEmpty()) {
+                    banner$itemstack1.shrink(1);
                 }
-                if (itemstack != null && (Object) this instanceof ServerPlayer serverplayerentity) {
+                if (banner$itemstack != null && (Object) this instanceof ServerPlayer serverplayerentity) {
                     serverplayerentity.awardStat(Stats.ITEM_USED.get(Items.TOTEM_OF_UNDYING));
-                    CriteriaTriggers.USED_TOTEM.trigger(serverplayerentity, itemstack);
+                    CriteriaTriggers.USED_TOTEM.trigger(serverplayerentity, banner$itemstack);
                 }
 
                 this.setHealth(1.0F);
