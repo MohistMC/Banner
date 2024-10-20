@@ -3,6 +3,7 @@ package com.mohistmc.banner.mixin.world.entity;
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.bukkit.EntityDamageResult;
@@ -557,10 +558,9 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         }
     }
 
-    @Decorate(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isDamageSourceBlocked(Lnet/minecraft/world/damagesource/DamageSource;)Z"))
-    private boolean banner$cancelShieldBlock(LivingEntity instance, DamageSource damageSource,
-                                               @io.izzel.arclight.mixin.Local(ordinal = -1) boolean blocked) throws Throwable {
-        return (entityDamageResult == null || !entityDamageResult.blockingCancelled()) && (boolean) DecorationOps.callsite().invoke(instance, damageSource);
+    @ModifyExpressionValue(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isDamageSourceBlocked(Lnet/minecraft/world/damagesource/DamageSource;)Z"))
+    private boolean banner$cancelShieldBlock(boolean original) {
+        return (entityDamageResult == null || !entityDamageResult.blockingCancelled()) && original;
     }
 
     @Decorate(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;hurtHelmet(Lnet/minecraft/world/damagesource/DamageSource;F)V"))
