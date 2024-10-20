@@ -3,10 +3,14 @@ package com.mohistmc.banner.mixin.world.entity;
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.bukkit.ProcessableEffect;
 import com.mohistmc.banner.injection.world.entity.InjectionLivingEntity;
+import com.mojang.datafixers.util.Either;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import io.izzel.arclight.mixin.Eject;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -59,6 +63,7 @@ import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -206,6 +211,8 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
 
     @Shadow public abstract int getExperienceReward(ServerLevel serverLevel, @Nullable Entity entity);
 
+    @Shadow public abstract boolean addEffect(MobEffectInstance mobEffectInstance, @Nullable Entity entity);
+
     public MixinLivingEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }
@@ -301,40 +308,21 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         // CraftBukkit end
     }
 
-    /**
-     * @author wdog5
-     * @reason
-     */
-    /*
-    @Overwrite
-    protected void tickEffects() {
+    @Inject(method = "tickEffects", at = @At("HEAD"))
+    private void banner$startTicking(CallbackInfo ci) {
         this.isTickingEffects = true;
-        Iterator<MobEffect> iterator = this.activeEffects.keySet().iterator();
+    }
 
-        try {
-            while (iterator.hasNext()) {
-                MobEffect effect = iterator.next();
-                MobEffectInstance effectinstance = this.activeEffects.get(effect);
-                if (!effectinstance.tick((LivingEntity) (Object) this, () -> {
-                    onEffectUpdated(effectinstance, true, null);
-                })) {
-                    if (!this.level().isClientSide) {
-
-                        EntityPotionEffectEvent event = CraftEventFactory.callEntityPotionEffectChangeEvent((LivingEntity) (Object) this, effectinstance, null, EntityPotionEffectEvent.Cause.EXPIRATION);
-                        if (event.isCancelled()) {
-                            continue;
-                        }
-
-                        iterator.remove();
-                        this.onEffectRemoved(effectinstance);
-                    }
-                } else if (effectinstance.getDuration() % 600 == 0) {
-                    this.onEffectUpdated(effectinstance, false, null);
-                }
-            }
-        } catch (ConcurrentModificationException ignored) {
+    @Decorate(method = "tickEffects", inject = true, at = @At(value = "INVOKE", target = "Ljava/util/Iterator;remove()V"))
+    private void banner$effectExpire(@Local(ordinal = -1) MobEffectInstance mobeffect) throws Throwable {
+        EntityPotionEffectEvent event = CraftEventFactory.callEntityPotionEffectChangeEvent((LivingEntity) (Object) this, mobeffect, null, EntityPotionEffectEvent.Cause.EXPIRATION);
+        if (event.isCancelled()) {
+            throw DecorationOps.jumpToLoopStart();
         }
+    }
 
+    @Inject(method = "tickEffects", at = @At(value = "FIELD", opcode = Opcodes.GETFIELD, target = "Lnet/minecraft/world/entity/LivingEntity;effectsDirty:Z"))
+    private void banner$pendingEffects(CallbackInfo ci) {
         isTickingEffects = false;
         for (ProcessableEffect e : effectsToProcess) {
             EntityPotionEffectEvent.Cause cause = e.getCause();
@@ -346,99 +334,61 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
             }
         }
         effectsToProcess.clear();
+    }
 
-        if (this.effectsDirty) {
-            if (!this.level().isClientSide) {
-                this.updateInvisibilityStatus();
-            }
-
-            this.effectsDirty = false;
+    @Decorate(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z", inject = true, at = @At(value = "JUMP", opcode = Opcodes.IFNE, ordinal = 0))
+    private void banner$addPendingEffects(MobEffectInstance mobEffectInstance, Entity entity,
+                                            @io.izzel.arclight.mixin.Local(allocate = "cause") EntityPotionEffectEvent.Cause cause) throws Throwable {
+        cause = getEffectCause().orElse(EntityPotionEffectEvent.Cause.UNKNOWN);
+        if (isTickingEffects) {
+            effectsToProcess.add(new ProcessableEffect(mobEffectInstance, cause));
+            DecorationOps.cancel().invoke(true);
+            return;
         }
+        DecorationOps.blackhole().invoke();
+    }
 
-        int i = this.entityData.get(DATA_EFFECT_COLOR_ID);
-        boolean flag1 = this.entityData.get(DATA_EFFECT_AMBIENCE_ID);
-        if (i > 0) {
-            boolean flag;
-            if (this.isInvisible()) {
-                flag = this.random.nextInt(15) == 0;
-            } else {
-                flag = this.random.nextBoolean();
-            }
-
-            if (flag1) {
-                flag &= this.random.nextInt(5) == 0;
-            }
-
-            if (flag && i > 0) {
-                double d0 = (double) (i >> 16 & 255) / 255.0D;
-                double d1 = (double) (i >> 8 & 255) / 255.0D;
-                double d2 = (double) (i >> 0 & 255) / 255.0D;
-                this.level().addParticle(flag1 ? ParticleTypes.A : ParticleTypes.ENTITY_EFFECT, this.getX() + (this.random.nextDouble() - 0.5D) * (double) this.getBbWidth(), this.getY() + this.random.nextDouble() * (double) this.getBbHeight(), this.getZ() + (this.random.nextDouble() - 0.5D) * (double) this.getBbWidth(), d0, d1, d2);
-            }
+    @Decorate(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z", inject = true,
+            at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))
+    private void banner$effectAdd(MobEffectInstance mobEffectInstance, Entity entity, @io.izzel.arclight.mixin.Local(allocate = "cause") EntityPotionEffectEvent.Cause cause) throws Throwable {
+        var event = CraftEventFactory.callEntityPotionEffectChangeEvent((LivingEntity) (Object) this, null, mobEffectInstance, cause, false);
+        if (event.isCancelled()) {
+            DecorationOps.cancel().invoke(false);
+            return;
         }
-    }*/
+        DecorationOps.blackhole().invoke();
+    }
 
-    // @Shadow public abstract boolean addEffect(MobEffectInstance effectInstanceIn, Entity entity);
+    @Decorate(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/effect/MobEffectInstance;update(Lnet/minecraft/world/effect/MobEffectInstance;)Z"))
+    private boolean banner$effectReplace(MobEffectInstance oldEffect, MobEffectInstance newEffect,
+                                           MobEffectInstance mobEffectInstance, Entity entity, @io.izzel.arclight.mixin.Local(allocate = "cause") EntityPotionEffectEvent.Cause cause) throws Throwable {
+        var override = new MobEffectInstance(oldEffect).update(newEffect);
+        var event = CraftEventFactory.callEntityPotionEffectChangeEvent((LivingEntity) (Object) this, oldEffect, newEffect, cause, override);
+        if (event.isCancelled()) {
+            return (boolean) DecorationOps.cancel().invoke(false);
+        }
+        if (event.isOverride()) {
+            var b = (boolean) DecorationOps.callsite().invoke(oldEffect, newEffect);
+            DecorationOps.blackhole().invoke(b);
+        }
+        return event.isOverride();
+    }
 
     // Banner - fix mixin(locals = LocalCapture.CAPTURE_FAILHARD)
     public EntityPotionEffectEvent.Cause cause;
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    public boolean addEffect(MobEffectInstance effectInstanceIn, Entity entity) {
-        cause = getEffectCause().orElse(EntityPotionEffectEvent.Cause.UNKNOWN);
-        if (isTickingEffects) {
-            effectsToProcess.add(new ProcessableEffect(effectInstanceIn, cause));
-            return true;
-        }
 
-        if (!this.canBeAffected(effectInstanceIn)) {
-            return false;
-        } else {
-            MobEffectInstance effectinstance = this.activeEffects.get(effectInstanceIn.getEffect());
-            boolean flag = false;
-
-            boolean override = false;
-            if (effectinstance != null) {
-                override = new MobEffectInstance(effectinstance).update(effectInstanceIn);
-            }
-
-            EntityPotionEffectEvent event = CraftEventFactory.callEntityPotionEffectChangeEvent((LivingEntity) (Object) this, effectinstance, effectInstanceIn, cause, override);
-            override = event.isOverride();
-            if (event.isCancelled()) {
-                return false;
-            }
-
-            if (effectinstance == null) {
-                this.activeEffects.put(effectInstanceIn.getEffect(), effectInstanceIn);
-                this.onEffectAdded(effectInstanceIn, entity);
-                flag = true;
-                effectInstanceIn.onEffectAdded((LivingEntity) (Object) this);
-            } else if (override) {
-                effectinstance.update(effectInstanceIn);
-                this.onEffectUpdated(effectinstance, true, entity);
-                flag = true;
-            }
-
-            effectInstanceIn.onEffectStarted((LivingEntity) (Object) this);
-            return flag;
-        }
-    }
-
-    @SuppressWarnings("unused") // mock
-    /*
-    public MobEffectInstance c(@Nullable MobEffect potioneffectin, EntityPotionEffectEvent.Cause cause) {
+    @Override
+    public boolean addEffect(MobEffectInstance effect, Entity entity, EntityPotionEffectEvent.Cause cause) {
         pushEffectCause(cause);
-        return removeEffectNoUpdate(potioneffectin);
-    }*/
+        return this.addEffect(effect, entity);
+    }
 
     @Inject(method = "removeEffectNoUpdate", cancellable = true, at = @At("HEAD"))
     public void banner$clearActive(Holder<MobEffect> holder, CallbackInfoReturnable<MobEffectInstance> cir) {
         EntityPotionEffectEvent.Cause cause = getEffectCause().orElse(EntityPotionEffectEvent.Cause.UNKNOWN);
         if (isTickingEffects) {
-            effectsToProcess.add(new ProcessableEffect(holder.value(), cause));
+            effectsToProcess.add(new ProcessableEffect(holder, cause));
             cir.setReturnValue(null);
             return;
         }
