@@ -19,7 +19,7 @@ public final class RemappingUtil {
             int classId = Integer.parseInt(result.group(2));
             String className = CachedMappings.remapClass(classId);
             if (className == null) {
-                return result.group();
+                return Matcher.quoteReplacement(result.group());
             }
 
             String packageName = result.group(1);
@@ -27,17 +27,16 @@ public final class RemappingUtil {
                 // a package has been specified, don't remove it
                 if (packageName.indexOf('.') == -1) {
                     // original package name contains "/" as package separator instead of "."
-                    return className.replace('.', '/');
+                    className = className.replace('.', '/');
                 }
-                return className;
+            } else {
+                // no package in original string, remove it
+                int packageIndex = className.lastIndexOf('.');
+                if (packageIndex != -1) {
+                    className = className.substring(packageIndex + 1);
+                }
             }
-
-            // no package in original string, remove it
-            int packageIndex = className.lastIndexOf('.');
-            if (packageIndex != -1) {
-                className = className.substring(packageIndex + 1);
-            }
-            return className;
+            return Matcher.quoteReplacement(className);
         });
     }
 
