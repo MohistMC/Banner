@@ -322,7 +322,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
     }
 
     @Decorate(method = "tickEffects", inject = true, at = @At(value = "INVOKE", target = "Ljava/util/Iterator;remove()V"))
-    private void banner$effectExpire(@Local(ordinal = -1) MobEffectInstance mobeffect) throws Throwable {
+    private void banner$effectExpire(@io.izzel.arclight.mixin.Local(ordinal = -1) MobEffectInstance mobeffect) throws Throwable {
         EntityPotionEffectEvent event = CraftEventFactory.callEntityPotionEffectChangeEvent((LivingEntity) (Object) this, mobeffect, null, EntityPotionEffectEvent.Cause.EXPIRATION);
         if (event.isCancelled()) {
             throw DecorationOps.jumpToLoopStart();
