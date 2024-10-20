@@ -5,11 +5,7 @@ import io.izzel.tools.product.Product2;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.JarURLConnection;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.URLConnection;
-import java.net.URLStreamHandlerFactory;
+import java.net.*;
 import java.security.CodeSource;
 import java.util.concurrent.Callable;
 import java.util.jar.Manifest;
@@ -21,6 +17,7 @@ import java.util.jar.Manifest;
  * @originalClassName ArclightReflectionHandler
  */
 public class RemappingURLClassLoader extends URLClassLoader implements RemappingClassLoader {
+    private final ClassLoader mainParent;
 
     static {
         ClassLoader.registerAsParallelCapable();
@@ -28,22 +25,26 @@ public class RemappingURLClassLoader extends URLClassLoader implements Remapping
 
     public RemappingURLClassLoader(URL[] urls, ClassLoader parent) {
         super(urls, RemappingClassLoader.asTransforming(parent));
+        this.mainParent = new URLClassLoader(urls, parent);
     }
 
     public RemappingURLClassLoader(URL[] urls) {
-        super(urls, RemappingClassLoader.asTransforming(null));
+        this(urls, RemappingClassLoader.asTransforming(null));
     }
 
     public RemappingURLClassLoader(URL[] urls, ClassLoader parent, URLStreamHandlerFactory factory) {
         super(urls, RemappingClassLoader.asTransforming(parent), factory);
+        this.mainParent = new URLClassLoader(urls, parent);
     }
 
     public RemappingURLClassLoader(String name, URL[] urls, ClassLoader parent) {
         super(name, urls, RemappingClassLoader.asTransforming(parent));
+        this.mainParent = new URLClassLoader(urls, parent);
     }
 
     public RemappingURLClassLoader(String name, URL[] urls, ClassLoader parent, URLStreamHandlerFactory factory) {
         super(name, urls, RemappingClassLoader.asTransforming(parent), factory);
+        this.mainParent = new URLClassLoader(urls, parent);
     }
 
     @Override
@@ -92,7 +93,12 @@ public class RemappingURLClassLoader extends URLClassLoader implements Remapping
                     }
                 }
             }
-            result = this.defineClass(name, classBytes._1, 0, classBytes._1.length, classBytes._2);
+
+            try {
+                result = this.defineClass(name, classBytes._1, 0, classBytes._1.length, classBytes._2);
+            } catch (NoClassDefFoundError ignored) {
+                result = mainParent.loadClass(name);
+            }
         }
         if (result == null) {
             throw new ClassNotFoundException(name);
