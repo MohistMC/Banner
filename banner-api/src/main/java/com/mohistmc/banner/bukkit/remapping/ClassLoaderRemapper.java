@@ -6,17 +6,14 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import io.izzel.tools.product.Product;
 import io.izzel.tools.product.Product2;
+import net.fabricmc.loader.api.FabricLoader;
 import net.md_5.specialsource.JarMapping;
 import net.md_5.specialsource.JarRemapper;
 import net.md_5.specialsource.RemappingClassAdapter;
 import net.md_5.specialsource.repo.ClassRepo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -31,11 +28,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.CodeSigner;
 import java.security.CodeSource;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -194,19 +187,38 @@ public class ClassLoaderRemapper extends LenientJarRemapper {
         return toBukkitRemapper.mapFieldName(owner, srgName, desc, -1);
     }
 
+    @Override
+    public String mapType(String internalName) {
+        var result = super.mapType(internalName);
+        if (result.contains("class_"))
+            return FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", result.replace("/", ".")).replace(".", "/");
+        else
+            return result;
+    }
+
     public String tryMapDecFieldToSrg(Class<?> cl, String bukkitName) {
         String internalName = Type.getInternalName(cl);
         if (internalName.startsWith(PREFIX)) {
+            var mappingResolver = FabricLoader.getInstance().getMappingResolver();
+            var mappedFromOfficial = mappingResolver.mapFieldName("official", mappingResolver.unmapClassName("official", internalName.replace("/", ".")), bukkitName, null);
+            if (!mappedFromOfficial.equals(bukkitName)) {
+                bukkitName = mappedFromOfficial;
+            }
             Field field = getFields(cl, internalName).inverse().get(bukkitName);
-            return field == null ? bukkitName : field.getName();
+            return field == null ? bukkitName : FabricLoader.getInstance().getMappingResolver().mapFieldName("intermediary", internalName.replace("/", "."), field.getName(), Type.getDescriptor(field.getType()));
         } else return bukkitName;
     }
 
     public String tryMapFieldToSrg(Class<?> cl, String bukkitName) {
         String internalName = Type.getInternalName(cl);
         if (shouldRemap(internalName)) {
+            var mappingResolver = FabricLoader.getInstance().getMappingResolver();
+            var mappedFromOfficial = mappingResolver.mapFieldName("official", mappingResolver.unmapClassName("official", internalName.replace("/", ".")), bukkitName, null);
+            if (!mappedFromOfficial.equals(bukkitName)) {
+                bukkitName = mappedFromOfficial;
+            }
             Field field = getFields(cl, internalName).inverse().get(bukkitName);
-            return field == null ? bukkitName : field.getName();
+            return field == null ? bukkitName : FabricLoader.getInstance().getMappingResolver().mapFieldName("intermediary", internalName.replace("/", "."), field.getName(), Type.getDescriptor(field.getType()));
         } else return bukkitName;
     }
 
@@ -221,6 +233,11 @@ public class ClassLoaderRemapper extends LenientJarRemapper {
     public Method tryMapMethodToSrg(Class<?> cl, String bukkitName, Class<?>[] pTypes) {
         String internalName = Type.getInternalName(cl);
         if (shouldRemap(internalName)) {
+            var mappingResolver = FabricLoader.getInstance().getMappingResolver();
+            var mappedFromOfficial = mappingResolver.mapMethodName("official", mappingResolver.unmapClassName("official", internalName.replace("/", ".")), bukkitName, null);
+            if (!mappedFromOfficial.equals(bukkitName)) {
+                bukkitName = mappedFromOfficial;
+            }
             return getMethods(cl, internalName).getValue().get(new WrappedMethod(bukkitName, pTypes));
         } else return null;
     }
