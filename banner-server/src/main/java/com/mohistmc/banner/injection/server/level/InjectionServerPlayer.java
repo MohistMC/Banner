@@ -229,4 +229,8 @@ public interface InjectionServerPlayer extends InjectionPlayer {
     default CraftPlayer.TransferCookieConnection bridge$transferCookieConnection() {
         throw new IllegalStateException("Not implemented");
     }
+
+    default void resendItemInHands() {
+        throw new IllegalStateException("Not implemented");
+    }
 }

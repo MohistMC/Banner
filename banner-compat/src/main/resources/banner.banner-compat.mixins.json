@@ -1,6 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
+  "plugin": "com.mohistmc.banner.compat.mixin.BannerCompatMixinPlugin",
   "package": "com.mohistmc.banner.compat.mixin",
   "compatibilityLevel": "JAVA_21",
   "overwrites": {

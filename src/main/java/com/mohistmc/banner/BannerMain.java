@@ -39,12 +39,35 @@ public class BannerMain {
         }
     }
 
+    private static Path extractMC() throws Exception {
+        var path = BannerMain.class.getModule().getResourceAsStream("/META-INF/jars/server-1.21.2.jar");
+        var dir = Paths.get("libraries", "net/minecraft/server/1.21.2");
+        if (!Files.exists(dir)) {
+            Files.createDirectories(dir);
+        }
+        var mc = dir.resolve("server-1.21.2.jar");
+        if (!Files.exists(mc)) {
+            try (var files = Files.list(dir)) {
+                for (Path old : files.toList()) {
+                    Files.delete(old);
+                }
+                Files.copy(path, mc);
+            }
+        }
+        return mc;
+    }
+
     @SuppressWarnings("unchecked")
     private static Map.Entry<String, List<Path>> fabricInstall() throws Throwable {
         var path = Paths.get(".banner", "gson.jar");
         if (!Files.exists(path)) {
             Files.createDirectories(path.getParent());
             Files.copy(Objects.requireNonNull(BannerMain.class.getResourceAsStream("/gson.jar")), path);
+        }
+        try {
+            extractMC();
+        } catch (Exception e) {
+            System.out.println("Failed to extract MC Jar");
         }
         try (var loader = new URLClassLoader(new URL[]{path.toUri().toURL(), BannerMain.class.getProtectionDomain().getCodeSource().getLocation()}, ClassLoader.getPlatformClassLoader())) {
             var cl = loader.loadClass("com.mohistmc.banner.install.FabricInstaller");

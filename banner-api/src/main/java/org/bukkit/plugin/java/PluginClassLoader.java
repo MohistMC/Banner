@@ -2,6 +2,10 @@ package org.bukkit.plugin.java;
 
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
+import com.mohistmc.banner.bukkit.remapping.ClassLoaderRemapper;
+import com.mohistmc.banner.bukkit.remapping.GlobalClassRepo;
+import com.mohistmc.banner.bukkit.remapping.Remapper;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.SimplePluginManager;
@@ -18,11 +22,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.CodeSigner;
 import java.security.CodeSource;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -182,6 +182,26 @@ final class PluginClassLoader extends URLClassLoader {
                 }
 
                 classBytes = loader.server.getUnsafe().processClass(description, path, classBytes);
+                classBytes = this.getRemapper().remapClassFile(classBytes, GlobalClassRepo.INSTANCE);
+
+                // Banner: Allow dumping of loaded classes, to help figure out what's going wrong with any files.
+                if (System.getProperty("banner.dumpLoadedClasses", "false").equals("true")) {
+                    try {
+                        var file = new File(".banner/loaded/" + name.replace(".", "/") + ".class");
+
+                        if (!file.getParentFile().exists()) {
+                            file.getParentFile().mkdirs();
+                        }
+
+                        if (!file.exists()) {
+                            file.createNewFile();
+                        }
+
+                        Files.write(classBytes, file);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
 
                 int dot = name.lastIndexOf('.');
                 if (dot != -1) {
@@ -216,6 +236,16 @@ final class PluginClassLoader extends URLClassLoader {
         }
 
         return result;
+    }
+
+    private ClassLoaderRemapper remapper;
+
+    private ClassLoaderRemapper getRemapper() {
+        if (remapper == null) {
+            remapper = Remapper.createClassLoaderRemapper(this);
+        }
+
+        return remapper;
     }
 
     @Override

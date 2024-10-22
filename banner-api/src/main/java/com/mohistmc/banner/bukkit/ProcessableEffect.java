@@ -1,12 +1,13 @@
 package com.mohistmc.banner.bukkit;
 
+import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 
 public class ProcessableEffect {
 
-    private MobEffect type;
+    private Holder<MobEffect> type;
     private MobEffectInstance effect;
     private final EntityPotionEffectEvent.Cause cause;
 
@@ -15,16 +16,16 @@ public class ProcessableEffect {
         this.cause = cause;
     }
 
-    public ProcessableEffect(MobEffect type, EntityPotionEffectEvent.Cause cause) {
+    public ProcessableEffect(Holder<MobEffect> type, EntityPotionEffectEvent.Cause cause) {
         this.type = type;
         this.cause = cause;
     }
 
-    public MobEffect getType() {
+    public Holder<MobEffect> getType() {
         return type;
     }
 
-    public void setType(MobEffect type) {
+    public void setType(Holder<MobEffect> type) {
         this.type = type;
     }
 

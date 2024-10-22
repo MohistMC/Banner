@@ -106,7 +106,6 @@ public class FabricInstaller {
 
     @SuppressWarnings("unchecked")
     private static CompletableFuture<Path>[] installFabric(InstallInfo info, ExecutorService pool, Consumer<String> logger) {
-        var minecraftData = MinecraftProvider.downloadMinecraftData(info, pool, logger);
         String coord = String.format("net.fabricmc:fabric-loader:%s", info.installer.fabricLoader);
         String dist = "libraries/" + Util.mavenToPath(coord);
         var installerFuture = MinecraftProvider.reportSupply(pool, logger).apply(new MavenDownloader(Mirrors.getMavenRepo(), coord, dist, info.installer.fabricLoaderHash))
@@ -120,10 +119,6 @@ public class FabricInstaller {
                         throw new RuntimeException(e);
                     }
                 });
-        var serverFuture = minecraftData.thenCompose(data -> MinecraftProvider.reportSupply(pool, logger).apply(
-                new FileDownloader(String.format(data.serverUrl(), info.installer.minecraft),
-                        String.format("libraries/net/minecraft/server/%1$s/server-%1$s.jar", info.installer.minecraft), data.serverHash())
-        ));
-        return new CompletableFuture[]{installerFuture, serverFuture};
+        return new CompletableFuture[]{installerFuture};
     }
 }
