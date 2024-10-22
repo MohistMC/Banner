@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Report with [latest development version](https://ci.codemc.io/job/MohistMC/job/Banner-1.20/), your issue is likely to be fixed.
+        Report with [latest development version](https://ci.codemc.io/job/MohistMC/job/Banner-1.21.2/), your issue is likely to be fixed.
 
         Make sure you have searched issues and no similar is present.
 
