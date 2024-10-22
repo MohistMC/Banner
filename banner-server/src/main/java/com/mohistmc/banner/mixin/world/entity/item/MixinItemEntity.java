@@ -3,6 +3,7 @@ package com.mohistmc.banner.mixin.world.entity.item;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -49,9 +50,9 @@ public abstract class MixinItemEntity extends Entity {
         }
     }
 
-    @Inject(method = "hurt", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/item/ItemEntity;markHurt()V"))
-    private void banner$damageNonLiving(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (CraftEventFactory.handleNonLivingEntityDamageEvent((ItemEntity) (Object) this, source, amount)) {
+    @Inject(method = "hurtServer", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/item/ItemEntity;markHurt()V"))
+    private void banner$damageNonLiving(ServerLevel serverLevel, DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> cir) {
+        if (CraftEventFactory.handleNonLivingEntityDamageEvent((ItemEntity) (Object) this, damageSource, f)) {
             cir.setReturnValue(false);
         }
     }

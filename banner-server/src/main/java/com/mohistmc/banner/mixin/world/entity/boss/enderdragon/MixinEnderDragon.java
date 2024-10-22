@@ -70,7 +70,7 @@ public abstract class MixinEnderDragon extends Mob {
      * @reason
      */
     @Overwrite
-    private boolean checkWalls(final AABB axisalignedbb) {
+    private boolean checkWalls(ServerLevel serverLevel, AABB axisalignedbb) {
         final int i = Mth.floor(axisalignedbb.minX);
         final int j = Mth.floor(axisalignedbb.minY);
         final int k = Mth.floor(axisalignedbb.minZ);
@@ -86,7 +86,7 @@ public abstract class MixinEnderDragon extends Mob {
                     final BlockPos blockposition = new BlockPos(k2, l2, i3);
                     final BlockState iblockdata = this.level().getBlockState(blockposition);
                     if (!iblockdata.isAir() && !iblockdata.is(BlockTags.DRAGON_TRANSPARENT)) {
-                        if (this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) && !iblockdata.is(BlockTags.DRAGON_IMMUNE)) {
+                        if (serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) && !iblockdata.is(BlockTags.DRAGON_IMMUNE)) {
                             flag2 = true;
                             destroyedBlocks.add(CraftBlock.at(this.level(), blockposition));
                         } else {
@@ -127,7 +127,7 @@ public abstract class MixinEnderDragon extends Mob {
                     craftBlock.getNMS().spawnAfterBreak((ServerLevel) this.level(), blockposition2, ItemStack.EMPTY, false);
                     // net.minecraft.block.Block.spawnDrops(craftBlock.getNMS(), loottableinfo_builder);
                 }
-                nmsBlock.wasExploded(this.level(), blockposition2, this.explosionSource);
+                nmsBlock.wasExploded(serverLevel, blockposition2, this.explosionSource);
                 this.level().removeBlock(blockposition2, false);
             }
         }
@@ -136,19 +136,5 @@ public abstract class MixinEnderDragon extends Mob {
             this.level().levelEvent(2008, blockposition3, 0);
         }
         return flag;
-    }
-
-    // TODO FIXME: exp patch for end dragon
-    @Override
-    protected int getBaseExperienceReward() {
-        // CraftBukkit - Moved from #tickDeath method
-        boolean flag = this.level().getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT);
-        short short0 = 500;
-
-        if (this.dragonFight != null && !this.dragonFight.hasPreviouslyKilledDragon()) {
-            short0 = 12000;
-        }
-
-        return flag ? short0 : 0;
     }
 }

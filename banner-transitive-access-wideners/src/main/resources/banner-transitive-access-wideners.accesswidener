@@ -3,14 +3,12 @@ accessWidener v2 named
 
 # public clazz
 transitive-accessible class net/minecraft/world/level/biome/Biome$ClimateSettings
-transitive-accessible class net/minecraft/world/item/crafting/Ingredient$ItemValue
 transitive-accessible class net/minecraft/world/entity/monster/Guardian$GuardianAttackGoal
 transitive-accessible class net/minecraft/world/entity/Interaction$PlayerAction
 transitive-accessible class net/minecraft/world/item/ItemCooldowns$CooldownInstance
 transitive-accessible class net/minecraft/server/level/ServerPlayer$RespawnPosAngle
 transitive-accessible class net/minecraft/world/level/block/ComposterBlock$InputContainer
 transitive-accessible class net/minecraft/world/entity/projectile/FishingHook$FishHookState
-transitive-accessible class net/minecraft/world/item/crafting/Ingredient$Value
 transitive-accessible class net/minecraft/world/level/block/ComposterBlock$OutputContainer
 transitive-accessible class net/minecraft/server/level/ChunkMap$TrackedEntity
 transitive-accessible class net/minecraft/server/MinecraftServer$ReloadableResources
@@ -33,7 +31,6 @@ transitive-accessible class net/minecraft/server/commands/LootCommand$Callback
 transitive-accessible class net/minecraft/server/level/DistanceManager$ChunkTicketTracker
 
 # public methods
-transitive-accessible method net/minecraft/server/WorldLoader loadAndReplaceLayer (Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/core/LayeredRegistryAccess;Lnet/minecraft/server/RegistryLayer;Ljava/util/List;)Lnet/minecraft/core/LayeredRegistryAccess;
 transitive-accessible method net/minecraft/world/entity/animal/allay/Allay duplicateAllay ()V
 transitive-accessible method net/minecraft/world/entity/animal/allay/Allay resetDuplicationCooldown ()V
 transitive-accessible method net/minecraft/world/entity/animal/allay/Allay canDuplicate ()Z
@@ -43,10 +40,8 @@ transitive-accessible method net/minecraft/world/entity/ItemBasedSteering boostT
 transitive-accessible method net/minecraft/world/entity/animal/Wolf setCollarColor (Lnet/minecraft/world/item/DyeColor;)V
 transitive-accessible method net/minecraft/world/level/block/entity/BarrelBlockEntity updateBlockState (Lnet/minecraft/world/level/block/state/BlockState;Z)V
 transitive-accessible method net/minecraft/world/level/block/entity/BarrelBlockEntity playSound (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/sounds/SoundEvent;)V
-transitive-accessible method net/minecraft/world/item/crafting/Ingredient$ItemValue <init> (Lnet/minecraft/world/item/ItemStack;)V
 transitive-accessible method net/minecraft/world/level/block/entity/SculkCatalystBlockEntity$CatalystListener bloom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/util/RandomSource;)V
 transitive-accessible method net/minecraft/nbt/ListTag <init> (Ljava/util/List;B)V
-transitive-accessible method net/minecraft/world/level/biome/Biome getTemperature (Lnet/minecraft/core/BlockPos;)F
 transitive-accessible method net/minecraft/world/level/block/entity/ConduitBlockEntity getDestroyRangeAABB (Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/phys/AABB;
 transitive-accessible method net/minecraft/world/entity/projectile/AbstractArrow setPierceLevel (B)V
 transitive-accessible method net/minecraft/world/item/DebugStickItem handleInteraction (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;ZLnet/minecraft/world/item/ItemStack;)Z
@@ -163,7 +158,6 @@ transitive-accessible method net/minecraft/world/entity/player/Player closeConta
 transitive-accessible method net/minecraft/world/entity/player/Player setShoulderEntityLeft (Lnet/minecraft/nbt/CompoundTag;)V
 transitive-accessible method net/minecraft/world/entity/player/Player setShoulderEntityRight (Lnet/minecraft/nbt/CompoundTag;)V
 transitive-accessible method net/minecraft/world/entity/monster/Skeleton startFreezeConversion (I)V
-transitive-accessible method net/minecraft/world/item/crafting/Ingredient <init> (Ljava/util/stream/Stream;)V
 transitive-accessible method net/minecraft/world/entity/Display$TextDisplay setFlags (B)V
 transitive-accessible method net/minecraft/world/entity/Display$TextDisplay getText ()Lnet/minecraft/network/chat/Component;
 transitive-accessible method net/minecraft/world/entity/Display$TextDisplay setText (Lnet/minecraft/network/chat/Component;)V
@@ -191,7 +185,6 @@ transitive-accessible method net/minecraft/server/dedicated/DedicatedServerPrope
 transitive-accessible method net/minecraft/server/level/ServerLevel getEntities ()Lnet/minecraft/world/level/entity/LevelEntityGetter;
 transitive-accessible method net/minecraft/world/level/GameRules$Value deserialize (Ljava/lang/String;)V
 transitive-accessible method net/minecraft/server/level/PlayerRespawnLogic getOverworldRespawnPos (Lnet/minecraft/server/level/ServerLevel;II)Lnet/minecraft/core/BlockPos;
-transitive-accessible method net/minecraft/server/commands/TeleportCommand$LookAt perform (Lnet/minecraft/commands/CommandSourceStack;Lnet/minecraft/world/entity/Entity;)V
 transitive-accessible method net/minecraft/server/level/Ticket <init> (Lnet/minecraft/server/level/TicketType;ILjava/lang/Object;)V
 transitive-accessible method net/minecraft/server/level/Ticket setCreatedTick (J)V
 transitive-accessible method net/minecraft/server/level/ChunkTracker update (JIZ)V
@@ -207,7 +200,6 @@ transitive-accessible method net/minecraft/world/entity/animal/horse/Llama setSt
 transitive-accessible method net/minecraft/world/level/block/DropperBlock dispenseFrom (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)V
 transitive-accessible method net/minecraft/world/level/block/entity/ConduitBlockEntity updateDestroyTarget (Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Ljava/util/List;Lnet/minecraft/world/level/block/entity/ConduitBlockEntity;)V
 transitive-accessible method net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity isLit ()Z
-transitive-accessible method net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity getBurnDuration (Lnet/minecraft/world/item/ItemStack;)I
 transitive-accessible method net/minecraft/world/level/block/state/BlockBehaviour onPlace (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)V
 transitive-accessible method net/minecraft/world/inventory/Slot onSwapCraft (I)V
 transitive-accessible method net/minecraft/world/entity/animal/Turtle setHasEgg (Z)V
@@ -224,7 +216,6 @@ transitive-accessible method net/minecraft/world/level/NaturalSpawner$SpawnState
 transitive-accessible method net/minecraft/network/protocol/game/ClientboundAddEntityPacket <init> (Lnet/minecraft/network/RegistryFriendlyByteBuf;)V
 transitive-accessible method net/minecraft/world/level/block/entity/LecternBlockEntity onBookItemRemove ()V
 # public fields
-transitive-accessible field net/minecraft/world/level/chunk/storage/ChunkSerializer BLOCK_STATE_CODEC Lcom/mojang/serialization/Codec;
 transitive-accessible field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner stateAccessor Lnet/minecraft/world/level/block/entity/trialspawner/TrialSpawner$StateAccessor;
 transitive-accessible field net/minecraft/world/level/block/state/BlockBehaviour$BlockStateBase destroySpeed F
 transitive-accessible field net/minecraft/world/entity/raid/Raids raidMap Ljava/util/Map;
@@ -270,13 +261,11 @@ transitive-accessible field net/minecraft/world/level/block/entity/BrushableBloc
 transitive-accessible field net/minecraft/world/entity/animal/Pig steering Lnet/minecraft/world/entity/ItemBasedSteering;
 transitive-accessible field net/minecraft/network/chat/TextColor name Ljava/lang/String;
 transitive-accessible field net/minecraft/world/level/biome/Biome climateSettings Lnet/minecraft/world/level/biome/Biome$ClimateSettings;
-transitive-accessible field net/minecraft/world/item/armortrim/ArmorTrim showInTooltip Z
 transitive-accessible field net/minecraft/world/level/block/entity/ConduitBlockEntity destroyTarget Lnet/minecraft/world/entity/LivingEntity;
 transitive-accessible field net/minecraft/world/level/block/entity/ConduitBlockEntity effectBlocks Ljava/util/List;
 transitive-accessible field net/minecraft/world/level/block/entity/ConduitBlockEntity destroyTargetUUID Ljava/util/UUID;
 transitive-accessible field net/minecraft/world/level/storage/PrimaryLevelData settings Lnet/minecraft/world/level/LevelSettings;
 transitive-accessible field net/minecraft/world/entity/projectile/AbstractArrow firedFromWeapon Lnet/minecraft/world/item/ItemStack;
-transitive-accessible field net/minecraft/world/entity/projectile/AbstractArrow inGround Z
 transitive-accessible field net/minecraft/world/entity/projectile/AbstractArrow pickupItemStack Lnet/minecraft/world/item/ItemStack;
 transitive-accessible field net/minecraft/world/entity/projectile/AbstractArrow life I
 transitive-accessible field net/minecraft/world/item/StandingAndWallBlockItem wallBlock Lnet/minecraft/world/level/block/Block;
@@ -309,7 +298,6 @@ transitive-accessible field net/minecraft/world/entity/Interaction interaction L
 transitive-accessible field net/minecraft/world/entity/monster/Strider steering Lnet/minecraft/world/entity/ItemBasedSteering;
 transitive-accessible field net/minecraft/world/level/block/entity/BellBlockEntity resonating Z
 transitive-accessible field net/minecraft/world/level/block/entity/BellBlockEntity resonationTicks I
-transitive-accessible field net/minecraft/world/entity/vehicle/Boat status Lnet/minecraft/world/entity/vehicle/Boat$Status;
 transitive-accessible field net/minecraft/world/level/chunk/LevelChunk loaded Z
 transitive-accessible field net/minecraft/world/level/chunk/LevelChunk level Lnet/minecraft/world/level/Level;
 transitive-accessible field net/minecraft/world/entity/item/FallingBlockEntity cancelDrop Z
@@ -317,7 +305,6 @@ transitive-accessible field net/minecraft/world/entity/item/FallingBlockEntity h
 transitive-accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamagePerDistance F
 transitive-accessible field net/minecraft/world/entity/item/FallingBlockEntity fallDamageMax I
 transitive-accessible field net/minecraft/world/level/block/FireBlock igniteOdds Lit/unimi/dsi/fastutil/objects/Object2IntMap;
-transitive-accessible field net/minecraft/world/level/Explosion source Lnet/minecraft/world/entity/Entity;
 transitive-accessible field net/minecraft/world/level/block/entity/SculkSensorBlockEntity lastVibrationFrequency I
 transitive-accessible field net/minecraft/world/level/levelgen/structure/placement/StructurePlacement frequencyReductionMethod Lnet/minecraft/world/level/levelgen/structure/placement/StructurePlacement$FrequencyReductionMethod;
 transitive-accessible field net/minecraft/world/level/levelgen/structure/placement/StructurePlacement salt I
@@ -326,7 +313,6 @@ transitive-accessible field net/minecraft/world/level/levelgen/structure/placeme
 transitive-accessible field net/minecraft/world/level/levelgen/structure/placement/StructurePlacement frequency F
 transitive-accessible field net/minecraft/server/level/Ticket key Ljava/lang/Object;
 transitive-accessible field net/minecraft/world/level/block/entity/BannerBlockEntity baseColor Lnet/minecraft/world/item/DyeColor;
-transitive-accessible field net/minecraft/world/LockCode key Ljava/lang/String;
 transitive-accessible field net/minecraft/world/level/storage/DimensionDataStorage cache Ljava/util/Map;
 transitive-accessible field net/minecraft/world/level/chunk/ChunkAccess blockEntities Ljava/util/Map;
 transitive-accessible field net/minecraft/world/level/chunk/ChunkAccess heightmaps Ljava/util/Map;
@@ -340,9 +326,7 @@ transitive-accessible field net/minecraft/world/entity/monster/Creeper swell I
 transitive-accessible field net/minecraft/world/entity/monster/Creeper explosionRadius I
 transitive-accessible field net/minecraft/world/entity/projectile/SpectralArrow duration I
 transitive-accessible field net/minecraft/server/level/ServerBossEvent visible Z
-transitive-accessible field net/minecraft/world/inventory/CraftingMenu craftSlots Lnet/minecraft/world/inventory/CraftingContainer;
 transitive-accessible field net/minecraft/world/inventory/CraftingMenu access Lnet/minecraft/world/inventory/ContainerLevelAccess;
-transitive-accessible field net/minecraft/world/inventory/CraftingMenu resultSlots Lnet/minecraft/world/inventory/ResultContainer;
 transitive-accessible field net/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess levelDirectory Lnet/minecraft/world/level/storage/LevelStorageSource$LevelDirectory;
 transitive-accessible field net/minecraft/server/level/ChunkHolder playerProvider Lnet/minecraft/server/level/ChunkHolder$PlayerProvider;
 transitive-accessible field net/minecraft/server/level/ChunkHolder oldTicketLevel I
@@ -420,14 +404,12 @@ transitive-accessible field net/minecraft/network/protocol/game/ClientboundTabLi
 transitive-accessible field net/minecraft/network/protocol/game/ClientboundTabListPacket header Lnet/minecraft/network/chat/Component;
 transitive-accessible field net/minecraft/world/level/block/entity/ChiseledBookShelfBlockEntity lastInteractedSlot I
 transitive-accessible field net/minecraft/world/entity/projectile/EvokerFangs warmupDelayTicks I
-transitive-accessible field net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity recipesUsed Lit/unimi/dsi/fastutil/objects/Object2IntOpenHashMap;
 transitive-accessible field net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity cookingTotalTime I
 transitive-accessible field net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity litTime I
 transitive-accessible field net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity cookingProgress I
 transitive-accessible field net/minecraft/world/level/material/MapColor MATERIAL_COLORS [Lnet/minecraft/world/level/material/MapColor;
 transitive-accessible field net/minecraft/world/entity/animal/goat/Goat DATA_HAS_LEFT_HORN Lnet/minecraft/network/syncher/EntityDataAccessor;
 transitive-accessible field net/minecraft/world/entity/animal/goat/Goat DATA_HAS_RIGHT_HORN Lnet/minecraft/network/syncher/EntityDataAccessor;
-transitive-accessible field net/minecraft/world/entity/Mob lootTable Lnet/minecraft/resources/ResourceKey;
 transitive-accessible field net/minecraft/world/entity/Mob handDropChances [F
 transitive-accessible field net/minecraft/world/entity/Mob armorDropChances [F
 transitive-accessible field net/minecraft/world/entity/Mob lootTableSeed J
@@ -443,7 +425,6 @@ transitive-accessible field net/minecraft/world/entity/decoration/ItemFrame DATA
 transitive-accessible field net/minecraft/world/entity/decoration/ItemFrame fixed Z
 transitive-accessible field net/minecraft/world/entity/decoration/ItemFrame DATA_ROTATION Lnet/minecraft/network/syncher/EntityDataAccessor;
 transitive-accessible field net/minecraft/server/ServerAdvancementManager advancements Ljava/util/Map;
-transitive-accessible field net/minecraft/server/ServerAdvancementManager GSON Lcom/google/gson/Gson;
 transitive-accessible field net/minecraft/world/level/block/entity/TrialSpawnerBlockEntity trialSpawner Lnet/minecraft/world/level/block/entity/trialspawner/TrialSpawner;
 transitive-accessible field net/minecraft/world/CompoundContainer container1 Lnet/minecraft/world/Container;
 transitive-accessible field net/minecraft/world/CompoundContainer container2 Lnet/minecraft/world/Container;
@@ -490,7 +471,6 @@ transitive-accessible field net/minecraft/world/entity/raid/Raid raidOmenLevel I
 transitive-accessible field net/minecraft/world/entity/raid/Raid heroesOfTheVillage Ljava/util/Set;
 transitive-accessible field net/minecraft/world/entity/Display DATA_POS_ROT_INTERPOLATION_DURATION_ID Lnet/minecraft/network/syncher/EntityDataAccessor;
 transitive-accessible field net/minecraft/world/level/chunk/storage/EntityStorage level Lnet/minecraft/server/level/ServerLevel;
-transitive-accessible field net/minecraft/world/level/chunk/storage/EntityStorage entityDeserializerQueue Lnet/minecraft/util/thread/ProcessorMailbox;
 transitive-accessible field net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator settings Lnet/minecraft/core/Holder;
 transitive-accessible field net/minecraft/server/MinecraftServer fixerUpper Lcom/mojang/datafixers/DataFixer;
 transitive-accessible field net/minecraft/server/MinecraftServer progressListenerFactory Lnet/minecraft/server/level/progress/ChunkProgressListenerFactory;
@@ -517,7 +497,6 @@ transitive-accessible field net/minecraft/world/flag/FeatureFlag mask J
 transitive-accessible field net/minecraft/world/level/chunk/ChunkGenerator generationSettingsGetter Ljava/util/function/Function;
 transitive-accessible field net/minecraft/world/entity/monster/Skeleton DATA_STRAY_CONVERSION_ID Lnet/minecraft/network/syncher/EntityDataAccessor;
 transitive-accessible field net/minecraft/world/entity/monster/Skeleton conversionTime I
-transitive-accessible field net/minecraft/world/item/crafting/Ingredient itemStacks [Lnet/minecraft/world/item/ItemStack;
 transitive-accessible field net/minecraft/world/entity/Display$TextDisplay DATA_BACKGROUND_COLOR_ID Lnet/minecraft/network/syncher/EntityDataAccessor;
 transitive-accessible field net/minecraft/world/entity/Display$TextDisplay DATA_LINE_WIDTH_ID Lnet/minecraft/network/syncher/EntityDataAccessor;
 transitive-accessible field net/minecraft/world/entity/boss/enderdragon/EnderDragon subEntities [Lnet/minecraft/world/entity/boss/EnderDragonPart;
@@ -548,10 +527,8 @@ transitive-accessible field net/minecraft/server/packs/repository/Pack resources
 transitive-accessible field net/minecraft/world/entity/monster/ZombieVillager DATA_CONVERTING_ID Lnet/minecraft/network/syncher/EntityDataAccessor;
 transitive-accessible field net/minecraft/world/entity/monster/ZombieVillager conversionStarter Ljava/util/UUID;
 transitive-accessible field net/minecraft/world/entity/monster/ZombieVillager villagerConversionTime I
-transitive-accessible field net/minecraft/stats/RecipeBook known Ljava/util/Set;
 transitive-accessible field net/minecraft/world/entity/monster/Drowned waterNavigation Lnet/minecraft/world/entity/ai/navigation/WaterBoundPathNavigation;
 transitive-accessible field net/minecraft/world/entity/monster/Drowned groundNavigation Lnet/minecraft/world/entity/ai/navigation/GroundPathNavigation;
-transitive-accessible field net/minecraft/world/item/enchantment/ItemEnchantments showInTooltip Z
 transitive-accessible field net/minecraft/server/players/PlayerList playerIo Lnet/minecraft/world/level/storage/PlayerDataStorage;
 transitive-accessible field net/minecraft/server/players/PlayerList players Ljava/util/List;
 transitive-accessible field net/minecraft/world/level/block/entity/SignBlockEntity playerWhoMayEdit Ljava/util/UUID;
@@ -620,8 +597,6 @@ transitive-accessible field net/minecraft/world/level/saveddata/maps/MapItemSave
 transitive-mutable field net/minecraft/world/level/saveddata/maps/MapItemSavedData locked Z
 transitive-accessible field net/minecraft/world/level/saveddata/maps/MapItemSavedData dimension Lnet/minecraft/resources/ResourceKey;
 transitive-mutable field net/minecraft/world/level/saveddata/maps/MapItemSavedData dimension Lnet/minecraft/resources/ResourceKey;
-transitive-accessible field net/minecraft/world/item/crafting/RecipeManager byType Lcom/google/common/collect/Multimap;
-transitive-mutable field net/minecraft/world/item/crafting/RecipeManager byType Lcom/google/common/collect/Multimap;
 transitive-accessible field net/minecraft/server/ReloadableServerResources commands Lnet/minecraft/commands/Commands;
 transitive-mutable field net/minecraft/server/ReloadableServerResources commands Lnet/minecraft/commands/Commands;
 transitive-accessible field net/minecraft/network/protocol/handshake/ClientIntentionPacket hostName Ljava/lang/String;
@@ -659,15 +634,9 @@ transitive-accessible field net/minecraft/world/entity/LivingEntity invulnerable
 transitive-mutable field net/minecraft/world/entity/LivingEntity invulnerableDuration I
 transitive-accessible field net/minecraft/world/entity/LivingEntity combatTracker Lnet/minecraft/world/damagesource/CombatTracker;
 transitive-mutable field net/minecraft/world/entity/LivingEntity combatTracker Lnet/minecraft/world/damagesource/CombatTracker;
-transitive-accessible field net/minecraft/world/item/enchantment/ItemEnchantments$Mutable showInTooltip Z
-transitive-mutable field net/minecraft/world/item/enchantment/ItemEnchantments$Mutable showInTooltip Z
 transitive-accessible field net/minecraft/server/players/PlayerList maxPlayers I
 transitive-mutable field net/minecraft/server/players/PlayerList maxPlayers I
 transitive-accessible field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner targetCooldownLength I
 transitive-mutable field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner targetCooldownLength I
-transitive-accessible field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner normalConfig Lnet/minecraft/world/level/block/entity/trialspawner/TrialSpawnerConfig;
-transitive-mutable field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner normalConfig Lnet/minecraft/world/level/block/entity/trialspawner/TrialSpawnerConfig;
 transitive-accessible field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner requiredPlayerRange I
 transitive-mutable field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner requiredPlayerRange I
-transitive-accessible field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner ominousConfig Lnet/minecraft/world/level/block/entity/trialspawner/TrialSpawnerConfig;
-transitive-mutable field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner ominousConfig Lnet/minecraft/world/level/block/entity/trialspawner/TrialSpawnerConfig;

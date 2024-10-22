@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.entity.npc;
 
 import com.mohistmc.banner.bukkit.BukkitContainer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -18,9 +19,9 @@ public interface MixinInventoryCarrier {
      * @reason
      */
     @Overwrite
-    static void pickUpItem(Mob mob, InventoryCarrier carrier, ItemEntity itemEntity) {
+    static void pickUpItem(ServerLevel serverLevel, Mob mob, InventoryCarrier carrier, ItemEntity itemEntity) {
         ItemStack itemstack = itemEntity.getItem();
-        if (mob.wantsToPickUp(itemstack)) {
+        if (mob.wantsToPickUp(serverLevel, itemstack)) {
             SimpleContainer simplecontainer = carrier.getInventory();
             boolean flag = simplecontainer.canAddItem(itemstack);
             if (!flag) {

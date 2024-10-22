@@ -60,6 +60,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.ScoreAccess;
@@ -585,20 +586,8 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         }
     }
 
-    @Inject(method = "setPlayerInput", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;setShiftKeyDown(Z)V"))
-    private void banner$toggleSneak(float strafe, float forward, boolean jumping, boolean sneaking, CallbackInfo ci) {
-        if (sneaking != this.isShiftKeyDown()) {
-            PlayerToggleSneakEvent event = new PlayerToggleSneakEvent(this.getBukkitEntity(), sneaking);
-            Bukkit.getPluginManager().callEvent(event);
-
-            if (event.isCancelled()) {
-                ci.cancel();
-            }
-        }
-    }
-
-    @Redirect(method = "restoreFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/stats/ServerRecipeBook;copyOverData(Lnet/minecraft/stats/RecipeBook;)V"))
-    private void banner$copyOverData(ServerRecipeBook instance, RecipeBook recipeBook) {}
+    @Redirect(method = "restoreFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/stats/ServerRecipeBook;copyOverData(Lnet/minecraft/stats/ServerRecipeBook;)V"))
+    private void banner$copyOverData(ServerRecipeBook instance, ServerRecipeBook serverRecipeBook) {}
 
     @Redirect(method = "awardStat", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/scores/Scoreboard;forAllObjectives(Lnet/minecraft/world/scores/criteria/ObjectiveCriteria;Lnet/minecraft/world/scores/ScoreHolder;Ljava/util/function/Consumer;)V"))
     private void banner$addStats(Scoreboard instance, ObjectiveCriteria criteria, ScoreHolder scoreHolder, Consumer<ScoreAccess> points) {
@@ -639,7 +628,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Inject(method = "setCamera",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerPlayer;teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDLjava/util/Set;FF)Z"))
+            target = "Lnet/minecraft/server/level/ServerPlayer;teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDLjava/util/Set;FFZ)Z"))
     private void banner$pushSpectiveTpReason(Entity entity, CallbackInfo ci) {
         this.connection.pushTeleportCause(PlayerTeleportEvent.TeleportCause.SPECTATE);
     }
@@ -803,7 +792,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             ci.cancel();
         }
         java.util.List<org.bukkit.inventory.ItemStack> loot = new java.util.ArrayList<>(this.getInventory().getContainerSize());
-        boolean keepInventory = this.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) || this.isSpectator();
+        boolean keepInventory = this.serverLevel().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) || this.isSpectator();
 
         if (!keepInventory) {
             for (ItemStack item : this.getInventory().getContents()) {
@@ -813,7 +802,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             }
         }
         // SPIGOT-5071: manually add player loot tables (SPIGOT-5195 - ignores keepInventory rule)
-        this.dropFromLootTable(damageSource, this.lastHurtByPlayerTime > 0);
+        this.dropFromLootTable(this.serverLevel(), damageSource, this.lastHurtByPlayerTime > 0);
         for (org.bukkit.inventory.ItemStack item : this.bridge$drops()) {
             loot.add(item);
         }
@@ -861,7 +850,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             target = "Lnet/minecraft/server/level/ServerPlayer;isSpectator()Z"))
     private void banner$checkEventDrop(DamageSource damageSource, CallbackInfo ci) {
         // SPIGOT-5478 must be called manually now
-        this.dropExperience(damageSource.getEntity());
+        this.dropExperience(this.serverLevel(), damageSource.getEntity());
         // we clean the player's inventory after the EntityDeathEvent is called so plugins can get the exact state of the inventory.
         if (!banner$deathEvent.get().getKeepInventory()) {
             this.getInventory().clearContent();
@@ -888,12 +877,12 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Override
     public Entity changeDimension(ServerLevel worldserver, PlayerTeleportEvent.TeleportCause cause) {
         banner$changeDimensionCause.set(cause);
-        DimensionTransition dimensionTransition = this.portalProcess.getPortalDestination(worldserver, this);
+        TeleportTransition dimensionTransition = this.portalProcess.getPortalDestination(worldserver, this);
         return changeDimension(dimensionTransition);
     }
 
     @Inject(method = "teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDLjava/util/Set;FF)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;teleport(DDDFFLjava/util/Set;)V"))
-    private void banner$forwardReason(ServerLevel level, double x, double y, double z, Set<RelativeMovement> relativeMovements, float yRot, float xRot, CallbackInfoReturnable<Boolean> cir) {
+    private void banner$forwardReason(ServerLevel level, double x, double y, double z, Set<Relative> relativeMovements, float yRot, float xRot, CallbackInfoReturnable<Boolean> cir) {
         this.connection.pushTeleportCause(banner$changeDimensionCause.getAndSet(PlayerTeleportEvent.TeleportCause.UNKNOWN));
     }
 
@@ -910,7 +899,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     }
 
     @Override
-    public boolean teleportTo(ServerLevel worldserver, double d0, double d1, double d2, Set<RelativeMovement> pRelativeMovements, float f, float f1, PlayerTeleportEvent.TeleportCause cause) {
+    public boolean teleportTo(ServerLevel worldserver, double d0, double d1, double d2, Set<Relative> pRelativeMovements, float f, float f1, PlayerTeleportEvent.TeleportCause cause) {
         pushChangeDimensionCause(cause);
         return teleportTo(worldserver, d0, d1, d2, pRelativeMovements, f, f1);
     }

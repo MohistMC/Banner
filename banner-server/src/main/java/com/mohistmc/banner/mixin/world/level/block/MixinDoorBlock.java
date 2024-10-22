@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.redstone.Orientation;
 import org.bukkit.World;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.jetbrains.annotations.Nullable;
@@ -39,7 +40,7 @@ public abstract class MixinDoorBlock extends Block{
      * @reason
      */
     @Overwrite
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation fromPos, boolean isMoving) {
         // CraftBukkit start
         BlockPos otherHalf = pos.relative(state.getValue(HALF) == DoubleBlockHalf.LOWER ? Direction.UP : Direction.DOWN);
         World bworld = level.getWorld();

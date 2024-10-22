@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.animal;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -28,8 +29,8 @@ public abstract class MixinBee extends Animal {
     }
 
     @Inject(method = "doHurtTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z"))
-    private void banner$sting(Entity entityIn, CallbackInfoReturnable<Boolean> cir) {
-        ((LivingEntity) entityIn).pushEffectCause(EntityPotionEffectEvent.Cause.ATTACK);
+    private void banner$sting(ServerLevel serverLevel, Entity entity, CallbackInfoReturnable<Boolean> cir) {
+        ((LivingEntity) entity).pushEffectCause(EntityPotionEffectEvent.Cause.ATTACK);
     }
 
     /**
@@ -37,12 +38,12 @@ public abstract class MixinBee extends Animal {
      * @reason
      */
     @Overwrite
-    public boolean hurt(DamageSource source, float amount) {
-        if (this.isInvulnerableTo(source)) {
+    public boolean hurtServer(ServerLevel serverLevel, DamageSource source, float amount) {
+        if (this.isInvulnerableTo(serverLevel, source)) {
             return false;
         } else {
             Entity entity = source.getEntity();
-            boolean ret = super.hurt(source, amount);
+            boolean ret = super.hurtServer(serverLevel, source, amount);
             if (ret && !this.level().isClientSide) {
                 this.beePollinateGoal.stopPollinating();
             }

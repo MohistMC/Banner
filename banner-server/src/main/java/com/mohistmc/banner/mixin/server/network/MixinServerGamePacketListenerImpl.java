@@ -76,7 +76,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.entity.RelativeMovement;
+import net.minecraft.world.entity.Relative;
 import net.minecraft.world.entity.player.ChatVisiblity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -272,7 +272,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
 
     @Shadow
     public abstract void teleport(double d, double e, double f, float g, float h);
-    @Shadow public abstract void teleport(double d, double e, double f, float g, float h, Set<RelativeMovement> set);
+    @Shadow public abstract void teleport(double d, double e, double f, float g, float h, Set<Relative> set);
 
     @Shadow protected abstract boolean updateAwaitingTeleport();
 
@@ -1617,7 +1617,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
             cancellable = true)
     private void banner$recipeClickEvent(ServerboundPlaceRecipePacket packet, CallbackInfo ci) {
         // CraftBukkit start - implement PlayerRecipeBookClickEvent
-        org.bukkit.inventory.Recipe recipe = this.cserver.getRecipe(CraftNamespacedKey.fromMinecraft(packet.getRecipe()));
+        org.bukkit.inventory.Recipe recipe = this.cserver.getRecipe(CraftNamespacedKey.fromMinecraft(packet.recipe()));
         if (recipe == null) {
             ci.cancel();
         }
@@ -1730,7 +1730,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     private transient boolean banner$teleportCancelled;
 
     @Decorate(method = "teleport(DDDFFLjava/util/Set;)V", inject = true, at = @At("HEAD"))
-    private void banner$teleportEvent(double x, double y, double z, float yaw, float pitch, Set<RelativeMovement> relativeSet) throws Throwable {
+    private void banner$teleportEvent(double x, double y, double z, float yaw, float pitch, Set<Relative> relativeSet) throws Throwable {
         PlayerTeleportEvent.TeleportCause cause = banner$cause == null ? PlayerTeleportEvent.TeleportCause.UNKNOWN : banner$cause;
         banner$cause = null;
         Player player = this.getCraftPlayer();
@@ -1765,7 +1765,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     }
 
     @Inject(method = "teleport(DDDFFLjava/util/Set;)V", at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;awaitingTeleportTime:I"))
-    private void banner$storeLastPosition(double d, double e, double f, float yaw, float pitch, Set<RelativeMovement> set, CallbackInfo ci) {
+    private void banner$storeLastPosition(double d, double e, double f, float yaw, float pitch, Set<Relative> set, CallbackInfo ci) {
         this.lastPosX = this.awaitingPositionFromClient.x;
         this.lastPosY = this.awaitingPositionFromClient.y;
         this.lastPosZ = this.awaitingPositionFromClient.z;
@@ -1779,7 +1779,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     }
 
     @Override
-    public boolean teleport(double d0, double d1, double d2, float f, float f1, Set<RelativeMovement> set, PlayerTeleportEvent.TeleportCause cause) {
+    public boolean teleport(double d0, double d1, double d2, float f, float f1, Set<Relative> set, PlayerTeleportEvent.TeleportCause cause) {
         cause = banner$cause == null ? PlayerTeleportEvent.TeleportCause.UNKNOWN : banner$cause;
         banner$cause = null;
         org.bukkit.entity.Player player = this.getCraftPlayer();
@@ -1833,7 +1833,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     }
 
     @Override
-    public void internalTeleport(double pX, double pY, double pZ, float pYaw, float pPitch, Set<RelativeMovement> pRelativeSet) {
+    public void internalTeleport(double pX, double pY, double pZ, float pYaw, float pPitch, Set<Relative> pRelativeSet) {
         // CraftBukkit start
         if (Float.isNaN(pYaw)) {
             pYaw = 0;
@@ -1844,11 +1844,11 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
 
         this.justTeleported = true;
         // CraftBukkit end
-        double d0 = pRelativeSet.contains(RelativeMovement.X) ? this.player.getX() : 0.0D;
-        double d1 = pRelativeSet.contains(RelativeMovement.Y) ? this.player.getY() : 0.0D;
-        double d2 = pRelativeSet.contains(RelativeMovement.Z) ? this.player.getZ() : 0.0D;
-        float f = pRelativeSet.contains(RelativeMovement.Y_ROT) ? this.player.getYRot() : 0.0F;
-        float f1 = pRelativeSet.contains(RelativeMovement.X_ROT) ? this.player.getXRot() : 0.0F;
+        double d0 = pRelativeSet.contains(Relative.X) ? this.player.getX() : 0.0D;
+        double d1 = pRelativeSet.contains(Relative.Y) ? this.player.getY() : 0.0D;
+        double d2 = pRelativeSet.contains(Relative.Z) ? this.player.getZ() : 0.0D;
+        float f = pRelativeSet.contains(Relative.Y_ROT) ? this.player.getYRot() : 0.0F;
+        float f1 = pRelativeSet.contains(Relative.X_ROT) ? this.player.getXRot() : 0.0F;
         this.awaitingPositionFromClient = new Vec3(pX, pY, pZ);
         if (++this.awaitingTeleport == Integer.MAX_VALUE) {
             this.awaitingTeleport = 0;

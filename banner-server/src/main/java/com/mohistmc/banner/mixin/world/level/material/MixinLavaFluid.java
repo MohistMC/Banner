@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.material;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
@@ -30,29 +31,29 @@ public abstract class MixinLavaFluid {
      * @reason
      */
     @Overwrite
-    public void randomTick(Level level, BlockPos pos, FluidState state, RandomSource random) {
-        if (level.getGameRules().getBoolean(GameRules.RULE_DOFIRETICK)) {
+    public void randomTick(ServerLevel serverLevel, BlockPos pos, FluidState state, RandomSource random) {
+        if (serverLevel.getGameRules().getBoolean(GameRules.RULE_DOFIRETICK)) {
             int i = random.nextInt(3);
             if (i > 0) {
                 BlockPos blockPos = pos;
 
                 for(int j = 0; j < i; ++j) {
                     blockPos = blockPos.offset(random.nextInt(3) - 1, 1, random.nextInt(3) - 1);
-                    if (!level.isLoaded(blockPos)) {
+                    if (!serverLevel.isLoaded(blockPos)) {
                         return;
                     }
 
-                    BlockState blockState = level.getBlockState(blockPos);
+                    BlockState blockState = serverLevel.getBlockState(blockPos);
                     if (blockState.isAir()) {
-                        if (this.hasFlammableNeighbours(level, blockPos)) {
+                        if (this.hasFlammableNeighbours(serverLevel, blockPos)) {
                             // CraftBukkit start - Prevent lava putting something on fire
-                            if (level.getBlockState(blockPos).getBlock() != Blocks.FIRE) {
-                                if (CraftEventFactory.callBlockIgniteEvent(level, blockPos, pos).isCancelled()) {
+                            if (serverLevel.getBlockState(blockPos).getBlock() != Blocks.FIRE) {
+                                if (CraftEventFactory.callBlockIgniteEvent(serverLevel, blockPos, pos).isCancelled()) {
                                     continue;
                                 }
                             }
                             // CraftBukkit end
-                            level.setBlockAndUpdate(blockPos, BaseFireBlock.getState(level, blockPos));
+                            serverLevel.setBlockAndUpdate(blockPos, BaseFireBlock.getState(serverLevel, blockPos));
                             return;
                         }
                     } else if (blockState.blocksMotion()) {
@@ -62,12 +63,12 @@ public abstract class MixinLavaFluid {
             } else {
                 for(int k = 0; k < 3; ++k) {
                     BlockPos blockPos2 = pos.offset(random.nextInt(3) - 1, 0, random.nextInt(3) - 1);
-                    if (!level.isLoaded(blockPos2)) {
+                    if (!serverLevel.isLoaded(blockPos2)) {
                         return;
                     }
 
-                    if (level.isEmptyBlock(blockPos2.above()) && this.isFlammable(level, blockPos2)) {
-                        level.setBlockAndUpdate(blockPos2.above(), BaseFireBlock.getState(level, blockPos2));
+                    if (serverLevel.isEmptyBlock(blockPos2.above()) && this.isFlammable(serverLevel, blockPos2)) {
+                        serverLevel.setBlockAndUpdate(blockPos2.above(), BaseFireBlock.getState(serverLevel, blockPos2));
                     }
                 }
             }

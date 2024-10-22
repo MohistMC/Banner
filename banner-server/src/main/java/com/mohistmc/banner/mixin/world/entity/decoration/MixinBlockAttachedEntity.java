@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.entity.decoration;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -53,14 +54,14 @@ public abstract class MixinBlockAttachedEntity extends Entity {
         }
     }
 
-    @Inject(method = "hurt", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/BlockAttachedEntity;kill()V"))
-    private void banner$hangingBreakByAttack(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        Entity damager = (source.isDirect()) ? source.getEntity() : source.getDirectEntity();
+    @Inject(method = "hurtServer", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/BlockAttachedEntity;kill(Lnet/minecraft/server/level/ServerLevel;)V"))
+    private void banner$hangingBreakByAttack(ServerLevel serverLevel, DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> cir) {
+        Entity damager = (damageSource.isDirect()) ? damageSource.getEntity() : damageSource.getDirectEntity();
         HangingBreakEvent event;
         if (damager != null) {
-            event = new HangingBreakByEntityEvent((Hanging) this.getBukkitEntity(), damager.getBukkitEntity(), source.is(DamageTypeTags.IS_EXPLOSION) ? HangingBreakEvent.RemoveCause.EXPLOSION : HangingBreakEvent.RemoveCause.ENTITY);
+            event = new HangingBreakByEntityEvent((Hanging) this.getBukkitEntity(), damager.getBukkitEntity(), damageSource.is(DamageTypeTags.IS_EXPLOSION) ? HangingBreakEvent.RemoveCause.EXPLOSION : HangingBreakEvent.RemoveCause.ENTITY);
         } else {
-            event = new HangingBreakEvent((Hanging) this.getBukkitEntity(), source.is(DamageTypeTags.IS_EXPLOSION) ? HangingBreakEvent.RemoveCause.EXPLOSION : HangingBreakEvent.RemoveCause.DEFAULT);
+            event = new HangingBreakEvent((Hanging) this.getBukkitEntity(), damageSource.is(DamageTypeTags.IS_EXPLOSION) ? HangingBreakEvent.RemoveCause.EXPLOSION : HangingBreakEvent.RemoveCause.DEFAULT);
         }
         Bukkit.getPluginManager().callEvent(event);
         if (this.isRemoved() || event.isCancelled()) {
@@ -68,7 +69,7 @@ public abstract class MixinBlockAttachedEntity extends Entity {
         }
     }
 
-    @Inject(method = "move", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/BlockAttachedEntity;kill()V"))
+    @Inject(method = "move", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/BlockAttachedEntity;kill(Lnet/minecraft/server/level/ServerLevel;)V"))
     private void banner$hangingBreakByMove(MoverType typeIn, Vec3 pos, CallbackInfo ci) {
         if (this.isRemoved()) {
             ci.cancel();
