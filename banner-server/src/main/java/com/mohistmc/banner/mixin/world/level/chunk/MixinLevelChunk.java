@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.level.chunk;
 
 import com.mohistmc.banner.bukkit.DistValidate;
 import com.mohistmc.banner.injection.world.level.chunk.InjectionLevelChunk;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerLevel;
@@ -33,8 +34,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mixin(LevelChunk.class)
 public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLevelChunk {

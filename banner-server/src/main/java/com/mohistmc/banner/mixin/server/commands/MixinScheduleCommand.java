@@ -2,6 +2,8 @@ package com.mohistmc.banner.mixin.server.commands;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.functions.CommandFunction;
 import net.minecraft.resources.ResourceLocation;
@@ -14,9 +16,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Collection;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(ScheduleCommand.class)
 public class MixinScheduleCommand {

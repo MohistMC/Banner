@@ -3,6 +3,9 @@ package com.mohistmc.banner.mixin.world.level.block.entity;
 import com.mohistmc.banner.injection.world.level.block.entity.InjectionAbstractFurnaceBlockEntity;
 import io.izzel.arclight.mixin.Eject;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
@@ -16,16 +19,18 @@ import net.minecraft.world.inventory.RecipeCraftingHolder;
 import net.minecraft.world.inventory.StackedContentsCompatible;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
-import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.craftbukkit.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
@@ -46,26 +51,17 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-
 @Mixin(AbstractFurnaceBlockEntity.class)
 public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlockEntity implements WorldlyContainer, RecipeCraftingHolder, StackedContentsCompatible, InjectionAbstractFurnaceBlockEntity {
 
 
     // @formatter:off
     @Shadow protected NonNullList<ItemStack> items;
-    @Shadow protected abstract int getBurnDuration(ItemStack stack);
+    @Shadow  protected abstract int getBurnDuration(FuelValues fuelValues, ItemStack itemStack);
     @Shadow protected abstract boolean isLit();
     @Shadow @Final private Object2IntOpenHashMap<ResourceLocation> recipesUsed;
     @Shadow public abstract List<RecipeHolder<?>> getRecipesToAwardAndPopExperience(ServerLevel p_154996_, Vec3 p_154997_);
     // @formatter:on
-
-    @Shadow
-    private static boolean canBurn(RegistryAccess registryAccess, @Nullable RecipeHolder<?> recipeHolder, NonNullList<ItemStack> nonNullList, int i) {
-        return false;
-    }
 
     public List<HumanEntity> transaction = new ArrayList<>();
     private int maxStack = MAX_STACK;
@@ -110,23 +106,22 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
     private static AtomicReference<BlockPos> banner$blockPos = new AtomicReference<>();
 
     @Inject(method = "serverTick", at = @At("HEAD"))
-    private static void banner$getInfo(Level level, BlockPos pos, BlockState state,
-                                       AbstractFurnaceBlockEntity blockEntity, CallbackInfo ci) {
-        banner$world.set(level);
-        banner$blockPos.set(pos);
+    private static void banner$getInfo(ServerLevel serverLevel, BlockPos blockPos, BlockState blockState, AbstractFurnaceBlockEntity abstractFurnaceBlockEntity, CallbackInfo ci) {
+        banner$world.set(serverLevel);
+        banner$blockPos.set(blockPos);
     }
 
     @Redirect(method = "serverTick",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;burn(Lnet/minecraft/core/RegistryAccess;Lnet/minecraft/world/item/crafting/RecipeHolder;Lnet/minecraft/core/NonNullList;I)Z"))
-    private static boolean banner$burnEvent(RegistryAccess registryAccess, RecipeHolder<?> recipeHolder, NonNullList<ItemStack> nonNullList, int i) {
+                    target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;burn(Lnet/minecraft/core/RegistryAccess;Lnet/minecraft/world/item/crafting/RecipeHolder;Lnet/minecraft/world/item/crafting/SingleRecipeInput;Lnet/minecraft/core/NonNullList;I)Z"))
+    private static boolean banner$burnEvent(RegistryAccess registryAccess, RecipeHolder<? extends AbstractCookingRecipe> recipeHolder, SingleRecipeInput singleRecipeInput, NonNullList<ItemStack> nonNullList, int i) {
         return burn(banner$world.get(), banner$blockPos.get(), registryAccess, recipeHolder, nonNullList, i);
     }
 
-    private static boolean burn(Level world, BlockPos blockposition, RegistryAccess iregistrycustom, @Nullable RecipeHolder<?> irecipe, NonNullList<ItemStack> nonnulllist, int i) {
+    private static boolean burn(Level world, BlockPos blockposition, RegistryAccess iregistrycustom, @Nullable RecipeHolder<?> irecipe, NonNullList<ItemStack> nonNullList, int i) {
         banner$level.set(world);
         banner$pos.set(blockposition);
-        return burn(iregistrycustom, irecipe, nonnulllist, i);
+        return burn(iregistrycustom, irecipe, nonNullList, i);
     }
 
     /**
@@ -134,18 +129,18 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
      * @reason bukkit
      */
     @Overwrite
-    private static boolean burn(RegistryAccess iregistrycustom, @Nullable RecipeHolder<?> irecipe, NonNullList<ItemStack> nonnulllist, int i) {
-        if (irecipe != null && canBurn(iregistrycustom, irecipe, nonnulllist, i)) {
-            ItemStack itemstack = (ItemStack) nonnulllist.get(0);
-            ItemStack itemstack1 = irecipe.value().getResultItem(iregistrycustom);
-            ItemStack itemstack2 = (ItemStack) nonnulllist.get(2);
+    private static boolean burn(RegistryAccess registryAccess, @Nullable RecipeHolder<? extends AbstractCookingRecipe> recipeHolder, SingleRecipeInput singleRecipeInput, NonNullList<ItemStack> nonNullList, int i) {
+        if (recipeHolder != null && canBurn(registryAccess, recipeHolder, singleRecipeInput, nonNullList, i)) {
+            ItemStack itemStack = (ItemStack)nonNullList.get(0);
+            ItemStack itemStack2 = ((AbstractCookingRecipe)recipeHolder.value()).assemble(singleRecipeInput, registryAccess);
+            ItemStack itemStack3 = (ItemStack)nonNullList.get(2);
 
             // CraftBukkit start - fire FurnaceSmeltEvent
             CraftItemStack source = CraftItemStack.asCraftMirror(itemstack);
             org.bukkit.inventory.ItemStack result = CraftItemStack.asBukkitCopy(itemstack1);
 
             FurnaceSmeltEvent furnaceSmeltEvent;
-            if (irecipe.toBukkitRecipe() instanceof CookingRecipe cookingRecipe) {
+            if (recipeHolder.toBukkitRecipe() instanceof CookingRecipe cookingRecipe) {
                 furnaceSmeltEvent = new FurnaceSmeltEvent(CraftBlock.at(banner$level.get(), banner$pos.get()), source, result, cookingRecipe); // Paper
             } else {
                 furnaceSmeltEvent = new FurnaceSmeltEvent(CraftBlock.at(banner$level.get(), banner$pos.get()), source, result);
@@ -161,7 +156,7 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
 
             if (!itemstack1.isEmpty()) {
                 if (itemstack2.isEmpty()) {
-                    nonnulllist.set(2, itemstack1.copy());
+                    nonNullList.set(2, itemstack1.copy());
                 } else if (CraftItemStack.asCraftMirror(itemstack2).isSimilar(result)) {
                     itemstack2.grow(itemstack1.getCount());
                 } else {
@@ -171,15 +166,15 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
 
             /*
             if (itemstack2.isEmpty()) {
-                nonnulllist.set(2, itemstack1.copy());
+                nonNullList.set(2, itemstack1.copy());
             } else if (itemstack2.is(itemstack1.getItem())) {
                 itemstack2.grow(1);
             }
             */
             // CraftBukkit end
 
-            if (itemstack.is(Blocks.WET_SPONGE.asItem()) && !((ItemStack) nonnulllist.get(1)).isEmpty() && ((ItemStack) nonnulllist.get(1)).is(Items.BUCKET)) {
-                nonnulllist.set(1, new ItemStack(Items.WATER_BUCKET));
+            if (itemstack.is(Blocks.WET_SPONGE.asItem()) && !((ItemStack) nonNullList.get(1)).isEmpty() && ((ItemStack) nonNullList.get(1)).is(Items.BUCKET)) {
+                nonNullList.set(1, new ItemStack(Items.WATER_BUCKET));
             }
 
             itemstack.shrink(1);

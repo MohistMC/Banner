@@ -1,8 +1,7 @@
 package com.mohistmc.banner.injection.server.rcon;
 
-import net.minecraft.commands.CommandSourceStack;
-
 import java.net.SocketAddress;
+import net.minecraft.commands.CommandSourceStack;
 
 public interface InjectionRconConsoleSource {
 

@@ -1,13 +1,12 @@
 package com.mohistmc.banner.mixin.world.level.chunk.storage;
 
 import com.mohistmc.banner.injection.world.level.chunk.InjectionRegionFileStorage;
+import java.io.IOException;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.storage.RegionFile;
 import net.minecraft.world.level.chunk.storage.RegionFileStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-
-import java.io.IOException;
 
 @Mixin(RegionFileStorage.class)
 public abstract class MixinRegionFileStorage implements InjectionRegionFileStorage {

@@ -25,21 +25,23 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class MixinAbstractArrow extends Projectile {
 
     // @formatter:off
-    @Shadow public boolean inGround;
     @Shadow public abstract boolean isNoPhysics();
     @Shadow public int shakeTime;
     @Shadow public net.minecraft.world.entity.projectile.AbstractArrow.Pickup pickup;
     @Shadow protected abstract ItemStack getPickupItem();
+    @Shadow protected abstract boolean isInGround();
     // @formatter:on
 
     public MixinAbstractArrow(EntityType<? extends Projectile> entityType, Level level) {
         super(entityType, level);
     }
 
+    /*
     @Redirect(method = "tick", at = @At(value = "INVOKE", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/world/entity/projectile/AbstractArrow;hitTargetOrDeflectSelf(Lnet/minecraft/world/phys/HitResult;)Lnet/minecraft/world/entity/projectile/ProjectileDeflection;"))
     private ProjectileDeflection banner$hitEvent(AbstractArrow abstractArrow, HitResult hitResult) {
         return preHitTargetOrDeflectSelf(hitResult);
     }
+    */
 
     @Redirect(method = "onHitEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(F)V"))
     private void banner$fireShot(Entity entity, float f) {
@@ -56,7 +58,7 @@ public abstract class MixinAbstractArrow extends Projectile {
      */
     @Overwrite
     public void playerTouch(Player playerEntity) {
-        if (!this.level().isClientSide && (this.inGround || this.isNoPhysics()) && this.shakeTime <= 0) {
+        if (!this.level().isClientSide && (this.isInGround() || this.isNoPhysics()) && this.shakeTime <= 0) {
             ItemStack itemstack = this.getPickupItem();
             if (this.pickup == net.minecraft.world.entity.projectile.AbstractArrow.Pickup.ALLOWED && !itemstack.isEmpty() &&  playerEntity.getInventory().canHold(itemstack) > 0) {
                 ItemEntity item = new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), itemstack);

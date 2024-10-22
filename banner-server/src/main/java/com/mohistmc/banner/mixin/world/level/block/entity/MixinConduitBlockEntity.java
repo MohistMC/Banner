@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
 import com.mohistmc.banner.asm.annotation.TransformAccess;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
@@ -10,8 +11,6 @@ import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import java.util.List;
 
 @Mixin(ConduitBlockEntity.class)
 public class MixinConduitBlockEntity {

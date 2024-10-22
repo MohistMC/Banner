@@ -12,6 +12,15 @@ import com.mohistmc.banner.injection.world.entity.InjectionLivingEntity;
 import io.izzel.arclight.mixin.Decorate;
 import io.izzel.arclight.mixin.DecorationOps;
 import io.izzel.arclight.mixin.Eject;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -37,16 +46,19 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Attackable;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.WalkAnimationState;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.Equipable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -62,7 +74,11 @@ import org.bukkit.craftbukkit.attribute.CraftAttributeMap;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityResurrectEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
@@ -79,19 +95,11 @@ import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-
 @Mixin(LivingEntity.class)
 public abstract class MixinLivingEntity extends Entity implements Attackable, InjectionLivingEntity {
 
     @Shadow @Final public static EntityDataAccessor<Float> DATA_HEALTH_ID;
     @Shadow @Final private AttributeMap attributes;
-
-    @Shadow public abstract SoundEvent getEatingSound(net.minecraft.world.item.ItemStack stack);
-
-    @Shadow protected abstract SoundEvent getDrinkingSound(net.minecraft.world.item.ItemStack stack);
 
     @Shadow protected abstract SoundEvent getFallDamageSound(int height);
 
@@ -101,8 +109,6 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
     @Shadow @Final public Map<Holder<MobEffect>, MobEffectInstance> activeEffects;
 
     @Shadow protected abstract void onEffectUpdated(MobEffectInstance effectInstance, boolean forced, @Nullable Entity entity);
-
-    @Shadow protected abstract void onEffectRemoved(MobEffectInstance effectInstance);
 
     @Shadow public boolean effectsDirty;
 
@@ -165,8 +171,6 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
 
     @Shadow public abstract void indicateDamage(double d, double e);
 
-    @Shadow public abstract ItemStack eat(Level level, ItemStack food);
-
     @Shadow protected boolean dead;
 
     @Shadow public abstract boolean isSleeping();
@@ -178,8 +182,6 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
     @Shadow public int invulnerableDuration;
 
     @Shadow public float lastHurt;
-
-    @Shadow protected abstract void actuallyHurt(DamageSource damageSource, float f);
 
     @Shadow public abstract void die(DamageSource damageSource);
 

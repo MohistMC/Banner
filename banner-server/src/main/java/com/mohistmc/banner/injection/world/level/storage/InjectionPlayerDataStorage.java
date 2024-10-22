@@ -1,9 +1,8 @@
 package com.mohistmc.banner.injection.world.level.storage;
 
-import net.minecraft.nbt.CompoundTag;
-
 import java.io.File;
 import java.util.Optional;
+import net.minecraft.nbt.CompoundTag;
 
 public interface InjectionPlayerDataStorage {
 

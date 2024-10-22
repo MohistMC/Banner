@@ -8,7 +8,6 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.ResultContainer;
 import org.bukkit.craftbukkit.inventory.CraftInventoryCrafter;
-import org.bukkit.craftbukkit.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.inventory.view.CraftCrafterView;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;

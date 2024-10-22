@@ -1,5 +1,8 @@
 package com.mohistmc.banner.bukkit;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -11,10 +14,6 @@ import org.bukkit.craftbukkit.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.util.CraftLocation;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class BannerLecternInventory implements Container {
 

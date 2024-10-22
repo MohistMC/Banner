@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.item.crafting;
 
+import java.util.Optional;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.SmithingRecipe;
 import net.minecraft.world.item.crafting.SmithingTrimRecipe;
@@ -15,13 +16,13 @@ import org.spongepowered.asm.mixin.Shadow;
 public abstract class MixinSmithingTrimRecipe implements SmithingRecipe {
 
     @Shadow @Final
-    Ingredient addition;
+    Optional<Ingredient> addition;
 
     @Shadow @Final
-    Ingredient base;
+    Optional<Ingredient> base;
 
     @Shadow @Final
-    Ingredient template;
+    Optional<Ingredient> template;
 
     // CraftBukkit start
     @Override

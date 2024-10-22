@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.server.network;
 
 import com.mojang.authlib.GameProfile;
+import java.net.SocketAddress;
 import net.fabricmc.fabric.api.networking.v1.FabricServerConfigurationNetworkHandler;
 import net.minecraft.network.Connection;
 import net.minecraft.network.TickablePacketListener;
@@ -16,8 +17,6 @@ import net.minecraft.server.players.PlayerList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import java.net.SocketAddress;
 
 @Mixin(ServerConfigurationPacketListenerImpl.class)
 public abstract class MixinServerConfigurationPacketListenerImpl extends ServerCommonPacketListenerImpl implements ServerConfigurationPacketListener, TickablePacketListener, FabricServerConfigurationNetworkHandler {

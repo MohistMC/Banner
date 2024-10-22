@@ -8,7 +8,6 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.StonecutterMenu;
 import org.bukkit.craftbukkit.inventory.CraftInventoryStonecutter;
-import org.bukkit.craftbukkit.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.inventory.view.CraftStonecutterView;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;

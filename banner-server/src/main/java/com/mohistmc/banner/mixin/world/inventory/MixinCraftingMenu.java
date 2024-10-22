@@ -6,26 +6,18 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.AbstractCraftingMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.CraftingMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.inventory.RecipeBookMenu;
-import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.TransientCraftingContainer;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RepairItemRecipe;
-import net.minecraft.world.level.Level;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.craftbukkit.inventory.CraftInventoryCrafting;
 import org.bukkit.craftbukkit.inventory.CraftInventoryView;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -35,14 +27,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(CraftingMenu.class)
-public abstract class MixinCraftingMenu extends RecipeBookMenu<CraftingInput, CraftingRecipe> {
+public abstract class MixinCraftingMenu extends AbstractCraftingMenu {
 
-    // @formatter:off
-    @Mutable @Shadow @Final private CraftingContainer craftSlots;
-    @Shadow @Final private ResultContainer resultSlots;
 
-    public MixinCraftingMenu(MenuType<?> menuType, int i) {
-        super(menuType, i);
+    public MixinCraftingMenu(MenuType<?> menuType, int i, int j, int k) {
+        super(menuType, i, j, k);
     }
 
     @Accessor("access") public abstract ContainerLevelAccess bridge$getWorldPos();
@@ -70,7 +59,7 @@ public abstract class MixinCraftingMenu extends RecipeBookMenu<CraftingInput, Cr
     }
 
     @ModifyVariable(method = "slotChangedCraftingGrid", ordinal = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/ResultContainer;setItem(ILnet/minecraft/world/item/ItemStack;)V"))
-    private static ItemStack banner$preCraft(ItemStack stack, AbstractContainerMenu container, Level level, Player player, CraftingContainer craftingContainer, ResultContainer resultContainer) {
+    private static AbstractContainerMenu banner$preCraft(AbstractContainerMenu value) {
         return CraftEventFactory.callPreCraftEvent(craftingContainer, resultContainer, stack, container.getBukkitView(), banner$capture );
     }
 

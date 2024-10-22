@@ -1,6 +1,11 @@
 package com.mohistmc.banner.injection.world.entity;
 
 import com.mohistmc.banner.bukkit.ProcessableEffect;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
@@ -13,12 +18,6 @@ import org.bukkit.craftbukkit.attribute.CraftAttributeMap;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 
 public interface InjectionLivingEntity extends InjectionEntity {
 

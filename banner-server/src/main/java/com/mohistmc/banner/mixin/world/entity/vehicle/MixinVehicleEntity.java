@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.vehicle;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -39,25 +40,22 @@ public abstract class MixinVehicleEntity extends Entity {
     public abstract float getDamage();
 
     @Shadow
-    protected abstract void destroy(DamageSource source);
-
-    @Shadow
-    public abstract int getHurtTime();
+    protected abstract void destroy(ServerLevel serverLevel, DamageSource source);
 
     @Shadow
     abstract boolean shouldSourceDestroy(DamageSource p_309621_);
     // @formatter:on
 
     /**
-     * @author IzzelAliz
+     * @author
      * @reason
      */
     @Overwrite
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurtServer(ServerLevel serverLevel, DamageSource source, float amount) {
         if (this.level().isClientSide || this.isRemoved()) {
             return true;
         }
-        if (this.isInvulnerableTo(source)) {
+        if (this.isInvulnerableToBase(source)) {
             return false;
         }
         Vehicle vehicle = (Vehicle) this.getBukkitEntity();
@@ -95,7 +93,7 @@ public abstract class MixinVehicleEntity extends Entity {
                 this.setDamage(40.0F); // Maximize damage so this doesn't get triggered again right away
                 return true;
             }
-            this.destroy(source);
+            this.destroy(serverLevel, source);
         }
         return true;
     }

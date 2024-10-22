@@ -8,7 +8,6 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.LoomMenu;
 import net.minecraft.world.inventory.MenuType;
 import org.bukkit.craftbukkit.inventory.CraftInventoryLoom;
-import org.bukkit.craftbukkit.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.inventory.view.CraftLoomView;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;

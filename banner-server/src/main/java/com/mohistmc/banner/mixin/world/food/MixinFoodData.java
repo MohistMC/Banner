@@ -5,6 +5,7 @@ import com.mohistmc.banner.asm.annotation.ShadowConstructor;
 import com.mohistmc.banner.injection.world.food.InjectionFoodData;
 import io.izzel.arclight.mixin.Decorate;
 import io.izzel.arclight.mixin.DecorationOps;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -25,13 +26,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 @Mixin(FoodData.class)
 public abstract class MixinFoodData implements InjectionFoodData {
 
     @Shadow public int foodLevel;
-    @Shadow private int lastFoodLevel;
     @Shadow public float saturationLevel;
 
     @Shadow protected abstract void add(int i, float f);
@@ -98,28 +96,28 @@ public abstract class MixinFoodData implements InjectionFoodData {
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE_ASSIGN", remap = false, target = "Ljava/lang/Math;max(II)I"))
-    public void banner$foodLevelChange2(Player player, CallbackInfo ci) {
+    public void banner$foodLevelChange2(ServerPlayer serverPlayer, CallbackInfo ci) {
         if (entityhuman == null) {
             return;
         }
-        FoodLevelChangeEvent event = CraftEventFactory.callFoodLevelChangeEvent(entityhuman, Math.max(this.lastFoodLevel - 1, 0));
+        FoodLevelChangeEvent event = CraftEventFactory.callFoodLevelChangeEvent(entityhuman, Math.max(this.foodLevel - 1, 0));
 
         if (!event.isCancelled()) {
             this.foodLevel = event.getFoodLevel();
         } else {
-            this.foodLevel = this.lastFoodLevel;
+            this.foodLevel = Math.max(this.foodLevel - 1, 0);
         }
 
         ((ServerPlayer) entityhuman).connection.send(new ClientboundSetHealthPacket(((ServerPlayer) entityhuman).getBukkitEntity().getScaledHealth(), this.foodLevel, this.saturationLevel));
     }
 
-    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;heal(F)V"))
-    public void banner$heal(Player player, CallbackInfo ci) {
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;heal(F)V"))
+    public void banner$heal(ServerPlayer serverPlayer, CallbackInfo ci) {
         if (entityhuman == null) {
-            entityhuman = player;
+            entityhuman = serverPlayer;
         }
-         player.pushHealReason(EntityRegainHealthEvent.RegainReason.SATIATED);
-         player.pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.REGEN);
+        serverPlayer.pushHealReason(EntityRegainHealthEvent.RegainReason.SATIATED);
+        serverPlayer.pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.REGEN);
     }
 
     @ModifyConstant(method = "tick", constant = @Constant(intValue = 10))

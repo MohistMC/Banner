@@ -9,7 +9,6 @@ import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.EnchantmentMenu;
 import net.minecraft.world.inventory.MenuType;
 import org.bukkit.craftbukkit.inventory.CraftInventoryEnchanting;
-import org.bukkit.craftbukkit.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.inventory.view.CraftEnchantmentView;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;

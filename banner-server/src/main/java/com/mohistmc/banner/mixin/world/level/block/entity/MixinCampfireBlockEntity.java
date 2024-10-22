@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -14,6 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.CampfireBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.gameevent.GameEvent.Context;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
@@ -29,16 +32,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.Optional;
-
 @Mixin(CampfireBlockEntity.class)
 public abstract class MixinCampfireBlockEntity extends BlockEntity {
-    @Shadow
-    public abstract Optional<CampfireCookingRecipe> getCookableRecipe(ItemStack p_59052_);
 
     @Shadow @Final public int[] cookingTime;
-
-    @Shadow @Final private RecipeManager.CachedCheck<SingleRecipeInput, CampfireCookingRecipe> quickCheck;
 
     public MixinCampfireBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
@@ -46,7 +43,6 @@ public abstract class MixinCampfireBlockEntity extends BlockEntity {
 
 
     // Banner - fix mixin(locals = LocalCapture.CAPTURE_FAILSOFT)
-    private static Optional<RecipeHolder<CampfireCookingRecipe>> recipe;
     private static CraftItemStack source;
     private static  org.bukkit.inventory.ItemStack result;
     private static BlockCookEvent blockCookEvent;
@@ -56,30 +52,27 @@ public abstract class MixinCampfireBlockEntity extends BlockEntity {
      * @reason bukkit
      */
     @Overwrite
-    public static void cookTick(Level world, BlockPos blockposition, BlockState iblockdata, CampfireBlockEntity tileentitycampfire) {
-        boolean flag = false;
+    public static void cookTick(ServerLevel serverLevel, BlockPos blockPos, BlockState blockState, CampfireBlockEntity campfireBlockEntity, RecipeManager.CachedCheck<SingleRecipeInput, CampfireCookingRecipe> cachedCheck) {
+        boolean bl = false;
 
-        for (int i = 0; i < tileentitycampfire.getItems().size(); ++i) {
-            ItemStack itemstack = tileentitycampfire.getItems().get(i);
+        for(int i = 0; i < campfireBlockEntity.getItems().size(); ++i) {
+            ItemStack itemStack = (ItemStack) campfireBlockEntity.getItems().get(i);
+            if (!itemStack.isEmpty()) {
+                bl = true;
+                int var10002 = campfireBlockEntity.cookingProgress[i]++;
+                if (campfireBlockEntity.cookingProgress[i] >= campfireBlockEntity.cookingTime[i]) {
+                    SingleRecipeInput singleRecipeInput = new SingleRecipeInput(itemStack);
+                    ItemStack itemStack2 = (ItemStack)cachedCheck.getRecipeFor(singleRecipeInput, serverLevel).map((recipeHolder) -> {
+                        return ((CampfireCookingRecipe)recipeHolder.value()).assemble(singleRecipeInput, serverLevel.registryAccess());
+                    }).orElse(itemStack);
 
-            if (!itemstack.isEmpty()) {
-                flag = true;
-
-                if (tileentitycampfire.cookingProgress[i] >= tileentitycampfire.cookingTime[i]) {
-                    SingleRecipeInput singleRecipeInput = new SingleRecipeInput(itemstack);
-                    recipe = ((MixinCampfireBlockEntity) (Object) tileentitycampfire).quickCheck.getRecipeFor( singleRecipeInput, world);
-                    ItemStack itemStack2 = recipe.map((recipecampfire) -> {
-                        // Paper end
-                        return recipecampfire.value().assemble(singleRecipeInput, world.registryAccess());
-                    }).orElse(itemstack);
-
-                    if (itemStack2.isItemEnabled(world.enabledFeatures())) {
+                    if (itemStack2.isItemEnabled(serverLevel.enabledFeatures())) {
                         // CraftBukkit start - fire BlockCookEvent
-                        source = CraftItemStack.asCraftMirror(itemstack);
+                        source = CraftItemStack.asCraftMirror(itemStack);
                         result = CraftItemStack.asBukkitCopy(itemStack2);
 
-                        blockCookEvent = new BlockCookEvent(CraftBlock.at(world, blockposition), source, result, (org.bukkit.inventory.CookingRecipe<?>) recipe.map(((RecipeHolder<CampfireCookingRecipe>::toBukkitRecipe))).orElse(null)); // Paper
-                        world.getCraftServer().getPluginManager().callEvent(blockCookEvent);
+                        blockCookEvent = new BlockCookEvent(CraftBlock.at(serverLevel, blockPos), source, result);
+                        serverLevel.getCraftServer().getPluginManager().callEvent(blockCookEvent);
 
                         if (blockCookEvent.isCancelled()) {
                             return;
@@ -88,25 +81,25 @@ public abstract class MixinCampfireBlockEntity extends BlockEntity {
                         result = blockCookEvent.getResult();
                         itemStack2 = CraftItemStack.asNMSCopy(result);
                         // CraftBukkit end
-                        Containers.dropItemStack(world, (double) blockposition.getX(), (double) blockposition.getY(), (double) blockposition.getZ(), itemStack2);
-                        tileentitycampfire.getItems().set(i, ItemStack.EMPTY);
-                        world.sendBlockUpdated(blockposition, iblockdata, iblockdata, 3);
-                        world.gameEvent(GameEvent.BLOCK_CHANGE, blockposition, GameEvent.Context.of(iblockdata));
+                        Containers.dropItemStack(serverLevel, (double)blockPos.getX(), (double)blockPos.getY(), (double)blockPos.getZ(), itemStack2);
+                        campfireBlockEntity.getItems().set(i, ItemStack.EMPTY);
+                        serverLevel.sendBlockUpdated(blockPos, blockState, blockState, 3);
+                        serverLevel.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, Context.of(blockState));
                     }
                 }
             }
         }
 
-        if (flag) {
-            setChanged(world, blockposition, iblockdata);
+        if (bl) {
+            setChanged(serverLevel, blockPos, blockState);
         }
 
     }
 
     @Inject(method = "placeFood", locals = LocalCapture.CAPTURE_FAILHARD,
             at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/block/entity/CampfireBlockEntity;cookingProgress:[I"))
-    private void banner$cookStart(LivingEntity livingEntity, ItemStack itemStack, int i, CallbackInfoReturnable<Boolean> cir, int j, ItemStack itemStack2) {
-        var event = new CampfireStartEvent(CraftBlock.at(this.level, this.worldPosition), CraftItemStack.asCraftMirror(itemStack), (CampfireRecipe) ((RecipeHolder) (Object) getCookableRecipe(itemStack).get()).toBukkitRecipe());
+    private void banner$cookStart(ServerLevel serverLevel, LivingEntity livingEntity, ItemStack itemStack, CallbackInfoReturnable<Boolean> cir, int i, ItemStack itemStack2, Optional optional) {
+        var event = new CampfireStartEvent(CraftBlock.at(this.level, this.worldPosition), CraftItemStack.asCraftMirror(itemStack), (CampfireRecipe) ((RecipeHolder) optional.get()).toBukkitRecipe());
         Bukkit.getPluginManager().callEvent(event);
         this.cookingTime[i] = event.getTotalCookTime();
     }

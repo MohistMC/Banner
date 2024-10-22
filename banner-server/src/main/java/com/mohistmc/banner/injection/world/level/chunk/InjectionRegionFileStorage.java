@@ -1,8 +1,7 @@
 package com.mohistmc.banner.injection.world.level.chunk;
 
-import net.minecraft.world.level.ChunkPos;
-
 import java.io.IOException;
+import net.minecraft.world.level.ChunkPos;
 
 public interface InjectionRegionFileStorage {
 

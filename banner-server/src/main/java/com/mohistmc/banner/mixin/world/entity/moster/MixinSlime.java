@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.world.entity.moster;
 
 import com.mohistmc.banner.injection.world.entity.monster.InjectionSlime;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
@@ -20,9 +22,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Mixin(net.minecraft.world.entity.monster.Slime.class)
 public abstract class MixinSlime extends Mob implements InjectionSlime {

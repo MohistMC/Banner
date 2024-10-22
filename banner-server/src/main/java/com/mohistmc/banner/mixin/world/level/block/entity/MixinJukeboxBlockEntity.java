@@ -1,6 +1,9 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
 import com.mohistmc.banner.bukkit.DistValidate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.item.ItemStack;
@@ -14,10 +17,6 @@ import org.bukkit.craftbukkit.entity.CraftHumanEntity;
 import org.bukkit.entity.HumanEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 @Mixin(JukeboxBlockEntity.class)
 public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Clearable, ContainerSingleItem {

@@ -4,7 +4,6 @@ import com.mohistmc.banner.bukkit.BukkitCauldronHooks;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.stats.Stats;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.level.block.Block;

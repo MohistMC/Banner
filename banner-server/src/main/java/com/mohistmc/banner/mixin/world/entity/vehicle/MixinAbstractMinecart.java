@@ -3,6 +3,7 @@ package com.mohistmc.banner.mixin.world.entity.vehicle;
 import com.mohistmc.banner.injection.world.entity.vehicle.InjectionAbstractMinecart;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -30,7 +31,6 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AbstractMinecart.class)
@@ -41,19 +41,10 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Inj
     }
 
     // @formatter:off
-    @Shadow protected abstract void moveAlongTrack(BlockPos pos, BlockState state);
     @Shadow public abstract void activateMinecart(int x, int y, int z, boolean receivingPower);
     @Shadow private boolean flipped;
-    @Shadow public abstract AbstractMinecart.Type getMinecartType();
     // @formatter:on
 
-    @Shadow private boolean onRails;
-    @Shadow private int lerpSteps;
-    @Shadow private double lerpX;
-    @Shadow private double lerpY;
-    @Shadow private double lerpZ;
-    @Shadow private double lerpYRot;
-    @Shadow private double lerpXRot;
     public boolean slowWhenEmpty = true;
     private double derailedX = 0.5;
     private double derailedY = 0.5;
@@ -237,7 +228,7 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Inj
      * @reason
      */
     @Overwrite
-    protected double getMaxSpeed() {
+    protected double getMaxSpeed(ServerLevel serverLevel) {
         return maxSpeed;
     }
 
@@ -246,11 +237,11 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Inj
      * @reason
      */
     @Overwrite
-    protected void comeOffTrack() {
-        double d0 = this.getMaxSpeed();
+    protected void comeOffTrack(ServerLevel serverLevel) {
+        double d = this.getMaxSpeed(serverLevel);
         Vec3 vec3d = this.getDeltaMovement();
 
-        this.setDeltaMovement(Mth.clamp(vec3d.x, -d0, d0), vec3d.y, Mth.clamp(vec3d.z, -d0, d0));
+        this.setDeltaMovement(Mth.clamp(vec3d.x, -d, d), vec3d.y, Mth.clamp(vec3d.z, -d, d));
         if (this.onGround()) {
             // CraftBukkit start - replace magic numbers with our variables
             this.setDeltaMovement(new Vec3(this.getDeltaMovement().x * this.derailedX, this.getDeltaMovement().y * this.derailedY, this.getDeltaMovement().z * this.derailedZ));
@@ -263,11 +254,6 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Inj
             this.setDeltaMovement(new Vec3(this.getDeltaMovement().x * this.flyingX, this.getDeltaMovement().y * this.flyingY, this.getDeltaMovement().z * this.flyingZ));
             // CraftBukkit end
         }
-    }
-
-    @Redirect(method = "applyNaturalSlowdown", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/AbstractMinecart;isVehicle()Z"))
-    private boolean banner$slowWhenEmpty(AbstractMinecart abstractMinecartEntity) {
-        return this.isVehicle() || !this.slowWhenEmpty;
     }
 
     @Inject(method = "push", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/AbstractMinecart;hasPassenger(Lnet/minecraft/world/entity/Entity;)Z"))

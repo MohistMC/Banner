@@ -1,5 +1,8 @@
 package com.mohistmc.banner.mixin.world.level.saveddata.maps;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.saveddata.maps.MapDecoration;
@@ -18,10 +21,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(MapItemSavedData.HoldingPlayer.class)
 public abstract class MixinMapItemSavedData_HoldingPlayer {

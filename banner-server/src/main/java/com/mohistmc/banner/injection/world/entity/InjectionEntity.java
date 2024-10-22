@@ -1,11 +1,13 @@
 package com.mohistmc.banner.injection.world.entity;
 
+import java.util.Set;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.RelativeMovement;
+import net.minecraft.world.entity.Relative;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftEntity;
@@ -13,9 +15,6 @@ import org.bukkit.craftbukkit.event.CraftPortalEvent;
 import org.bukkit.event.entity.EntityRemoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Set;
-import java.util.UUID;
 
 public interface InjectionEntity {
 
@@ -113,7 +112,7 @@ public interface InjectionEntity {
         throw new IllegalStateException("Not implemented");
     }
 
-    default  boolean teleportTo(ServerLevel worldserver, double d0, double d1, double d2, Set<RelativeMovement> set, float f, float f1, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause cause) {
+    default  boolean teleportTo(ServerLevel worldserver, double d0, double d1, double d2, Set<Relative> set, float f, float f1, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause cause) {
         throw new IllegalStateException("Not implemented");
     }
 

@@ -1,5 +1,7 @@
 package com.mohistmc.banner.bukkit;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.TicketType;
@@ -9,9 +11,6 @@ import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.SaplingBlock;
 import org.bukkit.TreeType;
 import org.bukkit.plugin.Plugin;
-
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
 
 public class BukkitFieldHooks {
 

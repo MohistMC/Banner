@@ -9,10 +9,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
@@ -85,7 +85,7 @@ public abstract class MixinZombie extends Monster {
     }
 
     @Inject(method = "finalizeSpawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerLevelAccessor;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
-    private void banner$mount(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, SpawnGroupData spawnGroupData, CallbackInfoReturnable<SpawnGroupData> cir) {
+    private void banner$mount(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, EntitySpawnReason mobSpawnType, SpawnGroupData spawnGroupData, CallbackInfoReturnable<SpawnGroupData> cir) {
         serverLevelAccessor.getLevel().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.MOUNT);
     }
 
@@ -95,7 +95,7 @@ public abstract class MixinZombie extends Monster {
         villager.bridge$pushTransformReason(EntityTransformEvent.TransformReason.INFECTION);
         ZombieVillager zombieVillager = villager.convertTo(EntityType.ZOMBIE_VILLAGER, false);
         if (zombieVillager != null) {
-            zombieVillager.finalizeSpawn(level, level.getCurrentDifficultyAt(zombieVillager.blockPosition()), MobSpawnType.CONVERSION, new net.minecraft.world.entity.monster.Zombie.ZombieGroupData(false, true));
+            zombieVillager.finalizeSpawn(level, level.getCurrentDifficultyAt(zombieVillager.blockPosition()), EntitySpawnReason.CONVERSION, new net.minecraft.world.entity.monster.Zombie.ZombieGroupData(false, true));
             zombieVillager.setVillagerData(villager.getVillagerData());
             zombieVillager.setGossips(villager.getGossips().store(NbtOps.INSTANCE));
             zombieVillager.setTradeOffers(villager.getOffers().copy());

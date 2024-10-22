@@ -8,15 +8,14 @@ import com.mohistmc.banner.asm.MixinProcessor;
 import com.mohistmc.banner.asm.RenameIntoProcessor;
 import com.mohistmc.banner.asm.TransformAccessProcessor;
 import io.izzel.arclight.mixin.MixinTools;
+import java.util.List;
+import java.util.Set;
 import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 import org.spongepowered.asm.mixin.extensibility.IEnvironmentTokenProvider;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
-
-import java.util.List;
-import java.util.Set;
 
 public class BannerMixinPlugin implements IMixinConfigPlugin, IEnvironmentTokenProvider {
 
@@ -65,9 +64,6 @@ public class BannerMixinPlugin implements IMixinConfigPlugin, IEnvironmentTokenP
         }
         if (mixinClassName.equals("com.mohistmc.banner.mixin.core.network.protocol.MixinPacketUtils")) {
             return !FabricLoader.getInstance().isModLoaded("cobblemon");
-        }
-        if (mixinClassName.equals("com.mohistmc.banner.mixin.core.world.item.MixinChorusFruitItem")) {
-            return !FabricLoader.getInstance().isModLoaded("openpartiesandclaims");
         }
         return true;
     }

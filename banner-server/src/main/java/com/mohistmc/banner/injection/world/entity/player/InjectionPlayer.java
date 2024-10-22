@@ -2,6 +2,7 @@ package com.mohistmc.banner.injection.world.entity.player;
 
 import com.mohistmc.banner.injection.world.entity.InjectionLivingEntity;
 import com.mojang.datafixers.util.Either;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Unit;
@@ -10,8 +11,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.craftbukkit.entity.CraftHumanEntity;
 import org.bukkit.event.entity.EntityExhaustionEvent;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public interface InjectionPlayer extends InjectionLivingEntity {
 

@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.level.block.entity;
 
 import com.mohistmc.banner.asm.annotation.TransformAccess;
 import com.mohistmc.banner.injection.world.level.block.entity.InjectionBeaconBlockEntity;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -22,8 +23,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.List;
 
 // Banner TODO fix patches
 @Mixin(BeaconBlockEntity.class)

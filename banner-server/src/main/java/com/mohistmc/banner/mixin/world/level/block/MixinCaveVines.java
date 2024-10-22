@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
+import java.util.Collections;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -24,8 +25,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-
-import java.util.Collections;
 
 @Mixin(CaveVines.class)
 public interface MixinCaveVines {

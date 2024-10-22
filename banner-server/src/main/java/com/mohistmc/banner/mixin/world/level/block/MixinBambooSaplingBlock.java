@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
+import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -14,8 +15,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 @Mixin(BambooSaplingBlock.class)
 public class MixinBambooSaplingBlock {

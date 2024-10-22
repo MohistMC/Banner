@@ -4787,6 +4787,8 @@ public enum Material implements Keyed, Translatable {
     public final Class<?> data;
     private final boolean legacy;
     public NamespacedKey key;
+    private final Supplier<ItemType> itemType;
+    private final Supplier<BlockType> blockType;
     public boolean isFabricBlock = false;
     public boolean isFabricItem = false;
 

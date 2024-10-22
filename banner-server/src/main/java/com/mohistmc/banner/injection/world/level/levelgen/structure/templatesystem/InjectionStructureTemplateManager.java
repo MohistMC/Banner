@@ -1,9 +1,8 @@
 package com.mohistmc.banner.injection.world.level.levelgen.structure.templatesystem;
 
+import java.util.Optional;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-
-import java.util.Optional;
 
 public interface InjectionStructureTemplateManager {
 

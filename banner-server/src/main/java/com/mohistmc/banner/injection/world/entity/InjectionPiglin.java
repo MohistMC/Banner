@@ -1,8 +1,7 @@
 package com.mohistmc.banner.injection.world.entity;
 
-import net.minecraft.world.item.Item;
-
 import java.util.Set;
+import net.minecraft.world.item.Item;
 
 public interface InjectionPiglin {
 

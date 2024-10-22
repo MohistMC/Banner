@@ -7,13 +7,16 @@ import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.BoatDispenseItemBehavior;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.vehicle.Boat;
-import net.minecraft.world.entity.vehicle.ChestBoat;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.AbstractBoat;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.spongepowered.asm.mixin.Final;
@@ -26,63 +29,66 @@ public abstract class MixinBoatDispenseItemBehavior {
 
     @Shadow @Final private DefaultDispenseItemBehavior defaultDispenseItemBehavior;
 
-    @Shadow @Final private boolean isChestBoat;
-
-    @Shadow @Final private Boat.Type type;
+    @Shadow @Final private EntityType<? extends AbstractBoat> type;
 
     /**
      * @author wdog5
      * @reason bukkit event
      */
     @Overwrite
-    public ItemStack execute(BlockSource source, ItemStack stack) {
-        Direction direction = (Direction)source.state().getValue(DispenserBlock.FACING);
-        Level level = source.level();
-        double d = source.pos().getX() + (double)((float)direction.getStepX() * 1.125F);
-        double e = source.pos().getY() + (double)((float)direction.getStepY() * 1.125F);
-        double f = source.pos().getZ() + (double)((float)direction.getStepZ() * 1.125F);
-        BlockPos blockPos = source.pos().relative(direction);
-        double g;
-        if (level.getFluidState(blockPos).is(FluidTags.WATER)) {
-            g = 1.0;
+    public ItemStack execute(BlockSource blockSource, ItemStack itemStack) {
+        Direction direction = (Direction)blockSource.state().getValue(DispenserBlock.FACING);
+        ServerLevel serverLevel = blockSource.level();
+        Vec3 vec3 = blockSource.center();
+        double d = 0.5625 + (double)this.type.getWidth() / 2.0;
+        double e = vec3.x() + (double)direction.getStepX() * d;
+        double f = vec3.y() + (double)((float)direction.getStepY() * 1.125F);
+        double g = vec3.z() + (double)direction.getStepZ() * d;
+        BlockPos blockPos = blockSource.pos().relative(direction);
+        double h;
+        if (serverLevel.getFluidState(blockPos).is(FluidTags.WATER)) {
+            h = 1.0;
         } else {
-            if (!level.getBlockState(blockPos).isAir() || !level.getFluidState(blockPos.below()).is(FluidTags.WATER)) {
-                return this.defaultDispenseItemBehavior.dispense(source, stack);
+            if (!serverLevel.getBlockState(blockPos).isAir() || !serverLevel.getFluidState(blockPos.below()).is(FluidTags.WATER)) {
+                return this.defaultDispenseItemBehavior.dispense(blockSource, itemStack);
             }
 
-            g = 0.0;
+            h = 0.0;
         }
 
-        //Boat boat = this.isChestBoat ? new ChestBoat(level, d, e + g, f) : new Boat(level, d, e + g, f);
-
         // CraftBukkit start
-        ItemStack itemstack1 = stack.split(1);
-        org.bukkit.block.Block block = level.getWorld().getBlockAt(source.pos().getX(), source.pos().getY(), source.pos().getZ());
+        ItemStack itemstack1 = itemStack.split(1);
+        org.bukkit.block.Block block = serverLevel.getWorld().getBlockAt(blockSource.pos().getX(), blockSource.pos().getY(), blockSource.pos().getZ());
         CraftItemStack craftItem = CraftItemStack.asCraftMirror(itemstack1);
 
-        BlockDispenseEvent event = new BlockDispenseEvent(block, craftItem.clone(), new org.bukkit.util.Vector(d, e + g, f));
+        BlockDispenseEvent event = new BlockDispenseEvent(block, craftItem.clone(), new org.bukkit.util.Vector(e, f + h, g));
         if (!BukkitFieldHooks.isEventFired()) {
-            level.getCraftServer().getPluginManager().callEvent(event);
+            serverLevel.getCraftServer().getPluginManager().callEvent(event);
         }
 
         if (event.isCancelled()) {
-            stack.grow(1);
-            return stack;
+            itemStack.grow(1);
+            return itemStack;
         }
 
         if (!event.getItem().equals(craftItem)) {
-            stack.grow(1);
+            itemStack.grow(1);
             ItemStack eventStack = CraftItemStack.asNMSCopy(event.getItem());
             DispenseItemBehavior idispensebehavior = (DispenseItemBehavior) DispenserBlock.DISPENSER_REGISTRY.get(eventStack.getItem());
             if (idispensebehavior != DispenseItemBehavior.NOOP && idispensebehavior != this) {
-                idispensebehavior.dispense(source, eventStack);
-                return stack;
+                idispensebehavior.dispense(blockSource, eventStack);
+                return itemStack;
             }
         }
-        Boat boat = this.isChestBoat ? new ChestBoat(level, event.getVelocity().getX(), event.getVelocity().getY(), event.getVelocity().getZ()) : new Boat(level, event.getVelocity().getX(), event.getVelocity().getY(), event.getVelocity().getZ());
-        ((Boat)boat).setVariant(this.type);
-        ((Boat)boat).setYRot(direction.toYRot());
-        if (!level.addFreshEntity((Entity) boat)) stack.grow(1); // CraftBukkit
-        return stack;
+
+        AbstractBoat abstractBoat = (AbstractBoat)this.type.create(serverLevel, EntitySpawnReason.DISPENSER);
+        if (abstractBoat != null) {
+            abstractBoat.setInitialPos(event.getVelocity().getX(), event.getVelocity().getY(), event.getVelocity().getZ());
+            EntityType.createDefaultStackConfig(serverLevel, itemStack, (Player)null).accept(abstractBoat);
+            abstractBoat.setYRot(direction.toYRot());
+            if (!serverLevel.addFreshEntity((Entity) abstractBoat)) itemStack.grow(1); // CraftBukkit
+        }
+
+        return itemStack;
     }
 }

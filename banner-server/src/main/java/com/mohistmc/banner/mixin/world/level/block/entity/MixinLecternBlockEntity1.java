@@ -1,5 +1,8 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -11,10 +14,6 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 @Mixin(targets = "net/minecraft/world/level/block/entity/LecternBlockEntity$1")
 public abstract class MixinLecternBlockEntity1 implements Container {

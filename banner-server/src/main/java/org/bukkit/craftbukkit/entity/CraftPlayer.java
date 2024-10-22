@@ -102,7 +102,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.border.BorderChangeListener;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.level.saveddata.maps.MapDecoration;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
@@ -1053,7 +1053,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         } else {
             // The respawn reason should never be used if the passed location is non null.
             // Banner - fix #321
-            this.getHandle().changeDimension(new DimensionTransition(toWorld, new Vec3(to.getX(), to.getY(), to.getZ()), Vec3.ZERO, to.getYaw(), to.getPitch(), DimensionTransition.DO_NOTHING));
+            this.getHandle().changeDimension(new TeleportTransition(toWorld, new Vec3(to.getX(), to.getY(), to.getZ()), Vec3.ZERO, to.getYaw(), to.getPitch(), TeleportTransition.DO_NOTHING));
         }
         return true;
     }

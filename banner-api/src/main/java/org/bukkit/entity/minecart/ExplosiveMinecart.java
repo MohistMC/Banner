@@ -1,5 +1,6 @@
 package org.bukkit.entity.minecart;
 
+import org.bukkit.entity.Explosive;
 import org.bukkit.entity.Minecart;
 
 /**

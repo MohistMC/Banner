@@ -1,5 +1,9 @@
 package com.mohistmc.banner.mixin.world.entity.moster.piglin;
 
+import com.llamalad7.mixinextras.sugar.Local;
+import java.util.List;
+import java.util.stream.Collectors;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -20,9 +24,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Mixin(PiglinAi.class)
 public abstract class MixinPiglinAi {
 
@@ -35,7 +36,7 @@ public abstract class MixinPiglinAi {
     @Shadow private static boolean hasEatenRecently(Piglin piglin) {return false;}
     @Shadow private static boolean isFood(ItemStack stack) {return false;}
     @Shadow private static void admireGoldItem(LivingEntity piglin) {}
-    @Shadow private static void holdInOffhand(Piglin piglin, ItemStack stack) {}
+    @Shadow private static void holdInOffhand(ServerLevel serverLevel, Piglin piglin, ItemStack stack) {}
     @Shadow private static ItemStack removeOneItemFromItemEntity(ItemEntity itemEntity) {return null;}
     @Shadow private static void stopWalking(Piglin piglin) {}
 
@@ -44,7 +45,7 @@ public abstract class MixinPiglinAi {
      * @reason
      */
     @Overwrite
-    protected static void pickUpItem(Piglin piglinEntity, ItemEntity itemEntity) {
+    protected static void pickUpItem(ServerLevel serverLevel, Piglin piglinEntity, ItemEntity itemEntity) {
         ItemStack itemstack;
         stopWalking(piglinEntity);
         if (itemEntity.getItem().getItem() == Items.GOLD_NUGGET && !CraftEventFactory.callEntityPickupItemEvent(piglinEntity, itemEntity, 0, false).isCancelled()) {
@@ -60,12 +61,12 @@ public abstract class MixinPiglinAi {
 
         if (isLovedByPiglin(itemstack, piglinEntity)) {
             piglinEntity.getBrain().eraseMemory(MemoryModuleType.TIME_TRYING_TO_REACH_ADMIRE_ITEM);
-            holdInOffhand(piglinEntity, itemstack);
+            holdInOffhand(serverLevel, piglinEntity, itemstack);
             admireGoldItem(piglinEntity);
         } else if (isFood(itemstack) && !hasEatenRecently(piglinEntity)) {
             eat(piglinEntity);
         } else {
-            boolean flag = !piglinEntity.equipItemIfPossible(itemstack).equals(ItemStack.EMPTY);
+            boolean flag = !piglinEntity.equipItemIfPossible(serverLevel, itemstack).equals(ItemStack.EMPTY);
             if (!flag) {
                 putInInventory(piglinEntity, itemstack);
             }
@@ -81,8 +82,8 @@ public abstract class MixinPiglinAi {
         return isBarterCurrency(itemstack) || piglin.bridge$allowedBarterItems().contains(itemstack.getItem());    }
 
     @Redirect(method = "stopHoldingOffHandItem", at = @At(value = "INVOKE", remap = false, target = "Lnet/minecraft/world/entity/monster/piglin/PiglinAi;isBarterCurrency(Lnet/minecraft/world/item/ItemStack;)Z"))
-    private static boolean banner$customBarter(ItemStack stack, Piglin piglin) {
-        return isBarterItem(stack, piglin);
+    private static boolean banner$customBarter(ItemStack itemStack, @Local(argsOnly = true) Piglin piglin) {
+        return isBarterItem(itemStack, piglin);
     }
 
     @Redirect(method = "stopHoldingOffHandItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/piglin/PiglinAi;throwItems(Lnet/minecraft/world/entity/monster/piglin/Piglin;Ljava/util/List;)V"))
@@ -95,8 +96,8 @@ public abstract class MixinPiglinAi {
     }
 
     @Redirect(method = "stopHoldingOffHandItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/piglin/PiglinAi;isLovedItem(Lnet/minecraft/world/item/ItemStack;)Z"))
-    private static boolean banner$customLove(ItemStack stack, Piglin piglin) {
-        return isLovedByPiglin(stack, piglin);
+    private static boolean banner$customLove(ItemStack itemStack, @Local(argsOnly = true) Piglin piglin) {
+        return isLovedByPiglin(itemStack, piglin);
     }
 
     @Redirect(method = "wantsToPickup", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/piglin/PiglinAi;isBarterCurrency(Lnet/minecraft/world/item/ItemStack;)Z"))
@@ -115,7 +116,7 @@ public abstract class MixinPiglinAi {
     }
 
     @Inject(method = "angerNearbyPiglins", at = @At("HEAD"), cancellable = true)
-    private static void banner$configAnger(Player player, boolean angerOnlyIfCanSee, CallbackInfo ci) {
+    private static void banner$configAnger(ServerLevel serverLevel, Player player, boolean bl, CallbackInfo ci) {
         if (!player.level().bridge$bannerConfig().piglinsGuardChests) ci.cancel(); // Paper
     }
 }

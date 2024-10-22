@@ -1,14 +1,13 @@
 package com.mohistmc.banner.injection.server.network;
 
+import java.util.Set;
 import net.minecraft.network.chat.PlayerChatMessage;
-import net.minecraft.world.entity.RelativeMovement;
+import net.minecraft.world.entity.Relative;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.slf4j.Logger;
-
-import java.util.Set;
 
 public interface InjectionServerGamePacketListenerImpl extends InjectionServerCommonPacketListenerImpl {
 
@@ -20,7 +19,7 @@ public interface InjectionServerGamePacketListenerImpl extends InjectionServerCo
         throw new IllegalStateException("Not implemented");
     }
 
-    default boolean teleport(double d0, double d1, double d2, float f, float f1, Set<RelativeMovement> set, PlayerTeleportEvent.TeleportCause cause) { // CraftBukkit - Return event status
+    default boolean teleport(double d0, double d1, double d2, float f, float f1, Set<Relative> set, PlayerTeleportEvent.TeleportCause cause) { // CraftBukkit - Return event status
         throw new IllegalStateException("Not implemented");
     }
 
@@ -28,7 +27,7 @@ public interface InjectionServerGamePacketListenerImpl extends InjectionServerCo
         throw new IllegalStateException("Not implemented");
     }
 
-    default void internalTeleport(double d0, double d1, double d2, float f, float f1, Set<RelativeMovement> set) {
+    default void internalTeleport(double d0, double d1, double d2, float f, float f1, Set<Relative> set) {
         throw new IllegalStateException("Not implemented");
     }
 

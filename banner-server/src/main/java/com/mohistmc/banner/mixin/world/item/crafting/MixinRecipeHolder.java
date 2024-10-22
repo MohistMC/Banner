@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.item.crafting;
 
 import com.mohistmc.banner.injection.world.item.crafting.InjectionRecipeHolder;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.bukkit.craftbukkit.util.CraftNamespacedKey;
@@ -13,7 +14,7 @@ import org.spongepowered.asm.mixin.Shadow;
 public class MixinRecipeHolder<T extends net.minecraft.world.item.crafting.Recipe<?>> implements InjectionRecipeHolder {
 
     @Shadow @Final private T value;
-    @Shadow @Final private ResourceLocation id;
+    @Shadow @Final private ResourceKey id;
 
     @Override
     public Recipe toBukkitRecipe() {

@@ -7,7 +7,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
-import net.minecraft.world.entity.PowerableMob;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
@@ -27,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.Collection;
 
 @Mixin(Creeper.class)
-public abstract class MixinCreeper extends Monster implements PowerableMob, InjectionCreeper {
+public abstract class MixinCreeper extends Monster implements InjectionCreeper {
 
     // @formatter:off
     @Shadow @Final private static EntityDataAccessor<Boolean> DATA_IS_POWERED;

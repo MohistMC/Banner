@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.item.crafting;
 
 import com.mohistmc.banner.bukkit.inventory.recipe.BannerShapelessRecipe;
 import com.mohistmc.banner.injection.world.item.crafting.InjectionShapelessRecipe;
+import java.util.List;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
@@ -25,7 +26,7 @@ public abstract class MixinShapelessRecipe implements CraftingRecipe, InjectionS
     String group;
 
     @Shadow @Final
-    NonNullList<Ingredient> ingredients;
+    List<Ingredient> ingredients;
 
     @Override
     // CraftBukkit start

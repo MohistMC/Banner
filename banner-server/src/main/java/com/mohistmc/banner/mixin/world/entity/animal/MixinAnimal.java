@@ -1,6 +1,9 @@
 package com.mohistmc.banner.mixin.world.entity.animal;
 
 import com.mohistmc.banner.injection.world.entity.InjectionAnimal;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nullable;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -23,10 +26,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import javax.annotation.Nullable;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Mixin(Animal.class)
 public abstract class MixinAnimal extends AgeableMob implements InjectionAnimal {

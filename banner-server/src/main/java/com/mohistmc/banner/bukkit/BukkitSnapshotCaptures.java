@@ -1,5 +1,10 @@
 package com.mohistmc.banner.bukkit;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Stack;
+import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.WorldLoader;
@@ -16,12 +21,6 @@ import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.event.CraftPortalEvent;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Stack;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class BukkitSnapshotCaptures {
 

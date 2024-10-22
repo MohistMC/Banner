@@ -1,5 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.dimension.end;
 
+import java.util.Iterator;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
@@ -10,9 +12,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.Iterator;
-import java.util.List;
 
 @Mixin(targets = "net.minecraft.world.level.dimension.end.DragonRespawnAnimation$4")
 public class MixinDragonRespawnAnimation {

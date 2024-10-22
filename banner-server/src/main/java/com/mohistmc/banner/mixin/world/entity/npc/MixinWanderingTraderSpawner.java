@@ -15,7 +15,7 @@ public class MixinWanderingTraderSpawner {
 
     @Inject(method = "spawn", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/EntityType;spawn(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/MobSpawnType;)Lnet/minecraft/world/entity/Entity;",
+            target = "Lnet/minecraft/world/entity/EntityType;spawn(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/EntitySpawnReason;)Lnet/minecraft/world/entity/Entity;",
             shift = At.Shift.AFTER))
     private void banner$pushTraderSpawnReason(ServerLevel serverLevel, CallbackInfoReturnable<Boolean> cir) {
         serverLevel.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.NATURAL);
@@ -23,7 +23,7 @@ public class MixinWanderingTraderSpawner {
 
     @Inject(method = "tryToSpawnLlamaFor", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/EntityType;spawn(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/MobSpawnType;)Lnet/minecraft/world/entity/Entity;",
+            target = "Lnet/minecraft/world/entity/EntityType;spawn(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/EntitySpawnReason;)Lnet/minecraft/world/entity/Entity;",
             shift = At.Shift.AFTER))
     private void banner$pushLlamaSpawnReason(ServerLevel serverLevel, WanderingTrader trader, int maxDistance, CallbackInfo ci) {
         serverLevel.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.NATURAL);

@@ -8,9 +8,7 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.RecipeBookMenu;
 import net.minecraft.world.inventory.RecipeBookType;
-import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import org.bukkit.craftbukkit.inventory.CraftInventoryFurnace;
 import org.bukkit.craftbukkit.inventory.view.CraftFurnaceView;
@@ -23,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractFurnaceMenu.class)
-public abstract class MixinAbstractFurnaceMenu extends RecipeBookMenu<SingleRecipeInput, AbstractCookingRecipe> {
+public abstract class MixinAbstractFurnaceMenu extends RecipeBookMenu {
 
     @Shadow @Final private Container container;
     private CraftFurnaceView bukkitEntity = null;

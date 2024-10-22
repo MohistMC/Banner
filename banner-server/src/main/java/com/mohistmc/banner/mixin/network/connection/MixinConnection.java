@@ -3,12 +3,11 @@ package com.mohistmc.banner.mixin.network.connection;
 import com.mohistmc.banner.injection.network.connection.InjectionConnection;
 import com.mojang.authlib.properties.Property;
 import io.netty.channel.Channel;
+import java.net.SocketAddress;
+import java.util.UUID;
 import net.minecraft.network.Connection;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-
-import java.net.SocketAddress;
-import java.util.UUID;
 
 @Mixin(Connection.class)
 public class MixinConnection implements InjectionConnection {

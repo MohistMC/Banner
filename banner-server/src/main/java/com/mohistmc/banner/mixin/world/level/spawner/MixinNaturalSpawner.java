@@ -1,14 +1,19 @@
 package com.mohistmc.banner.mixin.world.level.spawner;
 
 import com.mohistmc.banner.injection.world.level.spawner.InjectionSpawnState;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.profiling.Profiler;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.animal.Ocelot;
 import net.minecraft.world.entity.player.Player;
@@ -28,9 +33,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-
-import java.util.Objects;
-import java.util.Optional;
 
 @Mixin(NaturalSpawner.class)
 public abstract class MixinNaturalSpawner {
@@ -74,8 +76,9 @@ public abstract class MixinNaturalSpawner {
      * @reason bukkit things
      */
     @Overwrite
-    public static void spawnForChunk(ServerLevel worldserver, LevelChunk chunk, NaturalSpawner.SpawnState spawnercreature_d, boolean flag, boolean flag1, boolean flag2) {
-        worldserver.getProfiler().push("spawner");
+    public static void spawnForChunk(ServerLevel worldserver, LevelChunk chunk, NaturalSpawner.SpawnState spawnercreature_d, List<MobCategory> list) {
+        ProfilerFiller profilerFiller = Profiler.get();
+        profilerFiller.push("spawner");
         MobCategory[] aenumcreaturetype = SPAWNING_CATEGORIES;
         int i = aenumcreaturetype.length;
 
@@ -95,7 +98,7 @@ public abstract class MixinNaturalSpawner {
                 continue;
             }
 
-            if ((flag || !enumcreaturetype.isFriendly()) && (flag1 || enumcreaturetype.isFriendly()) && (flag2 || !enumcreaturetype.isPersistent()) && ((InjectionSpawnState) spawnercreature_d).canSpawnForCategory(enumcreaturetype, chunk.getPos(), limit)) {
+            if (((InjectionSpawnState) spawnercreature_d).canSpawnForCategory(enumcreaturetype, chunk.getPos(), limit)) { // TODO
                 // CraftBukkit end
                 Objects.requireNonNull(spawnercreature_d);
                 NaturalSpawner.SpawnPredicate spawnercreature_c = spawnercreature_d::canSpawn;
@@ -104,7 +107,7 @@ public abstract class MixinNaturalSpawner {
                 spawnCategoryForChunk(enumcreaturetype, worldserver, chunk, spawnercreature_c, spawnercreature_d::afterSpawn);
             }
         }
-        worldserver.getProfiler().pop();
+        profilerFiller.pop();
     }
 
     /**
@@ -162,7 +165,7 @@ public abstract class MixinNaturalSpawner {
 
                                 entityinsentient.moveTo(d0, (double) i, d1, worldserver.random.nextFloat() * 360.0F, 0.0F);
                                 if (isValidPositionForMob(worldserver, entityinsentient, d2)) {
-                                    groupdataentity = entityinsentient.finalizeSpawn(worldserver, worldserver.getCurrentDifficultyAt(entityinsentient.blockPosition()), MobSpawnType.NATURAL, groupdataentity);
+                                    groupdataentity = entityinsentient.finalizeSpawn(worldserver, worldserver.getCurrentDifficultyAt(entityinsentient.blockPosition()), EntitySpawnReason.NATURAL, groupdataentity);
                                     // CraftBukkit start
                                     // SPIGOT-7045: Give ocelot babies back their special spawn reason. Note: This is the only modification required as ocelots count as monsters which means they only spawn during normal chunk ticking and do not spawn during chunk generation as starter mobs.
                                     if (entityinsentient instanceof Ocelot && !((org.bukkit.entity.Ageable) entityinsentient.getBukkitEntity()).isAdult()) {

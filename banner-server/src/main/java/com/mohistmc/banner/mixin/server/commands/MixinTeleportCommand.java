@@ -2,8 +2,10 @@ package com.mohistmc.banner.mixin.server.commands;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import java.util.Set;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.commands.LookAt;
 import net.minecraft.server.commands.TeleportCommand;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,7 +13,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.RelativeMovement;
+import net.minecraft.world.entity.Relative;
 import net.minecraft.world.level.Level;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.CraftWorld;
@@ -22,8 +24,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-
-import java.util.Set;
 
 @Mixin(TeleportCommand.class)
 public class MixinTeleportCommand {
@@ -36,7 +36,7 @@ public class MixinTeleportCommand {
      * @reason Bukkit Tp Event
      */
     @Overwrite
-    private static void performTeleport(CommandSourceStack source, Entity entity, ServerLevel level, double x, double y, double z, Set<RelativeMovement> relativeList, float yaw, float pitch, @Nullable TeleportCommand.LookAt facing) throws CommandSyntaxException {
+    private static void performTeleport(CommandSourceStack source, Entity entity, ServerLevel level, double x, double y, double z, Set<Relative> relativeList, float yaw, float pitch, @Nullable LookAt facing) throws CommandSyntaxException {
         BlockPos blockPos = BlockPos.containing(x, y, z);
         if (!Level.isInSpawnableBounds(blockPos)) {
             throw INVALID_POSITION.create();

@@ -9,7 +9,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
@@ -42,7 +41,7 @@ public abstract class MixinBucketItem extends Item {
     }
 
     @Inject(method = "use", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/BucketPickup;pickupBlock(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/item/ItemStack;"))
-    private void banner$bucketFill(Level worldIn, Player playerIn, InteractionHand handIn, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir, @Local ItemStack stack, @Local BlockHitResult result) {
+    private void banner$bucketFill(Level worldIn, Player playerIn, InteractionHand handIn, CallbackInfoReturnable<InteractionResult> cir, @Local ItemStack stack, @Local BlockHitResult result) {
         if (!DistValidate.isValid(worldIn)) return;
         BlockPos pos = result.getBlockPos();
         BlockState state = worldIn.getBlockState(pos);
@@ -51,14 +50,14 @@ public abstract class MixinBucketItem extends Item {
         if (event.isCancelled()) {
             ((ServerPlayer) playerIn).connection.send(new ClientboundBlockUpdatePacket(worldIn, pos));
             ((ServerPlayer) playerIn).getBukkitEntity().updateInventory();
-            cir.setReturnValue(new InteractionResultHolder<>(InteractionResult.FAIL, stack));
+            cir.setReturnValue(InteractionResult.FAIL);
         } else {
             banner$captureItem = event.getItemStack();
         }
     }
 
     @Inject(method = "use", at = @At("RETURN"))
-    private void banner$clean(Level worldIn, Player playerIn, InteractionHand handIn, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir) {
+    private void banner$clean(Level worldIn, Player playerIn, InteractionHand handIn, CallbackInfoReturnable<InteractionResult> cir) {
         banner$captureItem = null;
         banner$direction = null;
         banner$click = null;
@@ -72,7 +71,7 @@ public abstract class MixinBucketItem extends Item {
     }
 
     @Inject(method = "use", require = 0, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/BucketItem;emptyContents(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/BlockHitResult;)Z"))
-    private void banner$capture(Level worldIn, Player playerIn, InteractionHand handIn, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir, ItemStack stack, BlockHitResult result) {
+    private void banner$capture(Level worldIn, Player playerIn, InteractionHand handIn, CallbackInfoReturnable<InteractionResult> cir, ItemStack stack, BlockHitResult result) {
         banner$direction = result.getDirection();
         banner$click = result.getBlockPos();
         banner$hand = handIn;

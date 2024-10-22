@@ -1,13 +1,12 @@
 package com.mohistmc.banner.mixin.interaction.component;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
+import java.util.Optional;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-
-import java.util.Optional;
 
 @Mixin(DataComponentPatch.Builder.class)
 public class DataComponentPatch_BuilderMixin {

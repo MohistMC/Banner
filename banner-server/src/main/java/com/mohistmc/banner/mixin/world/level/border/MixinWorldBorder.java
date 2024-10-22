@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.border;
 
 import com.mohistmc.banner.injection.world.level.border.InjectionWorldBorder;
+import java.util.List;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.border.WorldBorder;
@@ -10,8 +11,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.List;
 
 @Mixin(WorldBorder.class)
 public abstract class MixinWorldBorder implements InjectionWorldBorder {

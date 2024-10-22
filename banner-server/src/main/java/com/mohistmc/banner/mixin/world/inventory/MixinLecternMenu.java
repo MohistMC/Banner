@@ -12,7 +12,6 @@ import net.minecraft.world.inventory.LecternMenu;
 import net.minecraft.world.inventory.MenuType;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.inventory.CraftInventoryLectern;
-import org.bukkit.craftbukkit.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.inventory.view.CraftLecternView;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.jetbrains.annotations.Nullable;

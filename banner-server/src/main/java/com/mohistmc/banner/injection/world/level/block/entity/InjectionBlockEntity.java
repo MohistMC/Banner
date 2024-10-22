@@ -1,13 +1,12 @@
 package com.mohistmc.banner.injection.world.level.block.entity;
 
+import java.util.Set;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer;
 import org.bukkit.inventory.InventoryHolder;
-
-import java.util.Set;
 
 public interface InjectionBlockEntity {
 

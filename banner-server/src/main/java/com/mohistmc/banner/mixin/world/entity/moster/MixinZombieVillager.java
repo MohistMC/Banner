@@ -3,13 +3,12 @@ package com.mohistmc.banner.mixin.world.entity.moster;
 import com.mohistmc.banner.asm.annotation.TransformAccess;
 import io.izzel.arclight.mixin.Eject;
 import java.util.UUID;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.level.Level;
@@ -71,7 +70,7 @@ public abstract class MixinZombieVillager extends Zombie {
         villager.bridge$pushTransformReason(EntityTransformEvent.TransformReason.INFECTION);
         net.minecraft.world.entity.monster.ZombieVillager zombieVillager = villager.convertTo(EntityType.ZOMBIE_VILLAGER, false);
         if (zombieVillager != null) {
-            zombieVillager.finalizeSpawn(level, level.getCurrentDifficultyAt(zombieVillager.blockPosition()), MobSpawnType.CONVERSION, new net.minecraft.world.entity.monster.Zombie.ZombieGroupData(false, true));
+            zombieVillager.finalizeSpawn(level, level.getCurrentDifficultyAt(zombieVillager.blockPosition()), EntitySpawnReason.CONVERSION, new net.minecraft.world.entity.monster.Zombie.ZombieGroupData(false, true));
             zombieVillager.setVillagerData(villager.getVillagerData());
             zombieVillager.setGossips(villager.getGossips().store(NbtOps.INSTANCE));
             zombieVillager.setTradeOffers(villager.getOffers().copy());

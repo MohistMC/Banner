@@ -1,11 +1,10 @@
 package com.mohistmc.banner.bukkit;
 
 import com.mohistmc.dynamicenum.MohistDynamEnum;
+import java.util.List;
 import net.minecraft.resources.ResourceLocation;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.util.CraftNamespacedKey;
-
-import java.util.List;
 
 public class MaterialHelper {
 

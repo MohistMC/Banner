@@ -2,14 +2,12 @@ package com.mohistmc.banner.mixin.world.inventory;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.MerchantContainer;
 import net.minecraft.world.inventory.MerchantMenu;
 import net.minecraft.world.item.trading.Merchant;
 import org.bukkit.craftbukkit.inventory.CraftInventoryMerchant;
-import org.bukkit.craftbukkit.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.inventory.view.CraftMerchantView;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;

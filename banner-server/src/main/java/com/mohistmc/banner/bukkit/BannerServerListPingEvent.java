@@ -1,6 +1,9 @@
 package com.mohistmc.banner.bukkit;
 
 
+import java.net.InetSocketAddress;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import net.minecraft.network.Connection;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,10 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.util.CachedServerIcon;
 import org.jetbrains.annotations.NotNull;
-
-import java.net.InetSocketAddress;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 public class BannerServerListPingEvent extends ServerListPingEvent {
 

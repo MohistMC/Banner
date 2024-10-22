@@ -1,12 +1,10 @@
 package com.mohistmc.banner.mixin.server.level;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mohistmc.banner.injection.server.level.InjectionServerPlayerGameMode;
 import io.izzel.arclight.mixin.Decorate;
 import io.izzel.arclight.mixin.DecorationOps;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -22,7 +20,6 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
@@ -120,7 +117,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
         this.player.server.getPlayerList().broadcastAll(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_GAME_MODE, this.player), this.player);
     }
 
-    @Redirect(method = "handleBlockBreakAction", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V"),
+    @Redirect(method = "handleBlockBreakAction", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/server/network/ServerCommonPacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V"),
             slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;mayInteract(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;)Z")))
     private void banner$mayNotInteractEvent(ServerGamePacketListenerImpl instance, Packet<?> packet, BlockPos blockPos, ServerboundPlayerActionPacket.Action action, Direction direction) throws Throwable {
         CraftEventFactory.callPlayerInteractEvent(this.player, Action.LEFT_CLICK_BLOCK, blockPos, direction, this.player.getInventory().getSelected(), InteractionHand.MAIN_HAND);
@@ -312,7 +309,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
             MenuProvider menuProvider = blockState.getMenuProvider(level, blockPos);
             cancelledBlock = !(menuProvider instanceof MenuProvider);
         }
-        if (player.getCooldowns().isOnCooldown(stack.getItem())) {
+        if (player.getCooldowns().isOnCooldown(stack)) {
             cancelledBlock = true;
         }
 
@@ -352,13 +349,13 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
             boolean bl2 = player.isSecondaryUseActive() && bl;
             ItemStack itemStack = stack.copy();
             if (!bl2) {
-                ItemInteractionResult result = blockState.useItemOn(player.getItemInHand(hand), level, player, hand, hitResult);
+                InteractionResult result = blockState.useItemOn(player.getItemInHand(hand), level, player, hand, hitResult);
                 if (result.consumesAction()) {
                     CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger(player, blockPos, itemStack);
-                    return result.result();
+                    return result;
                 }
 
-                if (result == ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION && hand == InteractionHand.MAIN_HAND) {
+                if (result instanceof InteractionResult.TryEmptyHandInteraction && hand == InteractionHand.MAIN_HAND) {
                     enuminteractionresult = blockState.useWithoutItem(level, player, hitResult);
                     if (enuminteractionresult.consumesAction()) {
                         CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger(player, blockPos, itemStack);

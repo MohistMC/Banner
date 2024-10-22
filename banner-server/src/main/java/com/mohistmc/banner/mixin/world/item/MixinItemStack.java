@@ -2,6 +2,10 @@ package com.mohistmc.banner.mixin.world.item;
 
 import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import com.mohistmc.banner.injection.world.item.InjectionItemStack;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Consumer;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -56,11 +60,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Consumer;
 
 @Mixin(ItemStack.class)
 public abstract class MixinItemStack implements InjectionItemStack {

@@ -4,14 +4,13 @@ import com.google.common.collect.ImmutableList;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.injection.world.entity.InjectionEntity;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-
-import io.izzel.arclight.mixin.Decorate;
-import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.BlockUtil;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
@@ -34,7 +33,15 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Leashable;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.PortalProcessor;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.Relative;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -44,7 +51,7 @@ import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
@@ -153,7 +160,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Shadow public abstract DamageSources damageSources();
 
     @Shadow protected abstract ListTag newDoubleList(double... ds);
-    @Shadow public abstract boolean teleportTo(ServerLevel level, double x, double y, double z, Set<RelativeMovement> relativeMovements, float yRot, float xRot);
+    @Shadow public abstract boolean teleportTo(ServerLevel level, double x, double y, double z, Set<Relative> relativeMovements, float yRot, float xRot);
     @Shadow public abstract Level level();
 
     @Shadow protected abstract Vec3 getRelativePortalPosition(Direction.Axis axis, BlockUtil.FoundRectangle portal);
@@ -192,7 +199,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
 
     @Shadow public abstract void igniteForTicks(int i);
 
-    @Shadow @Nullable public abstract Entity changeDimension(DimensionTransition dimensionTransition);
+    @Shadow @Nullable public abstract Entity changeDimension(TeleportTransition dimensionTransition);
 
     @Shadow @Nullable public PortalProcessor portalProcess;
     private CraftEntity bukkitEntity;
@@ -762,12 +769,12 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Override
     public Entity teleportTo(ServerLevel worldserver, Vec3 location) {
         banner$location.set(location);
-        DimensionTransition dimensionTransition = this.portalProcess.getPortalDestination(worldserver, ((Entity) (Object) this));
+        TeleportTransition dimensionTransition = this.portalProcess.getPortalDestination(worldserver, ((Entity) (Object) this));
         return changeDimension(dimensionTransition);
     }
 
     @Override
-    public boolean teleportTo(ServerLevel worldserver, double d0, double d1, double d2, Set<RelativeMovement> set, float f, float f1, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause cause) {
+    public boolean teleportTo(ServerLevel worldserver, double d0, double d1, double d2, Set<Relative> set, float f, float f1, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause cause) {
         return this.teleportTo(worldserver, d0, d1, d2, set, f, f1);
     }
 

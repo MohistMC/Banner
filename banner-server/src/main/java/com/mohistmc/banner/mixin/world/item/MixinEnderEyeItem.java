@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.EyeOfEnder;
@@ -30,12 +29,12 @@ public class MixinEnderEyeItem {
     @Inject(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z",
             shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private void banner$handleAddEntity(Level level, Player player, InteractionHand usedHand,
-                                        CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir,
+                                        CallbackInfoReturnable<InteractionResult> cir,
                                         ItemStack itemStack, BlockHitResult blockHitResult, ServerLevel serverLevel,
                                         BlockPos blockPos, EyeOfEnder eyeOfEnder) {
         // CraftBukkit start
         if (!level.addFreshEntity(eyeOfEnder)) {
-            cir.setReturnValue(new InteractionResultHolder<>(InteractionResult.FAIL, itemStack));
+            cir.setReturnValue(InteractionResult.FAIL);
         }
         // CraftBukkit end
     }

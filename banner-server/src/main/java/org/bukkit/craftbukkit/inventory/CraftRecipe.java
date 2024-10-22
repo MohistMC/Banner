@@ -3,6 +3,7 @@ package org.bukkit.craftbukkit.inventory;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -14,7 +15,7 @@ public interface CraftRecipe extends Recipe {
 
     void addToCraftingManager();
 
-    default Ingredient toNMS(RecipeChoice bukkit, boolean requireNotEmpty) {
+    default Optional<Ingredient> toNMS(RecipeChoice bukkit, boolean requireNotEmpty) {
         Ingredient stack;
 
         if (bukkit == null) {
@@ -36,7 +37,7 @@ public interface CraftRecipe extends Recipe {
         return stack;
     }
 
-    public static RecipeChoice toBukkit(Ingredient list) {
+    public static RecipeChoice toBukkit(Optional<Ingredient> list) {
         list.getItems();
 
         if (list.itemStacks.length == 0) {

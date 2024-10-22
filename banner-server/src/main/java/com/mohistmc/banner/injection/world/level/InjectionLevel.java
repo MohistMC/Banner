@@ -1,6 +1,8 @@
 package com.mohistmc.banner.injection.world.level;
 
 import com.mohistmc.banner.config.BannerWorldConfig;
+import java.util.List;
+import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -13,9 +15,6 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CapturedBlockState;
 import org.bukkit.entity.SpawnCategory;
 import org.spigotmc.SpigotWorldConfig;
-
-import java.util.List;
-import java.util.Map;
 
 public interface InjectionLevel {
 

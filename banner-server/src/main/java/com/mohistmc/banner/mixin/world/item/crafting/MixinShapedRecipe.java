@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.item.crafting;
 
 import com.mohistmc.banner.bukkit.inventory.recipe.BannerShapedRecipe;
 import com.mohistmc.banner.injection.world.item.crafting.InjectionShapedRecipe;
+import java.util.List;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
@@ -33,7 +34,7 @@ public abstract class MixinShapedRecipe implements CraftingRecipe, InjectionShap
 
     @Shadow public abstract int getWidth();
 
-    @Shadow public abstract NonNullList<Ingredient> getIngredients();
+    @Shadow public abstract List<Ingredient> getIngredients();
 
     @Override
     // CraftBukkit start

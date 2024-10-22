@@ -2,13 +2,12 @@ package com.mohistmc.banner.bukkit;
 
 import com.mohistmc.dynamicenum.MohistDynamEnum;
 import com.mojang.datafixers.DSL;
+import java.util.List;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.bukkit.craftbukkit.CraftWorld;
-
-import java.util.List;
 
 // Banner TODO fix
 public class LevelPersistentData extends SavedData {

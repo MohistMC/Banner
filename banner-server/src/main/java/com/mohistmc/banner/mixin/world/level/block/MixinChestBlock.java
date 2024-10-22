@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
 import com.mohistmc.banner.injection.world.level.block.InjectionChestBlock;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.level.Level;
@@ -15,8 +16,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Optional;
 
 @Mixin(ChestBlock.class)
 public abstract class MixinChestBlock implements InjectionChestBlock {

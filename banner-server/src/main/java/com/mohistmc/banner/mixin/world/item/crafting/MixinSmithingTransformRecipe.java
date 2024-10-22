@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.item.crafting;
 
 import com.mohistmc.banner.bukkit.inventory.recipe.BannerModdedRecipe;
+import java.util.Optional;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.SmithingRecipe;
@@ -18,13 +19,13 @@ import org.spongepowered.asm.mixin.Shadow;
 public abstract class MixinSmithingTransformRecipe implements SmithingRecipe {
 
     @Shadow @Final
-    Ingredient template;
+    Optional<Ingredient> template;
 
     @Shadow @Final
-    Ingredient base;
+    Optional<Ingredient> base;
 
     @Shadow @Final
-    Ingredient addition;
+    Optional<Ingredient> addition;
 
     @Shadow @Final
     ItemStack result;

@@ -8,12 +8,14 @@ import com.mohistmc.banner.injection.server.players.InjectionPlayerList;
 import com.mohistmc.banner.util.Blackhole;
 import com.mohistmc.banner.util.I18n;
 import com.mojang.authlib.GameProfile;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Eject;
 import java.io.File;
 import java.net.SocketAddress;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.EnumSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,14 +23,8 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import io.izzel.arclight.mixin.Decorate;
-import io.izzel.arclight.mixin.DecorationOps;
-import io.izzel.arclight.mixin.Eject;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.nbt.CompoundTag;
@@ -39,7 +35,6 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundChangeDifficultyPacket;
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
 import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
 import net.minecraft.network.protocol.game.ClientboundSetBorderCenterPacket;
@@ -70,17 +65,14 @@ import net.minecraft.server.players.UserBanListEntry;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.ServerStatsCounter;
-import net.minecraft.stats.Stats;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.border.WorldBorder;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.PlayerDataStorage;
@@ -101,14 +93,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSpawnChangeEvent;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -326,16 +316,16 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         serverPlayer.stopRiding();
     }
 
-    @Decorate(method = "respawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;findRespawnPositionAndUseSpawnBlock(ZLnet/minecraft/world/level/portal/DimensionTransition$PostDimensionTransition;)Lnet/minecraft/world/level/portal/DimensionTransition;"))
-    private DimensionTransition banner$respawnPoint(ServerPlayer instance, boolean bl, DimensionTransition.PostDimensionTransition postDimensionTransition) throws Throwable {
+    @Decorate(method = "respawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;findRespawnPositionAndUseSpawnBlock(ZLnet/minecraft/world/level/portal/TeleportTransition$PostTeleportTransition;)Lnet/minecraft/world/level/portal/TeleportTransition;"))
+    private TeleportTransition banner$respawnPoint(ServerPlayer instance, boolean bl, TeleportTransition.PostTeleportTransition postDimensionTransition) throws Throwable {
         var location = banner$loc;
         var respawnReason = banner$respawnReason == null ? PlayerRespawnEvent.RespawnReason.DEATH : banner$respawnReason;
-        DimensionTransition dimensiontransition;
+        TeleportTransition dimensiontransition;
         if (location == null) {
             //instance.pushRespawnReason(respawnReason);
-            dimensiontransition = (DimensionTransition) DecorationOps.callsite().invoke(instance, bl, postDimensionTransition);
+            dimensiontransition = (TeleportTransition) DecorationOps.callsite().invoke(instance, bl, postDimensionTransition);
         } else {
-            dimensiontransition = new DimensionTransition(((CraftWorld) location.getWorld()).getHandle(), CraftLocation.toVec3D(location), Vec3.ZERO, location.getYaw(), location.getPitch(), DimensionTransition.DO_NOTHING);
+            dimensiontransition = new TeleportTransition(((CraftWorld) location.getWorld()).getHandle(), CraftLocation.toVec3D(location), Vec3.ZERO, location.getYaw(), location.getPitch(), TeleportTransition.DO_NOTHING);
         }
         if (dimensiontransition == null) {
             // Banner start - fix #321
@@ -344,7 +334,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             this.players.add(instance);
             // Banner end
 
-            return (DimensionTransition) DecorationOps.cancel().invoke(instance);
+            return (TeleportTransition) DecorationOps.cancel().invoke(instance);
         }
         return dimensiontransition;
     }
@@ -410,15 +400,15 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             playerIn.addTag(s);
         }
         */
-        DimensionTransition dimensiontransition;
+        TeleportTransition dimensiontransition;
         if (location == null) {
             //playerIn.pushRespawnReason(respawnReason);
-            dimensiontransition = playerIn.findRespawnPositionAndUseSpawnBlock(flag, DimensionTransition.DO_NOTHING);
+            dimensiontransition = playerIn.findRespawnPositionAndUseSpawnBlock(flag, TeleportTransition.DO_NOTHING);
             if (!flag) {
                  playerIn.reset(); // SPIGOT-4785
             }
         } else {
-            dimensiontransition = new DimensionTransition(((CraftWorld) location.getWorld()).getHandle(), CraftLocation.toVec3D(location), Vec3.ZERO, location.getYaw(), location.getPitch(), DimensionTransition.DO_NOTHING);
+            dimensiontransition = new TeleportTransition(((CraftWorld) location.getWorld()).getHandle(), CraftLocation.toVec3D(location), Vec3.ZERO, location.getYaw(), location.getPitch(), TeleportTransition.DO_NOTHING);
         }
         // Spigot Start
         if (dimensiontransition == null) {
@@ -453,7 +443,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         }
         playerIn.setHealth(playerIn.getHealth());
         if (!flag) {
-            BlockPos blockposition = BlockPos.containing(dimensiontransition.pos());
+            BlockPos blockposition = BlockPos.containing(dimensiontransition.position());
             BlockState iblockdata = serverWorld.getBlockState(blockposition);
 
             if (iblockdata.is(Blocks.RESPAWN_ANCHOR)) {
@@ -503,9 +493,9 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     private void banner$useScaledHealth(ServerPlayer playerEntity) {
         playerEntity.getBukkitEntity().updateScaledHealth(); // CraftBukkit - Update scaled health on respawn and worldchange
         playerEntity.refreshEntityData(playerEntity);// CraftBukkkit - SPIGOT-7218: sync metadata
-        int i = playerEntity.level().getGameRules().getBoolean(GameRules.RULE_REDUCEDDEBUGINFO) ? 22 : 23;
+        int i = playerEntity.serverLevel().getGameRules().getBoolean(GameRules.RULE_REDUCEDDEBUGINFO) ? 22 : 23;
         playerEntity.connection.send(new ClientboundEntityEventPacket(playerEntity, (byte) i));
-        float immediateRespawn = playerEntity.level().getGameRules().getBoolean(GameRules.RULE_DO_IMMEDIATE_RESPAWN) ? 1.0f : 0.0f;
+        float immediateRespawn = playerEntity.serverLevel().getGameRules().getBoolean(GameRules.RULE_DO_IMMEDIATE_RESPAWN) ? 1.0f : 0.0f;
         playerEntity.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.IMMEDIATE_RESPAWN, immediateRespawn));
     }
 

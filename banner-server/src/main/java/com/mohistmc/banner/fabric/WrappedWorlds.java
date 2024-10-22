@@ -1,14 +1,13 @@
 package com.mohistmc.banner.fabric;
 
 import com.mohistmc.banner.BannerMod;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.function.Function;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 
 public class WrappedWorlds {
 

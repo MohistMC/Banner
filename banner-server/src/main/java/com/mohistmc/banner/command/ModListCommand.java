@@ -1,14 +1,13 @@
 package com.mohistmc.banner.command;
 
 import com.google.common.collect.ImmutableList;
+import java.util.List;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 public class ModListCommand extends BukkitCommand {
 

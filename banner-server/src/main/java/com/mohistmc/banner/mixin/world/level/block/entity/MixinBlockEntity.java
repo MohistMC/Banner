@@ -1,6 +1,9 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
 import com.mohistmc.banner.injection.world.level.block.entity.InjectionBlockEntity;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
@@ -24,10 +27,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
 
 @Mixin(BlockEntity.class)
 public abstract class MixinBlockEntity implements InjectionBlockEntity {

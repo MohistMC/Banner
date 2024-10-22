@@ -1,8 +1,8 @@
 package com.mohistmc.banner.mixin.world.entity.moster;
 
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Spider;
@@ -22,7 +22,7 @@ public abstract class MixinSpider extends Monster {
     }
 
     @Inject(method = "finalizeSpawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/Spider;addEffect(Lnet/minecraft/world/effect/MobEffectInstance;)Z"))
-    private void banner$potionReason(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, SpawnGroupData spawnGroupData, CallbackInfoReturnable<SpawnGroupData> cir) {
+    private void banner$potionReason(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, EntitySpawnReason mobSpawnType, SpawnGroupData spawnGroupData, CallbackInfoReturnable<SpawnGroupData> cir) {
         pushEffectCause(EntityPotionEffectEvent.Cause.SPIDER_SPAWN);
     }
 }
