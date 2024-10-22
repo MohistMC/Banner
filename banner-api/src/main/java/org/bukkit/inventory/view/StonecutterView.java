@@ -1,16 +1,20 @@
 package org.bukkit.inventory.view;
 
+import java.util.List;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.StonecutterInventory;
 import org.bukkit.inventory.StonecuttingRecipe;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 /**
  * An instance of {@link InventoryView} which provides extra methods related to
  * stonecutter view data.
  */
 public interface StonecutterView extends InventoryView {
+
+    @NotNull
+    @Override
+    StonecutterInventory getTopInventory();
 
     /**
      * Gets the current index of the selected recipe.

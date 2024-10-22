@@ -129,8 +129,7 @@ public class SpawnerEntry {
         /**
          * Set the loot table for the entity.
          * <br>
-         * To remove a loot table use null. Do not use {@link LootTables#EMPTY}
-         * to clear a LootTable.
+         * To remove a loot table use null.
          *
          * @param table this {@link org.bukkit.entity.Mob} will have.
          */

@@ -16,7 +16,7 @@ public class PlayerLinksSendEvent extends PlayerEvent {
     private final ServerLinks links;
 
     public PlayerLinksSendEvent(@NotNull final Player player, @NotNull final ServerLinks links) {
-        super(player, true);
+        super(player);
         this.links = links;
     }
 

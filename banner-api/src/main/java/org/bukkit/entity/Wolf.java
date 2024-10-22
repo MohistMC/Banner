@@ -104,10 +104,7 @@ public interface Wolf extends Tameable, Sittable {
 
         @NotNull
         private static Variant getVariant(@NotNull String key) {
-            NamespacedKey namespacedKey = NamespacedKey.minecraft(key);
-            Variant variant = Registry.WOLF_VARIANT.get(namespacedKey);
-            Preconditions.checkNotNull(variant, "No Wolf Variant found for %s. This is a bug.", namespacedKey);
-            return variant;
+            return Registry.WOLF_VARIANT.getOrThrow(NamespacedKey.minecraft(key));
         }
     }
 }

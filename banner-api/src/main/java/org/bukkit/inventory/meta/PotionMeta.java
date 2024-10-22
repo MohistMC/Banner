@@ -1,5 +1,6 @@
 package org.bukkit.inventory.meta;
 
+import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
@@ -7,8 +8,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  * Represents a potion or item that can have custom effects.
@@ -146,6 +145,31 @@ public interface PotionMeta extends ItemMeta {
      * @param color the color to set
      */
     void setColor(@Nullable Color color);
+
+    /**
+     * Checks for existence of a custom potion name translation suffix.
+     *
+     * @return true if this has a custom potion name
+     */
+    boolean hasCustomName();
+
+    /**
+     * Gets the potion name translation suffix that is set.
+     * <p>
+     * Plugins should check that hasCustomName() returns <code>true</code>
+     * before calling this method.
+     *
+     * @return the potion name that is set
+     */
+    @Nullable
+    String getCustomName();
+
+    /**
+     * Sets the potion name translation suffix.
+     *
+     * @param name the name to set
+     */
+    void setCustomName(@Nullable String name);
 
     @Override
     PotionMeta clone();

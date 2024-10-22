@@ -1,11 +1,10 @@
 package org.bukkit;
 
 import com.google.common.base.Preconditions;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * GameRules dictate certain behavior within Minecraft itself
@@ -29,6 +28,11 @@ public final class GameRule<T> {
      * Whether command blocks should notify admins when they perform commands.
      */
     public static final GameRule<Boolean> COMMAND_BLOCK_OUTPUT = new GameRule<>("commandBlockOutput", Boolean.class);
+
+    /**
+     * Whether the server should skip checking player speed.
+     */
+    public static final GameRule<Boolean> DISABLE_PLAYER_MOVEMENT_CHECK = new GameRule<>("disablePlayerMovementCheck", Boolean.class);
 
     /**
      * Whether the server should skip checking player speed when the player is
@@ -278,6 +282,12 @@ public final class GameRule<T> {
      * portal before the portal activates.
      */
     public static final GameRule<Integer> PLAYERS_NETHER_PORTAL_CREATIVE_DELAY = new GameRule<>("playersNetherPortalCreativeDelay", Integer.class);
+
+    /**
+     * The maximum speed of minecarts (when the new movement algorithm is
+     * enabled).
+     */
+    public static final GameRule<Integer> MINECART_MAX_SPEED = new GameRule<>("minecartMaxSpeed", Integer.class);
 
     /**
      * The number of chunks around spawn which will be kept loaded at all times.

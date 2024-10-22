@@ -183,10 +183,6 @@ public enum EntityType implements Keyed, Translatable {
      */
     COMMAND_BLOCK_MINECART("command_block_minecart", CommandMinecart.class, 40),
     /**
-     * A placed boat.
-     */
-    BOAT("boat", Boat.class, 41),
-    /**
      * @see RideableMinecart
      */
     MINECART("minecart", RideableMinecart.class, 42),
@@ -276,7 +272,6 @@ public enum EntityType implements Keyed, Translatable {
     GOAT("goat", Goat.class, -1),
     MARKER("marker", Marker.class, -1),
     ALLAY("allay", Allay.class, -1),
-    CHEST_BOAT("chest_boat", ChestBoat.class, -1),
     FROG("frog", Frog.class, -1),
     TADPOLE("tadpole", Tadpole.class, -1),
     WARDEN("warden", Warden.class, -1),
@@ -292,6 +287,32 @@ public enum EntityType implements Keyed, Translatable {
     ARMADILLO("armadillo", Armadillo.class, -1),
     BOGGED("bogged", Bogged.class, -1),
     OMINOUS_ITEM_SPAWNER("ominous_item_spawner", OminousItemSpawner.class, -1),
+    ACACIA_BOAT("acacia_boat", AcaciaBoat.class, -1),
+    ACACIA_CHEST_BOAT("acacia_chest_boat", AcaciaChestBoat.class, -1),
+    BAMBOO_RAFT("bamboo_raft", BambooRaft.class, -1),
+    BAMBOO_CHEST_RAFT("bamboo_chest_raft", BambooChestRaft.class, -1),
+    BIRCH_BOAT("birch_boat", BirchBoat.class, -1),
+    BIRCH_CHEST_BOAT("birch_chest_boat", BirchChestBoat.class, -1),
+    CHERRY_BOAT("cherry_boat", CherryBoat.class, -1),
+    CHERRY_CHEST_BOAT("cherry_chest_boat", CherryChestBoat.class, -1),
+    DARK_OAK_BOAT("dark_oak_boat", DarkOakBoat.class, -1),
+    DARK_OAK_CHEST_BOAT("dark_oak_chest_boat", DarkOakChestBoat.class, -1),
+    JUNGLE_BOAT("jungle_boat", JungleBoat.class, -1),
+    JUNGLE_CHEST_BOAT("jungle_chest_boat", JungleChestBoat.class, -1),
+    MANGROVE_BOAT("mangrove_boat", MangroveBoat.class, -1),
+    MANGROVE_CHEST_BOAT("mangrove_chest_boat", MangroveChestBoat.class, -1),
+    OAK_BOAT("oak_boat", OakBoat.class, -1),
+    OAK_CHEST_BOAT("oak_chest_boat", OakChestBoat.class, -1),
+    PALE_OAK_BOAT("pale_oak_boat", PaleOakBoat.class, -1),
+    PALE_OAK_CHEST_BOAT("pale_oak_chest_boat", PaleOakChestBoat.class, -1),
+    SPRUCE_BOAT("spruce_boat", SpruceBoat.class, -1),
+    SPRUCE_CHEST_BOAT("spruce_chest_boat", SpruceChestBoat.class, -1),
+    @ApiStatus.Experimental
+    @MinecraftExperimental(MinecraftExperimental.Requires.WINTER_DROP)
+    CREAKING("creaking", Creaking.class, -1),
+    @ApiStatus.Experimental
+    @MinecraftExperimental(MinecraftExperimental.Requires.WINTER_DROP)
+    CREAKING_TRANSIENT("creaking_transient", CreakingTransient.class, -1),
     /**
      * A fishing line and bobber.
      */

@@ -74,6 +74,9 @@ public enum Biome implements Keyed {
     JAGGED_PEAKS,
     STONY_PEAKS,
     CHERRY_GROVE,
+    @ApiStatus.Experimental
+    @MinecraftExperimental(MinecraftExperimental.Requires.WINTER_DROP)
+    PALE_GARDEN,
     /**
      * Represents a custom Biome
      */
