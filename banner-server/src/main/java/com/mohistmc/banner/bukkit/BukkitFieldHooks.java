@@ -7,6 +7,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.SignItem;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.SaplingBlock;
 import org.bukkit.TreeType;
@@ -20,6 +21,7 @@ public class BukkitFieldHooks {
     private static final VarHandle pluginTicket;
     private static final VarHandle pluginTicketType;
     private static final VarHandle openSign;
+    private static final VarHandle lastPhysicsProblem;
 
     static {
         try {
@@ -35,6 +37,8 @@ public class BukkitFieldHooks {
             pluginTicketType = MethodHandles.lookup().unreflectVarHandle(pluginTicketTypeField);
             var openSignField = SignItem.class.getDeclaredField("openSign");
             openSign = MethodHandles.lookup().unreflectVarHandle(openSignField);
+            var lastPhysicsProblemField = Level.class.getDeclaredField("lastPhysicsProblem");
+            lastPhysicsProblem = MethodHandles.lookup().unreflectVarHandle(lastPhysicsProblemField);
         } catch (Throwable t) {
             throw new ExceptionInInitializerError(t);
         }
@@ -78,5 +82,13 @@ public class BukkitFieldHooks {
 
     public static void setOpenSign(BlockPos newSign) {
         openSign.set(newSign);
+    }
+
+    public static BlockPos lastPhysicsProblem() {
+        return (BlockPos) lastPhysicsProblem.get();
+    }
+
+    public static void setLastPhysicsProblem(BlockPos newLastPhysicsProblem) {
+        lastPhysicsProblem.set(newLastPhysicsProblem);
     }
 }

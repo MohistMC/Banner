@@ -141,7 +141,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void banner$init(WritableLevelData info, ResourceKey<Level> dimension, RegistryAccess registryAccess, Holder<DimensionType> dimType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdates, CallbackInfo ci) {
+    private void banner$init(WritableLevelData writableLevelData, ResourceKey resourceKey, RegistryAccess registryAccess, Holder holder, boolean bl, boolean bl2, long l, int i, CallbackInfo ci) {
         if ((Object) this instanceof ServerLevel) {
             this.banner$setSpigotConfig(new SpigotWorldConfig(BukkitMethodHooks.getServer().storageSource.getDimensionPath(dimension).getFileName().toFile().getName()));
             this.banner$setBannerConfig(new BannerWorldConfig(BukkitMethodHooks.getServer().storageSource.getDimensionPath(dimension).getFileName().toFile().getName()));
@@ -288,18 +288,21 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
     @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/level/block/state/BlockState;updateNeighbourShapes(Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;II)V"),
-            locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
-    private void banner$physicEvent(BlockPos blockPos, BlockState blockState, int i, int j, CallbackInfoReturnable<Boolean> cir, LevelChunk levelChunk, Block block, BlockState blockState2, BlockState blockState3, int k) {
+            cancellable = true)
+    private void banner$physicEvent(BlockPos blockPos, BlockState blockState, int i, int j, CallbackInfoReturnable<Boolean> cir) {
         CraftWorld world = ((ServerLevel) (Object) this).getWorld();
-        if (world != null) {
-            BlockPhysicsEvent event = new BlockPhysicsEvent(world.getBlockAt(blockPos.getX(), blockPos.getY(), blockPos.getZ()), CraftBlockData.fromData(blockState));
-            this.getCraftServer().getPluginManager().callEvent(event);
+        try {
+            if (world != null) {
+                BlockPhysicsEvent event = new BlockPhysicsEvent(world.getBlockAt(blockPos.getX(), blockPos.getY(), blockPos.getZ()), CraftBlockData.fromData(blockState));
+                this.getCraftServer().getPluginManager().callEvent(event);
 
-            if (event.isCancelled()) {
-                cir.setReturnValue(true);
-                cir.cancel();
+                if (event.isCancelled()) {
+                    cir.setReturnValue(true);
+                    cir.cancel();
+                }
             }
-            // CraftBukkit end
+        } catch (StackOverflowError e) {
+            lastPhysicsProblem = blockPos;
         }
     }
 
@@ -616,7 +619,7 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
                     }
                     var generator = serverWorld.getChunkSource().getGenerator();
                     if (biomeProvider != null) {
-                        BiomeSource biomeSource = new CustomWorldChunkManager(worldInfo, biomeProvider, serverWorld.registryAccess().registryOrThrow(Registries.BIOME));
+                        BiomeSource biomeSource = new CustomWorldChunkManager(worldInfo, biomeProvider, serverWorld.registryAccess().lookupOrThrow(Registries.BIOME));
                         if (generator instanceof NoiseBasedChunkGenerator cga) {
                             generator = new NoiseBasedChunkGenerator(biomeSource, cga.settings);
                         } else if (generator instanceof FlatLevelSource cpf) {

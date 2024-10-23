@@ -2,6 +2,8 @@ package org.spigotmc;
 
 import java.io.File;
 import java.util.List;
+
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.command.Command;
@@ -24,7 +26,7 @@ public class RestartCommand extends Command
     {
         if ( this.testPermission( sender ) )
         {
-            MinecraftServer.getServer().processQueue.add( new Runnable()
+            BukkitMethodHooks.getServer().bridge$processQueue().add(new Runnable()
             {
                 @Override
                 public void run()
@@ -55,7 +57,7 @@ public class RestartCommand extends Command
                 WatchdogThread.doStop();
 
                 // Kick all players
-                for ( ServerPlayer p : (List<ServerPlayer>) MinecraftServer.getServer().getPlayerList().players )
+                for ( ServerPlayer p : (List<ServerPlayer>) BukkitMethodHooks.getServer().getPlayerList().players )
                 {
                     p.connection.disconnect( CraftChatMessage.fromStringOrEmpty( SpigotConfig.restartMessage, true ) );
                 }
@@ -67,7 +69,7 @@ public class RestartCommand extends Command
                 {
                 }
                 // Close the socket so we can rebind with the new process
-                MinecraftServer.getServer().getConnection().stop();
+                BukkitMethodHooks.getServer().getConnection().stop();
 
                 // Give time for it to kick in
                 try
@@ -80,7 +82,7 @@ public class RestartCommand extends Command
                 // Actually shutdown
                 try
                 {
-                    MinecraftServer.getServer().close();
+                    BukkitMethodHooks.getServer().close();
                 } catch ( Throwable t )
                 {
                 }
@@ -117,7 +119,7 @@ public class RestartCommand extends Command
                 // Actually shutdown
                 try
                 {
-                    MinecraftServer.getServer().close();
+                    BukkitMethodHooks.getServer().close();
                 } catch ( Throwable t )
                 {
                 }

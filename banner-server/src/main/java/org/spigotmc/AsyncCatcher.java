@@ -1,5 +1,6 @@
 package org.spigotmc;
 
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.server.MinecraftServer;
 
 public class AsyncCatcher
@@ -9,7 +10,7 @@ public class AsyncCatcher
 
     public static void catchOp(String reason)
     {
-        if ( AsyncCatcher.enabled && Thread.currentThread() != MinecraftServer.getServer().serverThread )
+        if ( AsyncCatcher.enabled && Thread.currentThread() != BukkitMethodHooks.getServer().serverThread )
         {
             throw new IllegalStateException( "Asynchronous " + reason + "!" );
         }

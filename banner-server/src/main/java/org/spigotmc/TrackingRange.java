@@ -26,11 +26,11 @@ public class TrackingRange
         {
             return defaultRange;
         }
-        SpigotWorldConfig config = entity.level().spigotConfig;
+        SpigotWorldConfig config = entity.level().bridge$spigotConfig();
         if ( entity instanceof ServerPlayer )
         {
             return config.playerTrackingRange;
-        } else if ( entity.activationType == ActivationRange.ActivationType.MONSTER || entity.activationType == ActivationRange.ActivationType.RAIDER )
+        } else if ( entity.bridge$activationType() == ActivationRange.ActivationType.MONSTER || entity.bridge$activationType() == ActivationRange.ActivationType.RAIDER )
         {
             return config.monsterTrackingRange;
         } else if ( entity instanceof Ghast )
@@ -42,7 +42,7 @@ public class TrackingRange
             {
                 return config.monsterActivationRange;
             }
-        } else if ( entity.activationType == ActivationRange.ActivationType.ANIMAL )
+        } else if ( entity.bridge$activationType() == ActivationRange.ActivationType.ANIMAL )
         {
             return config.animalTrackingRange;
         } else if ( entity instanceof ItemFrame || entity instanceof Painting || entity instanceof ItemEntity || entity instanceof ExperienceOrb )
