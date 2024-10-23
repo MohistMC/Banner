@@ -1,11 +1,10 @@
 --- a/net/minecraft/world/entity/projectile/EntityFireball.java
 +++ b/net/minecraft/world/entity/projectile/EntityFireball.java
-@@ -18,11 +18,18 @@
+@@ -19,11 +19,17 @@
  import net.minecraft.world.phys.MovingObjectPosition;
  import net.minecraft.world.phys.Vec3D;
  
 +// CraftBukkit start
-+import org.bukkit.craftbukkit.event.CraftEventFactory;
 +import org.bukkit.event.entity.EntityRemoveEvent;
 +// CraftBukkit end
 +
@@ -19,27 +18,21 @@
  
      protected EntityFireball(EntityTypes<? extends EntityFireball> entitytypes, World world) {
          super(entitytypes, world);
-@@ -71,7 +78,7 @@
-         Entity entity = this.getOwner();
+@@ -73,7 +79,7 @@
  
+         this.applyInertia();
          if (!this.level().isClientSide && (entity != null && entity.isRemoved() || !this.level().hasChunkAt(this.blockPosition()))) {
 -            this.discard();
 +            this.discard(EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - add Bukkit remove cause
          } else {
-             super.tick();
-             if (this.shouldBurn()) {
-@@ -81,7 +88,13 @@
              MovingObjectPosition movingobjectposition = ProjectileHelper.getHitResultOnMoveVector(this, this::canHitEntity, this.getClipType());
- 
-             if (movingobjectposition.getType() != MovingObjectPosition.EnumMovingObjectType.MISS) {
--                this.hitTargetOrDeflectSelf(movingobjectposition);
-+                this.preHitTargetOrDeflectSelf(movingobjectposition); // CraftBukkit - projectile hit event
-+
-+                // CraftBukkit start - Fire ProjectileHitEvent
-+                if (this.isRemoved()) {
-+                    CraftEventFactory.callProjectileHitEvent(this, movingobjectposition);
-+                }
-+                // CraftBukkit end
+             Vec3D vec3d;
+@@ -93,7 +99,7 @@
              }
  
-             this.checkInsideBlocks();
+             if (movingobjectposition.getType() != MovingObjectPosition.EnumMovingObjectType.MISS && this.isAlive()) {
+-                this.hitTargetOrDeflectSelf(movingobjectposition);
++                this.preHitTargetOrDeflectSelf(movingobjectposition); // CraftBukkit - projectile hit event
+             }
+ 
+             this.createParticleTrail();

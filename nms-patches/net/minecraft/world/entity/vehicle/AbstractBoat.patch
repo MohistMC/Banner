@@ -1,6 +1,6 @@
---- a/net/minecraft/world/entity/vehicle/EntityBoat.java
-+++ b/net/minecraft/world/entity/vehicle/EntityBoat.java
-@@ -55,6 +55,16 @@
+--- a/net/minecraft/world/entity/vehicle/AbstractBoat.java
++++ b/net/minecraft/world/entity/vehicle/AbstractBoat.java
+@@ -48,6 +48,15 @@
  import net.minecraft.world.phys.shapes.VoxelShape;
  import net.minecraft.world.phys.shapes.VoxelShapes;
  
@@ -9,17 +9,16 @@
 +import org.bukkit.craftbukkit.util.CraftLocation;
 +import org.bukkit.entity.Vehicle;
 +import org.bukkit.event.entity.EntityRemoveEvent;
-+import org.bukkit.event.vehicle.VehicleDestroyEvent;
 +import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
 +import org.bukkit.event.vehicle.VehicleMoveEvent;
 +// CraftBukkit end
 +
- public class EntityBoat extends VehicleEntity implements Leashable, VariantHolder<EntityBoat.EnumBoatType> {
+ public abstract class AbstractBoat extends VehicleEntity implements Leashable {
  
-     private static final DataWatcherObject<Integer> DATA_ID_TYPE = DataWatcher.defineId(EntityBoat.class, DataWatcherRegistry.INT);
-@@ -94,6 +104,14 @@
-     @Nullable
+     private static final DataWatcherObject<Boolean> DATA_ID_PADDLE_LEFT = DataWatcher.defineId(AbstractBoat.class, DataWatcherRegistry.BOOLEAN);
+@@ -87,6 +96,14 @@
      private Leashable.a leashData;
+     private final Supplier<Item> dropItem;
  
 +    // CraftBukkit start
 +    // PAIL: Some of these haven't worked since a few updates, and since 1.9 they are less and less applicable.
@@ -29,12 +28,12 @@
 +    public boolean landBoats = false;
 +    // CraftBukkit end
 +
-     public EntityBoat(EntityTypes<? extends EntityBoat> entitytypes, World world) {
+     public AbstractBoat(EntityTypes<? extends AbstractBoat> entitytypes, World world, Supplier<Item> supplier) {
          super(entitytypes, world);
-         this.paddlePositions = new float[2];
-@@ -189,9 +207,29 @@
+         this.dropItem = supplier;
+@@ -182,9 +199,29 @@
      public void push(Entity entity) {
-         if (entity instanceof EntityBoat) {
+         if (entity instanceof AbstractBoat) {
              if (entity.getBoundingBox().minY < this.getBoundingBox().maxY) {
 +                // CraftBukkit start
 +                if (!this.isPassengerOfSameVehicle(entity)) {
@@ -62,7 +61,7 @@
              super.push(entity);
          }
  
-@@ -285,6 +323,7 @@
+@@ -247,6 +284,7 @@
          return this.getDirection().getClockWise();
      }
  
@@ -70,7 +69,7 @@
      @Override
      public void tick() {
          this.oldStatus = this.status;
-@@ -325,6 +364,22 @@
+@@ -287,6 +325,21 @@
              this.setDeltaMovement(Vec3D.ZERO);
          }
  
@@ -89,11 +88,10 @@
 +        }
 +        lastLocation = vehicle.getLocation();
 +        // CraftBukkit end
-+
+         this.applyEffectsFromBlocks();
+         this.applyEffectsFromBlocks();
          this.tickBubbleColumn();
- 
-         for (int i = 0; i <= 1; ++i) {
-@@ -837,11 +892,18 @@
+@@ -790,11 +843,18 @@
  
      @Override
      public void remove(Entity.RemovalReason entity_removalreason) {
@@ -113,23 +111,3 @@
      }
  
      @Override
-@@ -857,6 +919,11 @@
- 
-                     this.causeFallDamage(this.fallDistance, 1.0F, this.damageSources().fall());
-                     if (!this.level().isClientSide && !this.isRemoved()) {
-+                    // CraftBukkit start
-+                    Vehicle vehicle = (Vehicle) this.getBukkitEntity();
-+                    VehicleDestroyEvent destroyEvent = new VehicleDestroyEvent(vehicle, null);
-+                    this.level().getCraftServer().getPluginManager().callEvent(destroyEvent);
-+                    if (!destroyEvent.isCancelled()) {
-                         this.kill();
-                         if (this.level().getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
-                             int i;
-@@ -870,6 +937,7 @@
-                             }
-                         }
-                     }
-+                    } // CraftBukkit end
-                 }
- 
-                 this.resetFallDistance();
