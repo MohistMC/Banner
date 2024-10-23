@@ -16,7 +16,9 @@ import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.monster.ZombieVillager;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.BoneMealItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
@@ -38,6 +40,7 @@ public class BukkitMethodHooks {
     private static final MethodHandle fall;
     private static final MethodHandle applyBonemeal;
     private static final MethodHandle reload;
+    private static final MethodHandle ofStacks;
 
     static {
         try {
@@ -62,7 +65,9 @@ public class BukkitMethodHooks {
             var applyBonemealMethod = BoneMealItem.class.getDeclaredMethod("applyBonemeal", UseOnContext.class);
             applyBonemeal = MethodHandles.lookup().unreflect(applyBonemealMethod);
             var reloadMethod = ReloadCommand.class.getDeclaredMethod("reload", MinecraftServer.class);
-            reload = MethodHandles.lookup().unreflect(reloadMethod);
+            reload = MethodHandles.lookup().unreflect(applyBonemealMethod);
+            var ofStacksMethod = Ingredient.class.getDeclaredMethod("ofStacks", MinecraftServer.class);
+            ofStacks = MethodHandles.lookup().unreflect(ofStacksMethod);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -151,6 +156,14 @@ public class BukkitMethodHooks {
     public static MinecraftServer reload(MinecraftServer minecraftserver) {
         try {
             return (MinecraftServer) reload.invokeWithArguments(minecraftserver);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Ingredient ofStacks(List<ItemStack> stacks) {
+        try {
+            return (Ingredient) ofStacks.invokeWithArguments(stacks);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

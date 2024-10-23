@@ -98,7 +98,7 @@ public class CraftMushroomCow extends CraftCow implements MushroomCow {
     public void setVariant(Variant variant) {
         Preconditions.checkArgument(variant != null, "Variant cannot be null");
 
-        this.getHandle().setVariant(net.minecraft.world.entity.animal.MushroomCow.MushroomType.values()[variant.ordinal()]);
+        this.getHandle().setVariant(net.minecraft.world.entity.animal.MushroomCow.Variant.values()[variant.ordinal()]);
     }
 
     @Override

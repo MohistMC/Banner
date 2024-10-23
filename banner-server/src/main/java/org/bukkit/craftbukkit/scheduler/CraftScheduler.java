@@ -26,7 +26,6 @@ import org.bukkit.scheduler.BukkitWorker;
 
 /**
  * The fundamental concepts for this implementation:
- * <ul>
  * <li>Main thread owns {@link #head} and {@link #currentTick}, but it may be read from any thread</li>
  * <li>Main thread exclusively controls {@link #temp} and {@link #pending}.
  *     They are never to be accessed outside of the main thread; alternatives exist to prevent locking.</li>
@@ -42,7 +41,6 @@ import org.bukkit.scheduler.BukkitWorker;
  * <li>Sync tasks are only to be removed from runners on the main thread when coupled with a removal from pending and temp.</li>
  * <li>Most of the design in this scheduler relies on queuing special tasks to perform any data changes on the main thread.
  *     When executed from inside a synchronous method, the scheduler will be updated before next execution by virtue of the frequent {@link #parsePending()} calls.</li>
- * </ul>
  */
 public class CraftScheduler implements BukkitScheduler {
 
@@ -397,11 +395,11 @@ public class CraftScheduler implements BukkitScheduler {
     /**
      * This method is designed to never block or wait for locks; an immediate execution of all current tasks.
      */
-    public void mainThreadHeartbeat(final int currentTick) {
-        this.currentTick = currentTick;
+    public void mainThreadHeartbeat() {
+        this.currentTick++;
         final List<CraftTask> temp = this.temp;
         this.parsePending();
-        while (this.isReady(currentTick)) {
+        while (this.isReady(this.currentTick)) {
             final CraftTask task = this.pending.remove();
             if (task.getPeriod() < CraftTask.NO_REPEATING) {
                 if (task.isSync()) {
@@ -429,14 +427,14 @@ public class CraftScheduler implements BukkitScheduler {
                 }
                 this.parsePending();
             } else {
-                this.debugTail = this.debugTail.setNext(new CraftAsyncDebugger(currentTick + CraftScheduler.RECENT_TICKS, task.getOwner(), task.getTaskClass()));
+                this.debugTail = this.debugTail.setNext(new CraftAsyncDebugger(this.currentTick + CraftScheduler.RECENT_TICKS, task.getOwner(), task.getTaskClass()));
                 this.executor.execute(task);
                 // We don't need to parse pending
                 // (async tasks must live with race-conditions if they attempt to cancel between these few lines of code)
             }
             final long period = task.getPeriod(); // State consistency
             if (period > 0) {
-                task.setNextRun(currentTick + period);
+                task.setNextRun(this.currentTick + period);
                 temp.add(task);
             } else if (task.isSync()) {
                 this.runners.remove(task.getTaskId());
@@ -444,7 +442,7 @@ public class CraftScheduler implements BukkitScheduler {
         }
         this.pending.addAll(temp);
         temp.clear();
-        this.debugHead = this.debugHead.getNextHead(currentTick);
+        this.debugHead = this.debugHead.getNextHead(this.currentTick);
     }
 
     private void addTask(final CraftTask task) {

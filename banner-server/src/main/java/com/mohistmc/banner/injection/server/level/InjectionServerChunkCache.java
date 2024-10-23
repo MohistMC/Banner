@@ -20,4 +20,8 @@ public interface InjectionServerChunkCache {
     default void purgeUnload() {
         throw new IllegalStateException("Not implemented");
     }
+
+    default void setSpawnSettings(boolean flag, boolean spawnFriendlies) {
+        throw new IllegalStateException("Not implemented");
+    }
 }

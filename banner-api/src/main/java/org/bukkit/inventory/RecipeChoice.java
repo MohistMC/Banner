@@ -1,18 +1,17 @@
 package org.bukkit.inventory;
 
 import com.google.common.base.Preconditions;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Tag;
-import org.bukkit.material.MaterialData;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Tag;
+import org.bukkit.material.MaterialData;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a potential item match within a recipe. All choices within a

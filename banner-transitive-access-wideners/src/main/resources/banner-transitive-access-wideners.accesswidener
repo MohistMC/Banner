@@ -570,6 +570,14 @@ transitive-accessible field net/minecraft/world/inventory/StonecutterMenu access
 transitive-accessible field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner isOminous Z
 transitive-accessible field net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity recipesUsed Lit/unimi/dsi/fastutil/objects/Reference2IntOpenHashMap;
 transitive-accessible field net/minecraft/world/item/crafting/RecipeManager recipes Lnet/minecraft/world/item/crafting/RecipeMap;
+transitive-accessible field net/minecraft/world/inventory/AbstractCraftingMenu craftSlots Lnet/minecraft/world/inventory/CraftingContainer;
+transitive-accessible field net/minecraft/world/inventory/AbstractCraftingMenu resultSlots Lnet/minecraft/world/inventory/ResultContainer;
+transitive-accessible field net/minecraft/world/level/chunk/storage/EntityStorage entityDeserializerQueue Lnet/minecraft/util/thread/ConsecutiveExecutor;
+transitive-accessible field net/minecraft/world/level/chunk/storage/SerializableChunkData BLOCK_STATE_CODEC Lcom/mojang/serialization/Codec;
+transitive-accessible field net/minecraft/world/item/crafting/RecipeMap byType Lcom/google/common/collect/Multimap;
+transitive-accessible field net/minecraft/world/entity/vehicle/AbstractBoat status Lnet/minecraft/world/entity/vehicle/AbstractBoat$Status;
+transitive-accessible method net/minecraft/world/entity/Entity isInvulnerableToBase (Lnet/minecraft/world/damagesource/DamageSource;)Z
+transitive-accessible field net/minecraft/world/entity/animal/Wolf isWet Z
 # public -f fields
 transitive-accessible field net/minecraft/world/item/trading/MerchantOffer maxUses I
 transitive-mutable field net/minecraft/world/item/trading/MerchantOffer maxUses I

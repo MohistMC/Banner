@@ -1,9 +1,8 @@
 package org.bukkit.inventory;
 
+import java.util.function.Supplier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Supplier;
 
 public enum EquipmentSlot {
 

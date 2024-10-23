@@ -364,6 +364,7 @@
     "world.item.crafting.MixinBlastingRecipe",
     "world.item.crafting.MixinCampfireCookingRecipe",
     "world.item.crafting.MixinCustomRecipe",
+    "world.item.crafting.MixinIngredient",
     "world.item.crafting.MixinRecipe",
     "world.item.crafting.MixinRecipeHolder",
     "world.item.crafting.MixinRecipeManager",

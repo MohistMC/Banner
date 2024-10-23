@@ -1,5 +1,6 @@
 package org.bukkit.entity;
 
+import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
@@ -7,8 +8,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public interface Arrow extends AbstractArrow {
 

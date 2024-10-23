@@ -1,11 +1,10 @@
 package org.bukkit.block;
 
+import java.util.Collection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
 
 /**
  * Represents a captured state of a conduit.

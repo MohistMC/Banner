@@ -2,10 +2,18 @@ package org.bukkit.craftbukkit.inventory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
+import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -83,6 +91,13 @@ public final class CraftItemStack extends ItemStack {
 
     public static CraftItemStack asNewCraftStack(Item item, int amount) {
         return new CraftItemStack(CraftItemType.minecraftToBukkit(item), amount, (short) 0, null);
+    }
+
+    public static ItemPredicate asCriterionConditionItem(ItemStack original) {
+        net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(original);
+        DataComponentPredicate predicate = DataComponentPredicate.allOf(PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, nms.getComponentsPatch()));
+
+        return new ItemPredicate(Optional.of(HolderSet.direct(nms.getItemHolder())), MinMaxBounds.Ints.ANY, predicate, Collections.emptyMap());
     }
 
     net.minecraft.world.item.ItemStack handle;
@@ -355,20 +370,6 @@ public final class CraftItemStack extends ItemStack {
 
         return true;
     }
-
-    // Paper start - MC Utils
-    public static net.minecraft.world.item.ItemStack unwrap(ItemStack bukkit) {
-        if (bukkit instanceof CraftItemStack craftItemStack) {
-            return craftItemStack.handle != null ? craftItemStack.handle : net.minecraft.world.item.ItemStack.EMPTY;
-        } else {
-            return asNMSCopy(bukkit);
-        }
-    }
-
-    public static net.minecraft.world.item.ItemStack getOrCloneOnMutation(ItemStack old, ItemStack newInstance) {
-        return old == newInstance ? unwrap(old) : asNMSCopy(newInstance);
-    }
-    // Paper end - MC Utils
 
     @Override
     public boolean isSimilar(ItemStack stack) {

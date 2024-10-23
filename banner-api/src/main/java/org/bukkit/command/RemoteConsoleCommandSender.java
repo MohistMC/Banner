@@ -1,8 +1,7 @@
 package org.bukkit.command;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.net.SocketAddress;
+import org.jetbrains.annotations.NotNull;
 
 public interface RemoteConsoleCommandSender extends CommandSender {
 

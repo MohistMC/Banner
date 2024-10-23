@@ -8,11 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import javax.annotation.Nullable;
-
-import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BannerBlockEntity;
@@ -33,6 +32,7 @@ import net.minecraft.world.level.block.entity.CommandBlockEntity;
 import net.minecraft.world.level.block.entity.ComparatorBlockEntity;
 import net.minecraft.world.level.block.entity.ConduitBlockEntity;
 import net.minecraft.world.level.block.entity.CrafterBlockEntity;
+import net.minecraft.world.level.block.entity.CreakingHeartBlockEntity;
 import net.minecraft.world.level.block.entity.DaylightDetectorBlockEntity;
 import net.minecraft.world.level.block.entity.DecoratedPotBlockEntity;
 import net.minecraft.world.level.block.entity.DispenserBlockEntity;
@@ -150,6 +150,8 @@ public final class CraftBlockStates {
                         Material.MANGROVE_WALL_SIGN,
                         Material.OAK_SIGN,
                         Material.OAK_WALL_SIGN,
+                        Material.PALE_OAK_SIGN,
+                        Material.PALE_OAK_WALL_SIGN,
                         Material.SPRUCE_SIGN,
                         Material.SPRUCE_WALL_SIGN,
                         Material.WARPED_SIGN,
@@ -177,6 +179,8 @@ public final class CraftBlockStates {
                         Material.MANGROVE_WALL_HANGING_SIGN,
                         Material.OAK_HANGING_SIGN,
                         Material.OAK_WALL_HANGING_SIGN,
+                        Material.PALE_OAK_HANGING_SIGN,
+                        Material.PALE_OAK_WALL_HANGING_SIGN,
                         Material.SPRUCE_HANGING_SIGN,
                         Material.SPRUCE_WALL_HANGING_SIGN,
                         Material.WARPED_HANGING_SIGN,
@@ -314,6 +318,7 @@ public final class CraftBlockStates {
         register(Material.CHISELED_BOOKSHELF, CraftChiseledBookshelf.class, CraftChiseledBookshelf::new, ChiseledBookShelfBlockEntity::new);
         register(Material.COMPARATOR, CraftComparator.class, CraftComparator::new, ComparatorBlockEntity::new);
         register(Material.CONDUIT, CraftConduit.class, CraftConduit::new, ConduitBlockEntity::new);
+        register(Material.CREAKING_HEART, CraftCreakingHeart.class, CraftCreakingHeart::new, CreakingHeartBlockEntity::new);
         register(Material.DAYLIGHT_DETECTOR, CraftDaylightDetector.class, CraftDaylightDetector::new, DaylightDetectorBlockEntity::new);
         register(Material.DECORATED_POT, CraftDecoratedPot.class, CraftDecoratedPot::new, DecoratedPotBlockEntity::new);
         register(Material.DISPENSER, CraftDispenser.class, CraftDispenser::new, DispenserBlockEntity::new);
@@ -347,7 +352,7 @@ public final class CraftBlockStates {
         CraftBlockStates.FACTORIES.put(blockType, factory);
     }
 
-    public static <T extends BlockEntity, B extends CraftBlockEntityState<T>> void register(
+    private static <T extends BlockEntity, B extends CraftBlockEntityState<T>> void register(
             Material blockType,
             Class<B> blockStateType,
             BiFunction<World, T, B> blockStateConstructor,
@@ -401,7 +406,7 @@ public final class CraftBlockStates {
 
     @Deprecated
     public static BlockState getBlockState(BlockPos blockPosition, Material material, @Nullable CompoundTag blockEntityTag) {
-        return CraftBlockStates.getBlockState(BukkitMethodHooks.getDefaultRegistryAccess(), blockPosition, material, blockEntityTag);
+        return CraftBlockStates.getBlockState(MinecraftServer.getDefaultRegistryAccess(), blockPosition, material, blockEntityTag);
     }
 
     public static BlockState getBlockState(LevelReader world, BlockPos blockPosition, Material material, @Nullable CompoundTag blockEntityTag) {
@@ -416,7 +421,7 @@ public final class CraftBlockStates {
 
     @Deprecated
     public static BlockState getBlockState(net.minecraft.world.level.block.state.BlockState blockData, @Nullable CompoundTag blockEntityTag) {
-        return CraftBlockStates.getBlockState(BukkitMethodHooks.getDefaultRegistryAccess(), BlockPos.ZERO, blockData, blockEntityTag);
+        return CraftBlockStates.getBlockState(MinecraftServer.getDefaultRegistryAccess(), BlockPos.ZERO, blockData, blockEntityTag);
     }
 
     public static BlockState getBlockState(LevelReader world, BlockPos blockPosition, net.minecraft.world.level.block.state.BlockState blockData, @Nullable CompoundTag blockEntityTag) {

@@ -1,14 +1,13 @@
 package org.bukkit.inventory;
 
 import com.google.common.base.Preconditions;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Predicate;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents a group of {@link EquipmentSlot}.

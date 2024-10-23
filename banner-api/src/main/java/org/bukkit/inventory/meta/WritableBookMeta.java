@@ -1,9 +1,8 @@
 package org.bukkit.inventory.meta;
 
+import java.util.List;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 /**
  * Represents a book ({@link Material#WRITABLE_BOOK} or {@link

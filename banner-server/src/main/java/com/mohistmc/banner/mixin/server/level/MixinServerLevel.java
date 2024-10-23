@@ -14,12 +14,14 @@ import com.mohistmc.banner.fabric.BannerDerivedWorldInfo;
 import com.mohistmc.banner.fabric.WorldSymlink;
 import com.mohistmc.banner.injection.server.level.InjectionServerLevel;
 import com.mohistmc.banner.injection.world.level.storage.InjectionLevelStorageAccess;
+
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
@@ -27,6 +29,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundExplodePacket;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -35,14 +38,19 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.server.players.PlayerList;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.ProgressListener;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.Container;
 import net.minecraft.world.RandomSequences;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.CustomSpawner;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.ExplosionDamageCalculator;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ServerExplosion;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -81,6 +89,7 @@ import org.bukkit.event.world.GenericGameEvent;
 import org.bukkit.event.world.TimeSkipEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -112,19 +121,18 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
 
     @Shadow @Final public PersistentEntitySectionManager<Entity> entityManager;
     @Shadow protected abstract void wakeUpAllPlayers();
-
-    @Shadow @Final public static BlockPos END_SPAWN_POINT;
-
     @Shadow public abstract boolean addFreshEntity(Entity entity);
-
     @Shadow public abstract void addDuringTeleport(Entity entity);
     @Shadow public abstract boolean addWithUUID(Entity entity);
-
     @Shadow public abstract DimensionDataStorage getDataStorage();
     @Shadow public abstract ServerChunkCache getChunkSource();
-
     @Shadow protected abstract boolean addEntity(Entity entity);
 
+    @Shadow protected abstract Explosion.BlockInteraction getDestroyType(GameRules.Key<GameRules.BooleanValue> key);
+
+    @Shadow public abstract GameRules getGameRules();
+
+    @Shadow @Final private List<ServerPlayer> players;
     public LevelStorageSource.LevelStorageAccess convertable;
     public UUID uuid;
     public PrimaryLevelData K;
@@ -135,8 +143,8 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     private final AtomicReference<Boolean> banner$timeSkipCancelled = new AtomicReference<>(false);
     public ResourceKey<LevelStem> typeKey;
 
-    protected MixinServerLevel(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean bl, boolean bl2, long l, int i) {
-        super(writableLevelData, resourceKey, registryAccess, holder, supplier, bl, bl2, l, i);
+    protected MixinServerLevel(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder<DimensionType> holder, boolean bl, boolean bl2, long l, int i) {
+        super(writableLevelData, resourceKey, registryAccess, holder, bl, bl2, l, i);
     }
 
     @ShadowConstructor
@@ -161,7 +169,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         if (typeKey != null) {
             this.typeKey = typeKey;
         } else {
-            var dimensions = BukkitMethodHooks.getServer().registryAccess().registryOrThrow(Registries.LEVEL_STEM);
+            var dimensions = BukkitMethodHooks.getServer().registryAccess().lookupOrThrow(Registries.LEVEL_STEM);
             var key = dimensions.getResourceKey(levelStem);
             if (key.isPresent()) {
                 this.typeKey = key.get();
@@ -393,6 +401,39 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
         return add;
     }
 
+    @Override
+    public ServerExplosion explode0(@Nullable Entity entity, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator explosionDamageCalculator, double d, double e, double f, float g, boolean bl, Level.ExplosionInteraction explosionInteraction, ParticleOptions particleOptions, ParticleOptions particleOptions2, Holder<SoundEvent> holder) {
+        Explosion.BlockInteraction var10000;
+        switch (explosionInteraction) {
+            case NONE -> var10000 = Explosion.BlockInteraction.KEEP;
+            case BLOCK -> var10000 = this.getDestroyType(GameRules.RULE_BLOCK_EXPLOSION_DROP_DECAY);
+            case MOB -> var10000 = this.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) ? this.getDestroyType(GameRules.RULE_MOB_EXPLOSION_DROP_DECAY) : Explosion.BlockInteraction.KEEP;
+            case TNT -> var10000 = this.getDestroyType(GameRules.RULE_TNT_EXPLOSION_DROP_DECAY);
+            case TRIGGER -> var10000 = Explosion.BlockInteraction.TRIGGER_BLOCK;
+            default -> throw new MatchException((String)null, (Throwable)null);
+        }
+
+        Explosion.BlockInteraction blockInteraction = var10000;
+        Vec3 vec3 = new Vec3(d, e, f);
+        ServerExplosion serverExplosion = new ServerExplosion(((ServerLevel) (Object) this), entity, damageSource, explosionDamageCalculator, vec3, g, bl, blockInteraction);
+        serverExplosion.explode();
+        // CraftBukkit start
+        if (serverExplosion.bridge$wasCanceled()) {
+            return serverExplosion;
+        }
+        // CraftBukkit end
+        ParticleOptions particleOptions3 = serverExplosion.isSmall() ? particleOptions : particleOptions2;
+        Iterator var20 = this.players.iterator();
+
+        while(var20.hasNext()) {
+            ServerPlayer serverPlayer = (ServerPlayer)var20.next();
+            if (serverPlayer.distanceToSqr(vec3) < 4096.0) {
+                Optional<Vec3> optional = Optional.ofNullable((Vec3)serverExplosion.getHitPlayers().get(serverPlayer));
+                serverPlayer.connection.send(new ClientboundExplodePacket(vec3, optional, particleOptions3, holder));
+            }
+        }
+        return serverExplosion;
+    }
 
     @Override
     public boolean addFreshEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {

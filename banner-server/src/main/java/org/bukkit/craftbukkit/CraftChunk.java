@@ -17,7 +17,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.thread.ProcessorMailbox;
+import net.minecraft.util.thread.ConsecutiveExecutor;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.Biomes;
@@ -29,8 +29,8 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.PalettedContainerRO;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
-import net.minecraft.world.level.chunk.storage.ChunkSerializer;
 import net.minecraft.world.level.chunk.storage.EntityStorage;
+import net.minecraft.world.level.chunk.storage.SerializableChunkData;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
@@ -109,7 +109,7 @@ public class CraftChunk implements Chunk {
 
     @Override
     public Block getBlock(int x, int y, int z) {
-        CraftChunk.validateChunkCoordinates(this.worldServer.getMinBuildHeight(), this.worldServer.getMaxBuildHeight(), x, y, z);
+        CraftChunk.validateChunkCoordinates(this.worldServer.getMinY(), this.worldServer.getMaxY(), x, y, z);
 
         return new CraftBlock(this.worldServer, new BlockPos((this.x << 4) | x, y, (this.z << 4) | z));
     }
@@ -137,7 +137,7 @@ public class CraftChunk implements Chunk {
         entityManager.ensureChunkQueuedForLoad(pair); // Start entity loading
 
         // SPIGOT-6772: Use entity mailbox and re-schedule entities if they get unloaded
-        ProcessorMailbox<Runnable> mailbox = ((EntityStorage) entityManager.permanentStorage).entityDeserializerQueue;
+        ConsecutiveExecutor mailbox = ((EntityStorage) entityManager.permanentStorage).entityDeserializerQueue;
         BooleanSupplier supplier = () -> {
             // only execute inbox if our entities are not present
             if (entityManager.areEntitiesLoaded(pair)) {
@@ -308,14 +308,14 @@ public class CraftChunk implements Chunk {
         boolean[] sectionEmpty = new boolean[cs.length];
         PalettedContainerRO<Holder<net.minecraft.world.level.biome.Biome>>[] biome = (includeBiome || includeBiomeTempRain) ? new PalettedContainer[cs.length] : null;
 
-        Registry<net.minecraft.world.level.biome.Biome> iregistry = this.worldServer.registryAccess().registryOrThrow(Registries.BIOME);
-        Codec<PalettedContainerRO<Holder<net.minecraft.world.level.biome.Biome>>> biomeCodec = PalettedContainer.codecRO(iregistry.asHolderIdMap(), iregistry.holderByNameCodec(), PalettedContainer.Strategy.SECTION_BIOMES, iregistry.getHolderOrThrow(Biomes.PLAINS));
+        Registry<net.minecraft.world.level.biome.Biome> iregistry = this.worldServer.registryAccess().lookupOrThrow(Registries.BIOME);
+        Codec<PalettedContainerRO<Holder<net.minecraft.world.level.biome.Biome>>> biomeCodec = PalettedContainer.codecRO(iregistry.asHolderIdMap(), iregistry.holderByNameCodec(), PalettedContainer.Strategy.SECTION_BIOMES, iregistry.getOrThrow(Biomes.PLAINS));
 
         for (int i = 0; i < cs.length; i++) {
             CompoundTag data = new CompoundTag();
 
-            data.put("block_states", ChunkSerializer.BLOCK_STATE_CODEC.encodeStart(NbtOps.INSTANCE, cs[i].getStates()).getOrThrow());
-            sectionBlockIDs[i] = ChunkSerializer.BLOCK_STATE_CODEC.parse(NbtOps.INSTANCE, data.getCompound("block_states")).getOrThrow(ChunkSerializer.ChunkReadException::new);
+            data.put("block_states", SerializableChunkData.BLOCK_STATE_CODEC.encodeStart(NbtOps.INSTANCE, cs[i].getStates()).getOrThrow());
+            sectionBlockIDs[i] = SerializableChunkData.BLOCK_STATE_CODEC.parse(NbtOps.INSTANCE, data.getCompound("block_states")).getOrThrow(SerializableChunkData.ChunkReadException::new);
             sectionEmpty[i] = cs[i].hasOnlyAir();
 
             LevelLightEngine lightengine = this.worldServer.getLightEngine();
@@ -336,7 +336,7 @@ public class CraftChunk implements Chunk {
 
             if (biome != null) {
                 data.put("biomes", biomeCodec.encodeStart(NbtOps.INSTANCE, cs[i].getBiomes()).getOrThrow());
-                biome[i] = biomeCodec.parse(NbtOps.INSTANCE, data.getCompound("biomes")).getOrThrow(ChunkSerializer.ChunkReadException::new);
+                biome[i] = biomeCodec.parse(NbtOps.INSTANCE, data.getCompound("biomes")).getOrThrow(SerializableChunkData.ChunkReadException::new);
             }
         }
 
@@ -348,12 +348,12 @@ public class CraftChunk implements Chunk {
         }
 
         World world = this.getWorld();
-        return new CraftChunkSnapshot(this.getX(), this.getZ(), chunk.getMinBuildHeight(), chunk.getMaxBuildHeight(), world.getName(), world.getFullTime(), sectionBlockIDs, sectionSkyLights, sectionEmitLights, sectionEmpty, hmap, iregistry, biome);
+        return new CraftChunkSnapshot(this.getX(), this.getZ(), chunk.getMinY(), chunk.getMaxY(), world.getSeaLevel(), world.getName(), world.getFullTime(), sectionBlockIDs, sectionSkyLights, sectionEmitLights, sectionEmpty, hmap, iregistry, biome);
     }
 
     @Override
     public PersistentDataContainer getPersistentDataContainer() {
-        return this.getHandle(ChunkStatus.STRUCTURE_STARTS).bridge$persistentDataContainer();
+        return this.getHandle(ChunkStatus.STRUCTURE_STARTS).persistentDataContainer;
     }
 
     @Override
@@ -409,9 +409,9 @@ public class CraftChunk implements Chunk {
         byte[][] skyLight = new byte[hSection][];
         byte[][] emitLight = new byte[hSection][];
         boolean[] empty = new boolean[hSection];
-        Registry<net.minecraft.world.level.biome.Biome> iregistry = world.getHandle().registryAccess().registryOrThrow(Registries.BIOME);
+        Registry<net.minecraft.world.level.biome.Biome> iregistry = world.getHandle().registryAccess().lookupOrThrow(Registries.BIOME);
         PalettedContainer<Holder<net.minecraft.world.level.biome.Biome>>[] biome = (includeBiome || includeBiomeTempRain) ? new PalettedContainer[hSection] : null;
-        Codec<PalettedContainerRO<Holder<net.minecraft.world.level.biome.Biome>>> biomeCodec = PalettedContainer.codecRO(iregistry.asHolderIdMap(), iregistry.holderByNameCodec(), PalettedContainer.Strategy.SECTION_BIOMES, iregistry.getHolderOrThrow(Biomes.PLAINS));
+        Codec<PalettedContainerRO<Holder<net.minecraft.world.level.biome.Biome>>> biomeCodec = PalettedContainer.codecRO(iregistry.asHolderIdMap(), iregistry.holderByNameCodec(), PalettedContainer.Strategy.SECTION_BIOMES, iregistry.getOrThrow(Biomes.PLAINS));
 
         for (int i = 0; i < hSection; i++) {
             blockIDs[i] = CraftChunk.emptyBlockIDs;
@@ -420,11 +420,11 @@ public class CraftChunk implements Chunk {
             empty[i] = true;
 
             if (biome != null) {
-                biome[i] = (PalettedContainer<Holder<net.minecraft.world.level.biome.Biome>>) biomeCodec.parse(NbtOps.INSTANCE, biomeCodec.encodeStart(NbtOps.INSTANCE, actual.getSection(i).getBiomes()).getOrThrow()).getOrThrow(ChunkSerializer.ChunkReadException::new);
+                biome[i] = (PalettedContainer<Holder<net.minecraft.world.level.biome.Biome>>) biomeCodec.parse(NbtOps.INSTANCE, biomeCodec.encodeStart(NbtOps.INSTANCE, actual.getSection(i).getBiomes()).getOrThrow()).getOrThrow(SerializableChunkData.ChunkReadException::new);
             }
         }
 
-        return new CraftChunkSnapshot(x, z, world.getMinHeight(), world.getMaxHeight(), world.getName(), world.getFullTime(), blockIDs, skyLight, emitLight, empty, new Heightmap(actual, Heightmap.Types.MOTION_BLOCKING), iregistry, biome);
+        return new CraftChunkSnapshot(x, z, world.getMinHeight(), world.getMaxHeight(), world.getSeaLevel(), world.getName(), world.getFullTime(), blockIDs, skyLight, emitLight, empty, new Heightmap(actual, Heightmap.Types.MOTION_BLOCKING), iregistry, biome);
     }
 
     static void validateChunkCoordinates(int minY, int maxY, int x, int y, int z) {

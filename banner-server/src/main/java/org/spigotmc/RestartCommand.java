@@ -2,8 +2,7 @@ package org.spigotmc;
 
 import java.io.File;
 import java.util.List;
-
-import com.mohistmc.banner.bukkit.BukkitMethodHooks;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -25,7 +24,7 @@ public class RestartCommand extends Command
     {
         if ( this.testPermission( sender ) )
         {
-            BukkitMethodHooks.getServer().bridge$processQueue().add(new Runnable()
+            MinecraftServer.getServer().processQueue.add( new Runnable()
             {
                 @Override
                 public void run()
@@ -56,9 +55,9 @@ public class RestartCommand extends Command
                 WatchdogThread.doStop();
 
                 // Kick all players
-                for ( ServerPlayer p : (List<ServerPlayer>) BukkitMethodHooks.getServer().getPlayerList().players )
+                for ( ServerPlayer p : (List<ServerPlayer>) MinecraftServer.getServer().getPlayerList().players )
                 {
-                    p.connection.disconnect( CraftChatMessage.fromStringOrEmpty( SpigotConfig.restartMessage ) );
+                    p.connection.disconnect( CraftChatMessage.fromStringOrEmpty( SpigotConfig.restartMessage, true ) );
                 }
                 // Give the socket a chance to send the packets
                 try
@@ -68,7 +67,7 @@ public class RestartCommand extends Command
                 {
                 }
                 // Close the socket so we can rebind with the new process
-                BukkitMethodHooks.getServer().getConnection().stop();
+                MinecraftServer.getServer().getConnection().stop();
 
                 // Give time for it to kick in
                 try
@@ -81,7 +80,7 @@ public class RestartCommand extends Command
                 // Actually shutdown
                 try
                 {
-                    BukkitMethodHooks.getServer().close();
+                    MinecraftServer.getServer().close();
                 } catch ( Throwable t )
                 {
                 }
@@ -118,7 +117,7 @@ public class RestartCommand extends Command
                 // Actually shutdown
                 try
                 {
-                    BukkitMethodHooks.getServer().close();
+                    MinecraftServer.getServer().close();
                 } catch ( Throwable t )
                 {
                 }

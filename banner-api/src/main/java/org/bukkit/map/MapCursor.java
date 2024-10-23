@@ -2,14 +2,13 @@ package org.bukkit.map;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import java.util.Locale;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.util.OldEnum;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Locale;
 
 /**
  * Represents a cursor on a map.

@@ -7,15 +7,6 @@ import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.mohistmc.banner.BannerMCStart;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.util.StringUtil;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URL;
@@ -27,6 +18,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.util.StringUtil;
+import org.jetbrains.annotations.NotNull;
 
 public class VersionCommand extends BukkitCommand {
     public VersionCommand(@NotNull String name) {
@@ -42,7 +40,41 @@ public class VersionCommand extends BukkitCommand {
     public boolean execute(@NotNull CommandSender sender, @NotNull String currentAlias, @NotNull String[] args) {
         if (!testPermission(sender)) return true;
 
-        sender.sendMessage("This server is running " + Bukkit.getName() + " version " + Bukkit.getVersion() + " (Implementing API version " + Bukkit.getBukkitVersion() + ")");
+        if (args.length == 0) {
+            sender.sendMessage("This server is running " + Bukkit.getName() + " version " + Bukkit.getVersion() + " (Implementing API version " + Bukkit.getBukkitVersion() + ")");
+            sendVersion(sender);
+        } else {
+            StringBuilder name = new StringBuilder();
+
+            for (String arg : args) {
+                if (name.length() > 0) {
+                    name.append(' ');
+                }
+
+                name.append(arg);
+            }
+
+            String pluginName = name.toString();
+            Plugin exactPlugin = Bukkit.getPluginManager().getPlugin(pluginName);
+            if (exactPlugin != null) {
+                describeToSender(exactPlugin, sender);
+                return true;
+            }
+
+            boolean found = false;
+            pluginName = pluginName.toLowerCase(Locale.ROOT);
+            for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+                if (plugin.getName().toLowerCase(Locale.ROOT).contains(pluginName)) {
+                    describeToSender(plugin, sender);
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                sender.sendMessage("This server is not running any plugin by that name.");
+                sender.sendMessage("Use /plugins to get a list of plugins.");
+            }
+        }
         return true;
     }
 
@@ -154,8 +186,36 @@ public class VersionCommand extends BukkitCommand {
     }
 
     private void obtainVersion() {
-        setVersionMessage("You are running the version of" + BannerMCStart.getVersion());
+        String version = Bukkit.getVersion();
+        if (version == null) version = "Custom";
+        String[] parts = version.substring(0, version.indexOf(' ')).split("-");
+        if (parts.length == 4) {
+            int cbVersions = getDistance("craftbukkit", parts[3]);
+            int spigotVersions = getDistance("spigot", parts[2]);
+            if (cbVersions == -1 || spigotVersions == -1) {
+                setVersionMessage("Error obtaining version information");
+            } else {
+                if (cbVersions == 0 && spigotVersions == 0) {
+                    setVersionMessage("You are running the latest version");
+                } else {
+                    setVersionMessage("You are " + (cbVersions + spigotVersions) + " version(s) behind");
+                }
+            }
 
+        } else if (parts.length == 3) {
+            int cbVersions = getDistance("craftbukkit", parts[2]);
+            if (cbVersions == -1) {
+                setVersionMessage("Error obtaining version information");
+            } else {
+                if (cbVersions == 0) {
+                    setVersionMessage("You are running the latest version");
+                } else {
+                    setVersionMessage("You are " + cbVersions + " version(s) behind");
+                }
+            }
+        } else {
+            setVersionMessage("Unknown version, custom build?");
+        }
     }
 
     private void setVersionMessage(@NotNull String msg) {

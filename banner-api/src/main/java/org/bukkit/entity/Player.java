@@ -1,9 +1,19 @@
 package org.bukkit.entity;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import org.bukkit.BanEntry;
 import org.bukkit.DyeColor;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
+import org.bukkit.Input;
 import org.bukkit.Instrument;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -44,16 +54,6 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents a player, connected or not
@@ -491,6 +491,30 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
      *     valid respawn point is not present
      */
     public void setRespawnLocation(@Nullable Location location, boolean force);
+
+    /**
+     * Gets the ender pearls currently associated with this entity.
+     * <p>
+     * The returned list will not be directly linked to the entity's current
+     * pearls, and no guarantees are made as to its mutability.
+     *
+     * @return collection of entities corresponding to current pearls.
+     */
+    @NotNull
+    @ApiStatus.Experimental
+    public Collection<EnderPearl> getEnderPearls();
+
+    /**
+     * Gets the current movement input, as last provided by the player.
+     * <br>
+     * <b>Note: that this may not always be consistent with the current movement
+     * of the player.</b>
+     *
+     * @return current input
+     */
+    @NotNull
+    @ApiStatus.Experimental
+    public Input getCurrentInput();
 
     /**
      * Play a note for the player at a location. <br>

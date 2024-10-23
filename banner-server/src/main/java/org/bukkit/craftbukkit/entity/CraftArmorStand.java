@@ -137,7 +137,7 @@ public class CraftArmorStand extends CraftLivingEntity implements ArmorStand {
 
     @Override
     public boolean hasBasePlate() {
-        return !this.getHandle().isNoBasePlate();
+        return this.getHandle().showBasePlate();
     }
 
     @Override
@@ -164,7 +164,7 @@ public class CraftArmorStand extends CraftLivingEntity implements ArmorStand {
 
     @Override
     public boolean hasArms() {
-        return this.getHandle().isShowArms();
+        return this.getHandle().showArms();
     }
 
     @Override
@@ -210,16 +210,16 @@ public class CraftArmorStand extends CraftLivingEntity implements ArmorStand {
 
     @Override
     public void addEquipmentLock(EquipmentSlot equipmentSlot, LockType lockType) {
-        this.getHandle().disabledSlots |= (1 << CraftEquipmentSlot.getNMS(equipmentSlot).getFilterFlag() + lockType.ordinal() * 8);
+        this.getHandle().disabledSlots |= (1 << CraftEquipmentSlot.getNMS(equipmentSlot).getFilterBit(lockType.ordinal() * 8));
     }
 
     @Override
     public void removeEquipmentLock(EquipmentSlot equipmentSlot, LockType lockType) {
-        this.getHandle().disabledSlots &= ~(1 << CraftEquipmentSlot.getNMS(equipmentSlot).getFilterFlag() + lockType.ordinal() * 8);
+        this.getHandle().disabledSlots &= ~(1 << CraftEquipmentSlot.getNMS(equipmentSlot).getFilterBit(lockType.ordinal() * 8));
     }
 
     @Override
     public boolean hasEquipmentLock(EquipmentSlot equipmentSlot, LockType lockType) {
-        return (this.getHandle().disabledSlots & (1 << CraftEquipmentSlot.getNMS(equipmentSlot).getFilterFlag() + lockType.ordinal() * 8)) != 0;
+        return (this.getHandle().disabledSlots & (1 << CraftEquipmentSlot.getNMS(equipmentSlot).getFilterBit(lockType.ordinal() * 8))) != 0;
     }
 }

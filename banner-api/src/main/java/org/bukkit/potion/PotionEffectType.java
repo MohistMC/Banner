@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
+import java.util.Locale;
 import org.bukkit.Color;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
@@ -12,8 +13,6 @@ import org.bukkit.Translatable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Locale;
 
 /**
  * Represents a type of potion and its effect on an entity.
@@ -223,9 +222,8 @@ public abstract class PotionEffectType implements Keyed, Translatable {
 
     @NotNull
     private static PotionEffectType getPotionEffectType(int typeId, @NotNull String key) {
-        NamespacedKey namespacedKey = NamespacedKey.minecraft(key);
-        PotionEffectType potionEffectType = Registry.EFFECT.get(namespacedKey);
-        Preconditions.checkNotNull(potionEffectType, "No PotionEffectType found for %s. This is a bug.", namespacedKey);
+        PotionEffectType potionEffectType = Registry.EFFECT.getOrThrow(NamespacedKey.minecraft(key));
+
         if (typeId > 0) {
             ID_MAP.put(typeId, potionEffectType);
         }

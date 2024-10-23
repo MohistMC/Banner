@@ -1,6 +1,9 @@
 package org.bukkit.entity;
 
 import com.google.common.base.Preconditions;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Keyed;
 import org.bukkit.Location;
@@ -41,10 +44,6 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 
 public enum EntityType implements Keyed, Translatable {
 
@@ -355,10 +354,10 @@ public enum EntityType implements Keyed, Translatable {
     private final Class<? extends Entity> clazz;
     private final short typeId;
     private final boolean independent, living;
-    public NamespacedKey key;
+    private final NamespacedKey key;
 
-    public static Map<String, EntityType> NAME_MAP = new HashMap<String, EntityType>();
-    public static Map<Short, EntityType> ID_MAP = new HashMap<Short, EntityType>();
+    private static final Map<String, EntityType> NAME_MAP = new HashMap<String, EntityType>();
+    private static final Map<Short, EntityType> ID_MAP = new HashMap<Short, EntityType>();
 
     static {
         for (EntityType type : values()) {

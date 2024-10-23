@@ -1,12 +1,10 @@
 package org.bukkit;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Collection;
 import java.util.Collections;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class MusicInstrument implements Keyed {
 
@@ -46,11 +44,6 @@ public abstract class MusicInstrument implements Keyed {
 
     @NotNull
     private static MusicInstrument getInstrument(@NotNull String key) {
-        NamespacedKey namespacedKey = NamespacedKey.minecraft(key);
-        MusicInstrument instrument = Registry.INSTRUMENT.get(namespacedKey);
-
-        Preconditions.checkNotNull(instrument, "No MusicInstrument found for %s. This is a bug.", namespacedKey);
-
-        return instrument;
+        return Registry.INSTRUMENT.getOrThrow(NamespacedKey.minecraft(key));
     }
 }

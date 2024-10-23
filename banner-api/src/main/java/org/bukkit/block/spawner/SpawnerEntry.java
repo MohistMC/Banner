@@ -1,14 +1,12 @@
 package org.bukkit.block.spawner;
 
 import com.google.common.base.Preconditions;
+import java.util.Map;
 import org.bukkit.entity.EntitySnapshot;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.loot.LootTable;
-import org.bukkit.loot.LootTables;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
 
 /**
  * Represents a weighted spawn potential that can be added to a monster spawner.

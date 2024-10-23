@@ -16,6 +16,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.Bootstrap;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.BlockStateData;
 import net.minecraft.util.datafix.fixes.ItemIdFix;
@@ -331,7 +332,7 @@ public final class CraftLegacy {
             }
 
             // Handle blocks
-            if (material.isBlock()) {
+            if (isBlock(material)) { // Use custom method instead of Material#isBlock since it relies on this being already run
                 for (byte data = 0; data < 16; data++) {
                     MaterialData matData = new MaterialData(material, data);
                     Dynamic blockTag = BlockStateData.getTag(material.getId() << 4 | data);
@@ -342,7 +343,7 @@ public final class CraftLegacy {
                     }
 
                     String name = blockTag.get("Name").asString("");
-                    Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(name));
+                    Block block = BuiltInRegistries.BLOCK.getValue(ResourceLocation.parse(name));
                     if (block == null) {
                         continue;
                     }
@@ -416,7 +417,7 @@ public final class CraftLegacy {
                 }
 
                 // Preconditions.checkState(newId.contains("minecraft:"), "Unknown new material for " + matData);
-                Item newMaterial = BuiltInRegistries.ITEM.get(ResourceLocation.parse(newId));
+                Item newMaterial = BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(newId));
 
                 if (newMaterial == Items.AIR) {
                     continue;
@@ -436,6 +437,12 @@ public final class CraftLegacy {
                 itemToMaterial.put(newMaterial, matData);
             }
         }
+    }
+
+    private static boolean isBlock(Material material) {
+        // From Material#isBlock before the rewrite to ItemType / BlockType
+        // Git hash: 42f6cdf4c5dcdd52a27543403dcd17fb60311621
+        return 0 <= material.getId() && material.getId() < 256;
     }
 
     public static void main(String[] args) {

@@ -6,6 +6,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -28,7 +29,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.ServerAdvancementManager;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.item.Item;
@@ -73,7 +74,9 @@ import org.bukkit.potion.PotionType;
 
 @SuppressWarnings("deprecation")
 public final class CraftMagicNumbers implements UnsafeValues {
-    public static final UnsafeValues INSTANCE = new CraftMagicNumbers();
+    public static final CraftMagicNumbers INSTANCE = new CraftMagicNumbers();
+
+    private final Commodore commodore = new Commodore();
 
     private CraftMagicNumbers() {}
 
@@ -102,10 +105,10 @@ public final class CraftMagicNumbers implements UnsafeValues {
     }
 
     // ========================================================================
-    public static final Map<Block, Material> BLOCK_MATERIAL = new HashMap<>();
-    public static final Map<Item, Material> ITEM_MATERIAL = new HashMap<>();
-    public static final Map<Material, Item> MATERIAL_ITEM = new HashMap<>();
-    public static final Map<Material, Block> MATERIAL_BLOCK = new HashMap<>();
+    private static final Map<Block, Material> BLOCK_MATERIAL = new HashMap<>();
+    private static final Map<Item, Material> ITEM_MATERIAL = new HashMap<>();
+    private static final Map<Material, Item> MATERIAL_ITEM = new HashMap<>();
+    private static final Map<Material, Block> MATERIAL_BLOCK = new HashMap<>();
 
     static {
         for (Block block : BuiltInRegistries.BLOCK) {
@@ -162,6 +165,10 @@ public final class CraftMagicNumbers implements UnsafeValues {
 
     public static byte toLegacyData(BlockState data) {
         return CraftLegacy.toLegacyData(data);
+    }
+
+    public Commodore getCommodore() {
+        return this.commodore;
     }
 
     @Override
@@ -225,7 +232,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
      * @return string
      */
     public String getMappingsVersion() {
-        return "7092ff1ff9352ad7e2260dc150e6a3ec";
+        return "ec8b033a89c54252f1dfcb809eab710a";
     }
 
     @Override
@@ -257,7 +264,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
         Preconditions.checkArgument(Bukkit.getAdvancement(key) == null, "Advancement %s already exists", key);
         ResourceLocation minecraftkey = CraftNamespacedKey.toMinecraft(key);
 
-        JsonElement jsonelement = ServerAdvancementManager.GSON.fromJson(advancement, JsonElement.class);
+        JsonElement jsonelement = JsonParser.parseString(advancement);
         net.minecraft.advancements.Advancement nms = net.minecraft.advancements.Advancement.CODEC.parse(JsonOps.INSTANCE, jsonelement).getOrThrow(JsonParseException::new);
         if (nms != null) {
             BukkitMethodHooks.getServer().getAdvancements().advancements.put(minecraftkey, new AdvancementHolder(minecraftkey, nms));
@@ -319,7 +326,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
     @Override
     public byte[] processClass(PluginDescriptionFile pdf, String path, byte[] clazz) {
         try {
-            clazz = Commodore.convert(clazz, pdf.getName(), ApiVersion.getOrCreateVersion(pdf.getAPIVersion()), ((CraftServer) Bukkit.getServer()).activeCompatibilities);
+            clazz = this.commodore.convert(clazz, pdf.getName(), ApiVersion.getOrCreateVersion(pdf.getAPIVersion()), ((CraftServer) Bukkit.getServer()).activeCompatibilities);
         } catch (Exception ex) {
             Bukkit.getLogger().log(Level.SEVERE, "Fatal error trying to convert " + pdf.getFullName() + ":" + path, ex);
         }
@@ -356,7 +363,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
     @Override
     public String getTranslationKey(ItemStack itemStack) {
         net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
-        return nmsItemStack.getItem().getDescriptionId(nmsItemStack);
+        return nmsItemStack.getItem().getDescriptionId();
     }
 
     @Override

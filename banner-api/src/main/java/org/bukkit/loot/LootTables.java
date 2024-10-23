@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public enum LootTables implements Keyed {
 
-    EMPTY("empty"),
     // Chests/Dispensers - treasure chests
     ABANDONED_MINESHAFT("chests/abandoned_mineshaft"),
     BURIED_TREASURE("chests/buried_treasure"),

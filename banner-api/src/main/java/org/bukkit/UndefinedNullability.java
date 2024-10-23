@@ -1,9 +1,8 @@
 package org.bukkit;
 
-import org.jetbrains.annotations.ApiStatus;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Annotation for types, whose nullability is not well defined, so

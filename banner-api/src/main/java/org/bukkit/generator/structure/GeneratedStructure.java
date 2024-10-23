@@ -1,10 +1,9 @@
 package org.bukkit.generator.structure;
 
+import java.util.Collection;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Collection;
 
 /**
  * Represents a structure placed in the world.

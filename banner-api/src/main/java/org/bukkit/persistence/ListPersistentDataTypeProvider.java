@@ -2,9 +2,8 @@ package org.bukkit.persistence;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A provider for list persistent data types that represent the known primitive

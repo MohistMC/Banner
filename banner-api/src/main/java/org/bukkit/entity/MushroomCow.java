@@ -1,10 +1,9 @@
 package org.bukkit.entity;
 
+import java.util.List;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 /**
  * Represents a mushroom {@link Cow}

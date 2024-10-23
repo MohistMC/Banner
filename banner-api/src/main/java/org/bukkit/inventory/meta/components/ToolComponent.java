@@ -1,14 +1,13 @@
 package org.bukkit.inventory.meta.components;
 
+import java.util.Collection;
+import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Represents a component which can turn any item into a tool.

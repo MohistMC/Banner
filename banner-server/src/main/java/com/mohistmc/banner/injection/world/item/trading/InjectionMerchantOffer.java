@@ -8,4 +8,7 @@ public interface InjectionMerchantOffer {
         throw new IllegalStateException("Not implemented");
     }
 
+    default void banner$setCraftMerchantRecipe(CraftMerchantRecipe merchantRecipe) {
+        throw new IllegalStateException("Not implemented");
+    }
 }

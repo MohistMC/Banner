@@ -12,9 +12,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
@@ -44,11 +46,10 @@ import org.bukkit.craftbukkit.inventory.CraftInventoryLectern;
 import org.bukkit.craftbukkit.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.inventory.CraftItemType;
 import org.bukkit.craftbukkit.inventory.CraftMerchantCustom;
+import org.bukkit.craftbukkit.inventory.CraftRecipe;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.craftbukkit.util.CraftLocation;
-import org.bukkit.craftbukkit.util.CraftNamespacedKey;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Villager;
@@ -157,6 +158,14 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         Preconditions.checkState(this.isSleeping(), "Cannot wakeup if not sleeping");
 
         this.getHandle().stopSleepInBed(true, setSpawnLocation);
+    }
+
+    @Override
+    public void startRiptideAttack(int duration, float damage, ItemStack attackItem) {
+        Preconditions.checkArgument(duration > 0, "Duration must be greater than 0");
+        Preconditions.checkArgument(damage >= 0, "Damage must not be negative");
+
+        this.getHandle().startAutoSpinAttack(duration, damage, CraftItemStack.asNMSCopy(attackItem));
     }
 
     @Override
@@ -309,14 +318,14 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         if (this.getHandle().containerMenu == formerContainer) {
             return null;
         }
-        this.getHandle().containerMenu.banner$setCheckReachable(false);
+        this.getHandle().containerMenu.checkReachable = false;
         return this.getHandle().containerMenu.getBukkitView();
     }
 
     private static void openCustomInventory(Inventory inventory, ServerPlayer player, MenuType<?> windowType) {
         if (player.connection == null) return;
         Preconditions.checkArgument(windowType != null, "Unknown windowType");
-        AbstractContainerMenu container = new CraftContainer(inventory, player, player.nextContainerCounterInt());
+        AbstractContainerMenu container = new CraftContainer(inventory, player, player.nextContainerCounter());
 
         container = CraftEventFactory.callInventoryOpenEvent(player, container);
         if (container == null) return;
@@ -341,7 +350,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         }
         this.getHandle().openMenu(Blocks.CRAFTING_TABLE.defaultBlockState().getMenuProvider(this.getHandle().level(), CraftLocation.toBlockPosition(location)));
         if (force) {
-            this.getHandle().containerMenu.banner$setCheckReachable(false);
+            this.getHandle().containerMenu.checkReachable = false;
         }
         return this.getHandle().containerMenu.getBukkitView();
     }
@@ -363,13 +372,14 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         this.getHandle().openMenu(Blocks.ENCHANTING_TABLE.defaultBlockState().getMenuProvider(this.getHandle().level(), pos));
 
         if (force) {
-            this.getHandle().containerMenu.banner$setCheckReachable(false);
+            this.getHandle().containerMenu.checkReachable = false;
         }
         return this.getHandle().containerMenu.getBukkitView();
     }
 
     @Override
     public void openInventory(InventoryView inventory) {
+        Preconditions.checkArgument(this.equals(inventory.getPlayer()), "InventoryView must belong to the opening player");
         if (!(this.getHandle() instanceof ServerPlayer)) return; // TODO: NPC support?
         if (((ServerPlayer) this.getHandle()).connection == null) return;
         if (this.getHandle().containerMenu != this.getHandle().inventoryMenu) {
@@ -381,7 +391,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         if (inventory instanceof CraftInventoryView) {
             container = ((CraftInventoryView) inventory).getHandle();
         } else {
-            container = new CraftContainer(inventory, this.getHandle(), player.nextContainerCounterInt());
+            container = new CraftContainer(inventory, this.getHandle(), player.nextContainerCounter());
         }
 
         // Trigger an INVENTORY_OPEN event
@@ -483,7 +493,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         Preconditions.checkArgument(material != null, "Material cannot be null");
         Preconditions.checkArgument(material.isItem(), "Material %s is not an item", material);
 
-        return this.getHandle().getCooldowns().isOnCooldown(CraftItemType.bukkitToMinecraft(material));
+        return this.hasCooldown(new ItemStack(material));
     }
 
     @Override
@@ -491,17 +501,40 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         Preconditions.checkArgument(material != null, "Material cannot be null");
         Preconditions.checkArgument(material.isItem(), "Material %s is not an item", material);
 
-        ItemCooldowns.CooldownInstance cooldown = this.getHandle().getCooldowns().cooldowns.get(CraftItemType.bukkitToMinecraft(material));
-        return (cooldown == null) ? 0 : Math.max(0, cooldown.endTime - this.getHandle().getCooldowns().tickCount);
+        return this.getCooldown(new ItemStack(material));
     }
 
     @Override
     public void setCooldown(Material material, int ticks) {
-        Preconditions.checkArgument(material != null, "Material cannot be null");
-        Preconditions.checkArgument(material.isItem(), "Material %s is not an item", material);
+        this.setCooldown(new ItemStack(material), ticks);
+    }
+
+    @Override
+    public boolean hasCooldown(ItemStack item) {
+        Preconditions.checkArgument(item != null, "Material cannot be null");
+
+        return this.getHandle().getCooldowns().isOnCooldown(CraftItemStack.asNMSCopy(item));
+    }
+
+    @Override
+    public int getCooldown(ItemStack item) {
+        Preconditions.checkArgument(item != null, "Material cannot be null");
+
+        ResourceLocation group = this.getHandle().getCooldowns().getCooldownGroup(CraftItemStack.asNMSCopy(item));
+        if (group == null) {
+            return 0;
+        }
+
+        ItemCooldowns.CooldownInstance cooldown = this.getHandle().getCooldowns().cooldowns.get(group);
+        return (cooldown == null) ? 0 : Math.max(0, cooldown.endTime - this.getHandle().getCooldowns().tickCount);
+    }
+
+    @Override
+    public void setCooldown(ItemStack item, int ticks) {
+        Preconditions.checkArgument(item != null, "Material cannot be null");
         Preconditions.checkArgument(ticks >= 0, "Cannot have negative cooldown");
 
-        this.getHandle().getCooldowns().addCooldown(CraftItemType.bukkitToMinecraft(material), ticks);
+        this.getHandle().getCooldowns().addCooldown(CraftItemStack.asNMSCopy(item), ticks);
     }
 
     @Override
@@ -539,7 +572,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         RecipeManager manager = this.getHandle().level().getServer().getRecipeManager();
 
         for (NamespacedKey recipeKey : recipeKeys) {
-            Optional<? extends RecipeHolder<?>> recipe = manager.byKey(CraftNamespacedKey.toMinecraft(recipeKey));
+            Optional<? extends RecipeHolder<?>> recipe = manager.byKey(CraftRecipe.toMinecraft(recipeKey));
             if (!recipe.isPresent()) {
                 continue;
             }
@@ -553,7 +586,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
     @Override
     public org.bukkit.entity.Entity getShoulderEntityLeft() {
         if (!this.getHandle().getShoulderEntityLeft().isEmpty()) {
-            Optional<Entity> shoulder = EntityType.create(this.getHandle().getShoulderEntityLeft(), this.getHandle().level());
+            Optional<Entity> shoulder = EntityType.create(this.getHandle().getShoulderEntityLeft(), this.getHandle().level(), EntitySpawnReason.LOAD);
 
             return (!shoulder.isPresent()) ? null : shoulder.get().getBukkitEntity();
         }
@@ -572,7 +605,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
     @Override
     public org.bukkit.entity.Entity getShoulderEntityRight() {
         if (!this.getHandle().getShoulderEntityRight().isEmpty()) {
-            Optional<Entity> shoulder = EntityType.create(this.getHandle().getShoulderEntityRight(), this.getHandle().level());
+            Optional<Entity> shoulder = EntityType.create(this.getHandle().getShoulderEntityRight(), this.getHandle().level(), EntitySpawnReason.LOAD);
 
             return (!shoulder.isPresent()) ? null : shoulder.get().getBukkitEntity();
         }
@@ -626,32 +659,32 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
 
     @Override
     public int getSaturatedRegenRate() {
-        return this.getHandle().getFoodData().bridge$saturatedRegenRate();
+        return this.getHandle().getFoodData().saturatedRegenRate;
     }
 
     @Override
     public void setSaturatedRegenRate(int i) {
-        this.getHandle().getFoodData().banner$setSaturatedRegenRate(i);
+        this.getHandle().getFoodData().saturatedRegenRate = i;
     }
 
     @Override
     public int getUnsaturatedRegenRate() {
-        return this.getHandle().getFoodData().bridge$unsaturatedRegenRate();
+        return this.getHandle().getFoodData().unsaturatedRegenRate;
     }
 
     @Override
     public void setUnsaturatedRegenRate(int i) {
-        this.getHandle().getFoodData().banner$setUnsaturatedRegenRate(i);
+        this.getHandle().getFoodData().unsaturatedRegenRate = i;
     }
 
     @Override
     public int getStarvationRate() {
-        return this.getHandle().getFoodData().bridge$starvationRate();
+        return this.getHandle().getFoodData().starvationRate;
     }
 
     @Override
     public void setStarvationRate(int i) {
-        this.getHandle().getFoodData().banner$setSaturatedRegenRate(i);
+        this.getHandle().getFoodData().starvationRate = i;
     }
 
     @Override

@@ -1,11 +1,10 @@
 package org.bukkit.inventory.meta;
 
+import java.util.List;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  * Represents a {@link Material#WRITTEN_BOOK}) that can have a title, an author,

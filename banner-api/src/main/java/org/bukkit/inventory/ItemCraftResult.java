@@ -1,8 +1,7 @@
 package org.bukkit.inventory;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Container class containing the results of a Crafting event.

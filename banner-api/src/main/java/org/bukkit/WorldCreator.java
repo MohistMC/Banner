@@ -1,14 +1,13 @@
 package org.bukkit;
 
 import com.google.common.base.Preconditions;
+import java.util.Random;
 import org.bukkit.command.CommandSender;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Random;
 
 /**
  * Represents various types of options that may be used to create a world.

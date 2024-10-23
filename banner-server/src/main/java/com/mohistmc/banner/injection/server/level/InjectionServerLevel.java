@@ -2,14 +2,22 @@ package com.mohistmc.banner.injection.server.level;
 
 import com.mohistmc.banner.injection.world.level.InjectionLevel;
 import java.util.UUID;
+
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ExplosionDamageCalculator;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerExplosion;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
+import org.jetbrains.annotations.Nullable;
 
 public interface InjectionServerLevel extends InjectionLevel {
 
@@ -62,6 +70,10 @@ public interface InjectionServerLevel extends InjectionLevel {
     }
 
     default boolean canAddFreshEntity() {
+        throw new IllegalStateException("Not implemented");
+    }
+
+    default ServerExplosion explode0(@Nullable Entity entity, @Nullable DamageSource damagesource, @Nullable ExplosionDamageCalculator explosiondamagecalculator, double d0, double d1, double d2, float f, boolean flag, Level.ExplosionInteraction explosionInteraction, ParticleOptions particleparam, ParticleOptions particleparam1, Holder<SoundEvent> holder) {
         throw new IllegalStateException("Not implemented");
     }
 }

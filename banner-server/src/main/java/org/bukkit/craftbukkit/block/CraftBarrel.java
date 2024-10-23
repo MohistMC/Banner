@@ -37,7 +37,7 @@ public class CraftBarrel extends CraftLootable<BarrelBlockEntity> implements Bar
     @Override
     public void open() {
         this.requirePlaced();
-        if (!this.getTileEntity().openersCounter.bridge$opened()) {
+        if (!this.getTileEntity().openersCounter.opened) {
             BlockState blockData = this.getTileEntity().getBlockState();
             boolean open = blockData.getValue(BarrelBlock.OPEN);
 
@@ -48,20 +48,20 @@ public class CraftBarrel extends CraftLootable<BarrelBlockEntity> implements Bar
                 }
             }
         }
-        this.getTileEntity().openersCounter.banner$setOpened(true);
+        this.getTileEntity().openersCounter.opened = true;
     }
 
     @Override
     public void close() {
         this.requirePlaced();
-        if (this.getTileEntity().openersCounter.bridge$opened()) {
+        if (this.getTileEntity().openersCounter.opened) {
             BlockState blockData = this.getTileEntity().getBlockState();
             this.getTileEntity().updateBlockState(blockData, false);
             if (this.getWorldHandle() instanceof net.minecraft.world.level.Level) {
                 this.getTileEntity().playSound(blockData, SoundEvents.BARREL_CLOSE);
             }
         }
-        this.getTileEntity().openersCounter.banner$setOpened(false);
+        this.getTileEntity().openersCounter.opened = false;
     }
 
     @Override

@@ -55,4 +55,9 @@ public abstract class MixinMerchantOffer implements InjectionMerchantOffer {
         }
         // CraftBukkit end
     }
+
+    @Override
+    public void banner$setCraftMerchantRecipe(CraftMerchantRecipe merchantRecipe) {
+        this.bukkitHandle = merchantRecipe;
+    }
 }

@@ -2,6 +2,7 @@ package org.bukkit.craftbukkit.entity;
 
 import com.google.common.base.Preconditions;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.Items;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
@@ -75,7 +76,7 @@ public class CraftAbstractArrow extends AbstractProjectile implements AbstractAr
 
     @Override
     public boolean isInBlock() {
-        return this.getHandle().inGround;
+        return this.getHandle().isInGround();
     }
 
     @Override
@@ -109,7 +110,9 @@ public class CraftAbstractArrow extends AbstractProjectile implements AbstractAr
 
     @Override
     public boolean isShotFromCrossbow() {
-        return this.getHandle().shotFromCrossbow();
+        net.minecraft.world.item.ItemStack firedFromWeapon = this.getHandle().getWeaponItem();
+
+        return firedFromWeapon != null && firedFromWeapon.is(Items.CROSSBOW);
     }
 
     @Override

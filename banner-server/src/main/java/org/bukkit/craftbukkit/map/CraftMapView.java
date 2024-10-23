@@ -9,6 +9,7 @@ import java.util.logging.Level;
 
 import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.bukkit.Bukkit;

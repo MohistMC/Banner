@@ -1,5 +1,6 @@
 package org.bukkit;
 
+import java.util.Collection;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -11,8 +12,6 @@ import org.bukkit.generator.structure.Structure;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Collection;
 
 /**
  * Represents a chunk of blocks.

@@ -1,6 +1,5 @@
 package org.bukkit.entity;
 
-import com.google.common.base.Preconditions;
 import org.bukkit.DyeColor;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;

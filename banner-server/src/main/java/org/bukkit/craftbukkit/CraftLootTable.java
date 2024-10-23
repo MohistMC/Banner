@@ -9,13 +9,13 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.context.ContextKey;
+import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
@@ -131,12 +131,12 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
         }
 
         // SPIGOT-5603 - Avoid IllegalArgumentException in LootTableInfo#build()
-        LootContextParamSet.Builder nmsBuilder = new LootContextParamSet.Builder();
-        for (LootContextParam<?> param : this.getHandle().getParamSet().getRequired()) {
+        ContextKeySet.Builder nmsBuilder = new ContextKeySet.Builder();
+        for (ContextKey<?> param : this.getHandle().getParamSet().required()) {
             nmsBuilder.required(param);
         }
-        for (LootContextParam<?> param : this.getHandle().getParamSet().getAllowed()) {
-            if (!this.getHandle().getParamSet().getRequired().contains(param)) {
+        for (ContextKey<?> param : this.getHandle().getParamSet().allowed()) {
+            if (!this.getHandle().getParamSet().required().contains(param)) {
                 nmsBuilder.optional(param);
             }
         }
@@ -144,29 +144,29 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
         return builder.create(this.getHandle().getParamSet());
     }
 
-    private <T> void setMaybe(LootParams.Builder builder, LootContextParam<T> param, T value) {
-        if (this.getHandle().getParamSet().getRequired().contains(param) || this.getHandle().getParamSet().getAllowed().contains(param)) {
+    private <T> void setMaybe(LootParams.Builder builder, ContextKey<T> param, T value) {
+        if (this.getHandle().getParamSet().required().contains(param) || this.getHandle().getParamSet().allowed().contains(param)) {
             builder.withParameter(param, value);
         }
     }
 
     public static LootContext convertContext(net.minecraft.world.level.storage.loot.LootContext info) {
-        Vec3 position = info.getParamOrNull(LootContextParams.ORIGIN);
+        Vec3 position = info.getOptionalParameter(LootContextParams.ORIGIN);
         if (position == null) {
-            position = info.getParamOrNull(LootContextParams.THIS_ENTITY).position(); // Every vanilla context has origin or this_entity, see LootContextParameterSets
+            position = info.getOptionalParameter(LootContextParams.THIS_ENTITY).position(); // Every vanilla context has origin or this_entity, see LootContextParameterSets
         }
         Location location = CraftLocation.toBukkit(position, info.getLevel().getWorld());
         LootContext.Builder contextBuilder = new LootContext.Builder(location);
 
-        if (info.hasParam(LootContextParams.ATTACKING_ENTITY)) {
-            CraftEntity killer = info.getParamOrNull(LootContextParams.ATTACKING_ENTITY).getBukkitEntity();
+        if (info.hasParameter(LootContextParams.ATTACKING_ENTITY)) {
+            CraftEntity killer = info.getOptionalParameter(LootContextParams.ATTACKING_ENTITY).getBukkitEntity();
             if (killer instanceof CraftHumanEntity) {
                 contextBuilder.killer((CraftHumanEntity) killer);
             }
         }
 
-        if (info.hasParam(LootContextParams.THIS_ENTITY)) {
-            contextBuilder.lootedEntity(info.getParamOrNull(LootContextParams.THIS_ENTITY).getBukkitEntity());
+        if (info.hasParameter(LootContextParams.THIS_ENTITY)) {
+            contextBuilder.lootedEntity(info.getOptionalParameter(LootContextParams.THIS_ENTITY).getBukkitEntity());
         }
 
         contextBuilder.luck(info.getLuck());
@@ -187,11 +187,4 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
         org.bukkit.loot.LootTable table = (org.bukkit.loot.LootTable) obj;
         return table.getKey().equals(this.getKey());
     }
-
-    // Paper start - satisfy equals/hashCode contract
-    @Override
-    public int hashCode() {
-        return java.util.Objects.hash(key);
-    }
-    // Paper end
 }

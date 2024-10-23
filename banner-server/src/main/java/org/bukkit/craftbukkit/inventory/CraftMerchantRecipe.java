@@ -3,7 +3,11 @@ package org.bukkit.craftbukkit.inventory;
 import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.Optional;
+
+import com.mohistmc.banner.bukkit.BukkitConstructorHooks;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPredicate;
+import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.ItemCost;
 import org.bukkit.inventory.ItemStack;
@@ -27,7 +31,7 @@ public class CraftMerchantRecipe extends MerchantRecipe {
 
     public CraftMerchantRecipe(ItemStack result, int uses, int maxUses, boolean experienceReward, int experience, float priceMultiplier, int demand, int specialPrice) {
         super(result, uses, maxUses, experienceReward, experience, priceMultiplier, demand, specialPrice);
-        this.handle = new net.minecraft.world.item.trading.MerchantOffer(
+        this.handle = BukkitConstructorHooks.newMerchantOffer(
                 new ItemCost(Items.AIR),
                 Optional.empty(),
                 CraftItemStack.asNMSCopy(result),
@@ -35,7 +39,8 @@ public class CraftMerchantRecipe extends MerchantRecipe {
                 maxUses,
                 experience,
                 priceMultiplier,
-                demand
+                demand,
+                this
         );
         this.setSpecialPrice(specialPrice);
         this.setExperienceReward(experienceReward);
@@ -115,10 +120,14 @@ public class CraftMerchantRecipe extends MerchantRecipe {
         List<ItemStack> ingredients = this.getIngredients();
         Preconditions.checkState(!ingredients.isEmpty(), "No offered ingredients");
         net.minecraft.world.item.ItemStack baseCostA = CraftItemStack.asNMSCopy(ingredients.get(0));
-        this.handle.baseCostA = new ItemCost(baseCostA.getItemHolder(), baseCostA.getCount(), DataComponentPredicate.allOf(baseCostA.getComponents()), baseCostA);
+        DataComponentPredicate baseCostAPredicate = DataComponentPredicate.allOf(PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, baseCostA.getComponentsPatch()));
+        this.handle.baseCostA = new ItemCost(baseCostA.getItemHolder(), baseCostA.getCount(), baseCostAPredicate, baseCostA);
         if (ingredients.size() > 1) {
             net.minecraft.world.item.ItemStack costB = CraftItemStack.asNMSCopy(ingredients.get(1));
-            this.handle.costB = Optional.of(new ItemCost(costB.getItemHolder(), costB.getCount(), DataComponentPredicate.allOf(costB.getComponents()), costB));
+            DataComponentPredicate costBPredicate = DataComponentPredicate.allOf(PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, costB.getComponentsPatch()));
+            this.handle.costB = Optional.of(new ItemCost(costB.getItemHolder(), costB.getCount(), costBPredicate, costB));
+        } else {
+            this.handle.costB = Optional.empty();
         }
         return this.handle;
     }

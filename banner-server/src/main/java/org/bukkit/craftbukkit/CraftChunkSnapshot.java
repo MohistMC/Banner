@@ -25,7 +25,7 @@ import org.bukkit.craftbukkit.util.CraftMagicNumbers;
  */
 public class CraftChunkSnapshot implements ChunkSnapshot {
     private final int x, z;
-    private final int minHeight, maxHeight;
+    private final int minHeight, maxHeight, seaLevel;
     private final String worldname;
     private final PalettedContainer<BlockState>[] blockids;
     private final byte[][] skylight;
@@ -36,11 +36,12 @@ public class CraftChunkSnapshot implements ChunkSnapshot {
     private final Registry<net.minecraft.world.level.biome.Biome> biomeRegistry;
     private final PalettedContainerRO<Holder<net.minecraft.world.level.biome.Biome>>[] biome;
 
-    CraftChunkSnapshot(int x, int z, int minHeight, int maxHeight, String wname, long wtime, PalettedContainer<BlockState>[] sectionBlockIDs, byte[][] sectionSkyLights, byte[][] sectionEmitLights, boolean[] sectionEmpty, Heightmap hmap, Registry<net.minecraft.world.level.biome.Biome> biomeRegistry, PalettedContainerRO<Holder<net.minecraft.world.level.biome.Biome>>[] biome) {
+    CraftChunkSnapshot(int x, int z, int minHeight, int maxHeight, int seaLevel, String wname, long wtime, PalettedContainer<BlockState>[] sectionBlockIDs, byte[][] sectionSkyLights, byte[][] sectionEmitLights, boolean[] sectionEmpty, Heightmap hmap, Registry<net.minecraft.world.level.biome.Biome> biomeRegistry, PalettedContainerRO<Holder<net.minecraft.world.level.biome.Biome>>[] biome) {
         this.x = x;
         this.z = z;
         this.minHeight = minHeight;
         this.maxHeight = maxHeight;
+        this.seaLevel = seaLevel;
         this.worldname = wname;
         this.captureFulltime = wtime;
         this.blockids = sectionBlockIDs;
@@ -165,7 +166,7 @@ public class CraftChunkSnapshot implements ChunkSnapshot {
         this.validateChunkCoordinates(x, y, z);
 
         PalettedContainerRO<Holder<net.minecraft.world.level.biome.Biome>> biome = this.biome[this.getSectionIndex(y)]; // SPIGOT-7188: Don't need to convert y to biome coordinate scale since it is bound to the block chunk section
-        return biome.get(x >> 2, (y & 0xF) >> 2, z >> 2).value().getTemperature(new BlockPos((this.x << 4) | x, y, (this.z << 4) | z));
+        return biome.get(x >> 2, (y & 0xF) >> 2, z >> 2).value().getTemperature(new BlockPos((this.x << 4) | x, y, (this.z << 4) | z), this.seaLevel);
     }
 
     @Override

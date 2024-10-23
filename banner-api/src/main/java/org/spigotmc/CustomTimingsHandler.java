@@ -1,14 +1,13 @@
 package org.spigotmc;
 
+import java.io.PrintStream;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.defaults.TimingsCommand;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.PrintStream;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Provides custom timing sections for /timings merged.

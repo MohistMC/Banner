@@ -40,6 +40,4 @@ public enum SpawnCategory {
      * Entities not related to a mob, eg: Player, ArmorStand, Boat, etc.
      */
     MISC;
-
-    public boolean isMods = false;
 }

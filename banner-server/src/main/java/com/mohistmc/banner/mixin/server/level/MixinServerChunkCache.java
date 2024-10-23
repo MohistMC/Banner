@@ -11,6 +11,8 @@ import net.minecraft.server.level.FullChunkStatus;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
+import net.minecraft.util.profiling.Profiler;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -39,7 +41,7 @@ public abstract class MixinServerChunkCache implements InjectionServerChunkCache
     @Shadow
     public abstract boolean runDistanceManagerUpdates();
 
-    @Override
+    @Shadow public boolean spawnFriendlies;@Shadow public boolean spawnEnemies;@Override
     public boolean isChunkLoaded(final int chunkX, final int chunkZ) {
         ChunkHolder chunk =  this.chunkMap.getUpdatingChunkIfPresent(ChunkPos.asLong(chunkX, chunkZ));
         return chunk != null &&  chunk.getFullChunkNow() != null;
@@ -74,12 +76,12 @@ public abstract class MixinServerChunkCache implements InjectionServerChunkCache
         }
     }
 
-    @Redirect(method = "tickChunks", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z"))
+    @Redirect(method = "tickChunks(Lnet/minecraft/util/profiling/ProfilerFiller;JLjava/util/List;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z"))
     private boolean banner$noPlayer(GameRules gameRules, GameRules.Key<GameRules.BooleanValue> key) {
         return gameRules.getBoolean(key) && !this.level.players().isEmpty();
     }
 
-    @Redirect(method = "tickChunks", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/LevelData;getGameTime()J"))
+    @Redirect(method = "tickChunks(Lnet/minecraft/util/profiling/ProfilerFiller;JLjava/util/List;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/LevelData;getGameTime()J"))
     private long banner$ticksPer(LevelData worldInfo) {
         long gameTime = worldInfo.getGameTime();
         long ticksPer = this.level.bridge$ticksPerSpawnCategory().getLong(SpawnCategory.ANIMAL);
@@ -97,17 +99,25 @@ public abstract class MixinServerChunkCache implements InjectionServerChunkCache
 
     @Override
     public void purgeUnload() {
-        this.level.getProfiler().push("purge");
+        ProfilerFiller gameprofilerfiller = Profiler.get();
+
+        gameprofilerfiller.push("purge");
         this.distanceManager.purgeStaleTickets();
         this.runDistanceManagerUpdates();
-        this.level.getProfiler().popPush("unload");
+        gameprofilerfiller.popPush("unload");
         this.chunkMap.tick(() -> true);
-        this.level.getProfiler().pop();
+        gameprofilerfiller.pop();
         this.clearCache();
     }
 
     @Redirect(method = "chunkAbsent", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ChunkHolder;getTicketLevel()I"))
     public int banner$useOldTicketLevel(ChunkHolder chunkHolder) {
         return chunkHolder.oldTicketLevel;
+    }
+
+    @Override
+    public void setSpawnSettings(boolean flag, boolean spawnFriendlies) {
+        this.spawnEnemies = flag;
+        this.spawnFriendlies = spawnFriendlies;
     }
 }

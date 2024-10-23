@@ -36,6 +36,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerPlayerConnection;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.TamableAnimal;
@@ -215,7 +216,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
     @Override
     public boolean isOnGround() {
         if (this.entity instanceof AbstractArrow) {
-            return ((AbstractArrow) this.entity).inGround;
+            return ((AbstractArrow) this.entity).isInGround();
         }
         return this.entity.onGround();
     }
@@ -765,7 +766,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
 
     @Override
     public boolean isInvulnerable() {
-        return this.getHandle().isInvulnerableTo(this.getHandle().damageSources().generic());
+        return this.getHandle().isInvulnerableToBase(this.getHandle().damageSources().generic());
     }
 
     @Override
@@ -882,7 +883,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
         CompoundTag compoundTag = new CompoundTag();
         this.getHandle().saveAsPassenger(compoundTag);
 
-        return net.minecraft.world.entity.EntityType.loadEntityRecursive(compoundTag, level, java.util.function.Function.identity());
+        return net.minecraft.world.entity.EntityType.loadEntityRecursive(compoundTag, level, EntitySpawnReason.LOAD, java.util.function.Function.identity());
     }
 
     public void storeBukkitValues(CompoundTag c) {

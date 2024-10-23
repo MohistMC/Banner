@@ -1,15 +1,14 @@
 package org.bukkit.potion;
 
 import com.google.common.base.Suppliers;
+import java.util.List;
+import java.util.function.Supplier;
 import org.bukkit.Bukkit;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * This enum reflects and matches each potion state that can be obtained from
