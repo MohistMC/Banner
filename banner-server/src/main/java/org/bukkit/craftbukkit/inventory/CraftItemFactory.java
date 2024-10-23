@@ -10,7 +10,6 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
@@ -25,11 +24,9 @@ import org.bukkit.craftbukkit.CraftRegistry;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftEntityType;
-import org.bukkit.craftbukkit.inventory.components.CraftEquippableComponent;
 import org.bukkit.craftbukkit.inventory.components.CraftFoodComponent;
 import org.bukkit.craftbukkit.inventory.components.CraftJukeboxComponent;
 import org.bukkit.craftbukkit.inventory.components.CraftToolComponent;
-import org.bukkit.craftbukkit.inventory.components.CraftUseCooldownComponent;
 import org.bukkit.craftbukkit.util.CraftLegacy;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -45,12 +42,11 @@ public final class CraftItemFactory implements ItemFactory {
     static {
         instance = new CraftItemFactory();
         ConfigurationSerialization.registerClass(SerializableMeta.class);
-        ConfigurationSerialization.registerClass(CraftEquippableComponent.class);
         ConfigurationSerialization.registerClass(CraftFoodComponent.class);
+        ConfigurationSerialization.registerClass(CraftFoodComponent.CraftFoodEffect.class);
         ConfigurationSerialization.registerClass(CraftToolComponent.class);
         ConfigurationSerialization.registerClass(CraftToolComponent.CraftToolRule.class);
         ConfigurationSerialization.registerClass(CraftJukeboxComponent.class);
-        ConfigurationSerialization.registerClass(CraftUseCooldownComponent.class);
     }
 
     private CraftItemFactory() {
@@ -207,7 +203,7 @@ public final class CraftItemFactory implements ItemFactory {
         itemStack = CraftItemStack.asCraftCopy(itemStack);
         CraftItemStack craft = (CraftItemStack) itemStack;
         RegistryAccess registry = CraftRegistry.getMinecraftRegistry();
-        Optional<HolderSet.Named<Enchantment>> optional = (allowTreasures) ? Optional.empty() : registry.lookupOrThrow(Registries.ENCHANTMENT).get(EnchantmentTags.IN_ENCHANTING_TABLE);
+        Optional<HolderSet.Named<Enchantment>> optional = (allowTreasures) ? Optional.empty() : registry.registryOrThrow(Registries.ENCHANTMENT).getTag(EnchantmentTags.IN_ENCHANTING_TABLE);
         return CraftItemStack.asCraftMirror(EnchantmentHelper.enchantItem(source, craft.handle, level, registry, optional));
     }
 }

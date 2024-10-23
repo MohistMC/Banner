@@ -1,7 +1,6 @@
 package org.bukkit.craftbukkit.entity;
 
 import com.google.common.base.Preconditions;
-import java.util.Optional;
 import net.minecraft.sounds.SoundEvent;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.CraftLootTable;
@@ -18,7 +17,7 @@ public abstract class CraftMob extends CraftLivingEntity implements Mob {
 
     @Override
     public void setTarget(LivingEntity target) {
-        Preconditions.checkState(!this.getHandle().generation, "Cannot set target during world generation");
+        Preconditions.checkState(!this.getHandle().bridge$generation(), "Cannot set target during world generation");
 
         net.minecraft.world.entity.Mob entity = this.getHandle();
         if (target == null) {
@@ -37,12 +36,12 @@ public abstract class CraftMob extends CraftLivingEntity implements Mob {
 
     @Override
     public void setAware(boolean aware) {
-        this.getHandle().aware = aware;
+        this.getHandle().banner$setAware(aware);
     }
 
     @Override
     public boolean isAware() {
-        return this.getHandle().aware;
+        return this.getHandle().bridge$aware();
     }
 
     @Override
@@ -63,12 +62,12 @@ public abstract class CraftMob extends CraftLivingEntity implements Mob {
 
     @Override
     public void setLootTable(LootTable table) {
-        this.getHandle().lootTable = Optional.ofNullable(CraftLootTable.bukkitToMinecraft(table));
+        this.getHandle().lootTable = CraftLootTable.bukkitToMinecraft(table);
     }
 
     @Override
     public LootTable getLootTable() {
-        return CraftLootTable.minecraftToBukkit(this.getHandle().getLootTable().orElse(null));
+        return CraftLootTable.minecraftToBukkit(this.getHandle().getLootTable());
     }
 
     @Override

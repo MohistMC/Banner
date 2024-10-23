@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.List;
 
 import com.mohistmc.banner.bukkit.BukkitMethodHooks;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -59,7 +58,7 @@ public class RestartCommand extends Command
                 // Kick all players
                 for ( ServerPlayer p : (List<ServerPlayer>) BukkitMethodHooks.getServer().getPlayerList().players )
                 {
-                    p.connection.disconnect( CraftChatMessage.fromStringOrEmpty( SpigotConfig.restartMessage, true ) );
+                    p.connection.disconnect( CraftChatMessage.fromStringOrEmpty( SpigotConfig.restartMessage ) );
                 }
                 // Give the socket a chance to send the packets
                 try

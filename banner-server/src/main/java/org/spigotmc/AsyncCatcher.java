@@ -1,7 +1,6 @@
 package org.spigotmc;
 
 import com.mohistmc.banner.bukkit.BukkitMethodHooks;
-import net.minecraft.server.MinecraftServer;
 
 public class AsyncCatcher
 {

@@ -1,24 +1,24 @@
 package org.bukkit.craftbukkit.entity;
 
-import net.minecraft.world.entity.vehicle.AbstractChestBoat;
+import net.minecraft.world.entity.vehicle.ChestBoat;
 import org.bukkit.craftbukkit.CraftLootTable;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.loot.LootTable;
 
-public abstract class CraftChestBoat extends CraftBoat implements org.bukkit.entity.ChestBoat {
+public class CraftChestBoat extends CraftBoat implements org.bukkit.entity.ChestBoat {
 
     private final Inventory inventory;
 
-    public CraftChestBoat(CraftServer server, AbstractChestBoat entity) {
+    public CraftChestBoat(CraftServer server, ChestBoat entity) {
         super(server, entity);
         this.inventory = new CraftInventory(entity);
     }
 
     @Override
-    public AbstractChestBoat getHandle() {
-        return (AbstractChestBoat) this.entity;
+    public ChestBoat getHandle() {
+        return (ChestBoat) this.entity;
     }
 
     @Override
@@ -38,7 +38,7 @@ public abstract class CraftChestBoat extends CraftBoat implements org.bukkit.ent
 
     @Override
     public LootTable getLootTable() {
-        return CraftLootTable.minecraftToBukkit(this.getHandle().getContainerLootTable());
+        return CraftLootTable.minecraftToBukkit(this.getHandle().getLootTable());
     }
 
     @Override
@@ -48,11 +48,11 @@ public abstract class CraftChestBoat extends CraftBoat implements org.bukkit.ent
 
     @Override
     public long getSeed() {
-        return this.getHandle().getContainerLootTableSeed();
+        return this.getHandle().getLootTableSeed();
     }
 
     private void setLootTable(LootTable table, long seed) {
-        this.getHandle().setContainerLootTable(CraftLootTable.bukkitToMinecraft(table));
-        this.getHandle().setContainerLootTableSeed(seed);
+        this.getHandle().setLootTable(CraftLootTable.bukkitToMinecraft(table));
+        this.getHandle().setLootTableSeed(seed);
     }
 }

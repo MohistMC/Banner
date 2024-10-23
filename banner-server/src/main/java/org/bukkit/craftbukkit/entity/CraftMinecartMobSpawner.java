@@ -1,9 +1,6 @@
 package org.bukkit.craftbukkit.entity;
 
 import com.google.common.base.Preconditions;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.SimpleWeightedRandomList;
 import net.minecraft.world.entity.vehicle.MinecartSpawner;
@@ -15,6 +12,10 @@ import org.bukkit.craftbukkit.block.CraftCreatureSpawner;
 import org.bukkit.entity.EntitySnapshot;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.minecart.SpawnerMinecart;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 final class CraftMinecartMobSpawner extends CraftMinecart implements SpawnerMinecart {
     CraftMinecartMobSpawner(CraftServer server, MinecartSpawner entity) {

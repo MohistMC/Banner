@@ -3,9 +3,7 @@ package org.bukkit.craftbukkit.inventory;
 import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.Optional;
-import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPredicate;
-import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.ItemCost;
 import org.bukkit.inventory.ItemStack;
@@ -37,8 +35,7 @@ public class CraftMerchantRecipe extends MerchantRecipe {
                 maxUses,
                 experience,
                 priceMultiplier,
-                demand,
-                this
+                demand
         );
         this.setSpecialPrice(specialPrice);
         this.setExperienceReward(experienceReward);
@@ -118,14 +115,10 @@ public class CraftMerchantRecipe extends MerchantRecipe {
         List<ItemStack> ingredients = this.getIngredients();
         Preconditions.checkState(!ingredients.isEmpty(), "No offered ingredients");
         net.minecraft.world.item.ItemStack baseCostA = CraftItemStack.asNMSCopy(ingredients.get(0));
-        DataComponentPredicate baseCostAPredicate = DataComponentPredicate.allOf(PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, baseCostA.getComponentsPatch()));
-        this.handle.baseCostA = new ItemCost(baseCostA.getItemHolder(), baseCostA.getCount(), baseCostAPredicate, baseCostA);
+        this.handle.baseCostA = new ItemCost(baseCostA.getItemHolder(), baseCostA.getCount(), DataComponentPredicate.allOf(baseCostA.getComponents()), baseCostA);
         if (ingredients.size() > 1) {
             net.minecraft.world.item.ItemStack costB = CraftItemStack.asNMSCopy(ingredients.get(1));
-            DataComponentPredicate costBPredicate = DataComponentPredicate.allOf(PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, costB.getComponentsPatch()));
-            this.handle.costB = Optional.of(new ItemCost(costB.getItemHolder(), costB.getCount(), costBPredicate, costB));
-        } else {
-            this.handle.costB = Optional.empty();
+            this.handle.costB = Optional.of(new ItemCost(costB.getItemHolder(), costB.getCount(), DataComponentPredicate.allOf(costB.getComponents()), costB));
         }
         return this.handle;
     }

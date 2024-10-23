@@ -9,21 +9,6 @@ import org.bukkit.Bukkit;
 
 public final class Versioning {
     public static String getBukkitVersion() {
-        String result = "Unknown-Version";
-
-        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/org.spigotmc/spigot-api/pom.properties");
-        Properties properties = new Properties();
-
-        if (stream != null) {
-            try {
-                properties.load(stream);
-
-                result = properties.getProperty("version");
-            } catch (IOException ex) {
-                Logger.getLogger(Versioning.class.getName()).log(Level.SEVERE, "Could not get Bukkit version!", ex);
-            }
-        }
-
-        return result;
+        return "1.21-R0.1-SNAPSHOT";
     }
 }

@@ -4,7 +4,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import net.minecraft.world.item.BannerItem;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.BundleItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SignItem;
@@ -245,8 +244,7 @@ public final class CraftItemMetas {
                 || itemType == ItemType.CALIBRATED_SCULK_SENSOR || itemType == ItemType.CHISELED_BOOKSHELF
                 || itemType == ItemType.DECORATED_POT || itemType == ItemType.SUSPICIOUS_SAND
                 || itemType == ItemType.SUSPICIOUS_GRAVEL || itemType == ItemType.CRAFTER
-                || itemType == ItemType.TRIAL_SPAWNER || itemType == ItemType.VAULT
-                || itemType == ItemType.CREAKING_HEART) {
+                || itemType == ItemType.TRIAL_SPAWNER || itemType == ItemType.VAULT) {
             return CraftItemMetas.asType(CraftItemMetas.BLOCK_STATE_META_DATA);
         }
         if (itemType == ItemType.SHIELD) {
@@ -272,7 +270,7 @@ public final class CraftItemMetas {
         if (itemType == ItemType.COMPASS) {
             return CraftItemMetas.asType(CraftItemMetas.COMPASS_META_DATA);
         }
-        if (itemHandle instanceof BundleItem) {
+        if (itemType == ItemType.BUNDLE) {
             return CraftItemMetas.asType(CraftItemMetas.BUNDLE_META_DATA);
         }
         if (itemType == ItemType.GOAT_HORN) {

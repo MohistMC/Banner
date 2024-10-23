@@ -178,7 +178,7 @@ public class ActivationRange
             {
                 return true;
             }
-        } else if ( !( (AbstractArrow) entity ).isInGround() )
+        } else if ( !( (AbstractArrow) entity ).inGround )
         {
             return true;
         }

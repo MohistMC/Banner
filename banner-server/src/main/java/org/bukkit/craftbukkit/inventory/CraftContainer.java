@@ -18,6 +18,7 @@ import net.minecraft.world.inventory.GrindstoneMenu;
 import net.minecraft.world.inventory.HopperMenu;
 import net.minecraft.world.inventory.LecternMenu;
 import net.minecraft.world.inventory.LoomMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.MerchantMenu;
 import net.minecraft.world.inventory.ShulkerBoxMenu;
 import net.minecraft.world.inventory.SimpleContainerData;
@@ -28,7 +29,6 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
-import org.bukkit.inventory.MenuType;
 
 public class CraftContainer extends AbstractContainerMenu {
 
@@ -96,37 +96,75 @@ public class CraftContainer extends AbstractContainerMenu {
         return this.view;
     }
 
-    public static net.minecraft.world.inventory.MenuType getNotchInventoryType(Inventory inventory) {
-        final InventoryType type = inventory.getType();
-        switch (type) {
+    public static MenuType getNotchInventoryType(Inventory inventory) {
+        switch (inventory.getType()) {
             case PLAYER:
             case CHEST:
             case ENDER_CHEST:
             case BARREL:
                 switch (inventory.getSize()) {
                     case 9:
-                        return net.minecraft.world.inventory.MenuType.GENERIC_9x1;
+                        return MenuType.GENERIC_9x1;
                     case 18:
-                        return net.minecraft.world.inventory.MenuType.GENERIC_9x2;
+                        return MenuType.GENERIC_9x2;
                     case 27:
-                        return net.minecraft.world.inventory.MenuType.GENERIC_9x3;
+                        return MenuType.GENERIC_9x3;
                     case 36:
                     case 41: // PLAYER
-                        return net.minecraft.world.inventory.MenuType.GENERIC_9x4;
+                        return MenuType.GENERIC_9x4;
                     case 45:
-                        return net.minecraft.world.inventory.MenuType.GENERIC_9x5;
+                        return MenuType.GENERIC_9x5;
                     case 54:
-                        return net.minecraft.world.inventory.MenuType.GENERIC_9x6;
+                        return MenuType.GENERIC_9x6;
                     default:
                         throw new IllegalArgumentException("Unsupported custom inventory size " + inventory.getSize());
                 }
+            case WORKBENCH:
+                return MenuType.CRAFTING;
+            case FURNACE:
+                return MenuType.FURNACE;
+            case DISPENSER:
+                return MenuType.GENERIC_3x3;
+            case ENCHANTING:
+                return MenuType.ENCHANTMENT;
+            case BREWING:
+                return MenuType.BREWING_STAND;
+            case BEACON:
+                return MenuType.BEACON;
+            case ANVIL:
+                return MenuType.ANVIL;
+            case HOPPER:
+                return MenuType.HOPPER;
+            case DROPPER:
+                return MenuType.GENERIC_3x3;
+            case SHULKER_BOX:
+                return MenuType.SHULKER_BOX;
+            case BLAST_FURNACE:
+                return MenuType.BLAST_FURNACE;
+            case LECTERN:
+                return MenuType.LECTERN;
+            case SMOKER:
+                return MenuType.SMOKER;
+            case LOOM:
+                return MenuType.LOOM;
+            case CARTOGRAPHY:
+                return MenuType.CARTOGRAPHY_TABLE;
+            case GRINDSTONE:
+                return MenuType.GRINDSTONE;
+            case STONECUTTER:
+                return MenuType.STONECUTTER;
+            case SMITHING:
+            case SMITHING_NEW:
+                return MenuType.SMITHING;
+            case CREATIVE:
+            case CRAFTING:
+            case MERCHANT:
+                throw new IllegalArgumentException("Can't open a " + inventory.getType() + " inventory!");
+            case CRAFTER:
+                return MenuType.CRAFTER_3x3;
             default:
-                final MenuType menu = type.getMenuType();
-                if (menu == null) {
-                    return net.minecraft.world.inventory.MenuType.GENERIC_9x3;
-                } else {
-                    return ((CraftMenuType<?>) menu).getHandle();
-                }
+                // TODO: If it reaches the default case, should we throw an error?
+                return MenuType.GENERIC_9x3;
         }
     }
 
@@ -139,7 +177,7 @@ public class CraftContainer extends AbstractContainerMenu {
             case CHEST:
             case ENDER_CHEST:
             case BARREL:
-                this.delegate = new ChestMenu(net.minecraft.world.inventory.MenuType.GENERIC_9x3, windowId, bottom, top, top.getContainerSize() / 9);
+                this.delegate = new ChestMenu(MenuType.GENERIC_9x3, windowId, bottom, top, top.getContainerSize() / 9);
                 break;
             case DISPENSER:
             case DROPPER:
@@ -174,7 +212,7 @@ public class CraftContainer extends AbstractContainerMenu {
                 this.delegate = new BlastFurnaceMenu(windowId, bottom, top, new SimpleContainerData(4));
                 break;
             case LECTERN:
-                this.delegate = new LecternMenu(windowId, top, new SimpleContainerData(1), bottom);
+                this.delegate = new LecternMenu(windowId/*, top, new SimpleContainerData(1), bottom*/);
                 break;
             case SMOKER:
                 this.delegate = new SmokerMenu(windowId, bottom, top, new SimpleContainerData(4));
@@ -319,7 +357,7 @@ public class CraftContainer extends AbstractContainerMenu {
     }
 
     @Override
-    public net.minecraft.world.inventory.MenuType<?> getType() {
+    public MenuType<?> getType() {
         return CraftContainer.getNotchInventoryType(this.view.getTopInventory());
     }
 }

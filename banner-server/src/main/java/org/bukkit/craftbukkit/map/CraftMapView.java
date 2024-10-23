@@ -6,8 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.bukkit.Bukkit;
@@ -31,7 +32,7 @@ public final class CraftMapView implements MapView {
 
     @Override
     public int getId() {
-        return this.worldMap.bridge$id().;
+        return this.worldMap.bridge$mapView().getId();
     }
 
     @Override
@@ -52,14 +53,14 @@ public final class CraftMapView implements MapView {
     @Override
     public World getWorld() {
         ResourceKey<net.minecraft.world.level.Level> dimension = this.worldMap.dimension;
-        ServerLevel world = MinecraftServer.getServer().getLevel(dimension);
+        ServerLevel world = BukkitMethodHooks.getServer().getLevel(dimension);
 
         if (world != null) {
             return world.getWorld();
         }
 
-        if (this.worldMap.uniqueId != null) {
-            return Bukkit.getServer().getWorld(this.worldMap.uniqueId);
+        if (this.worldMap.bridge$uniqueId() != null) {
+            return Bukkit.getServer().getWorld(this.worldMap.bridge$uniqueId());
         }
         return null;
     }
@@ -67,7 +68,7 @@ public final class CraftMapView implements MapView {
     @Override
     public void setWorld(World world) {
         this.worldMap.dimension = ((CraftWorld) world).getHandle().dimension();
-        this.worldMap.uniqueId = world.getUID();
+        this.worldMap.banner$setUniqueId(world.getUID());
     }
 
     @Override

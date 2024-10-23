@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import java.util.UUID;
-import net.minecraft.core.Holder;
 import net.minecraft.world.level.block.TrialSpawnerBlock;
 import net.minecraft.world.level.block.entity.TrialSpawnerBlockEntity;
 import net.minecraft.world.level.block.entity.trialspawner.TrialSpawnerData;
@@ -45,7 +44,7 @@ public class CraftTrialSpawner extends CraftBlockEntityState<TrialSpawnerBlockEn
 
     @Override
     public int getRequiredPlayerRange() {
-      return this.getSnapshot().trialSpawner.getRequiredPlayerRange();
+        return this.getSnapshot().trialSpawner.getRequiredPlayerRange();
     }
 
     @Override
@@ -140,20 +139,20 @@ public class CraftTrialSpawner extends CraftBlockEntityState<TrialSpawnerBlockEn
 
     @Override
     public TrialSpawnerConfiguration getNormalConfiguration() {
-       return this.normalConfig;
+        return this.normalConfig;
     }
 
     @Override
     public TrialSpawnerConfiguration getOminousConfiguration() {
-       return this.ominousConfig;
+        return this.ominousConfig;
     }
 
     @Override
     protected void applyTo(TrialSpawnerBlockEntity tileEntity) {
         super.applyTo(tileEntity);
 
-        tileEntity.trialSpawner.normalConfig = Holder.direct(this.normalConfig.toMinecraft());
-        tileEntity.trialSpawner.ominousConfig = Holder.direct(this.ominousConfig.toMinecraft());
+        tileEntity.trialSpawner.normalConfig = this.normalConfig.toMinecraft();
+        tileEntity.trialSpawner.ominousConfig = this.ominousConfig.toMinecraft();
     }
 
     private TrialSpawnerData getTrialData() {

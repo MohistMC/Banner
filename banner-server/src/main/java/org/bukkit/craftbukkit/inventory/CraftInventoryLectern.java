@@ -13,6 +13,7 @@ public class CraftInventoryLectern extends CraftInventory implements LecternInve
 
     public CraftInventoryLectern(Container inventory) {
         super(inventory);
+
         if (inventory instanceof BannerLecternInventory bannerLecternInventory) {
             bannerLecternInventory.setLecternBlockEntity((LecternBlockEntity) inventory);
             this.tile = bannerLecternInventory.getLectern();

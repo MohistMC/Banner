@@ -5,6 +5,8 @@ import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.CreeperPowerEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class CraftCreeper extends CraftMonster implements Creeper {
 
@@ -22,7 +24,7 @@ public class CraftCreeper extends CraftMonster implements Creeper {
         CreeperPowerEvent.PowerCause cause = powered ? CreeperPowerEvent.PowerCause.SET_ON : CreeperPowerEvent.PowerCause.SET_OFF;
 
         // only call event when we are not in world generation
-        if (this.getHandle().generation || !this.callPowerEvent(cause)) {
+        if (this.getHandle().bridge$generation() || !this.callPowerEvent(cause)) {
             this.getHandle().setPowered(powered);
         }
     }
@@ -77,9 +79,10 @@ public class CraftCreeper extends CraftMonster implements Creeper {
 
     @Override
     public void ignite(Entity entity) {
+        // Banner TODO fixme
         Preconditions.checkNotNull(entity, "entity cannot be null");
-        this.getHandle().entityIgniter = ((CraftEntity) entity).getHandle();
-        this.getHandle().ignite();
+       // getHandle().entityIgniter = ((CraftEntity) entity).getHandle();
+        getHandle().ignite();
     }
 
     @Override
@@ -88,8 +91,10 @@ public class CraftCreeper extends CraftMonster implements Creeper {
     }
 
     @Override
-    public Entity getIgniter() {
-        return (this.getHandle().entityIgniter != null) ? this.getHandle().entityIgniter.getBukkitEntity() : null;
+    public @Nullable Entity getIgniter() {
+        // Banner TODO fixme
+       // return (getHandle().entityIgniter != null) ? getHandle().entityIgniter.getBukkitEntity() : null;
+        return null;
     }
 
     @Override

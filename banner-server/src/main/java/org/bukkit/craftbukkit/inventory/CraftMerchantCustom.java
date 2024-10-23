@@ -11,12 +11,10 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 
-public class CraftMerchantCustom implements CraftMerchant {
-
-    private MinecraftMerchant merchant;
+public class CraftMerchantCustom extends CraftMerchant {
 
     public CraftMerchantCustom(String title) {
-        this.merchant = new MinecraftMerchant(title);
+        super(new MinecraftMerchant(title));
         this.getMerchant().craftMerchant = this;
     }
 
@@ -27,7 +25,7 @@ public class CraftMerchantCustom implements CraftMerchant {
 
     @Override
     public MinecraftMerchant getMerchant() {
-        return this.merchant;
+        return (MinecraftMerchant) super.getMerchant();
     }
 
     public static class MinecraftMerchant implements Merchant {

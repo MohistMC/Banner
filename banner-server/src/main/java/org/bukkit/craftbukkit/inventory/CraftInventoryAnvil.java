@@ -3,6 +3,8 @@ package org.bukkit.craftbukkit.inventory;
 import com.google.common.base.Preconditions;
 import java.util.function.Consumer;
 import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AnvilMenu;
+import net.minecraft.world.inventory.CraftingContainer;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.inventory.view.CraftAnvilView;
 import org.bukkit.entity.HumanEntity;
@@ -28,6 +30,17 @@ public class CraftInventoryAnvil extends CraftResultInventory implements AnvilIn
         this.repairCostAmount = CraftInventoryAnvil.DEFAULT_REPAIR_COST_AMOUNT;
         this.maximumRepairCost = CraftInventoryAnvil.DEFAULT_MAXIMUM_REPAIR_COST;
     }
+
+    // Banner start - compat for old version
+    private AnvilMenu container;
+
+    public CraftInventoryAnvil(Location location, Container inventory, Container resultInventory, AnvilMenu container) {
+        super(inventory, resultInventory);
+        this.location = location;
+        this.container = container;
+    }
+    // Banner end
+
 
     @Override
     public Location getLocation() {
