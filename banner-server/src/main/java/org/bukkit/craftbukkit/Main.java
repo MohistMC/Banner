@@ -1,149 +1,158 @@
 package org.bukkit.craftbukkit;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import joptsimple.util.PathConverter;
-import net.minecrell.terminalconsole.TerminalConsoleAppender;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import joptsimple.util.PathConverter;
+import org.fusesource.jansi.AnsiConsole;
 
-import static java.util.Arrays.asList;
-
-public class Main extends OptionParser {
-
+public class Main {
     public static boolean useJline = true;
     public static boolean useConsole = true;
 
-    public Main() {
+    public static void main(String[] args) {
+        // Todo: Installation script
+        OptionParser parser = new OptionParser() {
+            {
+                this.acceptsAll(Main.asList("?", "help"), "Show the help");
 
-        acceptsAll(asList("?", "help"), "Show the help");
+                this.acceptsAll(Main.asList("c", "config"), "Properties file to use")
+                        .withRequiredArg()
+                        .ofType(File.class)
+                        .defaultsTo(new File("server.properties"))
+                        .describedAs("Properties file");
 
-        acceptsAll(asList("c", "config"), "Properties file to use")
-                .withRequiredArg()
-                .ofType(File.class)
-                .defaultsTo(new File("server.properties"))
-                .describedAs("Properties file");
+                this.acceptsAll(Main.asList("P", "plugins"), "Plugin directory to use")
+                        .withRequiredArg()
+                        .ofType(File.class)
+                        .defaultsTo(new File("plugins"))
+                        .describedAs("Plugin directory");
 
-        acceptsAll(asList("P", "plugins"), "Plugin directory to use")
-                .withRequiredArg()
-                .ofType(File.class)
-                .defaultsTo(new File("plugins"))
-                .describedAs("Plugin directory");
+                this.acceptsAll(Main.asList("h", "host", "server-ip"), "Host to listen on")
+                        .withRequiredArg()
+                        .ofType(String.class)
+                        .describedAs("Hostname or IP");
 
-        acceptsAll(asList("h", "host", "server-ip"), "Host to listen on")
-                .withRequiredArg()
-                .ofType(String.class)
-                .describedAs("Hostname or IP");
+                this.acceptsAll(Main.asList("W", "world-dir", "universe", "world-container"), "World container")
+                        .withRequiredArg()
+                        .ofType(File.class)
+                        .defaultsTo(new File("."))
+                        .describedAs("Directory containing worlds");
 
-        acceptsAll(asList("W", "world-dir", "universe", "world-container"), "World container")
-                .withRequiredArg()
-                .ofType(File.class)
-                .describedAs("Directory containing worlds");
+                this.acceptsAll(Main.asList("w", "world", "level-name"), "World name")
+                        .withRequiredArg()
+                        .ofType(String.class)
+                        .describedAs("World name");
 
-        acceptsAll(asList("w", "world", "level-name"), "World name")
-                .withRequiredArg()
-                .ofType(String.class)
-                .describedAs("World name");
+                this.acceptsAll(Main.asList("p", "port", "server-port"), "Port to listen on")
+                        .withRequiredArg()
+                        .ofType(Integer.class)
+                        .describedAs("Port");
 
-        acceptsAll(asList("p", "port", "server-port"), "Port to listen on")
-                .withRequiredArg()
-                .ofType(Integer.class)
-                .describedAs("Port");
+                this.accepts("serverId", "Server ID")
+                        .withRequiredArg();
 
-        accepts("serverId", "Server ID")
-                .withRequiredArg();
+                this.accepts("jfrProfile", "Enable JFR profiling");
 
-        accepts("jfrProfile", "Enable JFR profiling");
+                this.accepts("pidFile", "pid File")
+                        .withRequiredArg()
+                        .withValuesConvertedBy(new PathConverter());
 
-        accepts("pidFile", "pid File")
-                .withRequiredArg()
-                .withValuesConvertedBy(new PathConverter());
+                this.acceptsAll(Main.asList("o", "online-mode"), "Whether to use online authentication")
+                        .withRequiredArg()
+                        .ofType(Boolean.class)
+                        .describedAs("Authentication");
 
-        acceptsAll(asList("o", "online-mode"), "Whether to use online authentication")
-                .withRequiredArg()
-                .ofType(Boolean.class)
-                .describedAs("Authentication");
+                this.acceptsAll(Main.asList("s", "size", "max-players"), "Maximum amount of players")
+                        .withRequiredArg()
+                        .ofType(Integer.class)
+                        .describedAs("Server size");
 
-        acceptsAll(asList("s", "size", "max-players"), "Maximum amount of players")
-                .withRequiredArg()
-                .ofType(Integer.class)
-                .describedAs("Server size");
+                this.acceptsAll(Main.asList("d", "date-format"), "Format of the date to display in the console (for log entries)")
+                        .withRequiredArg()
+                        .ofType(SimpleDateFormat.class)
+                        .describedAs("Log date format");
 
-        acceptsAll(asList("d", "date-format"), "Format of the date to display in the console (for log entries)")
-                .withRequiredArg()
-                .ofType(SimpleDateFormat.class)
-                .describedAs("Log date format");
+                this.acceptsAll(Main.asList("log-pattern"), "Specfies the log filename pattern")
+                        .withRequiredArg()
+                        .ofType(String.class)
+                        .defaultsTo("server.log")
+                        .describedAs("Log filename");
 
-        acceptsAll(asList("log-pattern"), "Specfies the log filename pattern")
-                .withRequiredArg()
-                .ofType(String.class)
-                .defaultsTo("server.log")
-                .describedAs("Log filename");
+                this.acceptsAll(Main.asList("log-limit"), "Limits the maximum size of the log file (0 = unlimited)")
+                        .withRequiredArg()
+                        .ofType(Integer.class)
+                        .defaultsTo(0)
+                        .describedAs("Max log size");
 
-        acceptsAll(asList("log-limit"), "Limits the maximum size of the log file (0 = unlimited)")
-                .withRequiredArg()
-                .ofType(Integer.class)
-                .defaultsTo(0)
-                .describedAs("Max log size");
+                this.acceptsAll(Main.asList("log-count"), "Specified how many log files to cycle through")
+                        .withRequiredArg()
+                        .ofType(Integer.class)
+                        .defaultsTo(1)
+                        .describedAs("Log count");
 
-        acceptsAll(asList("log-count"), "Specified how many log files to cycle through")
-                .withRequiredArg()
-                .ofType(Integer.class)
-                .defaultsTo(1)
-                .describedAs("Log count");
+                this.acceptsAll(Main.asList("log-append"), "Whether to append to the log file")
+                        .withRequiredArg()
+                        .ofType(Boolean.class)
+                        .defaultsTo(true)
+                        .describedAs("Log append");
 
-        acceptsAll(asList("log-append"), "Whether to append to the log file")
-                .withRequiredArg()
-                .ofType(Boolean.class)
-                .defaultsTo(true)
-                .describedAs("Log append");
+                this.acceptsAll(Main.asList("log-strip-color"), "Strips color codes from log file");
 
-        acceptsAll(asList("log-strip-color"), "Strips color codes from log file");
+                this.acceptsAll(Main.asList("b", "bukkit-settings"), "File for bukkit settings")
+                        .withRequiredArg()
+                        .ofType(File.class)
+                        .defaultsTo(new File("bukkit.yml"))
+                        .describedAs("Yml file");
 
-        acceptsAll(asList("b", "bukkit-settings"), "File for bukkit settings")
-                .withRequiredArg()
-                .ofType(File.class)
-                .defaultsTo(new File("bukkit.yml"))
-                .describedAs("Yml file");
+                this.acceptsAll(Main.asList("C", "commands-settings"), "File for command settings")
+                        .withRequiredArg()
+                        .ofType(File.class)
+                        .defaultsTo(new File("commands.yml"))
+                        .describedAs("Yml file");
 
-        acceptsAll(asList("C", "commands-settings"), "File for command settings")
-                .withRequiredArg()
-                .ofType(File.class)
-                .defaultsTo(new File("commands.yml"))
-                .describedAs("Yml file");
+                this.acceptsAll(Main.asList("forceUpgrade"), "Whether to force a world upgrade");
+                this.acceptsAll(Main.asList("eraseCache"), "Whether to force cache erase during world upgrade");
+                this.acceptsAll(Main.asList("recreateRegionFiles"), "Whether to recreate region files during world upgrade");
+                this.acceptsAll(Main.asList("nogui"), "Disables the graphical console");
 
-        acceptsAll(asList("forceUpgrade"), "Whether to force a world upgrade");
-        acceptsAll(asList("eraseCache"), "Whether to force cache erase during world upgrade");
+                this.acceptsAll(Main.asList("nojline"), "Disables jline and emulates the vanilla console");
 
-        acceptsAll(asList("nojline"), "Disables jline and emulates the vanilla console");
+                this.acceptsAll(Main.asList("noconsole"), "Disables the console");
 
-        acceptsAll(asList("noconsole"), "Disables the console");
-        acceptsAll(asList("v", "version"), "Show the CraftBukkit Version");
+                this.acceptsAll(Main.asList("v", "version"), "Show the CraftBukkit Version");
 
-        acceptsAll(asList("demo"), "Demo mode");
+                this.acceptsAll(Main.asList("demo"), "Demo mode");
 
-        // Spigot Start
-        acceptsAll(asList("S", "spigot-settings"), "File for spigot settings")
-                .withRequiredArg()
-                .ofType(File.class)
-                .defaultsTo(new File("spigot.yml"))
-                .describedAs("Yml file");
+                this.acceptsAll(Main.asList("initSettings"), "Only create configuration files and then exit"); // SPIGOT-5761: Add initSettings option
 
-        // Banner Start
-        acceptsAll(asList("B", "banner-settings"), "File for banner settings")
-                .withRequiredArg()
-                .ofType(File.class)
-                .defaultsTo(new File("banner-config","banner.yml"))
-                .describedAs("Yml file");
+                // Spigot Start
+                this.acceptsAll(Main.asList("S", "spigot-settings"), "File for spigot settings")
+                        .withRequiredArg()
+                        .ofType(File.class)
+                        .defaultsTo(new File("spigot.yml"))
+                        .describedAs("Yml file");
+                // Spigot End
+            }
+        };
 
-        allowsUnrecognizedOptions();
-    }
+        OptionSet options = null;
 
-    public static void handleParser(OptionParser parser, OptionSet options) {
+        try {
+            options = parser.parse(args);
+        } catch (joptsimple.OptionException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, ex.getLocalizedMessage());
+        }
+
         if ((options == null) || (options.has("?"))) {
             try {
                 parser.printHelpOn(System.out);
@@ -161,33 +170,56 @@ public class Main extends OptionParser {
             }
 
             float javaVersion = Float.parseFloat(System.getProperty("java.class.version"));
-            if (javaVersion < 61.0) {
-                System.err.println("Unsupported Java detected (" + javaVersion + "). This version of Minecraft requires at least Java 17. Check your Java version with the command 'java -version'.");
-                return;
-            }
-            if (javaVersion > 65.0) {
-                System.err.println("Unsupported Java detected (" + javaVersion + "). Only up to Java 21 is supported.");
+            if (javaVersion > 67.0) {
+                System.err.println("Unsupported Java detected (" + javaVersion + "). Only up to Java 23 is supported.");
                 return;
             }
 
-            String javaVersionName = System.getProperty("java.version");
-            // J2SE SDK/JRE Version String Naming Convention
-            boolean isPreRelease = javaVersionName.contains("-");
-            if (isPreRelease && javaVersion == 61.0) {
-                System.err.println("Unsupported Java detected (" + javaVersionName + "). You are running an outdated, pre-release version. Only general availability versions of Java are supported. Please update your Java version.");
-                return;
-            }
+            try {
+                // This trick bypasses Maven Shade's clever rewriting of our getProperty call when using String literals
+                String jline_UnsupportedTerminal = new String(new char[]{'j', 'l', 'i', 'n', 'e', '.', 'U', 'n', 's', 'u', 'p', 'p', 'o', 'r', 't', 'e', 'd', 'T', 'e', 'r', 'm', 'i', 'n', 'a', 'l'});
+                String jline_terminal = new String(new char[]{'j', 'l', 'i', 'n', 'e', '.', 't', 'e', 'r', 'm', 'i', 'n', 'a', 'l'});
 
-            if (options.has("nojline")) {
-                System.setProperty(TerminalConsoleAppender.JLINE_OVERRIDE_PROPERTY, "false");
-                useJline = false;
-            }
+                Main.useJline = !(jline_UnsupportedTerminal).equals(System.getProperty(jline_terminal));
 
-            if (options.has("noconsole")) {
-                useConsole = false;
-                useJline = false;
-                System.setProperty(TerminalConsoleAppender.JLINE_OVERRIDE_PROPERTY, "false");
+                if (options.has("nojline")) {
+                    System.setProperty("user.language", "en");
+                    Main.useJline = false;
+                }
+
+                if (Main.useJline) {
+                    AnsiConsole.systemInstall();
+                } else {
+                    // This ensures the terminal literal will always match the jline implementation
+                    System.setProperty(jline.TerminalFactory.JLINE_TERMINAL, jline.UnsupportedTerminal.class.getName());
+                }
+
+                if (options.has("noconsole")) {
+                    Main.useConsole = false;
+                }
+
+                if (Main.class.getPackage().getImplementationVendor() != null && System.getProperty("IReallyKnowWhatIAmDoingISwear") == null) {
+                    Date buildDate = new Date(Integer.parseInt(Main.class.getPackage().getImplementationVendor()) * 1000L);
+
+                    Calendar deadline = Calendar.getInstance();
+                    deadline.add(Calendar.DAY_OF_YEAR, -3);
+                    if (buildDate.before(deadline.getTime())) {
+                        System.err.println("*** Error, this build is outdated ***");
+                        System.err.println("*** Please download a new build as per instructions from https://www.spigotmc.org/go/outdated-spigot ***");
+                        System.err.println("*** Server will start in 20 seconds ***");
+                        Thread.sleep(TimeUnit.SECONDS.toMillis(20));
+                    }
+                }
+
+                System.out.println("Loading libraries, please wait...");
+                net.minecraft.server.Main.main(options);
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
         }
+    }
+
+    private static List<String> asList(String... params) {
+        return Arrays.asList(params);
     }
 }

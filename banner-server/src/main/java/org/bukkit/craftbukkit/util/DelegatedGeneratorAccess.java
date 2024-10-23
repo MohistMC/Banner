@@ -22,8 +22,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.BlockGetter;
@@ -77,13 +75,13 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
-    public void setCurrentlyGenerating(Supplier<String> structureName) {
-        this.handle.setCurrentlyGenerating(structureName);
+    public boolean ensureCanWrite(BlockPos pos) {
+        return this.handle.ensureCanWrite(pos);
     }
 
     @Override
-    public boolean ensureCanWrite(BlockPos pos) {
-        return this.handle.ensureCanWrite(pos);
+    public void setCurrentlyGenerating(Supplier<String> structureName) {
+        this.handle.setCurrentlyGenerating(structureName);
     }
 
     @Override
@@ -91,16 +89,14 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
         return this.handle.getLevel();
     }
 
-    // Banner TODO fixme
-    /*
-    @Override
-    public void addFreshEntityWithPassengers(Entity arg0, CreatureSpawnEvent.SpawnReason arg1) {
-        this.handle.addFreshEntityWithPassengers(arg0, arg1);
-    }*/
-
     @Override
     public void addFreshEntityWithPassengers(Entity entity) {
         this.handle.addFreshEntityWithPassengers(entity);
+    }
+
+    @Override
+    public void addFreshEntityWithPassengers(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
+        this.handle.addFreshEntityWithPassengers(entity, reason);
     }
 
     @Override
@@ -109,33 +105,18 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
-    public DifficultyInstance getCurrentDifficultyAt(BlockPos pos) {
-        return this.handle.getCurrentDifficultyAt(pos);
-    }
-
-    @Override
-    public void neighborShapeChanged(Direction direction, BlockState neighborState, BlockPos pos, BlockPos neighborPos, int flags, int maxUpdateDepth) {
-        this.handle.neighborShapeChanged(direction, neighborState, pos, neighborPos, flags, maxUpdateDepth);
-    }
-
-    @Override
     public long dayTime() {
         return this.handle.dayTime();
     }
 
     @Override
-    public LevelData getLevelData() {
-        return this.handle.getLevelData();
+    public long nextSubTickCount() {
+        return this.handle.nextSubTickCount();
     }
 
     @Override
-    public boolean hasChunk(int chunkX, int chunkZ) {
-        return this.handle.hasChunk(chunkX, chunkZ);
-    }
-
-    @Override
-    public ChunkSource getChunkSource() {
-        return this.handle.getChunkSource();
+    public LevelTickAccess<Block> getBlockTicks() {
+        return this.handle.getBlockTicks();
     }
 
     @Override
@@ -149,6 +130,11 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
+    public LevelTickAccess<Fluid> getFluidTicks() {
+        return this.handle.getFluidTicks();
+    }
+
+    @Override
     public void scheduleTick(BlockPos pos, Fluid fluid, int delay, TickPriority priority) {
         this.handle.scheduleTick(pos, fluid, delay, priority);
     }
@@ -159,13 +145,13 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
-    public Difficulty getDifficulty() {
-        return this.handle.getDifficulty();
+    public LevelData getLevelData() {
+        return this.handle.getLevelData();
     }
 
     @Override
-    public void blockUpdated(BlockPos pos, Block block) {
-        this.handle.blockUpdated(pos, block);
+    public DifficultyInstance getCurrentDifficultyAt(BlockPos pos) {
+        return this.handle.getCurrentDifficultyAt(pos);
     }
 
     @Override
@@ -174,23 +160,33 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
+    public Difficulty getDifficulty() {
+        return this.handle.getDifficulty();
+    }
+
+    @Override
+    public ChunkSource getChunkSource() {
+        return this.handle.getChunkSource();
+    }
+
+    @Override
+    public boolean hasChunk(int chunkX, int chunkZ) {
+        return this.handle.hasChunk(chunkX, chunkZ);
+    }
+
+    @Override
     public RandomSource getRandom() {
         return this.handle.getRandom();
     }
 
     @Override
-    public LevelTickAccess<Block> getBlockTicks() {
-        return this.handle.getBlockTicks();
+    public void blockUpdated(BlockPos pos, Block block) {
+        this.handle.blockUpdated(pos, block);
     }
 
     @Override
-    public long nextSubTickCount() {
-        return this.handle.nextSubTickCount();
-    }
-
-    @Override
-    public LevelTickAccess<Fluid> getFluidTicks() {
-        return this.handle.getFluidTicks();
+    public void neighborShapeChanged(Direction direction, BlockPos pos, BlockPos neighborPos, BlockState neighborState, int flags, int maxUpdateDepth) {
+        this.handle.neighborShapeChanged(direction, pos, neighborPos, neighborState, flags, maxUpdateDepth);
     }
 
     @Override
@@ -204,8 +200,8 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
-    public void levelEvent(int eventId, BlockPos pos, int data) {
-        this.handle.levelEvent(eventId, pos, data);
+    public void addParticle(ParticleOptions parameters, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
+        this.handle.addParticle(parameters, x, y, z, velocityX, velocityY, velocityZ);
     }
 
     @Override
@@ -214,8 +210,8 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
-    public void addParticle(ParticleOptions parameters, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
-        this.handle.addParticle(parameters, x, y, z, velocityX, velocityY, velocityZ);
+    public void levelEvent(int eventId, BlockPos pos, int data) {
+        this.handle.levelEvent(eventId, pos, data);
     }
 
     @Override
@@ -224,8 +220,8 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
-    public void gameEvent(Holder<GameEvent> event, BlockPos pos, GameEvent.Context emitter) {
-        this.handle.gameEvent(event, pos, emitter);
+    public void gameEvent(Entity entity, Holder<GameEvent> event, Vec3 pos) {
+        this.handle.gameEvent(entity, event, pos);
     }
 
     @Override
@@ -234,13 +230,13 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
-    public void gameEvent(Entity entity, Holder<GameEvent> event, Vec3 pos) {
-        this.handle.gameEvent(entity, event, pos);
+    public void gameEvent(Holder<GameEvent> event, BlockPos pos, GameEvent.Context emitter) {
+        this.handle.gameEvent(event, pos, emitter);
     }
 
     @Override
-    public List<VoxelShape> getEntityCollisions(Entity entity, AABB box) {
-        return this.handle.getEntityCollisions(entity, box);
+    public void gameEvent(ResourceKey<GameEvent> event, BlockPos pos, GameEvent.Context emitter) {
+        this.handle.gameEvent(event, pos, emitter);
     }
 
     @Override
@@ -249,8 +245,8 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
-    public BlockPos getHeightmapPos(Heightmap.Types heightmap, BlockPos pos) {
-        return this.handle.getHeightmapPos(heightmap, pos);
+    public List<VoxelShape> getEntityCollisions(Entity entity, AABB box) {
+        return this.handle.getEntityCollisions(entity, box);
     }
 
     @Override
@@ -259,225 +255,23 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
-    public boolean hasNearbyAlivePlayer(double x, double y, double z, double range) {
-        return this.handle.hasNearbyAlivePlayer(x, y, z, range);
+    public BlockPos getHeightmapPos(Heightmap.Types heightmap, BlockPos pos) {
+        return this.handle.getHeightmapPos(heightmap, pos);
     }
 
     @Override
-    public List<? extends Player> players() {
-        return this.handle.players();
+    public float getMoonBrightness() {
+        return this.handle.getMoonBrightness();
     }
 
     @Override
-    public List<Entity> getEntities(Entity except, AABB box, Predicate<? super Entity> predicate) {
-        return this.handle.getEntities(except, box, predicate);
+    public float getTimeOfDay(float tickDelta) {
+        return this.handle.getTimeOfDay(tickDelta);
     }
 
     @Override
-    public <T extends Entity> List<T> getEntities(EntityTypeTest<Entity, T> filter, AABB box, Predicate<? super T> predicate) {
-        return this.handle.getEntities(filter, box, predicate);
-    }
-
-    @Override
-    public List<Entity> getEntities(Entity except, AABB box) {
-        return this.handle.getEntities(except, box);
-    }
-
-    @Override
-    public <T extends Entity> List<T> getEntitiesOfClass(Class<T> entityClass, AABB box) {
-        return this.handle.getEntitiesOfClass(entityClass, box);
-    }
-
-    @Override
-    public <T extends Entity> List<T> getEntitiesOfClass(Class<T> entityClass, AABB box, Predicate<? super T> predicate) {
-        return this.handle.getEntitiesOfClass(entityClass, box, predicate);
-    }
-
-    @Override
-    public Player getNearestPlayer(TargetingConditions targetPredicate, LivingEntity entity, double x, double y, double z) {
-        return this.handle.getNearestPlayer(targetPredicate, entity, x, y, z);
-    }
-
-    @Override
-    public Player getNearestPlayer(TargetingConditions targetPredicate, double x, double y, double z) {
-        return this.handle.getNearestPlayer(targetPredicate, x, y, z);
-    }
-
-    @Override
-    public Player getNearestPlayer(Entity entity, double maxDistance) {
-        return this.handle.getNearestPlayer(entity, maxDistance);
-    }
-
-    @Override
-    public Player getNearestPlayer(double x, double y, double z, double maxDistance, Predicate<Entity> targetPredicate) {
-        return this.handle.getNearestPlayer(x, y, z, maxDistance, targetPredicate);
-    }
-
-    @Override
-    public Player getNearestPlayer(double x, double y, double z, double maxDistance, boolean ignoreCreative) {
-        return this.handle.getNearestPlayer(x, y, z, maxDistance, ignoreCreative);
-    }
-
-    @Override
-    public Player getNearestPlayer(TargetingConditions targetPredicate, LivingEntity entity) {
-        return this.handle.getNearestPlayer(targetPredicate, entity);
-    }
-
-    @Override
-    public <T extends LivingEntity> T getNearestEntity(Class<? extends T> entityClass, TargetingConditions targetPredicate, LivingEntity entity, double x, double y, double z, AABB box) {
-        return this.handle.getNearestEntity(entityClass, targetPredicate, entity, x, y, z, box);
-    }
-
-    @Override
-    public <T extends LivingEntity> T getNearestEntity(List<? extends T> entityList, TargetingConditions targetPredicate, LivingEntity entity, double x, double y, double z) {
-        return this.handle.getNearestEntity(entityList, targetPredicate, entity, x, y, z);
-    }
-
-    @Override
-    public Player getPlayerByUUID(UUID uuid) {
-        return this.handle.getPlayerByUUID(uuid);
-    }
-
-    @Override
-    public List<Player> getNearbyPlayers(TargetingConditions targetPredicate, LivingEntity entity, AABB box) {
-        return this.handle.getNearbyPlayers(targetPredicate, entity, box);
-    }
-
-    @Override
-    public <T extends LivingEntity> List<T> getNearbyEntities(Class<T> entityClass, TargetingConditions targetPredicate, LivingEntity targetingEntity, AABB box) {
-        return this.handle.getNearbyEntities(entityClass, targetPredicate, targetingEntity, box);
-    }
-
-    @Override
-    @Deprecated
-    public float getLightLevelDependentMagicValue(BlockPos pos) {
-        return this.handle.getLightLevelDependentMagicValue(pos);
-    }
-
-    @Override
-    public BlockGetter getChunkForCollisions(int chunkX, int chunkZ) {
-        return this.handle.getChunkForCollisions(chunkX, chunkZ);
-    }
-
-    @Override
-    public int getMaxLocalRawBrightness(BlockPos pos) {
-        return this.handle.getMaxLocalRawBrightness(pos);
-    }
-
-    @Override
-    public int getMaxLocalRawBrightness(BlockPos pos, int ambientDarkness) {
-        return this.handle.getMaxLocalRawBrightness(pos, ambientDarkness);
-    }
-
-    @Override
-    public boolean canSeeSkyFromBelowWater(BlockPos pos) {
-        return this.handle.canSeeSkyFromBelowWater(pos);
-    }
-
-    @Override
-    public float getPathfindingCostFromLightLevels(BlockPos pos) {
-        return this.handle.getPathfindingCostFromLightLevels(pos);
-    }
-
-    @Override
-    public Stream<BlockState> getBlockStatesIfLoaded(AABB box) {
-        return this.handle.getBlockStatesIfLoaded(box);
-    }
-
-    @Override
-    public Holder<Biome> getUncachedNoiseBiome(int biomeX, int biomeY, int biomeZ) {
-        return this.handle.getUncachedNoiseBiome(biomeX, biomeY, biomeZ);
-    }
-
-    @Override
-    @Deprecated
-    public int getSeaLevel() {
-        return this.handle.getSeaLevel();
-    }
-
-    @Override
-    public boolean containsAnyLiquid(AABB box) {
-        return this.handle.containsAnyLiquid(box);
-    }
-
-    @Override
-    public int getMinBuildHeight() {
-        return this.handle.getMinBuildHeight();
-    }
-
-    @Override
-    public boolean isWaterAt(BlockPos pos) {
-        return this.handle.isWaterAt(pos);
-    }
-
-    @Override
-    public boolean isEmptyBlock(BlockPos pos) {
-        return this.handle.isEmptyBlock(pos);
-    }
-
-    @Override
-    public boolean isClientSide() {
-        return this.handle.isClientSide();
-    }
-
-    @Override
-    public DimensionType dimensionType() {
-        return this.handle.dimensionType();
-    }
-
-    @Override
-    public FeatureFlagSet enabledFeatures() {
-        return this.handle.enabledFeatures();
-    }
-
-    @Override
-    @Deprecated
-    public boolean hasChunkAt(int x, int z) {
-        return this.handle.hasChunkAt(x, z);
-    }
-
-    @Override
-    @Deprecated
-    public boolean hasChunkAt(BlockPos pos) {
-        return this.handle.hasChunkAt(pos);
-    }
-
-    @Override
-    public <T> HolderLookup<T> holderLookup(ResourceKey<? extends Registry<? extends T>> registryRef) {
-        return this.handle.holderLookup(registryRef);
-    }
-
-    @Override
-    public RegistryAccess registryAccess() {
-        return this.handle.registryAccess();
-    }
-
-    @Override
-    public Holder<Biome> getNoiseBiome(int biomeX, int biomeY, int biomeZ) {
-        return this.handle.getNoiseBiome(biomeX, biomeY, biomeZ);
-    }
-
-    @Override
-    public int getBlockTint(BlockPos pos, ColorResolver colorResolver) {
-        return this.handle.getBlockTint(pos, colorResolver);
-    }
-
-    @Override
-    @Deprecated
-    public boolean hasChunksAt(BlockPos min, BlockPos max) {
-        return this.handle.hasChunksAt(min, max);
-    }
-
-    @Override
-    @Deprecated
-    public boolean hasChunksAt(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-        return this.handle.hasChunksAt(minX, minY, minZ, maxX, maxY, maxZ);
-    }
-
-    @Override
-    @Deprecated
-    public boolean hasChunksAt(int minX, int minZ, int maxX, int maxZ) {
-        return this.handle.hasChunksAt(minX, minZ, maxX, maxZ);
+    public int getMoonPhase() {
+        return this.handle.getMoonPhase();
     }
 
     @Override
@@ -486,33 +280,8 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
-    public ChunkAccess getChunk(int chunkX, int chunkZ, ChunkStatus status) {
-        return this.handle.getChunk(chunkX, chunkZ, status);
-    }
-
-    @Override
-    public ChunkAccess getChunk(BlockPos pos) {
-        return this.handle.getChunk(pos);
-    }
-
-    @Override
-    public ChunkAccess getChunk(int chunkX, int chunkZ) {
-        return this.handle.getChunk(chunkX, chunkZ);
-    }
-
-    @Override
     public int getHeight(Heightmap.Types heightmap, int x, int z) {
         return this.handle.getHeight(heightmap, x, z);
-    }
-
-    @Override
-    public int getHeight() {
-        return this.handle.getHeight();
-    }
-
-    @Override
-    public Holder<Biome> getBiome(BlockPos pos) {
-        return this.handle.getBiome(pos);
     }
 
     @Override
@@ -526,13 +295,158 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
-    public boolean canSeeSky(BlockPos pos) {
-        return this.handle.canSeeSky(pos);
+    public Holder<Biome> getBiome(BlockPos pos) {
+        return this.handle.getBiome(pos);
     }
 
     @Override
-    public int getRawBrightness(BlockPos pos, int ambientDarkness) {
-        return this.handle.getRawBrightness(pos, ambientDarkness);
+    public Stream<BlockState> getBlockStatesIfLoaded(AABB box) {
+        return this.handle.getBlockStatesIfLoaded(box);
+    }
+
+    @Override
+    public int getBlockTint(BlockPos pos, ColorResolver colorResolver) {
+        return this.handle.getBlockTint(pos, colorResolver);
+    }
+
+    @Override
+    public Holder<Biome> getNoiseBiome(int biomeX, int biomeY, int biomeZ) {
+        return this.handle.getNoiseBiome(biomeX, biomeY, biomeZ);
+    }
+
+    @Override
+    public Holder<Biome> getUncachedNoiseBiome(int biomeX, int biomeY, int biomeZ) {
+        return this.handle.getUncachedNoiseBiome(biomeX, biomeY, biomeZ);
+    }
+
+    @Override
+    public boolean isClientSide() {
+        return this.handle.isClientSide();
+    }
+
+    @Override
+    public int getSeaLevel() {
+        return this.handle.getSeaLevel();
+    }
+
+    @Override
+    public DimensionType dimensionType() {
+        return this.handle.dimensionType();
+    }
+
+    @Override
+    public int getMinY() {
+        return this.handle.getMinY();
+    }
+
+    @Override
+    public int getHeight() {
+        return this.handle.getHeight();
+    }
+
+    @Override
+    public boolean isEmptyBlock(BlockPos pos) {
+        return this.handle.isEmptyBlock(pos);
+    }
+
+    @Override
+    public boolean canSeeSkyFromBelowWater(BlockPos pos) {
+        return this.handle.canSeeSkyFromBelowWater(pos);
+    }
+
+    @Override
+    public float getPathfindingCostFromLightLevels(BlockPos pos) {
+        return this.handle.getPathfindingCostFromLightLevels(pos);
+    }
+
+    @Override
+    public float getLightLevelDependentMagicValue(BlockPos pos) {
+        return this.handle.getLightLevelDependentMagicValue(pos);
+    }
+
+    @Override
+    public ChunkAccess getChunk(BlockPos pos) {
+        return this.handle.getChunk(pos);
+    }
+
+    @Override
+    public ChunkAccess getChunk(int chunkX, int chunkZ) {
+        return this.handle.getChunk(chunkX, chunkZ);
+    }
+
+    @Override
+    public ChunkAccess getChunk(int chunkX, int chunkZ, ChunkStatus status) {
+        return this.handle.getChunk(chunkX, chunkZ, status);
+    }
+
+    @Override
+    public BlockGetter getChunkForCollisions(int chunkX, int chunkZ) {
+        return this.handle.getChunkForCollisions(chunkX, chunkZ);
+    }
+
+    @Override
+    public boolean isWaterAt(BlockPos pos) {
+        return this.handle.isWaterAt(pos);
+    }
+
+    @Override
+    public boolean containsAnyLiquid(AABB box) {
+        return this.handle.containsAnyLiquid(box);
+    }
+
+    @Override
+    public int getMaxLocalRawBrightness(BlockPos pos) {
+        return this.handle.getMaxLocalRawBrightness(pos);
+    }
+
+    @Override
+    public int getMaxLocalRawBrightness(BlockPos pos, int ambientDarkness) {
+        return this.handle.getMaxLocalRawBrightness(pos, ambientDarkness);
+    }
+
+    @Override
+    public boolean hasChunkAt(int x, int z) {
+        return this.handle.hasChunkAt(x, z);
+    }
+
+    @Override
+    public boolean hasChunkAt(BlockPos pos) {
+        return this.handle.hasChunkAt(pos);
+    }
+
+    @Override
+    public boolean hasChunksAt(BlockPos min, BlockPos max) {
+        return this.handle.hasChunksAt(min, max);
+    }
+
+    @Override
+    public boolean hasChunksAt(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        return this.handle.hasChunksAt(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    @Override
+    public boolean hasChunksAt(int minX, int minZ, int maxX, int maxZ) {
+        return this.handle.hasChunksAt(minX, minZ, maxX, maxZ);
+    }
+
+    @Override
+    public RegistryAccess registryAccess() {
+        return this.handle.registryAccess();
+    }
+
+    @Override
+    public FeatureFlagSet enabledFeatures() {
+        return this.handle.enabledFeatures();
+    }
+
+    @Override
+    public <T> HolderLookup<T> holderLookup(ResourceKey<? extends Registry<? extends T>> registryRef) {
+        return this.handle.holderLookup(registryRef);
+    }
+
+    @Override
+    public float getShade(Direction direction, boolean shaded) {
+        return this.handle.getShade(direction, shaded);
     }
 
     @Override
@@ -546,113 +460,18 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
-    public float getShade(Direction direction, boolean shaded) {
-        return this.handle.getShade(direction, shaded);
+    public int getRawBrightness(BlockPos pos, int ambientDarkness) {
+        return this.handle.getRawBrightness(pos, ambientDarkness);
     }
 
     @Override
-    public BlockEntity getBlockEntity(BlockPos pos) {
-        return this.handle.getBlockEntity(pos);
+    public boolean canSeeSky(BlockPos pos) {
+        return this.handle.canSeeSky(pos);
     }
 
     @Override
-    public double getBlockFloorHeight(VoxelShape blockCollisionShape, Supplier<VoxelShape> belowBlockCollisionShapeGetter) {
-        return this.handle.getBlockFloorHeight(blockCollisionShape, belowBlockCollisionShapeGetter);
-    }
-
-    @Override
-    public double getBlockFloorHeight(BlockPos pos) {
-        return this.handle.getBlockFloorHeight(pos);
-    }
-
-    @Override
-    public BlockHitResult clipWithInteractionOverride(Vec3 start, Vec3 end, BlockPos pos, VoxelShape shape, BlockState state) {
-        return this.handle.clipWithInteractionOverride(start, end, pos, shape, state);
-    }
-
-    @Override
-    public BlockState getBlockState(BlockPos pos) {
-        return this.handle.getBlockState(pos);
-    }
-
-    @Override
-    public FluidState getFluidState(BlockPos pos) {
-        return this.handle.getFluidState(pos);
-    }
-
-    @Override
-    public int getLightEmission(BlockPos pos) {
-        return this.handle.getLightEmission(pos);
-    }
-
-    @Override
-    public BlockHitResult clip(ClipContext context) {
-        return this.handle.clip(context);
-    }
-
-    @Override
-    public BlockHitResult clip(ClipContext arg0, BlockPos arg1) {
-        return this.handle.clip(arg0, arg1);
-    }
-
-    @Override
-    public int getMaxLightLevel() {
-        return this.handle.getMaxLightLevel();
-    }
-
-    @Override
-    public BlockHitResult isBlockInLine(ClipBlockStateContext context) {
-        return this.handle.isBlockInLine(context);
-    }
-
-    @Override
-    public Stream<BlockState> getBlockStates(AABB box) {
-        return this.handle.getBlockStates(box);
-    }
-
-    @Override
-    public boolean isOutsideBuildHeight(int y) {
-        return this.handle.isOutsideBuildHeight(y);
-    }
-
-    @Override
-    public boolean isOutsideBuildHeight(BlockPos pos) {
-        return this.handle.isOutsideBuildHeight(pos);
-    }
-
-    @Override
-    public int getSectionIndexFromSectionY(int coord) {
-        return this.handle.getSectionIndexFromSectionY(coord);
-    }
-
-    @Override
-    public int getSectionYFromSectionIndex(int index) {
-        return this.handle.getSectionYFromSectionIndex(index);
-    }
-
-    @Override
-    public int getMaxSection() {
-        return this.handle.getMaxSection();
-    }
-
-    @Override
-    public int getMinSection() {
-        return this.handle.getMinSection();
-    }
-
-    @Override
-    public int getSectionIndex(int y) {
-        return this.handle.getSectionIndex(y);
-    }
-
-    @Override
-    public int getSectionsCount() {
-        return this.handle.getSectionsCount();
-    }
-
-    @Override
-    public int getMaxBuildHeight() {
-        return this.handle.getMaxBuildHeight();
+    public WorldBorder getWorldBorder() {
+        return this.handle.getWorldBorder();
     }
 
     @Override
@@ -663,26 +482,6 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     @Override
     public boolean isUnobstructed(Entity entity) {
         return this.handle.isUnobstructed(entity);
-    }
-
-    @Override
-    public WorldBorder getWorldBorder() {
-        return this.handle.getWorldBorder();
-    }
-
-    @Override
-    public Optional<Vec3> findFreePosition(Entity entity, VoxelShape shape, Vec3 target, double x, double y, double z) {
-        return this.handle.findFreePosition(entity, shape, target, x, y, z);
-    }
-
-    @Override
-    public Iterable<VoxelShape> getCollisions(Entity entity, AABB box) {
-        return this.handle.getCollisions(entity, box);
-    }
-
-    @Override
-    public Iterable<VoxelShape> getBlockCollisions(Entity entity, AABB box) {
-        return this.handle.getBlockCollisions(entity, box);
     }
 
     @Override
@@ -701,6 +500,36 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
+    public boolean noCollision(Entity entity, AABB box, boolean checkFluid) {
+        return this.handle.noCollision(entity, box, checkFluid);
+    }
+
+    @Override
+    public boolean noBlockCollision(Entity entity, AABB box) {
+        return this.handle.noBlockCollision(entity, box);
+    }
+
+    @Override
+    public Iterable<VoxelShape> getCollisions(Entity entity, AABB box) {
+        return this.handle.getCollisions(entity, box);
+    }
+
+    @Override
+    public Iterable<VoxelShape> getBlockCollisions(Entity entity, AABB box) {
+        return this.handle.getBlockCollisions(entity, box);
+    }
+
+    @Override
+    public Iterable<VoxelShape> getBlockAndLiquidCollisions(Entity entity, AABB box) {
+        return this.handle.getBlockAndLiquidCollisions(entity, box);
+    }
+
+    @Override
+    public BlockHitResult clipIncludingBorder(ClipContext context) {
+        return this.handle.clipIncludingBorder(context);
+    }
+
+    @Override
     public boolean collidesWithSuffocatingBlock(Entity entity, AABB box) {
         return this.handle.collidesWithSuffocatingBlock(entity, box);
     }
@@ -711,13 +540,8 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
-    public int getBestNeighborSignal(BlockPos pos) {
-        return this.handle.getBestNeighborSignal(pos);
-    }
-
-    @Override
-    public int getControlInputSignal(BlockPos pos, Direction direction, boolean onlyFromGate) {
-        return this.handle.getControlInputSignal(pos, direction, onlyFromGate);
+    public Optional<Vec3> findFreePosition(Entity entity, VoxelShape shape, Vec3 target, double x, double y, double z) {
+        return this.handle.findFreePosition(entity, shape, target, x, y, z);
     }
 
     @Override
@@ -731,8 +555,8 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
-    public boolean hasNeighborSignal(BlockPos pos) {
-        return this.handle.hasNeighborSignal(pos);
+    public int getControlInputSignal(BlockPos pos, Direction direction, boolean onlyFromGate) {
+        return this.handle.getControlInputSignal(pos, direction, onlyFromGate);
     }
 
     @Override
@@ -746,48 +570,123 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
-    public boolean isStateAtPosition(BlockPos pos, Predicate<BlockState> state) {
-        return this.handle.isStateAtPosition(pos, state);
+    public boolean hasNeighborSignal(BlockPos pos) {
+        return this.handle.hasNeighborSignal(pos);
     }
 
     @Override
-    public boolean isFluidAtPosition(BlockPos pos, Predicate<FluidState> state) {
-        return this.handle.isFluidAtPosition(pos, state);
+    public int getBestNeighborSignal(BlockPos pos) {
+        return this.handle.getBestNeighborSignal(pos);
     }
 
     @Override
-    public boolean addFreshEntity(Entity arg0, CreatureSpawnEvent.SpawnReason arg1) {
-        return this.handle.addFreshEntity(arg0, arg1);
+    public BlockEntity getBlockEntity(BlockPos pos) {
+        return this.handle.getBlockEntity(pos);
     }
 
     @Override
-    public boolean addFreshEntity(Entity entity) {
-        return this.handle.addFreshEntity(entity);
+    public BlockState getBlockState(BlockPos pos) {
+        return this.handle.getBlockState(pos);
     }
 
     @Override
-    public boolean removeBlock(BlockPos pos, boolean move) {
-        return this.handle.removeBlock(pos, move);
+    public FluidState getFluidState(BlockPos pos) {
+        return this.handle.getFluidState(pos);
     }
 
     @Override
-    public boolean destroyBlock(BlockPos pos, boolean drop, Entity breakingEntity, int maxUpdateDepth) {
-        return this.handle.destroyBlock(pos, drop, breakingEntity, maxUpdateDepth);
+    public int getLightEmission(BlockPos pos) {
+        return this.handle.getLightEmission(pos);
     }
 
     @Override
-    public boolean destroyBlock(BlockPos pos, boolean drop, Entity breakingEntity) {
-        return this.handle.destroyBlock(pos, drop, breakingEntity);
+    public Stream<BlockState> getBlockStates(AABB box) {
+        return this.handle.getBlockStates(box);
     }
 
     @Override
-    public boolean destroyBlock(BlockPos pos, boolean drop) {
-        return this.handle.destroyBlock(pos, drop);
+    public BlockHitResult isBlockInLine(ClipBlockStateContext context) {
+        return this.handle.isBlockInLine(context);
     }
 
     @Override
-    public boolean setBlock(BlockPos pos, BlockState state, int flags) {
-        return this.handle.setBlock(pos, state, flags);
+    public BlockHitResult clip(ClipContext raytrace1, BlockPos blockposition) {
+        return this.handle.clip(raytrace1, blockposition);
+    }
+
+    @Override
+    public BlockHitResult clip(ClipContext context) {
+        return this.handle.clip(context);
+    }
+
+    @Override
+    public BlockHitResult clipWithInteractionOverride(Vec3 start, Vec3 end, BlockPos pos, VoxelShape shape, BlockState state) {
+        return this.handle.clipWithInteractionOverride(start, end, pos, shape, state);
+    }
+
+    @Override
+    public double getBlockFloorHeight(VoxelShape blockCollisionShape, Supplier<VoxelShape> belowBlockCollisionShapeGetter) {
+        return this.handle.getBlockFloorHeight(blockCollisionShape, belowBlockCollisionShapeGetter);
+    }
+
+    @Override
+    public double getBlockFloorHeight(BlockPos pos) {
+        return this.handle.getBlockFloorHeight(pos);
+    }
+
+    @Override
+    public List<Entity> getEntities(Entity except, AABB box, Predicate<? super Entity> predicate) {
+        return this.handle.getEntities(except, box, predicate);
+    }
+
+    @Override
+    public <T extends Entity> List<T> getEntities(EntityTypeTest<Entity, T> filter, AABB box, Predicate<? super T> predicate) {
+        return this.handle.getEntities(filter, box, predicate);
+    }
+
+    @Override
+    public <T extends Entity> List<T> getEntitiesOfClass(Class<T> entityClass, AABB box, Predicate<? super T> predicate) {
+        return this.handle.getEntitiesOfClass(entityClass, box, predicate);
+    }
+
+    @Override
+    public List<? extends Player> players() {
+        return this.handle.players();
+    }
+
+    @Override
+    public List<Entity> getEntities(Entity except, AABB box) {
+        return this.handle.getEntities(except, box);
+    }
+
+    @Override
+    public <T extends Entity> List<T> getEntitiesOfClass(Class<T> entityClass, AABB box) {
+        return this.handle.getEntitiesOfClass(entityClass, box);
+    }
+
+    @Override
+    public Player getNearestPlayer(double x, double y, double z, double maxDistance, Predicate<Entity> targetPredicate) {
+        return this.handle.getNearestPlayer(x, y, z, maxDistance, targetPredicate);
+    }
+
+    @Override
+    public Player getNearestPlayer(Entity entity, double maxDistance) {
+        return this.handle.getNearestPlayer(entity, maxDistance);
+    }
+
+    @Override
+    public Player getNearestPlayer(double x, double y, double z, double maxDistance, boolean ignoreCreative) {
+        return this.handle.getNearestPlayer(x, y, z, maxDistance, ignoreCreative);
+    }
+
+    @Override
+    public boolean hasNearbyAlivePlayer(double x, double y, double z, double range) {
+        return this.handle.hasNearbyAlivePlayer(x, y, z, range);
+    }
+
+    @Override
+    public Player getPlayerByUUID(UUID uuid) {
+        return this.handle.getPlayerByUUID(uuid);
     }
 
     @Override
@@ -796,17 +695,97 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
-    public float getTimeOfDay(float tickDelta) {
-        return this.handle.getTimeOfDay(tickDelta);
+    public boolean setBlock(BlockPos pos, BlockState state, int flags) {
+        return this.handle.setBlock(pos, state, flags);
     }
 
     @Override
-    public float getMoonBrightness() {
-        return this.handle.getMoonBrightness();
+    public boolean removeBlock(BlockPos pos, boolean move) {
+        return this.handle.removeBlock(pos, move);
     }
 
     @Override
-    public int getMoonPhase() {
-        return this.handle.getMoonPhase();
+    public boolean destroyBlock(BlockPos pos, boolean drop) {
+        return this.handle.destroyBlock(pos, drop);
+    }
+
+    @Override
+    public boolean destroyBlock(BlockPos pos, boolean drop, Entity breakingEntity) {
+        return this.handle.destroyBlock(pos, drop, breakingEntity);
+    }
+
+    @Override
+    public boolean destroyBlock(BlockPos pos, boolean drop, Entity breakingEntity, int maxUpdateDepth) {
+        return this.handle.destroyBlock(pos, drop, breakingEntity, maxUpdateDepth);
+    }
+
+    @Override
+    public boolean addFreshEntity(Entity entity) {
+        return this.handle.addFreshEntity(entity);
+    }
+
+    @Override
+    public boolean addFreshEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
+        return this.handle.addFreshEntity(entity, reason);
+    }
+
+    @Override
+    public int getMaxY() {
+        return this.handle.getMaxY();
+    }
+
+    @Override
+    public int getSectionsCount() {
+        return this.handle.getSectionsCount();
+    }
+
+    @Override
+    public int getMinSectionY() {
+        return this.handle.getMinSectionY();
+    }
+
+    @Override
+    public int getMaxSectionY() {
+        return this.handle.getMaxSectionY();
+    }
+
+    @Override
+    public boolean isInsideBuildHeight(int y) {
+        return this.handle.isInsideBuildHeight(y);
+    }
+
+    @Override
+    public boolean isOutsideBuildHeight(BlockPos pos) {
+        return this.handle.isOutsideBuildHeight(pos);
+    }
+
+    @Override
+    public boolean isOutsideBuildHeight(int y) {
+        return this.handle.isOutsideBuildHeight(y);
+    }
+
+    @Override
+    public int getSectionIndex(int y) {
+        return this.handle.getSectionIndex(y);
+    }
+
+    @Override
+    public int getSectionIndexFromSectionY(int coord) {
+        return this.handle.getSectionIndexFromSectionY(coord);
+    }
+
+    @Override
+    public int getSectionYFromSectionIndex(int index) {
+        return this.handle.getSectionYFromSectionIndex(index);
+    }
+
+    @Override
+    public boolean isStateAtPosition(BlockPos pos, Predicate<BlockState> state) {
+        return this.handle.isStateAtPosition(pos, state);
+    }
+
+    @Override
+    public boolean isFluidAtPosition(BlockPos pos, Predicate<FluidState> state) {
+        return this.handle.isFluidAtPosition(pos, state);
     }
 }

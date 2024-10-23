@@ -14,22 +14,22 @@ public class CraftTNTPrimed extends CraftEntity implements TNTPrimed {
 
     @Override
     public float getYield() {
-        return this.getHandle().bridge$yield();
+        return this.getHandle().explosionPower;
     }
 
     @Override
     public boolean isIncendiary() {
-        return this.getHandle().bridge$isIncendiary();
+        return this.getHandle().isIncendiary;
     }
 
     @Override
     public void setIsIncendiary(boolean isIncendiary) {
-        this.getHandle().banner$setIsIncendiary(isIncendiary);
+        this.getHandle().isIncendiary = isIncendiary;
     }
 
     @Override
     public void setYield(float yield) {
-        this.getHandle().banner$setYield(yield);
+        this.getHandle().explosionPower = yield;
     }
 
     @Override

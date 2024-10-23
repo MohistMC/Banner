@@ -218,7 +218,8 @@ class CraftMetaFirework extends CraftMetaItem implements FireworkMeta {
         return !(this.hasEffects() || this.hasPower());
     }
 
-    boolean hasPower() {
+    @Override
+    public boolean hasPower() {
         return this.power != null;
     }
 
@@ -340,7 +341,7 @@ class CraftMetaFirework extends CraftMetaItem implements FireworkMeta {
 
     @Override
     public int getPower() {
-        return this.hasPower() ? this.power : 1;
+        return this.hasPower() ? this.power : 0;
     }
 
     @Override

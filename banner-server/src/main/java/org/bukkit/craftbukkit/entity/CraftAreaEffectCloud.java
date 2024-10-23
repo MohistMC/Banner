@@ -131,7 +131,7 @@ public class CraftAreaEffectCloud extends CraftEntity implements AreaEffectCloud
     @Override
     public void setColor(Color color) {
         PotionContents old = this.getHandle().potionContents;
-        this.getHandle().setPotionContents(new PotionContents(old.potion(), Optional.of(color.asRGB()), old.customEffects()));
+        this.getHandle().setPotionContents(new PotionContents(old.potion(), Optional.of(color.asRGB()), old.customEffects(), old.customName()));
     }
 
     @Override
@@ -150,7 +150,7 @@ public class CraftAreaEffectCloud extends CraftEntity implements AreaEffectCloud
     @Override
     public void clearCustomEffects() {
         PotionContents old = this.getHandle().potionContents;
-        this.getHandle().setPotionContents(new PotionContents(old.potion(), old.customColor(), List.of()));
+        this.getHandle().setPotionContents(new PotionContents(old.potion(), old.customColor(), List.of(), old.customName()));
         this.getHandle().updateColor();
     }
 
@@ -186,7 +186,7 @@ public class CraftAreaEffectCloud extends CraftEntity implements AreaEffectCloud
         Holder<MobEffect> minecraft = CraftPotionEffectType.bukkitToMinecraftHolder(effect);
 
         PotionContents old = this.getHandle().potionContents;
-        this.getHandle().setPotionContents(new PotionContents(old.potion(), old.customColor(), old.customEffects().stream().filter((mobEffect) -> !mobEffect.getEffect().equals(minecraft)).toList()));
+        this.getHandle().setPotionContents(new PotionContents(old.potion(), old.customColor(), old.customEffects().stream().filter((mobEffect) -> !mobEffect.getEffect().equals(minecraft)).toList(), old.customName()));
         return true;
     }
 
@@ -206,7 +206,7 @@ public class CraftAreaEffectCloud extends CraftEntity implements AreaEffectCloud
             this.getHandle().setPotionContents(this.getHandle().potionContents.withPotion(CraftPotionType.bukkitToMinecraftHolder(potionType)));
         } else {
             PotionContents old = this.getHandle().potionContents;
-            this.getHandle().setPotionContents(new PotionContents(Optional.empty(), old.customColor(), old.customEffects()));
+            this.getHandle().setPotionContents(new PotionContents(Optional.empty(), old.customColor(), old.customEffects(), old.customName()));
         }
     }
 

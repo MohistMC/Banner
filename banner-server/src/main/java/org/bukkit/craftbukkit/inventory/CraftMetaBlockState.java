@@ -25,6 +25,7 @@ import org.bukkit.craftbukkit.block.CraftBlockEntityState;
 import org.bukkit.craftbukkit.block.CraftBlockStates;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.util.BlockVector;
 
 @DelegateDeserialization(SerializableMeta.class)
 public class CraftMetaBlockState extends CraftMetaItem implements BlockStateMeta {
@@ -54,6 +55,7 @@ public class CraftMetaBlockState extends CraftMetaItem implements BlockStateMeta
 
     final Material material;
     private CraftBlockEntityState<?> blockEntityTag;
+    private BlockVector position;
     private CompoundTag internalTag;
 
     CraftMetaBlockState(CraftMetaItem meta, Material material) {
@@ -68,14 +70,20 @@ public class CraftMetaBlockState extends CraftMetaItem implements BlockStateMeta
 
         CraftMetaBlockState te = (CraftMetaBlockState) meta;
         this.blockEntityTag = te.blockEntityTag;
+        this.position = te.position;
     }
 
     CraftMetaBlockState(DataComponentPatch tag, Material material) {
         super(tag);
         this.material = material;
 
-        getOrEmpty(tag, CraftMetaBlockState.BLOCK_ENTITY_TAG).ifPresent((nbt) -> {
-            this.blockEntityTag = CraftMetaBlockState.getBlockState(material, nbt.copyTag());
+        getOrEmpty(tag, CraftMetaBlockState.BLOCK_ENTITY_TAG).ifPresent((blockTag) -> {
+            CompoundTag nbt = blockTag.copyTag();
+
+            this.blockEntityTag = CraftMetaBlockState.getBlockState(material, nbt);
+            if (nbt.contains("x", CraftMagicNumbers.NBT.TAG_ANY_NUMBER) && nbt.contains("y", CraftMagicNumbers.NBT.TAG_ANY_NUMBER) && nbt.contains("z", CraftMagicNumbers.NBT.TAG_ANY_NUMBER)) {
+                this.position = new BlockVector(nbt.getInt("x"), nbt.getInt("y"), nbt.getInt("z"));
+            }
         });
 
         if (!tag.isEmpty()) {
@@ -113,18 +121,38 @@ public class CraftMetaBlockState extends CraftMetaItem implements BlockStateMeta
             this.blockEntityTag = CraftMetaBlockState.getBlockState(this.material, this.internalTag);
             this.internalTag = null;
         }
+        this.position = SerializableMeta.getObject(BlockVector.class, map, "blockPosition", true);
     }
 
     @Override
     void applyToItem(CraftMetaItem.Applicator tag) {
         super.applyToItem(tag);
 
+        CompoundTag nbt = null;
         if (this.blockEntityTag != null) {
-            tag.put(CraftMetaBlockState.BLOCK_ENTITY_TAG, CustomData.of(this.blockEntityTag.getSnapshotNBTWithoutComponents()));
+            nbt = this.blockEntityTag.getItemNBT();
 
             for (TypedDataComponent<?> component : this.blockEntityTag.collectComponents()) {
                 tag.putIfAbsent(component);
             }
+        }
+
+        if (this.position != null) {
+            if (nbt == null) {
+                nbt = new CompoundTag();
+            }
+
+            nbt.putInt("x", this.position.getBlockX());
+            nbt.putInt("y", this.position.getBlockY());
+            nbt.putInt("z", this.position.getBlockZ());
+        }
+
+        if (nbt != null && !nbt.isEmpty()) {
+            CraftBlockEntityState<?> tile = (this.blockEntityTag != null) ? this.blockEntityTag : CraftMetaBlockState.getBlockState(this.material, null);
+            // See ItemBlock#setBlockEntityData
+            tile.addEntityType(nbt);
+
+            tag.put(CraftMetaBlockState.BLOCK_ENTITY_TAG, CustomData.of(nbt));
         }
     }
 
@@ -148,6 +176,9 @@ public class CraftMetaBlockState extends CraftMetaItem implements BlockStateMeta
     ImmutableMap.Builder<String, Object> serialize(ImmutableMap.Builder<String, Object> builder) {
         super.serialize(builder);
         builder.put("blockMaterial", this.material.name());
+        if (this.position != null) {
+            builder.put("blockPosition", this.position);
+        }
         return builder;
     }
 
@@ -157,6 +188,9 @@ public class CraftMetaBlockState extends CraftMetaItem implements BlockStateMeta
         int hash = original = super.applyHash();
         if (this.blockEntityTag != null) {
             hash = 61 * hash + this.blockEntityTag.hashCode();
+        }
+        if (this.position != null) {
+            hash = 61 * hash + this.position.hashCode();
         }
         return original != hash ? CraftMetaBlockState.class.hashCode() ^ hash : hash;
     }
@@ -169,19 +203,23 @@ public class CraftMetaBlockState extends CraftMetaItem implements BlockStateMeta
         if (meta instanceof CraftMetaBlockState) {
             CraftMetaBlockState that = (CraftMetaBlockState) meta;
 
-            return Objects.equal(this.blockEntityTag, that.blockEntityTag);
+            return Objects.equal(this.blockEntityTag, that.blockEntityTag) && Objects.equal(this.position, that.position);
         }
         return true;
     }
 
+    boolean isBlockStateEmpty() {
+        return !(this.blockEntityTag != null || this.position != null);
+    }
+
     @Override
     boolean notUncommon(CraftMetaItem meta) {
-        return super.notUncommon(meta) && (meta instanceof CraftMetaBlockState || this.blockEntityTag == null);
+        return super.notUncommon(meta) && (meta instanceof CraftMetaBlockState || this.isBlockStateEmpty());
     }
 
     @Override
     boolean isEmpty() {
-        return super.isEmpty() && this.blockEntityTag == null;
+        return super.isEmpty() && this.isBlockStateEmpty();
     }
 
     @Override
@@ -189,6 +227,9 @@ public class CraftMetaBlockState extends CraftMetaItem implements BlockStateMeta
         CraftMetaBlockState meta = (CraftMetaBlockState) super.clone();
         if (this.blockEntityTag != null) {
             meta.blockEntityTag = this.blockEntityTag.copy();
+        }
+        if (this.position != null) {
+            meta.position = this.position.clone();
         }
         return meta;
     }

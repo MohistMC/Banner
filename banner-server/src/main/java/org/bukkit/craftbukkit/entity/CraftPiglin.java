@@ -33,7 +33,7 @@ public class CraftPiglin extends CraftPiglinAbstract implements Piglin {
         Preconditions.checkArgument(material != null, "material cannot be null");
 
         Item item = CraftItemType.bukkitToMinecraft(material);
-        return this.getHandle().bridge$allowedBarterItems().add(item);
+        return this.getHandle().allowedBarterItems.add(item);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class CraftPiglin extends CraftPiglinAbstract implements Piglin {
         Preconditions.checkArgument(material != null, "material cannot be null");
 
         Item item = CraftItemType.bukkitToMinecraft(material);
-        return this.getHandle().bridge$allowedBarterItems().remove(item);
+        return this.getHandle().allowedBarterItems.remove(item);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class CraftPiglin extends CraftPiglinAbstract implements Piglin {
         Preconditions.checkArgument(material != null, "material cannot be null");
 
         Item item = CraftItemType.bukkitToMinecraft(material);
-        return this.getHandle().bridge$interestItems().add(item);
+        return this.getHandle().interestItems.add(item);
     }
 
     @Override
@@ -57,17 +57,17 @@ public class CraftPiglin extends CraftPiglinAbstract implements Piglin {
         Preconditions.checkArgument(material != null, "material cannot be null");
 
         Item item = CraftItemType.bukkitToMinecraft(material);
-        return this.getHandle().bridge$interestItems().remove(item);
+        return this.getHandle().interestItems.remove(item);
     }
 
     @Override
     public Set<Material> getInterestList() {
-        return Collections.unmodifiableSet(this.getHandle().bridge$interestItems().stream().map(CraftItemType::minecraftToBukkit).collect(Collectors.toSet()));
+        return Collections.unmodifiableSet(this.getHandle().interestItems.stream().map(CraftItemType::minecraftToBukkit).collect(Collectors.toSet()));
     }
 
     @Override
     public Set<Material> getBarterList() {
-        return Collections.unmodifiableSet(this.getHandle().bridge$allowedBarterItems().stream().map(CraftItemType::minecraftToBukkit).collect(Collectors.toSet()));
+        return Collections.unmodifiableSet(this.getHandle().allowedBarterItems.stream().map(CraftItemType::minecraftToBukkit).collect(Collectors.toSet()));
     }
 
     @Override

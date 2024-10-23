@@ -1,8 +1,8 @@
 package org.bukkit.craftbukkit.entity;
 
 import com.google.common.base.Preconditions;
-import com.mohistmc.banner.fabric.BukkitRegistry;
 import java.util.Locale;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
@@ -18,11 +18,7 @@ public class CraftEntityType {
         Preconditions.checkArgument(minecraft != null);
 
         net.minecraft.core.Registry<net.minecraft.world.entity.EntityType<?>> registry = CraftRegistry.getMinecraftRegistry(Registries.ENTITY_TYPE);
-        NamespacedKey key = CraftNamespacedKey.fromMinecraft(registry.getResourceKey(minecraft).orElseThrow().location());
-        if (BukkitRegistry.entityTypeMap.containsKey(key)) {
-            return BukkitRegistry.entityTypeMap.get(key);
-        }
-        EntityType bukkit = Registry.ENTITY_TYPE.get(key);
+        EntityType bukkit = Registry.ENTITY_TYPE.get(CraftNamespacedKey.fromMinecraft(registry.getResourceKey(minecraft).orElseThrow().location()));
 
         Preconditions.checkArgument(bukkit != null);
 
@@ -34,6 +30,19 @@ public class CraftEntityType {
 
         return CraftRegistry.getMinecraftRegistry(Registries.ENTITY_TYPE)
                 .getOptional(CraftNamespacedKey.toMinecraft(bukkit.getKey())).orElseThrow();
+    }
+
+    public static Holder<net.minecraft.world.entity.EntityType<?>> bukkitToMinecraftHolder(EntityType bukkit) {
+        Preconditions.checkArgument(bukkit != null);
+
+        net.minecraft.core.Registry<net.minecraft.world.entity.EntityType<?>> registry = CraftRegistry.getMinecraftRegistry(Registries.ENTITY_TYPE);
+
+        if (registry.wrapAsHolder(CraftEntityType.bukkitToMinecraft(bukkit)) instanceof Holder.Reference<net.minecraft.world.entity.EntityType<?>> holder) {
+            return holder;
+        }
+
+        throw new IllegalArgumentException("No Reference holder found for " + bukkit
+                + ", this can happen if a plugin creates its own sound effect with out properly registering it.");
     }
 
     public static String bukkitToString(EntityType bukkit) {

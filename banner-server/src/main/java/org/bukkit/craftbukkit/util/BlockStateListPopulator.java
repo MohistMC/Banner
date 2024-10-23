@@ -113,8 +113,8 @@ public class BlockStateListPopulator extends DummyGeneratorAccess {
 
     // For tree generation
     @Override
-    public int getMinBuildHeight() {
-        return this.getWorld().getMinBuildHeight();
+    public int getMinY() {
+        return this.getWorld().getMinY();
     }
 
     @Override

@@ -13,6 +13,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.SculkChargeParticleOptions;
 import net.minecraft.core.particles.ShriekParticleOption;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.core.particles.TargetColorParticleOption;
 import net.minecraft.core.particles.VibrationParticleOption;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.Entity;
@@ -36,7 +37,6 @@ import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.util.CraftNamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
-import org.joml.Vector3f;
 
 public abstract class CraftParticle<D> implements Keyed {
 
@@ -123,7 +123,7 @@ public abstract class CraftParticle<D> implements Keyed {
                 @Override
                 public ParticleOptions createParticleParam(Particle.DustOptions data) {
                     Color color = data.getColor();
-                    return new DustParticleOptions(new Vector3f(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f), data.getSize());
+                    return new DustParticleOptions(color.asRGB(), data.getSize());
                 }
             };
 
@@ -146,7 +146,7 @@ public abstract class CraftParticle<D> implements Keyed {
                 public ParticleOptions createParticleParam(Particle.DustTransition data) {
                     Color from = data.getColor();
                     Color to = data.getToColor();
-                    return new DustColorTransitionOptions(new Vector3f(from.getRed() / 255.0f, from.getGreen() / 255.0f, from.getBlue() / 255.0f), new Vector3f(to.getRed() / 255.0f, to.getGreen() / 255.0f, to.getBlue() / 255.0f), data.getSize());
+                    return new DustColorTransitionOptions(from.asRGB(), to.asRGB(), data.getSize());
                 }
             };
 
@@ -189,6 +189,13 @@ public abstract class CraftParticle<D> implements Keyed {
                 }
             };
 
+            BiFunction<NamespacedKey, net.minecraft.core.particles.ParticleType<?>, CraftParticle<?>> targetColorFunction = (name, particle) -> new CraftParticle<>(name, particle, Particle.TargetColor.class) {
+                @Override
+                public ParticleOptions createParticleParam(Particle.TargetColor data) {
+                    return new TargetColorParticleOption(CraftLocation.toVec3D(data.getTarget()), data.getColor().asRGB());
+                }
+            };
+
             add("dust", dustOptionsFunction);
             add("item", itemStackFunction);
             add("block", blockDataFunction);
@@ -200,6 +207,8 @@ public abstract class CraftParticle<D> implements Keyed {
             add("block_marker", blockDataFunction);
             add("entity_effect", colorFunction);
             add("dust_pillar", blockDataFunction);
+            add("block_crumble", blockDataFunction);
+            add("trail", targetColorFunction);
         }
 
         private static void add(String name, BiFunction<NamespacedKey, net.minecraft.core.particles.ParticleType<?>, CraftParticle<?>> function) {

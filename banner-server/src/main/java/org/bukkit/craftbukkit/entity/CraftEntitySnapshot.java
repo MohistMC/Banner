@@ -3,6 +3,7 @@ package org.bukkit.craftbukkit.entity;
 import com.google.common.base.Preconditions;
 import java.util.function.Function;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.EntitySpawnReason;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
@@ -48,9 +49,9 @@ public class CraftEntitySnapshot implements EntitySnapshot {
 
     private net.minecraft.world.entity.Entity createInternal(World world) {
         net.minecraft.world.level.Level nms = ((CraftWorld) world).getHandle();
-        net.minecraft.world.entity.Entity internal = net.minecraft.world.entity.EntityType.loadEntityRecursive(this.data, nms, Function.identity());
+        net.minecraft.world.entity.Entity internal = net.minecraft.world.entity.EntityType.loadEntityRecursive(this.data, nms, EntitySpawnReason.LOAD, Function.identity());
         if (internal == null) { // Try creating by type
-            internal = CraftEntityType.bukkitToMinecraft(this.type).create(nms);
+            internal = CraftEntityType.bukkitToMinecraft(this.type).create(nms, EntitySpawnReason.LOAD);
         }
 
         Preconditions.checkArgument(internal != null, "Error creating new entity."); // This should only fail if the stored NBTTagCompound is malformed.
@@ -65,8 +66,7 @@ public class CraftEntitySnapshot implements EntitySnapshot {
 
     public static CraftEntitySnapshot create(CraftEntity entity) {
         CompoundTag tag = new CompoundTag();
-        // Banner TODO fixme
-        if (!entity.getHandle().saveAsPassenger(tag)) {
+        if (!entity.getHandle().saveAsPassenger(tag, false)) {
             return null;
         }
 

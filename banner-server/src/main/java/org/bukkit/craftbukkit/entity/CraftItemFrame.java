@@ -25,7 +25,7 @@ public class CraftItemFrame extends CraftHanging implements ItemFrame {
         Preconditions.checkArgument(newDir != null, "%s is not a valid facing direction", face);
 
         this.getHandle().setDirection(newDir);
-        if (!force && !this.getHandle().bridge$generation() && !hanging.survives()) {
+        if (!force && !this.getHandle().generation && !hanging.survives()) {
             hanging.setDirection(oldDir);
             return false;
         }
@@ -44,7 +44,7 @@ public class CraftItemFrame extends CraftHanging implements ItemFrame {
         this.getHandle().getEntityData().markDirty(net.minecraft.world.entity.decoration.ItemFrame.DATA_ROTATION);
 
         // update redstone
-        if (!this.getHandle().bridge$generation()) {
+        if (!this.getHandle().generation) {
             this.getHandle().level().updateNeighbourForOutputSignal(this.getHandle().getPos(), Blocks.AIR);
         }
     }
@@ -57,7 +57,7 @@ public class CraftItemFrame extends CraftHanging implements ItemFrame {
     @Override
     public void setItem(org.bukkit.inventory.ItemStack item, boolean playSound) {
         // only updated redstone and play sound when it is not in generation
-        this.getHandle().setItem(CraftItemStack.asNMSCopy(item), !this.getHandle().bridge$generation(), !this.getHandle().bridge$generation() && playSound);
+        this.getHandle().setItem(CraftItemStack.asNMSCopy(item), !this.getHandle().generation, !this.getHandle().generation && playSound);
     }
 
     @Override
