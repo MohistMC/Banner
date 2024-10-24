@@ -165,7 +165,7 @@ dependencies {
     include(project("banner-server"))
     include(project("banner-plugin"))
     include(project("banner-bootstrap"))
-    include("net.minecraft:server:${project.minecraft_version}")
+    //include("net.minecraft:server:${project.minecraft_version}")
 }
 
 tasks.withType(JavaCompile).configureEach {
