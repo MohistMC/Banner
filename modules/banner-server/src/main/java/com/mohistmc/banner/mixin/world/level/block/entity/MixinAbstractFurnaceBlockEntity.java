@@ -74,6 +74,8 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
         super(blockEntityType, blockPos, blockState);
     }
 
+    // Banner TODO fixme
+    /*
     @Eject(method = "serverTick",
             at = @At(value = "INVOKE", ordinal = 3,
             target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;isLit()Z"))
@@ -88,7 +90,7 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
             return false;
         }
         return furnace.isLit() && furnaceBurnEvent.isBurning();
-    }
+    }*/
 
     @Redirect(method = "createExperience", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ExperienceOrb;award(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;I)V"))
     private static void banner$expEvent(ServerLevel level, Vec3 vec3, int amount) {

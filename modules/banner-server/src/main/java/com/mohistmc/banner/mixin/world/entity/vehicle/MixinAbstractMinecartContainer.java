@@ -39,12 +39,14 @@ public abstract class MixinAbstractMinecartContainer extends AbstractMinecart im
         transaction = new ArrayList<>();
     }
 
+    // Banner TODO fixme
+    /*
     @Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;DDDLnet/minecraft/world/level/Level;)V", at = @At("RETURN"))
     private void banner$init(EntityType<?> type, double x, double y, double z, Level world, CallbackInfo ci) {
         this.itemStacks = NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
         maxStack = MAX_STACK;
         transaction = new ArrayList<>();
-    }
+    }*/
 
     @Override
     public List<ItemStack> getContents() {

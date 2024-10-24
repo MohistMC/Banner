@@ -32,8 +32,6 @@ public abstract class MixinEnderMan extends Monster {
     @Shadow @Final private static EntityDataAccessor<Boolean> DATA_STARED_AT;
     @Shadow @Final private static AttributeModifier SPEED_MODIFIER_ATTACKING;
 
-    @Shadow abstract boolean isLookingAtMe(Player player);
-
     protected MixinEnderMan(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
     }

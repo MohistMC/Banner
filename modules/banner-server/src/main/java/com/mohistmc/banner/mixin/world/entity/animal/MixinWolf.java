@@ -23,9 +23,12 @@ public abstract class MixinWolf extends TamableAnimal {
         super(entityType, level);
     }
 
+    // Banner TODO fixme
+
+    /*
     @Redirect(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/Wolf;setOrderedToSit(Z)V"))
     private void banner$handledBy(Wolf wolfEntity, boolean fire) {
-    }
+    }*/
 
     // CraftBukkit - add overriden version
     public boolean setTarget(LivingEntity entityliving, org.bukkit.event.entity.EntityTargetEvent.TargetReason reason, boolean fire) {
