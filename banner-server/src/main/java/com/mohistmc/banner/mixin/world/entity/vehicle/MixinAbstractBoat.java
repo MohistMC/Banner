@@ -1,8 +1,9 @@
 package com.mohistmc.banner.mixin.world.entity.vehicle;
 
-import com.mohistmc.banner.injection.world.entity.vehicle.InjectionBoat;
+import com.mohistmc.banner.injection.world.entity.vehicle.InjectionAbstractBoat;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.vehicle.AbstractBoat;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.level.Level;
@@ -20,8 +21,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(Boat.class)
-public abstract class MixinBoat extends VehicleEntity implements InjectionBoat {
+@Mixin(AbstractBoat.class)
+public abstract class MixinAbstractBoat extends VehicleEntity implements InjectionAbstractBoat {
 
     public double maxSpeed = 0.4D;
     public double occupiedDeceleration = 0.2D;
@@ -29,7 +30,7 @@ public abstract class MixinBoat extends VehicleEntity implements InjectionBoat {
     public boolean landBoats = false;
     private Location lastLocation;
 
-    public MixinBoat(EntityType<?> entityType, Level level) {
+    public MixinAbstractBoat(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }
 

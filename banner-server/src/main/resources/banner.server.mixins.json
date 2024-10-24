@@ -291,7 +291,7 @@
     "world.entity.raid.MixinRaids",
     "world.entity.vehicle.MixinAbstractMinecart",
     "world.entity.vehicle.MixinAbstractMinecartContainer",
-    "world.entity.vehicle.MixinBoat",
+    "world.entity.vehicle.MixinAbstractBoat",
     "world.entity.vehicle.MixinChestBoat",
     "world.entity.vehicle.MixinMinecartCommandBlock_MinecartCommandBase",
     "world.entity.vehicle.MixinMinecartTNT",

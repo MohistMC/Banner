@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.vehicle.MinecartCommandBlock;
 import org.bukkit.Location;
 import org.bukkit.command.BlockCommandSender;
@@ -62,12 +63,12 @@ public final class VanillaCommandWrapper extends BukkitCommand {
     }
 
     public static CommandSourceStack getListener(CommandSender sender) {
-        if (sender instanceof Entity) {
+        if (sender instanceof CraftEntity entity) {
             if (sender instanceof CommandMinecart) {
                 return ((MinecartCommandBlock) ((CraftMinecartCommand) sender).getHandle()).getCommandBlock().createCommandSourceStack();
             }
 
-            return ((CraftEntity) sender).getHandle().createCommandSourceStack();
+            return entity.getHandle().createCommandSourceStackForNameResolution((ServerLevel) entity.getHandle().level());
         }
         if (sender instanceof BlockCommandSender) {
             return ((CraftBlockCommandSender) sender).getWrapper();

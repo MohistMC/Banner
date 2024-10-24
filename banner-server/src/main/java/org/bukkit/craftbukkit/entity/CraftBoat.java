@@ -1,6 +1,5 @@
 package org.bukkit.craftbukkit.entity;
 
-import com.google.common.base.Preconditions;
 import java.util.stream.Collectors;
 
 import net.minecraft.world.entity.EntityType;
@@ -12,7 +11,7 @@ import org.bukkit.entity.Entity;
 
 public class CraftBoat extends CraftVehicle implements Boat {
 
-    public CraftBoat(CraftServer server, net.minecraft.world.entity.vehicle.Boat entity) {
+    public CraftBoat(CraftServer server, AbstractBoat entity) {
         super(server, entity);
     }
 
@@ -81,8 +80,8 @@ public class CraftBoat extends CraftVehicle implements Boat {
     }
 
     @Override
-    public net.minecraft.world.entity.vehicle.Boat getHandle() {
-        return (net.minecraft.world.entity.vehicle.Boat) this.entity;
+    public AbstractBoat getHandle() {
+        return (AbstractBoat) this.entity;
     }
 
     @Override

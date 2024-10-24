@@ -661,3 +661,5 @@ transitive-accessible field net/minecraft/world/level/block/entity/trialspawner/
 transitive-mutable field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner ominousConfig Lnet/minecraft/core/Holder;
 transitive-accessible field net/minecraft/world/item/enchantment/ItemEnchantments showInTooltip Z
 transitive-mutable field net/minecraft/world/item/enchantment/ItemEnchantments showInTooltip Z
+transitive-accessible field net/minecraft/world/item/enchantment/ItemEnchantments$Mutable showInTooltip Z
+transitive-mutable field net/minecraft/world/item/enchantment/ItemEnchantments$Mutable showInTooltip Z

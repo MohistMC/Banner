@@ -353,7 +353,7 @@ public class CraftChunk implements Chunk {
 
     @Override
     public PersistentDataContainer getPersistentDataContainer() {
-        return this.getHandle(ChunkStatus.STRUCTURE_STARTS).persistentDataContainer;
+        return this.getHandle(ChunkStatus.STRUCTURE_STARTS).bridge$persistentDataContainer();
     }
 
     @Override

@@ -1675,7 +1675,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
         CraftMetaItem.Applicator tag = new CraftMetaItem.Applicator();
         this.applyToItem(tag);
         DataComponentPatch patch = tag.build();
-        net.minecraft.nbt.Tag nbt = DataComponentPatch.CODEC.encodeStart(MinecraftServer.getDefaultRegistryAccess().createSerializationContext(NbtOps.INSTANCE), patch).getOrThrow();
+        net.minecraft.nbt.Tag nbt = DataComponentPatch.CODEC.encodeStart(BukkitMethodHooks.getDefaultRegistryAccess().createSerializationContext(NbtOps.INSTANCE), patch).getOrThrow();
         return nbt.toString();
     }
 
@@ -2070,8 +2070,8 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
             }
         }
 
-        if (!this.unhandledTags.isEmpty()) {
-            net.minecraft.nbt.Tag unhandled = DataComponentPatch.CODEC.encodeStart(MinecraftServer.getDefaultRegistryAccess().createSerializationContext(NbtOps.INSTANCE), this.unhandledTags.build()).getOrThrow(IllegalStateException::new);
+        if (!this.unhandledTags.build().isEmpty()) {
+            net.minecraft.nbt.Tag unhandled = DataComponentPatch.CODEC.encodeStart(BukkitMethodHooks.getDefaultRegistryAccess().createSerializationContext(NbtOps.INSTANCE), this.unhandledTags.build()).getOrThrow(IllegalStateException::new);
             try {
                 ByteArrayOutputStream buf = new ByteArrayOutputStream();
                 NbtIo.writeCompressed((CompoundTag) unhandled, buf);

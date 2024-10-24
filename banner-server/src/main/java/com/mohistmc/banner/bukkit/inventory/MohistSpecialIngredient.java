@@ -17,8 +17,11 @@ public record MohistSpecialIngredient(Ingredient ingredient) implements RecipeCh
     @NotNull
     @Override
     public ItemStack getItemStack() {
-        net.minecraft.world.item.ItemStack[] items = ingredient.getItems();
-        return items.length > 0 ? CraftItemStack.asCraftMirror(items[0]) : new ItemStack(Material.AIR, 0);
+        // Banner TODO fixme
+        /*
+        net.minecraft.world.item.ItemStack[] items = ingredient.getCustomIngredient()
+        return items.length > 0 ? CraftItemStack.asCraftMirror(items[0]) : new ItemStack(Material.AIR, 0);*/
+        return null;
     }
 
     @NotNull

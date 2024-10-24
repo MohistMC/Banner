@@ -12,22 +12,28 @@ public final class CraftMinecartTNT extends CraftMinecart implements ExplosiveMi
 
     @Override
     public float getYield() {
-        return this.getHandle().explosionPowerBase;
+        // Banner TODO fixme
+       // return this.getHandle().explosionPowerBase;
+        return 0;
     }
 
     @Override
     public boolean isIncendiary() {
-        return this.getHandle().isIncendiary;
+        // Banner TODO fixme
+        //return this.getHandle().isIncendiary;
+        return false;
     }
 
     @Override
     public void setIsIncendiary(boolean isIncendiary) {
-        this.getHandle().isIncendiary = isIncendiary;
+        // Banner TODO fixme
+        //this.getHandle().isIncendiary = isIncendiary;
     }
 
     @Override
     public void setYield(float yield) {
-        this.getHandle().explosionPowerBase = yield;
+        // Banner TODO fixme
+        //this.getHandle().explosionPowerBase = yield;
     }
 
     @Override
