@@ -84,6 +84,8 @@ public abstract class MixinArmorStand extends LivingEntity implements InjectionA
         }
     }
 
+    // Banner TODO fixme
+    /*
     @Inject(method = "hurt", cancellable = true, at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/world/entity/decoration/ArmorStand;kill()V"))
     public void banner$damageDropOut(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         if (CraftEventFactory.handleNonLivingEntityDamageEvent((net.minecraft.world.entity.decoration.ArmorStand) (Object) this, source, amount)) {
@@ -118,7 +120,7 @@ public abstract class MixinArmorStand extends LivingEntity implements InjectionA
     @Inject(method = "causeDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/ArmorStand;kill()V"))
     private void banner$deathEvent2(ServerLevel serverLevel, DamageSource damageSource, float f, CallbackInfo ci) {
         banner$callEntityDeath();
-    }
+    }*/
 
     @Redirect(method = "brokenByAnything", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/ArmorStand;dropAllDeathLoot(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;)V"))
     private void banner$dropLater(ArmorStand instance, ServerLevel serverLevel, DamageSource damageSource) {
@@ -140,7 +142,7 @@ public abstract class MixinArmorStand extends LivingEntity implements InjectionA
     }
 
     private void banner$addDrops(Level worldIn, ItemStack stack) {
-        if (!worldIn.isClientSide && !stack.isEmpty() && worldIn.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) { // Banner - prevents item dupe
+        if (!worldIn.isClientSide && !stack.isEmpty() && ((ServerLevel) worldIn).getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) { // Banner - prevents item dupe
             this.bridge$drops().add(CraftItemStack.asBukkitCopy(stack));
         }
     }

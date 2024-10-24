@@ -62,6 +62,7 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -222,6 +223,8 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
     @Shadow @Nullable public abstract MobEffectInstance getEffect(Holder<MobEffect> holder);
 
     @Shadow public abstract int getArmorValue();
+
+    @Shadow public abstract boolean isInvulnerableTo(ServerLevel serverLevel, DamageSource damageSource);
 
     public MixinLivingEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -417,7 +420,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
 
     @Override
     public int getExpReward(@Nullable Entity entity) {
-        if (this.level() instanceof ServerLevel serverLevel && !this.wasExperienceConsumed() && (this.isAlwaysExperienceDropper() || this.lastHurtByPlayerTime > 0 && this.shouldDropExperience() && this.level().getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT))) {
+        if (this.level() instanceof ServerLevel serverLevel && !this.wasExperienceConsumed() && (this.isAlwaysExperienceDropper() || this.lastHurtByPlayerTime > 0 && this.shouldDropExperience() && ((ServerLevel) this.level()).getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT))) {
             int exp = this.getExperienceReward(serverLevel, entity);
             return exp;
         } else {
@@ -437,7 +440,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
     private transient boolean banner$damageResult;
     @Unique protected transient EntityDamageResult entityDamageResult;
 
-    @Decorate(method = "hurt", inject = true, at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;noActionTime:I"))
+    @Decorate(method = "hurtServer", inject = true, at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;noActionTime:I"))
     private void banner$entityDamageEvent(DamageSource damagesource, float originalDamage) throws Throwable {
         banner$damageResult = false;
         entityDamageResult = null;
@@ -560,12 +563,12 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         }
     }
 
-    @ModifyExpressionValue(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isDamageSourceBlocked(Lnet/minecraft/world/damagesource/DamageSource;)Z"))
+    @ModifyExpressionValue(method = "hurtServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isDamageSourceBlocked(Lnet/minecraft/world/damagesource/DamageSource;)Z"))
     private boolean banner$cancelShieldBlock(boolean original) {
         return (entityDamageResult == null || !entityDamageResult.blockingCancelled()) && original;
     }
 
-    @Decorate(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;hurtHelmet(Lnet/minecraft/world/damagesource/DamageSource;F)V"))
+    @Decorate(method = "hurtServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;hurtHelmet(Lnet/minecraft/world/damagesource/DamageSource;F)V"))
     private void banner$cancelHurtHelmet(LivingEntity instance, DamageSource damageSource, float f) throws
             Throwable {
         if (entityDamageResult == null || !entityDamageResult.helmetHurtCancelled()) {
@@ -579,14 +582,14 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         }
     }
 
-    @Decorate(method = "hurt", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;invulnerableTime:I"),
+    @Decorate(method = "hurtServer", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;invulnerableTime:I"),
             slice = @Slice(to = @At(value = "FIELD", target = "Lnet/minecraft/tags/DamageTypeTags;BYPASSES_COOLDOWN:Lnet/minecraft/tags/TagKey;")))
     private int banner$useInvulnerableDuration(LivingEntity instance) throws Throwable {
         int result = (int) DecorationOps.callsite().invoke(instance);
         return result + 10 - (int) (this.invulnerableDuration / 2.0F);
     }
 
-    @Decorate(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/world/damagesource/DamageSource;F)V"))
+    @Decorate(method = "hurtServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;markHurt()V"))
     private void banner$returnIfBlocked(LivingEntity instance, DamageSource damageSource, float f) throws
             Throwable {
         DecorationOps.callsite().invoke(instance, damageSource, f);
@@ -599,7 +602,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
 
     @Override
     public boolean damageEntity0(DamageSource damagesource, float f) {
-        if (!this.isInvulnerableTo(damagesource)) {
+        if (!this.isInvulnerableTo((ServerLevel) this.level(), damagesource)) {
             final boolean human = ((LivingEntity) (Object) this) instanceof Player;
             if (f <= 0) return banner$damageResult = true;
             float originalDamage = f;
@@ -896,7 +899,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         return CraftEventFactory.handleBlockFormEvent(instance, pPos, pNewState, 3, (Entity) (Object) this);
     }
 
-    @Inject(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setSharedFlag(IZ)V"))
+    @Inject(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;canStandOnFluid(Lnet/minecraft/world/level/material/FluidState;)Z"))
     public void banner$stopGlide(Vec3 travelVector, CallbackInfo ci) {
         BukkitSnapshotCaptures.capturebanner$stopGlide(true);
     }
@@ -993,7 +996,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
     public void equipEventAndSound(EquipmentSlot slot, ItemStack oldItem, ItemStack newItem, boolean silent) {
         boolean flag = newItem.isEmpty() && oldItem.isEmpty();
         if (!flag && !ItemStack.isSameItem(oldItem, newItem) && !this.firstTick) {
-            Equipable equipable = Equipable.get(newItem);
+            Equippable equipable = Equippable.builder(newItem);
             if (equipable != null && !this.isSpectator() && equipable.getEquipmentSlot() == slot) {
                 if (!this.level().isClientSide() && !this.isSilent() && !silent) {
                     this.level().playSound(null, this.getX(), this.getY(), this.getZ(), equipable.getEquipSound().value(), this.getSoundSource(), 1.0F, 1.0F);
