@@ -24,7 +24,7 @@ moduleDependencies(project, [
 		"banner-transitive-access-wideners"
 ])
 
-// b=
+// Banner exclude mixin classes at now for a while
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 	exclude("com/mohistmc/banner/mixin/**")
