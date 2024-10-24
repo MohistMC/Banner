@@ -18,10 +18,12 @@ public abstract class MixinThrowableProjectile extends Projectile {
         super(entityType, level);
     }
 
+    // Banner TODO fixme
+    /*
     @Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;)V", at = @At("RETURN"))
     private void banner$init(EntityType<? extends ThrowableProjectile> type, LivingEntity livingEntityIn, Level worldIn, CallbackInfo ci) {
         this.banner$setProjectileSource((ProjectileSource) livingEntityIn.getBukkitEntity());
-    }
+    }*/
 
     /*
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/ThrowableProjectile;onHit(Lnet/minecraft/world/phys/HitResult;)V"))

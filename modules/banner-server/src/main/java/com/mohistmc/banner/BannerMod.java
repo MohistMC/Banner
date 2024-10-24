@@ -15,12 +15,6 @@ public class BannerMod implements DedicatedServerModInitializer {
 
     @Override
     public void onInitializeServer() {
-        try {
-            BannerMCStart.run();
-        } catch (Exception ex) {
-            BannerMCStart.LOGGER.error("Failed to load BannerServer..., caused by " + ex.getCause());
-            throw new RuntimeException(ex);
-        }
         BannerEventDispatcherRegistry.registerEventDispatchers();
     }
 

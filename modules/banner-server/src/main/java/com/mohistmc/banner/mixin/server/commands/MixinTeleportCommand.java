@@ -62,7 +62,7 @@ public class MixinTeleportCommand {
                 g = to.getPitch();
 
                 level = ((CraftWorld) to.getWorld()).getHandle();
-                result = entity.teleportTo(level, x, y, z, relativeList, f, g);
+                result = entity.teleportTo(level, x, y, z, relativeList, f, g, true);
             }
             if (result) {
                 // CraftBukkit end

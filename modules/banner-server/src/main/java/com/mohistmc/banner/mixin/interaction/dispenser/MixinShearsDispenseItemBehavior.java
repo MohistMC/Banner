@@ -41,6 +41,8 @@ public abstract class MixinShearsDispenseItemBehavior extends OptionalDispenseIt
      * @author wdog5
      * @reason
      */
+    // Banner TODO fixme
+    /*
     @Overwrite
     protected ItemStack execute(BlockSource source, ItemStack stack) {
         Level level = source.level();
@@ -83,12 +85,14 @@ public abstract class MixinShearsDispenseItemBehavior extends OptionalDispenseIt
         banner$bukkitBlock = bukkitBlock;
         banner$craftItem = craftItem;
         return tryShearLivingEntity(worldserver, blockposition);
-    }
+    }*/
 
     /**
      * @author wdog5
      * @reason
      */
+    // Banner TODO fixme
+    /*
     @Overwrite
     private static boolean tryShearLivingEntity(ServerLevel level, BlockPos pos) {
         List<LivingEntity> list = level.getEntitiesOfClass(LivingEntity.class, new AABB(pos), EntitySelector.NO_SPECTATORS);
@@ -106,5 +110,5 @@ public abstract class MixinShearsDispenseItemBehavior extends OptionalDispenseIt
             }
         }
         return false;
-    }
+    }*/
 }

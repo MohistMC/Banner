@@ -36,8 +36,6 @@ public abstract class MixinChunkAccess implements BlockGetter, BiomeManager.Nois
 
     @Shadow @Final protected LevelChunkSection[] sections;
 
-    @Shadow public abstract int getMinBuildHeight();
-
     // CraftBukkit start - SPIGOT-6814: move to IChunkAccess to account for 1.17 to 1.18 chunk upgrading.
     private static final CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new CraftPersistentDataTypeRegistry();
     public DirtyCraftPersistentDataContainer persistentDataContainer = new DirtyCraftPersistentDataContainer(DATA_TYPE_REGISTRY);
@@ -49,9 +47,9 @@ public abstract class MixinChunkAccess implements BlockGetter, BiomeManager.Nois
         this.biomeRegistry = registry;
     }
 
-    @Inject(method = "setUnsaved", at = @At("HEAD"))
-    private void banner$dirty(boolean flag, CallbackInfo ci) {
-        if (!flag) {
+    @Inject(method = "markUnsaved", at = @At("HEAD"))
+    private void banner$dirty(CallbackInfo ci) {
+        if (false) {
             this.persistentDataContainer.dirty(false);
         }
     }
@@ -64,7 +62,7 @@ public abstract class MixinChunkAccess implements BlockGetter, BiomeManager.Nois
     @Override
     public void setBiome(int i, int j, int k, Holder<Biome> biome) {
         try {
-            int l = QuartPos.fromBlock(this.getMinBuildHeight());
+            int l = QuartPos.fromBlock(this.getMinY());
             int i1 = l + QuartPos.fromBlock(this.getHeight()) - 1;
             int j1 = Mth.clamp(j, l, i1);
             int k1 = this.getSectionIndex(QuartPos.toBlock(j1));

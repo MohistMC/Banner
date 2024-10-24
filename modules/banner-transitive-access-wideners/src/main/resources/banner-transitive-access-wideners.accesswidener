@@ -220,6 +220,7 @@ transitive-accessible method net/minecraft/world/entity/projectile/AbstractArrow
 transitive-accessible method net/minecraft/world/entity/decoration/Painting offsetForPaintingSize (I)D
 transitive-accessible method net/minecraft/world/entity/LivingEntity setLivingEntityFlag (IZ)V
 transitive-accessible method net/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity getBurnDuration (Lnet/minecraft/world/level/block/entity/FuelValues;Lnet/minecraft/world/item/ItemStack;)I
+transitive-accessible method net/minecraft/server/level/ServerEntity removedPassengers (Ljava/util/List;Ljava/util/List;)Ljava/util/stream/Stream;
 # public fields
 transitive-accessible field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner stateAccessor Lnet/minecraft/world/level/block/entity/trialspawner/TrialSpawner$StateAccessor;
 transitive-accessible field net/minecraft/world/level/block/state/BlockBehaviour$BlockStateBase destroySpeed F

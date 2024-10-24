@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.entity.projectile;
 
 import com.mohistmc.banner.injection.world.entity.projectile.InjectionShulkerBullet;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -57,9 +58,9 @@ public abstract class MixinShulkerBullet extends Projectile implements Injection
         ((LivingEntity) result.getEntity()).pushEffectCause(EntityPotionEffectEvent.Cause.ATTACK);
     }
 
-    @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
-    private void banner$hurt(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (CraftEventFactory.handleNonLivingEntityDamageEvent(this, source, amount, false)) {
+    @Inject(method = "hurtServer", at = @At("HEAD"), cancellable = true)
+    private void banner$hurt(ServerLevel serverLevel, DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> cir) {
+        if (CraftEventFactory.handleNonLivingEntityDamageEvent(this, damageSource, f, false)) {
             cir.setReturnValue(false);
         }
     }

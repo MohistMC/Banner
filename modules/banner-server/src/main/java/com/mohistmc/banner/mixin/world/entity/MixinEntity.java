@@ -154,13 +154,9 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Shadow public abstract boolean isSwimming();
 
     @Shadow public abstract boolean fireImmune();
-
-    @Shadow public abstract boolean hurt(DamageSource source, float amount);
-
     @Shadow public abstract DamageSources damageSources();
 
     @Shadow protected abstract ListTag newDoubleList(double... ds);
-    @Shadow public abstract boolean teleportTo(ServerLevel level, double x, double y, double z, Set<Relative> relativeMovements, float yRot, float xRot);
     @Shadow public abstract Level level();
 
     @Shadow protected abstract Vec3 getRelativePortalPosition(Direction.Axis axis, BlockUtil.FoundRectangle portal);
@@ -198,8 +194,6 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Shadow public abstract void setRemainingFireTicks(int i);
 
     @Shadow public abstract void igniteForTicks(int i);
-
-    @Shadow @Nullable public abstract Entity changeDimension(TeleportTransition dimensionTransition);
 
     @Shadow @Nullable public PortalProcessor portalProcess;
     private CraftEntity bukkitEntity;
@@ -421,6 +415,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         return damageSource.directBlock(damager);
     }
 
+    /*
     @ModifyArg(method = "move", index = 1, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;stepOn(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/Entity;)V"))
     private BlockPos banner$captureBlockWalk(BlockPos pos) {
         BukkitSnapshotCaptures.captureDamageEventBlock(pos);
@@ -457,7 +452,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
             }
         }
         // CraftBukkit end
-    }
+    }*/
 
     @Inject(method = "saveAsPassenger", cancellable = true, at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/entity/Entity;getEncodeId()Ljava/lang/String;"))
     public void banner$writeUnlessRemoved$persistCheck(CompoundTag compound, CallbackInfoReturnable<Boolean> cir) {
@@ -722,6 +717,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         // CraftBukkit end
     }
 
+    /*
     @Redirect(method = "thunderHit", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
     public boolean banner$onStruckByLightning$EntityCombustByEntityEvent1(Entity instance, DamageSource source, float amount) {
         final org.bukkit.entity.Entity thisBukkitEntity = this.getBukkitEntity();
@@ -743,7 +739,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
             return false;
         }
         return true;
-    }
+    }*/
 
     @Inject(method = "startSeenByPlayer", at = @At("HEAD"))
     private void banner$trackEvent(ServerPlayer serverPlayer, CallbackInfo ci) {
@@ -765,6 +761,8 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
 
     private AtomicReference<Vec3> banner$location = new AtomicReference<>();
 
+    // Banner TODO fixme
+    /*
     @Nullable
     @Override
     public Entity teleportTo(ServerLevel worldserver, Vec3 location) {
@@ -783,7 +781,7 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         if (this.inWorld) {
             instance.addDuringTeleport(entity);
         }
-    }
+    }*/
 
     @Inject(method = "restoreFrom", at = @At("HEAD"))
     private void banner$forwardHandle(Entity entityIn, CallbackInfo ci) {

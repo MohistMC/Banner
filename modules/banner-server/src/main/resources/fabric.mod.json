@@ -23,7 +23,8 @@
     ]
   },
   "mixins": [
-
+    "banner.server.mixins.json",
+    "banner.event.mixins.json"
   ],
 
   "depends": {

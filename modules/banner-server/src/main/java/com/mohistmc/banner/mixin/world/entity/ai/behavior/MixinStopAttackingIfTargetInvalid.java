@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
+// Banner TODO fixme
 @Mixin(StopAttackingIfTargetInvalid.class)
 public abstract class MixinStopAttackingIfTargetInvalid {
 
@@ -26,6 +27,7 @@ public abstract class MixinStopAttackingIfTargetInvalid {
      * @author Mgazul
      * @reason
      */
+    /*
     @Overwrite
     public static <E extends Mob> BehaviorControl<E> create(Predicate<LivingEntity> canStopAttacking, BiConsumer<E, LivingEntity> onStopAttacking, boolean canGrowTiredOfTryingToReachTarget) {
         return BehaviorBuilder.create((instance) -> {
@@ -53,5 +55,5 @@ public abstract class MixinStopAttackingIfTargetInvalid {
                 };
             });
         });
-    }
+    }*/
 }

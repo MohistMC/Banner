@@ -13,16 +13,16 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(LockCode.class)
 public abstract class MixinLockCode {
 
-    @Shadow @Final public String key;
-
     /**
      * @author wdog5
      * @reason bukkit
      */
+    // Banner TODO fixme
+    /*
     @Overwrite
     public boolean unlocksWith(ItemStack stack) {
         // CraftBukkit start - SPIGOT-6307: Check for color codes if the lock contains color codes
-        if (this.key.isEmpty()) return true;
+        if (this.ke.isEmpty()) return true;
         if (!stack.isEmpty() && stack.get(DataComponents.CUSTOM_NAME) != null) {
             if (this.key.indexOf(ChatColor.COLOR_CHAR) == -1) {
                 // The lock key contains no color codes, so let's ignore colors in the item display name (vanilla Minecraft behavior):
@@ -34,5 +34,5 @@ public abstract class MixinLockCode {
         }
         return false;
         // CraftBukkit end
-    }
+    }*/
 }

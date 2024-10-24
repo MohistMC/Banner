@@ -18,6 +18,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(CauldronInteraction.class)
 public interface MixinCauldronInteraction {
 
+    // Banner TODO fixme
+    /*
     @Redirect(method = "<clinit>", at = @At(value = "FIELD",
             target = "Lnet/minecraft/core/cauldron/CauldronInteraction;SHULKER_BOX:Lnet/minecraft/core/cauldron/CauldronInteraction;"))
     private static void banner$resetShulkerBox(CauldronInteraction value) {
@@ -76,8 +78,8 @@ public interface MixinCauldronInteraction {
                     // LayeredCauldronBlock.lowerFillLevel(blockState, level, blockPos);
                 }
 
-                return ItemInteractionResult.sidedSuccess(level.isClientSide);
+                return InteractionResult.sidedSuccess(level.isClientSide);
             }
         };
-    }
+    }*/
 }

@@ -41,32 +41,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Explosion.class)
 public abstract class MixinExplosion implements InjectionExplosion {
-
-    // @formatter:off
-    @Shadow @Final private Level level;
-    @Shadow @Final private Explosion.BlockInteraction blockInteraction;
-    @Shadow @Mutable @Final private float radius;
-    @Shadow @Final private ObjectArrayList<BlockPos> toBlow;
-    @Shadow @Final private double x;
-    @Shadow @Final private double y;
-    @Shadow @Final private double z;
-    @Shadow @Final public Entity source;
-    @Shadow @Final private Map<Player, Vec3> hitPlayers;
-    @Shadow @Final private boolean fire;
-    @Shadow @Final private RandomSource random;
-    @Shadow @Final private ExplosionDamageCalculator damageCalculator;
-    @Shadow public abstract boolean interactsWithBlocks();
-    @Shadow @Nullable public abstract LivingEntity getIndirectSourceEntity();
-    @Shadow public static float getSeenPercent(Vec3 p_46065_, Entity p_46066_) { return 0f; }
-    // @formatter:on
-
+    // Banner TODO fixme
+    /*
     @Shadow @Final private DamageSource damageSource;
     @Inject(method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/Entity;DDDFZLnet/minecraft/world/level/Explosion$BlockInteraction;)V",
             at = @At("RETURN"))
     public void banner$adjustSize(Level worldIn, Entity exploderIn, double xIn, double yIn, double zIn, float sizeIn, boolean causesFireIn, Explosion.BlockInteraction modeIn, CallbackInfo ci) {
         this.radius = Math.max(sizeIn, 0F);
         this.yield = this.blockInteraction == Explosion.BlockInteraction.DESTROY_WITH_DECAY ? 1.0F / this.radius : 1.0F;
-    }
+    }*/
 
     public boolean wasCanceled = false; // CraftBukkit - add field
     public float yield;
@@ -76,6 +59,8 @@ public abstract class MixinExplosion implements InjectionExplosion {
         return yield;
     }
 
+    // Banner TODO fixme
+    /*
     @Decorate(method = "explode", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
     private boolean banner$handleMultiPart(Entity entity, DamageSource damageSource, float f, @Local(ordinal = -1) List<Entity> list) throws Throwable {
         // Special case ender dragon only give knockback if no damage is cancelled
@@ -133,7 +118,7 @@ public abstract class MixinExplosion implements InjectionExplosion {
     @Inject(method = "addOrAppendStack", cancellable = true, at = @At("HEAD"))
     private static void banner$fix(List<Pair<ItemStack, BlockPos>> p_311090_, ItemStack stack, BlockPos p_309821_, CallbackInfo ci) {
         if (stack.isEmpty()) ci.cancel();
-    }
+    }*/
 
     @Override
     public boolean bridge$wasCanceled() {
