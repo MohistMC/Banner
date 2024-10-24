@@ -226,6 +226,8 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
 
     @Shadow public abstract boolean isInvulnerableTo(ServerLevel serverLevel, DamageSource damageSource);
 
+    @Shadow @Nullable protected abstract SoundEvent getHurtSound(DamageSource damageSource);
+
     public MixinLivingEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }
@@ -600,6 +602,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         DecorationOps.blackhole().invoke();
     }
 
+    /*
     @Override
     public boolean damageEntity0(DamageSource damagesource, float f) {
         if (!this.isInvulnerableTo((ServerLevel) this.level(), damagesource)) {
@@ -772,7 +775,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
             }
         }
         return banner$damageResult = false; // CraftBukkit
-    }
+    }*/
 
     private transient EntityRegainHealthEvent.RegainReason banner$regainReason;
 
@@ -951,10 +954,11 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         }
     }
 
+    /*
     @Inject(method = "addEatEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;addEffect(Lnet/minecraft/world/effect/MobEffectInstance;)Z"))
     public void banner$foodEffectCause(FoodProperties foodProperties, CallbackInfo ci) {
         ((LivingEntity) (Object) this).pushEffectCause(EntityPotionEffectEvent.Cause.FOOD);
-    }
+    }*/
 
     @Inject(method = "setArrowCount", cancellable = true, at = @At("HEAD"))
     private void banner$onArrowChange(int count, CallbackInfo ci) {
@@ -992,6 +996,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         return CraftEventFactory.callArrowBodyCountChangeEvent((LivingEntity) (Object) this, this.getArrowCount(), newCount, reset).isCancelled();
     }
 
+    /*
     @Override
     public void equipEventAndSound(EquipmentSlot slot, ItemStack oldItem, ItemStack newItem, boolean silent) {
         boolean flag = newItem.isEmpty() && oldItem.isEmpty();
@@ -1008,7 +1013,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
             }
 
         }
-    }
+    }*/
 
     @Override
     public void setItemSlot(EquipmentSlot slotIn, ItemStack stack, boolean silent) {
@@ -1038,12 +1043,12 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
 
     @Override
     public SoundEvent getDrinkingSound0(net.minecraft.world.item.ItemStack itemstack) {
-        return getDrinkingSound(itemstack);
+        return getDrinkingSound0(itemstack);
     }
 
     @Override
     public SoundEvent getEatingSound0(net.minecraft.world.item.ItemStack itemstack) {
-        return getEatingSound(itemstack);
+        return getEatingSound0(itemstack);
     }
 
     @Override

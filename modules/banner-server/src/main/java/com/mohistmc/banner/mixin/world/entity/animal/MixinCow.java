@@ -40,7 +40,7 @@ public abstract class MixinCow extends Animal {
             }
             ItemStack itemstack1 = ItemUtils.createFilledResult(itemstack, playerEntity, CraftItemStack.asNMSCopy(event.getItemStack()));
             playerEntity.setItemInHand(hand, itemstack1);
-            return InteractionResult.sidedSuccess(this.level().isClientSide);
+            return InteractionResult.SUCCESS;
         } else {
             return super.mobInteract(playerEntity, hand);
         }

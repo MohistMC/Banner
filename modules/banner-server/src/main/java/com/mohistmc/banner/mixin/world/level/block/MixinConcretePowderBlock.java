@@ -48,6 +48,8 @@ public abstract class MixinConcretePowderBlock extends Block {
         return super.getStateForPlacement(context);
     }
 
+    // Banner TODO fixme
+    /*
     @Redirect(method = "updateShape", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;defaultBlockState()Lnet/minecraft/world/level/block/state/BlockState;"))
     public BlockState banner$blockForm(Block instance, BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
         if (!(worldIn instanceof Level)) {
@@ -61,5 +63,5 @@ public abstract class MixinConcretePowderBlock extends Block {
             return blockState.getHandle();
         }
         return super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
-    }
+    }*/
 }

@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mohistmc.banner.bukkit.BukkitFieldHooks;
+import io.izzel.arclight.mixin.Decorate;
 import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -24,27 +25,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ArmorItem.class)
 public class MixinArmorItem {
 
-    @Inject(method = "dispenseArmor",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/LivingEntity;setItemSlot(Lnet/minecraft/world/entity/EquipmentSlot;Lnet/minecraft/world/item/ItemStack;)V"), cancellable = true)
-    private static void banner$inlineBukkit(BlockSource blockSource, ItemStack itemStack,
-                                            CallbackInfoReturnable<Boolean> cir,
-                                            @Local LivingEntity livingEntity,
-                                            @Local(ordinal = 1) ItemStack itemStack2,
-                                            @Share("bannerEvent") LocalRef<BlockDispenseArmorEvent> eventLocalRef) {
-        // CraftBukkit start
+    /*
+    @Redirect(method = "s", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setItemSlot(Lnet/minecraft/world/entity/EquipmentSlot;Lnet/minecraft/world/item/ItemStack;)V"))
+    private static void banner$dispense(LivingEntity instance, EquipmentSlot equipmentSlot, ItemStack stack, BlockSource blockSource, ItemStack itemStack, @Local(ordinal = -1) ItemStack itemstack1) throws Throwable {
         Level world = blockSource.level();
         org.bukkit.block.Block block = CraftBlock.at(world, blockSource.pos());
-        CraftItemStack craftItem = CraftItemStack.asCraftMirror(itemStack2);
-        BlockDispenseArmorEvent event = new BlockDispenseArmorEvent(block, craftItem.clone(), (org.bukkit.craftbukkit.entity.CraftLivingEntity) livingEntity.getBukkitEntity());
-        eventLocalRef.set(event);
-        if (!BukkitFieldHooks.isEventFired()) {
-            world.getCraftServer().getPluginManager().callEvent(event);
+        CraftItemStack craftItem = CraftItemStack.asCraftMirror(itemstack1);
+
+        BlockDispenseArmorEvent event = new BlockDispenseArmorEvent(block, craftItem.clone(), (CraftLivingEntity) instance.bridge$getBukkitEntity());
+        if (!DispenserBlockHooks.isEventFired()) {
+            Bukkit.getPluginManager().callEvent(event);
         }
 
         if (event.isCancelled()) {
             itemStack.grow(1);
-            cir.setReturnValue(false);
+            DecorationOps.cancel().invoke(false);
+            return;
         }
 
         if (!event.getItem().equals(craftItem)) {
@@ -54,15 +50,11 @@ public class MixinArmorItem {
             DispenseItemBehavior idispensebehavior = DispenserBlock.DISPENSER_REGISTRY.get(eventStack.getItem());
             if (idispensebehavior != DispenseItemBehavior.NOOP && idispensebehavior != ArmorItem.DISPENSE_ITEM_BEHAVIOR) {
                 idispensebehavior.dispense(blockSource, eventStack);
-                cir.setReturnValue(true);
+                DecorationOps.cancel().invoke(true);
+                return;
             }
         }
-    }
 
-    @Redirect(method = "dispenseArmor",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/LivingEntity;setItemSlot(Lnet/minecraft/world/entity/EquipmentSlot;Lnet/minecraft/world/item/ItemStack;)V"))
-    private static void banner$holdEvent(LivingEntity instance, EquipmentSlot equipmentSlot, ItemStack itemStack,  @Share("bannerEvent") LocalRef<BlockDispenseArmorEvent> eventLocalRef) {
-        instance.setItemSlot(equipmentSlot, CraftItemStack.asNMSCopy(eventLocalRef.get().getItem()));
-    }
+        DecorationOps.callsite().invoke(instance, equipmentSlot, CraftItemStack.asNMSCopy(event.getItem()));
+    }*/
 }

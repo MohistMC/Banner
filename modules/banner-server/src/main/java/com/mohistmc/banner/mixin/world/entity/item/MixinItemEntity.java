@@ -108,7 +108,7 @@ public abstract class MixinItemEntity extends Entity {
             EntityPickupItemEvent entityEvent = new EntityPickupItemEvent((org.bukkit.entity.Player) player.getBukkitEntity(), (org.bukkit.entity.Item) this.getBukkitEntity(), remaining);
             entityEvent.setCancelled(!entityEvent.getEntity().getCanPickupItems());
             this.level().getCraftServer().getPluginManager().callEvent(entityEvent);
-            flyAtPlayer.set(playerEvent.getFlyAtPlayer()); // Paper
+            flyAtPlayer.set(playerEvent.getPlayer().isFlying()); // Paper
             if (entityEvent.isCancelled()) {
                 itemStack.setCount(i); // SPIGOT-5294 - restore count
                 // Paper Start

@@ -64,6 +64,8 @@ public abstract class MixinEnderMan extends Monster {
         return true;
     }
 
+    // Banner TODO fixme
+    /*
     @Inject(method = "isLookingAtMe", at = @At("HEAD"), cancellable = true)
     private void banner$lookingCheck(Player player, CallbackInfoReturnable<Boolean> cir) {
         boolean shouldAttack = isLookingAtMe_check(player);
@@ -71,7 +73,7 @@ public abstract class MixinEnderMan extends Monster {
         event.setCancelled(!shouldAttack);
         cir.setReturnValue(event.callEvent());
         cir.cancel();
-    }
+    }*/
 
     private boolean isLookingAtMe_check(Player player) {
         ItemStack itemStack = (ItemStack) player.getInventory().armor.get(3);

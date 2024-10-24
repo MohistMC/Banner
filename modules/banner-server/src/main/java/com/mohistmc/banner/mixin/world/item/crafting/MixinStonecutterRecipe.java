@@ -17,19 +17,16 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(StonecutterRecipe.class)
 public abstract class MixinStonecutterRecipe extends SingleItemRecipe {
 
-    public MixinStonecutterRecipe(RecipeType<?> recipeType, RecipeSerializer<?> recipeSerializer, String string, Ingredient ingredient, ItemStack itemStack) {
-        super(recipeType, recipeSerializer, string, ingredient, itemStack);
+    public MixinStonecutterRecipe(String string, Ingredient ingredient, ItemStack itemStack) {
+        super(string, ingredient, itemStack);
     }
 
     @Override
     public Recipe toBukkitRecipe(NamespacedKey id) {
-        if (this.result.isEmpty()) {
-            return new BannerModdedRecipe(id, (StonecutterRecipe) (Object) this);
-        }
-        CraftItemStack result = CraftItemStack.asCraftMirror(this.result);
+        CraftItemStack result = CraftItemStack.asCraftMirror(this.result());
 
-        CraftStonecuttingRecipe recipe = new CraftStonecuttingRecipe(id, result, CraftRecipe.toBukkit(this.ingredient));
-        recipe.setGroup(this.group);
+        CraftStonecuttingRecipe recipe = new CraftStonecuttingRecipe(id, result, CraftRecipe.toBukkit(this.input()));
+        recipe.setGroup(this.group());
 
         return recipe;
     }

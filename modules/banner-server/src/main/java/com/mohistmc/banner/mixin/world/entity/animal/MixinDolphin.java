@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.animal;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.AgeableWaterCreature;
 import net.minecraft.world.entity.animal.Dolphin;
@@ -16,12 +17,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Dolphin.class)
 public abstract class MixinDolphin extends AgeableWaterCreature {
 
-    protected MixinDolphin(EntityType<? extends WaterAnimal> entityType, Level level) {
+    protected MixinDolphin(EntityType<? extends AgeableWaterCreature> entityType, Level level) {
         super(entityType, level);
     }
 
     @Inject(method = "pickUpItem", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/Dolphin;setItemSlot(Lnet/minecraft/world/entity/EquipmentSlot;Lnet/minecraft/world/item/ItemStack;)V"))
-    private void banner$entityPick(ItemEntity itemEntity, CallbackInfo ci) {
+    private void banner$entityPick(ServerLevel serverLevel, ItemEntity itemEntity, CallbackInfo ci) {
         if (CraftEventFactory.callEntityPickupItemEvent((Dolphin) (Object) this, itemEntity, 0, false).isCancelled()) {
             ci.cancel();
         }

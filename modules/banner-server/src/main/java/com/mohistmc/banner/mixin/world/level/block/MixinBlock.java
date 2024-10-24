@@ -37,7 +37,7 @@ public abstract class MixinBlock extends BlockBehaviour implements InjectionBloc
      */
     @Overwrite
     private static void popResource(Level level, Supplier<ItemEntity> itemEntitySupplier, ItemStack stack) {
-        if (!level.isClientSide && !stack.isEmpty() && level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
+        if (!level.isClientSide && !stack.isEmpty() && ((ServerLevel) level).getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
             ItemEntity itemEntity = (ItemEntity)itemEntitySupplier.get();
             itemEntity.setDefaultPickUpDelay();
             // CraftBukkit start

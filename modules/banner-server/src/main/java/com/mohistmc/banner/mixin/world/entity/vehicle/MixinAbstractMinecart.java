@@ -78,6 +78,7 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Inj
      * @author wdog5
      * @reason
      */
+    /*
     @Overwrite
     public void tick() {
         // CraftBukkit start
@@ -164,7 +165,7 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Inj
                 this.level().getCraftServer().getPluginManager().callEvent(new org.bukkit.event.vehicle.VehicleMoveEvent(vehicle, from, to));
             }
             // CraftBukkit end
-            if (this.getMinecartType() == AbstractMinecart.Type.RIDEABLE && this.getDeltaMovement().horizontalDistanceSqr() > 0.01D) {
+            if (this.getType() == AbstractMinecart.Re && this.getDeltaMovement().horizontalDistanceSqr() > 0.01D) {
                 List<Entity> list = this.level().getEntities((Entity) this, this.getBoundingBox().inflate(0.20000000298023224D, 0.0D, 0.20000000298023224D), EntitySelector.pushableBy(this));
 
                 if (!list.isEmpty()) {
@@ -227,6 +228,7 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Inj
      * @author wdog5
      * @reason
      */
+    /*
     @Overwrite
     protected double getMaxSpeed(ServerLevel serverLevel) {
         return maxSpeed;
@@ -236,6 +238,7 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Inj
      * @author wdog5
      * @reason
      */
+    /*
     @Overwrite
     protected void comeOffTrack(ServerLevel serverLevel) {
         double d = this.getMaxSpeed(serverLevel);
@@ -254,7 +257,7 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Inj
             this.setDeltaMovement(new Vec3(this.getDeltaMovement().x * this.flyingX, this.getDeltaMovement().y * this.flyingY, this.getDeltaMovement().z * this.flyingZ));
             // CraftBukkit end
         }
-    }
+    }*/
 
     @Inject(method = "push", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/AbstractMinecart;hasPassenger(Lnet/minecraft/world/entity/Entity;)Z"))
     private void banner$vehicleCollide(Entity entityIn, CallbackInfo ci) {

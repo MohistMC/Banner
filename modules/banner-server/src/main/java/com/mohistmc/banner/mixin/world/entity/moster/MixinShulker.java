@@ -51,7 +51,7 @@ public abstract class MixinShulker extends AbstractGolem {
 
             for(int i = 0; i < 5; ++i) {
                 BlockPos blockPos2 = blockPos.offset(Mth.randomBetweenInclusive(this.random, -8, 8), Mth.randomBetweenInclusive(this.random, -8, 8), Mth.randomBetweenInclusive(this.random, -8, 8));
-                if (blockPos2.getY() > this.level().getMinBuildHeight() && this.level().isEmptyBlock(blockPos2) && this.level().getWorldBorder().isWithinBounds(blockPos2) && this.level().noCollision(this, (new AABB(blockPos2)).deflate(1.0E-6))) {
+                if (blockPos2.getY() > this.level().getHeight() && this.level().isEmptyBlock(blockPos2) && this.level().getWorldBorder().isWithinBounds(blockPos2) && this.level().noCollision(this, (new AABB(blockPos2)).deflate(1.0E-6))) {
                     Direction direction = this.findAttachableSurface(blockPos2);
                     if (direction != null) {
                         // CraftBukkit start

@@ -4,10 +4,12 @@ import com.mohistmc.banner.BannerMod;
 import com.mohistmc.banner.injection.world.entity.InjectionMob;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.ConversionParams;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -53,6 +55,9 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
 
     @Shadow protected abstract void setItemSlotAndDropWhenKilled(EquipmentSlot slot, ItemStack stack);
     @Shadow @Nullable private Leashable.LeashData leashData;
+
+    @Shadow @Nullable public abstract <T extends Mob> T convertTo(EntityType<T> entityType, ConversionParams conversionParams, ConversionParams.AfterConversion<T> afterConversion);
+
     public boolean aware = true; // CraftBukkit
 
     protected transient boolean banner$targetSuccess = false;
@@ -111,7 +116,7 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
 
 
     @Inject(method = "pickUpItem", at = @At("HEAD"))
-    private void banner$captureItemEntity(ItemEntity itemEntity, CallbackInfo ci) {
+    private void banner$captureItemEntity(ServerLevel serverLevel, ItemEntity itemEntity, CallbackInfo ci) {
         banner$item = itemEntity;
     }
 
@@ -160,6 +165,7 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
      * @author wdog5
      * @reason
      */
+    /*
     @Overwrite
     public ItemStack equipItemIfPossible(ItemStack stack) {
         ItemEntity itemEntity = banner$item;
@@ -197,7 +203,7 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
         } else {
             return ItemStack.EMPTY;
         }
-    }
+    }*/
 
     // Banner TODO fixme
     @Inject(method = "interact", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Mob;checkAndHandleImportantInteractions(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
@@ -294,7 +300,8 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
     public <T extends Mob> T convertTo(EntityType<T> entitytypes, boolean flag, EntityTransformEvent.TransformReason transformReason, CreatureSpawnEvent.SpawnReason spawnReason) {
         this.level().pushAddEntityReason(spawnReason);
         bridge$pushTransformReason(transformReason);
-        return this.convertTo(entitytypes, flag);
+        //return this.convertTo(entitytypes, flag);
+        return null;
     }
 
     @Override

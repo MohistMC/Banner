@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.entity.ai.goal;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.EatBlockGoal;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -22,6 +23,6 @@ public abstract class MixinEatBlockGoal extends Goal {
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z"))
     private boolean banner$eatGrassTick(GameRules instance, GameRules.Key<GameRules.BooleanValue> key) {
-        return CraftEventFactory.callEntityChangeBlockEvent(this.mob, this.mob.blockPosition(), Blocks.AIR.defaultBlockState(), !this.level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING));
+        return CraftEventFactory.callEntityChangeBlockEvent(this.mob, this.mob.blockPosition(), Blocks.AIR.defaultBlockState(), !((ServerLevel)this.level).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING));
     }
 }

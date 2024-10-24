@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
+// Banner TODO fixme
 @Mixin(Bat.class)
 public abstract class MixinBat extends AmbientCreature {
 
@@ -37,6 +38,7 @@ public abstract class MixinBat extends AmbientCreature {
      * @author wdog5
      * @reason bukkit
      */
+    /*
     @Overwrite
     protected void customServerAiStep() {
         super.customServerAiStep();
@@ -72,7 +74,7 @@ public abstract class MixinBat extends AmbientCreature {
                 // CraftBukkit End - Call BatToggleSleepEvent
             }
         } else {
-            if (this.targetPosition != null && (!this.level().isEmptyBlock(this.targetPosition) || this.targetPosition.getY() <= this.level().getMinBuildHeight())) {
+            if (this.targetPosition != null && (!this.level().isEmptyBlock(this.targetPosition) || this.targetPosition.getY() <= this.level().getHeight())) {
                 this.targetPosition = null;
             }
 
@@ -110,5 +112,5 @@ public abstract class MixinBat extends AmbientCreature {
         // CraftBukkit Start - Call BatToggleSleepEvent
         return CraftEventFactory.handleBatToggleSleepEvent(((Bat) (Object) this), true);
         // CraftBukkit End - Call BatToggleSleepEvent
-    }
+    }*/
 }

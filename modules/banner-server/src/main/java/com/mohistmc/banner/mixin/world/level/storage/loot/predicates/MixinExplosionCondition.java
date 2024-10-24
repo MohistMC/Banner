@@ -16,7 +16,7 @@ public class MixinExplosionCondition {
      */
     @Overwrite
     public boolean test(LootContext lootContext) {
-        Float float_ = (Float)lootContext.getParamOrNull(LootContextParams.EXPLOSION_RADIUS);
+        Float float_ = (Float)lootContext.getParameter(LootContextParams.EXPLOSION_RADIUS);
         if (float_ != null) {
             RandomSource randomSource = lootContext.getRandom();
             float f = 1.0F / float_;

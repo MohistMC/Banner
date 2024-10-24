@@ -182,6 +182,8 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         }
     }
 
+    // Banner TODO fixme
+    /*
     @Redirect(method = "addAdditionalSaveData", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hasExactlyOnePlayerPassenger()Z"))
     private boolean banner$nonPersistVehicle(Entity entity) {
         Entity entity1 = this.getVehicle();
@@ -196,7 +198,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             }
         }
         return persistVehicle && entity.hasExactlyOnePlayerPassenger();
-    }
+    }*/
 
 
     @Inject(method = "addAdditionalSaveData", at = @At("RETURN"))
@@ -328,6 +330,8 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         this.setRespawnPosition(level, pos, pitch, flag, flag1);
     }
 
+    // Banner TODO fixme
+    /*
     @Inject(method = "startSleepInBed", at = @At("HEAD"), cancellable = true)
     private void banner$bedEvent(BlockPos blockPos, CallbackInfoReturnable<Either<BedSleepingProblem, Unit>> cir) {
         boolean force = bridge$startSleepInBed_force().getAndSet(false);
@@ -391,7 +395,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         ((ServerLevel) this.level()).updateSleepingPlayerList();
         cir.setReturnValue(either);
         cir.cancel();
-    }
+    }*/
 
     @Inject(method = "setRespawnPosition", at = @At("HEAD"))
     private void banner$spawnChangeEvent(ResourceKey<Level> resourceKey, BlockPos blockPos, float f, boolean bl, boolean bl2, CallbackInfo ci) {
@@ -471,6 +475,8 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         return blockposition;
     }
 
+    // Banner TODO fixme
+    /*
     @Override
     public Either<BedSleepingProblem, Unit> getBedResult(BlockPos blockposition, Direction enumdirection) {
         if (!this.isSleeping() && this.isAlive()) {
@@ -499,7 +505,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             return Either.right(Unit.INSTANCE);
         }
         return Either.left(Player.BedSleepingProblem.OTHER_PROBLEM);
-    }
+    }*/
 
     @Override
     public Scoreboard getScoreboard() {
@@ -869,6 +875,8 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     private AtomicReference<PlayerTeleportEvent.TeleportCause> banner$changeDimensionCause = new AtomicReference<>(PlayerTeleportEvent.TeleportCause.UNKNOWN);
 
+    // Banner TODO fixme
+    /*
     @Override
     public Entity changeDimension(ServerLevel worldserver, PlayerTeleportEvent.TeleportCause cause) {
         banner$changeDimensionCause.set(cause);
@@ -891,12 +899,14 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     public void teleportTo(ServerLevel worldserver, double d0, double d1, double d2, float f, float f1, PlayerTeleportEvent.TeleportCause cause) {
         pushChangeDimensionCause(cause);
         teleportTo(worldserver, d0, d1, d2, f, f1);
-    }
+    }*/
 
     @Override
     public boolean teleportTo(ServerLevel worldserver, double d0, double d1, double d2, Set<Relative> pRelativeMovements, float f, float f1, PlayerTeleportEvent.TeleportCause cause) {
         pushChangeDimensionCause(cause);
-        return teleportTo(worldserver, d0, d1, d2, pRelativeMovements, f, f1);
+        // Banner TODO fixme
+        //return teleportTo(worldserver, d0, d1, d2, pRelativeMovements, f, f1);
+        return false;
     }
 
     @Inject(method = "stopSleepInBed",

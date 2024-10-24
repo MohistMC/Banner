@@ -5,6 +5,7 @@ import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.ItemCombinerMenu;
+import net.minecraft.world.inventory.ItemCombinerMenuSlotDefinition;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.SmithingMenu;
@@ -20,21 +21,23 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+// Banner TODO fixme
 @Mixin(SmithingMenu.class)
 public abstract class MixinSmithingMenu extends ItemCombinerMenu {
 
     private CraftInventoryView bukkitEntity;
 
-    public MixinSmithingMenu(@Nullable MenuType<?> menuType, int i, Inventory inventory, ContainerLevelAccess containerLevelAccess) {
-        super(menuType, i, inventory, containerLevelAccess);
+    public MixinSmithingMenu(@Nullable MenuType<?> menuType, int i, Inventory inventory, ContainerLevelAccess containerLevelAccess, ItemCombinerMenuSlotDefinition itemCombinerMenuSlotDefinition) {
+        super(menuType, i, inventory, containerLevelAccess, itemCombinerMenuSlotDefinition);
     }
 
+    /*
     @Decorate(method = "createResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/ResultContainer;setItem(ILnet/minecraft/world/item/ItemStack;)V"))
     private void banner$prepareSmithing(ResultContainer craftResultInventory, int index, ItemStack stack) throws Throwable {
         PrepareSmithingEvent event = new PrepareSmithingEvent(getBukkitView(), CraftItemStack.asCraftMirror(stack).clone());
         Bukkit.getServer().getPluginManager().callEvent(event);
         DecorationOps.callsite().invoke(craftResultInventory, index, CraftItemStack.asNMSCopy(event.getResult()));
-    }
+    }*/
 
     @Override
     public InventoryView getBukkitView() {

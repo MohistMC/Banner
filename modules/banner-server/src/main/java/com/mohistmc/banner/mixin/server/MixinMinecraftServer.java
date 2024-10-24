@@ -110,7 +110,6 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Shadow public Map<ResourceKey<net.minecraft.world.level.Level>, ServerLevel> levels;
     @Shadow @Final public static org.slf4j.Logger LOGGER;
     @Shadow public abstract boolean isSpawningMonsters();
-    @Shadow public abstract boolean isSpawningAnimals();
     @Shadow private int tickCount;
     @Shadow public abstract PlayerList getPlayerList();
     @Shadow public abstract boolean isStopped();
@@ -206,6 +205,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         return serverStatus;
     }
 
+    /*
     @Decorate(method = "runServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;startMetricsRecordingTick()V"))
     private void banner$updateTickParam(MinecraftServer instance, @Local(allocate = "tickSection") long tickSection, @Local(allocate = "tickCount") long tickCount) throws Throwable {
         if (tickCount++ % SAMPLE_INTERVAL == 0) {
@@ -219,7 +219,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         DecorationOps.blackhole().invoke(tickSection, tickCount);
         currentTick = (int) (System.currentTimeMillis() / 50);
         DecorationOps.callsite().invoke(instance);
-    }
+    }*/
 
     @WrapWithCondition(method = "runServer", at = @At(value = "INVOKE", remap = false, target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V"))
     private boolean banner$warnOnLoad(org.slf4j.Logger instance, String s, Object o1, Object o2) throws Throwable {
@@ -305,7 +305,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             target = "Lnet/minecraft/server/level/ServerLevel;<init>(Lnet/minecraft/server/MinecraftServer;Ljava/util/concurrent/Executor;Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;Lnet/minecraft/world/level/storage/ServerLevelData;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/level/dimension/LevelStem;Lnet/minecraft/server/level/progress/ChunkProgressListener;ZJLjava/util/List;ZLnet/minecraft/world/RandomSequences;)V",
             ordinal = 0))
     private void banner$registerEnv(ChunkProgressListener p_240787_1_, CallbackInfo ci) {
-        BukkitRegistry.registerEnvironments(this.registryAccess().registryOrThrow(Registries.LEVEL_STEM));
+        BukkitRegistry.registerEnvironments(this.registryAccess().lookupOrThrow(Registries.LEVEL_STEM));
     }
 
     @Inject(method = "createLevels", at = @At(value = "INVOKE", remap = false,
@@ -485,7 +485,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                     listener.stop();
                     // CraftBukkit start
                     // this.updateMobSpawningFlags();
-                    worldserver.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
+                    worldserver.setSpawnSettings(this.isSpawningMonsters());
 
                     this.forceTicks = false;
                     // CraftBukkit end
@@ -561,7 +561,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         listener.stop();
         // CraftBukkit start
         // this.updateMobSpawningFlags();
-        worldserver.setSpawnSettings(this.isSpawningMonsters(), this.isSpawningAnimals());
+        worldserver.setSpawnSettings(this.isSpawningMonsters());
 
         this.forceTicks = false;
         // CraftBukkit end
@@ -587,7 +587,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
     @Inject(method = "tickChildren", at = @At("HEAD"))
     private void banner$processStart(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
         BukkitFieldHooks.setCurrentTick((int) (System.currentTimeMillis() / 50));
-        server.getScheduler().mainThreadHeartbeat(this.tickCount);
+        server.getScheduler().mainThreadHeartbeat();
         this.bridge$drainQueuedTasks();
     }
 
@@ -596,14 +596,14 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
             target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
                     ordinal = 0))
     private void banner$mainThreadHeartbeat0(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-        this.server.getScheduler().mainThreadHeartbeat(this.tickCount); // CraftBukkit
+        this.server.getScheduler().mainThreadHeartbeat(); // CraftBukkit
     }
 
     @Inject(method = "tickChildren",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/server/ServerFunctionManager;tick()V"))
     private void banner$mainThreadHeartbeat1(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-        this.server.getScheduler().mainThreadHeartbeat(this.tickCount); // CraftBukkit
+        this.server.getScheduler().mainThreadHeartbeat(); // CraftBukkit
     }
 
     @Inject(method = "tickChildren",
@@ -611,7 +611,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
                     target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
                     ordinal = 0))
     private void banner$mainThreadHeartbeat2(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-        this.server.getScheduler().mainThreadHeartbeat(this.tickCount); // CraftBukkit
+        this.server.getScheduler().mainThreadHeartbeat(); // CraftBukkit
     }
 
     @Inject(method = "tickChildren", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getAllLevels()Ljava/lang/Iterable;"))
@@ -626,7 +626,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
         if (this.tickCount % 20 == 0) {
             for (int i = 0; i < this.getPlayerList().players.size(); ++i) {
                 ServerPlayer entityplayer = (ServerPlayer) this.getPlayerList().players.get(i);
-                entityplayer.connection.send(new ClientboundSetTimePacket(entityplayer.level().getGameTime(), entityplayer.getPlayerTime(), entityplayer.level().getGameRules().getBoolean(GameRules.RULE_DAYLIGHT))); // Add support for per player time
+                entityplayer.connection.send(new ClientboundSetTimePacket(entityplayer.level().getGameTime(), entityplayer.getPlayerTime(), ((ServerLevel)entityplayer.level()).getGameRules().getBoolean(GameRules.RULE_DAYLIGHT))); // Add support for per player time
             }
         }
     }

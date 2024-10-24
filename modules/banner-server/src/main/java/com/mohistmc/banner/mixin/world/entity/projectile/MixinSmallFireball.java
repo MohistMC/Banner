@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.world.entity.projectile;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -31,7 +33,7 @@ public abstract class MixinSmallFireball extends Fireball {
     @Inject(method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/phys/Vec3;)V", at = @At("RETURN"))
     private void banner$init(Level level, LivingEntity livingEntity, Vec3 vec3, CallbackInfo ci) {
         if (this.getOwner() != null && this.getOwner() instanceof Mob) {
-            this.banner$setIsIncendiary(this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING));
+            this.banner$setIsIncendiary(((ServerLevel)this.level()).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING));
         }
     }
 
@@ -47,10 +49,10 @@ public abstract class MixinSmallFireball extends Fireball {
         }
     }
 
-    @Inject(method = "onHitBlock", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD,
+    @Inject(method = "onHitBlock", cancellable = true,
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
-    private void banner$burnBlock(BlockHitResult result, CallbackInfo ci, Entity entity, BlockPos pos) {
-        if (!this.bridge$isIncendiary() || CraftEventFactory.callBlockIgniteEvent(this.level(), pos, (SmallFireball) (Object) this).isCancelled()) {
+    private void banner$burnBlock(BlockHitResult blockHitResult, CallbackInfo ci, @Local BlockPos blockPos) {
+        if (!this.bridge$isIncendiary() || CraftEventFactory.callBlockIgniteEvent(this.level(), blockPos, (SmallFireball) (Object) this).isCancelled()) {
             ci.cancel();
         }
     }

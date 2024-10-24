@@ -75,6 +75,7 @@ public abstract class MixinZombie extends Monster {
         }
     }
 
+    /*
     @Redirect(method = "killedEntity(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/Zombie;convertVillagerToZombieVillager(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/npc/Villager;)Z"))
     private <T extends Mob> boolean banner$transform(net.minecraft.world.entity.monster.Zombie instance, ServerLevel serverLevel, Villager villager) {
         villager.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.INFECTION);
@@ -84,7 +85,7 @@ public abstract class MixinZombie extends Monster {
             cir.setReturnValue(false);
         }
         return t;
-    }
+    }*/
 
     @Inject(method = "finalizeSpawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerLevelAccessor;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
     private void banner$mount(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, EntitySpawnReason mobSpawnType, SpawnGroupData spawnGroupData, CallbackInfoReturnable<SpawnGroupData> cir) {
@@ -96,7 +97,7 @@ public abstract class MixinZombie extends Monster {
         villager.level().pushAddEntityReason(spawnReason);
         villager.bridge$pushTransformReason(EntityTransformEvent.TransformReason.INFECTION);
         ZombieVillager zombieVillager = villager.convertTo(EntityType.ZOMBIE_VILLAGER, ConversionParams.single(villager, true, true) , (entityzombievillager1) -> {
-            entityzombievillager1.finalizeSpawn(level, level.getCurrentDifficultyAt(entityzombievillager1.blockPosition()), EntitySpawnReason.CONVERSION, new Zombie.ZombieGroupData(false, true));
+            entityzombievillager1.finalizeSpawn(level, level.getCurrentDifficultyAt(entityzombievillager1.blockPosition()), EntitySpawnReason.CONVERSION, new net.minecraft.world.entity.monster.Zombie.ZombieGroupData(false, true));
             entityzombievillager1.setVillagerData(villager.getVillagerData());
             entityzombievillager1.setGossips(villager.getGossips().store(NbtOps.INSTANCE));
             entityzombievillager1.setTradeOffers(villager.getOffers().copy());

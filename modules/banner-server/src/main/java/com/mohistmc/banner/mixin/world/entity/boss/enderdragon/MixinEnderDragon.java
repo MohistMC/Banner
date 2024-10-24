@@ -37,12 +37,18 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+// Banner TODO fixme
 @Mixin(EnderDragon.class)
 public abstract class MixinEnderDragon extends Mob {
 
     @Shadow
     @Nullable private EndDragonFight dragonFight;
 
+    protected MixinEnderDragon(EntityType<? extends Mob> entityType, Level level) {
+        super(entityType, level);
+    }
+
+    /*
     private final Explosion explosionSource = new Explosion(this.level(), (EnderDragon) (Object) this, null, null, Double.NaN, Double.NaN, Double.NaN, Float.NaN, true, Explosion.BlockInteraction.DESTROY, ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER, SoundEvents.GENERIC_EXPLODE);
 
     protected MixinEnderDragon(EntityType<? extends Mob> entityType, Level level) {
@@ -69,6 +75,7 @@ public abstract class MixinEnderDragon extends Mob {
      * @author wdog5
      * @reason
      */
+    /*
     @Overwrite
     private boolean checkWalls(ServerLevel serverLevel, AABB axisalignedbb) {
         final int i = Mth.floor(axisalignedbb.minX);
@@ -136,5 +143,5 @@ public abstract class MixinEnderDragon extends Mob {
             this.level().levelEvent(2008, blockposition3, 0);
         }
         return flag;
-    }
+    }*/
 }

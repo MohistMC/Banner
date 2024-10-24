@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+// Banner TODO fixme
 @Mixin(WitherSkull.class)
 public abstract class MixinWitherSkull extends AbstractHurtingProjectile {
 
@@ -35,6 +36,7 @@ public abstract class MixinWitherSkull extends AbstractHurtingProjectile {
         ((LivingEntity) result.getEntity()).pushEffectCause(EntityPotionEffectEvent.Cause.ATTACK);
     }
 
+    /*
     @Redirect(method = "onHit", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;explode(Lnet/minecraft/world/entity/Entity;DDDFZLnet/minecraft/world/level/Level$ExplosionInteraction;)Lnet/minecraft/world/level/Explosion;"))
     private Explosion banner$explode(Level world, Entity entityIn, double xIn, double yIn, double zIn, float explosionRadius, boolean causesFire, Level.ExplosionInteraction interaction) {
         ExplosionPrimeEvent event = new ExplosionPrimeEvent(this.getBukkitEntity(), explosionRadius, causesFire);
@@ -43,5 +45,5 @@ public abstract class MixinWitherSkull extends AbstractHurtingProjectile {
             return this.level().explode((WitherSkull) (Object) this, xIn, yIn, zIn, event.getRadius(), event.getFire(), interaction);
         }
         return null;
-    }
+    }*/
 }

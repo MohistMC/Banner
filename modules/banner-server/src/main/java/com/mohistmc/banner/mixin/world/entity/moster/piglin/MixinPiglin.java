@@ -24,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+// Banner TODO fixme
 @Mixin(Piglin.class)
 public abstract class MixinPiglin extends AbstractPiglin implements InjectionPiglin {
 
@@ -44,22 +45,24 @@ public abstract class MixinPiglin extends AbstractPiglin implements InjectionPig
         compound.put("Bukkit.InterestList", interestList);
     }
 
+    /*
     @Inject(method = "readAdditionalSaveData", at = @At("RETURN"))
     private void banner$readAdditional(CompoundTag compound, CallbackInfo ci) {
         this.allowedBarterItems = compound.getList("Bukkit.BarterList", 8).stream().map(Tag::getAsString).map(ResourceLocation::tryParse).map(BuiltInRegistries.ITEM::get).collect(Collectors.toCollection(HashSet::new));
         this.interestItems = compound.getList("Bukkit.InterestList", 8).stream().map(Tag::getAsString).map(ResourceLocation::tryParse).map(BuiltInRegistries.ITEM::get).collect(Collectors.toCollection(HashSet::new));
-    }
+    }*/
 
     @Redirect(method = "holdInOffHand", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;is(Lnet/minecraft/world/item/Item;)Z"))
     private boolean banner$customBarter(ItemStack instance, Item item) {
         return instance.is(PiglinAi.BARTERING_ITEM) || allowedBarterItems.contains(item);
     }
 
+    /*
     @Redirect(method = "canReplaceCurrentItem(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/piglin/PiglinAi;isLovedItem(Lnet/minecraft/world/item/ItemStack;)Z"))
     private boolean banner$customLoved(ItemStack stack) {
         return stack.is(ItemTags.PIGLIN_LOVED) || interestItems.contains(stack.getItem()) || allowedBarterItems.contains(stack.getItem());
-    }
+    }*/
 
     @Override
     public Set<Item> bridge$allowedBarterItems() {

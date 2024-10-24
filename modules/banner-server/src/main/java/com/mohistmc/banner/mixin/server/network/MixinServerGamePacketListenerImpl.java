@@ -1240,6 +1240,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
 
     @Override
     public void detectRateSpam(String s) {
+        /*
         // CraftBukkit start - replaced with thread safe throttle
         for ( String exclude : org.spigotmc.SpigotConfig.spamExclusions )
         {
@@ -1253,8 +1254,8 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         if (!this.chatSpamThrottler.isIncrementAndUnderThreshold() && !this.server.getPlayerList().isOp(this.player.getGameProfile()) && !this.server.isSingleplayerOwner(this.player.getGameProfile())) {
             // CraftBukkit end
             this.disconnect((Component) Component.translatable("disconnect.spam"));
-        }
-
+        }*/
+        // Banner TODO fixme
     }
 
     @Inject(method = "handlePlayerCommand", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;resetLastActionTime()V"))
@@ -1628,6 +1629,8 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
 
     private AtomicReference<PlayerRecipeBookClickEvent> banner$recipeClickEvent = new AtomicReference<>();
 
+    // Banner TODO fixme
+    /*
     @Inject(method = "handlePlaceRecipe",
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/server/MinecraftServer;getRecipeManager()Lnet/minecraft/world/item/crafting/RecipeManager;"),
@@ -1642,12 +1645,14 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
                 CraftEventFactory.callRecipeBookClickEvent(this.player, recipe, packet.isShiftDown());
         banner$recipeClickEvent.set(event);
         // Cast to keyed should be safe as the recipe will never be a MerchantRecipe.
-    }
+    }*/
 
     /**
      * @author wdog5
      * @reason bukkit
      */
+    // Banner TODO fixme
+    /*
     @Overwrite
     public void handleSetCreativeModeSlot(final ServerboundSetCreativeModeSlotPacket packetplayinsetcreativeslot) {
         PacketUtils.ensureRunningOnSameThread(packetplayinsetcreativeslot, (ServerGamePacketListenerImpl) (Object) this, this.player.serverLevel());
@@ -1707,14 +1712,16 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
                 this.player.drop(itemstack, true);
             }
         }
-    }
+    }*/
 
+    // Banner TODO fixme
+    /*
     @Redirect(method = "method_17820",
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/inventory/RecipeBookMenu;handlePlacement(ZLnet/minecraft/world/item/crafting/RecipeHolder;Lnet/minecraft/server/level/ServerPlayer;)V"))
     private <C extends Container> void banner$recipeClickEvent0(RecipeBookMenu instance, boolean bl, RecipeHolder<?> recipeHolder, ServerPlayer serverPlayer) {
         ((RecipeBookMenu)this.player.containerMenu).handlePlacement(banner$recipeClickEvent.get().isShiftClick(), recipeHolder, this.player);
-    }
+    }*/
 
     @Inject(method = "updateSignText", cancellable = true, at = @At("HEAD"))
     private void banner$updateSignText(ServerboundSignUpdatePacket packet, List<FilteredText> filteredText, CallbackInfo ci) {
@@ -1746,6 +1753,8 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     private transient boolean banner$noTeleportEvent;
     private transient boolean banner$teleportCancelled;
 
+    // Banner TODO fixme
+    /*
     @Decorate(method = "teleport(DDDFFLjava/util/Set;)V", inject = true, at = @At("HEAD"))
     private void banner$teleportEvent(double x, double y, double z, float yaw, float pitch, Set<Relative> relativeSet) throws Throwable {
         PlayerTeleportEvent.TeleportCause cause = banner$cause == null ? PlayerTeleportEvent.TeleportCause.UNKNOWN : banner$cause;
@@ -1781,6 +1790,8 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         DecorationOps.blackhole().invoke(x, y, z, yaw, pitch);
     }
 
+    // Banner TODO fixme
+    /*
     @Inject(method = "teleport(DDDFFLjava/util/Set;)V", at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;awaitingTeleportTime:I"))
     private void banner$storeLastPosition(double d, double e, double f, float yaw, float pitch, Set<Relative> set, CallbackInfo ci) {
         this.lastPosX = this.awaitingPositionFromClient.x;
@@ -1788,7 +1799,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         this.lastPosZ = this.awaitingPositionFromClient.z;
         this.lastYaw = yaw;
         this.lastPitch = pitch;
-    }
+    }*/
 
     @Override
     public void teleport(double d0, double d1, double d2, float f, float f1, PlayerTeleportEvent.TeleportCause cause) {
@@ -1835,7 +1846,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     @Override
     public void teleport(Location dest) {
         banner$noTeleportEvent = true;
-        this.teleport(dest.getX(), dest.getY(), dest.getZ(), dest.getYaw(), dest.getPitch(), Collections.emptySet());
+        this.teleport(dest.getX(), dest.getY(), dest.getZ(), dest.getYaw(), dest.getPitch(), PlayerTeleportEvent.TeleportCause.CHORUS_FRUIT);// Banner TODO fixme
         banner$noTeleportEvent = false;
     }
 
@@ -1873,7 +1884,8 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
 
         this.awaitingTeleportTime = this.tickCount;
         this.player.absMoveTo(pX, pY, pZ, pYaw, pPitch);
-        this.player.connection.send(new ClientboundPlayerPositionPacket(pX - d0, pY - d1, pZ - d2, pYaw - f, pPitch - f1, pRelativeSet, this.awaitingTeleport));
+        // Banner TODO fixme
+        //this.player.connection.send(new ClientboundPlayerPositionPacket(pX - d0, pY - d1, pZ - d2, pYaw - f, pPitch - f1, pRelativeSet, this.awaitingTeleport));
     }
 
     @Override

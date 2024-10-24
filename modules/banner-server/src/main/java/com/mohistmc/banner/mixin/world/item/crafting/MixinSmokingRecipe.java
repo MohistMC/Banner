@@ -16,19 +16,15 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(SmokingRecipe.class)
 public abstract class MixinSmokingRecipe extends AbstractCookingRecipe {
 
-
-    public MixinSmokingRecipe(RecipeType<?> recipeType, String string, CookingBookCategory cookingBookCategory, Ingredient ingredient, ItemStack itemStack, float f, int i) {
-        super(recipeType, string, cookingBookCategory, ingredient, itemStack, f, i);
+    public MixinSmokingRecipe(String string, CookingBookCategory cookingBookCategory, Ingredient ingredient, ItemStack itemStack, float f, int i) {
+        super(string, cookingBookCategory, ingredient, itemStack, f, i);
     }
 
     @Override
     public org.bukkit.inventory.Recipe toBukkitRecipe(NamespacedKey id) {
-        if (this.result.isEmpty()) {
-            return new BannerModdedRecipe(id, (SmokingRecipe) (Object) this);
-        }
-        CraftItemStack result = CraftItemStack.asCraftMirror(this.result);
-        CraftSmokingRecipe recipe = new CraftSmokingRecipe(id, result, CraftRecipe.toBukkit(this.ingredient), this.experience, this.cookingTime);
-        recipe.setGroup(this.group);
+        CraftItemStack result = CraftItemStack.asCraftMirror(this.result());
+        CraftSmokingRecipe recipe = new CraftSmokingRecipe(id, result, CraftRecipe.toBukkit(this.input()), this.experience(), this.cookingTime());
+        recipe.setGroup(this.group());
         recipe.setCategory(CraftRecipe.getCategory(this.category()));
 
         return recipe;

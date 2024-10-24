@@ -60,7 +60,7 @@ public interface MixinCaveVines {
             BlockState blockState2 = (BlockState)blockState.setValue(BERRIES, false);
             level.setBlock(blockPos, blockState2, 2);
             level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(entity, blockState2));
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.SUCCESS;
         } else {
             return InteractionResult.PASS;
         }

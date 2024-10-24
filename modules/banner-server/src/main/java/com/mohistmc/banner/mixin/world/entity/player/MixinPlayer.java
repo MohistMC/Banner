@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Unit;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -98,6 +99,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
         pushEffectCause(EntityPotionEffectEvent.Cause.TURTLE_HELMET);
     }
 
+    /*
     @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;heal(F)V"))
     private void banner$healByRegen(CallbackInfo ci) {
         pushHealReason(EntityRegainHealthEvent.RegainReason.REGEN);
@@ -127,8 +129,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
             }
             cir.setReturnValue(null);
         }
-    }
-
+    }*/
     /**
      * @author wdog5
      * @reason
@@ -180,18 +181,16 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     @Overwrite
     private void respawnEntityOnShoulder(CompoundTag entityCompound) {
         if (!this.level().isClientSide && !entityCompound.isEmpty()) {
-            EntityType.create(entityCompound, this.level()).map((entity) -> { // CraftBukkit
+            EntityType.create(entityCompound, this.level(), EntitySpawnReason.LOAD).ifPresent((entity) -> {
                 if (entity instanceof TamableAnimal) {
-                    ((TamableAnimal) entity).setOwnerUUID(this.uuid);
+                    ((TamableAnimal)entity).setOwnerUUID(this.uuid);
                 }
 
-                entity.setPos(this.getX(), this.getY() + 0.699999988079071D, this.getZ());
-                boolean canAdd =  ((ServerLevel)this.level()).addWithUUID(entity);
+                entity.setPos(this.getX(), this.getY() + 0.699999988079071, this.getZ());
+                boolean canAdd = ((ServerLevel)this.level()).addWithUUID(entity);
                 spawnEntityFromShoulder.set(canAdd);
-                return ((ServerLevel) this.level()).addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY); // CraftBukkit
-            }); // CraftBukkit
+            });
         }
-
     }
 
     @Override
@@ -235,8 +234,8 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     }
 
     @Inject(method = "actuallyHurt", at = @At("HEAD"), cancellable = true)
-    private void banner$damageEntityCustom(DamageSource damageSrc, float damageAmount, CallbackInfo ci) {
-        damageEntity0(damageSrc, damageAmount);
+    private void banner$damageEntityCustom(ServerLevel serverLevel, DamageSource damageSource, float f, CallbackInfo ci) {
+        damageEntity0(damageSource, f);
         ci.cancel();
     }
 
@@ -255,6 +254,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
         }
     }
 
+    /*
     @ModifyArg(method = "jumpFromGround", index = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
     private float banner$exhaustInfo(float f) {
         SpigotWorldConfig config =  level().bridge$spigotConfig();
@@ -268,14 +268,15 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
             }
         }
         return f;
-    }
+    }*/
 
+    /*
     @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;setSharedFlag(IZ)V"))
     private void banner$toggleGlide(net.minecraft.world.entity.player.Player playerEntity, int flag, boolean set) {
         if (playerEntity.getSharedFlag(flag) != set && !CraftEventFactory.callToggleGlideEvent((net.minecraft.world.entity.player.Player) (Object) this, set).isCancelled()) {
             playerEntity.setSharedFlag(flag, set);
         }
-    }
+    }*/
     
     @Inject(method = "startFallFlying", cancellable = true, at = @At("HEAD"))
     private void banner$startGlidingEvent(CallbackInfo ci) {
@@ -341,8 +342,9 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
         return startSleepInBed_force;
     }
 
+    /*
     @Inject(method = "eat", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/food/FoodData;eat(Lnet/minecraft/world/food/FoodProperties;)V"))
     private void banner$eatStack(Level level, ItemStack itemStack, FoodProperties foodProperties, CallbackInfoReturnable<ItemStack> cir) {
         this.getFoodData().pushEatStack(itemStack);
-    }
+    }*/
 }

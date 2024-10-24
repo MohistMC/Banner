@@ -111,13 +111,15 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
         banner$blockPos.set(blockPos);
     }
 
+    /*
     @Redirect(method = "serverTick",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;burn(Lnet/minecraft/core/RegistryAccess;Lnet/minecraft/world/item/crafting/RecipeHolder;Lnet/minecraft/world/item/crafting/SingleRecipeInput;Lnet/minecraft/core/NonNullList;I)Z"))
     private static boolean banner$burnEvent(RegistryAccess registryAccess, RecipeHolder<? extends AbstractCookingRecipe> recipeHolder, SingleRecipeInput singleRecipeInput, NonNullList<ItemStack> nonNullList, int i) {
         return burn(banner$world.get(), banner$blockPos.get(), registryAccess, recipeHolder, nonNullList, i);
-    }
+    }*/
 
+    /*
     private static boolean burn(Level world, BlockPos blockposition, RegistryAccess iregistrycustom, @Nullable RecipeHolder<?> irecipe, NonNullList<ItemStack> nonNullList, int i) {
         banner$level.set(world);
         banner$pos.set(blockposition);
@@ -128,6 +130,7 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
      * @author wdog5
      * @reason bukkit
      */
+    /*
     @Overwrite
     private static boolean burn(RegistryAccess registryAccess, @Nullable RecipeHolder<? extends AbstractCookingRecipe> recipeHolder, SingleRecipeInput singleRecipeInput, NonNullList<ItemStack> nonNullList, int i) {
         if (recipeHolder != null && canBurn(registryAccess, recipeHolder, singleRecipeInput, nonNullList, i)) {
@@ -173,6 +176,7 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
             */
             // CraftBukkit end
 
+    /*
             if (itemstack.is(Blocks.WET_SPONGE.asItem()) && !((ItemStack) nonNullList.get(1)).isEmpty() && ((ItemStack) nonNullList.get(1)).is(Items.BUCKET)) {
                 nonNullList.set(1, new ItemStack(Items.WATER_BUCKET));
             }
@@ -182,7 +186,7 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
         } else {
             return false;
         }
-    }
+    }*/
 
     @Override
     public List<RecipeHolder<?>> getRecipesToAwardAndPopExperience(ServerLevel world, Vec3 vec, BlockPos pos, Player entity, ItemStack itemStack, int amount) {

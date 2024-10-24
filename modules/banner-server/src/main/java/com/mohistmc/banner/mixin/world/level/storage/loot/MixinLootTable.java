@@ -29,7 +29,7 @@ public abstract class MixinLootTable implements InjectionLootTable {
     @Eject(method = "fill", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/loot/LootTable;getRandomItems(Lnet/minecraft/world/level/storage/loot/LootContext;)Lit/unimi/dsi/fastutil/objects/ObjectArrayList;"))
     private ObjectArrayList<ItemStack> banner$nonPluginEvent(LootTable lootTable, LootContext context, CallbackInfo ci, Container inv) {
         ObjectArrayList<ItemStack> list = this.getRandomItems(context);
-        if (context.hasParam(LootContextParams.ORIGIN) && context.hasParam(LootContextParams.THIS_ENTITY)) {
+        if (context.hasParameter(LootContextParams.ORIGIN) && context.hasParameter(LootContextParams.THIS_ENTITY)) {
             LootGenerateEvent event = CraftEventFactory.callLootGenerateEvent(inv, (LootTable) (Object) this, context, list, isPlugin.getAndSet(false));
             if (event != null) {
                 if (event.isCancelled()) {

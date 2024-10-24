@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.entity.moster;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.monster.Silverfish;
@@ -46,7 +47,7 @@ public abstract class MixinSilverfish_WakeUpFriendsGoal extends Goal {
                             if (!CraftEventFactory.callEntityChangeBlockEvent(this.silverfish, blockPos2, Blocks.AIR.defaultBlockState())) {
                                 continue;
                             }
-                            if (level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+                            if (((ServerLevel)level).getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
                                 level.destroyBlock(blockPos2, true, this.silverfish);
                             } else {
                                 level.setBlock(blockPos2, ((InfestedBlock)block).hostStateByInfested(level.getBlockState(blockPos2)), 3);
