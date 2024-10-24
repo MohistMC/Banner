@@ -56,7 +56,7 @@
     "org.jline:jline-reader:3.12.1":"4382ab1382c7b6f379377ed5f665dc2f6e1218bc",
     "org.fusesource.jansi:jansi:1.18":"d9205bbcd4b5f9cd1effe752d18f73bd942d783f",
     "org.apache.maven:maven-artifact:3.8.5":"4433f50c07debefaed0553bd0068f4f48d449313",
-    "net.fabricmc:intermediary:1.21.1":"4b96f58657aa282efa6bb8ae9369c2d42cf96e8c",
-    "net.fabricmc.fabric-api:fabric-api:0.106.1+1.21.3":"c7d381d76c22ada6679ef9683da9384751db3874"
+    "net.fabricmc:intermediary:1.21.3":"548fc0907aa5d3e2c571d2b7890b47a126c40a08",
+    "net.fabricmc.fabric-api:fabric-api:0.106.1+1.21.3":"eca0f6294f4a0b5ad14783906d1f3224b232faa4"
   }
 }

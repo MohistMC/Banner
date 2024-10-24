@@ -15,5 +15,8 @@
   "mixins": [
     "banner.stackdeobf.mixins.json"
   ],
+  "depends": {
+    "banner-server": "*"
+  },
   "description": "Deobfuscates stacktraces to mojang mappings for Banner."
 }
