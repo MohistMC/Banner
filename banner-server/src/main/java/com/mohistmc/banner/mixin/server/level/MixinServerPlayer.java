@@ -128,11 +128,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Shadow public ServerGamePacketListenerImpl connection;
 
     @Shadow public abstract void initMenu(AbstractContainerMenu abstractContainerMenu);
-
-    @Shadow public abstract boolean teleportTo(ServerLevel level, double x, double y, double z, Set<Relative> relativeMovements, float yRot, float xRot);
-
-    @Shadow public abstract void teleportTo(ServerLevel newLevel, double x, double y, double z, float yaw, float pitch);
-
     @Shadow public abstract void setCamera(@Nullable Entity entityToSpectate);
     @Shadow public abstract void resetFallDistance();
 

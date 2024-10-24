@@ -581,6 +581,7 @@ transitive-accessible method net/minecraft/world/entity/Entity isInvulnerableToB
 transitive-accessible field net/minecraft/world/entity/animal/Wolf isWet Z
 transitive-accessible field net/minecraft/stats/ServerRecipeBook known Ljava/util/Set;
 transitive-accessible field net/minecraft/world/entity/LivingEntity LIVING_ENTITY_FLAG_SPIN_ATTACK I
+transitive-accessible field net/minecraft/world/entity/Mob lootTable Ljava/util/Optional;
 # public -f fields
 transitive-accessible field net/minecraft/world/item/trading/MerchantOffer maxUses I
 transitive-mutable field net/minecraft/world/item/trading/MerchantOffer maxUses I

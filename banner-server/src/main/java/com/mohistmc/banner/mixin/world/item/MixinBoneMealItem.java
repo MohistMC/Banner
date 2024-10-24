@@ -23,7 +23,7 @@ public abstract class MixinBoneMealItem{
                 level.levelEvent(1505, blockPos, 0);
             }
 
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.SUCCESS;
         } else {
             BlockState blockState = level.getBlockState(blockPos);
             boolean bl = blockState.isFaceSturdy(level, blockPos, context.getClickedFace());
@@ -32,7 +32,7 @@ public abstract class MixinBoneMealItem{
                     level.levelEvent(1505, blockPos2, 0);
                 }
 
-                return InteractionResult.sidedSuccess(level.isClientSide);
+                return InteractionResult.SUCCESS;
             } else {
                 return InteractionResult.PASS;
             }

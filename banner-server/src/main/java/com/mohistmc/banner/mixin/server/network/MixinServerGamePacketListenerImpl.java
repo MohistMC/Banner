@@ -35,7 +35,8 @@ import net.minecraft.network.protocol.PacketUtils;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.network.protocol.game.ClientboundMoveVehiclePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
-import net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket;
+import net.minecraft.network.protocol.game.ClientboundSetCursorItemPacket;
+import net.minecraft.network.protocol.game.ClientboundSetHeldSlotPacket;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.network.protocol.game.ServerboundAcceptTeleportationPacket;
@@ -1083,7 +1084,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         PlayerItemHeldEvent event = new PlayerItemHeldEvent(this.getCraftPlayer(), this.player.getInventory().selected, packet.getSlot());
         this.cserver.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
-            this.send(new ClientboundSetCarriedItemPacket(this.player.getInventory().selected));
+            this.send(new ClientboundSetHeldSlotPacket(this.player.getInventory().selected));
             this.player.resetLastActionTime();
             ci.cancel();
         }

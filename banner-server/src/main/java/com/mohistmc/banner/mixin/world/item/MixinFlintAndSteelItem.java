@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.item;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,9 +22,9 @@ public class MixinFlintAndSteelItem {
 
     @Inject(method = "useOn", cancellable = true, at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/Level;playSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V")
-            , locals = LocalCapture.CAPTURE_FAILHARD)
+    )
     public void banner$blockIgnite(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir,
-                                   Player player, Level level, BlockPos blockPos, BlockState blockState) {
+                                   @Local Player player, @Local Level level, @Local(ordinal = 0) BlockPos blockPos) {
         // CraftBukkit start - Store the clicked block
         if (CraftEventFactory.callBlockIgniteEvent(level, blockPos, BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL, player).isCancelled()) {
             context.getItemInHand().hurtAndBreak(1, player, LivingEntity.getSlotForHand(context.getHand()));

@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -67,7 +68,7 @@ public abstract class MixinSlime extends Mob implements InjectionSlime {
             for (int l = 0; l < k; ++l) {
                 float f1 = ((float) (l % 2) - 0.5F) * f;
                 float f2 = ((float) (l / 2) - 0.5F) * f;
-                net.minecraft.world.entity.monster.Slime slimeentity = this.getType().create(this.level());
+                net.minecraft.world.entity.monster.Slime slimeentity = this.getType().create(this.level(), EntitySpawnReason.CONVERSION);
                 if (slimeentity == null) continue;
                 if (this.isPersistenceRequired()) {
                     slimeentity.setPersistenceRequired();

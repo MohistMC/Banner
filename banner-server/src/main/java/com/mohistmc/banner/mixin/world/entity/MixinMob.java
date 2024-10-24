@@ -47,16 +47,11 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
     @Shadow @Nullable private LivingEntity target;
 
     @Shadow @Nullable public abstract LivingEntity getTarget();
-
-    @Shadow protected abstract boolean canReplaceCurrentItem(ItemStack candidate, ItemStack existing);
-
     @Shadow public abstract boolean canHoldItem(ItemStack stack);
 
     @Shadow protected abstract float getEquipmentDropChance(EquipmentSlot slot);
 
     @Shadow protected abstract void setItemSlotAndDropWhenKilled(EquipmentSlot slot, ItemStack stack);
-    @Shadow @Nullable public abstract <T extends Mob> T convertTo(EntityType<T> entityType, boolean bl);
-
     @Shadow @Nullable private Leashable.LeashData leashData;
     public boolean aware = true; // CraftBukkit
 

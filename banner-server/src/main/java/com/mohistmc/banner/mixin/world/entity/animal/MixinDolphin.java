@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.entity.animal;
 
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.AgeableWaterCreature;
 import net.minecraft.world.entity.animal.Dolphin;
 import net.minecraft.world.entity.animal.WaterAnimal;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -13,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Dolphin.class)
-public abstract class MixinDolphin extends WaterAnimal {
+public abstract class MixinDolphin extends AgeableWaterCreature {
 
     protected MixinDolphin(EntityType<? extends WaterAnimal> entityType, Level level) {
         super(entityType, level);

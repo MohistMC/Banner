@@ -4,12 +4,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import net.minecraft.world.item.CrossbowItem;
 import org.spongepowered.asm.mixin.Mixin;
 
+// Banner TODO fixme
 @Mixin(CrossbowItem.class)
 public class MixinCrossbowItem {
 
     private static AtomicBoolean banner$capturedBoolean = new AtomicBoolean(true);
-
-    /*
+    /**
     @Inject(method = "shootProjectile", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/Projectile;shoot(DDDFF)V"))
     private void banner$entityShoot(LivingEntity livingEntity, Projectile projectile, int i, float f, float g, float h, LivingEntity livingEntity2, CallbackInfo ci) {
         if (!DistValidate.isValid(worldIn)) {

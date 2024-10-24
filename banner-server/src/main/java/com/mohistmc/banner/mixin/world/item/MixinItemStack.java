@@ -117,8 +117,8 @@ public abstract class MixinItemStack implements InjectionItemStack {
             }
 
             this.hurtAndBreak(i, serverLevel, var10003, (item) -> {
-                if (this.count == 1 && livingEntity instanceof Player) {
-                    CraftEventFactory.callPlayerItemBreakEvent(((Player) livingEntity), (ItemStack) (Object) this);
+                if (this.count == 1 && livingEntity instanceof ServerPlayer) {
+                    CraftEventFactory.callPlayerItemBreakEvent((ServerPlayer) livingEntity, (ItemStack) (Object) this);
                 }
                 livingEntity.onEquippedItemBroken(item, equipmentSlot);
             });
@@ -248,7 +248,7 @@ public abstract class MixinItemStack implements InjectionItemStack {
                 return interactionResult;
             }
             world.banner$setCaptureTreeGeneration(false);
-            if (player != null && interactionResult.indicateItemUse()) {
+            if (player != null && interactionResult instanceof InteractionResult.Success) {
                 InteractionHand bannerHand = context.getHand(); // Banner
                 org.bukkit.event.block.BlockPlaceEvent placeEvent = null;
                 List<org.bukkit.block.BlockState> blocks = new java.util.ArrayList<>(world.bridge$capturedBlockStates().values());

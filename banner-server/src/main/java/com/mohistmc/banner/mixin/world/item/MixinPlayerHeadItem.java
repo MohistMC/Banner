@@ -4,6 +4,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.PlayerHeadItem;
 import org.spongepowered.asm.mixin.Mixin;
 
+// Banner TODO fixme
 @Mixin(PlayerHeadItem.class)
 public abstract class MixinPlayerHeadItem extends Item {
 

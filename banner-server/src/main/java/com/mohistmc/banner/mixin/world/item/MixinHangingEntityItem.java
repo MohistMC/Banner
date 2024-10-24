@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.item;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
@@ -22,12 +23,11 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(HangingEntityItem.class)
 public class MixinHangingEntityItem {
 
-    @Inject(method = "useOn", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD,
+    @Inject(method = "useOn", cancellable = true,
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/HangingEntity;playPlacementSound()V"))
     public void banner$hangingPlace(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir,
-                                    BlockPos blockPos, Direction direction, BlockPos blockPos1,
-                                    net.minecraft.world.entity.player.Player playerEntity,
-                                    ItemStack itemStack, Level world, HangingEntity hangingEntity) {
+                                    @Local(ordinal = 0) BlockPos blockPos, @Local Direction direction,
+                                    @Local ItemStack itemStack, @Local Level world, @Local HangingEntity hangingEntity) {
         // CraftBukkit start - fire HangingPlaceEvent
         Player who = (context.getPlayer() == null) ? null : (Player) context.getPlayer().getBukkitEntity();
         org.bukkit.block.Block blockClicked = world.getWorld().getBlockAt(blockPos.getX(), blockPos.getY(), blockPos.getZ());

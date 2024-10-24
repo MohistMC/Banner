@@ -41,14 +41,14 @@ public abstract class MixinEnderCrystal extends Entity {
     }
 
     @Redirect(method = "hurtServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;explode(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/damagesource/DamageSource;Lnet/minecraft/world/level/ExplosionDamageCalculator;DDDFZLnet/minecraft/world/level/Level$ExplosionInteraction;)V"))
-    private void banner$blockPrime(ServerLevel instance, Entity entity, DamageSource damageSource, ExplosionDamageCalculator explosionDamageCalculator, double v, double v, double v, float v, boolean b, ExplosionInteraction explosionInteraction) {
+    private void banner$blockPrime(ServerLevel instance, Entity entity, DamageSource damageSource, ExplosionDamageCalculator explosionDamageCalculator, double x, double y, double z, float explosionRadius, boolean fire, ExplosionInteraction explosionInteraction) {
         ExplosionPrimeEvent event = new ExplosionPrimeEvent(this.getBukkitEntity(), explosionRadius, fire);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             this.unsetRemoved();
-            return null;
+            return;
         } else {
-            return world.explode(entityIn, damageSource, calculator, xIn, yIn, zIn, event.getRadius(), event.getFire(), interaction);
+            instance.explode(entity, damageSource, explosionDamageCalculator, x, y, z, event.getRadius(), event.getFire(), explosionInteraction);
         }
     }
 }

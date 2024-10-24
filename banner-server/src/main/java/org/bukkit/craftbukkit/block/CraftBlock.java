@@ -6,6 +6,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.mohistmc.banner.bukkit.BukkitFieldHooks;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -469,15 +472,15 @@ public class CraftBlock implements Block {
         UseOnContext context = new UseOnContext(world, null, InteractionHand.MAIN_HAND, Items.BONE_MEAL.getDefaultInstance(), new BlockHitResult(Vec3.ZERO, direction, this.getPosition(), false));
 
         // SPIGOT-6895: Call StructureGrowEvent and BlockFertilizeEvent
-        world.captureTreeGeneration = true;
-        InteractionResult result = BoneMealItem.applyBonemeal(context);
-        world.captureTreeGeneration = false;
+        world.banner$setCaptureTreeGeneration(true);
+        InteractionResult result = BukkitMethodHooks.applyBonemeal(context);
+        world.banner$setCaptureTreeGeneration(false);
 
-        if (world.capturedBlockStates.size() > 0) {
-            TreeType treeType = SaplingBlock.treeType;
-            SaplingBlock.treeType = null;
-            List<BlockState> blocks = new ArrayList<>(world.capturedBlockStates.values());
-            world.capturedBlockStates.clear();
+        if (world.bridge$capturedBlockStates().size() > 0) {
+            TreeType treeType = BukkitFieldHooks.treeType();
+            BukkitFieldHooks.setTreeType(null);
+            List<BlockState> blocks = new ArrayList<>(world.bridge$capturedBlockStates().values());
+            world.bridge$capturedBlockStates().clear();
             StructureGrowEvent structureEvent = null;
 
             if (treeType != null) {
