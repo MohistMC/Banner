@@ -47,6 +47,10 @@ allprojects {
             name = "Adventure"
             url = 'https://jd.advntr.dev/'
         }
+        maven {
+            name = "bawnorton"
+            url = "https://maven.bawnorton.com/releases"
+        }
         mavenCentral()
     }
 
@@ -88,6 +92,7 @@ allprojects {
         //class modify
         implementation("io.izzel.arclight:mixin-tools:1.2.4") { transitive = false }
         annotationProcessor("io.izzel.arclight:mixin-tools:1.2.4") { transitive = false }
+        implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.2.0"))
 
         // mappings remapper
         implementation("net.fabricmc:mapping-io:0.6.1")
