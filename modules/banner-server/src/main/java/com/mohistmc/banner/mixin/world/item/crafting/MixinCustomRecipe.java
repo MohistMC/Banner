@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.world.item.crafting;
 
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import org.bukkit.NamespacedKey;
@@ -15,9 +15,10 @@ public abstract class MixinCustomRecipe implements CraftingRecipe {
 
     @Override
     public Recipe toBukkitRecipe(NamespacedKey id) {
-        CraftItemStack result = CraftItemStack.asCraftMirror(getResultItem(RegistryAccess.EMPTY));
+        CraftItemStack result = CraftItemStack.asCraftMirror(ItemStack.EMPTY);
+
         CraftComplexRecipe recipe = new CraftComplexRecipe(id, result, ((CustomRecipe) (Object) this));
-        recipe.setGroup(this.getGroup());
+        recipe.setGroup(this.group());
         recipe.setCategory(CraftRecipe.getCategory(this.category()));
 
         return recipe;

@@ -11,6 +11,7 @@ import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.ItemCombinerMenu;
+import net.minecraft.world.inventory.ItemCombinerMenuSlotDefinition;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.item.ItemStack;
@@ -42,11 +43,12 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu implements Injecti
     private static final int DEFAULT_DENIED_COST = -1;
     public int maximumRepairCost = Math.min(Short.MAX_VALUE, Math.max(41, BannerConfig.maximumRepairCost));
     private CraftAnvilView bukkitEntity;
+
+    public MixinAnvilMenu(@Nullable MenuType<?> menuType, int i, Inventory inventory, ContainerLevelAccess containerLevelAccess, ItemCombinerMenuSlotDefinition itemCombinerMenuSlotDefinition) {
+        super(menuType, i, inventory, containerLevelAccess, itemCombinerMenuSlotDefinition);
+    }
     // CraftBukkit end
 
-    public MixinAnvilMenu(@Nullable MenuType<?> menuType, int i, Inventory inventory, ContainerLevelAccess containerLevelAccess) {
-        super(menuType, i, inventory, containerLevelAccess);
-    }
 
     /**
      * @author wdog5
@@ -169,10 +171,11 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu implements Injecti
         if (bukkitEntity != null) {
             return bukkitEntity;
         }
-        CraftInventory inventory = new CraftInventoryAnvil(
-                access.getLocation(), this.inputSlots, this.resultSlots, ((AnvilMenu) (Object) this));
-        bukkitEntity = new CraftAnvilView(this.player.getBukkitEntity(), inventory, ((AnvilMenu) (Object) this));
-        return bukkitEntity;
+        org.bukkit.craftbukkit.inventory.CraftInventoryAnvil inventory = new org.bukkit.craftbukkit.inventory.CraftInventoryAnvil(
+                this.access.getLocation(), this.inputSlots, this.resultSlots);
+        this.bukkitEntity = new CraftAnvilView(this.player.getBukkitEntity(), inventory, ((AnvilMenu) (Object) this));
+        this.bukkitEntity.updateFromLegacy(inventory);
+        return this.bukkitEntity;
     }
     // CraftBukkit end
 }

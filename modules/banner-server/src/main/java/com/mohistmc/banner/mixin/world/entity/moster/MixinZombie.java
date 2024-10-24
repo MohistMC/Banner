@@ -1,8 +1,8 @@
 package com.mohistmc.banner.mixin.world.entity.moster;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.asm.annotation.TransformAccess;
-import io.izzel.arclight.mixin.Eject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
@@ -58,8 +58,8 @@ public abstract class MixinZombie extends Monster {
         }
     }
 
-    @Inject(method = "hurt", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/Zombie;setTarget(Lnet/minecraft/world/entity/LivingEntity;)V"))
-    private void banner$spawnWithReason(DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> cir, ServerLevel serverLevel, LivingEntity livingEntity, int i, int j, int k, net.minecraft.world.entity.monster.Zombie zombie, int l, int m, int n, int o, BlockPos blockPos, EntityType entityType) {
+    @Inject(method = "hurtServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/Zombie;setTarget(Lnet/minecraft/world/entity/LivingEntity;)V"))
+    private void banner$spawnWithReason(ServerLevel serverLevel, DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> cir, @Local LivingEntity livingEntity, @Local(ordinal = 1) net.minecraft.world.entity.monster.Zombie zombie) {
         serverLevel.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.REINFORCEMENTS);
         if (livingEntity != null) {
             zombie.bridge$pushGoalTargetReason(EntityTargetEvent.TargetReason.REINFORCEMENT_TARGET, true);
@@ -75,11 +75,11 @@ public abstract class MixinZombie extends Monster {
         }
     }
 
-    @Eject(method = "killedEntity(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;convertTo(Lnet/minecraft/world/entity/EntityType;Z)Lnet/minecraft/world/entity/Mob;"))
-    private <T extends Mob> T banner$transform(Villager villagerEntity, EntityType<T> entityType, boolean flag, CallbackInfoReturnable<Boolean> cir) {
-         villagerEntity.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.INFECTION);
-         villagerEntity.bridge$pushTransformReason(EntityTransformEvent.TransformReason.INFECTION);
-        T t = villagerEntity.convertTo(entityType, flag);
+    @Redirect(method = "killedEntity(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/Zombie;convertVillagerToZombieVillager(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/npc/Villager;)Z"))
+    private <T extends Mob> boolean banner$transform(net.minecraft.world.entity.monster.Zombie instance, ServerLevel serverLevel, Villager villager) {
+        villager.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.INFECTION);
+        villager.bridge$pushTransformReason(EntityTransformEvent.TransformReason.INFECTION);
+        T t = villager.convertTo(entityType, flag);
         if (t == null) {
             cir.setReturnValue(false);
         }

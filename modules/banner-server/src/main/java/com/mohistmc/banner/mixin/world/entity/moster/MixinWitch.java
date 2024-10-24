@@ -33,6 +33,8 @@ public abstract class MixinWitch extends Raider {
         pushEffectCause(EntityPotionEffectEvent.Cause.ATTACK);
     }
 
+    // Banner TODO fixme
+    /*
     @Inject(method = "aiStep", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/item/ItemStack;is(Lnet/minecraft/world/item/Item;)Z"),
             locals = LocalCapture.CAPTURE_FAILHARD)
@@ -66,5 +68,5 @@ public abstract class MixinWitch extends Raider {
             target = "Lnet/minecraft/world/entity/projectile/ThrownPotion;setItem(Lnet/minecraft/world/item/ItemStack;)V"))
     private void banner$setPaperPotion(ThrownPotion instance, ItemStack itemStack) {
         instance.setItem(paperPotion.get());
-    }
+    }*/
 }

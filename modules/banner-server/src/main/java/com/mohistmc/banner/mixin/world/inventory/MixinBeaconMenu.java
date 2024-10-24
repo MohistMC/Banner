@@ -11,6 +11,8 @@ import net.minecraft.world.inventory.MenuType;
 import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.craftbukkit.inventory.CraftInventoryBeacon;
 import org.bukkit.craftbukkit.inventory.view.CraftBeaconView;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.BeaconInventory;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -51,7 +53,7 @@ public abstract class MixinBeaconMenu extends AbstractContainerMenu {
         }
 
         CraftInventory inventory = new CraftInventoryBeacon(this.beacon);
-        bukkitEntity = new CraftBeaconView(this.playerInventory.player.getBukkitEntity(), inventory, (BeaconMenu) (Object) this);
+        bukkitEntity = new CraftBeaconView(this.playerInventory.player.getBukkitEntity(), (BeaconInventory) inventory, (BeaconMenu) (Object) this);
         return bukkitEntity;
     }
 }
