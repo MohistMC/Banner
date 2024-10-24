@@ -2277,7 +2277,7 @@ public final class CraftServer implements Server {
     }
 
     public void checkSaveState() {
-        if (this.playerCommandState || this.printSaveWarning || this.console.autosavePeriod <= 0) {
+        if (this.playerCommandState || this.printSaveWarning || this.console.bridge$autosavePeriod() <= 0) {
             return;
         }
         this.printSaveWarning = true;

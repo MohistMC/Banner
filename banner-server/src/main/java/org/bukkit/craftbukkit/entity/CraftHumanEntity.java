@@ -318,14 +318,14 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         if (this.getHandle().containerMenu == formerContainer) {
             return null;
         }
-        this.getHandle().containerMenu.checkReachable = false;
+        this.getHandle().containerMenu.banner$setCheckReachable(false);
         return this.getHandle().containerMenu.getBukkitView();
     }
 
     private static void openCustomInventory(Inventory inventory, ServerPlayer player, MenuType<?> windowType) {
         if (player.connection == null) return;
         Preconditions.checkArgument(windowType != null, "Unknown windowType");
-        AbstractContainerMenu container = new CraftContainer(inventory, player, player.nextContainerCounter());
+        AbstractContainerMenu container = new CraftContainer(inventory, player, player.nextContainerCounterInt());
 
         container = CraftEventFactory.callInventoryOpenEvent(player, container);
         if (container == null) return;
@@ -350,7 +350,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         }
         this.getHandle().openMenu(Blocks.CRAFTING_TABLE.defaultBlockState().getMenuProvider(this.getHandle().level(), CraftLocation.toBlockPosition(location)));
         if (force) {
-            this.getHandle().containerMenu.checkReachable = false;
+            this.getHandle().containerMenu.banner$setCheckReachable(false);
         }
         return this.getHandle().containerMenu.getBukkitView();
     }
@@ -372,7 +372,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         this.getHandle().openMenu(Blocks.ENCHANTING_TABLE.defaultBlockState().getMenuProvider(this.getHandle().level(), pos));
 
         if (force) {
-            this.getHandle().containerMenu.checkReachable = false;
+            this.getHandle().containerMenu.banner$setCheckReachable(false);
         }
         return this.getHandle().containerMenu.getBukkitView();
     }
@@ -391,7 +391,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         if (inventory instanceof CraftInventoryView) {
             container = ((CraftInventoryView) inventory).getHandle();
         } else {
-            container = new CraftContainer(inventory, this.getHandle(), player.nextContainerCounter());
+            container = new CraftContainer(inventory, this.getHandle(), player.nextContainerCounterInt());
         }
 
         // Trigger an INVENTORY_OPEN event
@@ -659,32 +659,32 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
 
     @Override
     public int getSaturatedRegenRate() {
-        return this.getHandle().getFoodData().saturatedRegenRate;
+        return this.getHandle().getFoodData().bridge$saturatedRegenRate();
     }
 
     @Override
     public void setSaturatedRegenRate(int i) {
-        this.getHandle().getFoodData().saturatedRegenRate = i;
+        this.getHandle().getFoodData().banner$setSaturatedRegenRate(i);
     }
 
     @Override
     public int getUnsaturatedRegenRate() {
-        return this.getHandle().getFoodData().unsaturatedRegenRate;
+        return this.getHandle().getFoodData().bridge$unsaturatedRegenRate();
     }
 
     @Override
     public void setUnsaturatedRegenRate(int i) {
-        this.getHandle().getFoodData().unsaturatedRegenRate = i;
+        this.getHandle().getFoodData().banner$setUnsaturatedRegenRate(i);
     }
 
     @Override
     public int getStarvationRate() {
-        return this.getHandle().getFoodData().starvationRate;
+        return this.getHandle().getFoodData().bridge$starvationRate();
     }
 
     @Override
     public void setStarvationRate(int i) {
-        this.getHandle().getFoodData().starvationRate = i;
+        this.getHandle().getFoodData().banner$setStarvationRate(i);
     }
 
     @Override

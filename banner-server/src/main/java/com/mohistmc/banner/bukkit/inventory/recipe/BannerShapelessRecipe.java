@@ -21,11 +21,15 @@ public class BannerShapelessRecipe extends CraftShapelessRecipe {
 
     @Override
     public @NotNull ItemStack getResult() {
-        return CraftItemStack.asCraftMirror(this.recipe.getResultItem(BukkitMethodHooks.getServer().registryAccess()));
+        // Banner TODO fixme
+        //return CraftItemStack.asCraftMirror(this.recipe.getRemainingItems(BukkitMethodHooks.getServer().registryAccess()));
+
+        return super.getResult();
     }
 
     @Override
     public void addToCraftingManager() {
-        BukkitMethodHooks.getServer().getRecipeManager().addRecipe((new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.getKey()), this.recipe)));
+        // Banner TODO fixme
+        //BukkitMethodHooks.getServer().getRecipeManager().addRecipe((new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.getKey()), this.recipe)));
     }
 }

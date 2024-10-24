@@ -22,11 +22,14 @@ public class BannerModdedRecipe extends CraftComplexRecipe {
 
     @Override
     public @NotNull ItemStack getResult() {
-        return CraftItemStack.asCraftMirror(new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.getKey()), this.recipe).value().getResultItem(BukkitMethodHooks.getServer().registryAccess()));
+        // Banner TODO fixme
+        //return CraftItemStack.asCraftMirror(new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.getKey()), this.recipe).value().getResultItem(BukkitMethodHooks.getServer().registryAccess()));
+        return super.getResult();
     }
 
     @Override
     public void addToCraftingManager() {
-        BukkitMethodHooks.getServer().getRecipeManager().addRecipe((new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.getKey()), this.recipe)));
+        // Banner TODO fixme
+        //BukkitMethodHooks.getServer().getRecipeManager().addRecipe((new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.getKey()), this.recipe)));
     }
 }

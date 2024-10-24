@@ -64,8 +64,8 @@ public enum Art implements Keyed {
 
     private final int id, width, height;
     private final NamespacedKey key;
-    private static final HashMap<String, Art> BY_NAME = Maps.newHashMap();
-    private static final HashMap<Integer, Art> BY_ID = Maps.newHashMap();
+    public static HashMap<String, Art> BY_NAME = Maps.newHashMap();
+    public static HashMap<Integer, Art> BY_ID = Maps.newHashMap();
 
     private Art(int id, int width, int height) {
         this.id = id;

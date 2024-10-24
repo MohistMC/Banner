@@ -230,4 +230,12 @@ public interface InjectionServerPlayer extends InjectionPlayer {
     default void resendItemInHands() {
         throw new IllegalStateException("Not implemented");
     }
+
+    default int bridge$listOrder() {
+        throw new IllegalStateException("Not implemented");
+    }
+
+    default void banner$setListOrder(int listOrder) {
+        throw new IllegalStateException("Not implemented");
+    }
 }

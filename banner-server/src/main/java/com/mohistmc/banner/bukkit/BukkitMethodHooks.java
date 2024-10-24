@@ -29,7 +29,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 
 public class BukkitMethodHooks {
 
-    private static final MethodHandle zombifyVillager;
+    private static final MethodHandle convertVillagerToZombieVillager;
     private static final MethodHandle defaultRegistryAccess;
     private static final MethodHandle cbServer;
     private static final MethodHandle calculateBoundingBoxStaticItemFrame;
@@ -44,8 +44,8 @@ public class BukkitMethodHooks {
 
     static {
         try {
-            var zombifyVillagerMethod = ZombieVillager.class.getDeclaredMethod("zombifyVillager", ServerLevel.class, Villager.class, BlockPos.class, boolean.class, CreatureSpawnEvent.SpawnReason.class);
-            zombifyVillager = MethodHandles.lookup().unreflect(zombifyVillagerMethod);
+            var convertVillagerToZombieVillagerMethod = ZombieVillager.class.getDeclaredMethod("convertVillagerToZombieVillager", ServerLevel.class, Villager.class, BlockPos.class, boolean.class, CreatureSpawnEvent.SpawnReason.class);
+            convertVillagerToZombieVillager = MethodHandles.lookup().unreflect(convertVillagerToZombieVillagerMethod);
             var defaultRegistryAccessMethod = MinecraftServer.class.getDeclaredMethod("getDefaultRegistryAccess");
             defaultRegistryAccess = MethodHandles.lookup().unreflect(defaultRegistryAccessMethod);
             var cbServerMethod = MinecraftServer.class.getDeclaredMethod("getServer");
@@ -73,9 +73,9 @@ public class BukkitMethodHooks {
         }
     }
 
-    public static ZombieVillager zombifyVillager(ServerLevel level, Villager villager, BlockPos blockPosition, boolean silent, CreatureSpawnEvent.SpawnReason spawnReason) {
+    public static ZombieVillager convertVillagerToZombieVillager(ServerLevel level, Villager villager, BlockPos blockPosition, boolean silent, CreatureSpawnEvent.SpawnReason spawnReason) {
         try {
-            return (ZombieVillager) zombifyVillager.invokeWithArguments(level, villager, blockPosition, silent, spawnReason);
+            return (ZombieVillager) convertVillagerToZombieVillager.invokeWithArguments(level, villager, blockPosition, silent, spawnReason);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

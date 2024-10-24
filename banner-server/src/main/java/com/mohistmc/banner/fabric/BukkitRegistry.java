@@ -249,7 +249,7 @@ public class BukkitRegistry {
 
     private static void loadArts(DedicatedServer console) {
         int i = Art.values().length;
-        var registry = console.registryAccess().registryOrThrow(Registries.PAINTING_VARIANT);
+        var registry = console.registryAccess().lookupOrThrow(Registries.PAINTING_VARIANT);
         for (var entry : registry) {
             ResourceLocation resourceLocation = registry.getKey(entry);
             if (!resourceLocation.getNamespace().equals(NamespacedKey.MINECRAFT)) {
@@ -284,7 +284,7 @@ public class BukkitRegistry {
 
     private static void loadBiomes(DedicatedServer console) {
         List<String> map = new ArrayList<>();
-        var registry = console.registryAccess().registryOrThrow(Registries.BIOME);
+        var registry = console.registryAccess().lookupOrThrow(Registries.BIOME);
         for (net.minecraft.world.level.biome.Biome biome : registry) {
             ResourceLocation resourceLocation = registry.getKey(biome);
             String biomeName = normalizeName(resourceLocation.toString());

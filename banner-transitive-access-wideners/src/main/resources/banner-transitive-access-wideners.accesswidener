@@ -218,6 +218,7 @@ transitive-accessible method net/minecraft/world/level/block/entity/LecternBlock
 transitive-accessible method net/minecraft/world/level/biome/Biome getTemperature (Lnet/minecraft/core/BlockPos;I)F
 transitive-accessible method net/minecraft/world/entity/projectile/AbstractArrow isInGround ()Z
 transitive-accessible method net/minecraft/world/entity/decoration/Painting offsetForPaintingSize (I)D
+transitive-accessible method net/minecraft/world/entity/LivingEntity setLivingEntityFlag (IZ)V
 # public fields
 transitive-accessible field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner stateAccessor Lnet/minecraft/world/level/block/entity/trialspawner/TrialSpawner$StateAccessor;
 transitive-accessible field net/minecraft/world/level/block/state/BlockBehaviour$BlockStateBase destroySpeed F
@@ -578,6 +579,8 @@ transitive-accessible field net/minecraft/world/item/crafting/RecipeMap byType L
 transitive-accessible field net/minecraft/world/entity/vehicle/AbstractBoat status Lnet/minecraft/world/entity/vehicle/AbstractBoat$Status;
 transitive-accessible method net/minecraft/world/entity/Entity isInvulnerableToBase (Lnet/minecraft/world/damagesource/DamageSource;)Z
 transitive-accessible field net/minecraft/world/entity/animal/Wolf isWet Z
+transitive-accessible field net/minecraft/stats/ServerRecipeBook known Ljava/util/Set;
+transitive-accessible field net/minecraft/world/entity/LivingEntity LIVING_ENTITY_FLAG_SPIN_ATTACK I
 # public -f fields
 transitive-accessible field net/minecraft/world/item/trading/MerchantOffer maxUses I
 transitive-mutable field net/minecraft/world/item/trading/MerchantOffer maxUses I

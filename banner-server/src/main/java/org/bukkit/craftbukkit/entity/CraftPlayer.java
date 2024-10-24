@@ -36,6 +36,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -83,6 +85,7 @@ import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.network.protocol.game.ClientboundTabListPacket;
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket;
 import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
@@ -430,7 +433,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     public void setPlayerListOrder(int order) {
         Preconditions.checkArgument(order >= 0, "order cannot be negative");
 
-        this.getHandle().listOrder = order;
+        this.getHandle().banner$setListOrder(order);
     }
 
     private Component playerListHeader;
@@ -749,9 +752,12 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
         // Construct the packets using the data allocated above and send then to the players
         for (Map.Entry<SectionPos, ChunkSectionChanges> entry : changes.entrySet()) {
+            // Banner start
             ChunkSectionChanges chunkChanges = entry.getValue();
-            ClientboundSectionBlocksUpdatePacket packet = new ClientboundSectionBlocksUpdatePacket(entry.getKey(), chunkChanges.positions(), chunkChanges.blockData().toArray(net.minecraft.world.level.block.state.BlockState[]::new));
-            this.getHandle().connection.send(packet);
+            ClientboundSectionBlocksUpdatePacket packet = new ClientboundSectionBlocksUpdatePacket(entry.getKey(), chunkChanges.positions(), null);
+            packet.putBukkitPacket(chunkChanges.blockData().toArray(net.minecraft.world.level.block.state.BlockState[]::new));
+            getHandle().connection.send(packet);
+            // Banner end
         }
     }
 
@@ -1136,13 +1142,13 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public void setSleepingIgnored(boolean isSleeping) {
-        this.getHandle().fauxSleeping = isSleeping;
+        this.getHandle().banner$setFauxSleeping(isSleeping);
         ((CraftWorld) this.getWorld()).getHandle().updateSleepingPlayerList();
     }
 
     @Override
     public boolean isSleepingIgnored() {
-        return this.getHandle().fauxSleeping;
+        return this.getHandle().bridge$fauxSleeping();
     }
 
     @Override
@@ -1312,13 +1318,13 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public void setPlayerTime(long time, boolean relative) {
-        this.getHandle().timeOffset = time;
-        this.getHandle().relativeTime = relative;
+        this.getHandle().banner$setTimeOffset(time);
+        this.getHandle().banner$setRelativeTime(relative);
     }
 
     @Override
     public long getPlayerTimeOffset() {
-        return this.getHandle().timeOffset;
+        return this.getHandle().bridge$timeOffset();
     }
 
     @Override
@@ -1328,7 +1334,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public boolean isPlayerTimeRelative() {
-        return this.getHandle().relativeTime;
+        return this.getHandle().bridge$relativeTime();
     }
 
     @Override
@@ -1585,7 +1591,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         // Remove the hidden entity from this player user list, if they're on it
         if (other instanceof ServerPlayer) {
             ServerPlayer otherPlayer = (ServerPlayer) other;
-            if (otherPlayer.sentListPacket) {
+            if (otherPlayer.bridge$sentListPacket()) {
                 this.getHandle().connection.send(new ClientboundPlayerInfoRemovePacket(List.of(otherPlayer.getUUID())));
             }
         }
@@ -1769,11 +1775,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
             if (data.contains("newExp")) {
                 ServerPlayer handle = this.getHandle();
-                handle.newExp = data.getInt("newExp");
-                handle.newTotalExp = data.getInt("newTotalExp");
-                handle.newLevel = data.getInt("newLevel");
-                handle.expToDrop = data.getInt("expToDrop");
-                handle.keepLevel = data.getBoolean("keepLevel");
+                handle.banner$setNewExp(data.getInt("newExp"));
+                handle.banner$setNewTotalExp(data.getInt("newTotalExp"));
+                handle.banner$setNewLevel(data.getInt("newLevel"));
+                handle.banner$setExpToDrop(data.getInt("expToDrop"));
+                handle.banner$setKeepLevel(data.getBoolean("keepLevel"));
             }
         }
     }
@@ -1785,11 +1791,14 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
         CompoundTag data = nbttagcompound.getCompound("bukkit");
         ServerPlayer handle = this.getHandle();
-        data.putInt("newExp", handle.newExp);
-        data.putInt("newTotalExp", handle.newTotalExp);
-        data.putInt("newLevel", handle.newLevel);
-        data.putInt("expToDrop", handle.expToDrop);
-        data.putBoolean("keepLevel", handle.keepLevel);
+        data.putInt("newExp", handle.bridge$newExp());
+        data.putInt("newTotalExp", handle.bridge$newTotalExp());
+        data.putInt("newLevel", handle.bridge$newLevel());
+        data.putInt("expToDrop", handle.bridge$expToDrop());
+        data.putBoolean("keepLevel", handle.bridge$keepLevel());
+        data.putLong("firstPlayed", getFirstPlayed());
+        data.putLong("lastPlayed", System.currentTimeMillis());
+        data.putString("lastKnownName", handle.getScoreboardName());
         data.putLong("firstPlayed", this.getFirstPlayed());
         data.putLong("lastPlayed", System.currentTimeMillis());
         data.putString("lastKnownName", handle.getScoreboardName());
@@ -1832,7 +1841,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     }
 
     private void sendCustomPayload(ResourceLocation id, byte[] message) {
-        ClientboundCustomPayloadPacket packet = new ClientboundCustomPayloadPacket(new DiscardedPayload(id, Unpooled.wrappedBuffer(message)));
+        var payload = new DiscardedPayload(id);
+        payload.bridge$setData(Unpooled.wrappedBuffer(message));
+        ClientboundCustomPayloadPacket packet = new ClientboundCustomPayloadPacket(payload);
         this.getHandle().connection.send(packet);
     }
 
@@ -2152,7 +2163,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         }
         this.getHandle().getEntityData().set(net.minecraft.world.entity.LivingEntity.DATA_HEALTH_ID, (float) this.getScaledHealth());
 
-        this.getHandle().maxHealthCache = this.getMaxHealth();
+        this.getHandle().banner$setMaxHealthCache(this.getMaxHealth());
     }
 
     @Override
@@ -2372,7 +2383,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         @Override
         public InetSocketAddress getRawAddress()
         {
-            return (InetSocketAddress) CraftPlayer.this.getHandle().connection.getRawAddress();
+            return (InetSocketAddress) CraftPlayer.this.getHandle().connection.connection.getRawAddress();
         }
 
         @Override
@@ -2436,9 +2447,12 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
         @Override
         public void sendMessage(net.md_5.bungee.api.ChatMessageType position, UUID sender, BaseComponent... components) {
-            if ( CraftPlayer.this.getHandle().connection == null ) return;
-
-            CraftPlayer.this.getHandle().connection.send(new net.minecraft.network.protocol.game.ClientboundSystemChatPacket(components, position == net.md_5.bungee.api.ChatMessageType.ACTION_BAR));
+            if ( getHandle().connection == null ) return;
+            getHandle().connection.send(new ClientboundSystemChatPacket(
+                    Component.Serializer.fromJson(
+                            ComponentSerializer.toString(components), getHandle().level().registryAccess()
+                    ), position == net.md_5.bungee.api.ChatMessageType.ACTION_BAR
+            ));
         }
     };
 

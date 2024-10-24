@@ -111,7 +111,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
         Preconditions.checkArgument(health >= 0 && health <= this.getMaxHealth(), "Health value (%s) must be between 0 and %s", health, this.getMaxHealth());
 
         // during world generation, we don't want to run logic for dropping items and xp
-        if (this.getHandle().generation && health == 0) {
+        if (this.getHandle().bridge$generation() && health == 0) {
             this.getHandle().discard(null); // Add Bukkit remove cause
             return;
         }
@@ -167,7 +167,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
     }
 
     private List<Block> getLineOfSight(Set<Material> transparent, int maxDistance, int maxLength) {
-        Preconditions.checkState(!this.getHandle().generation, "Cannot get line of sight during world generation");
+        Preconditions.checkState(!this.getHandle().bridge$generation(), "Cannot get line of sight during world generation");
 
         if (transparent == null) {
             transparent = Sets.newHashSet(Material.AIR, Material.CAVE_AIR, Material.VOID_AIR);
@@ -225,7 +225,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
 
     @Override
     public RayTraceResult rayTraceBlocks(double maxDistance, FluidCollisionMode fluidCollisionMode) {
-        Preconditions.checkState(!this.getHandle().generation, "Cannot ray tray blocks during world generation");
+        Preconditions.checkState(!this.getHandle().bridge$generation(), "Cannot ray tray blocks during world generation");
 
         Location eyeLocation = this.getEyeLocation();
         Vector direction = eyeLocation.getDirection();
@@ -244,12 +244,12 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
 
     @Override
     public int getMaximumAir() {
-        return this.getHandle().maxAirTicks;
+        return this.getHandle().bridge$maxAirTicks();
     }
 
     @Override
     public void setMaximumAir(int ticks) {
-        this.getHandle().maxAirTicks = ticks;
+        this.getHandle().banner$setMaxAirTicks(ticks);
     }
 
     @Override
@@ -321,7 +321,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
 
     private void damage(double amount, DamageSource damageSource) {
         Preconditions.checkArgument(damageSource != null, "damageSource cannot be null");
-        Preconditions.checkState(!this.getHandle().generation, "Cannot damage entity during world generation");
+        Preconditions.checkState(!this.getHandle().bridge$generation(), "Cannot damage entity during world generation");
 
         this.entity.hurt(damageSource, (float) amount);
     }
@@ -446,7 +446,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Projectile> T launchProjectile(Class<? extends T> projectile, Vector velocity) {
-        Preconditions.checkState(!this.getHandle().generation, "Cannot launch projectile during world generation");
+        Preconditions.checkState(!this.getHandle().bridge$generation(), "Cannot launch projectile during world generation");
 
         net.minecraft.world.level.Level world = ((CraftWorld) this.getWorld()).getHandle();
         net.minecraft.world.entity.Entity launch = null;
@@ -508,7 +508,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
                 launch = new LargeFireball(world, this.getHandle(), vec, 1);
             }
 
-            ((AbstractHurtingProjectile) launch).projectileSource = this;
+            ((AbstractHurtingProjectile) launch).banner$setProjectileSource(this);
             launch.moveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
         } else if (LlamaSpit.class.isAssignableFrom(projectile)) {
             Location location = this.getEyeLocation();
@@ -543,7 +543,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
 
     @Override
     public boolean hasLineOfSight(Entity other) {
-        Preconditions.checkState(!this.getHandle().generation, "Cannot check line of sight during world generation");
+        Preconditions.checkState(!this.getHandle().bridge$generation(), "Cannot check line of sight during world generation");
 
         return this.getHandle().hasLineOfSight(((CraftEntity) other).getHandle());
     }
@@ -570,7 +570,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
         if (this.getHandle() instanceof Mob) {
             ((Mob) this.getHandle()).setCanPickUpLoot(pickup);
         } else {
-            this.getHandle().bukkitPickUpLoot = pickup;
+            this.getHandle().banner$setBukkitPickUpLoot(pickup);
         }
     }
 
@@ -579,7 +579,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
         if (this.getHandle() instanceof Mob) {
             return ((Mob) this.getHandle()).canPickUpLoot();
         } else {
-            return this.getHandle().bukkitPickUpLoot;
+            return this.getHandle().bridge$bukkitPickUpLoot();
         }
     }
 
@@ -616,7 +616,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
 
     @Override
     public boolean setLeashHolder(Entity holder) {
-        if (this.getHandle().generation || (this.getHandle() instanceof WitherBoss) || !(this.getHandle() instanceof Mob)) {
+        if (this.getHandle().bridge$generation() || (this.getHandle() instanceof WitherBoss) || !(this.getHandle() instanceof Mob)) {
             return false;
         }
 
@@ -670,14 +670,14 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
 
     @Override
     public boolean isClimbing() {
-        Preconditions.checkState(!this.getHandle().generation, "Cannot check if climbing during world generation");
+        Preconditions.checkState(!this.getHandle().bridge$generation(), "Cannot check if climbing during world generation");
 
         return this.getHandle().onClimbable();
     }
 
     @Override
     public AttributeInstance getAttribute(Attribute attribute) {
-        return this.getHandle().craftAttributes.getAttribute(attribute);
+        return this.getHandle().bridge$craftAttributes().getAttribute(attribute);
     }
 
     @Override
@@ -695,7 +695,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
     @Override
     public void attack(Entity target) {
         Preconditions.checkArgument(target != null, "target == null");
-        Preconditions.checkState(!this.getHandle().generation, "Cannot attack during world generation");
+        Preconditions.checkState(!this.getHandle().bridge$generation(), "Cannot attack during world generation");
 
         if (this.getHandle() instanceof net.minecraft.world.entity.player.Player) {
             ((net.minecraft.world.entity.player.Player) this.getHandle()).attack(((CraftEntity) target).getHandle());
@@ -706,14 +706,14 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
 
     @Override
     public void swingMainHand() {
-        Preconditions.checkState(!this.getHandle().generation, "Cannot swing hand during world generation");
+        Preconditions.checkState(!this.getHandle().bridge$generation(), "Cannot swing hand during world generation");
 
         this.getHandle().swing(InteractionHand.MAIN_HAND, true);
     }
 
     @Override
     public void swingOffHand() {
-        Preconditions.checkState(!this.getHandle().generation, "Cannot swing hand during world generation");
+        Preconditions.checkState(!this.getHandle().bridge$generation(), "Cannot swing hand during world generation");
 
         this.getHandle().swing(InteractionHand.OFF_HAND, true);
     }
@@ -734,17 +734,17 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
 
     @Override
     public void setCollidable(boolean collidable) {
-        this.getHandle().collides = collidable;
+        this.getHandle().banner$setCollides(collidable);
     }
 
     @Override
     public boolean isCollidable() {
-        return this.getHandle().collides;
+        return this.getHandle().bridge$collides();
     }
 
     @Override
     public Set<UUID> getCollidableExemptions() {
-        return this.getHandle().collidableExemptions;
+        return this.getHandle().bridge$collidableExemptions();
     }
 
     @Override
@@ -825,7 +825,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
 
     @Override
     public void setInvisible(boolean invisible) {
-        this.getHandle().persistentInvisibility = invisible;
+        this.getHandle().banner$setPersistentInvisibility(invisible);
         this.getHandle().setSharedFlag(5, invisible);
     }
 }
