@@ -64,11 +64,13 @@ public class BannerMain {
             Files.createDirectories(path.getParent());
             Files.copy(Objects.requireNonNull(BannerMain.class.getResourceAsStream("/gson.jar")), path);
         }
+        // Banner TODO fixme
+        /*
         try {
-            extractMC();
+            //extractMC();
         } catch (Exception e) {
             System.out.println("Failed to extract MC Jar");
-        }
+        }*/
         try (var loader = new URLClassLoader(new URL[]{path.toUri().toURL(), BannerMain.class.getProtectionDomain().getCodeSource().getLocation()}, ClassLoader.getPlatformClassLoader())) {
             var cl = loader.loadClass("com.mohistmc.banner.install.FabricInstaller");
             var handle = MethodHandles.lookup().findStatic(cl, "applicationInstall", MethodType.methodType(Map.Entry.class));

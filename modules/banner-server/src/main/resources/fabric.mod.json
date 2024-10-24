@@ -23,8 +23,7 @@
     ]
   },
   "mixins": [
-    "banner.server.mixins.json",
-    "banner.event.mixins.json"
+
   ],
 
   "depends": {
@@ -32,7 +31,7 @@
     "java": ">=21",
     "banner-api": "*",
     "banner-transitive-access-wideners": "*",
-    "minecraft": "1.21.2"
+    "minecraft": "1.21.3"
   },
   "custom": {
     "loom:injected_interfaces": {
