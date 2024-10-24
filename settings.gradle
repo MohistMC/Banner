@@ -9,10 +9,30 @@ pluginManagement {
     }
 }
 
-include("banner-server")
-include("banner-api")
-include("banner-transitive-access-wideners")
-include("banner-stackdeobf")
-include("banner-plugin")
-include("banner-bootstrap")
-include("banner-bukkit-manager")
+for (File file in getFile("modules").listFiles()) {
+    if (isModuleDir(file)) {
+        String name = file.name
+        include(name)
+        ProjectDescriptor project = project(":" + name)
+        project.projectDir = getFile("modules/" + name)
+    }
+}
+
+// jank! why is this needed??
+def getFile(String name) {
+    return file(name)
+}
+
+static def isModuleDir(File file) {
+    if (file.isDirectory()) {
+        File[] files = file.listFiles()
+        if (files != null) {
+            for (File subFile in files) {
+                if (subFile.name == "build.gradle") {
+                    return true
+                }
+            }
+        }
+    }
+    return false
+}
