@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -17,10 +18,10 @@ public class MixinTrapDoorBlock {
 
 
     @Redirect(method = "neighborChanged", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;hasNeighborSignal(Lnet/minecraft/core/BlockPos;)Z"))
-    public boolean banner$blockRedstone(Level world, BlockPos pos, BlockState state, Level worldIn, BlockPos blockPos, Block blockIn, BlockPos fromPos, boolean isMoving) {
-        boolean flag = world.hasNeighborSignal(pos);
+    public boolean banner$blockRedstone(Level instance, BlockPos blockPos, @Local(argsOnly = true) Level world, @Local(argsOnly = true) BlockState state, @Local(argsOnly = true) Block blockIn) {
+        boolean flag = world.hasNeighborSignal(blockPos);
         if (flag != state.getValue(TrapDoorBlock.POWERED)) {
-            org.bukkit.block.Block craftBlock = CraftBlock.at(world, pos);
+            org.bukkit.block.Block craftBlock = CraftBlock.at(world, blockPos);
             int power = craftBlock.getBlockPower();
             int oldPower = state.getValue(TrapDoorBlock.OPEN) ? 15 : 0;
 

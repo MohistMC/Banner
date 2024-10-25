@@ -442,6 +442,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
     private transient boolean banner$damageResult;
     @Unique protected transient EntityDamageResult entityDamageResult;
 
+    /*
     @Decorate(method = "hurtServer", inject = true, at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;noActionTime:I"))
     private void banner$entityDamageEvent(DamageSource damagesource, float originalDamage) throws Throwable {
         banner$damageResult = false;
@@ -563,13 +564,14 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
             originalDamage = 0;
             DecorationOps.blackhole().invoke(originalDamage);
         }
-    }
+    }*/
 
     @ModifyExpressionValue(method = "hurtServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isDamageSourceBlocked(Lnet/minecraft/world/damagesource/DamageSource;)Z"))
     private boolean banner$cancelShieldBlock(boolean original) {
         return (entityDamageResult == null || !entityDamageResult.blockingCancelled()) && original;
     }
 
+    /*
     @Decorate(method = "hurtServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;hurtHelmet(Lnet/minecraft/world/damagesource/DamageSource;F)V"))
     private void banner$cancelHurtHelmet(LivingEntity instance, DamageSource damageSource, float f) throws
             Throwable {
@@ -600,7 +602,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
             return;
         }
         DecorationOps.blackhole().invoke();
-    }
+    }*/
 
     /*
     @Override

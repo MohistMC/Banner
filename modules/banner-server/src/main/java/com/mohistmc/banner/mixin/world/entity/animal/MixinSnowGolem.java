@@ -1,12 +1,14 @@
 package com.mohistmc.banner.mixin.world.entity.animal;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.AbstractGolem;
 import net.minecraft.world.entity.animal.SnowGolem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
@@ -34,13 +36,13 @@ public abstract class MixinSnowGolem extends AbstractGolem {
         return CraftEventFactory.handleBlockFormEvent(world, pos, state, (SnowGolem) (Object) this);
     }
 
-    @Inject(method = "shear", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/SnowGolem;spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;"))
-    private void banner$forceDropOn(SoundSource pCategory, CallbackInfo ci) {
+    @Inject(method = "shear", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/SnowGolem;dropFromShearingLootTable(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/item/ItemStack;Ljava/util/function/BiConsumer;)V"))
+    private void banner$forceDropOn(ServerLevel serverLevel, SoundSource soundSource, ItemStack itemStack, CallbackInfo ci) {
         this.banner$setForceDrops(true);
     }
 
-    @Inject(method = "shear", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/animal/SnowGolem;spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;"))
-    private void banner$forceDropOff(SoundSource pCategory, CallbackInfo ci) {
+    @Inject(method = "shear", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/animal/SnowGolem;dropFromShearingLootTable(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/item/ItemStack;Ljava/util/function/BiConsumer;)V"))
+    private void banner$forceDropOff(ServerLevel serverLevel, SoundSource soundSource, ItemStack itemStack, CallbackInfo ci) {
         this.banner$setForceDrops(false);
     }
 }

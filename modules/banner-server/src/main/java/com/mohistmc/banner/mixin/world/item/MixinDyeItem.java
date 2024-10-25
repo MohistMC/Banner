@@ -16,13 +16,15 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-
+import org.spongepowered.asm.mixin.injection.Redirect;
+// Banner TODO fixme
 @Mixin(DyeItem.class)
 public class MixinDyeItem {
 
     @Shadow @Final private DyeColor dyeColor;
 
-    @Decorate(method = "interactLivingEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/Sheep;setColor(Lnet/minecraft/world/item/DyeColor;)V"))
+    /*
+    @Redirect(method = "interactLivingEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/Sheep;setColor(Lnet/minecraft/world/item/DyeColor;)V"))
     private void banner$sheepDyeWool(net.minecraft.world.entity.animal.Sheep sheepEntity, DyeColor color, ItemStack stack, Player playerIn, LivingEntity target, InteractionHand hand) throws Throwable {
         byte bColor = (byte) this.dyeColor.getId();
         SheepDyeWoolEvent event = new SheepDyeWoolEvent((org.bukkit.entity.Sheep) target.getBukkitEntity(), org.bukkit.DyeColor.getByWoolData(bColor), ((ServerPlayer) playerIn).getBukkitEntity());
@@ -34,5 +36,5 @@ public class MixinDyeItem {
             DecorationOps.callsite().invoke(sheepEntity, DyeColor.byId(event.getColor().getWoolData()));
         }
         DecorationOps.blackhole().invoke();
-    }
+    }*/
 }

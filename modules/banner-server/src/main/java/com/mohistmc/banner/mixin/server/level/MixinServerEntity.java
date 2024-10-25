@@ -96,13 +96,12 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
         return null;
     }
 
-    @Shadow private int lastSentXRot;
-    @Shadow private int lastSentYRot;
-    @Shadow private Vec3 lastSentMovement;
-    @Shadow private int lastSentYHeadRot;
-
     @Shadow protected abstract void handleMinecartPosRot(NewMinecartBehavior newMinecartBehavior, byte b, byte c, boolean bl);
 
+    @Shadow private byte lastSentYRot;
+    @Shadow private byte lastSentXRot;
+    @Shadow private Vec3 lastSentMovement;
+    @Shadow private byte lastSentYHeadRot;
     private Set<ServerPlayerConnection> trackedPlayers;
     @Unique private int lastTick;
     @Unique private int lastUpdate, lastPosUpdate, lastMapUpdate;
@@ -326,7 +325,6 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
             return;
         }
         Packet<ClientGamePacketListener> packet = this.entity.getAddEntityPacket(((ServerEntity) (Object) this));
-        this.lastSentYHeadRot = Mth.floor(this.entity.getYHeadRot() * 256.0f / 360.0f);
         consumer.accept(packet);
         if (this.trackedDataValues != null) {
             consumer.accept(new ClientboundSetEntityDataPacket(this.entity.getId(), this.trackedDataValues));
@@ -359,7 +357,6 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
                 consumer.accept(new ClientboundSetEquipmentPacket(this.entity.getId(), list));
             }
         }
-        this.lastSentYHeadRot = Mth.floor(this.entity.getYHeadRot() * 256.0f / 360.0f);
         consumer.accept(new ClientboundRotateHeadPacket(this.entity, (byte) this.lastSentYHeadRot));
         if (this.entity instanceof LivingEntity livingEntity) {
             for (MobEffectInstance mobeffect : livingEntity.getActiveEffects()) {

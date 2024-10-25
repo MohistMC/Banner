@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+// Banner TODO fixme
 @Mixin(AbstractBoat.class)
 public abstract class MixinAbstractBoat extends VehicleEntity implements InjectionAbstractBoat {
 
@@ -46,6 +47,7 @@ public abstract class MixinAbstractBoat extends VehicleEntity implements Injecti
         }
     }
 
+    /*
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/Boat;tickBubbleColumn()V"))
     private void banner$updateVehicle(CallbackInfo ci) {
         org.bukkit.World bworld = this.level().getWorld();
@@ -69,7 +71,7 @@ public abstract class MixinAbstractBoat extends VehicleEntity implements Injecti
         } else {
             return true;
         }
-    }
+    }*/
 
     @Override
     public double bridge$maxSpeed() {

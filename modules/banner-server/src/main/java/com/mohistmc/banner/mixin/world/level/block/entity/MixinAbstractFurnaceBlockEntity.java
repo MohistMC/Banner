@@ -1,15 +1,15 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
 import com.mohistmc.banner.injection.world.level.block.entity.InjectionAbstractFurnaceBlockEntity;
-import io.izzel.arclight.mixin.Eject;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+
+import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.WorldlyContainer;
@@ -18,12 +18,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.RecipeCraftingHolder;
 import net.minecraft.world.inventory.StackedContentsCompatible;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.AbstractCookingRecipe;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -33,18 +30,13 @@ import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.craftbukkit.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
-import org.bukkit.event.inventory.FurnaceSmeltEvent;
-import org.bukkit.inventory.CookingRecipe;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -57,12 +49,14 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
 
     // @formatter:off
     @Shadow protected NonNullList<ItemStack> items;
-    @Shadow  protected abstract int getBurnDuration(FuelValues fuelValues, ItemStack itemStack);
-    @Shadow protected abstract boolean isLit();
-    @Shadow @Final private Object2IntOpenHashMap<ResourceLocation> recipesUsed;
+    @Shadow   public abstract int getBurnDuration(FuelValues fuelValues, ItemStack itemStack);
+    @Shadow  public abstract boolean isLit();
     @Shadow public abstract List<RecipeHolder<?>> getRecipesToAwardAndPopExperience(ServerLevel p_154996_, Vec3 p_154997_);
     // @formatter:on
 
+    @Shadow @Nullable public abstract RecipeHolder<?> getRecipeUsed();
+
+    @Shadow @Final public Reference2IntOpenHashMap<ResourceKey<Recipe<?>>> recipesUsed;
     public List<HumanEntity> transaction = new ArrayList<>();
     private int maxStack = MAX_STACK;
     private static AbstractFurnaceBlockEntity banner$captureFurnace;
@@ -199,7 +193,7 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
             banner$capturePlayer = entity;
             List<RecipeHolder<?>> list = this.getRecipesToAwardAndPopExperience(world, vec);
             entity.awardRecipes(list);
-            this.recipesUsed.clear();
+            this.getRecipesUsed().clear();
             return list;
         } finally {
             banner$item = null;
@@ -250,7 +244,7 @@ public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlock
     }
 
     @Override
-    public Object2IntOpenHashMap<ResourceLocation> getRecipesUsed() {
+    public Reference2IntOpenHashMap<ResourceKey<Recipe<?>>> getRecipesUsed() {
         return this.recipesUsed;
     }
 }

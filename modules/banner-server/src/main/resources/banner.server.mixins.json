@@ -195,7 +195,6 @@
     "world.entity.animal.MixinRabbit",
     "world.entity.animal.MixinRabbit_RaidGardenGoal",
     "world.entity.animal.MixinSheep",
-    "world.entity.animal.MixinSheep1",
     "world.entity.animal.MixinSniffer",
     "world.entity.animal.MixinSnowGolem",
     "world.entity.animal.MixinTurtle",

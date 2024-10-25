@@ -99,7 +99,7 @@ public abstract class MixinBeehiveBlockEntity extends BlockEntity implements Inj
         }
     }
 
-    @Redirect(method = "releaseOccupant", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isNight()Z"))
+    @Redirect(method = "releaseOccupant", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/Bee;isNightOrRaining(Lnet/minecraft/world/level/Level;)Z"))
     private static boolean banner$bypassNightCheck(Level world) {
         return !banner$force && world.isNight();
     }

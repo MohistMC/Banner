@@ -40,7 +40,7 @@ import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Explosion.class)
-public abstract class MixinExplosion implements InjectionExplosion {
+public abstract interface MixinExplosion extends InjectionExplosion {
     // Banner TODO fixme
     /*
     @Shadow @Final private DamageSource damageSource;
@@ -51,11 +51,12 @@ public abstract class MixinExplosion implements InjectionExplosion {
         this.yield = this.blockInteraction == Explosion.BlockInteraction.DESTROY_WITH_DECAY ? 1.0F / this.radius : 1.0F;
     }*/
 
-    public boolean wasCanceled = false; // CraftBukkit - add field
-    public float yield;
+    /*
+    boolean wasCanceled = false; // CraftBukkit - add field
+    public float yield = 0;
 
     @Override
-    public float bridge$getYield() {
+    public default float bridge$getYield() {
         return yield;
     }
 
@@ -120,13 +121,14 @@ public abstract class MixinExplosion implements InjectionExplosion {
         if (stack.isEmpty()) ci.cancel();
     }*/
 
+    /*
     @Override
-    public boolean bridge$wasCanceled() {
+    public default boolean bridge$wasCanceled() {
         return wasCanceled;
     }
 
     @Override
-    public void banner$setWasCanceled(boolean wasCanceled) {
+    public default void banner$setWasCanceled(boolean wasCanceled) {
         this.wasCanceled = wasCanceled;
-    }
+    }*/
 }

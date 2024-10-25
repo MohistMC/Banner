@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Pseudo
-@Mixin(targets = "com.sk89q.worldedit.fabric.FabricWorldEdit")
+@Mixin(targets = "com.sk89q.worldedit.fabric.FabricWorldEdit", remap = false)
 public abstract class MixinFabricWorldEdit {
 
     @Shadow protected abstract void setupRegistries(MinecraftServer server);

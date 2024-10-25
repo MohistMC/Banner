@@ -9,7 +9,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FireBlock;
@@ -29,6 +30,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(FireBlock.class)
 public abstract class MixinFireBlock implements InjectionFireBlock {
@@ -89,21 +92,22 @@ public abstract class MixinFireBlock implements InjectionFireBlock {
         }
     }
 
-    @Redirect(method = "updateShape", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;defaultBlockState()Lnet/minecraft/world/level/block/state/BlockState;"))
-    public BlockState banner$blockFade(net.minecraft.world.level.block.Block block, BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
+    /*
+    @Inject(method = "updateShape", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;defaultBlockState()Lnet/minecraft/world/level/block/state/BlockState;"), locals = LocalCapture.CAPTURE_FAILHARD)
+    public void banner$blockFade(BlockState blockState, LevelReader levelReader, ScheduledTickAccess scheduledTickAccess, BlockPos blockPos, Direction direction, BlockPos blockPos2, BlockState blockState2, RandomSource randomSource, CallbackInfoReturnable<BlockState> cir) {
         if (!(worldIn instanceof Level)) {
             return Blocks.AIR.defaultBlockState();
         }
-        CraftBlockState blockState = CraftBlockStates.getBlockState(worldIn, currentPos);
+        CraftBlockState blockState = CraftBlockStates.getBlockState(levelReader, blockPos);
         blockState.setData(Blocks.AIR.defaultBlockState());
         BlockFadeEvent event = new BlockFadeEvent(blockState.getBlock(), blockState);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
-            return this.getStateForPlacement(worldIn, currentPos).setValue(FireBlock.AGE, stateIn.getValue(FireBlock.AGE));
+            return this.getStateForPlacement(worldIn, blockPos).setValue(FireBlock.AGE, stateIn.getValue(FireBlock.AGE));
         } else {
             return blockState.getHandle();
         }
-    }
+    }*/
 
     @Override
     public boolean bridge$canBurn(Block block) {

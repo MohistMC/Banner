@@ -19,7 +19,7 @@ public abstract class MixinSniffer extends Animal {
         super(entityType, level);
     }
 
-    @Redirect(method = "dropSeed", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    @Redirect(method = "method_64178", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
     private boolean banner$dropSeed(ServerLevel instance, Entity entity) {
         EntityDropItemEvent event = new EntityDropItemEvent(this.getBukkitEntity(), (Item) (entity).getBukkitEntity());
         instance.getCraftServer().getPluginManager().callEvent(event);
