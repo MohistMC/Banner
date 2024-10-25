@@ -16,7 +16,7 @@ public abstract class MixinTadpole {
 
     @Shadow protected abstract void setAge(int i);
 
-    @Inject(method = "ageUp()V",
+    @Inject(method = "method_63651",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/animal/frog/Frog;fudgePositionAfterSizeChange(Lnet/minecraft/world/entity/EntityDimensions;)Z")
     )
@@ -27,8 +27,9 @@ public abstract class MixinTadpole {
         }
     }
 
-    @Inject(method = "ageUp()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/frog/Tadpole;discard()V"))
+    /*
+    @Inject(method = "method_63651", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/frog/Tadpole;discard()V"))
     private void banner$pushRemoveReason(CallbackInfo ci, @Local Frog frog) {
         frog.pushRemoveCause(EntityRemoveEvent.Cause.TRANSFORMATION);
-    }
+    }*/
 }
